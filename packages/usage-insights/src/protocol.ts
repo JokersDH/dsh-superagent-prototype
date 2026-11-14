@@ -414,6 +414,23 @@ export const UsageInsightsAnalysisSchema = z.strictObject({
 })
 export type UsageInsightsAnalysis = z.infer<typeof UsageInsightsAnalysisSchema>
 
+/**
+ * Compatibility policy for consumers.
+ *
+ * `usage-insights/1` is additive-only: a new field may appear, an existing field keeps its meaning and
+ * type, and no field is ever defaulted to `0` to keep an old consumer compiling. A consumer must treat
+ * `null` as unknown, because that is exactly what it means here.
+ */
+export const USAGE_INSIGHTS_COMPATIBILITY = {
+  protocol: 'usage-insights/1',
+  analysisProtocol: 'usage-insights-analysis/1',
+  inputProtocol: 'usage-insights-input/1',
+  baselineProtocol: 'operator-baseline/1',
+  changePolicy: 'additive-only',
+  nullPolicy: 'null-means-unknown-never-zero',
+  authority: 'none',
+} as const
+
 /** Re-exported contract surfaces the module reads, so consumers bind to one identity. */
 export const RecordSchemas = {
   outcome: ExecutionOutcomeSchema,

@@ -480,6 +480,10 @@ try {
   } else if (error?.code === 'source_unavailable') {
     process.stderr.write(`source_unavailable: ${error.message}\n`)
     process.exitCode = EXIT.unavailable
+  } else if (['EACCES', 'EPERM', 'ENOSPC', 'EROFS', 'EDQUOT'].includes(error?.code)) {
+    const label = error.code === 'ENOSPC' ? 'no space left for the output' : 'the output path is not writable'
+    process.stderr.write(`output_unavailable: ${label}\n`)
+    process.exitCode = EXIT.unavailable
   } else if (error?.name === 'UsageInsightsFault') {
     process.stderr.write(`${error.code}: ${error.message}\n`)
     process.exitCode = error.code === 'invalid_input' || error.code === 'invalid_argument' ? EXIT.usage : EXIT.unavailable

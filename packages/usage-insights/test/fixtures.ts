@@ -87,7 +87,7 @@ export function makeOutcome(options: OutcomeOptions): ExecutionOutcome {
     ...(options.durationMs === undefined ? {} : { durationMs: options.durationMs }),
     observedAt: options.observedAt ?? '2026-11-13T10:00:01.000Z',
     ...(reviewTiming ? { reviewTiming } : {}),
-  } as ExecutionOutcome
+  } as unknown as ExecutionOutcome
 }
 
 export interface EntryOptions { at?: string; kind: string; sourceRef: string; detail?: unknown }
@@ -109,7 +109,7 @@ export function makeWorkEvidence(workId: string, entries: EntryOptions[], option
     })),
     outcomes: options.outcomes ?? [],
     truncated: options.truncated ?? false,
-  } as WorkEvidence
+  } as unknown as WorkEvidence
 }
 
 export function makeHistory(workId: string, contract: { workId: string; revision: number; digest: string },
@@ -130,7 +130,7 @@ export function makeHistory(workId: string, contract: { workId: string; revision
     ...(options.nextCursor ? { nextCursor: options.nextCursor } : {}),
     window,
     sourcesCapped: window === 'storage_cap' ? ['outcomes'] : [],
-  } as WorkEvidenceHistory
+  } as unknown as WorkEvidenceHistory
 }
 
 export function makeAttentionPage(options: {
@@ -151,7 +151,7 @@ export function makeAttentionPage(options: {
     questionCoverage: options.questionCoverage ?? 'complete',
     hasMore: options.hasMore ?? false,
     ...(options.nextCursor ? { nextCursor: options.nextCursor } : {}),
-  } as AttentionPage
+  } as unknown as AttentionPage
 }
 
 const WINDOW = { from: '2026-11-13T00:00:00.000Z', to: '2026-11-14T00:00:00.000Z' }

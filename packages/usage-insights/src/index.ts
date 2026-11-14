@@ -39,6 +39,7 @@ export {
   UsageInsightsAnalysisSchema,
   UsageInsightsInputSchema,
   UsageInsightsSummarySchema,
+  USAGE_INSIGHTS_COMPATIBILITY,
 } from './protocol.ts'
 export type {
   Aggregation,
@@ -76,3 +77,5 @@ export { attentionSummary } from './attention.ts'
 export { interventionMetrics, metricRow, outcomeMetrics, workInterventions } from './metrics.ts'
 export { outcomeSubject, parseAttentionPages, parseOutcomes, parseWorkRecords } from './subject.ts'
 export { renderMarkdown, renderTerminal, safeText } from './report.ts'
+export { metricRowKey, observedOutcomeCount, toInsightConsumerView } from './facing.ts'
+export type { ConsumerViewOptions, InsightConsumerMetric, InsightConsumerView } from './facing.ts'

@@ -3,6 +3,7 @@
  * is escaped before it reaches Markdown, so a work title, path or note can never inject markup, a
  * link or an execution instruction into the report. Numbers are rendered from the summary only.
  */
+import { METRIC_DEFINITIONS } from './protocol.ts'
 import type { MetricRow, UsageInsightsAnalysis, UsageInsightsSummary } from './protocol.ts'
 
 const MAX_TEXT = 512
@@ -93,6 +94,27 @@ export function renderMarkdown(analysis: UsageInsightsAnalysis): string {
   lines.push('')
   lines.push('A dash means the value was not observed; the missing-reason column says why. Unknown counts stay separate and are never filled with zero.')
   lines.push('')
+  const used = [...new Set(summary.metrics.map(row => row.metricId))].sort()
+  if (used.length) {
+    lines.push('### How each metric is computed')
+    lines.push('')
+    for (const metricId of used) {
+      const definition = METRIC_DEFINITIONS[metricId]
+      lines.push(`- \`${metricId}\` (${definition.unit}, ${definition.aggregation}, ${definition.scope === 'outcome' ? 'per evidence layer' : 'product records'}): ${safeText(definition.definition)}`)
+    }
+    lines.push('')
+    lines.push('### Record-level provenance')
+    lines.push('')
+    lines.push('Identifiers only: they point back to the product records this observation counted. Titles, prompts and payloads are never copied into a report.')
+    lines.push('')
+    for (const row of summary.metrics) {
+      const refs = row.provenanceRefs
+      const shown = refs.slice(0, 5).map(safeText).join(', ')
+      const more = refs.length > 5 ? ` … (+${refs.length - 5})` : ''
+      lines.push(`- ${row.metricId}${row.layer ? ` · ${row.layer}` : ''}${row.currency ? ` · ${row.currency}` : ''}: ${refs.length === 0 ? 'no record reference (count derived from the declared window)' : `${shown}${more}`}`)
+    }
+    lines.push('')
+  }
   lines.push('## Projects')
   lines.push('')
   if (summary.projects.length === 0) lines.push('_No project was declared._')
@@ -155,6 +177,18 @@ export function renderMarkdown(analysis: UsageInsightsAnalysis): string {
     for (const entry of summary.quarantine.byCode) lines.push(`| ${entry.code} | ${entry.records} |`)
   }
   lines.push('')
+  if (analysis.subjects.length) {
+    lines.push('## Observed subjects')
+    lines.push('')
+    lines.push('| Subject | Project | Work | Attempt | Layer | Status | Reasons |')
+    lines.push('| --- | --- | --- | --- | --- | --- | --- |')
+    for (const subject of analysis.subjects.slice(0, 50)) {
+      lines.push(`| ${subject.subjectKey.slice(0, 12)} | ${safeText(subject.projectId)} | ${safeText(subject.workId)} | ${subject.attemptId ? safeText(subject.attemptId) : '—'} | ${subject.layer} | ${subject.status} | ${subject.reasons.length ? subject.reasons.map(safeText).join(', ') : '—'} |`)
+    }
+    if (analysis.subjects.length > 50) lines.push('')
+    if (analysis.subjects.length > 50) lines.push(`_${analysis.subjects.length - 50} further subject(s) are available through the JSON analysis._`)
+    lines.push('')
+  }
   lines.push('## Limitations')
   lines.push('')
   for (const limitation of summary.limitations) lines.push(`- ${safeText(limitation)}`)

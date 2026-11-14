@@ -4,7 +4,7 @@
  */
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
-import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, statSync, symlinkSync, writeFileSync } from 'node:fs'
+import { chmodSync, copyFileSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, statSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
@@ -149,4 +149,45 @@ test('a copied fixture stays byte-identical after a read-only analysis', () => {
   assert.equal(result.status, 0)
   assert.deepEqual(readFileSync(copy), before)
   mkdirSync(join(directory, 'unused'))
+})
+
+test('an unwritable destination fails explicitly and leaves no temporary file', () => {
+  const directory = workspace()
+  const locked = join(directory, 'locked')
+  mkdirSync(locked, { mode: 0o500 })
+  const result = run(['report', '--input', complete, '--out', join(locked, 'report.md')])
+  assert.equal(result.status, 5)
+  assert.ok(result.stderr.includes('output_unavailable'))
+  assert.deepEqual(readdirSync(locked), [])
+  chmodSync(locked, 0o700)
+
+  const target = join(directory, 'taken.md')
+  writeFileSync(target, 'existing')
+  const conflict = run(['report', '--input', complete, '--out', target])
+  assert.equal(conflict.status, 5)
+  const leftovers = readdirSync(directory).filter(name => name.startsWith('.usage-insights-'))
+  assert.deepEqual(leftovers, [], 'a refused write must not leave a temporary file behind')
+  assert.equal(readFileSync(target, 'utf8'), 'existing')
+})
+
+test('hostile operator notes are escaped in the report', () => {
+  const directory = workspace()
+  const baselineBody = JSON.parse(readFileSync(baseline, 'utf8'))
+  baselineBody.operatorNote = '<img src=x onerror=alert(1)> | `curl evil` ## heading'
+  const hostile = join(directory, 'baseline.json')
+  writeFileSync(hostile, JSON.stringify(baselineBody))
+  const target = join(directory, 'report.md')
+  const result = run(['report', '--input', complete, '--baseline', hostile, '--out', target])
+  assert.equal(result.status, 0)
+  const content = readFileSync(target, 'utf8')
+  // Escaping keeps the characters but neutralizes them: inside the operator line every `<` and
+  // backtick must be preceded by a backslash, so no tag or code span can be produced.
+  const noteLine = content.split('\n').find(line => line.startsWith('Operator note'))
+  assert.ok(noteLine, 'the operator note is rendered as its own line')
+  assert.equal(/(?<!\\)</.test(noteLine), false, 'no unescaped angle bracket in operator text')
+  assert.equal(/(?<!\\)`/.test(noteLine), false, 'no unescaped backtick in operator text')
+  assert.equal(content.split('\n').some(line => line.trimStart().startsWith('## heading')), false,
+    'operator text can never become a heading')
+  assert.ok(noteLine.includes('\\<img'), 'the hostile tag is present but escaped')
+  assert.ok(content.includes('observational only') || content.includes('observational'))
 })

@@ -231,10 +231,11 @@ test('a malformed record is quarantined while valid records are still analysed',
 
 test('the envelope itself is strict: unknown fields and bad windows are refused', () => {
   const bundle = completeBundle() as unknown as Record<string, unknown>
-  assert.throws(() => analyzeUsageInsights({ ...bundle, extra: true }), error => error.name === 'UsageInsightsFault')
-  assert.throws(() => analyzeUsageInsights({ ...bundle, window: { from: '2026-11-14T00:00:00.000Z', to: '2026-11-13T00:00:00.000Z' } }),
-    error => error.name === 'UsageInsightsFault')
-  assert.throws(() => analyzeUsageInsights({ ...bundle, timezone: 'Mars/Olympus' }), error => error.message.includes('time zone'))
+  const isFault = (error: unknown) => (error as { name?: string }).name === 'UsageInsightsFault'
+  assert.throws(() => analyzeUsageInsights({ ...bundle, extra: true }), isFault)
+  assert.throws(() => analyzeUsageInsights({ ...bundle, window: { from: '2026-11-14T00:00:00.000Z', to: '2026-11-13T00:00:00.000Z' } }), isFault)
+  assert.throws(() => analyzeUsageInsights({ ...bundle, timezone: 'Mars/Olympus' }),
+    error => (error as Error).message.includes('time zone'))
 })
 
 test('reports escape untrusted text and state unknown explicitly', () => {
