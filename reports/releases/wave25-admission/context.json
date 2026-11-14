@@ -1,0 +1,188 @@
+{
+  "protocol": "wave25-ac-admission/1",
+  "date": "2026-11-14",
+  "status": "PASS_SCOPED_MANIFEST_AND_RESTORE_PACKAGE_IDENTITY_NEGATIVES_REMAIN",
+  "fixedSources": {
+    "mainDispatch": "4e805dedadb1163f488df8888f610d41d444c8bd",
+    "A": "e60e130029f377edb3b02a2c8762c3d990016004",
+    "C": "d9ada879226c3b72f84f59b48adac7f107ccac80"
+  },
+  "worktrees": {
+    "A": "/Users/hh/Desktop/joker/superagent-agent-a",
+    "C": "/Users/hh/Desktop/joker/superagent-agent-c",
+    "dirtyBeforeAndAfter": { "A": [], "C": ["pnpm-lock.yaml"] },
+    "sourceFilesEditedByReview": false
+  },
+  "executed": [
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "command": "node --test packages/workflows/test/wave23-process-reader.case.ts packages/workflows/test/wave24-subject-consistency.case.ts",
+      "exitCode": 0,
+      "tests": 2,
+      "passed": 2,
+      "scope": "Different Node PID verifies independently supplied original expectation; actual two-Work question/answer and subject mixing refused; recomputed-digest deletion/empty/foreign/duplicate manifest controls refused; synchronous UoW plus injected payload-window source change refusal; explicit observation/command/payload limits"
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "command": "node --test packages/knowledge/test/main-personal-a-manifest.case.ts packages/knowledge/test/main-personal-restore-formats.case.ts packages/knowledge/test/wave23-driver-lib.case.ts",
+      "exitCode": 0,
+      "tests": 9,
+      "passed": 9,
+      "durationMs": 16970,
+      "scope": "C actually invokes exact A manifest source and independent A reader on C's real same-Store business/context chain; two separate v1/v2 snapshots each wrapped in a real portability bundle, restored to their own root and read by source driver; seven bounded primitive/cleanup-result cases. This is not one manifest-driven installed workflow."
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "command": "pnpm --filter @personal-agent/workflows typecheck",
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "command": "pnpm --filter @personal-agent/context --filter @personal-agent/knowledge typecheck",
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "command": "node /tmp/pa-wave25-ac-audit-Ojd8bm/probe-c-package-identity.mjs",
+      "exitCode": 0,
+      "positiveCases": 1,
+      "negativeMutations": 2,
+      "correctNegativeRefusals": 0,
+      "report": "/tmp/pa-wave25-ac-audit-Ojd8bm/c-identity-results.json",
+      "scope": "Private owned mock CLI/HTTP/worker processes only: complete identity positive; unique omitted launcher PID and omitted API processStart both still return verified-flow/verified true. Each exact spawned worker is stopped and awaited by the probe."
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "command": "node --experimental-strip-types /tmp/pa-wave25-ac-audit-Ojd8bm/probe-c-exact-package.ts",
+      "exitCode": 0,
+      "positiveCases": 1,
+      "report": "/tmp/pa-wave25-ac-audit-Ojd8bm/exact-package-02/result.json",
+      "scope": "Verified immutable0ede tar, private first-run and exact package fresh readonly start via current C driver; real original Work/delivery/source reads, descriptor hash, PID/start/API identity and verified stop corroborated; independent status STOPPED; local mock provider2 before/2 after. Only a v1 restored-source-helper positive, not dual-version package, A manifest consumer, newUI, upgrade or native admission.",
+      "harnessCalibration": "Initial private helper treated valid STOPPED/exit2 as a thrown command failure before starting a driver. Corrected its own structured status parsing and used a new private root; this was not a product failure. Initial root remains preserved."
+    }
+  ],
+  "previousFindingsClosed": [
+    {
+      "id": "A-MANIFEST-QUESTION-ANSWER-NOT-BOUND-TO-ATTEMPT",
+      "closedScope": "Actual two-Work test now binds question target and expected attempt/ticket/assignment/contract/epoch, answer and required deliveries. Independent expectation, not the supplied manifest, drives verification."
+    },
+    {
+      "id": "A-MANIFEST-EXPECTED-REQUIRED-SET-UNBOUND",
+      "closedScope": "Required commands/dispatch/targets/observations are externally expected; missing/empty/duplicate/foreign or recomputed digest omission is refused in submitted actual tests and C's real A-module test. This is integrity for a trusted producer expectation, not a new authorization authority."
+    },
+    {
+      "id": "A-UOW-COST-AND-PRODUCER-SCOPE",
+      "closedScope": "Indexes are read in synchronous uow.atomic, bytes outside the transaction, then the subject/source is re-read and compared. Injected source mutation and explicit command/observation/payload byte bounds refuse. Existing independent Node reader pass remains; no physical writer-stop claim is made."
+    },
+    {
+      "id": "C-CLEANUP-FAILURE-DOES-NOT-FAIL-FLOW",
+      "closedScope": "applyCleanupOutcome now turns owned unverified stop into failed/verified false; primitive positive/failure/reuse/keep controls pass. Actual exact0ede fresh package stop also independently reports STOPPED. No generalized all-fault lifecycle admission is inferred."
+    },
+    {
+      "id": "C-PACKAGE-ENTRY-HASH-IGNORES-ACTUAL-PA-OVERRIDE",
+      "closedScope": "Default actual0ede package entry and descriptor/report hashes agree in the independently rerun positive. A descriptor hash guard now fails rather than silently accepting a different reported hash. Nondefault override reporting still needs the functional alignment described below."
+    }
+  ],
+  "admittedScopes": {
+    "ATrustedExpectationManifestSubjectAndCollections": true,
+    "ASynchronousUowAndPayloadPrePostGuard": true,
+    "ABoundedPositiveAndRefusals": true,
+    "AIndependentNodeReader": true,
+    "CActuallyInvokesAProducerModuleAndReader": true,
+    "CIndependentV1V2ActualBundleRestoreSourceConsumers": true,
+    "CExact0edeFreshPackageReadonlyAndVerifiedStop": true,
+    "CGenericPackageIdentityNegativeGate": false,
+    "AManifestConsumedBySingleHttpDriver": false,
+    "BothFormatsThroughSameExactPackage": false,
+    "InstalledReleaseOfCurrentMainUi": false,
+    "BusinessRecovery": false,
+    "PrivatePermissionOrTarget": false
+  },
+  "findings": [
+    {
+      "id": "C-PACKAGE-MISSING-PROCESS-IDENTITY-STILL-ACCEPTED",
+      "priority": "P2",
+      "continuationOf": "wave24 C-PACKAGE-MISSING-PROCESS-IDENTITY-ACCEPTED",
+      "file": "packages/context/tools/personal-review-driver.mjs",
+      "line": 276,
+      "detail": "A missing launcher PID is still not refused: process.kill(pid,0) is conditional on typeof pid==='number' without an else. apiPid/apiProcessStart are copied to output but never required; checks.some(...) also admits an empty checks collection. With a complete private package protocol positive, uniquely omitting pid returns verified-flow/verified:true/identity.recordPid:null/bound:true; uniquely omitting apiProcessStart also returns verified true. Cleanup even reports stopped when packageRecord.pid is missing because its alive flag initializes false.",
+      "scope": "C's new package verification tool only. It does not erase the independently observed complete exact0ede positive, reject the product's existing package identity implementation or demonstrate a main permission bypass.",
+      "next": "Require the complete existing package instance observation set, fail closed on absent PID/start/API/root/config/operation observations, and correlate current status/health with the same exact consumer. Add independent complete positive plus each omitted-field mutation through the actual driver."
+    }
+  ],
+  "remainingDeliveryGaps": [
+    {
+      "id": "AC-MANIFEST-AND-HTTP-CONSUMER-ARE-SEPARATE-FLOWS",
+      "detail": "C now has real A-module build/verify and a separate A reader test, which is useful actual composition and closes the old no-consumer-call claim. However personal-review-driver.mjs has no manifest/expectation input and does not invoke that wrapper; package-install and restore-formats tests do not read the A manifest. The three passing paths are not yet one manifest-driven producer->snapshot->restore->actual HTTP consumer chain."
+    },
+    {
+      "id": "C-DUAL-RESTORE-IS-SOURCE-NOT-SAME-PACKAGE",
+      "detail": "Both snapshots now independently pass real createBundle/restoreBundle and source consumer reads, rather than hand-written markers. Exact0ede package evidence is a separate v1 readonly start flow. No two-format same-package restore consumer evidence is yet established, and later main UI bytes are not in0ede."
+    },
+    {
+      "id": "C-NONDEFAULT-PA-OVERRIDE-REPORTING-FAILS-CLOSED",
+      "detail": "Execution and cleanup use descriptor.entry, but collectEntries still derives default pa/review/start paths instead of descriptor.entry. The final descriptor_mismatch guard prevents a silent false pass if hashes differ; it also prevents a legitimate different --pa-entry from completing. Preserve the new fail-closed behavior while reporting the actual descriptor consistently."
+    },
+    {
+      "id": "C-GLOBAL-DEADLINE-ALL-FAULTS-NOT-MEASURED",
+      "detail": "Preparation/identity timeouts are now clipped toward the working budget, and HTTP abort plus cleanup outcome controls pass. The package stop wait still has a fixed up-to30x100ms PID loop and source stopChild retains its independent kill grace; this review did not run an all-stage elapsed-time fault matrix. Do not turn the actual short positive into a universal global-deadline guarantee."
+    },
+    {
+      "id": "AB-RECOVERED-RESULT-LANDING",
+      "detail": "A continues to mark B result landing NOT_REACHED pending actual main-admitted same-Runner attachment. No new attempt/question/answer grant, ledger or receipt-only substitute was added. B's current implementation and admission must be assessed independently by its reviewer."
+    }
+  ],
+  "minimalMainIntegration": {
+    "AOptionalDataOnlySlice": [
+      "packages/workflows/src/data-manifest.ts",
+      "packages/workflows/src/index.ts manifest exports",
+      "packages/workflows/test/fixtures/wave23-reader.mjs",
+      "packages/workflows/test/wave23-process-reader.case.ts",
+      "packages/workflows/test/wave24-subject-consistency.case.ts"
+    ],
+    "AAdmissionBoundary": "A trusted-expectation data integrity/helper slice can be considered for a real main consumer after current-source strict consumer checks. It remains data-only, not send authorization, physical quiescence or portable grant. No new migration is required.",
+    "CProductionSourceRequiredNow": [],
+    "CUsefulInputs": ["packages/context/reports/wave24-ui-input.json", "packages/context/docs/WAVE24-RECIPE.md"],
+    "CDriverScope": "Development tooling positive and actual package evidence are reusable in their precise scopes. Do not use its package verified flag as the independent required identity gate until omission negatives are closed.",
+    "ordinaryProductIndependentOfBlockedStudy": true
+  },
+  "nextWholePackages": {
+    "A": "Finish the real typed producer/expectation handoff into the single C driver, original-root to actual restored-root mapping and two formats on the same data. Supply original-ID B result landing only after main admission; preserve current subject/UoW/bounds tests rather than repackaging old repairs.",
+    "C": "Finish complete package identity omission refusal and truthful descriptor path support, then actually consume A's producer/expectation manifest in one exact-package HTTP workflow with two independent snapshot restores and bounded failure cleanup. Keep source, old0ede, laterUI and installed verdicts separate."
+  },
+  "suggestedAdditionalOwners": [
+    {
+      "role": "F",
+      "wholeOutcome": "Internal-trial onboarding and ergonomic project-to-task-to-question-to-delivery journey",
+      "proposedNewPaths": ["apps/console/src/features/internal-trial/"],
+      "ownershipCondition": "Main explicitly delegates only this new UI subtree; main retains app composition, routing, API/SSE, shared styles/contracts and existing source diagnostic ownership. F uses existing public configuration/command/read transports.",
+      "acceptance": "A first-time colleague completes project selection, explicit task submission, pending-question response and human delivery review in a controlled real product journey; loading/empty/error/mobile/keyboard states work. No new execution authority or automatic acceptance."
+    },
+    {
+      "role": "G",
+      "wholeOutcome": "Redacted diagnostic export and reproducible internal support package",
+      "proposedNewPaths": ["packages/support-bundle/"],
+      "ownershipCondition": "New module uses supplied read-only facts/log/config metadata ports. It does not edit A/C data domains or D lifecycle/distribution; main/D integrate the one user command and UI entry after an early stable API.",
+      "acceptance": "One bounded support artifact binds observed product/artifact versions and error timeline, excludes credentials/tokens/raw personal content by default, has explicit unknowns and byte limits, and can be locally validated without stopping or modifying an instance."
+    },
+    {
+      "role": "H",
+      "wholeOutcome": "Reusable project task templates and explicit acceptance recipes",
+      "proposedNewPaths": ["packages/task-templates/", "examples/task-templates/"],
+      "ownershipCondition": "Pure versioned data/validation and candidate command preparation only; reuse existing shared command/profile/check references. No writes to C proposals/context, A persistence, B runtime or main command authority. Main composes final explicit confirmation.",
+      "acceptance": "Three practical templates such as fixing a failing test, adding a scoped interface and reviewing a frozen change produce complete validated scope/profile/check inputs. Missing capabilities refuse with clear reasons, edits remain reviewable, and confirmation still passes the original application authority."
+    }
+  ],
+  "preservation": {
+    "realVendorModelCalls": 0,
+    "nativeTurnStarts": 0,
+    "userServicesRestarted": false,
+    "globalSocketDiscovery": false,
+    "foreignCredentialsRead": false,
+    "mutatedAgentSource": false,
+    "allPrivateProbeSessionsCompleted": true,
+    "privateEvidenceRoot": "/tmp/pa-wave25-ac-audit-Ojd8bm",
+    "exactPackagePrivateStatusAfter": "STOPPED",
+    "releaseApproved": false
+  }
+}
