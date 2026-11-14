@@ -658,7 +658,8 @@ export function App({ transport }: { transport: ConsoleTransport }) {
   const projectName = projectFilter
     ? configuration?.projects.find(project => project.id === projectFilter)?.displayName ?? projectFilter
     : '个人工作区'
-  const trial = useTrialReadiness(transport, auth === 'ready' && workspaceView === 'trial')
+  const trialIdentity = useMemo(() => newId('trial-client'), [transport, auth])
+  const trial = useTrialReadiness(transport, { enabled: auth === 'ready' && workspaceView === 'trial', identity: trialIdentity })
   const openView = (view: typeof workspaceView) => {
     attentionNavigation.current += 1
     setWorkspaceView(view)
