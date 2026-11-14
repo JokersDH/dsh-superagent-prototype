@@ -130,11 +130,8 @@
       ]
     },
     "d5": {
-      "status": "PASS_WITH_DRIVER_LIMIT",
-      "summary": "Same Store tracks real Work/question/answer/attempt/native_applied and controlled SDK candidates; original IDs/digests asserted on second root. A/C independent parameterized driver is not in package; main HTTP consumer used and marked NOT_TESTED.",
-      "evidence": [
-        "same-store.json"
-      ]
+      "status": "NOT_TESTED",
+      "summary": "Same Store original Broker IDs and SDK candidates pass through main HTTP; A independent reader and C unique driver were not available in this package. A C package-dialect attempt on the exact restored target passed health/restoredReviewDigest but failed before source review (missing_history/sources404); recorded as NOT_TESTED, not an installed admission."
     },
     "d6": {
       "status": "PASS",
@@ -882,6 +879,9 @@
     "independentSnapshotRestores": {
       "steps": 4,
       "status": "PASS"
+    },
+    "cDriverAttempt": {
+      "status": "NOT_REACHED"
     }
   },
   "blockers": [
@@ -914,6 +914,12 @@
       "owner": "D/main",
       "status": "NOT_TESTED",
       "summary": "Zero real vendor/model/native turns."
+    },
+    {
+      "id": "A-C-DRIVER",
+      "owner": "A/C",
+      "status": "NOT_TESTED",
+      "summary": "C package driver source path did not reach actual source; A independent reader absent. Do not certify."
     }
   ],
   "eConsumption": [

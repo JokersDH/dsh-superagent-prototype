@@ -1,0 +1,50 @@
+{
+  "protocol": "wave24-a-c-driver-attempt/1",
+  "status": "NOT_REACHED",
+  "warning": "D must not certify A/C driver; C package driver was attempted on exact package-restored state with the frozen target. A independent reader entry was not present on this branch.",
+  "attempts": [
+    {
+      "when": "first",
+      "status": "failed",
+      "identity": {
+        "bound": true,
+        "digest": "f7af44a10ff518481ffb60a69eb19302f1388e38b5c127f6d08a0cb8fd64fa4b"
+      }
+    },
+    {
+      "when": "with-work-message",
+      "status": "failed",
+      "identity": {
+        "bound": true,
+        "digest": "629f186a3ed6ba7fa1948ac09c2884accf8d50a680118591d4d90ebe4a0d5cc8"
+      },
+      "lastAssertions": [
+        {
+          "name": "health.startupMode",
+          "expected": "recovery_readonly",
+          "actual": "recovery_readonly",
+          "ok": true
+        },
+        {
+          "name": "health.restoredReviewDigest",
+          "expected": "629f186a3ed6ba7fa1948ac09c2884accf8d50a680118591d4d90ebe4a0d5cc8",
+          "actual": "629f186a3ed6ba7fa1948ac09c2884accf8d50a680118591d4d90ebe4a0d5cc8",
+          "ok": true
+        },
+        {
+          "name": "history.httpStatus",
+          "expected": 200,
+          "actual": 200,
+          "ok": true
+        },
+        {
+          "name": "sources.httpStatus",
+          "expected": 200,
+          "actual": 404,
+          "ok": false
+        }
+      ]
+    }
+  ],
+  "interpretation": "C driver health/digest identity passed on the package-restored root, but source review did not reach an actual source; A reader was not available. This is NOT_TESTED for A/C composition and not an installed admission."
+}
