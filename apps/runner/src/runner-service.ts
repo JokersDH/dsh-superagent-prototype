@@ -281,7 +281,6 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
                 for (const entry of all) {
                   const frame = { seq: entry.seq, fact: entry.fact, payload: entry.payload }
                   const size = Buffer.byteLength(JSON.stringify(frame))
-                  if (frames.length > 0 && bytes + size > maxBytes) { done = false; break }
                   if (size > maxBytes) {
                     // Too large to inline. Emit a reference page instead of an oversized inline page, so
                     // the caller can discover the ref and fetch the payload in bounded chunks; the page

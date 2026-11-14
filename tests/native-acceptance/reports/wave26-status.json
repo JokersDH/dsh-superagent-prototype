@@ -1,0 +1,58 @@
+{
+  "wave": "product-wave-26",
+  "role": "B",
+  "branch": "codex/g1-runtime",
+  "checkpoint": "1 of 4",
+  "scopeNote": "Zero real vendor/model/native turns. Only B-owned paths. No second coordinator/ledger/lifecycle. Original main before-write guard, complete registration, proof and barrier untouched. Twelve services, all ledgers, two historical report diffs and untracked b16-real-begin.mjs preserved.",
+
+  "previouslyPassingKept": "large-first-frame ref discovery, foreign payload refusal, complete command tuple and 48KB clamp were already closed and are not re-dispatched",
+
+  "defectFixed": {
+    "intermediateChunkRejected": {
+      "before": "the length guard demanded length == total - offset, which only holds for the LAST chunk, so every legal intermediate chunk was refused and the 135540-byte replay regressed",
+      "after": "only bounds are enforced: offset + decodedBytes must not exceed total, and decoded bytes must not exceed the requested length. Intermediate chunks are legal again"
+    },
+    "largeFrameOrdering": {
+      "before": "a frame bigger than the budget closed the page before the size test, so it was only referenceable on a later page",
+      "after": "the size test runs first, so a large frame becomes a reference wherever it appears in the stream, including first"
+    }
+  },
+
+  "observedPositive": {
+    "harness": "tests/native-acceptance/b26-ref-payload.mjs",
+    "status": "4 PASS / 0 FAIL / 1 NOT_TESTED",
+    "cases": [
+      "B26-FIRST-PAGE-REFERENCE-DISCOVERY - the large frame returned as a reference with payloadBytes 135586 and a matching digest, and the page advanced seq 1,2,3 with no gap",
+      "B26-MULTI-CHUNK-PAYLOAD-MIDDLE-AND-LAST - five chunks covering all 135586 bytes, including intermediate chunks",
+      "B26-FULL-DIGEST-MATCH - reassembled payload reproduces the referenced SHA-256",
+      "B26-FOREIGN-PRODUCER-PAYLOAD-REFUSED - a foreign producer is refused with identity_mismatch",
+      "B26-SCOPE-NOT-NATIVE - no installed agent or gateway"
+    ],
+    "note": "decoded byte counts are asserted per chunk against the declared length, so the old base64-character unit error cannot hide here"
+  },
+
+  "strict": "direct strict + exactOptionalPropertyTypes compile of runner-service.ts and recovery-transport.ts exits 0",
+
+  "notDone": {
+    "milestone1_full": "NOT PASSED. facts->ref->payload continuity is now observed, but unified dispatch and the real rebind of fact-receipt ACK, payload read and native-write-admission onto the attach channel are still absent, and the same-Runner two-client handover has no passing proof",
+    "unifiedDispatch": "endpoint command path and original stdio path still not proven to share ONE dispatch",
+    "threeChannelRebind": "ACK, payload and write admission still belong to the original stdio channel",
+    "sameRunnerDualClient": "no passing A-disconnect/B-takeover proof",
+    "milestone2_sigkillRecovery": "NOT_REACHED",
+    "milestone3_recoveredVerifyAcceptSlots": "NOT_REACHED",
+    "milestone4_interfaceCompatFaults": "NOT_REACHED",
+    "RFC": "docs/rfcs/WP-03/0001-b-runner-business-attach.md exists and was corrected in wave-25; it is not yet re-issued for the reference-page and producer-bound payload behaviour added now"
+  },
+
+  "wholePackageComplete": false,
+  "budget": {
+    "grants": [{ "grantId": "wave03-b-native", "limit": 4, "attributionState": "UNVERIFIED", "remainder": "UNKNOWN", "maySendReal": false }],
+    "modelCallsThisWave": 0,
+    "nativeTurnsThisWave": 0
+  },
+  "limitations": [
+    "the observed positive runs against a controlled endpoint whose facts/payload backends are fixture-shaped, not the full product journal path",
+    "no coordinator SIGKILL recovery, no ACK window, no recovered verify/candidate/accept, no 2/4 slots",
+    "one of four runnable milestones published"
+  ]
+}

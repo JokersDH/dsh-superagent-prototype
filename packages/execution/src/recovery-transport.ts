@@ -177,7 +177,10 @@ export async function serveRunnerRecovery(endpoint: Pick<RunnerEndpoint, 'socket
         reply(res, 503, { error: 'invalid_payload' }); return
       }
       const chunkBytes = Buffer.from(chunk.base64, 'base64')
-      if (chunkBytes.length !== chunk.total - offset && offset + chunkBytes.length < chunk.total) { reply(res, 503, { error: 'invalid_payload' }); return }
+      // Only the bounds are enforceable here: an intermediate chunk is legitimately shorter than the
+      // remaining payload, so the previous equality test rejected every legal non-final chunk.
+      if (offset + chunkBytes.length > chunk.total) { reply(res, 503, { error: 'invalid_payload' }); return }
+      if (chunkBytes.length > length) { reply(res, 503, { error: 'invalid_payload' }); return }
       // length is the decoded byte length; reporting base64 characters was a unit error.
       reply(res, 200, { ref, offset, length: chunkBytes.length, total: chunk.total, digest: chunk.digest, base64: chunk.base64 })
       return
