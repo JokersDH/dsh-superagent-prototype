@@ -13,7 +13,7 @@ node tools/usage-insights/cli.mjs help
 node tools/usage-insights/cli.mjs catalogue                 # 指标目录：单位/聚合/精确定义
 node tools/usage-insights/cli.mjs analyze --input /abs/bundle.json [--format terminal|json|markdown] [--out /abs/out]
 node tools/usage-insights/cli.mjs report  --input /abs/bundle.json --out /abs/report.md
-node tools/usage-insights/cli.mjs verify  --input /abs/bundle.json
+node tools/usage-insights/cli.mjs verify  --input /abs/bundle.json [--expect-digest <sha256>]
 node tools/usage-insights/cli.mjs collect --base-url http://127.0.0.1:<port> \
   --token-file /abs/private/token --from 2026-11-13T00:00:00Z --to 2026-11-14T00:00:00Z \
   --project project-atlas --include-attention --out /abs/bundle.json [--report /abs/report.md]
@@ -31,7 +31,8 @@ node tools/usage-insights/cli.mjs collect --base-url http://127.0.0.1:<port> \
 | 1 | 内部错误（stdout/stderr 只给有限代码，不含 token） |
 
 `analyze` 在 stderr 打印一行 `status=… coverage=… unavailableMetrics=… quarantine=…`，避免把 exit 0
-误读成"指标齐全"。
+误读成"指标齐全"。`stoppedBy` 区分**本工具的声明上限**（`records`/`works`/`pages`）与**采集端已截断**
+（`source`）：前者由 `--max-records/--max-works/--max-pages` 触发，后者来自 bundle 的 `declaredCoverage`。
 
 ## collect：显式 loopback 与显式凭据
 
@@ -40,6 +41,9 @@ node tools/usage-insights/cli.mjs collect --base-url http://127.0.0.1:<port> \
 - `--token-file` 必须是**绝对路径的普通文件**（≤4KB、单个无空白 token、非符号链接）。token 只在内存中
   使用，不写入 bundle、报告、错误信息、argv 回显或 provenance。
 - 只发 GET；任何 3xx 一律拒绝而不是跟随。每个请求有 `--request-timeout-ms`，整体有 `--deadline-ms`。
+- 响应体**按流累计**并对照剩余字节预算：超出即 `cancel` 并报告 `bytesReceived`/`allowed`；声明的
+  `Content-Length` 过大时在读取前拒绝（`declaredLength`）；错误/重定向的 body 也只在 16KB 内读取。
+- 采集结束时才写入 `capturedAt`，因此快照的 `observedAt` 永远不晚于它所属的观测。
 - 读取路径：`GET /v1/snapshot`（发现 work）→ `GET /v1/works/:id/evidence` +
   `GET /v1/works/:id/evidence/history`（分页）→ 可选 `GET /v1/attention`（每个项目）+ 可选
   `GET /v1/readiness`（仅作配置附录）。
@@ -49,6 +53,18 @@ node tools/usage-insights/cli.mjs collect --base-url http://127.0.0.1:<port> \
   `source_missing`/`caller_limit`。
 
 不会做的事：不读 `$HOME`、不扫描全局 socket、不借用其他实例凭据、不跟随外部跳转、不写设置、不确认候选。
+
+## 范围规则（所有记录类一致）
+
+- 每条记录都受**声明的项目集**与**请求窗口**约束，不只是 outcome：
+  - `outcomes` 按 `projectId` + `observedAt` 过滤；
+  - `workEvidence`/`workHistories` 的条目按 `entry.at` 过滤，窗口前的问题/回答/接受只作参考，不计入人工介入；
+  - `attention` 是**当前快照**：只保留声明项目的条目，捕获之后才观察到的页面被拒绝，超过 1 小时新鲜度的
+    快照最多是 `partial`。
+- work 的项目只能来自 collector 写入的 `workIndex`（取自产品自己的 snapshot/work 视图）或该 work 自己的
+  outcome。两者都没有时该 work 是 **unmapped**：隔离为 `project_unknown`，其人工介入计数进入 unknown，
+  绝不当成"一次已观察问题"或"完整零"。
+- 身份冲突（同 id 不同 body、index 与 outcome 指向不同项目）会**整条隔离**，不替用户选版本。
 
 ## 输入 bundle（`usage-insights-input/1`）
 
@@ -60,11 +76,12 @@ node tools/usage-insights/cli.mjs collect --base-url http://127.0.0.1:<port> \
   "timezone": "Asia/Shanghai",                // IANA 时区，非法值直接拒绝
   "window": { "from": "2026-11-13T00:00:00Z", "to": "2026-11-14T00:00:00Z" }, // from 含、to 不含
   "projects": [{ "projectId": "project-atlas" }],
+  "workIndex": [{ "workId": "work-1", "projectId": "project-atlas" }],   // collector 写入的可验证映射
   "source": { "kind": "http_read|verified_file|operator_file|synthetic_fixture",
               "descriptor": "loopback …", "digest": null, "layerAssertion": "recorded_by_producer",
               "capturedAt": "…" },
   "declaredCoverage": { "outcomes": "complete", "workEvidence": "complete", "attention": "complete" },
-  "limits": { "maxRecords": 50000, "maxWorks": 50, "maxPages": 20 },
+  "limits": { "maxRecords": 50000, "maxWorks": 50, "maxPages": 20 },  // 解析前生效
   "outcomes": [], "attentionPages": [], "workEvidence": [], "workHistories": [],
   "queueFacts": [],                            // 可选：显式 queuedAt/dispatchedAt + 同 attempt 身份
   "baseline": null,                             // 可选：operator-baseline/1
@@ -75,6 +92,19 @@ node tools/usage-insights/cli.mjs collect --base-url http://127.0.0.1:<port> \
 
 记录集合用 `unknown[]`：单条坏记录被隔离（`invalid_record`）并计入覆盖损失，不会静默丢弃或被改成 0；
 信封本身是 strict 的，未知字段、倒序窗口、非法时区都会被拒绝。
+
+### 声明上限如何生效
+
+`maxRecords`/`maxWorks`/`maxPages` **在解析之前**执行：超出预算的记录根本不会被解析（因此也不会产生
+`invalid_record`），只在 `losses.<source>.notParsed` 与 `limits` 中计数，`stoppedBy` 记录是哪一类上限先到。
+刚好等于上限**不是**截断（完整枚举，`notParsed=0`）。采集端已截断则显示 `stoppedBy=source`。
+
+### 损失如何传播
+
+`losses` 对 outcome/work/attention 分别给出 `seen/accepted/notParsed/invalid/conflicted/outOfScope/
+outsideWindow/unmapped`；`invalid/conflicted/notParsed/unmapped` 会把对应来源的 coverage 降为 `partial`，
+指标的 unknownCount 同步增加。`outOfScope/outsideWindow` 是声明范围的效果，会计数但不降低覆盖。
+因此 `workEvidence=[{}]` 得到的是 `value=null, coverage=partial, unknownCount>=1`，而不是 `0/complete`。
 
 ## 指标口径
 
@@ -125,6 +155,9 @@ targetLayer、sampleCount、value、coverage；手填工时/预期节省写在 `
 | `unstable_cursor` | 本地服务返回了不前进的游标；采集已停止，报告为部分 |
 | `output_conflict` | 目标文件已存在；换一个新路径，工具不会覆盖历史报告 |
 | `source_unavailable`（摘要不符） | bundle 自身记录的 digest 与文件字节不一致；不要分析被改动过的来源 |
+| `verify --expect-digest` 失败 | 文件字节与之前固定的摘要不一致；重新采集或确认来源被改动 |
+| `stoppedBy=records/works/pages` | 是你给的声明上限先到；调大对应 `--max-*` 或缩小窗口 |
+| `unmapped_work` | work 缺少可验证项目映射；用 `--project`/`--work` 让 collector 重新取 `workIndex` |
 
 不需要删账本/DB/队列、不需要重设预算、也不应该提供家目录凭据——以上问题都能通过显式参数定位。
 

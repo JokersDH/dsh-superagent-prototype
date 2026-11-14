@@ -30,11 +30,20 @@ Invariants enforced by the schema and the analyser:
 3. Interaction metrics carry **no** layer: they describe product records, not execution evidence.
 4. An identity that arrives twice with the same body counts once; an identity that arrives twice with
    different bodies is quarantined in full — the module never picks a winning version.
-5. A truncated page or capped scan (`hasMore`, `truncated`, `window: caller_limit|storage_cap`) can
-   only ever downgrade coverage. It can never read as complete.
+5. A truncated page, capped scan or rejected record (`hasMore`, `truncated`,
+   `window: caller_limit|storage_cap`, `invalid`, `conflicted`, `unmapped`) can only ever downgrade
+   coverage. It can never read as complete, and the per-source `losses` block explains every
+   presented record.
 6. An empty but complete window is reported as complete with zero counts, not as missing data.
 7. A producer's own `actual_native` label is retained as *recorded*, never upgraded: reports say the
    layer was recorded by the producing system.
+7a. Every record class obeys the declared project set and window: work entries are filtered by
+   `entry.at`, and a work's project comes only from the collector's `workIndex` or the work's own
+   outcome. An unmapped work is isolated and counted as unknown — never as one observed problem and
+   never as a proven zero.
+7b. Declared `maxRecords`/`maxWorks`/`maxPages` are applied *before* parsing, so a truncated
+   observation reports `recordsNotParsed`/`worksNotProcessed`/`pagesNotParsed`, partial coverage and
+   `stoppedBy`; an exact fit is not truncation.
 8. Operator baselines stay an explicit `operator_note` input. A comparison is
    `observation: 'observational_only'` and produces no percentage saving, saved hours or causality.
 9. A readiness/configuration snapshot may be attached for context; it contributes no metric, sample
@@ -95,6 +104,7 @@ pnpm --dir packages/usage-insights typecheck
 pnpm --dir packages/usage-insights build
 pnpm --dir packages/usage-insights test
 node --test tools/usage-insights/test/*.case.mjs
+node tools/usage-insights/probe/observe-two-projects.mjs
 ```
 
 Fixtures under `tools/usage-insights/fixtures/` are synthetic and say so; none of them is native

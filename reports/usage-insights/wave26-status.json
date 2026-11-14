@@ -1,0 +1,184 @@
+{
+  "protocol": "wave26-usage-insights-status/1",
+  "agent": "G",
+  "branch": "codex/g4-usage-insights",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-g",
+  "origin": "https://github.com/JokersDH/dsh-superagent-prototype.git",
+  "fixedStart": "96a9b2678beca2c902a0ccbc410c1aee39fa8f42",
+  "syncedMain": "6787bd0",
+  "generatedAt": "2026-11-14T07:51:57Z",
+  "goal": {
+    "statement": "A trustworthy, directly usable read-only efficiency observation module: every record scoped to the declared project/window, unknown never turned into zero, declared bounds enforced before parsing, streaming response budgets, and a stable summary plus sanitized report.",
+    "tokenBudget": "none",
+    "vendorModelNativeTurns": 0,
+    "blockedPilot": "E original 24turn/200000token/USD5 single-in-flight pilot remains BLOCKED; G did not reset, top up, refund, replace samples or research new pricing/recipes.",
+    "defaultUiAdmission": "Not requested and not granted: main has not connected G metrics to the default UI, and G does not depend on that. F can run without metrics."
+  },
+  "ownedPaths": [
+    "packages/usage-insights/",
+    "tools/usage-insights/",
+    "reports/usage-insights/"
+  ],
+  "checkpointCommits": ["9dce3fe", "5834458", "3649c64"],
+  "finalCommit": "the commit that introduces this file",
+  "closedIndependentFindings": [
+    "work interventions mixed projects, windows and unmapped works while outcomes were filtered",
+    "foreign attention items entered the complete pending total",
+    "a bad work source was quarantined yet reported a complete zero",
+    "maxRecords=1 accepted two records and stayed complete",
+    "an unknown-length 131072-byte response was fully buffered before the 1024-byte budget refused it"
+  ],
+  "phases": [
+    { "id": "G1", "status": "done", "result": "outcomes, work evidence, work history and attention are all constrained by the declared projects and the requested window; work entries are filtered by entry.at; attention pages from other projects, the future or outside the freshness window are refused or downgraded", "evidence": ["packages/usage-insights/src/subject.ts", "packages/usage-insights/test/scope.case.ts"] },
+    { "id": "G2", "status": "done", "result": "per-source losses (seen/accepted/notParsed/invalid/conflicted/outOfScope/outsideWindow/unmapped) propagate to source coverage and metric unknownCount; workEvidence=[{}] yields null/partial/unknown rather than 0/complete", "evidence": ["packages/usage-insights/src/analyze.ts", "packages/usage-insights/test/scope.case.ts"] },
+    { "id": "G3", "status": "done", "result": "maxRecords/maxWorks/maxPages applied before parsing; records past the bound are never validated; an exact fit is complete, not truncated; collector truncation is reported as stoppedBy=source; the CLI validates type and size before reading", "evidence": ["packages/usage-insights/src/analyze.ts", "packages/usage-insights/test/limits.case.ts", "tools/usage-insights/test/cli.case.mjs"] },
+    { "id": "G4", "status": "done", "result": "response bodies are read as a stream against the remaining budget and cancelled on overflow; failures report bytesReceived/declaredLength; error and redirect bodies are bounded to 16KB", "evidence": ["tools/usage-insights/lib/http.mjs", "tools/usage-insights/test/http-adapter.case.mjs"] },
+    { "id": "G5", "status": "done", "result": "two-project controlled product runtime driven through the real command surface; the collector writes a product-sourced workIndex and stamps capturedAt after reading", "evidence": ["tools/usage-insights/probe/observe-two-projects.mjs", "reports/usage-insights/probe/two-project-20261114T074222.bundle.json"] },
+    { "id": "G6", "status": "done", "result": "real question/answer/acceptance/verification facts and the product's own ReviewTiming are read from the same subject; usage stays unknown because the controlled execution records none", "evidence": ["reports/usage-insights/probe/two-project-20261114T074222.report.md"] },
+    { "id": "G7", "status": "done", "result": "the collected bundle is written to a new 0600 file, re-read by analyze/verify, reproduces the same summary id, and verify --expect-digest refuses changed bytes", "evidence": ["tools/usage-insights/cli.mjs", "tools/usage-insights/probe/observe-two-projects.mjs"] },
+    { "id": "G8", "status": "done", "result": "second runnable result: one two-project chain from real public reads to a bounded collection, verified file, pure API/CLI and readable report, with per-metric available/unknown listed", "evidence": ["reports/usage-insights/probe/", "reports/usage-insights/README.md"] },
+    { "id": "G9", "status": "done", "result": "toInsightConsumerView adds an explicit partial flag and refuses ready when records were quarantined; bounded-but-legal observations stay ready with partial=true; unknown stays null", "evidence": ["packages/usage-insights/src/facing.ts", "packages/usage-insights/test/consumer.case.ts", "reports/usage-insights/f-integration/"] },
+    { "id": "G10", "status": "done", "result": "reports lead with project/window/coverage/samples, carry a per-source loss table, cite record-level provenance ids, separate layers/currencies and escape untrusted text", "evidence": ["packages/usage-insights/src/report.ts", "reports/usage-insights/probe/two-project-20261114T074222.report.md"] },
+    { "id": "G11", "status": "done", "result": "collect/analyze/report/verify/help share argument, path, window, timezone, limit and exit semantics; exclusive 0600 output; bounded errors with bytesReceived; no token/header/body leakage", "evidence": ["tools/usage-insights/cli.mjs", "tools/usage-insights/test/cli.case.mjs"] },
+    { "id": "G12", "status": "done", "result": "third runnable result: stable package API and types, real same-source sample, partial/unknown conventions and CLI tooling handed to main/F", "evidence": ["packages/usage-insights/README.md", "reports/usage-insights/f-integration/README.md"] },
+    { "id": "G13", "status": "done", "result": "daily workflow: repeat observation of the same window does not double count; an earlier window reports a known zero for the same works with the excluded facts accounted for; reports are exclusive and never overwritten", "evidence": ["tools/usage-insights/probe/observe-two-projects.mjs"] },
+    { "id": "G14", "status": "done", "result": "bounded performance and fault regression: 4500 outcomes across three layers, 200 works under maxWorks, 40 pages under maxPages, 1000 quarantined records, 30 currencies, plus 16 HTTP adapter negatives", "evidence": ["packages/usage-insights/test/bounds.case.ts", "tools/usage-insights/test/http-adapter.case.mjs"] },
+    { "id": "G15", "status": "done", "result": "package/tools/reports documentation updated for range rules, limits-before-parsing, streaming budgets, workIndex, losses, partial consumer semantics and troubleshooting", "evidence": ["tools/usage-insights/README.md", "packages/usage-insights/README.md", "reports/usage-insights/README.md"] },
+    { "id": "G16", "status": "done", "result": "this status file lists the four results, commands, exit codes, measured values, coverage/losses, limits and unreached items", "evidence": ["reports/usage-insights/wave26-status.json"] }
+  ],
+  "results": [
+    { "id": "G1-G4", "title": "Full input scope, unknown preservation, hard bounds and streaming budgets", "publishedCommit": "9dce3fe", "runnable": true,
+      "commands": ["node tools/usage-insights/cli.mjs analyze --input /abs/bundle.json --max-records 3", "node tools/usage-insights/cli.mjs collect --base-url http://127.0.0.1:<port> --token-file /abs/token --from <utc> --to <utc> --project <id> --out /abs/bundle.json"],
+      "tests": { "package": 52, "tool": 32, "result": "pass" } },
+    { "id": "G5-G8", "title": "Real two-project question/answer/acceptance/ReviewTiming chain", "publishedCommit": "5834458", "runnable": true,
+      "commands": ["node tools/usage-insights/probe/observe-two-projects.mjs", "node tools/usage-insights/cli.mjs report --input /abs/bundle.json --out /abs/report.md"],
+      "tests": { "package": 52, "tool": 32, "probe": "pass", "result": "pass" } },
+    { "id": "G9-G12", "title": "Partial-aware consumer summary, source-loss report and pinned digest", "publishedCommit": "3649c64", "runnable": true,
+      "commands": ["node -e \"import('./packages/usage-insights/dist/index.js').then(m => console.log(JSON.stringify(m.toInsightConsumerView(m.analyzeUsageInsights(JSON.parse(require('node:fs').readFileSync('/abs/bundle.json','utf8'))).summary))))\"", "node tools/usage-insights/cli.mjs verify --input /abs/bundle.json --expect-digest <sha256>"],
+      "tests": { "package": 55, "tool": 34, "result": "pass" } },
+    { "id": "G13-G16", "title": "Daily workflow, bounded performance, documentation and handoff", "publishedCommit": "branch head (this commit)", "runnable": true,
+      "commands": ["node tools/usage-insights/probe/observe-two-projects.mjs --keep", "pnpm --dir packages/usage-insights test", "node --test tools/usage-insights/test/*.case.mjs"],
+      "tests": { "package": 57, "tool": 34, "probe": "pass", "result": "pass" } }
+  ],
+  "exitCodes": {
+    "0": "complete observation (every declared source fully enumerated, no quarantine)",
+    "3": "partial: bounded/truncated source, quarantined records or a declared analysis bound",
+    "4": "insufficient data: source missing or not collected",
+    "5": "source unavailable, digest mismatch/pin mismatch, redirect refusal, streaming budget exceeded or output not writable",
+    "2": "invalid arguments or input format",
+    "1": "internal failure"
+  },
+  "measured": {
+    "observation": {
+      "source": "real controlled product runtime (two projects) behind the real HTTP read app on 127.0.0.1",
+      "bundle": "reports/usage-insights/probe/two-project-20261114T074222.bundle.json",
+      "report": "reports/usage-insights/probe/two-project-20261114T074222.report.md",
+      "inputDigest": "95400df5276e0ac5daf896e75a5650e4bc3b9b3efef48a3f1a37d9bfb5ebe766",
+      "summaryId": "5b7ca26db2ab2d7cb1a98f21cdfd3cd9c1912ed95f2f73a48187501a0fc468d9",
+      "window": { "from": "2026-11-14T06:42:18.655Z", "to": "2026-11-14T09:42:18.656Z", "timezone": "UTC" },
+      "projects": [
+        { "projectId": "project-arcade", "works": 1, "outcomes": 1, "accepted": 1 },
+        { "projectId": "project-beacon", "works": 1, "outcomes": 1, "accepted": 1 }
+      ],
+      "recordedFacts": { "questions": 2, "answers": 2, "acceptances": 2, "reviewSpans": 2, "verifications": 2 },
+      "coverage": { "outcomes": "complete", "workEvidence": "complete", "attention": "complete", "overall": "complete" },
+      "losses": {
+        "outcomes": { "seen": 2, "accepted": 2, "notParsed": 0, "invalid": 0, "conflicted": 0, "outOfScope": 0, "outsideWindow": 0, "unmapped": 0 },
+        "workEvidence": { "seen": 4, "accepted": 2, "notParsed": 0, "invalid": 0, "conflicted": 0, "outOfScope": 0, "outsideWindow": 0, "unmapped": 0 },
+        "attention": { "seen": 2, "accepted": 0, "notParsed": 0, "invalid": 0, "conflicted": 0, "outOfScope": 0, "outsideWindow": 0, "unmapped": 0 }
+      },
+      "quarantine": 0,
+      "subjects": 2,
+      "metrics": [
+        { "metricId": "outcomes.count", "layer": "controlled", "value": 2, "sampleCount": 2, "unknownCount": 0 },
+        { "metricId": "outcomes.accepted", "layer": "controlled", "value": 2, "sampleCount": 2, "unknownCount": 0 },
+        { "metricId": "execution.durationMs", "layer": "controlled", "value": null, "nullReason": "timing_missing", "unknownCount": 2 },
+        { "metricId": "queue.waitMs", "layer": "controlled", "value": null, "nullReason": "endpoint_missing", "unknownCount": 2 },
+        { "metricId": "review.readyToAcceptanceMs", "layer": "controlled", "value": 799, "sampleCount": 2, "coverage": "complete" },
+        { "metricId": "review.activeMs", "layer": "controlled", "value": 700, "sampleCount": 2, "coverage": "partial" },
+        { "metricId": "usage.inputTokens", "layer": "controlled", "value": null, "nullReason": "insufficient_data", "unknownCount": 2 },
+        { "metricId": "usage.outputTokens", "layer": "controlled", "value": null, "nullReason": "insufficient_data", "unknownCount": 2 },
+        { "metricId": "interventions.questions", "layer": null, "value": 2, "sampleCount": 2, "unknownCount": 0 },
+        { "metricId": "interventions.answers", "layer": null, "value": 2, "sampleCount": 2, "unknownCount": 0 },
+        { "metricId": "interventions.acceptances", "layer": null, "value": 2, "sampleCount": 2, "unknownCount": 0 },
+        { "metricId": "interventions.total", "layer": null, "value": 6, "sampleCount": 2, "unknownCount": 0 }
+      ],
+      "attention": { "items": 0, "stale": false, "coverage": "complete", "meaning": "current pending-age snapshot after both works were accepted" },
+      "usageCompleteness": { "outcomeRecords": 2, "recordsWithKnownTokens": 0, "recordsWithUnknownUsage": 2, "recordsWithKnownCost": 0, "recordsWithoutCost": 2, "tokensCompleteness": "source_missing", "costCompleteness": "source_missing" },
+      "baseline": "not_requested",
+      "configuration": { "observed": false, "kind": "none", "authority": "none" },
+      "collectionMs": 137,
+      "analysisMs": 93,
+      "readOnlyCollection": true,
+      "repeatedCollectionIdenticalForHistoricalFacts": true,
+      "dailyRepeatNoDoubleCount": true,
+      "earlierWindowReportsKnownZero": true
+    },
+    "negatives": {
+      "scope": ["narrowed project counts 1 question not 2", "entry before the window is not counted", "unmapped work isolated", "foreign attention excluded", "future page refused", "stale page never complete", "index/outcome project conflict quarantined"],
+      "unknown": ["workEvidence=[{}] is null/partial, never 0/complete", "mixed valid+bad keeps known counts and adds unknown", "empty complete set is the only measured zero", "uncollected source is unavailable"],
+      "limits": ["maxRecords=1 accepts 1 and reports 1 not parsed", "record past the bound is never validated", "maxPages bounds history", "maxWorks leaves the remainder unknown", "exact bound is not truncation", "collector truncation is stoppedBy=source"],
+      "streaming": ["unknown-length 131072 bytes aborts mid-stream under a 1024-byte budget", "declared oversized Content-Length refused before reading", "short-framed body refused as bad schema", "trickling stream times out with progress", "large error body discarded within 16KB"]
+    },
+    "bounds": {
+      "multiLayerOutcomes": 4500,
+      "worksUnderMaxWorks": 200,
+      "pagesUnderMaxPages": 40,
+      "quarantinedRecords": 1000,
+      "currencies": 30,
+      "notes": "in-process pure analysis plus local adapter tests; timings are short bounded checks, not a soak or cross-machine guarantee"
+    }
+  },
+  "consumer": {
+    "projection": "toInsightConsumerView (structurally identical to apps/console/src/trial/insights.ts TrialInsightsView, plus an explicit partial flag)",
+    "sample": "reports/usage-insights/f-integration/consumer-view.example.json",
+    "contract": "reports/usage-insights/f-integration/README.md",
+    "compatibility": "usage-insights/1 additive-only; null means unknown and is never defaulted to 0",
+    "mainIntegrationNeeded": ["root workspace dependency registration for @personal-agent/usage-insights", "render of the partial flag by the trial UI", "root import/export wiring if the console consumes it directly"]
+  },
+  "notReached": [
+    "actual_native execution data: NOT_TESTED — the probe runs the controlled fixture driver; no vendor model or native turn was performed and no native sample was fabricated",
+    "operator production instance: NOT_ATTEMPTED — no operator credential was available; the tool supports it via --base-url/--token-file",
+    "real operator baseline: none supplied; the example baseline is illustrative only",
+    "queue.waitMs over real data: the product read surface exposes no queued/dispatched endpoint pair",
+    "execution.durationMs over real data: the controlled fixture driver records no duration on the outcome",
+    "known token/cost usage: the controlled execution records none, so usage is unknown rather than zero",
+    "long-running stability, cross-machine performance and 48h soak: out of scope"
+  ],
+  "limitations": [
+    "All numbers are observations of recorded facts. Nothing here proves saved hours, efficiency gains, causality or quality.",
+    "Interaction metrics are product-record counts; they carry no evidence layer and are not execution evidence.",
+    "review.activeMs is a partial UI-visibility proxy, clipped by the real ready→accepted interval; it is never human working time.",
+    "Unknown usage and unknown cost stay unknown; prices are not looked up and currencies are never combined.",
+    "A bundle retains product record detail (for example work titles) and is a private 0600 input; only generated reports are sanitized for sharing.",
+    "Reporting on a production instance would require that instance's own credential; G does not discover or reuse credentials."
+  ],
+  "boundaries": {
+    "noSqlOrPrivateDb": true,
+    "noRuntimeHttpUiChanges": true,
+    "noSecondLedger": true,
+    "noModelOrNativeCalls": true,
+    "noRootLockOrContractsChanges": true,
+    "noEAssertionsChanged": true,
+    "userServicesPreserved": "twelve 5180/8796 … 5191/8807 instances and all state/profile/tar/ledger left untouched",
+    "evidenceLayers": ["controlled", "operator_note", "synthetic_fixture"],
+    "nativeLayerPresent": false
+  },
+  "verification": {
+    "commands": [
+      "pnpm --dir packages/usage-insights typecheck",
+      "pnpm --dir packages/usage-insights build",
+      "pnpm --dir packages/usage-insights test",
+      "node --test tools/usage-insights/test/*.case.mjs",
+      "node tools/usage-insights/probe/observe-two-projects.mjs"
+    ],
+    "results": {
+      "typecheck": "pass",
+      "build": "pass",
+      "packageTests": { "total": 57, "pass": 57, "fail": 0 },
+      "toolTests": { "total": 34, "pass": 34, "fail": 0, "cli": 18, "httpAdapter": 16 },
+      "probe": "pass (all assertions, exit 0)"
+    },
+    "staticChecksConfer": "no runtime, native or release admission"
+  }
+}

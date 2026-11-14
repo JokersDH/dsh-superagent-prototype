@@ -109,3 +109,45 @@ test('work evidence with many entries per work stays bounded per metric', () => 
   assert.equal(questions?.value, 500)
   assert.ok((questions?.provenanceRefs.length ?? 0) <= 256, 'provenance references are capped')
 })
+
+test('many works are bounded by maxWorks and the remainder stays unknown', () => {
+  const works = []
+  const index = []
+  for (let number = 0; number < 200; number++) {
+    const workId = `work-bulk-${number}`
+    index.push({ workId, projectId: 'project-atlas' })
+    works.push(makeWorkEvidence(workId, [{ kind: 'question.opened', sourceRef: `question-${number}` }]))
+  }
+  const analysis = analyzeUsageInsights(bundle({
+    workEvidence: works,
+    workIndex: index,
+    limits: { maxWorks: 50 },
+  }))
+  const questions = analysis.summary.metrics.find(row => row.metricId === 'interventions.questions')
+  assert.equal(questions?.value, 50)
+  assert.equal(questions?.unknownCount, 150)
+  assert.equal(questions?.coverage, 'partial')
+  assert.equal(analysis.summary.limits.worksSeen, 200)
+  assert.equal(analysis.summary.limits.worksNotProcessed, 150)
+  assert.equal(analysis.summary.limits.stoppedBy, 'works')
+  assert.equal(analysis.summary.coverage.workEvidence, 'partial')
+})
+
+test('many attention pages are bounded and never read as complete', () => {
+  const pages = Array.from({ length: 40 }, (_, pageIndex) => ({
+    protocol: 'attention-inbox/1',
+    observedAt: '2026-11-13T11:00:00.000Z',
+    items: [],
+    ranks: [],
+    ranking: 'waiting_order',
+    scannedWorks: 0,
+    questionCoverage: 'complete',
+    hasMore: pageIndex < 39,
+    ...(pageIndex < 39 ? { nextCursor: `cursor-${pageIndex}` } : {}),
+  }))
+  const analysis = analyzeUsageInsights(bundle({ attentionPages: pages, limits: { maxPages: 10 } }))
+  assert.equal(analysis.summary.limits.pagesSeen, 40)
+  assert.equal(analysis.summary.limits.pagesNotParsed, 30)
+  assert.equal(analysis.summary.limits.stoppedBy, 'pages')
+  assert.notEqual(analysis.summary.attention.coverage, 'complete')
+})

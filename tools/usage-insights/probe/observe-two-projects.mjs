@@ -269,6 +269,32 @@ async function main() {
   assert.equal(summary.attention.stale, false)
   assert.equal(summary.attention.coverage, 'complete')
 
+  // ---- daily workflow: repeat observation without double counting (G13) -----------------------
+  // A second observation of the same window must not accumulate the first round's facts.
+  const secondAnalysis = JSON.parse((await run(['analyze', '--input', bundlePath2])).stdout)
+  assert.deepEqual(secondAnalysis.summary.metrics, summary.metrics,
+    'repeating the observation must not double-count questions, answers or usage')
+  assert.equal(secondAnalysis.summary.attention.items, summary.attention.items)
+
+  // An earlier window that ends before the run: the same works are presented, but every fact is
+  // outside it. That is a known zero for the observed works, not an unknown and not a repeat.
+  const earlyStart = new Date(Date.now() - 7_200_000).toISOString()
+  const earlyEnd = new Date(Date.now() - 3_600_000).toISOString()
+  const earlyBundle = join(directory, 'bundle-early.json')
+  const early = await run(['collect', '--base-url', `http://127.0.0.1:${port}`, '--token-file', tokenFile,
+    '--from', earlyStart, '--to', earlyEnd, '--project', PROJECT_A, '--project', PROJECT_B,
+    '--snapshot-limit', '20', '--history-pages', '5', '--history-limit', '100',
+    '--input-id', 'probe-two-projects-early', '--out', earlyBundle])
+  assert.equal(early.status, 0, early.stderr)
+  const earlyAnalysis = JSON.parse((await run(['analyze', '--input', earlyBundle])).stdout).summary
+  const earlyMetric = id => earlyAnalysis.metrics.find(row => row.metricId === id)
+  assert.equal(earlyMetric('outcomes.count'), undefined, 'no outcome is observed inside the earlier window')
+  assert.equal(earlyMetric('interventions.total')?.value, 0, 'the facts exist but none fall inside the window')
+  assert.ok(earlyAnalysis.losses.workEvidence.outsideWindow >= 6, 'the excluded facts are accounted for')
+
+  // The first report is untouched by later runs (exclusive create, no overwrite).
+  assert.ok(readFileSync(reportPath, 'utf8').includes(`Summary id | ${summary.summaryId}`))
+
   // ---- verified-file reproduction (G7) --------------------------------------------------------
   const verified = JSON.parse((await run(['verify', '--input', bundlePath])).stdout)
   assert.equal(verified.status, 'complete')
