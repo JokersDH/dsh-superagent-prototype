@@ -148,3 +148,19 @@ test('two works with the same title stay separate, and a cross-work outcome is r
   assert.equal(rejected.summary.quarantine.byCode.find(entry => entry.code === 'invalid_record')?.records, 1)
   assert.equal(rejected.summary.metrics.find(row => row.metricId === 'outcomes.count'), undefined)
 })
+
+test('an unrequested attention source does not downgrade a complete outcome window', () => {
+  const bundle = completeBundle()
+  const withoutAttention = {
+    ...bundle,
+    attentionPages: [],
+    declaredCoverage: { ...bundle.declaredCoverage, attention: 'not_collected' },
+  } as UsageInsightsInput
+  const analysis = analyzeUsageInsights(withoutAttention)
+  assert.equal(analysis.summary.coverage.attention, 'not_collected')
+  assert.equal(analysis.summary.coverage.overall, 'complete', 'a scope choice is not data loss')
+  assert.ok(analysis.summary.limitations.some(text => text.includes('Attention was not collected')))
+  const view = toInsightConsumerView(analysis.summary)
+  assert.equal(view.status, 'ready')
+  assert.equal(analysis.summary.metrics.find(row => row.metricId === 'outcomes.count')?.value, 2)
+})

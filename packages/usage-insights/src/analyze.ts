@@ -18,7 +18,6 @@ import {
   type CoverageBlock,
   type DeclaredCoverage,
   type IngestCoverage,
-  type InsightWindow,
   type MetricCoverage,
   type MetricRow,
   type ProjectSummary,
@@ -186,7 +185,7 @@ export function analyzeUsageInsights(raw: unknown): UsageInsightsAnalysis {
 
   metrics.sort((a, b) => a.metricId.localeCompare(b.metricId) || (a.layer ?? '').localeCompare(b.layer ?? '') || (a.currency ?? '').localeCompare(b.currency ?? ''))
 
-  const projects = projectSummaries(projectIds, inWindow, workParsed.works.map(work => work.workId))
+  const projects = projectSummaries(projectIds, inWindow)
   const usageCompleteness = usageBlock(inWindow)
   const coverage = coverageBlock(outcomesCoverage, workCoverage, attentionBlock)
   const baseline = compareBaseline({ baseline: input.baseline ?? null, measured: metrics, projectIds, window: input.window })
@@ -228,7 +227,7 @@ export function analyzeUsageInsights(raw: unknown): UsageInsightsAnalysis {
   }
   const summary: UsageInsightsSummary = { ...body, summaryId: canonicalDigest(body as unknown as Json) }
 
-  const subjects = subjectRows(input.window, inWindow, outsideWindow, queueWaitBySubject)
+  const subjects = subjectRows(inWindow, outsideWindow, queueWaitBySubject)
   const analysis: UsageInsightsAnalysis = {
     protocol: 'usage-insights-analysis/1',
     summary,
@@ -239,16 +238,15 @@ export function analyzeUsageInsights(raw: unknown): UsageInsightsAnalysis {
   return UsageInsightsAnalysisSchema.parse(analysis)
 }
 
-function projectSummaries(projectIds: readonly string[], outcomes: readonly ExecutionOutcome[], evidenceWorkIds: readonly string[]): ProjectSummary[] {
-  const evidence = new Set(evidenceWorkIds)
+/**
+ * Per-project counts come only from outcomes, which are the records that carry a project identity.
+ * A work with evidence but no outcome cannot be attributed to a project here, so it stays in the
+ * global unknown count instead of being guessed.
+ */
+function projectSummaries(projectIds: readonly string[], outcomes: readonly ExecutionOutcome[]): ProjectSummary[] {
   return projectIds.map(projectId => {
     const group = outcomes.filter(outcome => outcome.projectId === projectId)
     const works = new Set(group.map(outcome => outcome.attempt.contract.workId))
-    for (const workId of evidence) {
-      // A work with evidence but no outcome in this project cannot be attributed to a project here;
-      // it stays in the global unknown count instead of being guessed.
-      void workId
-    }
     return {
       projectId,
       works: works.size,
@@ -281,7 +279,11 @@ function usageBlock(outcomes: readonly ExecutionOutcome[]): UsageCompleteness {
 
 function coverageBlock(outcomes: IngestCoverage, workEvidence: IngestCoverage, attention: AttentionSummary): CoverageBlock {
   const mapped = { outcomes: toMetricCoverage(outcomes), workEvidence: toMetricCoverage(workEvidence), attention: attention.coverage }
-  const overall = worstMetric(worstMetric(mapped.outcomes, mapped.workEvidence), mapped.attention)
+  // "Attention was not requested" is reported per source but must not downgrade an otherwise fully
+  // enumerated outcome/work window; it is a scope choice, not a data loss.
+  const overall = attention.coverage === 'not_collected'
+    ? worstMetric(mapped.outcomes, mapped.workEvidence)
+    : worstMetric(worstMetric(mapped.outcomes, mapped.workEvidence), mapped.attention)
   return { ...mapped, overall }
 }
 
@@ -312,7 +314,7 @@ function quarantineSummary(quarantine: QuarantineCollector): QuarantineDigest {
   }
 }
 
-function subjectRows(window: InsightWindow, inWindow: readonly ExecutionOutcome[], outside: readonly ExecutionOutcome[],
+function subjectRows(inWindow: readonly ExecutionOutcome[], outside: readonly ExecutionOutcome[],
   queueWaitBySubject: ReadonlyMap<string, { waitMs: number; ref: string }>): SubjectRow[] {
   const build = (outcome: ExecutionOutcome, status: SubjectRow['status']): SubjectRow => {
     const identity = outcomeSubject(outcome)
@@ -336,7 +338,6 @@ function subjectRows(window: InsightWindow, inWindow: readonly ExecutionOutcome[
       reasons: reasons.slice(0, 8),
     }
   }
-  void window
   const unique = new Map<string, SubjectRow>()
   for (const outcome of inWindow) {
     const row = build(outcome, 'observed')
@@ -377,7 +378,9 @@ function collectLimitations(input: LimitationInput): string[] {
     limitations.push('Queue waiting requires explicit queued-at and dispatched-at endpoints bound to the same attempt; the collected product surface did not provide them.')
   if (input.unseenWorks > 0)
     limitations.push(`${input.unseenWorks} work(s) visible through attention had no collected work evidence; their interaction counts stay unknown.`)
-  if (input.attention.coverage !== 'complete')
+  if (input.attention.coverage === 'not_collected')
+    limitations.push('Attention was not collected for this observation; pending counts and waiting age are unavailable, not zero.')
+  else if (input.attention.coverage !== 'complete')
     limitations.push('The attention snapshot is bounded; pending counts and waiting age describe the observed page, not a total.')
   if (input.baseline.status !== 'not_requested')
     limitations.push('The operator baseline is a separate operator_note input. Any comparison is observational and does not establish causality, saved hours or a benefit rate.')

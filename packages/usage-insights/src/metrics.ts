@@ -58,10 +58,6 @@ export const mean = (values: readonly number[]): number | null =>
 
 export const sum = (values: readonly number[]): number | null => (values.length === 0 ? null : values.reduce((total, value) => total + value, 0))
 
-export interface MetricAccumulator {
-  rows: MetricRow[]
-}
-
 export interface OutcomeMetricInput {
   outcomes: readonly ExecutionOutcome[]
   queueWaitBySubject: ReadonlyMap<string, { waitMs: number; ref: string }>

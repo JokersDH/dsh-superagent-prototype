@@ -8,8 +8,6 @@ import {
   multiCurrencyBundle, multiProjectBundle, outsideWindowBundle, partialBundle, queueBundle, unknownBundle,
 } from './fixtures.ts'
 
-const partial = <T extends object>(value: T): Partial<T> => value
-
 function metric(analysis: ReturnType<typeof analyzeUsageInsights>, metricId: string, layer?: string | null, currency?: string): MetricRow | undefined {
   return analysis.summary.metrics.find(row => row.metricId === metricId &&
     (layer === undefined || row.layer === layer) &&
@@ -283,5 +281,3 @@ test('an empty but complete window is complete, not missing', () => {
   }
   assert.equal(analysis.summary.usageCompleteness.tokensCompleteness, 'not_collected')
 })
-
-void partial

@@ -68,6 +68,7 @@ export interface DedupeResult<T> {
   records: T[]
   replayed: number
   quarantined: QuarantineEntry[]
+  invalid: QuarantineEntry[]
 }
 
 interface LedgerEntry<T> {
@@ -77,24 +78,20 @@ interface LedgerEntry<T> {
 }
 
 /**
- * Generic id-keyed ledger. A repeat with identical content is counted once; a repeat whose body
- * differs quarantines *every* occurrence of that identity, because the module has no authority to
- * decide which version is the real fact.
+ * Keep only unambiguous identities. A repeat with identical content was already counted once; a
+ * repeat whose body differs removes *every* occurrence of that identity, because the module has no
+ * authority to decide which version is the real fact.
  */
-function settle<T>(entries: Map<string, LedgerEntry<T>>, conflicted: Set<string>, refOf: (record: T) => string): DedupeResult<T> {
+function settle<T>(entries: Map<string, LedgerEntry<T>>, conflicted: Set<string>, refOf: (record: T) => string,
+  recordClass: QuarantineEntry['recordClass']): { records: T[]; quarantined: QuarantineEntry[] } {
   const records = [...entries.values()].filter(entry => !conflicted.has(refOf(entry.record))).map(entry => entry.record)
   const quarantined: QuarantineEntry[] = [...conflicted].map(ref => ({
     code: 'identity_conflict' as QuarantineCode,
-    recordClass: 'outcome',
+    recordClass,
     ref,
     reason: 'The same identity arrived with a different body; every occurrence is excluded',
   }))
-  const replayed = [...entries.values()].filter(entry => conflicted.has(refOf(entry.record))).length
-  return { records, replayed, quarantined }
-}
-
-export interface ParsedFailures {
-  invalid: QuarantineEntry[]
+  return { records, quarantined }
 }
 
 function invalidEntry(recordClass: QuarantineEntry['recordClass'], ref: string, reason: string): QuarantineEntry {
@@ -102,7 +99,7 @@ function invalidEntry(recordClass: QuarantineEntry['recordClass'], ref: string, 
 }
 
 /** Parse outcomes individually so one malformed row cannot void the whole observation. */
-export function parseOutcomes(items: readonly unknown[]): DedupeResult<ExecutionOutcome> & ParsedFailures {
+export function parseOutcomes(items: readonly unknown[]): DedupeResult<ExecutionOutcome> {
   const entries = new Map<string, LedgerEntry<ExecutionOutcome>>()
   const conflicted = new Set<string>()
   const invalid: QuarantineEntry[] = []
@@ -120,8 +117,8 @@ export function parseOutcomes(items: readonly unknown[]): DedupeResult<Execution
     else if (existing.digest === digest) replayed++
     else conflicted.add(record.id)
   }
-  const settled = settle(entries, conflicted, record => record.id)
-  return { records: settled.records, replayed: replayed + settled.replayed, quarantined: [...invalid, ...settled.quarantined], invalid }
+  const settled = settle(entries, conflicted, record => record.id, 'outcome')
+  return { records: settled.records, replayed, quarantined: [...invalid, ...settled.quarantined], invalid }
 }
 
 export interface WorkEntry {
@@ -174,7 +171,6 @@ export function parseWorkRecords(evidenceItems: readonly unknown[], historyItems
   const works = new Map<string, { entries: Set<string>; coverage: WorkRecord['coverage']; sourceRef: string }>()
   const outcomes: ExecutionOutcome[] = []
   const quarantined: QuarantineEntry[] = []
-  let replayed = 0
 
   const addEntry = (workId: string, entry: WorkEntry, recordClass: QuarantineEntry['recordClass']) => {
     const key = `${workId}\u0000${entry.kind}\u0000${entry.sourceRef}`
@@ -184,7 +180,7 @@ export function parseWorkRecords(evidenceItems: readonly unknown[], historyItems
       entries.set(key, { record: entry, digest, ref: key })
       return
     }
-    if (existing.digest === digest) { replayed++; return }
+    if (existing.digest === digest) return
     conflicted.add(key)
     quarantined.push({
       code: 'identity_conflict', recordClass, ref: `${entry.kind}:${entry.sourceRef}`,
@@ -228,17 +224,18 @@ export function parseWorkRecords(evidenceItems: readonly unknown[], historyItems
     noteWork(record.workId, coverage, `work-history:${record.workId}`, keys)
   }
 
-  const acceptedEntries = [...entries.values()].filter(entry => !conflicted.has(`${entry.record.workId}\u0000${entry.record.kind}\u0000${entry.record.sourceRef}`))
+  const acceptedEntries = [...entries.values()]
+    .filter(entry => !conflicted.has(`${entry.record.workId}\u0000${entry.record.kind}\u0000${entry.record.sourceRef}`))
+    .map(entry => entry.record)
   const results: WorkRecord[] = []
   for (const [workId, value] of works) {
     results.push({
       workId,
-      entries: acceptedEntries.filter(entry => entry.record.workId === workId).map(entry => entry.record),
+      entries: acceptedEntries.filter(entry => entry.workId === workId),
       coverage: value.coverage,
       outcomes: [],
       sourceRef: value.sourceRef,
     })
-    void replayed
   }
   return { works: results, outcomes, quarantined: [...quarantined, ...invalid], invalid }
 }
@@ -324,8 +321,6 @@ export function firstIssue(error: { issues: readonly { message: string; path: re
   const path = issue.path.length ? `${issue.path.map(String).join('.')}: ` : ''
   return `${path}${issue.message}`.slice(0, 512)
 }
-
-export const timestampOrNull = (value: string | null | undefined): string | null => (value ? value : null)
 
 /** Bounds-limited record selection: the caller learns exactly which bound stopped collection. */
 export const withinWindow = (at: Timestamp, from: Timestamp, to: Timestamp): boolean =>

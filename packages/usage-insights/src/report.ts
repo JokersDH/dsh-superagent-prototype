@@ -111,7 +111,10 @@ export function renderMarkdown(analysis: UsageInsightsAnalysis): string {
       const refs = row.provenanceRefs
       const shown = refs.slice(0, 5).map(safeText).join(', ')
       const more = refs.length > 5 ? ` … (+${refs.length - 5})` : ''
-      lines.push(`- ${row.metricId}${row.layer ? ` · ${row.layer}` : ''}${row.currency ? ` · ${row.currency}` : ''}: ${refs.length === 0 ? 'no record reference (count derived from the declared window)' : `${shown}${more}`}`)
+      const description = refs.length === 0
+        ? (row.value === null ? `no value observed (${nullReasonText(row.nullReason)})` : 'derived from the declared window; no single record')
+        : `${shown}${more}`
+      lines.push(`- ${row.metricId}${row.layer ? ` · ${row.layer}` : ''}${row.currency ? ` · ${row.currency}` : ''}: ${description}`)
     }
     lines.push('')
   }

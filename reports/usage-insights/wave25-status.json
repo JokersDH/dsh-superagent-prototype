@@ -5,7 +5,7 @@
   "worktree": "/Users/hh/Desktop/joker/superagent-agent-g",
   "origin": "https://github.com/JokersDH/dsh-superagent-prototype.git",
   "baseMain": "11002b8",
-  "generatedAt": "2026-11-14T04:47:02Z",
+  "generatedAt": "2026-11-14T05:05:00Z",
   "goal": {
     "statement": "A directly usable read-only efficiency observation module: pure analysis API, bounded loopback collect/analyze/report CLI, stable summary for the trial UI, and traceable sanitized reports.",
     "tokenBudget": "none",
@@ -18,25 +18,164 @@
     "tools/usage-insights/",
     "reports/usage-insights/"
   ],
-  "checkpointCommits": ["94c8691", "47d3979", "18b4b6c"],
+  "checkpointCommits": [
+    "94c8691",
+    "47d3979",
+    "18b4b6c"
+  ],
   "finalCommit": "the commit that introduces this file (branch head codex/g4-usage-insights)",
   "phases": [
-    { "id": "G1", "status": "done", "result": "usage-insights-input/1 + usage-insights/1 protocols, metric catalogue with unit/aggregation/definition, pure API; unavailable fields recorded explicitly", "evidence": ["packages/usage-insights/src/protocol.ts", "packages/usage-insights/test/analyze.case.ts"] },
-    { "id": "G2", "status": "done", "result": "real shared schemas validate every record; identity dedupe, conflict quarantine, layer separation, window/scope refusal, per-record invalid isolation", "evidence": ["packages/usage-insights/src/subject.ts", "packages/usage-insights/test/analyze.case.ts"] },
-    { "id": "G3", "status": "done", "result": "queue/ready-to-acceptance/active-review/interventions/usage metrics; null+reason when unobserved; no zero filling; no price lookup", "evidence": ["packages/usage-insights/src/metrics.ts", "packages/usage-insights/test/analyze.case.ts"] },
-    { "id": "G4", "status": "done", "result": "runnable read-only collect/analyze/report/verify/catalogue CLI with help, strict args, fixtures and JSON/terminal/Markdown output", "evidence": ["tools/usage-insights/cli.mjs", "tools/usage-insights/fixtures/", "tools/usage-insights/test/cli.case.mjs"] },
-    { "id": "G5", "status": "done", "result": "bounded authenticated loopback GET adapter: explicit origin + credential file, redirect refusal, per-request timeout, overall deadline, page/work/byte caps, cursor validation", "evidence": ["tools/usage-insights/lib/http.mjs", "tools/usage-insights/test/http-adapter.case.mjs"] },
-    { "id": "G6", "status": "done", "result": "same real adapter for HTTP and verified-file input; same bytes yield the same summary id; recorded digest mismatch is refused; layers are never upgraded", "evidence": ["tools/usage-insights/probe/observe-two-projects.mjs", "reports/usage-insights/probe/"] },
-    { "id": "G7", "status": "done", "result": "operator baseline requires source/definition/project/window/timezone/metric/unit/aggregation/layer/samples/coverage; comparison is observational only, with zero-denominator/overlap/layer-mismatch refusals", "evidence": ["packages/usage-insights/src/baseline.ts", "packages/usage-insights/test/analyze.case.ts", "tools/usage-insights/fixtures/operator-baseline.example.json"] },
-    { "id": "G8", "status": "done", "result": "collect → analyze → report chained on one observation window with truthful complete/partial/unavailable statuses in exit codes and stderr", "evidence": ["tools/usage-insights/cli.mjs", "tools/usage-insights/probe/observe-two-projects.mjs"] },
-    { "id": "G9", "status": "done", "result": "toInsightConsumerView projects the stable summary into the trial workspace's compact view type; compile-time structural assertion; null stays null", "evidence": ["packages/usage-insights/src/facing.ts", "packages/usage-insights/test/consumer.case.ts", "reports/usage-insights/f-integration/"] },
-    { "id": "G10", "status": "done", "result": "reports document each metric, cite record-level provenance ids, list observed subjects, separate layers and escape untrusted text", "evidence": ["packages/usage-insights/src/report.ts", "reports/usage-insights/probe/two-project-20261108T120000Z.report.md"] },
-    { "id": "G11", "status": "done", "result": "exclusive 0600 create, refuse existing/symlink/symlinked parent/unwritable/out-of-space, no temporary leftovers, sanitized errors, token never persisted", "evidence": ["tools/usage-insights/lib/output.mjs", "tools/usage-insights/test/cli.case.mjs", "tools/usage-insights/test/http-adapter.case.mjs"] },
-    { "id": "G12", "status": "done", "result": "stable package API + additive-only compatibility policy + fixtures + F integration sample; readiness/configuration snapshot is an appendix with authority none and changes no metric", "evidence": ["packages/usage-insights/src/protocol.ts", "packages/usage-insights/test/consumer.case.ts", "reports/usage-insights/f-integration/README.md"] },
-    { "id": "G13", "status": "done_with_limits", "result": "two-project observation over the real product HTTP app with real store/application/attention/evidence readers; same-title works stay separate; reads create no product events; repeated collection is byte-identical", "limits": ["data layer is controlled; no operator production instance was read"], "evidence": ["reports/usage-insights/probe/two-project-20261108T120000Z.bundle.json", "reports/usage-insights/probe/two-project-20261108T120000Z.report.md"] },
-    { "id": "G14", "status": "done", "result": "bounded analysis (4500 outcomes across 3 layers), 1000 quarantined records with capped diagnostics, 300 identity conflicts, 30 currencies, declared caps enforced; no shared schema or dependency changes", "evidence": ["packages/usage-insights/test/bounds.case.ts"] },
-    { "id": "G15", "status": "done", "result": "operator documentation: commands, input protocol, loopback/credential rules, windows/timezone/limits, metric semantics, baseline rules, troubleshooting, privacy boundary", "evidence": ["tools/usage-insights/README.md", "packages/usage-insights/README.md", "reports/usage-insights/README.md"] },
-    { "id": "G16", "status": "done", "result": "this status file: phases, four results, commands, exit codes, measured values, coverage, limits and not-reached items", "evidence": ["reports/usage-insights/wave25-status.json"] }
+    {
+      "id": "G1",
+      "status": "done",
+      "result": "usage-insights-input/1 + usage-insights/1 protocols, metric catalogue with unit/aggregation/definition, pure API; unavailable fields recorded explicitly",
+      "evidence": [
+        "packages/usage-insights/src/protocol.ts",
+        "packages/usage-insights/test/analyze.case.ts"
+      ]
+    },
+    {
+      "id": "G2",
+      "status": "done",
+      "result": "real shared schemas validate every record; identity dedupe, conflict quarantine, layer separation, window/scope refusal, per-record invalid isolation",
+      "evidence": [
+        "packages/usage-insights/src/subject.ts",
+        "packages/usage-insights/test/analyze.case.ts"
+      ]
+    },
+    {
+      "id": "G3",
+      "status": "done",
+      "result": "queue/ready-to-acceptance/active-review/interventions/usage metrics; null+reason when unobserved; no zero filling; no price lookup",
+      "evidence": [
+        "packages/usage-insights/src/metrics.ts",
+        "packages/usage-insights/test/analyze.case.ts"
+      ]
+    },
+    {
+      "id": "G4",
+      "status": "done",
+      "result": "runnable read-only collect/analyze/report/verify/catalogue CLI with help, strict args, fixtures and JSON/terminal/Markdown output",
+      "evidence": [
+        "tools/usage-insights/cli.mjs",
+        "tools/usage-insights/fixtures/",
+        "tools/usage-insights/test/cli.case.mjs"
+      ]
+    },
+    {
+      "id": "G5",
+      "status": "done",
+      "result": "bounded authenticated loopback GET adapter: explicit origin + credential file, redirect refusal, per-request timeout, overall deadline, page/work/byte caps, cursor validation",
+      "evidence": [
+        "tools/usage-insights/lib/http.mjs",
+        "tools/usage-insights/test/http-adapter.case.mjs"
+      ]
+    },
+    {
+      "id": "G6",
+      "status": "done",
+      "result": "same real adapter for HTTP and verified-file input; same bytes yield the same summary id; recorded digest mismatch is refused; layers are never upgraded",
+      "evidence": [
+        "tools/usage-insights/probe/observe-two-projects.mjs",
+        "reports/usage-insights/probe/"
+      ]
+    },
+    {
+      "id": "G7",
+      "status": "done",
+      "result": "operator baseline requires source/definition/project/window/timezone/metric/unit/aggregation/layer/samples/coverage; comparison is observational only, with zero-denominator/overlap/layer-mismatch refusals",
+      "evidence": [
+        "packages/usage-insights/src/baseline.ts",
+        "packages/usage-insights/test/analyze.case.ts",
+        "tools/usage-insights/fixtures/operator-baseline.example.json"
+      ]
+    },
+    {
+      "id": "G8",
+      "status": "done",
+      "result": "collect → analyze → report chained on one observation window with truthful complete/partial/unavailable statuses in exit codes and stderr",
+      "evidence": [
+        "tools/usage-insights/cli.mjs",
+        "tools/usage-insights/probe/observe-two-projects.mjs"
+      ]
+    },
+    {
+      "id": "G9",
+      "status": "done",
+      "result": "toInsightConsumerView projects the stable summary into the trial workspace's compact view type; compile-time structural assertion; null stays null",
+      "evidence": [
+        "packages/usage-insights/src/facing.ts",
+        "packages/usage-insights/test/consumer.case.ts",
+        "reports/usage-insights/f-integration/"
+      ]
+    },
+    {
+      "id": "G10",
+      "status": "done",
+      "result": "reports document each metric, cite record-level provenance ids, list observed subjects, separate layers and escape untrusted text",
+      "evidence": [
+        "packages/usage-insights/src/report.ts",
+        "reports/usage-insights/probe/two-project-20261108T120000Z.report.md"
+      ]
+    },
+    {
+      "id": "G11",
+      "status": "done",
+      "result": "exclusive 0600 create, refuse existing/symlink/symlinked parent/unwritable/out-of-space, no temporary leftovers, sanitized errors, token never persisted",
+      "evidence": [
+        "tools/usage-insights/lib/output.mjs",
+        "tools/usage-insights/test/cli.case.mjs",
+        "tools/usage-insights/test/http-adapter.case.mjs"
+      ]
+    },
+    {
+      "id": "G12",
+      "status": "done",
+      "result": "stable package API + additive-only compatibility policy + fixtures + F integration sample; readiness/configuration snapshot is an appendix with authority none and changes no metric",
+      "evidence": [
+        "packages/usage-insights/src/protocol.ts",
+        "packages/usage-insights/test/consumer.case.ts",
+        "reports/usage-insights/f-integration/README.md"
+      ]
+    },
+    {
+      "id": "G13",
+      "status": "done_with_limits",
+      "result": "two-project observation over the real product HTTP app with real store/application/attention/evidence readers; same-title works stay separate; reads create no product events; repeated collection is byte-identical",
+      "limits": [
+        "data layer is controlled; no operator production instance was read"
+      ],
+      "evidence": [
+        "reports/usage-insights/probe/two-project-20261108T120000Z.bundle.json",
+        "reports/usage-insights/probe/two-project-20261108T120000Z.report.md"
+      ]
+    },
+    {
+      "id": "G14",
+      "status": "done",
+      "result": "bounded analysis (4500 outcomes across 3 layers), 1000 quarantined records with capped diagnostics, 300 identity conflicts, 30 currencies, declared caps enforced; no shared schema or dependency changes",
+      "evidence": [
+        "packages/usage-insights/test/bounds.case.ts"
+      ]
+    },
+    {
+      "id": "G15",
+      "status": "done",
+      "result": "operator documentation: commands, input protocol, loopback/credential rules, windows/timezone/limits, metric semantics, baseline rules, troubleshooting, privacy boundary",
+      "evidence": [
+        "tools/usage-insights/README.md",
+        "packages/usage-insights/README.md",
+        "reports/usage-insights/README.md"
+      ]
+    },
+    {
+      "id": "G16",
+      "status": "done",
+      "result": "this status file: phases, four results, commands, exit codes, measured values, coverage, limits and not-reached items",
+      "evidence": [
+        "reports/usage-insights/wave25-status.json"
+      ]
+    }
   ],
   "results": [
     {
@@ -49,7 +188,11 @@
         "node tools/usage-insights/cli.mjs analyze --input /abs/bundle.json --format terminal",
         "node tools/usage-insights/cli.mjs report --input /abs/bundle.json --out /abs/report.md"
       ],
-      "tests": { "package": 17, "cli": 11, "result": "pass" }
+      "tests": {
+        "package": 17,
+        "cli": 11,
+        "result": "pass"
+      }
     },
     {
       "id": "G5-G8",
@@ -60,7 +203,11 @@
         "node tools/usage-insights/cli.mjs collect --base-url http://127.0.0.1:<port> --token-file /abs/token --from <utc> --to <utc> --project <id> --include-attention --out /abs/bundle.json --report /abs/report.md",
         "node tools/usage-insights/probe/observe-two-projects.mjs"
       ],
-      "tests": { "adapter": 10, "probe": "pass", "result": "pass" }
+      "tests": {
+        "adapter": 10,
+        "probe": "pass",
+        "result": "pass"
+      }
     },
     {
       "id": "G9-G12",
@@ -70,7 +217,11 @@
       "commands": [
         "node -e \"import('./packages/usage-insights/dist/index.js').then(m => console.log(JSON.stringify(m.toInsightConsumerView(m.analyzeUsageInsights(JSON.parse(require('node:fs').readFileSync('/abs/bundle.json','utf8'))).summary))))\""
       ],
-      "tests": { "package": 32, "tools": 23, "result": "pass" }
+      "tests": {
+        "package": 33,
+        "tools": 23,
+        "result": "pass"
+      }
     },
     {
       "id": "G13-G16",
@@ -81,7 +232,11 @@
         "node tools/usage-insights/probe/observe-two-projects.mjs",
         "node tools/usage-insights/cli.mjs report --input /abs/reports/usage-insights/probe/two-project-20261108T120000Z.bundle.json --out /abs/reports/usage-insights/probe/<new>.md"
       ],
-      "tests": { "package": 32, "tools": 23, "result": "pass" }
+      "tests": {
+        "package": 33,
+        "tools": 23,
+        "result": "pass"
+      }
     }
   ],
   "exitCodes": {
@@ -99,34 +254,161 @@
       "report": "reports/usage-insights/probe/two-project-20261108T120000Z.report.md",
       "inputDigest": "77bb98b1cd4a8057798c4f1e9c919e3e354067ea72c6da8bf42cd1d2708cde87",
       "summaryId": "01f16b8307aa8dee20250aa57e059c3aca6832c707cfe84d8173c3e3073b6f7c",
-      "window": { "from": "2026-11-08T00:00:00.000Z", "to": "2026-11-09T00:00:00.000Z", "timezone": "UTC" },
+      "window": {
+        "from": "2026-11-08T00:00:00.000Z",
+        "to": "2026-11-09T00:00:00.000Z",
+        "timezone": "UTC"
+      },
       "projects": [
-        { "projectId": "project-atlas", "works": 1, "outcomes": 2, "layers": ["controlled"] },
-        { "projectId": "project-other", "works": 1, "outcomes": 1, "layers": ["controlled"] }
+        {
+          "projectId": "project-atlas",
+          "works": 1,
+          "outcomes": 2,
+          "layers": [
+            "controlled"
+          ]
+        },
+        {
+          "projectId": "project-other",
+          "works": 1,
+          "outcomes": 1,
+          "layers": [
+            "controlled"
+          ]
+        }
       ],
-      "coverage": { "outcomes": "complete", "workEvidence": "complete", "attention": "complete", "overall": "complete" },
+      "coverage": {
+        "outcomes": "complete",
+        "workEvidence": "complete",
+        "attention": "complete",
+        "overall": "complete"
+      },
       "quarantine": 0,
       "subjects": 3,
-      "limits": { "recordsSeen": 3, "recordsAccepted": 3, "worksSeen": 2, "pagesSeen": 2, "stoppedBy": "none" },
+      "limits": {
+        "recordsSeen": 3,
+        "recordsAccepted": 3,
+        "worksSeen": 2,
+        "pagesSeen": 2,
+        "stoppedBy": "none"
+      },
       "metrics": [
-        { "metricId": "outcomes.count", "layer": "controlled", "value": 3, "sampleCount": 3, "unknownCount": 0 },
-        { "metricId": "outcomes.accepted", "layer": "controlled", "value": 0, "sampleCount": 3, "unknownCount": 0 },
-        { "metricId": "execution.durationMs", "layer": "controlled", "value": 140000, "sampleCount": 2, "unknownCount": 1 },
-        { "metricId": "queue.waitMs", "layer": "controlled", "value": null, "nullReason": "endpoint_missing", "sampleCount": 0, "unknownCount": 3 },
-        { "metricId": "review.readyToAcceptanceMs", "layer": "controlled", "value": null, "nullReason": "acceptance_unknown", "sampleCount": 0, "unknownCount": 3 },
-        { "metricId": "review.activeMs", "layer": "controlled", "value": null, "nullReason": "timing_missing", "sampleCount": 0, "unknownCount": 3 },
-        { "metricId": "usage.inputTokens", "layer": "controlled", "value": 12500, "sampleCount": 1, "unknownCount": 2 },
-        { "metricId": "usage.outputTokens", "layer": "controlled", "value": 3100, "sampleCount": 1, "unknownCount": 2 },
-        { "metricId": "usage.cost", "layer": "controlled", "currency": "USD", "value": 0.42, "sampleCount": 1 },
-        { "metricId": "interventions.questions", "layer": null, "value": 2, "sampleCount": 2, "unknownCount": 0 },
-        { "metricId": "interventions.answers", "layer": null, "value": 0, "sampleCount": 2, "unknownCount": 0 },
-        { "metricId": "interventions.acceptances", "layer": null, "value": 0, "sampleCount": 2, "unknownCount": 0 },
-        { "metricId": "interventions.total", "layer": null, "value": 2, "sampleCount": 2, "unknownCount": 0 }
+        {
+          "metricId": "outcomes.count",
+          "layer": "controlled",
+          "value": 3,
+          "sampleCount": 3,
+          "unknownCount": 0
+        },
+        {
+          "metricId": "outcomes.accepted",
+          "layer": "controlled",
+          "value": 0,
+          "sampleCount": 3,
+          "unknownCount": 0
+        },
+        {
+          "metricId": "execution.durationMs",
+          "layer": "controlled",
+          "value": 140000,
+          "sampleCount": 2,
+          "unknownCount": 1
+        },
+        {
+          "metricId": "queue.waitMs",
+          "layer": "controlled",
+          "value": null,
+          "nullReason": "endpoint_missing",
+          "sampleCount": 0,
+          "unknownCount": 3
+        },
+        {
+          "metricId": "review.readyToAcceptanceMs",
+          "layer": "controlled",
+          "value": null,
+          "nullReason": "acceptance_unknown",
+          "sampleCount": 0,
+          "unknownCount": 3
+        },
+        {
+          "metricId": "review.activeMs",
+          "layer": "controlled",
+          "value": null,
+          "nullReason": "timing_missing",
+          "sampleCount": 0,
+          "unknownCount": 3
+        },
+        {
+          "metricId": "usage.inputTokens",
+          "layer": "controlled",
+          "value": 12500,
+          "sampleCount": 1,
+          "unknownCount": 2
+        },
+        {
+          "metricId": "usage.outputTokens",
+          "layer": "controlled",
+          "value": 3100,
+          "sampleCount": 1,
+          "unknownCount": 2
+        },
+        {
+          "metricId": "usage.cost",
+          "layer": "controlled",
+          "currency": "USD",
+          "value": 0.42,
+          "sampleCount": 1
+        },
+        {
+          "metricId": "interventions.questions",
+          "layer": null,
+          "value": 2,
+          "sampleCount": 2,
+          "unknownCount": 0
+        },
+        {
+          "metricId": "interventions.answers",
+          "layer": null,
+          "value": 0,
+          "sampleCount": 2,
+          "unknownCount": 0
+        },
+        {
+          "metricId": "interventions.acceptances",
+          "layer": null,
+          "value": 0,
+          "sampleCount": 2,
+          "unknownCount": 0
+        },
+        {
+          "metricId": "interventions.total",
+          "layer": null,
+          "value": 2,
+          "sampleCount": 2,
+          "unknownCount": 0
+        }
       ],
-      "attention": { "items": 2, "waitingAgeMs": 9900000, "coverage": "complete", "meaning": "current pending-age snapshot, not historical queue waiting" },
-      "usageCompleteness": { "outcomeRecords": 3, "recordsWithKnownTokens": 1, "recordsWithUnknownUsage": 2, "recordsWithKnownCost": 1, "recordsWithoutCost": 2, "tokensCompleteness": "partial", "costCompleteness": "partial" },
+      "attention": {
+        "items": 2,
+        "waitingAgeMs": 9900000,
+        "coverage": "complete",
+        "meaning": "current pending-age snapshot, not historical queue waiting"
+      },
+      "usageCompleteness": {
+        "outcomeRecords": 3,
+        "recordsWithKnownTokens": 1,
+        "recordsWithUnknownUsage": 2,
+        "recordsWithKnownCost": 1,
+        "recordsWithoutCost": 2,
+        "tokensCompleteness": "partial",
+        "costCompleteness": "partial"
+      },
       "baseline": "not_requested",
-      "configuration": { "observed": false, "kind": "none", "authority": "none" },
+      "configuration": {
+        "observed": false,
+        "kind": "none",
+        "authority": "none"
+      },
       "readOnlyNoProductEvents": true,
       "repeatedCollectionIdentical": true,
       "sameTitleWorksStayedSeparate": true,
@@ -146,7 +428,10 @@
     "sample": "reports/usage-insights/f-integration/consumer-view.example.json",
     "contract": "reports/usage-insights/f-integration/README.md",
     "compatibility": "usage-insights/1 additive-only; null means unknown and is never defaulted to 0",
-    "mainIntegrationNeeded": ["root workspace dependency registration for @personal-agent/usage-insights", "root import/export wiring if the console consumes it directly"]
+    "mainIntegrationNeeded": [
+      "root workspace dependency registration for @personal-agent/usage-insights",
+      "root import/export wiring if the console consumes it directly"
+    ]
   },
   "notReached": [
     "actual_native execution data: NOT_TESTED — no vendor/model/native turn was performed and no native sample was fabricated",
@@ -173,7 +458,11 @@
     "noRootLockOrContractsChanges": true,
     "noEShAssertionsChanged": true,
     "userServicesPreserved": "twelve 5180/8796 … 5191/8807 instances and all state/profile/tar/ledger left untouched",
-    "evidenceLayers": ["controlled", "operator_note", "synthetic_fixture"],
+    "evidenceLayers": [
+      "controlled",
+      "operator_note",
+      "synthetic_fixture"
+    ],
     "nativeLayerPresent": false
   },
   "verification": {
@@ -187,8 +476,18 @@
     "results": {
       "typecheck": "pass",
       "build": "pass",
-      "packageTests": { "total": 32, "pass": 32, "fail": 0 },
-      "toolTests": { "total": 23, "pass": 23, "fail": 0, "cli": 13, "httpAdapter": 10 },
+      "packageTests": {
+        "total": 33,
+        "pass": 33,
+        "fail": 0
+      },
+      "toolTests": {
+        "total": 23,
+        "pass": 23,
+        "fail": 0,
+        "cli": 13,
+        "httpAdapter": 10
+      },
       "probe": "pass (all assertions, exit 0)"
     },
     "staticChecksConfer": "no runtime, native or release admission"
