@@ -58,6 +58,8 @@ export interface RestoreSnapshotReport {
   readonly limitations: readonly string[]
 }
 
+export interface ArtifactExpectation { readonly id: string; readonly digest: string; readonly bytes: number }
+
 export interface RestoreExpectation {
   readonly protocol?: 'workflow-snapshot/1' | 'workflow-snapshot/2'
   readonly snapshotDigest?: string
@@ -65,6 +67,8 @@ export interface RestoreExpectation {
   readonly evidenceDigest?: string
   /** Content proof computed independently from the source database before snapshotting. */
   readonly contentDigest?: string
+  /** Exact independent artifact inventory (id/digest/bytes); an empty list is only valid for an empty original subject. */
+  readonly artifacts?: readonly ArtifactExpectation[]
 }
 
 export interface RestoreSnapshotResult {
@@ -75,7 +79,33 @@ export interface RestoreSnapshotResult {
   readonly message?: string
 }
 
-export const RESTORE_LIMITS = { manifestBytes: 8 * 1024 * 1024, databaseBytes: 512 * 1024 * 1024, artifactBytes: 512 * 1024 * 1024 } as const
+export const RESTORE_LIMITS = { manifestBytes: 8 * 1024 * 1024, databaseBytes: 512 * 1024 * 1024, artifactBytes: 512 * 1024 * 1024,
+  totalArtifactBytes: 2 * 1024 * 1024 * 1024, maxArtifacts: 4096 } as const
+const ARTIFACT_ID = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/
+
+const normalizeArtifacts = (input: readonly ArtifactExpectation[] | undefined, label: string): ArtifactExpectation[] => {
+  if (!Array.isArray(input)) throw new RestoreError(`${label} artifact inventory is not an array`)
+  if (input.length > RESTORE_LIMITS.maxArtifacts) throw new RestoreError(`${label} artifact count exceeds the limit`)
+  const seen = new Set<string>(), result: ArtifactExpectation[] = []
+  let total = 0
+  for (const artifact of input) {
+    if (!artifact || typeof artifact.id !== 'string' || artifact.id === 'tmp' || !ARTIFACT_ID.test(artifact.id) ||
+      typeof artifact.digest !== 'string' || !/^[a-f0-9]{64}$/.test(artifact.digest) ||
+      !Number.isSafeInteger(artifact.bytes) || artifact.bytes < 0 || artifact.bytes > RESTORE_LIMITS.artifactBytes)
+      throw new RestoreError(`${label} artifact entry is invalid`)
+    if (seen.has(artifact.id)) throw new RestoreError(`${label} artifact inventory contains a duplicate id`)
+    seen.add(artifact.id); total += artifact.bytes
+    if (total > RESTORE_LIMITS.totalArtifactBytes) throw new RestoreError(`${label} artifact bytes exceed the cumulative limit`)
+    result.push({ id: artifact.id, digest: artifact.digest, bytes: artifact.bytes })
+  }
+  return result
+}
+
+const sameArtifacts = (left: readonly ArtifactExpectation[], right: readonly ArtifactExpectation[]): boolean => {
+  if (left.length !== right.length) return false
+  const map = new Map(right.map(value => [value.id, value]))
+  return left.every(value => { const other = map.get(value.id); return !!other && other.digest === value.digest && other.bytes === value.bytes })
+}
 
 const sha256 = (data: Uint8Array): string => createHash('sha256').update(data).digest('hex')
 
@@ -146,6 +176,11 @@ export async function restoreWorkflowSnapshot(options: RestoreSnapshotOptions): 
     if (expected.snapshotDigest !== undefined && expected.snapshotDigest !== digest) return blocked('snapshot manifest digest does not match the independent expectation')
     if (expected.databaseSha256 !== undefined && expected.databaseSha256 !== manifest.database.sha256) return blocked('snapshot database digest does not match the independent expectation')
     if (expected.evidenceDigest !== undefined && expected.evidenceDigest !== manifest.evidence?.digest) return blocked('snapshot evidence digest does not match the independent expectation')
+    if (expected.artifacts !== undefined) {
+      const required = normalizeArtifacts(expected.artifacts, 'expected')
+      const actual = manifest.artifacts.map(artifact => ({ id: artifact.id, digest: artifact.digest, bytes: artifact.bytes }))
+      if (!sameArtifacts(required, actual)) return blocked('snapshot artifact inventory does not match the independent expected inventory')
+    }
     if (manifest.incompatibleSchema) return blocked(`snapshot schema ${String(manifest.database.productSchema)} is newer than this build (${PRODUCT_SCHEMA_VERSION})`)
     if (manifest.database.integrity !== 'ok' || manifest.database.foreignKeyViolations !== 0) return blocked('snapshot database was not verified when produced')
 
@@ -193,7 +228,7 @@ export async function restoreWorkflowSnapshot(options: RestoreSnapshotOptions): 
         evidence: { status: 'verified', digest: evidence.digest, protocol: evidence.protocol, families: evidence.families.length },
         content: { protocol: content.protocol, digest: content.digest, productSchema: content.productSchema, complete: content.complete,
           collections: content.collections, omittedTables: content.omittedTables, reason: content.reason, rows: content.rows, bytes: content.bytes },
-        artifacts: manifest.artifacts.map(artifact => ({ id: artifact.id, digest: artifact.digest, bytes: artifact.bytes })),
+        artifacts: normalizeArtifacts(manifest.artifacts, 'snapshot'),
         logicalSource: { digest: evidence.digest, coverage: 'complete' },
         rootMapping: { from: options.sourceStateRoot ? resolve(options.sourceStateRoot) : null, to: target },
         pathMappings: { applied: [], pendingRebind: ['project bindings are not carried by a workflow snapshot'] },
@@ -224,6 +259,7 @@ export interface RestoreVerification {
   readonly status: 'ok' | 'blocked'
   /** `independent` requires at least one caller-supplied snapshot/database/evidence/content expectation. */
   readonly basis: 'independent' | 'report_only' | null
+  readonly artifactCoverage: 'independent' | 'report_only' | null
   readonly report: RestoreSnapshotReport | null
   readonly content: WorkflowContentSummary | null
   readonly message?: string
@@ -247,22 +283,49 @@ export function verifyRestoredSnapshot(targetStateDir: string, expected: VerifyR
     const verified = verifyDatabase(database)
     if (verified.integrity !== 'ok' || verified.foreignKeyViolations !== 0) throw new RestoreError('restored database failed re-verification')
     if (verified.productSchema !== report.database.productSchema) throw new RestoreError('restored database schema changed after restore')
-    const content = readWorkflowContent(database)
+    const contentVersion = report.content?.protocol === 'workflow-content/1' ? 1 : report.content?.protocol === 'workflow-content/2' ? 2 : null
+    if (contentVersion === null) throw new RestoreError('restore report has an unsupported content proof protocol')
+    const content = readWorkflowContent(database, { version: contentVersion })
     if (!content.complete || content.digest === null) throw new RestoreError(`restored content proof is incomplete: ${content.reason ?? 'unknown'}`)
     if (content.productSchema !== report.content.productSchema) throw new RestoreError('restored content schema differs from the report')
     if (report.content.digest === null || content.digest !== report.content.digest) throw new RestoreError('restored row content differs from the restore report')
-    if (!Array.isArray(report.artifacts)) throw new RestoreError('restore report has no artifact inventory')
-    for (const artifact of report.artifacts) {
-      if (!artifact || typeof artifact.id !== 'string' || !Number.isSafeInteger(artifact.bytes) || artifact.bytes < 0 || !/^[a-f0-9]{64}$/.test(artifact.digest)) throw new RestoreError('restore artifact inventory is invalid')
-      const path = join(target, 'artifacts', artifact.id)
+    const reportArtifacts = normalizeArtifacts(report.artifacts, 'report')
+    if (!Number.isSafeInteger(report.snapshot.artifacts) || report.snapshot.artifacts !== reportArtifacts.length)
+      throw new RestoreError('restore report artifact count does not match its inventory')
+    const artifactCoverage: 'independent' | 'report_only' = expected.artifacts === undefined ? 'report_only' : 'independent'
+    const required = expected.artifacts === undefined ? reportArtifacts : normalizeArtifacts(expected.artifacts, 'expected')
+    if (artifactCoverage === 'independent' && !sameArtifacts(required, reportArtifacts))
+      throw new RestoreError('restore report artifact inventory differs from the independent expected inventory')
+    const artifactDirectory = join(target, 'artifacts')
+    let entries: string[] = []
+    if (existsSync(artifactDirectory)) {
+      const directory = lstatSync(artifactDirectory)
+      if (!directory.isDirectory() || directory.isSymbolicLink()) throw new RestoreError('restore artifact directory is not a real directory')
+      entries = readdirSync(artifactDirectory).sort().filter(name => {
+        if (name !== 'tmp') return true
+        const scratch = lstatSync(join(artifactDirectory, name))
+        if (!scratch.isDirectory() || scratch.isSymbolicLink()) throw new RestoreError('restore artifact scratch path is not a directory')
+        return false
+      })
+    }
+    const expectedIds = new Set(required.map(artifact => artifact.id))
+    if (entries.some(name => !expectedIds.has(name))) throw new RestoreError(`restore target contains a foreign artifact file: ${entries.filter(name => !expectedIds.has(name)).slice(0, 5).join(', ')}`)
+    if (required.length !== entries.length) throw new RestoreError('restore target is missing a required artifact file')
+    let artifactBytes = 0
+    for (const artifact of required) {
+      const path = join(artifactDirectory, artifact.id)
       const stat = lstatSync(path)
       if (!stat.isFile() || stat.isSymbolicLink()) throw new RestoreError(`restored artifact ${artifact.id} is not a regular file`)
+      if (stat.size !== artifact.bytes) throw new RestoreError(`restored artifact ${artifact.id} size differs from the expected inventory`)
+      artifactBytes += artifact.bytes
+      if (artifactBytes > RESTORE_LIMITS.totalArtifactBytes) throw new RestoreError('restored artifact bytes exceed the cumulative limit')
       const bytes = readFileSync(path)
-      if (bytes.byteLength !== artifact.bytes || sha256(bytes) !== artifact.digest) throw new RestoreError(`restored artifact ${artifact.id} differs from the snapshot`)
+      if (sha256(bytes) !== artifact.digest) throw new RestoreError(`restored artifact ${artifact.id} differs from the snapshot`)
     }
-    const independent = Boolean(expected.snapshotDigest || expected.databaseSha256 || expected.evidenceDigest || expected.contentDigest)
-    return { status: 'ok', basis: independent ? 'independent' : 'report_only', report, content }
+    const independentContent = Boolean(expected.snapshotDigest || expected.databaseSha256 || expected.evidenceDigest || expected.contentDigest)
+    const basis = artifactCoverage === 'independent' && independentContent ? 'independent' : 'report_only'
+    return { status: 'ok', basis, artifactCoverage, report, content }
   } catch (error) {
-    return { status: 'blocked', basis: null, report: null, content: null, message: error instanceof Error ? error.message : String(error) }
+    return { status: 'blocked', basis: null, artifactCoverage: null, report: null, content: null, message: error instanceof Error ? error.message : String(error) }
   }
 }

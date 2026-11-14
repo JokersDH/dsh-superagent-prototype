@@ -10,7 +10,7 @@ import { test } from 'node:test'
 import { ProductStore, readWorkflowContent } from '@personal-agent/storage'
 import { buildDataManifest, verifyDataManifest, type DataSubjectExpectation } from '../src/index.ts'
 import { key } from '../../orchestrator-core/src/core/ids.ts'
-import { restoreWorkflowSnapshot, verifyRestoredSnapshot, WorkflowSnapshots } from '../src/index.ts'
+import { restoreWorkflowSnapshot, verifyRestoredSnapshot, WorkflowSnapshots, RESTORE_LIMITS } from '../src/index.ts'
 import { localCredentials } from '../../../apps/coordinator/http/local-state.ts'
 import { prepareRestoredReview } from '../../../apps/coordinator/product/restored-review.ts'
 import { createControlledProduct, createProductRuntime, FIXTURE_CHECK } from '../../../apps/coordinator/product/runtime.ts'
@@ -100,7 +100,7 @@ test('the same real Store restores v1 and v2 separately through actual personal 
   assert.equal(sourceContent.complete, true); assert.ok(sourceContent.digest)
   const sourceExpectationPath = join(root, 'source-expectation.json'), sourceManifestPath = join(root, 'source-manifest.json')
   writeFileSync(sourceExpectationPath, JSON.stringify(sourceExpectation, null, 2)); writeFileSync(sourceManifestPath, JSON.stringify(sourceManifest, null, 2))
-  console.log('WAVE26_SOURCE_MANIFEST', JSON.stringify({ digest: sourceManifest.digest, counts: sourceManifest.counts, answers: sourceManifest.answer.id }))
+  console.log('WAVE27_SOURCE_MANIFEST', JSON.stringify({ digest: sourceManifest.digest, counts: sourceManifest.counts, answers: sourceManifest.answer.id }))
   for (const format of [1, 2] as const) {
     const snapshotDir = join(root, `snapshot-${format}`)
     const snapshot = await new WorkflowSnapshots(store).create({ destination: snapshotDir, ...(format === 2 ? { formatVersion: 2 } : {}) })
@@ -108,6 +108,19 @@ test('the same real Store restores v1 and v2 separately through actual personal 
     assert.equal(snapshot.manifest.protocol, format === 2 ? 'workflow-snapshot/2' : 'workflow-snapshot/1')
     assert.equal(snapshot.manifest.evidence.protocol, format === 2 ? 'workflow-evidence/2' : 'workflow-evidence/1')
     assert.equal(snapshot.manifest.evidence.families.length, format === 2 ? 21 : 13)
+    const expectedArtifacts = snapshot.manifest.artifacts.map(artifact => ({ id: artifact.id, digest: artifact.digest, bytes: artifact.bytes }))
+    const duplicateInventory = expectedArtifacts[0] ? [...expectedArtifacts, expectedArtifacts[0]] : []
+    if (duplicateInventory.length) {
+      const refusedInventory = await restoreWorkflowSnapshot({ snapshotDirectory: snapshot.destination, targetStateDir: join(root, `bad-inventory-${format}`),
+        expected: { artifacts: duplicateInventory } })
+      assert.equal(refusedInventory.status, 'blocked')
+      const oversizedInventory = await restoreWorkflowSnapshot({ snapshotDirectory: snapshot.destination, targetStateDir: join(root, `oversized-inventory-${format}`),
+        expected: { artifacts: [{ ...expectedArtifacts[0]!, bytes: RESTORE_LIMITS.artifactBytes + 1 }] } })
+      assert.equal(oversizedInventory.status, 'blocked')
+      const foreignInventory = await restoreWorkflowSnapshot({ snapshotDirectory: snapshot.destination, targetStateDir: join(root, `foreign-inventory-${format}`),
+        expected: { artifacts: [{ ...expectedArtifacts[0]!, id: '../foreign' }] } })
+      assert.equal(foreignInventory.status, 'blocked')
+    }
     const restoreRoot = join(mkdtempSync(join(tmpdir(), `wave25-restore-${format}-`)), 'state')
     const wrongFormat = format === 2 ? 'workflow-snapshot/1' : 'workflow-snapshot/2'
     const refusedFormat = await restoreWorkflowSnapshot({ snapshotDirectory: snapshot.destination, targetStateDir: join(root, `bad-format-${format}`),
@@ -140,7 +153,7 @@ test('the same real Store restores v1 and v2 separately through actual personal 
     assert.equal(restored.report?.evidence.digest, snapshot.manifest.evidence.digest)
     assert.equal(restored.report?.rootMapping.from, source)
     assert.equal(restored.report?.content.complete, true)
-    console.log('WAVE26_CONTENT', JSON.stringify({ format, snapshotDigest: sha256(readFileSync(snapshot.manifestPath)), databaseSha256: snapshot.manifest.database.sha256,
+    console.log('WAVE27_CONTENT', JSON.stringify({ format, snapshotDigest: sha256(readFileSync(snapshot.manifestPath)), databaseSha256: snapshot.manifest.database.sha256,
       contentDigest: restored.report?.content.digest, contentRows: restored.report?.content.rows, contentBytes: restored.report?.content.bytes, artifacts: restored.report?.artifacts.length }))
     assert.ok(restored.report?.content.digest)
     assert.equal(restored.report?.database.sha256, sha256(readFileSync(join(snapshot.destination, 'product.sqlite'))))
@@ -148,11 +161,11 @@ test('the same real Store restores v1 and v2 separately through actual personal 
     assert.equal(verifyRestoredSnapshot(restoreRoot).basis, 'report_only')
     const reverified = verifyRestoredSnapshot(restoreRoot, { protocol: snapshot.manifest.protocol,
       snapshotDigest: sha256(readFileSync(snapshot.manifestPath)), databaseSha256: snapshot.manifest.database.sha256,
-      evidenceDigest: snapshot.manifest.evidence.digest, contentDigest: sourceContent.digest!, sourceStateRoot: source })
+      evidenceDigest: snapshot.manifest.evidence.digest, contentDigest: sourceContent.digest!, artifacts: expectedArtifacts, sourceStateRoot: source })
     assert.equal(reverified.status, 'ok', reverified.message); assert.equal(reverified.basis, 'independent')
     assert.equal(reverified.content?.digest, restored.report!.content.digest)
     assert.equal(restored.report!.content.digest, sourceContent.digest)
-    assert.equal(verifyRestoredSnapshot(restoreRoot, { snapshotDigest: '0'.repeat(64) }).status, 'blocked')
+    assert.equal(verifyRestoredSnapshot(restoreRoot, { snapshotDigest: '0'.repeat(64), artifacts: expectedArtifacts }).status, 'blocked')
     const capped = readWorkflowContent(join(restoreRoot, 'state.sqlite'), { limits: { maxRows: 1 } })
     assert.equal(capped.complete, false); assert.equal(capped.digest, null); assert.ok(capped.reason)
     const driftRoot = join(root, `drift-${format}`)
@@ -166,7 +179,7 @@ test('the same real Store restores v1 and v2 separately through actual personal 
       driftStore.db.prepare('INSERT INTO conversation_messages (conversation_id, sequence, id, value, created_at) VALUES (?, ?, ?, ?, ?)')
         .run(last.conversation_id, last.sequence + 1, 'wave26-extra-message', last.value, last.created_at)
     } finally { driftStore.close() }
-    const drift = verifyRestoredSnapshot(driftRoot, { snapshotDigest: sha256(readFileSync(snapshot.manifestPath)), sourceStateRoot: source })
+    const drift = verifyRestoredSnapshot(driftRoot, { snapshotDigest: sha256(readFileSync(snapshot.manifestPath)), artifacts: expectedArtifacts, sourceStateRoot: source })
     assert.equal(drift.status, 'blocked'); assert.match(drift.message ?? '', /content differs/)
     const artifactRootCopy = join(root, `artifact-drift-${format}`)
     cpSync(restoreRoot, artifactRootCopy, { recursive: true })
@@ -177,18 +190,27 @@ test('the same real Store restores v1 and v2 separately through actual personal 
     if (artifactId) {
       const artifactPath = join(artifactRootCopy, 'artifacts', artifactId), bytes = Buffer.from(readFileSync(artifactPath))
       bytes[0] = (bytes[0] ?? 0) ^ 0xff; writeFileSync(artifactPath, bytes)
-      const artifactDrift = verifyRestoredSnapshot(artifactRootCopy, { snapshotDigest: sha256(readFileSync(snapshot.manifestPath)) })
+      const artifactDrift = verifyRestoredSnapshot(artifactRootCopy, { snapshotDigest: sha256(readFileSync(snapshot.manifestPath)), artifacts: expectedArtifacts })
       assert.equal(artifactDrift.status, 'blocked'); assert.match(artifactDrift.message ?? '', /artifact/)
       rmSync(artifactPath)
-      const missingArtifact = verifyRestoredSnapshot(artifactRootCopy, { snapshotDigest: sha256(readFileSync(snapshot.manifestPath)) })
+      const missingArtifact = verifyRestoredSnapshot(artifactRootCopy, { snapshotDigest: sha256(readFileSync(snapshot.manifestPath)), artifacts: expectedArtifacts })
       assert.equal(missingArtifact.status, 'blocked')
     }
+    const emptiedRoot = join(root, `emptied-inventory-${format}`)
+    cpSync(restoreRoot, emptiedRoot, { recursive: true })
+    const emptiedReport = JSON.parse(readFileSync(join(emptiedRoot, 'restore-report.json'), 'utf8'))
+    emptiedReport.targetPath = emptiedRoot; emptiedReport.rootMapping.to = emptiedRoot; emptiedReport.artifacts = []; emptiedReport.snapshot.artifacts = 0
+    writeFileSync(join(emptiedRoot, 'restore-report.json'), JSON.stringify(emptiedReport, null, 2))
+    const firstExpectedArtifact = expectedArtifacts[0]
+    if (firstExpectedArtifact) rmSync(join(emptiedRoot, 'artifacts', firstExpectedArtifact.id))
+    const emptied = verifyRestoredSnapshot(emptiedRoot, { snapshotDigest: sha256(readFileSync(snapshot.manifestPath)), contentDigest: sourceContent.digest!, artifacts: expectedArtifacts })
+    assert.equal(emptied.status, 'blocked'); assert.match(emptied.message ?? '', /artifact inventory/)
     const mappingRoot = join(root, `mapping-drift-${format}`)
     cpSync(restoreRoot, mappingRoot, { recursive: true })
     const mappingReport = JSON.parse(readFileSync(join(mappingRoot, 'restore-report.json'), 'utf8'))
     mappingReport.targetPath = mappingRoot; mappingReport.rootMapping.to = source
     writeFileSync(join(mappingRoot, 'restore-report.json'), JSON.stringify(mappingReport, null, 2))
-    const mappingDrift = verifyRestoredSnapshot(mappingRoot, { snapshotDigest: sha256(readFileSync(snapshot.manifestPath)) })
+    const mappingDrift = verifyRestoredSnapshot(mappingRoot, { snapshotDigest: sha256(readFileSync(snapshot.manifestPath)), artifacts: expectedArtifacts })
     assert.equal(mappingDrift.status, 'blocked'); assert.match(mappingDrift.message ?? '', /root mapping/)
     assert.equal((await restoreWorkflowSnapshot({ snapshotDirectory: snapshot.destination, targetStateDir: restoreRoot })).status, 'blocked')
     const credential = localCredentials(restoreRoot), reviewFile = join(root, `review-${format}.json`)
@@ -251,19 +273,28 @@ test('the same real Store restores v1 and v2 separately through actual personal 
       const cVerify = spawnSync(process.execPath, [cDriver, '--a-module', aModule, '--a-worktree', repoRoot, '--db', join(restoreRoot, 'state.sqlite'),
         '--expectation', expectationPath, '--manifest', cOutput, '--mode', 'verify', '--a-head', aHead], { encoding: 'utf8', timeout: 20000 })
       assert.equal(cVerify.status, 0, cVerify.stderr); assert.equal(JSON.parse(cVerify.stdout).verification.ok, true)
-      const cProof = join(process.env.PA_C_WORKTREE ?? '/Users/hh/Desktop/joker/superagent-agent-c', 'packages/context/tools/wave26-target-proof.mjs')
+      const cProof = join(process.env.PA_C_WORKTREE ?? '/Users/hh/Desktop/joker/superagent-agent-c', 'packages/context/tools/wave27-target-proof.mjs')
       if (existsSync(cProof)) {
-        const proof = spawnSync(process.execPath, [cProof, '--a-worktree', repoRoot, '--a-module', aModule, '--db', join(restoreRoot, 'state.sqlite'),
-          '--expectation', sourceExpectationPath, '--manifest', sourceManifestPath, '--report', restored.reportPath, '--a-head', aHead], { encoding: 'utf8', timeout: 20000 })
+        const artifactsPath = join(root, `expected-artifacts-${format}.json`)
+        writeFileSync(artifactsPath, JSON.stringify(expectedArtifacts))
+        const common: string[] = ['--a-worktree', repoRoot, '--a-module', aModule, '--expectation', sourceExpectationPath, '--manifest', sourceManifestPath,
+          '--source-state-root', source, '--protocol', snapshot.manifest.protocol, '--snapshot-digest', sha256(readFileSync(snapshot.manifestPath)),
+          '--content-digest', sourceContent.digest!, '--artifacts', artifactsPath, '--a-head', aHead]
+        const proof = spawnSync(process.execPath, [cProof, '--target-state', restoreRoot, ...common], { encoding: 'utf8', timeout: 20000 })
+        console.log('WAVE27_C_PROOF', proof.status, proof.stdout.slice(0, 1200), proof.stderr.slice(0, 800))
         assert.equal(proof.status, 0, `${proof.stderr}\n${proof.stdout}`)
-        assert.equal(JSON.parse(proof.stdout).status, 'ok')
-        const driftProof = spawnSync(process.execPath, [cProof, '--a-worktree', repoRoot, '--a-module', aModule, '--db', join(driftRoot, 'state.sqlite'),
-          '--expectation', sourceExpectationPath, '--manifest', sourceManifestPath, '--a-head', aHead], { encoding: 'utf8', timeout: 20000 })
+        const proofResult = JSON.parse(proof.stdout)
+        assert.equal(proofResult.status, 'ok'); assert.equal(proofResult.verification.basis, 'independent'); assert.equal(proofResult.verification.artifactCoverage, 'independent')
+        const driftProof = spawnSync(process.execPath, [cProof, '--target-state', driftRoot, ...common], { encoding: 'utf8', timeout: 20000 })
         assert.ok(driftProof.status === 0 || driftProof.status === 1, driftProof.stderr)
         assert.equal(JSON.parse(driftProof.stdout).status, 'mismatch')
-        console.log('WAVE25_DUAL_C_DRIVER', JSON.stringify({ format, pid: built.pid, manifestDigest: built.manifest.digest, aHead,
-          targetProof: 'ok', driftProof: 'mismatch' }))
-      } else console.log(`WAVE25_DUAL_C_DRIVER format=${format} driver=${built.pid} targetProof=NOT_REACHED`)
+        const emptiedProof = spawnSync(process.execPath, [cProof, '--target-state', emptiedRoot, ...common], { encoding: 'utf8', timeout: 20000 })
+        assert.ok(emptiedProof.status === 0 || emptiedProof.status === 1, emptiedProof.stderr)
+        assert.equal(JSON.parse(emptiedProof.stdout).status, 'mismatch')
+        console.log('WAVE27_DUAL_C_DRIVER', JSON.stringify({ format, pid: built.pid, manifestDigest: built.manifest.digest, aHead,
+          targetProof: 'ok', driftProof: 'mismatch', emptiedInventoryProof: 'mismatch', contentDigest: proofResult.verification.content?.digest,
+          artifacts: proofResult.verification.report?.artifacts }))
+      } else console.log(`WAVE27_DUAL_C_DRIVER format=${format} driver=${built.pid} targetProof=NOT_REACHED`)
     } else console.log(`WAVE25_DUAL_C_DRIVER_NOT_REACHED format=${format}`)
     const reader = spawnSync(process.execPath, [join(import.meta.dirname, 'fixtures', 'wave23-reader.mjs'), join(restoreRoot, 'state.sqlite'), manifestPath, expectationPath],
       { encoding: 'utf8', timeout: 20000 })

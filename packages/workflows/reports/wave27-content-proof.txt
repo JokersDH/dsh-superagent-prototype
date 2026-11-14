@@ -1,0 +1,10 @@
+WAVE27_CONTENT_PROOF {"baseDigest":"d4bcbe73b26e67d6dc6a3fbccec5c21141432c091eb03c31b984b835c48d7dd6","omitted":["coordinator_instances","writer_claim","conversation_search","conversation_search_config","conversation_search_content","conversation_search_data","conversation_search_docsize","conversation_search_idx"],"rows":2,"capped":"table alpha exceeds the row limit","missing":"database is not readable: SqliteError: unable to open database file"}
+✔ content proof changes with durable rows, ignores root-local runtime tables and stops at its limits (11.573834ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 81.741833

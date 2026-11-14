@@ -3,19 +3,27 @@
  *
  * SQLite `integrity_check`, foreign keys and `user_version` prove that a file is structurally a
  * current product database; they do not prove that the rows are the rows of the snapshot that was
- * restored. This module re-reads every durable table (except the explicitly listed root-local
- * runtime tables) and hashes rows by primary storage order, column names and values. A legitimate
- * extra message, a changed answer/delivery, a removed row or a replaced event changes the digest.
+ * restored. This module re-reads every durable ordinary table and hashes rows by primary storage
+ * order, column names and values. A legitimate extra message, a changed answer/delivery, a removed
+ * row or a replaced event changes the digest.
  *
- * Excluded tables are limited to root-local runtime presence/ownership and FTS shadow storage that
- * is derived from `conversation_messages`; they are never used as writer-quiescence or execution
- * evidence. The exclusion list and limits are part of the digest header, so a future change needs a
- * new protocol version rather than silently changing the meaning of an existing digest.
+ * Two protocol versions are intentionally supported:
+ * - `workflow-content/1` is the wave-26 recipe. It skips any table whose name starts with
+ *   `conversation_search`; its digests remain reproducible for already-recorded reports.
+ * - `workflow-content/2` uses SQLite schema metadata. Only an actual FTS virtual table and its
+ *   real shadow tables are derived/omitted; an ordinary table with the same prefix is included or
+ *   makes the proof incomplete. Unknown virtual/shadow tables make the proof incomplete instead of
+ *   silently disappearing.
+ *
+ * Root-local `coordinator_instances`/`writer_claim` remain explicit omissions in both versions. They
+ * are never writer-quiescence or execution evidence, and no other business table is broadly ignored.
  */
 import { createHash } from 'node:crypto'
 import Database from 'better-sqlite3'
 
-export const CONTENT_PROOF_PROTOCOL = 'workflow-content/1' as const
+export type ContentProofProtocol = 'workflow-content/1' | 'workflow-content/2'
+export const CONTENT_PROOF_PROTOCOL: ContentProofProtocol = 'workflow-content/2'
+export const LEGACY_CONTENT_PROOF_PROTOCOL: ContentProofProtocol = 'workflow-content/1'
 
 export interface ContentProofLimits {
   readonly maxTables: number
@@ -34,7 +42,7 @@ export interface ContentCollection {
 }
 
 export interface WorkflowContentSummary {
-  readonly protocol: typeof CONTENT_PROOF_PROTOCOL
+  readonly protocol: ContentProofProtocol
   readonly productSchema: number | null
   readonly digest: string | null
   readonly complete: boolean
@@ -48,7 +56,7 @@ export interface WorkflowContentSummary {
 
 /** Root-local runtime tables, not portable business content and not writer-quiescence evidence. */
 export const CONTENT_OMITTED_TABLES = Object.freeze(['coordinator_instances', 'writer_claim'])
-const FTS_PREFIX = 'conversation_search'
+const LEGACY_FTS_PREFIX = 'conversation_search'
 
 const sha256 = (value: string): string => createHash('sha256').update(value).digest('hex')
 
@@ -68,50 +76,104 @@ function canonical(value: unknown): string {
   return JSON.stringify(String(value))
 }
 
+interface SchemaEntry { name: string; type: string; sql: string | null }
+interface TableListEntry { name: string; type: string }
+
+const ftsModule = (sql: string | null): string | null => {
+  if (!sql) return null
+  const match = /CREATE\s+VIRTUAL\s+TABLE\s+[^\s]+\s+USING\s+(fts[45])\b/i.exec(sql)
+  return match?.[1]?.toLowerCase() ?? null
+}
+
+/**
+ * Select tables and the exact derived/omitted set.
+ * Version 2 uses `PRAGMA table_list`; an older SQLite without shadow/virtual type information is
+ * incomplete instead of falling back to a name-prefix guess.
+ */
+function tableSelection(database: Database.Database, version: 1 | 2):
+  { tables: string[]; omitted: string[]; reason?: string } {
+  const omitted = [...CONTENT_OMITTED_TABLES]
+  if (version === 1) {
+    const tables = (database.prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY name").all() as { name: string }[])
+      .map(row => row.name).filter(name => !omitted.includes(name) && !name.startsWith(LEGACY_FTS_PREFIX))
+    return { tables, omitted }
+  }
+  let tableList: TableListEntry[]
+  try {
+    tableList = database.pragma('table_list') as TableListEntry[]
+  } catch { return { tables: [], omitted, reason: 'SQLite schema metadata is unavailable; content completeness is unknown' } }
+  const entries = database.prepare("SELECT name, type, sql FROM sqlite_master WHERE type IN ('table', 'view') ORDER BY name").all() as SchemaEntry[]
+  const byName = new Map(entries.map(entry => [entry.name, entry]))
+  const ftsRoots = entries.filter(entry => entry.type === 'table' && ftsModule(entry.sql) !== null).map(entry => entry.name)
+  const derived = new Set<string>(ftsRoots)
+  for (const root of ftsRoots) {
+    for (const item of tableList) {
+      if (item.type !== 'shadow') continue
+      if (item.name.startsWith(`${root}_`)) derived.add(item.name)
+    }
+  }
+  for (const item of tableList) {
+    if (item.name.startsWith('sqlite_')) continue
+    const entry = byName.get(item.name)
+    if (item.type === 'virtual' && !ftsRoots.includes(item.name))
+      return { tables: [], omitted, reason: `unsupported virtual table ${item.name}; content completeness is unknown` }
+    if (item.type === 'shadow' && !derived.has(item.name))
+      return { tables: [], omitted, reason: `unsupported shadow table ${item.name}; content completeness is unknown` }
+    if (item.type === 'table' && entry?.type !== 'table') return { tables: [], omitted, reason: `table ${item.name} has no schema entry` }
+  }
+  const tables = tableList.filter(item => item.type === 'table' && !item.name.startsWith('sqlite_') && !derived.has(item.name) && !omitted.includes(item.name))
+    .map(item => item.name).sort()
+  omitted.push(...[...derived].sort())
+  return { tables, omitted }
+}
+
 /**
  * Read a bounded, deterministic content summary. A limit/failure result has `complete: false` and
  * `digest: null`; callers must not treat it as a partial match.
  */
-export function readWorkflowContent(databasePath: string, options: { limits?: Partial<ContentProofLimits> } = {}): WorkflowContentSummary {
+export function readWorkflowContent(databasePath: string,
+  options: { version?: 1 | 2; limits?: Partial<ContentProofLimits> } = {}): WorkflowContentSummary {
+  const version = options.version === undefined ? 2 : options.version
+  if (version !== 1 && version !== 2) throw new TypeError('Unsupported content proof version')
+  const protocol: ContentProofProtocol = version === 1 ? LEGACY_CONTENT_PROOF_PROTOCOL : CONTENT_PROOF_PROTOCOL
   const limits: ContentProofLimits = { ...DEFAULT_CONTENT_PROOF_LIMITS, ...(options.limits ?? {}) }
   for (const [name, value] of Object.entries(limits)) if (!Number.isSafeInteger(value) || value < 1) throw new TypeError(`Invalid content proof limit ${name}`)
-  const omitted = [...CONTENT_OMITTED_TABLES]
-  const fail = (reason: string, productSchema: number | null, collections: ContentCollection[] = [], rows = 0, bytes = 0): WorkflowContentSummary =>
-    ({ protocol: CONTENT_PROOF_PROTOCOL, productSchema, digest: null, complete: false, collections, omittedTables: omitted, limits, reason, rows, bytes })
+  const fail = (reason: string, productSchema: number | null, omitted: string[] = [...CONTENT_OMITTED_TABLES],
+    collections: ContentCollection[] = [], rows = 0, bytes = 0): WorkflowContentSummary =>
+    ({ protocol, productSchema, digest: null, complete: false, collections, omittedTables: omitted, limits, reason, rows, bytes })
   let database: Database.Database
   try { database = new Database(databasePath, { readonly: true, fileMustExist: true }) }
   catch (error) { return fail(`database is not readable: ${String(error)}`, null) }
   try {
     const productSchema = Number(database.pragma('user_version', { simple: true }))
-    const tables = (database.prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY name").all() as { name: string }[])
-      .map(row => row.name)
-      .filter(name => !omitted.includes(name) && !name.startsWith(FTS_PREFIX))
-    if (tables.length > limits.maxTables) return fail('table count exceeds the content proof limit', productSchema)
+    const selection = tableSelection(database, version)
+    if (selection.reason) return fail(selection.reason, productSchema, selection.omitted)
+    if (selection.tables.length > limits.maxTables) return fail('table count exceeds the content proof limit', productSchema, selection.omitted)
     const collections: ContentCollection[] = []
     let rows = 0, bytes = 0
-    for (const name of tables) {
+    for (const name of selection.tables) {
       const quoted = `"${name.replaceAll('"', '""')}"`
       const columns = (database.pragma(`table_info(${quoted})`) as { name: string }[]).map(column => column.name)
-      if (columns.length === 0) return fail(`table ${name} has no readable columns`, productSchema, collections, rows, bytes)
+      if (columns.length === 0) return fail(`table ${name} has no readable columns`, productSchema, selection.omitted, collections, rows, bytes)
       const header = `${name}\u0000${columns.join('\u0000')}`
       const hash = createHash('sha256').update(header)
       let tableRows = 0
       const statement = database.prepare(`SELECT rowid AS "__rowid", * FROM ${quoted} ORDER BY rowid`)
       for (const row of statement.iterate() as Iterable<Record<string, unknown>>) {
         tableRows += 1; rows += 1
-        if (tableRows > limits.maxRows) return fail(`table ${name} exceeds the row limit`, productSchema, collections, rows, bytes)
-        if (rows > limits.maxRows) return fail('row count exceeds the content proof limit', productSchema, collections, rows, bytes)
+        if (tableRows > limits.maxRows) return fail(`table ${name} exceeds the row limit`, productSchema, selection.omitted, collections, rows, bytes)
+        if (rows > limits.maxRows) return fail('row count exceeds the content proof limit', productSchema, selection.omitted, collections, rows, bytes)
         const line = `${canonical(row.__rowid)}:${columns.map(column => canonical(row[column])).join(',')}`
         bytes += Buffer.byteLength(line) + 1
-        if (bytes > limits.maxBytes) return fail('content bytes exceed the content proof limit', productSchema, collections, rows, bytes)
+        if (bytes > limits.maxBytes) return fail('content bytes exceed the content proof limit', productSchema, selection.omitted, collections, rows, bytes)
         hash.update('\n').update(line)
       }
       collections.push({ name, rows: tableRows, digest: hash.digest('hex') })
     }
-    const digest = sha256([CONTENT_PROOF_PROTOCOL, `schema:${productSchema}`, `omitted:${omitted.join(',')}`,
+    const digest = sha256([protocol, `schema:${productSchema}`, `omitted:${selection.omitted.join(',')}`,
       `limits:${limits.maxTables}/${limits.maxRows}/${limits.maxBytes}`,
       ...collections.map(value => `${value.name}:${value.rows}:${value.digest}`)].join('\n'))
-    return { protocol: CONTENT_PROOF_PROTOCOL, productSchema, digest, complete: true, collections, omittedTables: omitted, limits, reason: null, rows, bytes }
+    return { protocol, productSchema, digest, complete: true, collections, omittedTables: selection.omitted, limits, reason: null, rows, bytes }
   } catch (error) {
     return fail(`content proof could not be read: ${String(error)}`, null)
   } finally { database.close() }
