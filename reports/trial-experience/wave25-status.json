@@ -91,7 +91,7 @@
     "requestBudget": { "session": 1, "readiness": 1, "configuration": 1, "actionRequests": 0, "reloadAddsReadiness": 1 }
   },
   "visualGate": "programmatic browser audit: overlap, text clipping, horizontal overflow, control size, radius/shadow/transform, font size/tracking, 6 contrast pairs >= 4.5, semantic dot token colours; 17 element screenshots committed for independent human/E review; this session could not consume images",
-  "screenshots": "apps/console/e2e/trial/screenshots/ (13 state + 4 mobile + 1 real-HTTP page context + 1 app shell)",
+  "screenshots": "apps/console/e2e/trial/screenshots/ (24 PNG: 14 desktop state, 6 mobile state, 3 real-HTTP, 1 real app shell)",
   "modelNativeTurns": 0,
   "preservedServices": "5180-5191 / 8796-8807 and all state/profile/tar/ledger untouched; probes used 5178, 5789, 5292/8898, one-off 5791 (stopped and verified)",
   "pending": [

@@ -48,7 +48,7 @@
 - 键盘：Tab 顺序为刷新 → 主动作 → 次动作；`:focus-visible` 可见；Enter 触发一次；快速双击同一动作 300ms 内只导航一次；状态更新不移动焦点。
 - 错误用 `alert`，加载/刷新/接口缺失用 `status`；图标按钮均有中文 accessible name；`aria-busy` 只在加载时。
 
-**视觉验收方式说明**：本会话模型不支持读取图片，因此没有声称“已看截图通过”。交付的视觉门是浏览器内程序化审计（重叠、文字裁切、横向溢出、控件尺寸、圆角/阴影/transform、字号/字距、6 组色彩对比度 ≥4.5、语义圆点颜色取自 token），覆盖桌面与手机；17 张元素截图随仓库提交，供 E/人工独立审阅像素。
+**视觉验收方式说明**：本会话模型不支持读取图片，因此没有声称“已看截图通过”。交付的视觉门是浏览器内程序化审计（重叠、文字裁切、横向溢出、控件尺寸、圆角/阴影/transform、字号/字距、6 组色彩对比度 ≥4.5、语义圆点颜色取自 token），覆盖桌面与手机；24 张截图（14 张桌面状态、6 张手机状态、3 张真实 HTTP、1 张真实 App shell）随仓库提交，供 E/人工独立审阅像素。
 
 ## 证据（本机实际运行）
 
@@ -66,7 +66,7 @@
 
 真实 HTTP 观察（隔离 fixed-fixture 演示）：`mode=fixture`、`development=fixture_only`、`discussion=unknown`、`projects 1/0/1`、`profiles native0 controlled4（已准入4）`、`authorization=none`、`configurationRevision=1c957869…`；UI 与其逐项一致，且页面不含私有 state 路径。
 
-视口：1440×900（桌面）、390×844（手机）。浏览器：Chromium（Playwright 1.65）。截图：`apps/console/e2e/trial/screenshots/`（含 4 张手机与 1 张真实 HTTP 页面上下文，另有真实 App shell 截图）。
+视口：1440×900（桌面）、390×844（手机）。浏览器：Chromium（Playwright 1.65）。截图：`apps/console/e2e/trial/screenshots/`（24 张：14 桌面状态、6 手机状态、3 真实 HTTP、1 真实 App shell）。
 
 ## 未测与依赖（不得外推）
 
