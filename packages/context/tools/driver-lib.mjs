@@ -102,3 +102,16 @@ export function restoredReviewIdentity(file, modulePath, timeoutMs = 10000) {
   if (!/^[a-f0-9]{64}$/.test(value)) throw new DriverError('identity_unavailable', 'The package identity function did not return a 64-hex digest', { value })
   return value
 }
+
+/** A verified flow that owned resources but could not prove their stop is a failure, not success. */
+export function applyCleanupOutcome(result) {
+  if (!['verified-flow', 'reused'].includes(result.status)) return result
+  const cleanup = result.cleanup ?? {}
+  if (cleanup.attempted !== true || cleanup.owned !== true || cleanup.stopped === true || cleanup.detail === 'kept-running') return result
+  return {
+    ...result,
+    status: 'failed',
+    verified: false,
+    failure: { code: 'cleanup_failed', message: 'Owned resources were not verifiably stopped', detail: cleanup.error ?? { detail: cleanup.detail } },
+  }
+}
