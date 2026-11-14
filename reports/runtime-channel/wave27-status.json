@@ -1,0 +1,149 @@
+{
+  "wave": "product-wave-27",
+  "role": "I",
+  "title": "Concrete CoordinatorChannel implementation and B adapter handoff",
+  "date": "2026-11-14",
+  "workdir": "/Users/hh/Desktop/joker/superagent-agent-i",
+  "branch": "codex/g5-coordinator-channel",
+  "preparedFrom": "967dc0c677333ec307c215c0ed67e838b5487d92",
+  "implementationCommit": "ae93f3436663e1660b5ae45be3fd823f8caf9ad4",
+  "integrationCommit": "c9a68d6892fb097f973fe2611672a94a2f1743d5",
+  "mergedOriginMain": "22d0c759c59e6387ee397476f3d15d28425818df",
+  "status": "FIVE_RESULTS_SOURCE_PUBLISHED_B_ADOPTION_NOT_REACHED",
+  "statement": "The concrete module, strict types, adapter example, fault/capacity matrix, independent consumer and docs are published. B has not adopted it, so the old runner-service waiter maps still exist and results I9-I12 are not PASS.",
+  "ownedPaths": [
+    "apps/runner/src/attach-channel/",
+    "apps/runner/test/attach-channel/",
+    "docs/runtime-channel/",
+    "reports/runtime-channel/"
+  ],
+  "sharedInterface": {
+    "path": "packages/contracts/src/coordinator-channel.ts",
+    "modified": false,
+    "runtimeContractHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
+    "wireVersion": 1,
+    "contractCases": { "path": "packages/contracts/test/coordinator-channel.case.ts", "tests": 5, "passed": 5, "failed": 0 }
+  },
+  "module": {
+    "implementation": ["apps/runner/src/attach-channel/coordinator-channel.ts", "apps/runner/src/attach-channel/errors.ts", "apps/runner/src/attach-channel/index.ts"],
+    "exports": ["CoordinatorChannelModule", "CoordinatorChannelError", "NativeWriteDenied", "isCoordinatorChannelError", "DEFAULT_LIMITS", "sameCoordinatorChannelProducer", "shared contract schemas and types"],
+    "createsNo": ["socket", "server", "database", "ledger", "driver", "permission grant", "execution lifecycle", "credential"],
+    "invariants": [
+      "producer fixed at construction from the trusted registration and frozen; request identity is never taken from the request's own claim",
+      "generation 0 -> 1 on first bind, CAS monotonic, safe-integer bounded, failure leaves the current lease unchanged",
+      "exactly one live lease; replacement atomically fenced, old receive/close cannot touch the replacement",
+      "facts resend original factId and body within the unrefreshed deadline and wait for A's idempotent durable ACK",
+      "payload reads re-read the same immutable reference with the same correlation id across leases",
+      "each native intent needs a fresh guard decision; pending writes become indeterminate on rebind/close and old allowed replies are never reused",
+      "single settlement under timeout/reply, close/reply, send-failure/reply races; late replies return false",
+      "capacity and byte bounds refuse before send; rejected requests never reach the transport",
+      "errors carry bounded ids/status and a stable reason, never payload values, credentials, absolute private paths or stacks",
+      "close distinguishes lease detach from module close and claims no physical writer quiescence"
+    ]
+  },
+  "results": [
+    {
+      "id": "I4",
+      "milestone": "first complete result",
+      "status": "PASS",
+      "content": "Concrete three-callback module on one controller/one connection with constructor, CAS bind, recordFact/readPayload/beforeNativeWrite, strict types and adapter example",
+      "evidence": ["apps/runner/test/attach-channel/three-callbacks.test.ts (11 cases)", "tsc -p apps/runner/src/attach-channel/tsconfig.json exit 0"],
+      "notReached": ["same Runner process", "real product coordinator"]
+    },
+    {
+      "id": "I8",
+      "milestone": "second complete result",
+      "status": "PASS",
+      "content": "Same controller from client A to client B with durable-ACK sink, immutable payload re-read and fresh guard over one chatty scenario plus five focused rebind cases",
+      "evidence": ["apps/runner/test/attach-channel/rebind.test.ts (7 cases)"],
+      "notReached": ["A's real persisted ingress", "B Runner process", "coordinator SIGKILL"]
+    },
+    {
+      "id": "I12",
+      "milestone": "third complete result",
+      "status": "SOURCE_PUBLISHED_NOT_REACHED",
+      "content": "Compilable RunnerAttachChannel adapter, exact runner-service replacement points, deletion order for the three waiter maps and post-adoption regression inputs",
+      "evidence": ["apps/runner/test/attach-channel/adapter.ts", "docs/runtime-channel/b-adapter-handoff.zh-CN.md"],
+      "notReached": ["B adopted the module", "runner-service factWaiters/payloadWaiters/writeWaiters deleted (still 15 references)", "real Runner dual-client consumer"]
+    },
+    {
+      "id": "I16",
+      "milestone": "fourth complete result",
+      "status": "PASS",
+      "content": "Fault, capacity, late-reply and close matrix with single settlement, capacity recovery and secret-free diagnostics, plus direct actual-module strict compilation",
+      "evidence": ["apps/runner/test/attach-channel/faults.test.ts (14 cases)", "apps/runner/test/attach-channel/compatibility.test.ts (4 cases)", "strict tsc exit 0"],
+      "notReached": ["quiescence/native/vendor observations"]
+    },
+    {
+      "id": "I20",
+      "milestone": "fifth complete result",
+      "status": "PASS_SOURCE_HANDOFF",
+      "content": "Reusable module plus operations docs, B handoff, H independent consumer guidance, compatibility guard and this status file",
+      "evidence": ["docs/runtime-channel/README.zh-CN.md", "docs/runtime-channel/b-adapter-handoff.zh-CN.md", "docs/runtime-channel/h-independent-consumer.zh-CN.md", "apps/runner/test/attach-channel/independent-consumer.test.ts (2 cases)", "reports/runtime-channel/wave27-evidence.zh-CN.md"],
+      "notReached": ["H executed its own independent consumer in its own tree", "product/native/release admission"]
+    }
+  ],
+  "stages": [
+    { "id": "I1", "status": "DONE", "evidence": "Read runner-service three waiter maps, v1 bridge frames, RunnerLinkClient responder and the 0068 interface; depth/decision recorded in docs/runtime-channel/README.zh-CN.md" },
+    { "id": "I2", "status": "DONE", "evidence": "Immutable producer + CAS bind + lease fencing; binding.test.ts 6 cases" },
+    { "id": "I3", "status": "DONE", "evidence": "Three callbacks with register-then-send, timers, single settlement; three-callbacks.test.ts" },
+    { "id": "I4", "status": "DONE", "evidence": "First result published; commit ae93f34" },
+    { "id": "I5", "status": "DONE", "evidence": "Facts resend original id/body; durable-ACK double replays same receipt and refuses conflicting body; rebind.test.ts first two cases" },
+    { "id": "I6", "status": "DONE", "evidence": "Payload re-read across leases with same reference/correlation; oversized payload refused with capacity; rebind.test.ts + faults.test.ts" },
+    { "id": "I7", "status": "DONE", "evidence": "Fresh guard per intent, indeterminate on rebind/drop, denial class distinct; rebind.test.ts three write cases" },
+    { "id": "I8", "status": "DONE", "evidence": "Second result published; same controller A->B integrated scenario" },
+    { "id": "I9", "status": "PARTIAL", "evidence": "Adapter + strict direct compile delivered; B real consumption NOT_REACHED" },
+    { "id": "I10", "status": "NOT_REACHED", "evidence": "No B deletion performed; module is the single pending owner by construction and the replacement/deletion plan is documented with exact line numbers" },
+    { "id": "I11", "status": "NOT_REACHED", "evidence": "No real B Runner consumer exists; only module/same-controller scope is claimed" },
+    { "id": "I12", "status": "NOT_REACHED", "evidence": "Third result source published, not marked PASS; runner-service still holds all three maps" },
+    { "id": "I13", "status": "DONE", "evidence": "Injected clock/timer; timeout/reply, send/reply, close/reply races settle once; faults.test.ts" },
+    { "id": "I14", "status": "DONE", "evidence": "Per-kind pending, total bytes and payload bytes bounds refuse before send and recover after settlement; faults.test.ts" },
+    { "id": "I15", "status": "DONE", "evidence": "lease vs module close, late/unsupported frames, secret-free errors; faults.test.ts and three-callbacks.test.ts" },
+    { "id": "I16", "status": "DONE", "evidence": "Fourth result published; 14 fault cases + 4 compatibility cases; strict tsc" },
+    { "id": "I17", "status": "PARTIAL", "evidence": "Self-contained independent consumer (2 cases) and H guidance published; H has not yet run it in its own tree" },
+    { "id": "I18", "status": "DONE", "evidence": "Contract identity/v1 wire unchanged, entry exports the shared schemas, shared options type accepted; compatibility.test.ts" },
+    { "id": "I19", "status": "DONE", "evidence": "Usage invariants, error table, close semantics, runnable consumer and verification commands in docs/runtime-channel/README.zh-CN.md" },
+    { "id": "I20", "status": "DONE", "evidence": "Fifth result and this status file; explicit owned paths pushed to origin branch" }
+  ],
+  "checks": [
+    { "command": "node_modules/.bin/tsc -p apps/runner/src/attach-channel/tsconfig.json", "exit": 0, "note": "strict + noUncheckedIndexedAccess + exactOptionalPropertyTypes, direct actual-module scope" },
+    { "command": "cd apps/runner && node --test test/attach-channel/*.test.ts", "exit": 0, "tests": 44, "passed": 44, "failed": 0, "durationMs": 171 },
+    { "command": "node --test packages/contracts/test/coordinator-channel.case.ts", "exit": 0, "tests": 5, "passed": 5, "failed": 0 },
+    { "command": "git merge --no-edit origin/main", "exit": 0, "mergedOriginMain": "22d0c759c59e6387ee397476f3d15d28425818df", "note": "checks re-run after merge with identical results" }
+  ],
+  "testCounts": {
+    "three-callbacks.test.ts": 11,
+    "binding.test.ts": 6,
+    "rebind.test.ts": 7,
+    "faults.test.ts": 14,
+    "compatibility.test.ts": 4,
+    "independent-consumer.test.ts": 2,
+    "total": 44
+  },
+  "notReached": [
+    "B adopted CoordinatorChannel in runner-service/RunnerLinkClient",
+    "factWaiters/payloadWaiters/writeWaiters removed (15 references remain in apps/runner/src/runner-service.ts)",
+    "same Runner process dual-client with real A sink and real Broker guard",
+    "coordinator SIGKILL and original question->answer delivery",
+    "cross-coordinator crash recovery",
+    "durable exactly-once native execution (never claimed; facts replay is not a business command retry)",
+    "physical writer quiescence from channel close",
+    "H running the independent consumer in H's own test tree"
+  ],
+  "boundaries": {
+    "filesOutsideOwnershipModified": [],
+    "contractsRootWireChanged": false,
+    "runnerServiceOrLinkClientChanged": false,
+    "newServerDatabaseLedgerDriverLifecycle": false,
+    "realModelTurns": 0,
+    "nativeTurns": 0,
+    "userServicesTouchedOrSignalled": 0,
+    "preservedUserServices": [[5180, 8796], [5181, 8797], [5182, 8798], [5183, 8799], [5184, 8800], [5185, 8801], [5186, 8802], [5187, 8803], [5188, 8804], [5189, 8805], [5190, 8806], [5191, 8807]],
+    "studyState": "BLOCKED_CURRENT_RECIPE_UNTOUCHED"
+  },
+  "handoff": {
+    "main": "Module implements the 0068 interface unchanged; no contracts edit requested. Further failure-class semantics would need a minimal RFC.",
+    "B": "Replace three registrations (:144/:150/:151) and four receive branches (:325/:334/:342/:348), delete the maps, close via channel.close in the documented order, then run the original normal chain and rebind regressions.",
+    "H": "Copy apps/runner/test/attach-channel/independent-consumer.test.ts into its own tree; report defects with owner classification instead of editing I or B sources."
+  }
+}
