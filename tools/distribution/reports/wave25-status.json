@@ -27,7 +27,7 @@
     },
     "d5": {
       "status": "PASS_WITH_LIMIT",
-      "summary": "One D driver validated A producer/manifest coverage and rejected a tampered manifest before C start, then passed the A manifest digest as C package-subject. C returned verified-flow with packageSubject equal to the A digest, bound requested/live health digest and cleanup verified. Same original Store kept. LIMIT: C receives the A digest subject, not the full manifest object internally."
+      "summary": "Single driver validates A producer full manifest coverage and rejects tampered binding before C start, then passes the full A manifest (not just a digest) as C package-subject. C carries and echoes the full manifest byte-for-byte, subject digest matches, and C returns verified-flow with bound health digest and verified cleanup. LIMIT: C does not independently re-validate every manifest field internally."
     },
     "d6": {
       "status": "PASS",
@@ -124,7 +124,8 @@
     "portable": 5,
     "aToC": {
       "steps": 3,
-      "status": "PASS_WITH_LIMIT"
+      "status": "PASS_WITH_LIMIT",
+      "fullManifestCarried": true
     }
   },
   "notDone": [
@@ -132,7 +133,7 @@
     "E final verdict",
     "private permission/target",
     "real vendor/native",
-    "C full manifest object consumption (digest subject only)"
+    "C internal revalidation of every A manifest field (full manifest carried and echoed)"
   ],
   "limitations": [
     "zero real vendor/model/native turns",

@@ -1,8 +1,8 @@
 {
   "protocol": "wave25-ordinary-source-closure/1",
   "frozenRuntimeSource": "a826b5e",
-  "sourceCommit": "a826b5e",
-  "generatedAt": "2026-11-14T03:33:27.025Z",
+  "sourceCommit": "1769a78",
+  "generatedAt": "2026-11-14T03:40:23.087Z",
   "purpose": "Coherent ordinary personal distribution source/deploy closure with actual cleanup/fault, CLI help and same-Store validation tools; frozen runtime target remains 3b2ff68 with main UI; excludes historical reports.",
   "groups": {
     "mainUi": [

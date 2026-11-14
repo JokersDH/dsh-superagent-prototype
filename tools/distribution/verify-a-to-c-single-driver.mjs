@@ -41,17 +41,19 @@ try {
   const model = values['model-config']; if (!model) throw new Error('--model-config required for C package start')
   const out = spawnSync(process.execPath, [resolve(values['c-driver']), '--dialect', 'package', '--install', appInstall, '--state', state, '--data-root', state,
     '--config-root', values['config-root'] ? resolve(values['config-root']) : join(resolve(state), '..', 'config'), '--cache-root', values['cache-root'] ? resolve(values['cache-root']) : join(resolve(state), '..', 'cache'), '--logs-root', values['logs-root'] ? resolve(values['logs-root']) : join(resolve(state), '..', 'logs'), '--workspace-root', values['workspace-root'] ? resolve(values['workspace-root']) : join(resolve(state), '..', 'workspace'),
-    '--project', values.project, '--allow-path', '.', '--message', values.message, '--package-subject', manifest.digest,
+    '--project', values.project, '--allow-path', '.', '--message', values.message, '--package-subject', JSON.stringify(manifest),
     '--console-port', values['console-port'], '--api-port', values['api-port'], '--model-config', resolve(model), '--pa-entry', paEntry,
     '--identity-module', join(appInstall, 'apps/coordinator/product/restored-review.ts'), '--deadline-ms', '180000', '--readiness-ms', '60000'], { encoding: 'utf8', timeout: 240000 })
   let c = null; try { c = JSON.parse(out.stdout) } catch {}
   if (out.status !== 0 || c?.status !== 'verified-flow') throw new Error(`C driver failed: ${out.status} ${String(out.stdout).slice(0,600)} ${String(out.stderr).slice(0,300)}`)
   const subjectEcho = c.packageSubject ?? null
-  if (subjectEcho !== manifest.digest) throw new Error(`C packageSubject ${subjectEcho} != A manifest digest ${manifest.digest}`)
+  let echoedManifest = null; try { echoedManifest = JSON.parse(subjectEcho) } catch {}
+  if (!echoedManifest || echoedManifest.digest !== manifest.digest) throw new Error('C did not carry the full A manifest subject')
+  if (JSON.stringify(echoedManifest) !== JSON.stringify(manifest)) throw new Error('C echoed a different A manifest subject')
   const sourceMessage = c.data?.sources?.binding?.messageId ?? c.data?.history?.conversationId ?? null
-  step('c-consumes-a-subject', 'PASS', { subjectEcho, cStatus: c.status, bound: c.identity?.bound, requestedDigest: c.identity?.requestedDigest, actualHealthDigest: c.identity?.actualHealthDigest, assertions: c.assertions?.length ?? 0, cleanup: c.cleanup, sourceMessage })
+  step('c-consumes-a-subject', 'PASS', { subjectDigest: echoedManifest.digest, fullManifestCarried: true, cStatus: c.status, bound: c.identity?.bound, requestedDigest: c.identity?.requestedDigest, actualHealthDigest: c.identity?.actualHealthDigest, assertions: c.assertions?.length ?? 0, cleanup: c.cleanup, sourceMessage })
   result.cDriver = { status: c.status, packageSubject: subjectEcho, identity: c.identity, cleanup: c.cleanup }
-  result.limit = 'C receives the A manifest digest as package subject and must echo it; C does not consume the full A manifest object internally. A identity/coverage and tamper rejection are checked by the driving process before C starts.'
+  result.limit = 'C receives the full A manifest as package subject and echoes it byte-for-byte; A identity/coverage and tamper rejection are checked before C starts. C does not independently re-validate every manifest field internally.'
   result.status = 'PASS_WITH_LIMIT'
 } catch (error) { result.error = String(error?.stack ?? error) }
 if (values.json) process.stdout.write(`${JSON.stringify(result, null, 2)}\n`); else console.log(result.status)
