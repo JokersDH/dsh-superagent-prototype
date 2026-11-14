@@ -21,9 +21,10 @@
   "checkpointCommits": [
     "94c8691",
     "47d3979",
-    "18b4b6c"
+    "18b4b6c",
+    "80b1b29"
   ],
-  "finalCommit": "the commit that introduces this file (branch head codex/g4-usage-insights)",
+  "finalCommit": "branch head codex/g4-usage-insights (4c3b526 and later)",
   "phases": [
     {
       "id": "G1",
