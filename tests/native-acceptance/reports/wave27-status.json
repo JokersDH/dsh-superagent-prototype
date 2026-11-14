@@ -2,7 +2,7 @@
   "wave": "product-wave-27",
   "role": "B",
   "branch": "codex/g1-runtime",
-  "base": "4a7bdcc",
+  "base": "52a6d18",
   "checkpoint": "6 of 5 (item 5 compile/fault/docs)",
   "scopeNote": "Zero real vendor/model/native turns. Only B-owned paths. I's apps/runner/src/attach-channel and apps/runner/test/attach-channel untouched. No second coordinator/ledger/lifecycle. Main before-write guard, complete registration, proof and barrier untouched. Twelve services, ledgers, two historical report diffs and untracked b16-real-begin.mjs preserved.",
   "item3_dual_client": {
@@ -194,5 +194,10 @@
     "result": "7 PASS / 0 FAIL / 1 NOT_TESTED",
     "case": "B27-CHAIN-ONE-BINDING-ACROSS-KILL - three coordinator PIDs, one deliberate SIGKILL in the middle, saw ONE attempt at ONE epoch with the same original fact ids; the re-fed begin was RECEIVED a second time but ADMITTED only once (duplicate_begin)",
     "distinction": "reception count and admission count are different facts and are reported separately instead of conflated: the frame reaching the receiver is not the same as the command being executed twice"
+  },
+  "chainCallbackOrdering": {
+    "finding": "the Runner asks its bound lease for outbound callbacks ONLY while a lease is bound. A coordinator that attaches after the facts have already flowed cannot serve them, because those facts were acknowledged over stdio at the moment they were raised. Serving the three callbacks inside the SAME chain as the SIGKILL therefore requires the lease to bind BEFORE begin.",
+    "consequence": "the callback servicing is observed on b27-dual-client (controlled endpoint) and b27-dual-live (real child), and the kill chain on b27-sigkill; they are not yet one run, and this is stated rather than merged",
+    "nextStep": "bind a serving lease before begin on the live lane, let it serve the fact callbacks, SIGKILL it mid-flight, and let the successor lease finish the same attempt - one run, one attempt, one epoch"
   }
 }
