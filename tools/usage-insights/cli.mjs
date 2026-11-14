@@ -93,7 +93,10 @@ const SPECS = {
     timezone: flag(), baseline: flag(), 'max-input-bytes': flag(),
     'max-records': flag(), 'max-works': flag(), 'max-pages': flag(),
   },
-  verify: { input: flag(), 'max-input-bytes': flag(), 'max-records': flag(), 'max-works': flag(), 'max-pages': flag() },
+  verify: {
+    input: flag(), 'max-input-bytes': flag(), 'max-records': flag(), 'max-works': flag(), 'max-pages': flag(),
+    'expect-digest': flag(),
+  },
   catalogue: {},
   help: {},
 }
@@ -230,6 +233,14 @@ async function commandVerify(options, io) {
   const insights = io.insights
   const maxBytes = positiveInteger(options['max-input-bytes'], 'max-input-bytes', DEFAULT_MAX_INPUT_BYTES)
   const bundle = readBundle(requiredString(options.input, 'input'), maxBytes)
+  // A pinned digest turns "the file I analysed earlier" into a checkable identity.
+  if (options['expect-digest'] !== undefined) {
+    if (!/^[a-f0-9]{64}$/.test(options['expect-digest']))
+      throw new UsageError('--expect-digest must be a lowercase sha256 hex digest')
+    if (options['expect-digest'] !== bundle.digest)
+      throw new UsageInsightsError('source_unavailable',
+        `The bundle digest does not match the pinned digest (expected ${options['expect-digest'].slice(0, 12)}…, got ${bundle.digest.slice(0, 12)}…)`)
+  }
   const analysis = insights.analyzeUsageInsights(applyOverrides(bundle.value, {}, bundle.digest))
   const status = statusOf(analysis)
   const report = {
@@ -270,7 +281,6 @@ async function commandCollect(options, io) {
   const window = { from: parseUtc(requiredString(options.from, 'from'), 'from'), to: parseUtc(requiredString(options.to, 'to'), 'to') }
   if (Date.parse(window.to) <= Date.parse(window.from)) throw new UsageError('--to must be after --from')
   const timezone = options.timezone ?? 'UTC'
-  const capturedAt = options['captured-at'] ? parseUtc(options['captured-at'], 'captured-at') : new Date().toISOString().replace(/\.\d{3}Z$/, 'Z')
   const requestTimeoutMs = positiveInteger(options['request-timeout-ms'], 'request-timeout-ms', 5000)
   const deadlineMs = positiveInteger(options['deadline-ms'], 'deadline-ms', 60_000)
   const maxBytes = positiveInteger(options['max-bytes'], 'max-bytes', 8_000_000)
@@ -417,6 +427,9 @@ async function commandCollect(options, io) {
       }
     }
 
+    // The capture time is stamped now, after every read: a snapshot can never be observed later than
+    // the observation it belongs to.
+    const capturedAt = options['captured-at'] ? parseUtc(options['captured-at'], 'captured-at') : new Date().toISOString()
     const inputId = options['input-id'] ?? `collect-${capturedAt.replace(/[-:]/g, '').replace(/\..*$/, '')}`
     const bundle = {
       protocol: 'usage-insights-input/1',
