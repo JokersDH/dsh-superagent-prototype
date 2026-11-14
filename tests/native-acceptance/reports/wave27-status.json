@@ -2,7 +2,7 @@
   "wave": "product-wave-27",
   "role": "B",
   "branch": "codex/g1-runtime",
-  "base": "1c6cb4a",
+  "base": "fe6c5e6",
   "checkpoint": "6 of 5 (item 5 compile/fault/docs)",
   "scopeNote": "Zero real vendor/model/native turns. Only B-owned paths. I's apps/runner/src/attach-channel and apps/runner/test/attach-channel untouched. No second coordinator/ledger/lifecycle. Main before-write guard, complete registration, proof and barrier untouched. Twelve services, ledgers, two historical report diffs and untracked b16-real-begin.mjs preserved.",
   "item3_dual_client": {
@@ -130,5 +130,25 @@
     "same-Work current-candidate comparison",
     "2/4 slot accounting and its aggregate resource return",
     "any installed-Codex or gateway behaviour"
-  ]
+  ],
+  "consolidated": {
+    "harnessesAllGreen": "8 B27 harnesses plus b26: 39 PASS / 0 FAIL / 8 NOT_TESTED; b18 product lane 4 PASS / 1 FAIL (known-stale business-cancel stop assertion) / 1 NOT_TESTED; root tsconfig exit 0",
+    "byPacketStage": {
+      "pagesRefsPayloads": "OBSERVED - whole-encoded-page budgeting with trim-and-continue, reference descriptor for the large frame, five-chunk payload by decoded length, foreign producer refused, 160 small facts over 4 pages and over 32 pages at a 2KiB budget",
+      "dispatchAndWaiters": "OBSERVED - the three waiter maps are gone (zero references), one generation-scoped channel owns both directions, one command admission shared by stdio and the endpoint, facts acked by original id and payload reread by original ref",
+      "handover": "OBSERVED - controlled endpoint 5/0 and a real spawned Runner child 6/0: A serves all three callbacks, leaves with a pending native write, B takes the lease, the write becomes indeterminate, A's reply is refused, B replays the same original ids",
+      "sigkillResume": "CORE OBSERVED - real OS SIGKILL of a separate coordinator process while the Runner keeps running; a new PID resumes the same attempt and epoch with the same original fact ids; begin refused as duplicate_begin; re-fed deliver keeps its original command id",
+      "epochAckResources": "OBSERVED - stale epoch refused as identity_mismatch while current epoch accepted; late receipt refused; after stop admission closed, state terminated and every tracked writer quiescent",
+      "compileFaultsClose": "OBSERVED - direct strict compile of 7 modules and the attach consumer, explicit capacity backpressure, mid-callback detach fails indeterminate, idempotent close with no lease and nothing pending"
+    },
+    "notReached": {
+      "B11_answerAckWindow": "NOT_REACHED - the begin window is closed on the live lane, but the windows that need the original Broker question/answer (write-before, after-receiver-before-ACK, before-receipt, after-receipt) are not counted",
+      "B13_currentCandidate": "NOT_REACHED - same Work/Ticket/Assignment continuing to a registered verifier/check, artifact and current candidate after recovery",
+      "B14_manualAccept": "NOT_REACHED - explicit human accept of the current candidate binding acceptanceRef/verification/candidate/artifact to the original Work; the product lane only reaches a recorded answer (b18)",
+      "B15_slots": "NOT_REACHED - the 2-then-4 slot matrix with normal/waiting/handover/SIGKILL/unknown/stop/delivered mixes, per-slot isolation of identity/generation/credential/cursor/payload/receipt and the original scheduler backpressure",
+      "B9B11_singleChain": "NOT_REACHED as one chain - the pieces above are separate observations, and the packet requires the old coordinator's confirmed exit, the new process's original native question and answer, the three callbacks and the ACK/unknown semantics to close on ONE original business chain",
+      "vendorOrGateway": "not observed and not claimed anywhere"
+    },
+    "nextStep": "drive B11-B15 on the product lane: reach the Broker question/answer through the fake-executable product runtime, count the four ACK windows instead of trusting own send marks, then the recovered verifier/current candidate, explicit human accept, and finally the 2/4 slot matrix with per-slot isolation"
+  }
 }
