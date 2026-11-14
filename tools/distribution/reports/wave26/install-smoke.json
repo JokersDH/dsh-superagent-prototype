@@ -1,0 +1,63 @@
+{
+  "case": "DIST-INSTALL-01",
+  "status": "PASS",
+  "startedAt": "2026-11-14T07:25:52.930Z",
+  "steps": [
+    {
+      "id": "build",
+      "status": "PASS",
+      "result": {
+        "buildId": "0b6704d88599c211",
+        "artifacts": {
+          "count": 911,
+          "bytes": 8865605
+        }
+      }
+    },
+    {
+      "id": "release-manifest",
+      "status": "PASS",
+      "result": {
+        "buildId": "0b6704d88599c211",
+        "artifacts": 911
+      }
+    },
+    {
+      "id": "first-run",
+      "status": "PASS",
+      "result": {
+        "created": [
+          "data",
+          "cache",
+          "logs",
+          "workspace"
+        ],
+        "configFile": "/tmp/w26-cold2/config/launcher.json"
+      }
+    },
+    {
+      "id": "doctor",
+      "status": "PASS",
+      "result": {
+        "status": "DEGRADED",
+        "exitCode": 1,
+        "checks": 19
+      }
+    }
+  ],
+  "limitations": [
+    "This smoke builds and diagnoses one install; it starts no daemon and makes no model request.",
+    "Only darwin/arm64 is a measured candidate; other platforms remain NOT_TESTED."
+  ],
+  "platform": {
+    "platform": "darwin",
+    "arch": "arm64",
+    "node": "24.21.0"
+  },
+  "result": {
+    "status": "DEGRADED",
+    "exitCode": 1,
+    "checks": 19
+  },
+  "finishedAt": "2026-11-14T07:26:06.597Z"
+}

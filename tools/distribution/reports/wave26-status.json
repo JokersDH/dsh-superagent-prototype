@@ -32,6 +32,38 @@
     "d6": {
       "status": "NOT_REACHED_PACKAGE_CONSUMER",
       "summary": "A/C target content/fingerprint proof works as dev chain, but the C unique installed package driver does not consume the target proof; full same-package prepare/start UI chain not reached."
+    },
+    "d9": {
+      "status": "PASS",
+      "summary": "F App/readiness runtime bytes frozen once at ce64fc1; tar re-extracted and used for all tests; old tars preserved."
+    },
+    "d10": {
+      "status": "PASS",
+      "summary": "Cold full source install4 PASS, no-executor4 PASS, same-schema18 upgrade3 PASS, managed tar upgrade7 PASS, multi8/cross3/data5/backup6/portable5/matrix19 PASS."
+    },
+    "d11": {
+      "status": "PASS",
+      "summary": "Reopen/same-file reuse via same-store and browser; old data readable, no resend; unknown resources retain material."
+    },
+    "d12": {
+      "status": "PASS_WITH_E_PENDING",
+      "summary": "Installable clean candidate with E tuple/recipe; E self-test not release."
+    },
+    "d13": {
+      "status": "PASS",
+      "summary": "Reopen and data protection exercised; readiness/UI observations consistent."
+    },
+    "d14": {
+      "status": "PASS_WITH_PACKAGE_LIMIT",
+      "summary": "Exact freeze/repeatable scripts and colleague recipe; support/source guide provide commands; no overwrite of historical artifacts."
+    },
+    "d15": {
+      "status": "PASS",
+      "summary": "Closure96/96 includes F App/trial six, launcher41, portability23, distribution14, root5; all hashes 0 mismatches."
+    },
+    "d16": {
+      "status": "PASS_WITH_E_PENDING",
+      "summary": "Full tuple and limits handed to E; E independent required not executed."
     }
   },
   "artifacts": {
@@ -88,14 +120,20 @@
     "cross": 3,
     "data": 5,
     "backup": 6,
-    "portable": 5
+    "portable": 5,
+    "noexecutor": 4,
+    "coldInstall": 4,
+    "sameSchemaUpgrade": 3,
+    "managedUpgrade": 7,
+    "closed": true
   },
   "notDone": [
     "C internal full-manifest revalidation",
     "E final verdict",
     "G/H integration",
     "private/target/real vendor",
-    "C target-proof consumed by installed package driver (dev chain only)"
+    "C target-proof consumed by installed package driver (dev chain only)",
+    "A/C target proof consumed by installed package driver (dev chain only)"
   ],
   "limitations": [
     "zero real vendor/model/native turns",
