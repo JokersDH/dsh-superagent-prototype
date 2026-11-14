@@ -17,9 +17,9 @@ import { createHash } from 'node:crypto'
 import { spawn, spawnSync } from 'node:child_process'
 import { existsSync, lstatSync, mkdirSync, mkdtempSync, openSync, readFileSync, realpathSync, statSync, closeSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { isAbsolute, join, resolve } from 'node:path'
+import { dirname, isAbsolute, join, resolve } from 'node:path'
 import { parseArgs } from 'node:util'
-import { DEFAULTS, DriverError, applyCleanupOutcome as applyCleanup, httpJson, logSink, remaining, restoredReviewIdentity, stopChild, waitUntil } from './driver-lib.mjs'
+import { DEFAULTS, DriverError, applyCleanupOutcome as applyCleanup, httpJson, logSink, remaining, restoredReviewIdentity, stopChild, validatePackageIdentity, waitUntil } from './driver-lib.mjs'
 
 const args = process.argv.slice(2)
 const { values } = parseArgs({ args, options: {
@@ -40,6 +40,9 @@ const { values } = parseArgs({ args, options: {
   'expect-candidate-digest': { type: 'string' }, 'expect-work-phase': { type: 'string' }, 'expect-delivery': { type: 'string' },
   'expect-source-state': { type: 'string' }, 'expect-scope-review': { type: 'string' }, 'expect-reason': { type: 'string', multiple: true },
   'expect-entry-refusal': { type: 'string' }, 'allow-not-reached': { type: 'boolean' },
+  'a-worktree': { type: 'string' }, 'a-module': { type: 'string' }, 'manifest-db': { type: 'string' },
+  'manifest-expectation': { type: 'string' }, 'manifest-output': { type: 'string' }, 'root-map': { type: 'string' },
+  'replay-context-token': { type: 'string' }, 'replay-confirm-token': { type: 'string' },
 } })
 
 const startedAt = new Date().toISOString()
@@ -178,6 +181,43 @@ async function main() {
   identity.stateRoot = realpathSync(state)
   const review = { file: reviewFile, sha256: sha256(reviewFile), mode, startupAvailable: prepared.startupAvailable, projects: prepared.projects ?? null }
 
+  // Optional A manifest mode: the driver itself consumes A's producer and expectation before HTTP.
+  let manifest = null
+  if (values['manifest-expectation'] || values['manifest-db'] || values['a-worktree'] || values['a-module']) {
+    const aWorktree = values['a-worktree'] ? absolute('a-worktree', values['a-worktree']) : null
+    const aModule = values['a-module'] ? absolute('a-module', values['a-module']) : (aWorktree ? join(aWorktree, 'packages/workflows/src/data-manifest.ts') : null)
+    const manifestDb = values['manifest-db'] ? absolute('manifest-db', values['manifest-db']) : null
+    const expectation = values['manifest-expectation'] ? absolute('manifest-expectation', values['manifest-expectation']) : null
+    if (!aWorktree || !aModule || !manifestDb || !expectation || !values['root-map'])
+      throw new DriverError('manifest_input', 'Manifest mode needs --a-worktree, --a-module, --manifest-db, --manifest-expectation and --root-map')
+    const [fromRoot, toRoot] = String(values['root-map']).split('=')
+    if (!fromRoot || !toRoot) throw new DriverError('usage', '--root-map must be <original-root>=<target-root>')
+    const aHead = spawnSync('git', ['-C', aWorktree, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).stdout?.trim() ?? null
+    const output = values['manifest-output'] ? absolute('manifest-output', values['manifest-output']) : join(workDir, 'manifest.json')
+    const producer = join(import.meta.dirname, 'wave24-a-manifest.mjs')
+    const built = spawnSync(process.execPath, ['--experimental-strip-types', '--no-warnings', producer, '--mode', 'build',
+      '--a-worktree', aWorktree, '--a-module', aModule, '--db', manifestDb, '--expectation', expectation,
+      '--output', output, '--a-head', aHead ?? ''], { encoding: 'utf8', timeout: Math.max(100, Math.min(60000, workingDeadlineAt - Date.now())) })
+    if (built.status !== 0) throw new DriverError('manifest_failed', 'A producer did not build the manifest', { status: built.status, stderr: String(built.stderr ?? '').slice(-2000) })
+    let invocation
+    try { invocation = JSON.parse(String(built.stdout).trim().split('\n').at(-1)) } catch { throw new DriverError('manifest_failed', 'A producer output was not JSON') }
+    manifest = invocation.manifest
+    if (!manifest || manifest.protocol !== 'wave24-data-manifest/1')
+      throw new DriverError('manifest_failed', 'A producer did not return the expected manifest protocol')
+    if (Object.values(manifest.coverage ?? {}).some((value) => value !== 'complete'))
+      throw new DriverError('manifest_incomplete', 'A manifest coverage is not complete', { coverage: manifest.coverage })
+    if (realpathSync(manifest.subject.dataRoot) !== realpathSync(fromRoot))
+      throw new DriverError('manifest_mismatch', 'The manifest data root differs from the declared original root', { manifestRoot: manifest.subject.dataRoot })
+    if (realpathSync(toRoot) !== identity.stateRoot)
+      throw new DriverError('manifest_mismatch', 'The root map target differs from the reviewed state root', { target: realpathSync(toRoot), state: identity.stateRoot })
+    if (realpathSync(dirname(manifestDb)) !== realpathSync(fromRoot))
+      throw new DriverError('manifest_mismatch', 'The manifest database is not inside the declared original root')
+    data.manifest = { protocol: manifest.protocol, digest: manifest.digest, sourceFingerprint: manifest.sourceFingerprint,
+      coverage: manifest.coverage, aModuleSha256: invocation.aModuleSha256, aHead: invocation.aHead,
+      subject: manifest.subject, question: manifest.question, answer: manifest.answer, counts: manifest.counts,
+      roots: { from: realpathSync(fromRoot), to: identity.stateRoot }, output }
+  }
+
   if (values['expect-entry-refusal']) {
     if (dialect === 'package') throw new DriverError('NOT_REACHED', 'The package refusal dialect is not available in this source checkpoint', { capability: 'start-refusal' })
     const refusal = spawnSync(process.execPath, [command.startEntry, '--state', state, '--port', String(consolePort), '--api-port', String(apiPort),
@@ -206,7 +246,7 @@ async function main() {
     const logs = logSink()
     child = spawn(process.execPath, [command.entry, 'start', ...command.rootArgs, '--json', '--state', state,
       '--port', String(consolePort), '--api-port', String(apiPort), '--discussion-only', '--review-restored-scope', reviewFile],
-    { cwd: command.cwd, env: { ...process.env, PA_MODEL_CONFIG: modelConfig }, stdio: ['ignore', 'pipe', 'pipe'] })
+    { cwd: command.cwd, env: { ...process.env, PA_MODEL_CONFIG: modelConfig, NODE_OPTIONS: '--no-network-family-autoselection' }, stdio: ['ignore', 'pipe', 'pipe'] })
     child.stdout.on('data', (bytes) => logs.push(bytes))
     child.stderr.on('data', (bytes) => logs.push(bytes))
     const parseStart = () => {
@@ -251,31 +291,23 @@ async function main() {
     packageRecord = after.parsed?.status === 'RUNNING' ? instance : null
     if (after.parsed?.status !== 'RUNNING' || !instance)
       throw new DriverError('package_identity', 'The package status entry is not RUNNING after start', { start: parsed, after: after.parsed ?? after })
-    const checks = Array.isArray(after.parsed.checks) ? after.parsed.checks : []
-    if (checks.some((check) => check.ok !== true)) throw new DriverError('package_identity', 'The package instance checks are not all ok', { checks })
-    const recordState = instance.state ? realpathSync(instance.state) : null
-    const recordInstall = instance.install ? realpathSync(instance.install) : null
-    const argv = Array.isArray(instance.apiArgv) ? instance.apiArgv.map(String) : []
-    const reviewIndex = argv.indexOf('--review-restored-scope')
-    const selectedArgv = reviewIndex === -1 ? null : argv[reviewIndex + 1] ?? null
-    identity.recordPid = instance.pid ?? null
+    const expectedConfigRoot = values['config-root'] ? absolute('config-root', values['config-root']) : undefined
+    const validation = validatePackageIdentity({
+      instance, checks: after.parsed.checks, expectedState: identity.stateRoot, expectedInstall: realpathSync(install),
+      expectedConfigRoot, expectedReview: reviewFile, expectedApiPort: apiPort,
+    })
+    if (!validation.ok) throw new DriverError('package_identity', 'The package instance identity is incomplete or foreign', validation)
+    identity.recordPid = instance.pid
     identity.childPid = null
-    identity.instanceProcessStart = instance.processStart ?? null
-    identity.instanceApiPid = instance.apiPid ?? null
-    identity.instanceApiProcessStart = instance.apiProcessStart ?? null
-    identity.bound = !observe && instance.mode === 'personal' && instance.startupMode === 'recovery_readonly' &&
-      recordState === identity.stateRoot && recordInstall === realpathSync(install) && (selectedArgv ? realpathSync(selectedArgv) : null) === realpathSync(reviewFile)
-    assertResult('package.instance.state', identity.stateRoot, recordState)
-    assertResult('package.instance.install', realpathSync(install), recordInstall)
-    assertResult('package.instance.mode', 'personal', instance.mode ?? null)
-    assertResult('package.instance.startupMode', 'recovery_readonly', instance.startupMode ?? null)
-    assertResult('package.instance.reviewArgv', realpathSync(reviewFile), selectedArgv ? realpathSync(selectedArgv) : null)
-    assertResult('package.instance.processStart', true, typeof instance.processStart === 'string' && instance.processStart.length > 0)
+    identity.instanceProcessStart = instance.processStart
+    identity.instanceApiPid = instance.apiPid
+    identity.instanceApiProcessStart = instance.apiProcessStart
+    identity.bound = !observe
     assertResult('package.reuse', values.reuse === true, reused)
     assertResult('package.ownership', true, parsed.status === 'REUSED' || packageOwned)
-    if (typeof instance.pid === 'number') {
-      try { process.kill(instance.pid, 0) } catch { throw new DriverError('package_identity', 'The package launcher pid is not alive', { pid: instance.pid }) }
-    }
+    data.instance = { pid: instance.pid, processStart: instance.processStart, apiPid: instance.apiPid, apiProcessStart: instance.apiProcessStart,
+      state: instance.state, install: instance.install, configRoot: instance.configRoot, buildId: instance.buildId ?? null,
+      mode: instance.mode, startupMode: instance.startupMode, reused, owned: packageOwned, checks: after.parsed.checks?.length ?? 0 }
     // Review identity comes from the same file digest the package validated, and health must agree.
     const live = await httpJson(`${api}/v1/health`, {}, { perRequestMs, deadlineAt: workingDeadlineAt })
     if (live.status !== 200) throw new DriverError('package_identity', 'The package health is not available', { status: live.status })
@@ -283,12 +315,12 @@ async function main() {
     if (identity.actualHealthDigest !== identity.requestedDigest)
       throw new DriverError('package_identity', 'The package health review digest differs from the requested file', { health: identity.actualHealthDigest })
     data.instance = { pid: instance.pid, processStart: instance.processStart, apiPid: instance.apiPid, apiProcessStart: instance.apiProcessStart,
-      state: recordState, install: recordInstall, buildId: instance.buildId ?? null, reused, owned: packageOwned }
+      state: instance.state, install: instance.install, configRoot: instance.configRoot, buildId: instance.buildId ?? null, reused, owned: packageOwned }
   } else {
     const logs = logSink()
     child = spawn(process.execPath, [command.startEntry, '--state', state, '--port', String(consolePort), '--api-port', String(apiPort),
       '--discussion-only', '--review-restored-scope', reviewFile], {
-      cwd: install, env: { ...process.env, PA_MODEL_CONFIG: modelConfig }, stdio: ['ignore', 'pipe', 'pipe'],
+      cwd: install, env: { ...process.env, PA_MODEL_CONFIG: modelConfig, NODE_OPTIONS: '--no-network-family-autoselection' }, stdio: ['ignore', 'pipe', 'pipe'],
     })
     identity.childPid = child.pid ?? null
     child.stdout.on('data', (bytes) => logs.push(bytes))
@@ -359,6 +391,12 @@ async function main() {
   const historyEntries = Array.isArray(history.json.entries) ? history.json.entries : null
   if (!historyEntries) throw new DriverError('invalid_response', 'Context history did not contain entries')
   data.history = { conversationId: history.json.conversationId ?? null, entries: historyEntries.length }
+  const desiredWork = manifest ? manifest.subject.contract.workId : values.work
+  if (values.work && manifest && values.work !== desiredWork)
+    throw new DriverError('manifest_mismatch', 'The requested work id differs from the A manifest subject')
+  const desiredQuestion = manifest ? manifest.question.id : values.question
+  if (values.question && manifest && values.question !== desiredQuestion)
+    throw new DriverError('manifest_mismatch', 'The requested question id differs from the A manifest subject')
   const messageId = values.message ?? historyEntries[0]?.messageId
   if (!messageId) throw new DriverError('missing_history', 'No context history message is available for source review')
   const ordinary = await call(`/v1/messages/${encodeURIComponent(messageId)}/context/sources`)
@@ -414,21 +452,37 @@ async function main() {
   assertResult('chat.status', Number(values['expect-chat'] ?? 422), chat.status)
   data.chat = chat.status
 
-  if (values.work) {
-    const work = await call(`/v1/works/${encodeURIComponent(required('work'))}`)
+  if (desiredWork) {
+    const work = await call(`/v1/works/${encodeURIComponent(desiredWork)}`)
     assertHttp('work', 200, work)
     assertResult('work.phase', values['expect-work-phase'] ?? 'delivered', work.json.phase ?? null)
-    data.work = { id: values.work, phase: work.json.phase ?? null }
+    data.work = { id: desiredWork, phase: work.json.phase ?? null }
   }
-  if (values.question) {
-    const deliveries = await call(`/v1/questions/${encodeURIComponent(required('question'))}/deliveries`)
+  if (desiredQuestion) {
+    const deliveries = await call(`/v1/questions/${encodeURIComponent(desiredQuestion)}/deliveries`)
     assertHttp('deliveries', 200, deliveries)
     const statuses = Array.isArray(deliveries.json) ? deliveries.json.map((entry) => entry.status) : []
-    if (!statuses.length) throw new DriverError('delivery_missing', 'The expected question has no deliveries', { question: values.question })
+    if (!statuses.length) throw new DriverError('delivery_missing', 'The expected question has no deliveries', { question: desiredQuestion })
+    if (manifest) {
+      const expectedDeliveries = manifest.deliveries.map((entry) => `${entry.targetBindingId}:${entry.status}`).sort()
+      const actualDeliveries = Array.isArray(deliveries.json)
+        ? deliveries.json.map((entry) => `${entry.targetBindingId}:${entry.status}`).sort() : []
+      assertResult('manifest.deliveries', expectedDeliveries, actualDeliveries)
+    }
     assertResult('delivery.status', true, statuses.includes(values['expect-delivery'] ?? 'native_applied'))
-    data.delivery = { question: values.question, statuses }
+    data.delivery = { question: desiredQuestion, statuses }
   }
 
+  if (values['replay-context-token']) {
+    const replay = await call('/v1/assistant/context/send', { method: 'POST', body: JSON.stringify({ commandId: 'driver-replay-context', token: values['replay-context-token'] }) })
+    assertResult('replay.contextToken', 422, replay.status)
+    data.replay = { ...(data.replay ?? {}), contextToken: replay.status }
+  }
+  if (values['replay-confirm-token']) {
+    const replay = await call('/v1/proposals/commands', { method: 'POST', body: JSON.stringify({ kind: 'confirm_proposal', commandId: 'driver-replay-confirm', projectId: project, conversationId: values.conversation ?? data.history?.conversationId ?? 'driver', token: values['replay-confirm-token'] }) })
+    assertResult('replay.confirmToken', 422, replay.status)
+    data.replay = { ...(data.replay ?? {}), confirmToken: replay.status }
+  }
   return finish(observe ? 'observed' : reused ? 'reused' : 'verified-flow', !observe && (reused || identity.bound), { review, health })
 }
 

@@ -115,3 +115,54 @@ export function applyCleanupOutcome(result) {
     failure: { code: 'cleanup_failed', message: 'Owned resources were not verifiably stopped', detail: cleanup.error ?? { detail: cleanup.detail } },
   }
 }
+
+export const REQUIRED_PACKAGE_CHECKS = Object.freeze([
+  'launcher_alive', 'process_start', 'launcher_command', 'owner', 'cwd', 'install_identity',
+  'api_argv', 'api_process_start', 'api_owner', 'api_parent', 'api_cwd', 'listeners',
+  'health', 'runtime_mode', 'startup_mode',
+])
+
+const isPid = (value) => Number.isSafeInteger(value) && value > 0
+const isText = (value) => typeof value === 'string' && value.length > 0 && value.length <= 4096
+
+/**
+ * Full package instance identity. Every required field and status check must be present; a missing
+ * launcher/API pid or process start can never become a verified consumer.
+ */
+export function validatePackageIdentity({ instance, checks, expectedState, expectedInstall, expectedConfigRoot, expectedReview, expectedApiPort }) {
+  const missing = [], mismatches = []
+  if (!instance || typeof instance !== 'object') return { ok: false, missing: ['instance'], mismatches }
+  for (const field of ['pid', 'apiPid']) if (!isPid(instance[field])) missing.push(field)
+  for (const field of ['processStart', 'apiProcessStart']) if (!isText(instance[field])) missing.push(field)
+  for (const field of ['state', 'install', 'configRoot', 'mode', 'startupMode', 'apiURL']) if (!isText(instance[field])) missing.push(field)
+  if (!Array.isArray(instance.apiArgv) || instance.apiArgv.length === 0) missing.push('apiArgv')
+  if (!Array.isArray(checks)) missing.push('checks')
+  else {
+    const byId = new Map(checks.map((check) => [check?.id, check]))
+    for (const id of REQUIRED_PACKAGE_CHECKS) {
+      const check = byId.get(id)
+      if (!check) missing.push(`check:${id}`)
+      else if (check.ok !== true) mismatches.push(`check:${id}`)
+    }
+  }
+  const compare = (name, expected, actual) => { if (expected !== undefined && expected !== actual) mismatches.push(name) }
+  compare('state', expectedState, instance.state)
+  compare('install', expectedInstall, instance.install)
+  compare('configRoot', expectedConfigRoot, instance.configRoot)
+  compare('mode', 'personal', instance.mode)
+  compare('startupMode', 'recovery_readonly', instance.startupMode)
+  if (expectedApiPort !== undefined) {
+    let port = null
+    try { port = instance.apiURL ? Number(new URL(instance.apiURL).port) : null } catch { port = null }
+    compare('apiPort', expectedApiPort, port)
+  }
+  if (expectedReview !== undefined) {
+    const argv = Array.isArray(instance.apiArgv) ? instance.apiArgv.map(String) : []
+    const index = argv.indexOf('--review-restored-scope')
+    const selected = index === -1 ? null : argv[index + 1] ?? null
+    if (selected === null) missing.push('reviewArgv')
+    else compare('reviewArgv', expectedReview, selected)
+    if (!Array.isArray(instance.launcherArgv) || !instance.launcherArgv.map(String).includes('start')) missing.push('operation:start')
+  }
+  return { ok: missing.length === 0 && mismatches.length === 0, missing, mismatches }
+}
