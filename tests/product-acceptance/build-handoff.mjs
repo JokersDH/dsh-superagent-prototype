@@ -36,8 +36,8 @@ const upgradeEvidence = byId.get('E4-UPGRADE-ROLLBACK')?.evidence?.upgrade ?? {}
 const frozenScope = byId.get('E6-ARTIFACT-CURRENT-SCOPE')?.evidence?.frozenScope
 const currentMainInstall = byId.get('E6-CURRENT-MAIN-INSTALL')?.reason ?? null
 const artifactEvidence = byId.get('E4-INSTALL-ARTIFACT-IDENTITY')?.evidence?.artifact?.tuple ?? {}
-const artifactTuple = { baseline: upgradeEvidence.baseline ?? artifactEvidence.baseline ?? null,
-  target: upgradeEvidence.target ?? artifactEvidence.target ?? frozenScope?.artifact ?? null }
+const artifactTuple = { baseline: artifactEvidence.baseline ?? upgradeEvidence.baseline ?? null,
+  target: artifactEvidence.target ?? upgradeEvidence.target ?? frozenScope?.artifact ?? null }
 const caseStatus = (id) => byId.get(id)?.status ?? 'MISSING'
 
 /**

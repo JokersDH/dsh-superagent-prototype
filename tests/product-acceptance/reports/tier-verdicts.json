@@ -4,12 +4,12 @@
     "tier": "module",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-14T03:53:07.920Z",
+    "checkedAt": "2026-11-14T08:06:18.373Z",
     "source": {
-      "commit": "739bc5352e0fb39f66f4329a1ab44cc19d8b8223",
+      "commit": "26b9904a007052894f7b6eab7b711ccbc8e54263",
       "dirty": false
     },
-    "expectedSource": "739bc5352e0fb39f66f4329a1ab44cc19d8b8223",
+    "expectedSource": "26b9904a007052894f7b6eab7b711ccbc8e54263",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -406,7 +406,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-14T03:47:10.436Z",
+      "decidedAt": "2026-11-14T08:04:47.699Z",
       "failureCodes": []
     },
     "notes": [
@@ -419,12 +419,12 @@
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-14T03:53:07.921Z",
+    "checkedAt": "2026-11-14T08:06:18.375Z",
     "source": {
-      "commit": "739bc5352e0fb39f66f4329a1ab44cc19d8b8223",
+      "commit": "26b9904a007052894f7b6eab7b711ccbc8e54263",
       "dirty": false
     },
-    "expectedSource": "739bc5352e0fb39f66f4329a1ab44cc19d8b8223",
+    "expectedSource": "26b9904a007052894f7b6eab7b711ccbc8e54263",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -1101,7 +1101,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-14T03:47:10.436Z",
+      "decidedAt": "2026-11-14T08:04:47.699Z",
       "failureCodes": []
     },
     "notes": [
@@ -1114,12 +1114,12 @@
     "tier": "actual-native-control",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-14T03:53:07.923Z",
+    "checkedAt": "2026-11-14T08:06:18.377Z",
     "source": {
-      "commit": "739bc5352e0fb39f66f4329a1ab44cc19d8b8223",
+      "commit": "26b9904a007052894f7b6eab7b711ccbc8e54263",
       "dirty": false
     },
-    "expectedSource": "739bc5352e0fb39f66f4329a1ab44cc19d8b8223",
+    "expectedSource": "26b9904a007052894f7b6eab7b711ccbc8e54263",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -1817,7 +1817,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-14T03:47:10.436Z",
+      "decidedAt": "2026-11-14T08:04:47.699Z",
       "failureCodes": []
     },
     "notes": [
@@ -1830,12 +1830,12 @@
     "tier": "installed-alpha",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-14T03:53:07.923Z",
+    "checkedAt": "2026-11-14T08:06:18.380Z",
     "source": {
-      "commit": "739bc5352e0fb39f66f4329a1ab44cc19d8b8223",
+      "commit": "26b9904a007052894f7b6eab7b711ccbc8e54263",
       "dirty": false
     },
-    "expectedSource": "739bc5352e0fb39f66f4329a1ab44cc19d8b8223",
+    "expectedSource": "26b9904a007052894f7b6eab7b711ccbc8e54263",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -2568,6 +2568,16 @@
         "status": "PASS"
       },
       {
+        "id": "E7-READINESS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-TRIAL-WORKBENCH-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
         "id": "E6-INSTALLED-CONTEXT",
         "required": true,
         "status": "PASS"
@@ -2652,7 +2662,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-14T03:47:10.436Z",
+      "decidedAt": "2026-11-14T08:04:47.699Z",
       "failureCodes": []
     },
     "notes": [
@@ -2665,12 +2675,12 @@
     "tier": "advisory-routing",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-14T03:53:07.925Z",
+    "checkedAt": "2026-11-14T08:06:18.382Z",
     "source": {
-      "commit": "739bc5352e0fb39f66f4329a1ab44cc19d8b8223",
+      "commit": "26b9904a007052894f7b6eab7b711ccbc8e54263",
       "dirty": false
     },
-    "expectedSource": "739bc5352e0fb39f66f4329a1ab44cc19d8b8223",
+    "expectedSource": "26b9904a007052894f7b6eab7b711ccbc8e54263",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -3373,7 +3383,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-14T03:47:10.436Z",
+      "decidedAt": "2026-11-14T08:04:47.699Z",
       "failureCodes": []
     },
     "notes": [
@@ -3386,12 +3396,12 @@
     "tier": "controlled-review",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-14T03:53:07.925Z",
+    "checkedAt": "2026-11-14T08:06:18.382Z",
     "source": {
-      "commit": "739bc5352e0fb39f66f4329a1ab44cc19d8b8223",
+      "commit": "26b9904a007052894f7b6eab7b711ccbc8e54263",
       "dirty": false
     },
-    "expectedSource": "739bc5352e0fb39f66f4329a1ab44cc19d8b8223",
+    "expectedSource": "26b9904a007052894f7b6eab7b711ccbc8e54263",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -4114,7 +4124,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-14T03:47:10.436Z",
+      "decidedAt": "2026-11-14T08:04:47.699Z",
       "failureCodes": []
     },
     "notes": [
@@ -4127,12 +4137,12 @@
     "tier": "actual-heterogeneous-review",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-14T03:53:07.926Z",
+    "checkedAt": "2026-11-14T08:06:18.383Z",
     "source": {
-      "commit": "739bc5352e0fb39f66f4329a1ab44cc19d8b8223",
+      "commit": "26b9904a007052894f7b6eab7b711ccbc8e54263",
       "dirty": false
     },
-    "expectedSource": "739bc5352e0fb39f66f4329a1ab44cc19d8b8223",
+    "expectedSource": "26b9904a007052894f7b6eab7b711ccbc8e54263",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -4865,7 +4875,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-14T03:47:10.436Z",
+      "decidedAt": "2026-11-14T08:04:47.699Z",
       "failureCodes": []
     },
     "notes": [
@@ -4878,12 +4888,12 @@
     "tier": "review-value",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-14T03:53:07.926Z",
+    "checkedAt": "2026-11-14T08:06:18.384Z",
     "source": {
-      "commit": "739bc5352e0fb39f66f4329a1ab44cc19d8b8223",
+      "commit": "26b9904a007052894f7b6eab7b711ccbc8e54263",
       "dirty": false
     },
-    "expectedSource": "739bc5352e0fb39f66f4329a1ab44cc19d8b8223",
+    "expectedSource": "26b9904a007052894f7b6eab7b711ccbc8e54263",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -5581,7 +5591,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-14T03:47:10.436Z",
+      "decidedAt": "2026-11-14T08:04:47.699Z",
       "failureCodes": []
     },
     "notes": [
@@ -5594,12 +5604,12 @@
     "tier": "local-alpha",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-14T03:53:07.927Z",
+    "checkedAt": "2026-11-14T08:06:18.385Z",
     "source": {
-      "commit": "739bc5352e0fb39f66f4329a1ab44cc19d8b8223",
+      "commit": "26b9904a007052894f7b6eab7b711ccbc8e54263",
       "dirty": false
     },
-    "expectedSource": "739bc5352e0fb39f66f4329a1ab44cc19d8b8223",
+    "expectedSource": "26b9904a007052894f7b6eab7b711ccbc8e54263",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -6328,6 +6338,16 @@
       },
       {
         "id": "E7-SCOPE-DIAGNOSTICS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E7-READINESS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-TRIAL-WORKBENCH-UI",
         "required": true,
         "status": "PASS"
       },
@@ -6416,7 +6436,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-14T03:47:10.436Z",
+      "decidedAt": "2026-11-14T08:04:47.699Z",
       "failureCodes": []
     },
     "notes": [
@@ -6429,12 +6449,12 @@
     "tier": "full-product",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-14T03:53:07.928Z",
+    "checkedAt": "2026-11-14T08:06:18.388Z",
     "source": {
-      "commit": "739bc5352e0fb39f66f4329a1ab44cc19d8b8223",
+      "commit": "26b9904a007052894f7b6eab7b711ccbc8e54263",
       "dirty": false
     },
-    "expectedSource": "739bc5352e0fb39f66f4329a1ab44cc19d8b8223",
+    "expectedSource": "26b9904a007052894f7b6eab7b711ccbc8e54263",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -7163,6 +7183,16 @@
       },
       {
         "id": "E7-SCOPE-DIAGNOSTICS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E7-READINESS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-TRIAL-WORKBENCH-UI",
         "required": true,
         "status": "PASS"
       },
@@ -7287,7 +7317,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-14T03:47:10.436Z",
+      "decidedAt": "2026-11-14T08:04:47.699Z",
       "failureCodes": []
     },
     "notes": [

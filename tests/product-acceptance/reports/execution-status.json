@@ -2,11 +2,11 @@
   "schema": "agent-execution-status/1",
   "agent": "E",
   "branch": "codex/g3-product-acceptance",
-  "base": "11002b8",
-  "checkpoint": "4a1fd7d",
-  "head": "739bc5352e0fb39f66f4329a1ab44cc19d8b8223",
+  "base": "6787bd0",
+  "checkpoint": "26b9904",
+  "head": "26b9904a007052894f7b6eab7b711ccbc8e54263",
   "worktreeDirtyAtRun": false,
-  "checkedAt": "2026-11-14T03:47:10.422Z",
+  "checkedAt": "2026-11-14T08:04:47.680Z",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -20,10 +20,10 @@
   "stages": [
     {
       "id": "E1",
-      "title": "Fixed positives and original scopes",
-      "command": "node tests/product-acceptance/pilot/harness.mjs --preflight && node tests/product-acceptance/pilot/harness.mjs --selftest",
+      "title": "Lock the accurate new inputs",
+      "command": "node -e \"process.env.PA_E_TRACE&&0\"",
       "notes": [
-        "The complete 0ede report and historical 595/a9b reports stay as measured positives; module/controlled/ordinary-installed/UI/recovery/native/value remain separate."
+        "A826 tuple stays a separate measured scope; the wave26 ce64fc1 tar is the subject, read from its own install-artifact.json, and no F App package is relabeled from 3b."
       ],
       "result": "PASS",
       "counts": {
@@ -614,10 +614,10 @@
     },
     {
       "id": "E2",
-      "title": "Real opt-in HTTP success",
-      "command": "node tests/product-acceptance/pilot/harness.mjs --execute --confirm-grant",
+      "title": "Full tuple and actual consumer bytes",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "Both plain and narrow scope diagnostics require an actual HTTP 200 together with the bounded payload; 500/missing/201 or a stale payload is rejected on the recorded positive."
+        "Every required installed case binds source/tarSHA/bytes/build/schema/platform/ABI/mode/operation plus consumer file hashes from the target tar; a foreign package consumer is rejected."
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
@@ -769,14 +769,14 @@
     },
     {
       "id": "E3",
-      "title": "Tuple, capability and consumer provenance",
-      "command": "node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui",
+      "title": "Real selector and four navigation callbacks",
+      "command": "node tests/product-acceptance/cases/w26-trial-ui.mjs",
       "notes": [
-        "Every required installed case binds subject and consumer package/file hashes read from the tar; capability facts come from package bytes and must agree across cases."
+        "The packaged console is served by the package static server and driven by Playwright: trial navigation, configure/import/executor/conversation callbacks, draft kept, desktop/mobile layout and injected failure/stale/legacy states."
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
-        "PASS": 27,
+        "PASS": 28,
         "NOT_TESTED": 6
       },
       "cases": [
@@ -944,15 +944,20 @@
           "id": "E3-PERSONAL-COLD-START",
           "status": "PASS",
           "reason": null
+        },
+        {
+          "id": "E3-TRIAL-WORKBENCH-UI",
+          "status": "PASS",
+          "reason": null
         }
       ]
     },
     {
       "id": "E4",
-      "title": "First milestone complete gate",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha",
+      "title": "First milestone: current package UI and readiness",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "The real 0ede positive, HTTP/status omissions and capability/schema/tuple/consumer controls are in the recorded set with exact codes and case attribution."
+        "Real readiness HTTP in normal/readonly/fixture with schema, auth, query and revision facts; real trial workbench navigation; absent surfaces stay precise NOT_REACHED."
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
@@ -1084,10 +1089,10 @@
     },
     {
       "id": "E5",
-      "title": "Accurate 3b package",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=e4-bounded-stability",
+      "title": "Scope and source diagnostics guards",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "Target is 3b2ff68/build470738fd33b22ff4/tar f04abb1b… with 0ede as the safety baseline; tuple, consumer files, schema/ABI and mode/operation come from the extracted package."
+        "Plain default shape and opt-in plain/narrow HTTP 200 remain required with bounded reasons/counts; negatives start from an independent legal positive."
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
@@ -1134,10 +1139,10 @@
     },
     {
       "id": "E6",
-      "title": "D resource gate isolated",
-      "command": "node tests/product-acceptance/build-handoff.mjs --run <run-directory>",
+      "title": "Stale responses, auth and instance reuse",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "D live cleanup scripts are not run until its fresh pre-signal/child identity/root gate is independently passed; only probe-owned resources are signalled."
+        "Same-file REUSED keeps PID/processStart/digest; different/missing selection, root and port are refused without changing the live instance."
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
@@ -1173,21 +1178,20 @@
         {
           "id": "E6-SOURCE-UI",
           "status": "NOT_TESTED",
-          "reason": "NOT_REACHED: the frozen target package console does not contain the 0062 scope-review UI marker (main 4b); only the backend ?scopeReview=1 projection is present and tested. A package frozen with that UI is required for the user-facing assertion."
+          "reason": "NOT_REACHED: the scope-review marker exists in this package and its backend ?scopeReview=1 plain/narrow responses are measured, but the independent browser expansion of a restored message scope has not been recorded. Navigation and the trial workbench are separately browser-verified in E3-TRIAL-WORKBENCH-UI."
         }
       ]
     },
     {
       "id": "E7",
-      "title": "UI and readiness",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha",
+      "title": "A/C target and fingerprint mapping",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "3b contains the 4b console marker but the package entry predates GET /v1/readiness; both are recorded as NOT_REACHED rather than inferred."
+        "Original target, consumer entry and capability are read from the package bytes; opaque echoes and synthetic provenance cannot satisfy the required evidence."
       ],
-      "result": "PASS_WITH_GAPS",
+      "result": "PASS",
       "counts": {
-        "PASS": 5,
-        "NOT_TESTED": 1
+        "PASS": 6
       },
       "cases": [
         {
@@ -1217,17 +1221,17 @@
         },
         {
           "id": "E7-READINESS",
-          "status": "NOT_TESTED",
-          "reason": "NOT_REACHED: the frozen target package HTTP entry does not contain GET /v1/readiness (main 0064); it predates the readiness source. The default configuration/health endpoints are unchanged, and a package frozen with that API is required."
+          "status": "PASS",
+          "reason": null
         }
       ]
     },
     {
       "id": "E8",
-      "title": "Second milestone user closure",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha",
+      "title": "Second milestone: drift negatives and recovery consumers",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "The package-consumer review flow is exercised end to end for reachable surfaces; unrecorded UI/readiness stay NOT_REACHED."
+        "Complete drift/source/mapping negatives and recovered-read consumers are reported with exact refusal reasons."
       ],
       "result": "PASS",
       "counts": {
@@ -1248,10 +1252,10 @@
     },
     {
       "id": "E9",
-      "title": "A to C data driver",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=e4-bounded-stability",
+      "title": "Two formats in one data chain",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "The A producer manifest and C single driver are not admitted; the A→C two-snapshot chain stays NOT_REACHED while the package chain is measured."
+        "A source create/verify in default v1 and explicit v2 is consumed by the package into two fresh roots; the A/C chain remains separately NOT_REACHED when its consumer is absent."
       ],
       "result": "PASS",
       "counts": {
@@ -1272,10 +1276,10 @@
     },
     {
       "id": "E10",
-      "title": "Two snapshot restores",
-      "command": "node tests/product-acceptance/build-handoff.mjs --run <run-directory>",
+      "title": "Ordinary cold install, no executor and multi-state",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "Default v1 and explicit v2 are created/verified over the same store and read by the package consumer; independent A→C restores stay NOT_REACHED."
+        "Cold first-run/personal start, fixture and multi-state are bounded probe-owned resources; no real profile fallback and no user instance is touched."
       ],
       "result": "SEE_RUN",
       "counts": {},
@@ -1283,10 +1287,10 @@
     },
     {
       "id": "E11",
-      "title": "Install, reuse and upgrade",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha # E11",
+      "title": "Upgrade, rollback and new data protection",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "Cold/reuse/no-executor/multi-state, 0ede→3b and 16→18, same-file REUSED, refusals with BLOCKED codes and unchanged PID, tamper and post-upgrade data."
+        "A826->ce64 and 16->18 upgrades keep exit/status/pointer/operation/data; new data is not rolled back to pass rollback."
       ],
       "result": "SEE_RUN",
       "counts": {},
@@ -1294,10 +1298,10 @@
     },
     {
       "id": "E12",
-      "title": "Third milestone required result",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha # E12",
+      "title": "Third milestone: complete same-package required layers",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "The non-native ordinary/UI/readiness/recovery/install result is reported against the exact 3b tuple; full-product/native/value stay refused."
+        "UI/readiness, restored review, workflow formats and ordinary install/upgrade keep separate required conclusions; native/private/target/value stay not reached."
       ],
       "result": "SEE_RUN",
       "counts": {},
@@ -1305,10 +1309,10 @@
     },
     {
       "id": "E13",
-      "title": "Bounded stability",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha # E13",
+      "title": "Bounded availability and reopen",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "Limited SSE/reconnect/reopen/concurrent readonly sequences return provider/queue/count baselines; no soak or global socket scans."
+        "Bounded readonly concurrency, reopen and stop paths are measured with provider/queue unchanged; no long soak is claimed."
       ],
       "result": "SEE_RUN",
       "counts": {},
@@ -1316,10 +1320,10 @@
     },
     {
       "id": "E14",
-      "title": "H original observations",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha # E14",
+      "title": "G/H observation scope",
+      "command": "node tests/product-acceptance/selftest/gate-mutations.mjs",
       "notes": [
-        "H operational samples are inputs only; E validates source/tar/root/duration/redaction and rejects missing fields or cross-package samples."
+        "G/H summaries remain inputs: wrong-scope metrics, refused-then-executed tools and unverified checkers do not become acceptance authority."
       ],
       "result": "SEE_RUN",
       "counts": {},
@@ -1327,10 +1331,10 @@
     },
     {
       "id": "E15",
-      "title": "Trial materials and ownership",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha # E15",
+      "title": "Support material and current trial promise",
+      "command": "node tests/product-acceptance/build-handoff.mjs",
       "notes": [
-        "Support material privacy and readiness wording are checked separately; defects go to owners without changing the required set."
+        "Support/private material stays 0600 and non-overwriting; current guidance matches the real selector/CLI/readiness; docs do not re-freeze packages."
       ],
       "result": "SEE_RUN",
       "counts": {},
@@ -1338,10 +1342,10 @@
     },
     {
       "id": "E16",
-      "title": "Fourth milestone final verdict",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha # E16",
+      "title": "Fourth milestone: credible current product conclusion",
+      "command": "node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record",
       "notes": [
-        "wave25-status records the exact subject/consumer, the HTTP gate, the reachable user flow and explicit NOT_REACHED scopes."
+        "wave26-status, four checkpoints, real commands/exit/tuples/consumers/times and remaining gates; goal stays incomplete where required layers are NOT_REACHED."
       ],
       "result": "SEE_RUN",
       "counts": {},
@@ -1353,12 +1357,12 @@
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-14T03:47:10.436Z",
+    "checkedAt": "2026-11-14T08:04:47.699Z",
     "source": {
-      "commit": "739bc5352e0fb39f66f4329a1ab44cc19d8b8223",
+      "commit": "26b9904a007052894f7b6eab7b711ccbc8e54263",
       "dirty": false
     },
-    "expectedSource": "739bc5352e0fb39f66f4329a1ab44cc19d8b8223",
+    "expectedSource": "26b9904a007052894f7b6eab7b711ccbc8e54263",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -2038,31 +2042,31 @@
       "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability; there is no allow-gap switch."
     ]
   },
-  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T03-41-44-490Z",
+  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T07-58-15-588Z",
   "evidence": {
-    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T03-41-44-490Z/report.json",
-    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T03-41-44-490Z/release.json",
+    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T07-58-15-588Z/report.json",
+    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T07-58-15-588Z/release.json",
     "screenshots": [
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T03-41-44-490Z/screenshots/desktop-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T03-41-44-490Z/screenshots/notebook-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T03-41-44-490Z/screenshots/mobile-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T03-41-44-490Z/screenshots/mobile-navigation.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T03-41-44-490Z/screenshots/mobile-detail.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T03-41-44-490Z/screenshots/desktop-delivered.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T03-41-44-490Z/screenshots/desktop-error.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T03-41-44-490Z/screenshots/desktop-offline.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T03-41-44-490Z/screenshots/desktop-keyboard.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T03-41-44-490Z/screenshots/mobile-conversations.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T03-41-44-490Z/screenshots/desktop-verification-blocked.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T03-41-44-490Z/screenshots/desktop-verification-recovered.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T03-41-44-490Z/screenshots/desktop-review-activity.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T03-41-44-490Z/screenshots/mobile-attention-inbox.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T03-41-44-490Z/proposal-preview-desktop.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T03-41-44-490Z/proposal-preview-notebook.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T03-41-44-490Z/proposal-preview-mobile.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T03-41-44-490Z/screenshots/context-confirm-desktop.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T03-41-44-490Z/screenshots/context-confirm-mobile.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T03-41-44-490Z/screenshots/context-history-mobile.png"
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T07-58-15-588Z/screenshots/desktop-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T07-58-15-588Z/screenshots/notebook-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T07-58-15-588Z/screenshots/mobile-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T07-58-15-588Z/screenshots/mobile-navigation.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T07-58-15-588Z/screenshots/mobile-detail.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T07-58-15-588Z/screenshots/desktop-delivered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T07-58-15-588Z/screenshots/desktop-error.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T07-58-15-588Z/screenshots/desktop-offline.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T07-58-15-588Z/screenshots/desktop-keyboard.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T07-58-15-588Z/screenshots/mobile-conversations.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T07-58-15-588Z/screenshots/desktop-verification-blocked.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T07-58-15-588Z/screenshots/desktop-verification-recovered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T07-58-15-588Z/screenshots/desktop-review-activity.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T07-58-15-588Z/screenshots/mobile-attention-inbox.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T07-58-15-588Z/proposal-preview-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T07-58-15-588Z/proposal-preview-notebook.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T07-58-15-588Z/proposal-preview-mobile.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T07-58-15-588Z/screenshots/context-confirm-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T07-58-15-588Z/screenshots/context-confirm-mobile.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T07-58-15-588Z/screenshots/context-history-mobile.png"
     ],
     "matrix": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/release-matrix.json",
     "executionStatus": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/execution-status.json",
