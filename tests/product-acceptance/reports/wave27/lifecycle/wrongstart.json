@@ -1,25 +1,25 @@
 {
   "control": "wrongstart",
   "reason": "unknown_live_resource",
-  "at": "2026-11-14T11:18:46.063Z",
-  "root": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-7yaxgC",
+  "at": "2026-11-14T11:27:24.520Z",
+  "root": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-CUGiDA",
   "scope": {
-    "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-7yaxgC/install",
-    "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-7yaxgC/state",
-    "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-7yaxgC/config"
+    "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-CUGiDA/install",
+    "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-CUGiDA/state",
+    "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-CUGiDA/config"
   },
   "record": {
-    "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-7yaxgC/config/instance.json",
-    "sha256": "e10fbcac48bd010d2795093d8a9c03961439ee2f4763eebc731799590a4b0d3f",
-    "bytes": 539,
+    "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-CUGiDA/config/instance.json",
+    "sha256": "a3b69c16884c7aa3323ebc306ce0c5b8fd5c00b25e1d2baa4fa0d6098026efdc",
+    "bytes": 543,
     "value": {
       "protocol": "pa-instance/1",
-      "pid": 657,
+      "pid": 18298,
       "processStart": "Wed Jan  1 00:00:00 2020",
-      "apiPid": 657,
+      "apiPid": 18298,
       "apiProcessStart": "Wed Jan  1 00:00:00 2020",
-      "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-7yaxgC/state",
-      "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-7yaxgC/install",
+      "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-CUGiDA/state",
+      "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-CUGiDA/install",
       "apiURL": "http://127.0.0.1:1",
       "consoleURL": "http://127.0.0.1:2",
       "buildId": "probe",
@@ -30,18 +30,18 @@
   },
   "material": {
     "reason": "unknown_live_resource",
-    "root": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-7yaxgC",
-    "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-7yaxgC/install",
-    "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-7yaxgC/config",
-    "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-7yaxgC/state",
+    "root": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-CUGiDA",
+    "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-CUGiDA/install",
+    "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-CUGiDA/config",
+    "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-CUGiDA/state",
     "record": {
-      "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-7yaxgC/config/instance.json",
-      "sha256": "e10fbcac48bd010d2795093d8a9c03961439ee2f4763eebc731799590a4b0d3f",
-      "bytes": 539,
+      "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-CUGiDA/config/instance.json",
+      "sha256": "a3b69c16884c7aa3323ebc306ce0c5b8fd5c00b25e1d2baa4fa0d6098026efdc",
+      "bytes": 543,
       "error": null
     },
     "files": [],
-    "retainedAt": "2026-11-14T11:18:46.063Z",
+    "retainedAt": "2026-11-14T11:27:24.520Z",
     "deleted": false
   },
   "extra": {}

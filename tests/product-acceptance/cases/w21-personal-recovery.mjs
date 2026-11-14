@@ -710,7 +710,7 @@ export async function runPersonalReview() {
         argv: record?.launcherArgv ?? null, healthMode: health?.mode ?? null, healthStartupMode: health?.startupMode ?? null,
         recordMode: record?.mode ?? null, command: 'pa start --discussion-only (restored state, no review file) then pa stop --json',
         exit: direct?.status ?? null, reproducible: true } : null
-      evidence.packagedStop = { status: value.status, healthMode: health?.mode ?? null, healthStartupMode: health?.startupMode ?? null,
+      evidence.packagedStop = { subject: frozenArtifactSubject(target), status: value.status, healthMode: health?.mode ?? null, healthStartupMode: health?.startupMode ?? null,
         recordMode: record?.mode ?? null, stopStatus: stopJson?.status ?? null, stopCode: stopJson?.code ?? null,
         finding, cleaned: { clean: cleaned.clean, package: cleaned.packageStop?.json?.status ?? null, refusal: cleaned.packageRefusal ?? null,
           recordRemoved: cleaned.recordRemoved ?? null, signals: cleaned.signals, reason: cleaned.reason ?? null } }

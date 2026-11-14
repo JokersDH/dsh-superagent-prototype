@@ -180,7 +180,8 @@ const evidenceFor = (key) => {
           diagnostic: { protocol: 'context-scope-review/1', reasons: ['selection_narrowed'], partial: true, withheldSourceCount: 1, authorization: 'none' } },
       }
     case 'packagedStop':
-      return { status: 'RUNNING', healthMode: 'fixture', healthStartupMode: 'recovery_readonly', recordMode: 'personal',
+      return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
+        status: 'RUNNING', healthMode: 'fixture', healthStartupMode: 'recovery_readonly', recordMode: 'personal',
         stopStatus: 'BLOCKED', stopCode: 'instance_identity_mismatch',
         finding: { owner: 'main/D packaged launcher', code: 'instance_identity_mismatch', failures: ['runtime_mode'],
           expected: 'personal', observed: 'fixture', argv: ['pa', 'start'], healthMode: 'fixture', healthStartupMode: 'recovery_readonly',
