@@ -293,7 +293,7 @@
       "verdict": "EXPECTED_REFUSALS",
       "summary": {
         "protocol": "recovery-journal-fixture/1",
-        "path": "journal/critical.ndjson",
+        "path": "reports/trial-operations/wave26/recovery-a826-input/journal/critical.ndjson",
         "bytes": 3474,
         "sha256": "3430d28c77ce189e9a2ae756a62b710150aff8554309292805a6717ab65609cd",
         "factSource": "fixture-runner-source-wave26",
