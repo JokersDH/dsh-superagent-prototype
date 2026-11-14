@@ -61,7 +61,7 @@ async function startWork(h, id, projectId) {
     projectId,
     conversationId: `conversation-${id}`,
     scope: { ...scope, projectId },
-    goal: `Work ${id}`,
+    goal: 'Produce the same reported goal in both projects',
   }, actor)
   const active = await h.start(created.workId)
   return { workId: created.workId, active }
@@ -208,7 +208,10 @@ async function main() {
     '--project', PROJECT_A, '--project', PROJECT_B,
     '--include-attention', '--snapshot-limit', '20', '--history-pages', '3', '--history-limit', '50',
   ]
+  const cursorBefore = h.store.events.cursor()
+  const collectStarted = Date.now()
   const collected = await run(['collect', ...common, '--input-id', 'probe-two-projects', '--out', bundlePath])
+  const collectMs = Date.now() - collectStarted
   assert.equal(collected.status, 0, `collect failed: ${collected.stderr}`)
   const collectedAgain = await run(['collect', ...common, '--input-id', 'probe-two-projects', '--out', bundlePath2])
   assert.equal(collectedAgain.status, 0, `second collect failed: ${collectedAgain.stderr}`)
@@ -234,7 +237,9 @@ async function main() {
   assert.equal(markdown.includes(directory), false, 'the report must not embed a user path')
   assert.equal(markdown.includes(API_TOKEN), false, 'the report must never contain the credential')
 
+  const analyzeStarted = Date.now()
   const analysis = JSON.parse((await run(['analyze', '--input', bundlePath])).stdout)
+  const analyzeMs = Date.now() - analyzeStarted
   const summary = analysis.summary
   assert.equal(summary.coverage.overall, 'complete')
   assert.equal(summary.quarantine.total, 0)
@@ -253,6 +258,15 @@ async function main() {
   assert.equal(summary.attention.items, 2)
   assert.ok(summary.attention.waitingAgeMs > 0)
   assert.equal(summary.limits.stoppedBy, 'none')
+  assert.equal(h.store.events.cursor(), cursorBefore, 'read-only collection and analysis must not create product events')
+
+  // Two works share the same human goal text, and they still stay separate: identity, not similarity.
+  const titles = bundle.workEvidence.flatMap(work => work.entries.filter(entry => entry.kind === 'work.created').map(entry => entry.detail?.title))
+  assert.equal(new Set(titles).size, 1, 'both works carry the same reported title')
+  assert.deepEqual(summary.projects.map(project => [project.projectId, project.outcomes]).sort(),
+    [[PROJECT_A, 2], [PROJECT_B, 1]])
+  const subjectKeys = new Set(analysis.subjects.map(subject => subject.subjectKey))
+  assert.equal(subjectKeys.size, analysis.subjects.length, 'every subject keeps its own identity')
 
   // Same bytes as a "verified file": the summary id must be identical, and the digest must bind it.
   const verified = JSON.parse((await run(['verify', '--input', bundlePath])).stdout)
@@ -283,6 +297,10 @@ async function main() {
     layers: ['controlled'],
     nativeExecution: 'NOT_TESTED',
     summaryId: summary.summaryId,
+    readOnlyNoProductEvents: true,
+    sameTitleWorksStayedSeparate: true,
+    collectMs,
+    analyzeMs,
     digest: verified.digest,
     metrics: summary.metrics.map(row => ({ metricId: row.metricId, layer: row.layer, currency: row.currency, value: row.value, sampleCount: row.sampleCount, unknownCount: row.unknownCount })),
     unpublishedPaths: !keep,

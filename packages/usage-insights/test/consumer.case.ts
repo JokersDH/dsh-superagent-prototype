@@ -4,7 +4,7 @@ import { analyzeUsageInsights } from '../src/analyze.ts'
 import { toInsightConsumerView, observedOutcomeCount, metricRowKey } from '../src/facing.ts'
 import { USAGE_INSIGHTS_COMPATIBILITY, type UsageInsightsInput } from '../src/protocol.ts'
 import { renderMarkdown } from '../src/report.ts'
-import { completeBundle, unknownBundle } from './fixtures.ts'
+import { CONTRACT_ATLAS, CONTRACT_ORBIT, completeBundle, makeOutcome, makeWorkEvidence, unknownBundle } from './fixtures.ts'
 
 /**
  * Local copy of the trial workspace consumer type (`apps/console/src/trial/insights.ts`).
@@ -117,4 +117,34 @@ test('the report explains each metric, cites identifiers and separates layers', 
   assert.ok(markdown.includes('Observed subjects'))
   assert.ok(markdown.includes('| controlled |'))
   assert.equal(markdown.includes('we used to spend'), false)
+})
+
+test('two works with the same title stay separate, and a cross-work outcome is refused', () => {
+  const atlasOutcome = makeOutcome({ seed: 'iso-a', projectId: 'project-atlas', acceptance: 'unknown' })
+  const orbitOutcome = makeOutcome({ seed: 'iso-b', projectId: 'project-orbit', contract: CONTRACT_ORBIT, acceptance: 'unknown' })
+  const title = 'Produce the same reported goal'
+  const bundle = {
+    ...completeBundle(),
+    projects: [{ projectId: 'project-atlas' }, { projectId: 'project-orbit' }],
+    outcomes: [atlasOutcome, orbitOutcome],
+    workEvidence: [
+      makeWorkEvidence(CONTRACT_ATLAS.workId, [{ kind: 'work.created', sourceRef: CONTRACT_ATLAS.workId, detail: { title } }], { outcomes: [atlasOutcome] }),
+      makeWorkEvidence(CONTRACT_ORBIT.workId, [{ kind: 'work.created', sourceRef: CONTRACT_ORBIT.workId, detail: { title } }], { outcomes: [orbitOutcome] }),
+    ],
+  } as UsageInsightsInput
+  const analysis = analyzeUsageInsights(bundle)
+  assert.deepEqual(analysis.summary.projects.map(project => [project.projectId, project.outcomes]).sort(),
+    [['project-atlas', 1], ['project-orbit', 1]])
+  assert.equal(analysis.summary.quarantine.total, 0, 'identical titles never create a conflict or a join')
+  assert.equal(new Set(analysis.subjects.map(subject => subject.subjectKey)).size, 2)
+
+  // The real WorkEvidence schema refuses an outcome that belongs to another work.
+  const crossed = {
+    ...bundle,
+    workEvidence: [makeWorkEvidence(CONTRACT_ATLAS.workId, [], { outcomes: [orbitOutcome] })],
+    outcomes: [],
+  } as UsageInsightsInput
+  const rejected = analyzeUsageInsights(crossed)
+  assert.equal(rejected.summary.quarantine.byCode.find(entry => entry.code === 'invalid_record')?.records, 1)
+  assert.equal(rejected.summary.metrics.find(row => row.metricId === 'outcomes.count'), undefined)
 })

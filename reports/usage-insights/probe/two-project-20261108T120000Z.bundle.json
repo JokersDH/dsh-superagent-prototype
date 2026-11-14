@@ -17,7 +17,7 @@
   ],
   "source": {
     "kind": "http_read",
-    "descriptor": "loopback 127.0.0.1:64178 read-only",
+    "descriptor": "loopback 127.0.0.1:65300 read-only",
     "digest": null,
     "layerAssertion": "recorded_by_producer",
     "capturedAt": "2026-11-08T12:00:00Z"
@@ -47,9 +47,9 @@
           "contract": {
             "workId": "925149c14fd7b70c0f00917f866a8232",
             "revision": 1,
-            "digest": "a5f0b5ece8bb7d0a2bde5b55e3238cd64435750ac3d7f938a4f83bbb7bcc7cd2"
+            "digest": "4dea73e4b394b248768c29b56a467cab39653dea2f0aee756b859c3a1b287acf"
           },
-          "workTitle": "Work atlas-report",
+          "workTitle": "Produce the same reported goal in both projects",
           "summary": "Question question-atlas-1",
           "sinceAt": "2026-11-08T09:00:00.000Z",
           "deadlineAt": null,
@@ -85,9 +85,9 @@
           "contract": {
             "workId": "860c3fcc50b9631e1773212a34dc074a",
             "revision": 1,
-            "digest": "8193e457b1d39c1278179bfa4f928de6271e1a316e75967ab5c2787b1e9d730f"
+            "digest": "4cab31b985e72fd598e53df1c882512a9df83e82a06616ca6038a797e7de899d"
           },
-          "workTitle": "Work orbit-report",
+          "workTitle": "Produce the same reported goal in both projects",
           "summary": "Question question-orbit-1",
           "sinceAt": "2026-11-08T09:30:00.000Z",
           "deadlineAt": null,
@@ -140,10 +140,10 @@
         {
           "at": "2026-11-08T10:00:00.000Z",
           "kind": "contract.revision",
-          "sourceRef": "925149c14fd7b70c0f00917f866a8232@1/a5f0b5ece8bb7d0a2bde5b55e3238cd64435750ac3d7f938a4f83bbb7bcc7cd2",
+          "sourceRef": "925149c14fd7b70c0f00917f866a8232@1/4dea73e4b394b248768c29b56a467cab39653dea2f0aee756b859c3a1b287acf",
           "detail": {
             "revision": 1,
-            "digest": "a5f0b5ece8bb7d0a2bde5b55e3238cd64435750ac3d7f938a4f83bbb7bcc7cd2"
+            "digest": "4dea73e4b394b248768c29b56a467cab39653dea2f0aee756b859c3a1b287acf"
           }
         },
         {
@@ -152,7 +152,7 @@
           "sourceRef": "2bda24515c3a1341f050e0aa1c13ced9",
           "detail": {
             "revision": 1,
-            "digest": "a5f0b5ece8bb7d0a2bde5b55e3238cd64435750ac3d7f938a4f83bbb7bcc7cd2",
+            "digest": "4dea73e4b394b248768c29b56a467cab39653dea2f0aee756b859c3a1b287acf",
             "role": "primary"
           }
         },
@@ -161,7 +161,7 @@
           "kind": "work.created",
           "sourceRef": "925149c14fd7b70c0f00917f866a8232",
           "detail": {
-            "title": "Work atlas-report"
+            "title": "Produce the same reported goal in both projects"
           }
         },
         {
@@ -185,7 +185,7 @@
             "contract": {
               "workId": "925149c14fd7b70c0f00917f866a8232",
               "revision": 1,
-              "digest": "a5f0b5ece8bb7d0a2bde5b55e3238cd64435750ac3d7f938a4f83bbb7bcc7cd2"
+              "digest": "4dea73e4b394b248768c29b56a467cab39653dea2f0aee756b859c3a1b287acf"
             },
             "attemptId": "attempt-atlas-2",
             "fenceEpoch": 1
@@ -219,7 +219,7 @@
             "contract": {
               "workId": "925149c14fd7b70c0f00917f866a8232",
               "revision": 1,
-              "digest": "a5f0b5ece8bb7d0a2bde5b55e3238cd64435750ac3d7f938a4f83bbb7bcc7cd2"
+              "digest": "4dea73e4b394b248768c29b56a467cab39653dea2f0aee756b859c3a1b287acf"
             },
             "attemptId": "attempt-atlas-1",
             "fenceEpoch": 1
@@ -269,10 +269,10 @@
         {
           "at": "2026-11-08T10:00:00.000Z",
           "kind": "contract.revision",
-          "sourceRef": "860c3fcc50b9631e1773212a34dc074a@1/8193e457b1d39c1278179bfa4f928de6271e1a316e75967ab5c2787b1e9d730f",
+          "sourceRef": "860c3fcc50b9631e1773212a34dc074a@1/4cab31b985e72fd598e53df1c882512a9df83e82a06616ca6038a797e7de899d",
           "detail": {
             "revision": 1,
-            "digest": "8193e457b1d39c1278179bfa4f928de6271e1a316e75967ab5c2787b1e9d730f"
+            "digest": "4cab31b985e72fd598e53df1c882512a9df83e82a06616ca6038a797e7de899d"
           }
         },
         {
@@ -281,7 +281,7 @@
           "sourceRef": "922459e289b5b78221af7bb61788c4f4",
           "detail": {
             "revision": 1,
-            "digest": "8193e457b1d39c1278179bfa4f928de6271e1a316e75967ab5c2787b1e9d730f",
+            "digest": "4cab31b985e72fd598e53df1c882512a9df83e82a06616ca6038a797e7de899d",
             "role": "primary"
           }
         },
@@ -290,7 +290,7 @@
           "kind": "work.created",
           "sourceRef": "860c3fcc50b9631e1773212a34dc074a",
           "detail": {
-            "title": "Work orbit-report"
+            "title": "Produce the same reported goal in both projects"
           }
         },
         {
@@ -314,7 +314,7 @@
             "contract": {
               "workId": "860c3fcc50b9631e1773212a34dc074a",
               "revision": 1,
-              "digest": "8193e457b1d39c1278179bfa4f928de6271e1a316e75967ab5c2787b1e9d730f"
+              "digest": "4cab31b985e72fd598e53df1c882512a9df83e82a06616ca6038a797e7de899d"
             },
             "attemptId": "attempt-orbit-1",
             "fenceEpoch": 1
@@ -348,7 +348,7 @@
       "contract": {
         "workId": "925149c14fd7b70c0f00917f866a8232",
         "revision": 1,
-        "digest": "a5f0b5ece8bb7d0a2bde5b55e3238cd64435750ac3d7f938a4f83bbb7bcc7cd2"
+        "digest": "4dea73e4b394b248768c29b56a467cab39653dea2f0aee756b859c3a1b287acf"
       },
       "observedAt": "2026-11-08T10:00:00.000Z",
       "entries": [
@@ -373,10 +373,10 @@
         {
           "at": "2026-11-08T10:00:00.000Z",
           "kind": "contract.revision",
-          "sourceRef": "925149c14fd7b70c0f00917f866a8232@1/a5f0b5ece8bb7d0a2bde5b55e3238cd64435750ac3d7f938a4f83bbb7bcc7cd2",
+          "sourceRef": "925149c14fd7b70c0f00917f866a8232@1/4dea73e4b394b248768c29b56a467cab39653dea2f0aee756b859c3a1b287acf",
           "detail": {
             "revision": 1,
-            "digest": "a5f0b5ece8bb7d0a2bde5b55e3238cd64435750ac3d7f938a4f83bbb7bcc7cd2"
+            "digest": "4dea73e4b394b248768c29b56a467cab39653dea2f0aee756b859c3a1b287acf"
           }
         },
         {
@@ -385,7 +385,7 @@
           "sourceRef": "2bda24515c3a1341f050e0aa1c13ced9",
           "detail": {
             "revision": 1,
-            "digest": "a5f0b5ece8bb7d0a2bde5b55e3238cd64435750ac3d7f938a4f83bbb7bcc7cd2",
+            "digest": "4dea73e4b394b248768c29b56a467cab39653dea2f0aee756b859c3a1b287acf",
             "role": "primary"
           }
         },
@@ -394,7 +394,7 @@
           "kind": "work.created",
           "sourceRef": "925149c14fd7b70c0f00917f866a8232",
           "detail": {
-            "title": "Work atlas-report"
+            "title": "Produce the same reported goal in both projects"
           }
         },
         {
@@ -417,7 +417,7 @@
       "contract": {
         "workId": "860c3fcc50b9631e1773212a34dc074a",
         "revision": 1,
-        "digest": "8193e457b1d39c1278179bfa4f928de6271e1a316e75967ab5c2787b1e9d730f"
+        "digest": "4cab31b985e72fd598e53df1c882512a9df83e82a06616ca6038a797e7de899d"
       },
       "observedAt": "2026-11-08T10:00:00.000Z",
       "entries": [
@@ -433,10 +433,10 @@
         {
           "at": "2026-11-08T10:00:00.000Z",
           "kind": "contract.revision",
-          "sourceRef": "860c3fcc50b9631e1773212a34dc074a@1/8193e457b1d39c1278179bfa4f928de6271e1a316e75967ab5c2787b1e9d730f",
+          "sourceRef": "860c3fcc50b9631e1773212a34dc074a@1/4cab31b985e72fd598e53df1c882512a9df83e82a06616ca6038a797e7de899d",
           "detail": {
             "revision": 1,
-            "digest": "8193e457b1d39c1278179bfa4f928de6271e1a316e75967ab5c2787b1e9d730f"
+            "digest": "4cab31b985e72fd598e53df1c882512a9df83e82a06616ca6038a797e7de899d"
           }
         },
         {
@@ -445,7 +445,7 @@
           "sourceRef": "922459e289b5b78221af7bb61788c4f4",
           "detail": {
             "revision": 1,
-            "digest": "8193e457b1d39c1278179bfa4f928de6271e1a316e75967ab5c2787b1e9d730f",
+            "digest": "4cab31b985e72fd598e53df1c882512a9df83e82a06616ca6038a797e7de899d",
             "role": "primary"
           }
         },
@@ -454,7 +454,7 @@
           "kind": "work.created",
           "sourceRef": "860c3fcc50b9631e1773212a34dc074a",
           "detail": {
-            "title": "Work orbit-report"
+            "title": "Produce the same reported goal in both projects"
           }
         },
         {
