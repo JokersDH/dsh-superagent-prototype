@@ -151,6 +151,10 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
    * this, so begin-once, the prepared policy, admission state and the receiver log cannot be bypassed by
    * whichever channel a caller happens to use.
    */
+  /** One lease identity for the attach channel, derived from the registered producer. */
+  const leaseRef = (producer: { runnerIdentityRef: string; attempt: { attemptId: string } }, leaseId: string): string =>
+    `${producer.runnerIdentityRef}|${producer.attempt.attemptId}|${leaseId}`
+
   const admitCommand = async (command: RunnerCommand, id: string): Promise<{ code: string; reason: string; message: string } | null> => {
     if (!spec || !runner) return { code: 'state_indeterminate', reason: 'not_bootstrapped', message: 'Commands require a bootstrap first' }
     // Optional receiver log (wave-16 B1). Off by default and inert when unset; when a path is supplied,
@@ -187,6 +191,8 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
 
   const hooks = { beforeNativeWrite: (command: RunnerCommand) => {
     if (businessClosed || command.kind !== 'answer') return Promise.reject(new Error('Native write admission is closed'))
+    // With a bound lease the admission is requested from it; otherwise the stdio channel still serves it.
+    if (channel.hasLease()) return channel.requestWrite(command.id, command)
     const admission = channel.awaitWrite(command.id)
     write({ type: 'native-write-intent', id: command.id, command })
     return admission
@@ -263,6 +269,7 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
                 return readLocal(reference).catch((error) => {
                   if (!(error instanceof LocalPayloadMissing)) throw error
                   const requestId = `payload-${++payloadSeq}`
+                  if (channel.hasLease()) return channel.requestPayload(requestId, reference)
                   const pending = channel.awaitPayload(requestId)
                   write({ type: 'payload-read', id: requestId, requestId, reference } as never)
                   return pending
@@ -278,13 +285,16 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
             factSink: {
               record: async (fact: CriticalFact) => {
                 if (businessClosed) throw new Error('Attempt fact channel is closed')
-                const receipt = options.sink
-                  ? await options.sink.record(fact)
-                  : await (async () => {
-                      const pending = channel.awaitFact(fact.factId)
-                      write({ type: 'fact', id: fact.factId, fact } as never)
-                      return pending
-                    })()
+                const receipt = channel.hasLease()
+                  // A bound attach lease is asked first and by the original fact id.
+                  ? await channel.requestFact(fact)
+                  : options.sink
+                    ? await options.sink.record(fact)
+                    : await (async () => {
+                        const pending = channel.awaitFact(fact.factId)
+                        write({ type: 'fact', id: fact.factId, fact } as never)
+                        return pending
+                      })()
                 receipts.set(fact.factId, receipt)
                 write({ type: 'receipt', id: fact.factId, factId: fact.factId, receipt })
                 return receipt
@@ -342,6 +352,16 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
               },
               // A frame too large to inline is delivered by reference and read in bounded chunks here,
               // so a legitimate large payload stays readable without widening the transport cap.
+              channelNext: async (producer, leaseId) => {
+                // A different lease id replaces the current lease, which detaches it: pending native
+                // writes become indeterminate and are not answered by the new client.
+                channel.lease(leaseRef(producer as never, leaseId))
+                return { generation: channel.generation, request: channel.nextOutbound() }
+              },
+              channelReply: async (producer, reply, leaseId) => ({
+                accepted: channel.reply(leaseRef(producer as never, leaseId), reply as never),
+                generation: channel.generation,
+              }),
               payload: async (ref, offset, length) => {
                 const entry = journal!.entries().find(candidate => candidate.fact.payloadRef === ref)
                 if (!entry) throw new Error('Unknown payload reference')

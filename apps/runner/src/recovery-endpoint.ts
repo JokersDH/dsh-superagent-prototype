@@ -18,6 +18,8 @@ export type RecoveryEndpointOptions = {
   /** Durable business facts this Runner already recorded, for attach replay. */
   facts?: (since: number, maxBytes: number) => Promise<{ frames: unknown[]; next: number; done: boolean }>
   payload?: (ref: string, offset: number, length: number) => Promise<{ total: number; digest: string; base64: string }>
+  channelNext?: (producer: unknown, leaseId: string) => Promise<{ generation: number; request: unknown } | null>
+  channelReply?: (producer: unknown, reply: unknown, leaseId: string) => Promise<{ accepted: boolean; generation: number }>
   /** Business command intake for an attached client; applied to the same attempt and child. */
   command?: (command: RunnerCommand) => Promise<void>
   now?: () => string
@@ -69,6 +71,8 @@ export async function serveRecoveryEndpoint(options: RecoveryEndpointOptions): P
     },
     ...(options.facts ? { facts: options.facts } : {}),
     ...(options.payload ? { payload: options.payload } : {}),
+    ...(options.channelNext ? { channelNext: options.channelNext } : {}),
+    ...(options.channelReply ? { channelReply: options.channelReply } : {}),
     ...(options.command ? { command: async (command) => { await options.command!(command); return state() } } : {}),
   })
   return {

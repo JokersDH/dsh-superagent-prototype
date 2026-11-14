@@ -2,51 +2,54 @@
   "wave": "product-wave-27",
   "role": "B",
   "branch": "codex/g1-runtime",
-  "base": "d2e5f8e",
-  "checkpoint": "2 of 5",
+  "base": "eba7ffb",
+  "checkpoint": "3 of 5",
   "scopeNote": "Zero real vendor/model/native turns. Only B-owned paths. I's apps/runner/src/attach-channel and apps/runner/test/attach-channel untouched. No second coordinator/ledger/lifecycle. Main before-write guard, complete registration, proof and barrier untouched. Twelve services, ledgers, two historical report diffs and untracked b16-real-begin.mjs preserved.",
 
-  "item1_complete": {
-    "pageBudgetRegression": "closed earlier in this goal: the whole encoded page is budgeted, overrun pages are trimmed with done=false and a real cursor, the 64KiB cap is unchanged",
-    "indeterminateOnDetachObserved": "NOW OBSERVED. The earlier failure was my harness, not the implementation: the answer command did not match the strict RunnerCommand shape (id/ticketId/assignmentId/attemptId/fenceEpoch/contract/nativeBindingRef/answerRef). With the real shape, 'B27-PENDING-WRITE-INDETERMINATE-ON-DETACH' passes: the pending native write is rejected as indeterminate and nothing is granted.",
-    "harness": "tests/native-acceptance/b27-dispatch.mjs -> 5 PASS / 0 FAIL / 1 NOT_TESTED"
-  },
-
-  "item2_progress": {
-    "threeWaiterMapsRemoved": {
-      "before": "apps/runner/src/runner-service.ts held factWaiters, payloadWaiters and writeWaiters as three independent maps",
-      "after": "ZERO references remain. They are replaced by one generation-scoped store in the new B-owned apps/runner/src/business-channel.ts, which also rejects a previous lease's waiters when the lease changes instead of leaving them countable"
-    },
-    "singleAdmissionForBothChannels": {
-      "before": "the stdio 'command' handler enforced not-bootstrapped, receiver log, admission-closed and begin-once, while the authenticated endpoint route called runner.feed directly and bypassed all of it",
-      "after": "one admitCommand() is the only business-command admission; the stdio handler and the endpoint route both call it, so begin-once, prepared policy, admission state and the receiver log cannot be bypassed by choosing a channel"
+  "item3_dual_client": {
+    "status": "CORE OBSERVED on the real authenticated transport; not yet against a spawned Runner/child process",
+    "delivered": {
+      "outbound_channel": "business-channel.ts now owns BOTH directions: the Runner's inbound waiters and its outbound callbacks (fact, payload-read, native-write-intent), all scoped to the lease generation that created them",
+      "routes": "GET /v1/channel/next hands the lease the next callback, POST /v1/channel/reply routes one reply to the request it names. Both sit behind the existing bearer auth; the producer is the authenticated one and the lease id only scopes waiter ownership, so it grants nothing",
+      "runner_service": "the three callbacks ask the bound lease first and fall back to stdio when no client is attached, so the product lane is unaffected",
+      "detach": "a different lease replaces the current one: pending native writes become state_indeterminate / write_indeterminate_after_detach, outbound callbacks of the old lease are dropped, and the old client's later reply is refused",
+      "no_replay": "no business command is replayed and no permission migrates on rebind; the caller must return to the original command reconciliation"
     },
     "observed": {
-      "b27-channel": "5 PASS / 0 FAIL - generation starts 0 and the first CAS bind returns 1 with no reuse; a receipt settles only its own lease; a stale write reply cannot cross leases and the older waiter is settled as write_indeterminate_after_detach; detach makes a pending native write state_indeterminate; a fact waiter is rejected as channel_detached instead of hanging",
-      "b18-product-normal": "4 PASS / 1 FAIL / 1 NOT_TESTED - unchanged: exactly one begin, Broker question from the producer approval, durable rows (facts 4, dispatch 1, question.opened), answer delivered. The FAIL is the known-stale B18-STOP-DELIVERED assertion (real stop uses the authenticated recovery cancel, not business cancel frames)",
-      "b26-ref-payload": "4 PASS / 0 FAIL - inline, reference descriptor, five-chunk payload, digest, foreign refusal",
-      "b27-small-pages": "2 PASS / 0 FAIL - 160 facts over 4 pages, and over 32 pages under a 2KiB budget"
+      "harness": "tests/native-acceptance/b27-dual-client.mjs",
+      "result": "5 PASS / 0 FAIL / 1 NOT_TESTED",
+      "cases": [
+        "B27-DUAL-A-SERVES-ALL-THREE - A served the fact receipt by its original id and the payload by its original ref",
+        "B27-DUAL-PENDING-WRITE-INDETERMINATE-ON-LEAVE - the pending native write became write_indeterminate_after_detach when B took the lease, so B was never asked to grant it",
+        "B27-DUAL-A-REPLY-REFUSED-AFTER-HANDOVER - a reply from the old client was refused after the handover",
+        "B27-DUAL-B-SERVES-NEW-FACTS-BY-ORIGINAL-ID - B served the fact for the new lease using the original fact id",
+        "B27-DUAL-FACTS-REPLAYED-TO-B - B replayed both original facts by their original ids from the same Runner"
+      ]
     },
-    "foundByMyOwnHarness": [
-      "generation started at 2 instead of 1 because the counter was pre-incremented",
-      "a replaced lease left its waiters in the store, so a later pending count included them; bind now settles the previous lease"
-    ]
+    "bug_found_by_harness": "waiters created before the first bind belong to generation 0 and no lease owns them, so a client must bind before the callbacks are created; the first run hung for exactly that reason and the harness now binds first"
+  },
+
+  "regressions": {
+    "b27-channel": "5 PASS / 0 FAIL",
+    "b27-dispatch": "5 PASS / 0 FAIL",
+    "b27-small-pages": "2 PASS / 0 FAIL",
+    "b26-ref-payload": "4 PASS / 0 FAIL",
+    "b18-product-normal": "4 PASS / 1 FAIL / 1 NOT_TESTED - unchanged; the FAIL is the known-stale business-cancel stop assertion",
+    "typecheck": "root tsconfig clean for runner-service, business-channel, recovery-endpoint, recovery-transport"
   },
 
   "stillNotDone": {
-    "iModule": "I's apps/runner/src/attach-channel implementation is still not present in this worktree, so only the 0068 contract is consumed",
-    "crossLeaseProductObservation": "fact ACK by original id and payload reread by original ref are observed in-process, not yet across a real client handover on a live Runner",
-    "item3_dualClient": "NOT_REACHED - no A-disconnect/B-takeover against a real Runner/child",
+    "realChild": "the handover runs on the real transport and channel but with a controlled endpoint, not a spawned Runner/child; wiring it to the product lane Runner is next",
+    "iModule": "I's attach-channel module is still absent from this worktree, so only the 0068 contract is consumed",
     "item4_sigkillRecovery": "NOT_REACHED",
     "item5_recoveredAcceptSlots": "NOT_REACHED",
-    "resultCompleteness": "items 1 and 2 are partial; the package is not complete"
+    "item2_residual": "PREPARED-fact re-preparation across a recovered attempt is not re-proven here"
   },
 
   "wholePackageComplete": false,
   "budget": { "modelCallsThisWave": 0, "nativeTurnsThisWave": 0, "cap4": "UNKNOWN unspendable" },
   "limitations": [
-    "all positives are controlled in-process or local-fixture evidence; no installed agent, gateway or native turn",
-    "b18's stop assertion is the known-stale business-cancel expectation, not a regression from this change",
-    "checkpoint 2 of 5"
+    "all positives are controlled-transport evidence; no installed agent, gateway or native turn",
+    "checkpoint 3 of 5"
   ]
 }

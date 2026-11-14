@@ -43,6 +43,10 @@ export interface RecoveryRunnerPort {
    * global cap or truncating the payload.
    */
   payload?(ref: string, offset: number, length: number): Promise<{ total: number; digest: string; base64: string }>
+  /** Hand the current lease the next outbound callback the Runner is waiting to have answered. */
+  channelNext?(producer: RuntimeProducer, leaseId: string): Promise<{ generation: number; request: unknown } | null>
+  /** Route one reply to the outbound request it names; a reply for another lease is refused. */
+  channelReply?(producer: RuntimeProducer, reply: unknown, leaseId: string): Promise<{ accepted: boolean; generation: number }>
   /**
    * Business command intake for an attached client. The Runner applies it to the SAME attempt and
    * child; this is admission of an authenticated command, not a second execution lifecycle.
@@ -177,6 +181,26 @@ export async function serveRunnerRecovery(endpoint: Pick<RunnerEndpoint, 'socket
       // trusted from the backend, so a caller can verify the page before it exposes any frame.
       res.writeHead(200, { 'content-type': 'application/json' })
       res.end(encoded)
+      return
+    }
+    if (req.method === 'GET' && req.url === '/v1/channel/next') {
+      if (!backend.channelNext) { reply(res, 404, { error: 'unsupported_recovery_action' }); return }
+      // The lease is bound from the AUTHENTICATED producer; the lease id only scopes which client
+      // instance owns the waiters, so it grants nothing on its own.
+      const leaseId = typeof req.headers['x-pa-lease'] === 'string' ? req.headers['x-pa-lease'].trim() : ''
+      if (!/^[A-Za-z0-9._:-]{1,128}$/.test(leaseId)) { reply(res, 400, { error: 'invalid_lease' }); return }
+      const bound = await backend.channelNext(trusted, leaseId)
+      reply(res, 200, bound ?? { generation: 0, request: null })
+      return
+    }
+    if (req.method === 'POST' && req.url === '/v1/channel/reply') {
+      if (!backend.channelReply) { reply(res, 404, { error: 'unsupported_recovery_action' }); return }
+      const leaseId = typeof req.headers['x-pa-lease'] === 'string' ? req.headers['x-pa-lease'].trim() : ''
+      if (!/^[A-Za-z0-9._:-]{1,128}$/.test(leaseId)) { reply(res, 400, { error: 'invalid_lease' }); return }
+      const bodyValue = await body(req)
+      const routed = await backend.channelReply(trusted, bodyValue, leaseId)
+      if (!routed?.accepted) { reply(res, 409, { error: 'stale_lease' }); return }
+      reply(res, 200, routed)
       return
     }
     if (req.method === 'GET' && req.url?.startsWith('/v1/payload')) {
@@ -314,6 +338,18 @@ export function connectRunnerRecovery(input: RunnerEndpoint, context: RuntimePro
       return { producer: pageProducer, frames: replay.frames as unknown[], next: replay.next as number, done: replay.done as boolean }
     },
     command: (command: ReturnType<typeof RunnerCommandSchema.parse>) => call('POST', '/v1/commands', { producer: trusted, command }),
+    channelNext: async (leaseId: string) => {
+      const { value } = await invoke('GET', '/v1/channel/next', undefined, { 'x-pa-lease': leaseId }) as { value: unknown }
+      const page = value as { generation?: unknown; request?: unknown }
+      if (!Number.isSafeInteger(page?.generation)) throw new RunnerLinkError('invalid_response', 'Runner channel page did not match the attach protocol')
+      return (page.request ?? null) === null ? null : { generation: page.generation as number, request: page.request }
+    },
+    channelReply: async (leaseId: string, reply: unknown) => {
+      const { value } = await invoke('POST', '/v1/channel/reply', reply, { 'x-pa-lease': leaseId }) as { value: unknown }
+      const routed = value as { accepted?: unknown; generation?: unknown }
+      if (typeof routed?.accepted !== 'boolean') throw new RunnerLinkError('invalid_response', 'Runner channel reply result did not match the attach protocol')
+      return { accepted: routed.accepted, generation: Number(routed.generation ?? 0) }
+    },
     payload: async (ref: string, offset = 0, length = 32_768) => {
       const producerHeader = Buffer.from(JSON.stringify(trusted), 'utf8').toString('base64')
       const { value } = await invoke('GET', `/v1/payload?ref=${encodeURIComponent(ref)}&offset=${offset}&length=${length}`, undefined, { 'x-pa-producer': producerHeader }) as { value: unknown }
