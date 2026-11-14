@@ -154,6 +154,7 @@ const evidenceFor = (key) => {
       return {
         subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
         mode: 'personal', healthDigest: DIGEST, digestAvailable: true, sameDigest: DIGEST, firstPid: 100, unboundPid: 200, pidAfterRefusals: 100, pidAfterUnbound: 200,
+        packageCapability: { source: COMMIT, buildId: 'b', tarSha256: DIGEST, digestSupported: true },
         processes: { live: 'start-1', reused: 'start-1' }, scope: 'selection digest present',
         consumerEntry: { origin: 'package', package: { source: COMMIT, buildId: 'b', tarSha256: DIGEST, tarBytes: 1 },
           files: [{ path: 'apps/launcher/lib/start.mjs', sha256: 'a'.repeat(64), bytes: 1 },
@@ -173,9 +174,9 @@ const evidenceFor = (key) => {
           files: [{ path: 'apps/launcher/lib/start.mjs', sha256: 'a'.repeat(64), bytes: 1 },
             { path: 'apps/coordinator/product/restored-review.ts', sha256: 'b'.repeat(64), bytes: 1 },
             { path: 'apps/coordinator/product/demo.ts', sha256: 'c'.repeat(64), bytes: 1 }] },
-        plain: { plain: 200, plainHasDiagnostic: false, optIn: 200, duplicate: 400, unknown: 400,
+        plain: { plain: 200, plainHasDiagnostic: false, optIn: 200, duplicate: 400, unknown: 400, state: 'verified', bindingSourceCount: 0,
           diagnostic: { protocol: 'context-scope-review/1', reasons: [], partial: false, withheldSourceCount: 0, authorization: 'none' } },
-        narrow: { start: 'RUNNING', plain: 200, bodyServed: false,
+        narrow: { start: 'RUNNING', plain: 200, bodyServed: false, state: 'scope_changed', bindingSourceCount: 1,
           diagnostic: { protocol: 'context-scope-review/1', reasons: ['selection_narrowed'], partial: true, withheldSourceCount: 1, authorization: 'none' } },
       }
     case 'workflowFormats':
@@ -188,6 +189,7 @@ const evidenceFor = (key) => {
         v2: { protocol: 'workflow-snapshot/2', evidenceProtocol: 'workflow-evidence/2', families: 21, familySetVersion: 2, status: 'ok', verified: 'ok', digest: 'c'.repeat(64) },
         invalid3: { rejected: true, destinationCreated: false }, dbUnchanged: true, dbBytes: 679936,
         portability: { installArtifact: 'pa-install/1', restoreReport: 'personal-restore/1' },
+        packageCapabilities: { source: COMMIT, buildId: 'b', tarSha256: DIGEST, digestSupported: true },
         explicitV2: 'verified: workflow-snapshot/2 with 21 families and familySetVersion 2',
       }
     case 'installedStability':
@@ -1360,6 +1362,59 @@ const CASES = [
         findCase(report, 'E7-SCOPE-DIAGNOSTICS').evidence.scopeDiagnostics.plain.plainHasDiagnostic = true
         return report
       }, 'scopeDiagnostics_invalid'),
+  },
+  {
+    id: 'E1-MUTATE-SCOPE-WITHHELD-NEGATIVE',
+    title: 'A negative withheld source count is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'WITHHELD_NEGATIVE', (report) => {
+        const value = findCase(report, 'E7-SCOPE-DIAGNOSTICS').evidence.scopeDiagnostics
+        value.plain.diagnostic.withheldSourceCount = -1
+        return report
+      }, 'scopeDiagnostics_invalid'),
+  },
+  {
+    id: 'E1-MUTATE-SCOPE-WITHHELD-OVERFLOW',
+    title: 'A withheld source count beyond the public bound is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'WITHHELD_OVERFLOW', (report) => {
+        const value = findCase(report, 'E7-SCOPE-DIAGNOSTICS').evidence.scopeDiagnostics
+        value.narrow.diagnostic.withheldSourceCount = 65
+        return report
+      }, 'scopeDiagnostics_invalid'),
+  },
+  {
+    id: 'E1-MUTATE-SCOPE-DUPLICATE-REASON',
+    title: 'Duplicate or invalid scope reasons are rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'REASON_DUPLICATE', (report) => {
+        const value = findCase(report, 'E7-SCOPE-DIAGNOSTICS').evidence.scopeDiagnostics
+        value.narrow.diagnostic.reasons = ['selection_narrowed', 'selection_narrowed']
+        return report
+      }, 'scopeDiagnostics_invalid'),
+  },
+  {
+    id: 'E1-MUTATE-SCOPE-AUTHORIZATION',
+    title: 'A scope diagnostic claiming authorization is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'DIAG_AUTH', (report) => {
+        const value = findCase(report, 'E7-SCOPE-DIAGNOSTICS').evidence.scopeDiagnostics
+        value.plain.diagnostic.authorization = 'granted'
+        return report
+      }, 'scopeDiagnostics_invalid'),
+  },
+  {
+    id: 'E1-MUTATE-CAPABILITY-SELF-DOWNGRADE',
+    title: 'A review package cannot self-report unsupported digest while the package fact says supported',
+    check: ({ assert }) =>
+      rejectWith(assert, 'CAPABILITY_DOWNGRADE', (report) => {
+        const value = findCase(report, 'E5-REVIEW-REUSE-CONSISTENCY').evidence.reviewReuse
+        value.packageCapability = { ...value.packageCapability, digestSupported: false }
+        value.digestAvailable = false
+        value.digestScope = 'package_lacks_identity'
+        delete value.healthDigest; delete value.sameDigest
+        return report
+      }, 'capability_mismatch'),
   },
   {
     id: 'E1-MUTATE-SELF-CLAIM',

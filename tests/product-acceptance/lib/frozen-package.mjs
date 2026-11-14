@@ -13,9 +13,9 @@ import { join, resolve } from 'node:path'
 
 export const DEFAULT_FROZEN_DIRS = Object.freeze({
   // Upgrade safety baseline: the last package whose helper passed the same-UID probe.
-  baseline: process.env.PA_E_INSTALL_BASELINE_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave21-target',
+  baseline: process.env.PA_E_INSTALL_BASELINE_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave22-target',
   // The subject under test.
-  target: process.env.PA_E_INSTALL_TARGET_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave22-target',
+  target: process.env.PA_E_INSTALL_TARGET_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave23-target',
   // Mock-only failing control for the ownership helper; never a live install baseline.
   control: process.env.PA_E_INSTALL_CONTROL_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave16-target',
   cross: process.env.PA_E_INSTALL_CROSS_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave11-target',

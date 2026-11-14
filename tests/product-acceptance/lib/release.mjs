@@ -387,18 +387,34 @@ const OWNERSHIP_ISSUE_CODES = Object.freeze({
 export function scopeDiagnosticsIssues(value) {
   if (!value || typeof value !== 'object') return ['missing']
   const plain = value.plain ?? {}, narrow = value.narrow ?? {}, issues = []
+  const reasons = new Set(['project_changed', 'selection_narrowed', 'selection_broadened', 'selection_replaced',
+    'exclusion_added', 'exclusion_removed', 'selection_validity_changed'])
   if (!isSubstantive(value.subject?.buildId) || !Number.isSafeInteger(value.subject?.schema)) issues.push('subject')
   if (value.mode !== 'personal') issues.push('mode')
   issues.push(...consumerEntryIssues(value))
+  const check = (diagnostic, state, bindingCount, label) => {
+    if (!diagnostic) { issues.push(`${label}_missing`); return }
+    if (diagnostic.protocol !== 'context-scope-review/1' || diagnostic.authorization !== 'none' ||
+      typeof diagnostic.partial !== 'boolean' || !Array.isArray(diagnostic.reasons)) issues.push(`${label}_shape`)
+    const list = Array.isArray(diagnostic.reasons) ? diagnostic.reasons : []
+    if (list.length > 7 || new Set(list).size !== list.length || list.some(reason => !reasons.has(reason))) issues.push(`${label}_reasons`)
+    const withheld = diagnostic.withheldSourceCount
+    if (!(withheld === null || (Number.isSafeInteger(withheld) && withheld >= 0 && withheld <= 64))) issues.push(`${label}_withheld`)
+    if (typeof state === 'string') {
+      if (diagnostic.partial !== (state !== 'verified')) issues.push(`${label}_partial`)
+      const expected = state === 'scope_changed' ? bindingCount : 0
+      if (withheld !== expected) issues.push(`${label}_withheld`)
+    }
+  }
   if (plain.plain !== 200 || plain.plainHasDiagnostic !== false) issues.push('default_shape')
-  const diagnostic = plain.diagnostic ?? {}
-  if (plain.optIn !== 200 || diagnostic.protocol !== 'context-scope-review/1' || diagnostic.authorization !== 'none' ||
-    typeof diagnostic.partial !== 'boolean' || !(diagnostic.withheldSourceCount === null || Number.isSafeInteger(diagnostic.withheldSourceCount)) ||
-    !Array.isArray(diagnostic.reasons)) issues.push('opt_in')
+  check(plain.diagnostic, plain.state, plain.bindingSourceCount, 'opt_in')
   if (![400, 422].includes(plain.duplicate) || ![400, 422].includes(plain.unknown)) issues.push('strict_query')
   if (narrow.start !== 'RUNNING' && narrow.start !== 'REUSED') issues.push('narrow_start')
-  else if (narrow.bodyServed !== false || narrow.diagnostic?.authorization !== 'none' ||
-    !(narrow.diagnostic?.partial === true || (narrow.diagnostic?.reasons?.length ?? 0) > 0)) issues.push('narrow_explained')
+  else {
+    if (narrow.bodyServed !== false) issues.push('narrow_body')
+    check(narrow.diagnostic, narrow.state, narrow.bindingSourceCount, 'narrow')
+    if (narrow.state === 'verified') issues.push('narrow_state')
+  }
   return issues
 }
 export function installedStabilityIssues(value) {
@@ -466,11 +482,17 @@ export function reviewReuseIssues(value) {
   if (!((same.status === 'REUSED' || same.status === 'RUNNING') && Number.isSafeInteger(same.instance?.pid) &&
     same.instance.pid === value.firstPid)) issues.push('same_selection')
   else if (!isSubstantive(same.instance?.processStart) || same.instance.processStart !== processes?.reused) issues.push('process')
-  // Health digest observation is mandatory when the package supports it; a declared unsupported package must
-  // say so explicitly and carry its scope, rather than silently skipping the comparison.
-  if (value.digestAvailable === true) {
-    if (!HEX.test(String(value.healthDigest ?? '')) || value.sameDigest !== value.healthDigest) issues.push('digest')
-  } else if (value.packageDigestSupported !== false || !isSubstantive(value.digestScope)) issues.push('digest')
+  // Digest support is a fact of the immutable package bytes for this subject, not a self-claimed evidence
+  // field. A supporting package must always carry the original and reused observations.
+  const capability = value.packageCapability
+  if (!capability || String(capability.source ?? '') !== String(value.subject?.source ?? '') ||
+    String(capability.buildId ?? '') !== String(value.subject?.buildId ?? '') ||
+    String(capability.tarSha256 ?? '') !== String(value.subject?.tarSha256 ?? '') ||
+    typeof capability.digestSupported !== 'boolean') issues.push('capability')
+  else if (capability.digestSupported) {
+    if (value.digestAvailable !== true || !HEX.test(String(value.healthDigest ?? '')) || value.sameDigest !== value.healthDigest)
+      issues.push('digest')
+  } else if (value.digestAvailable !== false || !isSubstantive(value.digestScope)) issues.push('digest')
   // Every negative request needs a real observed refusal terminal; a RUNNING response (even without a
   // reused boolean) or a missing observation is not a refusal.
   for (const name of ['differentFile', 'missingFile', 'portChange', 'unboundThenSelection']) {
@@ -1059,6 +1081,17 @@ export function evaluateRelease({
         if (String(normalize(subject, field) ?? '') !== String(normalize(canonicalTuple, field) ?? ''))
           failures.push(fail('subject_mismatch', `Case ${id} ${field} differs from the tested artifact tuple`, id))
       }
+    }
+  }
+
+  // The digest capability of the review package must agree with the capability recorded from the same
+  // package bytes by the format case; one evidence file cannot downgrade a supporting package alone.
+  const reuseEvidence = byId.get('E5-REVIEW-REUSE-CONSISTENCY')?.evidence?.reviewReuse
+  const formatCapability = byId.get('E5-WORKFLOW-FORMATS')?.evidence?.workflowFormats?.packageCapabilities
+  if (reuseEvidence?.packageCapability && formatCapability) {
+    for (const field of ['source', 'buildId', 'tarSha256', 'digestSupported']) {
+      if (String(reuseEvidence.packageCapability[field] ?? '') !== String(formatCapability[field] ?? ''))
+        failures.push(fail('capability_mismatch', `Review package capability ${field} disagrees with the package-bytes fact`, 'E5-REVIEW-REUSE-CONSISTENCY'))
     }
   }
 

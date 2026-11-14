@@ -127,6 +127,14 @@ function messageFacts(state) {
   } finally { db.close() }
 }
 
+/** Digest support comes from the frozen package bytes for this exact subject, not from the evidence. */
+function packageCapability(install, target) {
+  const start = readFileSync(join(install, 'app/apps/launcher/lib/start.mjs'), 'utf8')
+  const demo = readFileSync(join(install, 'app/apps/coordinator/product/demo.ts'), 'utf8')
+  return { source: target.sourceCommit, buildId: target.buildId, tarSha256: target.tarSha256,
+    digestSupported: /restoredReviewDigest/u.test(start) && /restoredReviewDigest/u.test(demo) }
+}
+
 function consumerEntry(install, target) {
   const files = ['apps/launcher/lib/start.mjs', 'apps/launcher/lib/daemon.mjs',
     'apps/coordinator/product/restored-review.ts', 'apps/coordinator/product/demo.ts']
@@ -297,7 +305,7 @@ export async function runPersonalReview() {
           before: unboundStatuses, after: { candidates: details.candidates, history: details.history, sources: details.sources, originalBody: details.originalBody },
           reviewFile: { mode: '600', access: 'historical_data_read_only', startupAvailable: false, projects: 1 },
           business: details.business, queueHeld: true, providerRequests: mock.requests.length, health: details.health,
-          healthDigest: details.health.digest, scopeDiagnostics,
+          healthDigest: details.health.digest, scopeDiagnostics, packageCapability: packageCapability(install, target),
           registry: observed.registry, restore: { verify: observed.verify, restore: observed.restore },
         }
       } finally { rmSync(reviewFile, { force: true }) }
@@ -410,6 +418,7 @@ export async function runPersonalReview() {
             const optIn = await fetch(`${base}/v1/messages/${messageId}/context/sources?scopeReview=1`, { headers, signal: AbortSignal.timeout(5_000) })
             const optInBody = await optIn.json().catch(() => ({}))
             narrowed = { start: value.status, plain: plain.status, bodyServed: Array.isArray(plainBody.sources) && plainBody.sources.length > 0,
+              state: plainBody.state ?? null, bindingSourceCount: Array.isArray(plainBody.binding?.sources) ? plainBody.binding.sources.length : 0,
               optIn: optIn.status, diagnostic: optInBody.scopeReview ?? null }
           } else narrowed = { start: value.status, code: value.code ?? null, detail: value.detail ?? null, stderr: value.stderr ?? null }
         } finally { await stopOwned(install, { state: restored, config, mockFile: mock.file }) }
@@ -472,6 +481,7 @@ export async function runPersonalReview() {
         await stopOwned(install, { state: restored, config, mockFile: mock.file })
 
         evidence.reviewReuse = { subject: frozenArtifactSubject(target), mode: 'personal', consumerEntry: consumerEntry(install, target),
+          packageCapability: packageCapability(install, target),
           healthDigest: digest, digestAvailable: typeof digest === 'string', sameDigest,
           processes: { live: live.instance?.processStart ?? null, reused: outcomes.sameFile.instance?.processStart ?? null },
           firstPid, unboundPid, pidAfterRefusals, pidAfterUnbound, outcomes,
@@ -497,6 +507,17 @@ export async function runPersonalReview() {
         try { await stopOwned(install, { state: restored, config, mockFile: mock.file }) } catch { /* best effort */ }
       }
     }))
+
+  if (observed) {
+    const consoleDir = join(observed.install, 'app/apps/console/dist')
+    const marker = existsSync(consoleDir)
+      ? execFileSync('sh', ['-c', `grep -rl "范围说明\|scope-review" ${JSON.stringify(consoleDir)} 2>/dev/null | head -1`], { encoding: 'utf8' }).trim()
+      : ''
+    cases.push(notTested({ ...define('E6-SOURCE-UI', 'The installed console shows source scope states and the explicit scope-review action on the packaged UI bytes'), evidence: {} },
+      marker
+        ? 'NOT_REACHED: a console marker exists in this package, but the independent browser interaction against these exact packaged bytes has not been recorded yet.'
+        : 'NOT_REACHED: the frozen target package console does not contain the 0062 scope-review UI marker (main 4b); only the backend ?scopeReview=1 projection is present and tested. A package frozen with that UI is required for the user-facing assertion.'))
+  }
 
   if (observed && !process.env.PA_E_KEEP) {
     try { rmSync(observed.own, { recursive: true, force: true }) } catch { /* best effort */ }

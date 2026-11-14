@@ -366,6 +366,8 @@ async function packagedFormatEvidence(install, restoredRoot, marker, workRoot) {
     readSignature: (backupSource.match(/export function readWorkflowEvidence\([^)]*\)/) ?? [null])[0],
     ...format,
     portability: { installArtifact: installProtocol, restoreReport: restoreProtocol },
+    packageCapabilities: { source: spec.sourceCommit, buildId: spec.buildId, tarSha256: spec.tarSha256,
+      digestSupported: /restoredReviewDigest/u.test(read('apps/launcher/lib/start.mjs')) && /restoredReviewDigest/u.test(read('apps/coordinator/product/demo.ts')) },
   }
 }
 
@@ -478,7 +480,7 @@ export async function runInstalledRecovery() {
         snapshotProtocols: format.snapshotProtocols, evidenceProtocols: format.evidenceProtocols,
         hasFormatVersion: format.hasFormatVersion, hasFamilySetVersion: format.hasFamilySetVersion, readSignature: format.readSignature,
         v1: format.v1, v2: format.v2, invalid3: format.invalid3 ?? null, dbUnchanged: format.dbUnchanged ?? null, dbBytes: format.dbBytes ?? null,
-        portability: format.portability,
+        portability: format.portability, packageCapabilities: format.packageCapabilities ?? null,
         explicitV2: format.supportsV2 ? 'verified: workflow-snapshot/2 with 21 families and familySetVersion 2'
           : 'NOT_REACHED for this frozen package: no versioned snapshot code, v1-only scope kept' }
     }))
