@@ -5,7 +5,7 @@
   "base": "bcd4d4c",
   "mergedMain": "d3a0faa",
   "mainSource": "fdb3f16 readiness + 4b42a90 UI",
-  "head": "PENDING",
+  "head": "d5325b9",
   "frozenSource": "a826b5e",
   "status": "CANDIDATE",
   "phases": {
@@ -143,5 +143,8 @@
   "evidence": [
     "tools/distribution/reports/wave25/*.json",
     "tools/distribution/recipes/wave25-e-acceptance.zh-CN.md"
-  ]
+  ],
+  "evidenceHead": "d5325b9",
+  "closureSource": "a826b5e",
+  "finalPointerNote": "Runtime frozen at a826b5e/fefd93219cea0d4a; later heads are tool/report/docs only."
 }
