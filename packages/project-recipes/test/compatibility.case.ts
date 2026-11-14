@@ -103,3 +103,28 @@ test('the draft scope never carries external actions or an expiry copied from no
   assert.deepEqual(mined.scope.allowedPaths, ['src/a.ts'])
   void scope
 })
+
+test('two projects sharing a display name but not an identity never share a suggestion', () => {
+  const alpha = configuration.projects[0]!
+  const twin = {
+    ...alpha,
+    id: 'project-twin',
+    scope: { projectId: 'project-twin', allowedPaths: ['src'], excludedPaths: [], externalActions: [] },
+    defaultCriteria: [{ id: 'twin-tests', description: 'Twin tests pass.', kind: 'machine' as const, required: true as const, checkDefinitionRef: 'check-node-test' }],
+  }
+  const both = { ...configuration, projects: [alpha, twin] }
+  const alphaDraft = match({ configuration: both })
+  const twinDraft = match({ configuration: both, facts: withFacts({ projectId: 'project-twin' }) })
+  assert.equal(alphaDraft.status, 'draft')
+  assert.equal(twinDraft.status, 'draft')
+  if (alphaDraft.status !== 'draft' || twinDraft.status !== 'draft') return
+  assert.equal(alphaDraft.provenance.configuration.projectId, 'project-alpha')
+  assert.equal(twinDraft.provenance.configuration.projectId, 'project-twin')
+  assert.deepEqual(alphaDraft.scope.allowedPaths, ['src/a.ts'])
+  assert.deepEqual(twinDraft.scope.allowedPaths, ['src/a.ts'])
+  assert.notEqual(alphaDraft.projectId, twinDraft.projectId)
+  assert.notEqual(alphaDraft.criteria[0]!.id, twinDraft.criteria[0]!.id)
+  assert.notEqual(alphaDraft.revision, twinDraft.revision)
+  // Same display name may produce the same goal sentence; identity still differs.
+  assert.equal(alphaDraft.goal, twinDraft.goal)
+})

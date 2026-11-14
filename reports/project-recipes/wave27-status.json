@@ -49,8 +49,8 @@
         {
           "command": "pnpm --dir packages/project-recipes test",
           "exit": 0,
-          "tests": 41,
-          "pass": 41,
+          "tests": 42,
+          "pass": 42,
           "fail": 0,
           "note": "catalog+negative+preview suites landed in this source checkpoint; J12 consumes the preview layer"
         },
@@ -133,8 +133,8 @@
         {
           "command": "pnpm --dir packages/project-recipes test",
           "exit": 0,
-          "tests": 41,
-          "pass": 41,
+          "tests": 42,
+          "pass": 42,
           "fail": 0,
           "note": "includes 6 preview tests"
         },
@@ -169,8 +169,8 @@
         {
           "command": "pnpm --dir packages/project-recipes test",
           "exit": 0,
-          "tests": 41,
-          "pass": 41,
+          "tests": 42,
+          "pass": 42,
           "fail": 0
         }
       ],
@@ -242,7 +242,7 @@
         "packages/project-recipes/src/index.ts",
         "packages/project-recipes/test/negative.case.ts"
       ],
-      "capability": "41 package tests (catalog, negative, preview, compatibility), strict typecheck and build; examples are data and carry no command."
+      "capability": "42 package tests (catalog, negative, preview, compatibility), strict typecheck and build; examples are data and carry no command."
     },
     {
       "id": "J5",
@@ -293,7 +293,7 @@
         "packages/project-recipes/test/negative.case.ts",
         "tools/project-recipes/test/multi-project.case.ts"
       ],
-      "capability": "Scope may only narrow (pathWithin boundary aware), exclusions only grow, externalActions always empty; discussion-only/unavailable/blocked projects are explained; a draft from an older configuration revision or older facts is refused by assertDraftCurrent."
+      "capability": "Scope may only narrow (pathWithin boundary aware), exclusions only grow, externalActions always empty; discussion-only/unavailable/blocked projects are explained; two projects sharing a display name stay separated by real IDs; a draft from an older configuration revision or older facts is refused by assertDraftCurrent."
     },
     {
       "id": "J10",
@@ -303,7 +303,7 @@
         "packages/project-recipes/src/match.ts",
         "packages/project-recipes/test/catalog.case.ts"
       ],
-      "capability": "Only criteria already present in defaultCriteria and checkDefinitionRef already listed in configuration.checks; a selection without a required registered machine check becomes needs_input criteria_machine_required; an unregistered ref would be unsupported (defensive)."
+      "capability": "Only criteria already present in defaultCriteria and checkDefinitionRef already listed in configuration.checks; a selection without a required registered machine check becomes needs_input criteria_machine_required; the draft references check IDs only and does not pin a verifier revision."
     },
     {
       "id": "J11",
@@ -432,8 +432,8 @@
   "evidence": {
     "package": {
       "typecheckExit": 0,
-      "tests": 41,
-      "pass": 41,
+      "tests": 42,
+      "pass": 42,
       "fail": 0,
       "buildExit": 0
     },

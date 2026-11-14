@@ -255,6 +255,8 @@ const command = toCreateWorkCommand(draft, { commandId, conversationId })  // �
 - 配方目录内容变化必须提升 `RECIPE_CATALOG_VERSION`；每份草稿记录 catalog 版本与摘要，旧草稿不会被误认为新配方。
 - 后端缺少可选 facts 字段时给 `needs_input`，不会降级到另一个执行器。
 - 建议是数据：不是环境已准备、检查已通过、任务已执行或可计费的证明。
+- criteria 只引用已登记的**检查 ID**；检查的具体 revision 由原 verifier 在执行时记录。本模块不固定 revision，也不判断检查是否通过。
+- 同名不同 ID 的项目不会混用：provenance、projectId、criteria 与 revision 都按真实 ID 区分。
 
 ---
 

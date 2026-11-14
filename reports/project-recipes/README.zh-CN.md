@@ -19,7 +19,7 @@
 | --- | --- | --- |
 | `pnpm --dir packages/contracts build` | 0 | 复用既有依赖（未改动） |
 | `pnpm --dir packages/project-recipes typecheck` | 0 | strict / exactOptionalPropertyTypes |
-| `pnpm --dir packages/project-recipes test` | 0 | 41 tests / 41 pass / 0 fail |
+| `pnpm --dir packages/project-recipes test` | 0 | 42 tests / 42 pass / 0 fail |
 | `pnpm --dir packages/project-recipes build` | 0 | `dist/`（不提交） |
 | `./node_modules/.bin/tsc -p tools/project-recipes/tsconfig.json` | 0 | CLI/读取器/测试同等严格 |
 | `node --test tools/project-recipes/test/*.case.ts` | 0 | 29 tests / 29 pass / 0 fail |
