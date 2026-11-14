@@ -2,6 +2,7 @@ export * from './schemas.ts';
 export * from './identity.ts';
 export * from './validation.ts';
 export * from './configuration.ts';
+export * from './trial-readiness.ts';
 export * from './assistant.ts';
 export * from './projects.ts';
 export * from './operations.ts';

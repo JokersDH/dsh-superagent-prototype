@@ -1,0 +1,229 @@
+{
+  "$defs": {
+    "TrialReadiness": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "authorization": {
+          "const": "none",
+          "type": "string"
+        },
+        "capabilities": {
+          "additionalProperties": false,
+          "properties": {
+            "contextHistory": {
+              "type": "boolean"
+            },
+            "contextSources": {
+              "type": "boolean"
+            },
+            "decisions": {
+              "type": "boolean"
+            },
+            "proposals": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "contextHistory",
+            "contextSources",
+            "decisions",
+            "proposals"
+          ],
+          "type": "object"
+        },
+        "configurationRevision": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "development": {
+          "enum": [
+            "configuration_present",
+            "needs_project",
+            "blocked",
+            "fixture_only",
+            "readonly",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "discussion": {
+          "enum": [
+            "configuration_present",
+            "not_configured",
+            "provider_error",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "execution": {
+          "anyOf": [
+            {
+              "oneOf": [
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "kind": {
+                      "enum": [
+                        "native",
+                        "controlled_fixture"
+                      ],
+                      "type": "string"
+                    },
+                    "state": {
+                      "const": "available",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "state",
+                    "kind"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "reason": {
+                      "enum": [
+                        "not_installed",
+                        "incompatible_version",
+                        "unsupported_platform",
+                        "probe_failed",
+                        "not_admitted",
+                        "operator_disabled",
+                        "recovery_readonly"
+                      ],
+                      "type": "string"
+                    },
+                    "state": {
+                      "const": "unavailable",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "state",
+                    "reason"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "state": {
+                  "const": "unknown",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "state"
+              ],
+              "type": "object"
+            }
+          ]
+        },
+        "mode": {
+          "enum": [
+            "fixture",
+            "product",
+            "personal"
+          ],
+          "type": "string"
+        },
+        "observedAt": {
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+          "type": "string"
+        },
+        "profiles": {
+          "additionalProperties": false,
+          "properties": {
+            "admittedControlled": {
+              "maximum": 128,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "admittedNative": {
+              "maximum": 128,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "controlled": {
+              "maximum": 128,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "native": {
+              "maximum": 128,
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "native",
+            "controlled",
+            "admittedNative",
+            "admittedControlled"
+          ],
+          "type": "object"
+        },
+        "projects": {
+          "additionalProperties": false,
+          "properties": {
+            "development": {
+              "maximum": 128,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "discussion": {
+              "maximum": 128,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "dispatchable": {
+              "maximum": 128,
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "development",
+            "discussion",
+            "dispatchable"
+          ],
+          "type": "object"
+        },
+        "protocol": {
+          "const": "trial-readiness/1",
+          "type": "string"
+        },
+        "startupMode": {
+          "enum": [
+            "normal",
+            "recovery_readonly"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "protocol",
+        "observedAt",
+        "configurationRevision",
+        "mode",
+        "startupMode",
+        "discussion",
+        "execution",
+        "development",
+        "projects",
+        "profiles",
+        "capabilities",
+        "authorization"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:personal-agent:trial-readiness:1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}
