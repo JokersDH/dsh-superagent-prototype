@@ -72,6 +72,12 @@ readiness 只代表配置事实：它不含包身份（报告会写 `package_bin
 - 不要手工粘贴 token、对话正文、个人绝对路径；诊断包已脱敏，仍请快速扫一眼；
 - `pa support` 不会自动运行，因为它会在有数据库时以可写 pragma 打开数据库。请在自己的副本上运行后，用 `--support <file>` 引用；或让工具在“空的自有新根”上采集。
 
+## 4a. wave-27 渠道与消费者输入
+
+- 当前 main（`967dc0c`）把试用观察绑定到 transport/auth identity：切换 identity 会立即隐藏旧观察并忽略晚到结果；这是 UI 观察键，不是 token 或权限。
+- `tests/operational-soak/channel/` 提供共享 `CoordinatorChannel` 的合法 frames、拒绝边界，以及真实 B stdio bridge 上 fact ACK / payload / native-write guard 的 actual 计数。I 的 attach-channel、同 Runner 双 client、SIGKILL 恢复仍 **NOT_REACHED**，不要把它们当成已可用能力。
+- 项目配方（J）尚未进入本指南；在 main 明确接入原草稿/确认链前，不要向同事演示“自动生成项目模板”。
+
 ## 4b. 合法恢复输入（给 B/main）
 
 `tests/operational-soak/recovery/` 提供合法零模型输入包：真实 Work/Attempt/Question/Answer/native_applied、原 producer 生成的 journal、原公共 reader 和已准入 recovery port 的正例/故障。它**不包含**业务 attach/begin/deliver/answer 与 SIGKILL 恢复，`businessResume` 明确 `NOT_REACHED`。详见该目录 `README.zh-CN.md`。
