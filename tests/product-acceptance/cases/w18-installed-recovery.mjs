@@ -200,7 +200,7 @@ async function provision(target) {
     const restore = launcher(install, ['restore', '--bundle', bundle, '--to', restoredRoot, '--json'], { timeoutMs: 90_000 })
     if (restore.status !== 0 || restore.json?.status !== 'RESTORED') throw new Error(`restore ${restore.status}: ${restore.stderr}`)
     const marker = join(restoredRoot, 'restore-report.json')
-    const format = await packagedFormatEvidence(install, restoredRoot, marker, own)
+    const format = await packagedFormatEvidence(install, restoredRoot, marker, own, target)
     const beforeDb = snapshotDb(join(restoredRoot, 'state.sqlite'))
     const [rp, rap] = [await freePort(), await freePort()]
     restoredStarted = start(install, { port: rp, apiPort: rap, env: { PA_DATA_ROOT: restoredRoot, PA_MODEL_CONFIG: mock.file } })
@@ -310,7 +310,7 @@ async function provision(target) {
  * Reads the snapshot/evidence support of the frozen package itself. The package's own dist and
  * source bytes decide which workflow format exists; a later main source tree cannot lend v2 to it.
  */
-async function packagedFormatEvidence(install, restoredRoot, marker, workRoot) {
+async function packagedFormatEvidence(install, restoredRoot, marker, workRoot, target) {
   const read = relative => readFileSync(join(install, 'app', relative), 'utf8')
   const snapshotSource = read('packages/workflows/src/snapshot.ts')
   const backupSource = read('packages/storage/src/backup.ts')
@@ -366,7 +366,7 @@ async function packagedFormatEvidence(install, restoredRoot, marker, workRoot) {
     readSignature: (backupSource.match(/export function readWorkflowEvidence\([^)]*\)/) ?? [null])[0],
     ...format,
     portability: { installArtifact: installProtocol, restoreReport: restoreProtocol },
-    packageCapabilities: { source: spec.sourceCommit, buildId: spec.buildId, tarSha256: spec.tarSha256,
+    packageCapabilities: { source: target.sourceCommit, buildId: target.buildId, tarSha256: target.tarSha256,
       digestSupported: /restoredReviewDigest/u.test(read('apps/launcher/lib/start.mjs')) && /restoredReviewDigest/u.test(read('apps/coordinator/product/demo.ts')) },
   }
 }

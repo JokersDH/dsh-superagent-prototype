@@ -16,6 +16,7 @@ import { resolveFixtureDigest } from '../lib/fixtures.mjs'
 import { DEFAULT_FROZEN_DIRS, loadFrozenArtifact } from '../lib/frozen-package.mjs'
 
 const fixture = JSON.parse(readFileSync(new URL('../fixtures/wave22-595-report.json', import.meta.url), 'utf8'))
+const positiveDir = process.env.PA_E_W23_POSITIVE_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave21-target'
 const recordedNow = Date.parse(fixture.checkedAt) + 1_000
 const copy = () => JSON.parse(JSON.stringify(fixture))
 const reuse = report => report.cases.find(item => item.id === 'E5-REVIEW-REUSE-CONSISTENCY')
@@ -27,8 +28,29 @@ const requirement = {
   ...tier('installed-alpha'),
   cases: INSTALL_CASES.filter(entry => recordedIds.has(entry.id)),
 }
+function capabilityFor(dir) {
+  try {
+    const spec = loadFrozenArtifact('positive', dir)
+    const read = relative => spawnSync('tar', ['-xOzf', spec.tarPath, `install/app/${relative}`], { timeout: 60_000 })
+    const digestSupported = read('apps/launcher/lib/start.mjs').stdout?.toString().includes('restoredReviewDigest') === true &&
+      read('apps/coordinator/product/demo.ts').stdout?.toString().includes('restoredReviewDigest') === true
+    return { source: spec.sourceCommit, buildId: spec.buildId, tarSha256: spec.tarSha256, digestSupported }
+  } catch { return undefined }
+}
+
+/** Attaches the capability fact observed from the immutable package bytes to the recorded evidence. */
+function withCapability(report) {
+  const capability = capabilityFor(positiveDir)
+  if (!capability) return report
+  const reuseCase = report.cases.find(item => item.id === 'E5-REVIEW-REUSE-CONSISTENCY')
+  const formatCase = report.cases.find(item => item.id === 'E5-WORKFLOW-FORMATS')
+  if (reuseCase?.evidence?.reviewReuse) reuseCase.evidence.reviewReuse.packageCapability = capability
+  if (formatCase?.evidence?.workflowFormats) formatCase.evidence.workflowFormats.packageCapabilities = capability
+  return report
+}
+
 const evaluate = (report, now = recordedNow) =>
-  evaluateRelease({ report, requirement, expectedSource: fixture.source.commit, now, resolveFixture: resolveFixtureDigest })
+  evaluateRelease({ report: withCapability(report), requirement, expectedSource: fixture.source.commit, now, resolveFixture: resolveFixtureDigest })
 const codes = result => new Set(result.failures.map(item => item.code))
 
 /** Hashes the same consumer files from a second frozen package, read from its tar bytes. */
