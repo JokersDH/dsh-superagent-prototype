@@ -14,4 +14,9 @@ export {
   WorkflowSnapshots, SnapshotError, readSnapshotManifest, snapshotFileBytes,
   type SnapshotArtifact, type SnapshotManifest, type SnapshotResult, type SnapshotVerification,
 } from './snapshot.ts'
-export { buildDataManifest, verifyDataManifest, DEFAULT_DATA_MANIFEST_LIMITS, type DataManifest, type DataManifestLimits, type DataSubjectExpectation, type DispatchExpectation } from './data-manifest.ts'
+export { applyOriginalResult, OriginalResultError, type OriginalResultInput, type OriginalResultOutcome } from './original-result.ts'
+export {
+  restoreWorkflowSnapshot, verifyRestoredSnapshot, RestoreError, RESTORE_LIMITS,
+  type RestoreSnapshotOptions, type RestoreSnapshotReport, type RestoreSnapshotResult,
+} from './restore.ts'
+export { buildDataManifest, verifyDataManifest, parseDataSubjectExpectation, DEFAULT_DATA_MANIFEST_LIMITS, type DataManifest, type DataManifestLimits, type DataSubjectExpectation, type DispatchExpectation } from './data-manifest.ts'

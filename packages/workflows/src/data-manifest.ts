@@ -172,7 +172,54 @@ function stableSubject(snapshot: SyncSnapshot, expected: DataSubjectExpectation)
   } as unknown as Json
 }
 
-export async function buildDataManifest(store: ProductStore, expected: DataSubjectExpectation): Promise<DataManifest> {
+
+const ID = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/
+const HEX64 = /^[a-f0-9]{64}$/
+/** Runtime parser for JSON/typed producer input; rejects unknown fields and incomplete sets. */
+export function parseDataSubjectExpectation(value: unknown): DataSubjectExpectation {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Expected subject must be an object')
+  const allowed = new Set(['sourceSha', 'snapshotFormat', 'dataRoot', 'ticketId', 'assignmentId', 'attemptId',
+    'fenceEpoch', 'contract', 'questionId', 'answerId', 'requiredCommandIds', 'requiredDispatch',
+    'requiredDeliveryTargets', 'requiredObservationFactIds', 'limits'])
+  for (const key of Object.keys(value)) if (!allowed.has(key)) throw new Error(`Unknown expected subject field ${key}`)
+  const input = value as Record<string, any>
+  const id = (name: string): string => { if (typeof input[name] !== 'string' || !ID.test(input[name])) throw new Error(`Invalid ${name}`); return input[name] }
+  if (typeof input.sourceSha !== 'string' || !/^[a-f0-9]{7,128}$/.test(input.sourceSha)) throw new Error('Invalid sourceSha')
+  if (input.snapshotFormat !== 1 && input.snapshotFormat !== 2) throw new Error('snapshotFormat must be 1 or 2')
+  if (input.dataRoot !== undefined && (typeof input.dataRoot !== 'string' || !input.dataRoot.startsWith('/'))) throw new Error('dataRoot must be absolute')
+  const contract = input.contract
+  if (!contract || typeof contract !== 'object' || Array.isArray(contract)) throw new Error('Invalid contract')
+  for (const key of Object.keys(contract)) if (!['workId', 'revision', 'digest'].includes(key)) throw new Error(`Unknown contract field ${key}`)
+  if (typeof contract.workId !== 'string' || !ID.test(contract.workId) || !Number.isSafeInteger(contract.revision) || contract.revision < 1 || !HEX64.test(contract.digest))
+    throw new Error('Invalid contract identity')
+  if (!Number.isSafeInteger(input.fenceEpoch) || input.fenceEpoch < 1) throw new Error('Invalid fenceEpoch')
+  const required = (name: string): string[] => { const list = input[name]; if (!Array.isArray(list) || list.length === 0 || list.some(item => typeof item !== 'string' || !ID.test(item))) throw new Error(`Invalid ${name}`); return [...list] }
+  const dispatches = input.requiredDispatch
+  if (!Array.isArray(dispatches) || dispatches.length === 0) throw new Error('Invalid requiredDispatch')
+  const dispatch = dispatches.map((entry: any) => {
+    if (!entry || typeof entry !== 'object' || Object.keys(entry).sort().join(',') !== 'commandId,target' ||
+      typeof entry.commandId !== 'string' || !ID.test(entry.commandId) || typeof entry.target !== 'string' || !entry.target.length || entry.target.length > 1024)
+      throw new Error('Invalid requiredDispatch entry')
+    return { commandId: entry.commandId, target: entry.target }
+  })
+  const limits = input.limits
+  if (limits !== undefined && (!limits || typeof limits !== 'object' || Array.isArray(limits))) throw new Error('Invalid limits')
+  if (limits) for (const key of Object.keys(limits)) if (!(key in DEFAULT_DATA_MANIFEST_LIMITS)) throw new Error(`Unknown manifest limit ${key}`)
+  return {
+    sourceSha: input.sourceSha, snapshotFormat: input.snapshotFormat,
+    ...(input.dataRoot === undefined ? {} : { dataRoot: input.dataRoot }),
+    ticketId: id('ticketId'), assignmentId: id('assignmentId'), attemptId: id('attemptId'),
+    fenceEpoch: input.fenceEpoch, contract: { workId: contract.workId, revision: contract.revision, digest: contract.digest },
+    questionId: id('questionId'), answerId: id('answerId'),
+    requiredCommandIds: required('requiredCommandIds'), requiredDispatch: dispatch,
+    requiredDeliveryTargets: required('requiredDeliveryTargets'),
+    ...(input.requiredObservationFactIds === undefined ? {} : { requiredObservationFactIds: required('requiredObservationFactIds') }),
+    ...(limits === undefined ? {} : { limits: { ...limits } }),
+  }
+}
+
+export async function buildDataManifest(store: ProductStore, input: DataSubjectExpectation | unknown): Promise<DataManifest> {
+  const expected = parseDataSubjectExpectation(input)
   const limits = limitsFor(expected.limits)
   const dataRoot = dirname(store.database.path)
   if (expected.dataRoot && expected.dataRoot !== dataRoot) throw new Error('Expected data root does not match the opened store')
@@ -227,7 +274,9 @@ export async function buildDataManifest(store: ProductStore, expected: DataSubje
 }
 
 export async function verifyDataManifest(store: ProductStore, manifest: DataManifest,
-  expected: DataSubjectExpectation): Promise<{ ok: true; coverage: DataManifest['coverage'] } | { ok: false; reason: string }> {
+  input: DataSubjectExpectation | unknown): Promise<{ ok: true; coverage: DataManifest['coverage'] } | { ok: false; reason: string }> {
+  let expected: DataSubjectExpectation
+  try { expected = parseDataSubjectExpectation(input) } catch (error) { return { ok: false, reason: `invalid expected subject: ${String(error)}` } }
   if (manifest.protocol !== 'wave24-data-manifest/1') return { ok: false, reason: 'unsupported manifest protocol' }
   if (manifest.subject.sourceSha !== expected.sourceSha) return { ok: false, reason: 'source SHA differs from expectation' }
   if (manifest.subject.snapshotFormat !== expected.snapshotFormat) return { ok: false, reason: 'snapshot format differs from expectation' }

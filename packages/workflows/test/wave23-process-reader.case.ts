@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { execFileSync } from 'node:child_process'
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -70,6 +70,28 @@ test('a different Node PID reads the original attempt and the manifest rejects s
   const manifestPath = join(root, 'manifest.json'), expectationPath = join(root, 'expectation.json')
   writeFileSync(manifestPath, JSON.stringify(manifest, null, 2))
   writeFileSync(expectationPath, JSON.stringify(expectation, null, 2))
+
+  // C's single manifest driver consumes the same producer output; A does not reimplement it.
+  const cRoot = process.env.PA_C_WORKTREE ?? '/Users/hh/Desktop/joker/superagent-agent-c'
+  const cDriver = join(cRoot, 'packages/context/tools/wave24-a-manifest.mjs')
+  if (existsSync(cDriver)) {
+    const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '../../..')
+    const aModule = join(repoRoot, 'packages/workflows/dist/data-manifest.js')
+    const aHead = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' }).trim()
+    const cOutput = join(root, 'c-manifest.json')
+    const built = spawnSync(process.execPath, [cDriver, '--a-module', aModule, '--a-worktree', repoRoot, '--db', join(stateRoot, 'state.sqlite'),
+      '--expectation', expectationPath, '--manifest', manifestPath, '--output', cOutput, '--mode', 'build', '--a-head', aHead], { encoding: 'utf8', timeout: 20000 })
+    assert.equal(built.status, 0, built.stderr)
+    const invocation = JSON.parse(built.stdout)
+    assert.equal(invocation.status, 'ok'); assert.equal(invocation.manifest.digest, manifest.digest)
+    assert.equal(invocation.aHead, aHead)
+    const verified = spawnSync(process.execPath, [cDriver, '--a-module', aModule, '--a-worktree', repoRoot, '--db', join(stateRoot, 'state.sqlite'),
+      '--expectation', expectationPath, '--manifest', cOutput, '--mode', 'verify', '--a-head', aHead], { encoding: 'utf8', timeout: 20000 })
+    assert.equal(verified.status, 0, verified.stderr)
+    assert.equal(JSON.parse(verified.stdout).verification.ok, true)
+    console.log('WAVE25_C_DRIVER_INVOCATION', JSON.stringify({ pid: invocation.pid, aHead,
+      aModuleSha256: invocation.aModuleSha256, manifestDigest: invocation.manifest.digest, verified: true }))
+  } else console.log('WAVE25_C_DRIVER_NOT_REACHED')
   const before = { deliveries: manifest.counts.deliveries, dispatch: manifest.counts.dispatch, observations: manifest.counts.observations,
     queue: store.queue.dueRows('application.execute', Number.MAX_SAFE_INTEGER, 100).length }
   const reader = join(dirname(fileURLToPath(import.meta.url)), 'fixtures', 'wave23-reader.mjs')
