@@ -2,7 +2,7 @@
   "wave": "product-wave-27",
   "role": "B",
   "branch": "codex/g1-runtime",
-  "base": "7997ae9",
+  "base": "41e32f4",
   "checkpoint": "6 of 5 (item 5 compile/fault/docs)",
   "scopeNote": "Zero real vendor/model/native turns. Only B-owned paths. I's apps/runner/src/attach-channel and apps/runner/test/attach-channel untouched. No second coordinator/ledger/lifecycle. Main before-write guard, complete registration, proof and barrier untouched. Twelve services, ledgers, two historical report diffs and untracked b16-real-begin.mjs preserved.",
   "item3_dual_client": {
@@ -241,5 +241,40 @@
       "the product-lane probe showed SELECT COUNT(*) FROM candidates throwing (table absent) and observation kinds limited to writer.observed, policy.prepared, dispatch.observed, question.opened"
     ],
     "conclusion": "B13 current candidate and B14 explicit accept CANNOT be produced in this checkout by B: there is no candidate producer and no candidate table. Creating one would need a new migration (A-owned) or a new ledger, both explicitly forbidden for B. The harness keeps them NOT_REACHED instead of writing an accepted field."
+  },
+  "finalSweep": {
+    "date": "2026-11-14",
+    "b27AndB26Harnesses": 13,
+    "totals": {
+      "cases": 73,
+      "PASS": 59,
+      "FAIL": 0,
+      "SKIPPED": 0,
+      "NOT_TESTED": 14
+    },
+    "b18ProductLane": "4 PASS / 1 FAIL (known-stale business-cancel stop assertion) / 1 NOT_TESTED",
+    "rootTypecheck": "exit 0",
+    "perHarness": {
+      "b27-faults": "4/0/1",
+      "b27-chain": "4/0/1",
+      "b27-slots": "3/0/1",
+      "b27-epoch-ack": "4/0/1",
+      "b27-sigkill": "7/0/1",
+      "b27-dual-live": "6/0/1",
+      "b27-dual-client": "5/0/1",
+      "b27-channel": "5/0/1",
+      "b27-dispatch": "5/0/1",
+      "b27-small-pages": "2/0/1",
+      "b27-ack-points": "5/0/1",
+      "b27-ack-windows": "5/0/2",
+      "b26-ref-payload": "4/0/1"
+    }
+  },
+  "resultsFinal": {
+    "result1_pagesAndPendingWrite": "OBSERVED - whole-encoded-page budgeting with trim-and-continue and unchanged 64KiB cap, reference descriptor, five-chunk payload by decoded length, foreign producer refused, 160 small facts over 4 pages and 32 pages at a 2KiB budget; a pending native write becomes indifferentiate/state_indeterminate on detach",
+    "result2_dispatch": "OBSERVED - the three waiter maps are gone, one generation-scoped channel owns both directions, one command admission shared by stdio and the endpoint, facts acked by original id and payload reread by original ref",
+    "result3_handover": "OBSERVED - controlled endpoint 5/0 and a real spawned child 6/0: A serves fact/payload/write callbacks, leaves with a pending write that becomes indeterminate, A's reply is refused, B replays the same original ids",
+    "result4_sigkill": "OBSERVED - real OS SIGKILL of a separate coordinator while the Runner keeps running; new PID resumes same attempt/epoch/original ids; begin refused as duplicate_begin; re-fed deliver keeps its id; and ONE run closes serve -> SIGKILL -> successor serving on the same attempt",
+    "result5_boundary": "PARTIAL - stale epoch refused as identity_mismatch while current accepted, late receipt refused, resources quiescent after stop, slot bound enforced on attempts with no cross-slot fact attribution, compile/backpressure/fault/close observed, RFC written. B13 current candidate and B14 explicit accept are STRUCTURALLY UNAVAILABLE: no candidate producer and no candidates table exist in this checkout, and creating them would need an A-owned migration or a new ledger. Slot RELEASE is not observed (stop recorded, no ended phase in a 30s window)."
   }
 }
