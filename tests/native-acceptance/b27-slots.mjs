@@ -202,13 +202,14 @@ try {
     return { works: one.works ?? [] }
   })
   const ended = afterStop.works.find(work => work.id === first.workId)
+  log.evidence({ workProjection: ended ? Object.keys(ended) : [], work: ended ?? null })
   log.evidence({ status: stopped?.status ?? null, stopError, phase: ended?.phase ?? null })
   if ((stopped?.status === 'recorded' || stopped?.status === 'noop') && ['ended', 'stopped', 'cancelled'].includes(String(ended?.phase))) {
     log.pass(`stopping work ${first.workId} ended it and released its slot`)
   } else {
     // The stop was recorded but the work projection did not show an ended phase inside the window, so the
     // release is NOT claimed. The live-lane resource turnaround is measured separately by b27-epoch-ack.
-    log.notTested(`stop_work returned ${stopped?.status ?? 'nothing'} for work ${first.workId} but the work projection did not report an ended phase (phase ${ended?.phase ?? 'absent'}), so slot release is not claimed here`)
+    log.notTested(`stop_work returned ${stopped?.status ?? 'nothing'} for work ${first.workId} but the work projection did not report an ended phase; fields seen: ${ended ? Object.keys(ended).join(', ') : 'none'}; phase ${ended?.phase ?? ended?.status ?? 'absent'}`)
   }
 
 } finally {

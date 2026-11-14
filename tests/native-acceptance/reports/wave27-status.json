@@ -2,7 +2,7 @@
   "wave": "product-wave-27",
   "role": "B",
   "branch": "codex/g1-runtime",
-  "base": "41e32f4",
+  "base": "9246788",
   "checkpoint": "6 of 5 (item 5 compile/fault/docs)",
   "scopeNote": "Zero real vendor/model/native turns. Only B-owned paths. I's apps/runner/src/attach-channel and apps/runner/test/attach-channel untouched. No second coordinator/ledger/lifecycle. Main before-write guard, complete registration, proof and barrier untouched. Twelve services, ledgers, two historical report diffs and untracked b16-real-begin.mjs preserved.",
   "item3_dual_client": {
@@ -230,7 +230,7 @@
       "slot isolation: the four attempt ids are pairwise distinct, the questions are distinct, and NO slot carries another slot's fact (attribution checked per attempt; 3 of 4 slots already have facts)"
     ],
     "notObserved": [
-      "slot RELEASE: stop_work returned recorded while the work projection still reported no ended/stopped phase inside a 30s window, so release is not claimed (live-lane turnaround is b27-epoch-ack)",
+      "slot RELEASE is not observable through the work projection: after stop_work returned recorded, inspect({workId}) returned NO work object for that id (fields seen: none), so release is not claimed. A release observation would need a projection that still reports the work after it ends, or the binding state / runtime.exited fact instead.",
       "per-slot credential/cursor/payload isolation beyond fact attribution is not asserted"
     ]
   },
