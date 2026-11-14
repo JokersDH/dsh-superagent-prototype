@@ -1,12 +1,13 @@
 {
-  "protocol": "trial-run-check/1",
-  "checkedAt": "2026-11-14T05:03:10.755Z",
-  "runDirectory": "reports/trial-operations/wave25/runs/20261114T123153-1800s-mixed-churn",
+  "protocol": "trial-run-check/2",
+  "checkedAt": "2026-11-14T07:51:01.294Z",
+  "runDirectory": "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave25/runs/20261114T123153-1800s-mixed-churn",
   "run": {
     "status": "COMPLETED_WITH_OBSERVED_DEFECT",
     "startedAt": "2026-11-14T04:31:53.552Z",
     "endedAt": "2026-11-14T05:01:53.582Z",
-    "wallElapsedSeconds": 1800,
+    "derivedWallSeconds": 1800.03,
+    "summaryWallElapsedSeconds": 1800,
     "requestedDurationSeconds": 1800,
     "stoppedBy": "duration"
   },
@@ -16,7 +17,10 @@
     "declaredCount": 601,
     "bytes": 167476,
     "sha256": "ca89577009a34897d0f7134838d4417c05f65007d822ea0ee778cebe5cefb95c",
-    "lastElapsedMs": 1800009
+    "firstElapsedMs": 3,
+    "lastElapsedMs": 1800009,
+    "sampleSpanMs": 1800006,
+    "medianIntervalMs": 3001
   },
   "counters": {
     "pollRequests": 609,
@@ -43,6 +47,9 @@
     "lastEventAt": "2026-11-14T05:01:51.789Z"
   },
   "failures": 392,
+  "failureCounts": {
+    "sse:disconnect:error": 392
+  },
   "cleanup": {
     "closed": true,
     "activeSockets": 0,

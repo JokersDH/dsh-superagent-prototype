@@ -1,7 +1,7 @@
 {
   "protocol": "trial-run-check/2",
-  "checkedAt": "2026-11-14T07:47:48.420Z",
-  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-h/reports/trial-operations/wave25/runs/20261114T123153-1800s-mixed-churn",
+  "checkedAt": "2026-11-14T07:51:01.464Z",
+  "runDirectory": "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave25/runs/20261114T123153-1800s-mixed-churn",
   "run": {
     "status": "COMPLETED_WITH_OBSERVED_DEFECT",
     "startedAt": "2026-11-14T04:31:53.552Z",

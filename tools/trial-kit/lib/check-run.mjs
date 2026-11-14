@@ -13,6 +13,7 @@ import { createReadStream, lstatSync } from 'node:fs'
 import { readFile, stat } from 'node:fs/promises'
 import { dirname, isAbsolute, resolve } from 'node:path'
 import { TrialKitError, nowIso } from './output.mjs'
+import { homeDir, redactPath } from './redact.mjs'
 
 const MAX_RUN_BYTES = 8 * 1024 * 1024
 const MAX_SAMPLES_BYTES = 64 * 1024 * 1024
@@ -175,7 +176,7 @@ export async function verifyRun(runDirInput) {
     issues.push('sse_counter_regression')
 
   return {
-    protocol: 'trial-run-check/2', checkedAt: nowIso(), runDirectory: runDir,
+    protocol: 'trial-run-check/2', checkedAt: nowIso(), runDirectory: redactPath(runDir, homeDir()),
     run: {
       status: run.status, startedAt: run.startedAt, endedAt: run.endedAt,
       derivedWallSeconds, summaryWallElapsedSeconds: run.wallElapsedSeconds ?? null,

@@ -5,7 +5,7 @@
   "branch": "codex/g4-trial-operations",
   "baseMain": "11002b8",
   "preparedFrom": "fdb3f160b1d867f7167fb034d96a5c13bd16cdfb",
-  "updatedAt": "2026-11-14T05:05:30.894Z",
+  "updatedAt": "2026-11-14T07:51:21.015Z",
   "goal": {
     "established": true,
     "tokenBudget": null,
@@ -280,8 +280,8 @@
       },
       "checkMaterial": {
         "path": "reports/trial-operations/wave25/checks/600s-baseline/run-check.json",
-        "bytes": 1268,
-        "sha256": "58b63864004fd30381872edd68adb61ef113fa01c410d359c1369cd82526b80d"
+        "bytes": 1451,
+        "sha256": "068ed1d37f2c4de77735635f2e013805355ef1abf1a45efccb6cf54f2c87a849"
       }
     },
     "churn1800": {
@@ -364,8 +364,8 @@
       },
       "checkMaterial": {
         "path": "reports/trial-operations/wave25/checks/1800s-churn/run-check.json",
-        "bytes": 1296,
-        "sha256": "6dce3ffd73e619c442dd34ed68db796eb69fa6c42058358b48db6778db823d49"
+        "bytes": 1515,
+        "sha256": "2ed15aa6c155787f9239d6e31046a7cebf2a8b698ae5de9c8a88b7bd10c1cf48"
       }
     }
   },

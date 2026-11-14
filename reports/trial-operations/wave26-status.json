@@ -5,7 +5,7 @@
   "branch": "codex/g4-trial-operations",
   "mergedMain": "6787bd0",
   "preparedFrom": "88c19dde4617cee38635866256240a1f9eac4b4e",
-  "updatedAt": "2026-11-14T07:48:26.219Z",
+  "updatedAt": "2026-11-14T07:51:21.055Z",
   "goal": {
     "established": true,
     "tokenBudget": null,
@@ -557,8 +557,8 @@
       },
       "check": {
         "path": "reports/trial-operations/wave26/checks/20261114T154118-60s-mixed-normal/run-check.json",
-        "bytes": 1441,
-        "sha256": "0db624ddd92e2b0e438800b6ada00a5ff649d909d77d18223e01334a1e15f47c"
+        "bytes": 1433,
+        "sha256": "e30b69a2c7d4a65451967953770fd2b471dd30bed5acf8b64f58a95b13aff7fc"
       }
     },
     "short30Truncate": {
@@ -617,8 +617,8 @@
       },
       "check": {
         "path": "reports/trial-operations/wave26/checks/20261114T154118-30s-mixed-truncate/run-check.json",
-        "bytes": 1500,
-        "sha256": "e75b288706458d03cc78378802d8abc8d215febf7746497595e3f59a35fc3a05"
+        "bytes": 1492,
+        "sha256": "665f00e7d938dfa8da72f8024e8d43385b92a092f108294e14396014e403a006"
       }
     },
     "preservedWave25": {
@@ -666,8 +666,8 @@
         },
         "recheckV2": {
           "path": "reports/trial-operations/wave26/checks/wave25-600-v2/run-check.json",
-          "bytes": 1459,
-          "sha256": "61f5da014e09992e855e1121289b329cfac52fb2a7ec1b787dd9f8d0c2e4fa01"
+          "bytes": 1451,
+          "sha256": "8a9459e9b4bb24f80a46db1356387f1625c0c61678b7028940e5b92ba2985306"
         }
       },
       "churn1800": {
@@ -716,8 +716,8 @@
         "expectedDisconnectFailures": 392,
         "recheckV2": {
           "path": "reports/trial-operations/wave26/checks/wave25-1800-v2/run-check.json",
-          "bytes": 1523,
-          "sha256": "1c96f805427ab14d691b34c1effd827bf5b6d6dff31a514322dbe621b971c2de"
+          "bytes": 1515,
+          "sha256": "2cb1a62a8afd026cdf0bb46f36488736bb9b378093a4f61717135dcf41bf8065"
         }
       }
     },

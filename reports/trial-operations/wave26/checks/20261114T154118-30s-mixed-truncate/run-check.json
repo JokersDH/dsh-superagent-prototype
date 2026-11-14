@@ -1,7 +1,7 @@
 {
   "protocol": "trial-run-check/2",
-  "checkedAt": "2026-11-14T07:43:42.369Z",
-  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-h/reports/trial-operations/wave26/runs/20261114T154118-30s-mixed-truncate",
+  "checkedAt": "2026-11-14T07:51:01.554Z",
+  "runDirectory": "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave26/runs/20261114T154118-30s-mixed-truncate",
   "run": {
     "status": "COMPLETED_WITH_OBSERVED_DEFECT",
     "startedAt": "2026-11-14T07:42:49.467Z",

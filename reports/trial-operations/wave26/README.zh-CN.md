@@ -25,7 +25,8 @@ tests 27 / pass 27 / fail 0
 - **REFUSED 零包执行**：`hardening.case.mjs` 用 fixture `bin/pa` 的调用日志证明 bad-hash/missing-file/extra-file/bad-json/expectation mismatch 五类 REFUSED 下包命令调用数为 `0`，`package_cli.skipped` 为 UNKNOWN，support 不采集；合法包仍只有 `help/status --json/doctor --json` 三条。
 - **token 描述符校验**：symlink、hardlink（nlink=2）、0640、FIFO、目录分别得到 `token_symlink/token_hardlink/token_permissions/token_not_regular`；合法 0600 单链接文件通过且 token 不出现在 report/diagnostics。
 - **成熟 semver**：`>=24.21.0 <25` 对 24.21.0 PASS、24.20.9/25.0.0/26.1.0 WARN；`>=23 <24` 对 24.21.0 WARN（旧缺陷已关）；`^`/`~`/`||`/`*`/空 range 为 UNKNOWN。
-- **raw checker v2**：独立从 `startedAt/endedAt`、单调 `elapsedMs`、逐条 `sample.at` 推导时长；600 秒摘要但起止 0 ms、样本早停、乱序、失败合计不符、symlink 样本、越界样本路径均拒绝。既有 600/1800 原样复核 `CONSISTENT`（301/601 样本、600006/1800030 ms）。
+- **raw checker v2**：checker 输出中的 run 目录绝对路径按 home 前缀脱敏为 `~`；原始 `run.json`/`samples.ndjson` 字节不变。
+- **raw checker v2 规则**：独立从 `startedAt/endedAt`、单调 `elapsedMs`、逐条 `sample.at` 推导时长；600 秒摘要但起止 0 ms、样本早停、乱序、失败合计不符、symlink 样本、越界样本路径均拒绝。既有 600/1800 原样复核 `CONSISTENT`（301/601 样本、600006/1800030 ms）。
 
 ## H8：准确当前包
 

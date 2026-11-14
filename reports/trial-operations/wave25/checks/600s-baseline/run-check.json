@@ -1,12 +1,13 @@
 {
-  "protocol": "trial-run-check/1",
-  "checkedAt": "2026-11-14T04:49:43.850Z",
-  "runDirectory": "reports/trial-operations/wave25/runs/20261114T122036-600s-mixed-baseline",
+  "protocol": "trial-run-check/2",
+  "checkedAt": "2026-11-14T07:51:01.245Z",
+  "runDirectory": "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave25/runs/20261114T122036-600s-mixed-baseline",
   "run": {
     "status": "COMPLETED",
     "startedAt": "2026-11-14T04:20:37.000Z",
     "endedAt": "2026-11-14T04:30:37.006Z",
-    "wallElapsedSeconds": 600,
+    "derivedWallSeconds": 600.006,
+    "summaryWallElapsedSeconds": 600,
     "requestedDurationSeconds": 600,
     "stoppedBy": "duration"
   },
@@ -16,7 +17,10 @@
     "declaredCount": 301,
     "bytes": 82669,
     "sha256": "80d5b0f5181c8c0b70047916f317a625ac747dc1f5d4df9f55b7ae93a0095957",
-    "lastElapsedMs": 600005
+    "firstElapsedMs": 3,
+    "lastElapsedMs": 600005,
+    "sampleSpanMs": 600002,
+    "medianIntervalMs": 2001
   },
   "counters": {
     "pollRequests": 608,
@@ -43,6 +47,7 @@
     "lastEventAt": "2026-11-14T04:30:36.340Z"
   },
   "failures": 0,
+  "failureCounts": {},
   "cleanup": {
     "closed": true,
     "activeSockets": 0,
