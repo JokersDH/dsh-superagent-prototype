@@ -44,8 +44,9 @@ Wire additions, all on the existing authenticated socket and behind the same bea
 ## Relationship to existing code
 
 - `RunnerLink` still spawns the Runner and owns the stdio bootstrap.
-- `AttemptRunner` still applies commands; the attach command path calls the same `feed`, so begin-once,
-  prepared-policy and receiver rules are not bypassed by the socket.
+- `AttemptRunner` still applies commands; the attach command path calls the same `feed`. The socket does
+  not itself add begin-once, prepared-policy or receiver rules: those live in the original feed path and
+  are only inherited to the extent that path enforces them today. This RFC does not claim more.
 - `FileCriticalJournal` remains the only fact store. Replay pages are the journal's own entries, with its
   own sequence; nothing is renumbered or re-derived.
 
@@ -55,10 +56,13 @@ Wire additions, all on the existing authenticated socket and behind the same bea
 - a foreign producer, a replaced socket inode or a non-current epoch is refused before any write;
 - `send` runs the caller's before-write guard and returns the post-command proof; `sent` is admission of a
   command, never a claim of quiescence;
-- an observed command is never resent, a pending intent is sent exactly once, an unknown refuses.
+- an observed command is not resent, a pending intent is still sent, an unknown refuses. "Exactly once"
+  is NOT claimed: the socket provides identity-checked admission and idempotent replay of the same id, not
+  a transactional guarantee that the writer saw the command exactly once.
 
 ## Not claimed
 
-Unified dispatch with the stdio path, fact-receipt ACK rebinding, immutable payload read rebinding and
+Unified dispatch with the stdio path is not delivered, so begin-once and receiver-observed counts remain
+properties of the original stdio channel and are not re-proven here. Fact receipt ACK rebinding, fact-receipt ACK rebinding, immutable payload read rebinding and
 native-write-admission rebinding are NOT delivered yet. Receipts, payload reads and write admission still
 belong to the original stdio channel. Nothing here is admitted for use by the default product.

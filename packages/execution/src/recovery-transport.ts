@@ -163,13 +163,23 @@ export async function serveRunnerRecovery(endpoint: Pick<RunnerEndpoint, 'socket
       const query = new URL(req.url, 'http://runner').searchParams
       const ref = query.get('ref'), offset = Number(query.get('offset') ?? '0'), length = Number(query.get('length') ?? String(PAYLOAD_CHUNK_BYTES))
       if (!ref || ref.length > 512) { reply(res, 400, { error: 'invalid_ref' }); return }
+      // A payload read is bound to the original producer/source: holding a credential and a ref is not
+      // enough, so a foreign caller cannot read this Runner's payload bytes.
+      const claimedHeader = typeof req.headers['x-pa-producer'] === 'string' ? req.headers['x-pa-producer'] : ''
+      let claimedProducer: RuntimeProducer
+      try { claimedProducer = identity(JSON.parse(Buffer.from(claimedHeader, 'base64').toString('utf8')) as RuntimeProducer) }
+      catch { reply(res, 409, { error: 'identity_mismatch' }); return }
+      if (!matches(claimedProducer, trusted)) { reply(res, 409, { error: 'identity_mismatch' }); return }
       if (!Number.isSafeInteger(offset) || offset < 0) { reply(res, 400, { error: 'invalid_offset' }); return }
       if (!Number.isSafeInteger(length) || length < 1 || length > PAYLOAD_CHUNK_BYTES) { reply(res, 400, { error: 'invalid_chunk_length' }); return }
       const chunk = await backend.payload(ref, offset, length)
       if (!chunk || typeof chunk.total !== 'number' || typeof chunk.digest !== 'string' || typeof chunk.base64 !== 'string') {
         reply(res, 503, { error: 'invalid_payload' }); return
       }
-      reply(res, 200, { ref, offset, length: chunk.base64.length, total: chunk.total, digest: chunk.digest, base64: chunk.base64 })
+      const chunkBytes = Buffer.from(chunk.base64, 'base64')
+      if (chunkBytes.length !== chunk.total - offset && offset + chunkBytes.length < chunk.total) { reply(res, 503, { error: 'invalid_payload' }); return }
+      // length is the decoded byte length; reporting base64 characters was a unit error.
+      reply(res, 200, { ref, offset, length: chunkBytes.length, total: chunk.total, digest: chunk.digest, base64: chunk.base64 })
       return
     }
     if (req.method === 'POST' && req.url === '/v1/commands') {
@@ -225,7 +235,7 @@ export function verifiedRunnerInspection(proof: VerifiedRunnerInspection, maxAge
 export function connectRunnerRecovery(input: RunnerEndpoint, context: RuntimeProducer, timeoutMs = 3000) {
   if (!Number.isFinite(timeoutMs) || timeoutMs <= 0 || timeoutMs > 60_000) throw new RangeError('Runner timeout must be between 0 and 60000 milliseconds')
   const endpoint = structuredClone(input), trusted = identity(context), key = credential(endpoint.credentialPath)
-  async function invoke(method: 'GET' | 'POST', path: string, data?: unknown): Promise<unknown> {
+  async function invoke(method: 'GET' | 'POST', path: string, data?: unknown, extraHeaders?: Record<string, string>): Promise<unknown> {
     privateDirectory(dirname(endpoint.socketPath))
     let stat
     try { stat = lstatSync(endpoint.socketPath) }
@@ -236,7 +246,7 @@ export function connectRunnerRecovery(input: RunnerEndpoint, context: RuntimePro
       const bytes = data === undefined ? undefined : Buffer.from(JSON.stringify(data))
       if (bytes && bytes.length > MAX_BYTES) { reject(new RunnerLinkError('invalid_response', 'Runner control body is too large')); return }
       const req = request({ socketPath: endpoint.socketPath, method, path, agent: false,
-        headers: { authorization: `Bearer ${key}`, ...(bytes ? { 'content-type': 'application/json', 'content-length': bytes.length } : {}) } }, res => {
+        headers: { authorization: `Bearer ${key}`, ...(extraHeaders ?? {}), ...(bytes ? { 'content-type': 'application/json', 'content-length': bytes.length } : {}) } }, res => {
         const chunks: Buffer[] = []; let size = 0
         res.on('data', (chunk: Buffer) => { size += chunk.length; if (size > MAX_BYTES) req.destroy(new RunnerLinkError('invalid_response', 'Runner response exceeds the limit')); else chunks.push(chunk) })
         res.once('end', () => {
@@ -281,7 +291,8 @@ export function connectRunnerRecovery(input: RunnerEndpoint, context: RuntimePro
     },
     command: (command: ReturnType<typeof RunnerCommandSchema.parse>) => call('POST', '/v1/commands', { producer: trusted, command }),
     payload: async (ref: string, offset = 0, length = 32_768) => {
-      const { value } = await invoke('GET', `/v1/payload?ref=${encodeURIComponent(ref)}&offset=${offset}&length=${length}`) as { value: unknown }
+      const producerHeader = Buffer.from(JSON.stringify(trusted), 'utf8').toString('base64')
+      const { value } = await invoke('GET', `/v1/payload?ref=${encodeURIComponent(ref)}&offset=${offset}&length=${length}`, undefined, { 'x-pa-producer': producerHeader }) as { value: unknown }
       const chunk = value as { total?: unknown; digest?: unknown; base64?: unknown; offset?: unknown; length?: unknown }
       if (typeof chunk?.base64 !== 'string' || typeof chunk?.digest !== 'string' || !Number.isSafeInteger(chunk?.total))
         throw new RunnerLinkError('invalid_response', 'Runner payload chunk did not match the attach protocol')

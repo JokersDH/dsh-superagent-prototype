@@ -1,0 +1,55 @@
+{
+  "wave": "product-wave-25",
+  "role": "B",
+  "branch": "codex/g1-runtime",
+  "checkpoint": "1 of 4",
+  "scopeNote": "Zero real vendor/model/native turns. Only B-owned paths. No second coordinator/ledger/lifecycle; original main before-write guard, complete resource proof and barrier untouched. Twelve services, all ledgers, two historical report diffs and untracked b16-real-begin.mjs preserved.",
+
+  "previouslyPassingKept": "complete command tuple, 48KB page clamp, known-ref 135540-byte payload over five chunks, strict/exactOptional clean, old control 9/9 - none re-dispatched",
+
+  "defectsAddressed": {
+    "largeFirstFrameWasInlineSoRefWasUndiscoverable": {
+      "before": "a frame bigger than the page budget was emitted as its own oversized inline page, so the caller never saw a reference and discovery failed",
+      "after": "a frame larger than the budget is now emitted in REFERENCE form with payload null, the real payloadRef, payloadBytes and a SHA-256 payloadDigest, and the page cursor still advances by that frame's own seq so no frame is skipped or repeated"
+    },
+    "payloadRouteHadNoProducerBinding": {
+      "before": "possession of the credential plus a ref was enough to read payload bytes",
+      "after": "GET /v1/payload requires an x-pa-producer header carrying the caller's producer; the server validates it against its own registered producer and refuses 409 identity_mismatch otherwise, so a foreign caller cannot read this Runner's payload"
+    },
+    "lengthReportedBase64CharactersAsBytes": {
+      "before": "the route reported base64 character count as the chunk length",
+      "after": "the decoded byte length is reported, and a chunk whose byte length disagrees with the declared total is refused instead of being returned"
+    }
+  },
+
+  "rfcCorrected": {
+    "file": "docs/rfcs/WP-03/0001-b-runner-business-attach.md",
+    "overclaimRemoved": "the RFC claimed begin-once, prepared-policy and receiver rules were not bypassed by the socket, and that a pending intent is sent exactly once. Both overstate the actual path: the socket calls the same feed and does not itself add those rules, and exactly-once is not guaranteed. The RFC now says so explicitly and adds unified dispatch to the not-claimed section."
+  },
+
+  "typecheck": "direct strict + exactOptionalPropertyTypes compile of recovery-transport.ts and runner-service.ts exits 0",
+
+  "notDone": {
+    "unifiedDispatch": "the endpoint command path and the original stdio path are still not proven to share ONE dispatch",
+    "threeChannelRebind": "fact receipt ACK, immutable payload read and native-write admission still belong to the original stdio channel",
+    "sameRunnerDualClient": "no passing A-disconnect/B-takeover proof against a real Runner/child",
+    "milestone1": "NOT PASSED - known-ref read, inspect/cancel and a few new fields are explicitly not enough to count it",
+    "milestone2_sigkillRecovery": "NOT_REACHED",
+    "milestone3_recoveredVerifyAcceptSlots": "NOT_REACHED",
+    "milestone4_interfaceCompatAndFaults": "NOT_REACHED"
+  },
+
+  "wholePackageComplete": false,
+  "budget": {
+    "grants": [
+      { "grantId": "wave03-b-native", "limit": 4, "attributionState": "UNVERIFIED", "remainder": "UNKNOWN", "maySendReal": false }
+    ],
+    "modelCallsThisWave": 0,
+    "nativeTurnsThisWave": 0
+  },
+  "limitations": [
+    "this checkpoint is source and typecheck evidence; the reference-page and producer-bound payload read are not yet observed end-to-end",
+    "no coordinator SIGKILL recovery, no ACK window, no recovered verify/candidate/accept, no 2/4 slots",
+    "one of four runnable milestones published"
+  ]
+}

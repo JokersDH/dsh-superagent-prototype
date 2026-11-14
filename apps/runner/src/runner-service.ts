@@ -280,10 +280,25 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
                 let bytes = 0, next = since, done = true
                 for (const entry of all) {
                   const frame = { seq: entry.seq, fact: entry.fact, payload: entry.payload }
-                  // One oversized frame still gets its own page so a valid large payload is readable
-                  // instead of being silently dropped; the caller can then fetch it deliberately.
                   const size = Buffer.byteLength(JSON.stringify(frame))
                   if (frames.length > 0 && bytes + size > maxBytes) { done = false; break }
+                  if (size > maxBytes) {
+                    // Too large to inline. Emit a reference page instead of an oversized inline page, so
+                    // the caller can discover the ref and fetch the payload in bounded chunks; the page
+                    // still advances by the frame's own seq.
+                    const payloadBytes = Buffer.from(JSON.stringify(entry.payload), 'utf8')
+                    frames.push({
+                      seq: entry.seq,
+                      fact: { ...entry.fact, payloadRef: entry.fact.payloadRef },
+                      payload: null,
+                      payloadRef: entry.fact.payloadRef,
+                      payloadBytes: payloadBytes.length,
+                      payloadDigest: createHash('sha256').update(payloadBytes).digest('hex'),
+                    })
+                    bytes += Buffer.byteLength(JSON.stringify(frames[frames.length - 1]))
+                    next = entry.seq
+                    continue
+                  }
                   frames.push(frame)
                   bytes += size
                   next = entry.seq
