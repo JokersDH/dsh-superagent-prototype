@@ -2,7 +2,7 @@
   "wave": "product-wave-27",
   "role": "B",
   "branch": "codex/g1-runtime",
-  "base": "0bd6a4c",
+  "base": "a1b313a",
   "checkpoint": "6 of 5 (item 5 compile/fault/docs)",
   "scopeNote": "Zero real vendor/model/native turns. Only B-owned paths. I's apps/runner/src/attach-channel and apps/runner/test/attach-channel untouched. No second coordinator/ledger/lifecycle. Main before-write guard, complete registration, proof and barrier untouched. Twelve services, ledgers, two historical report diffs and untracked b16-real-begin.mjs preserved.",
   "item3_dual_client": {
@@ -155,7 +155,7 @@
   "item5_answerAckWindow": {
     "status": "OBSERVED on the real product lane",
     "harness": "tests/native-acceptance/b27-ack-windows.mjs",
-    "result": "5 PASS / 0 FAIL / 1 NOT_TESTED",
+    "result": "5 PASS / 0 FAIL / 2 NOT_TESTED",
     "method": "counted from the receiver log and the durable rows, not from the caller's own send marks",
     "cases": [
       "B27-ACK-SAME-WORK-AND-QUESTION - one Work reached one attempt with a real Broker question",
@@ -164,7 +164,9 @@
       "B27-ACK-NO-RESEND-AFTER-RECEIPT - after the receipts existed the receiver still shows exactly one begin and one answer, so nothing was resent in the bounded window",
       "B27-ACK-SAME-QUESTION-AND-ATTEMPT - the same question, attempt and binding carry the answer, with no second question created"
     ],
-    "correction": "the first assertion expected the answered question to remain in the pending projection; it empties after answering, so the durable user_questions row is what proves the chain stayed on one question"
+    "correction": "the first assertion expected the answered question to remain in the pending projection; it empties after answering, so the durable user_questions row is what proves the chain stayed on one question",
+    "points": "write, receive and ack are counted for the answer on the product lane with its reception timestamp; the answer's own durable receipt is not exposed there as a countable row delta, so the four-point persistence measurement stays on the live lane and this file does not invent a timestamp",
+    "ordering": "the recorded status is returned before the frame reaches the writer, so the answer's reception timestamp is after the ack; the begin/deliver measurement on the live lane does prove receive-before-ack"
   },
   "item5_candidateProbe": {
     "harness": "tests/native-acceptance/b27-ack-windows.mjs",

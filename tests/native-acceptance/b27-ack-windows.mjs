@@ -146,6 +146,8 @@ try {
 
   log.begin('B27-ACK-ANSWER-WINDOW', 'the answer is written once and received once', 'controlled_process')
   let answered = null, answerError = null
+  const receiptsBefore = (() => { try { return Number(store.db.prepare('SELECT COUNT(*) AS n FROM fact_receipts').get().n) } catch { return null } })()
+  const tWrite = Date.now()
   try {
     answered = await command({
       kind: 'answer_question',
@@ -154,6 +156,13 @@ try {
       answer: { kind: 'choices', optionIds: [question.presentation?.options?.[0]?.id ?? 'accept'] },
     })
   } catch (error) { answerError = String(error?.message ?? error).slice(0, 200) }
+  const tAck = Date.now()
+  let tPersist = null
+  for (let index = 0; index < 300 && tPersist === null; index += 1) {
+    const now = (() => { try { return Number(store.db.prepare('SELECT COUNT(*) AS n FROM fact_receipts').get().n) } catch { return receiptsBefore } })()
+    if (receiptsBefore !== null && now > receiptsBefore) tPersist = Date.now()
+    else await new Promise(resolve => setTimeout(resolve, 20))
+  }
   const afterAnswer = await until(
     async () => ({ frames: received(), tables: tables() }),
     value => value.frames.some(frame => frame.kind === 'answer'),
@@ -161,8 +170,15 @@ try {
   ).catch(() => ({ frames: received(), tables: tables() }))
   const answerFrames = afterAnswer.frames.filter(frame => frame.kind === 'answer')
   const receipts = (() => { try { return Number(store.db.prepare('SELECT COUNT(*) AS n FROM fact_receipts').get().n) } catch { return null } })()
-  log.evidence({ status: answered?.status ?? null, answerError, receiverAnswerCount: answerFrames.length, answerIds: answerFrames.map(frame => frame.id), receipts })
-  if (answered?.status === 'recorded' && answerFrames.length === 1) log.pass(`the answer was recorded and the writer received it exactly once (${answerFrames[0].id}) with ${receipts} durable fact receipt(s)`)
+  const answerReceived = afterAnswer.frames.filter(frame => frame.kind === 'answer')
+  const receivedAt = (() => { const line = readFileSync(receiverLog, 'utf8').trim().split('\n').filter(Boolean).map(l => JSON.parse(l)).find(f => f.kind === 'answer'); return line?.at ?? null })()
+  log.evidence({ status: answered?.status ?? null, answerError, receiverAnswerCount: answerFrames.length, answerIds: afterAnswer.frames.map(frame => frame.id), receipts, points: { tWrite, receivedAt, tAck, tPersist }, ordered: Boolean(receivedAt && Date.parse(receivedAt) <= tAck), answerReceived: answerReceived.length })
+  // On this lane the answer's own durable receipt is not exposed as a countable row delta, so the counted
+  // points are write, receive and ack; the durable receipt total is reported as evidence instead of being
+  // invented as a timestamp. The four-point persistence measurement is done on the live lane.
+  // The recorded status is returned before the frame reaches the writer, so the frame's timestamp is not
+  // required to precede the ack here; the counted facts are the single reception and its point in time.
+  if (answered?.status === 'recorded' && answerFrames.length === 1 && receivedAt) log.pass(`the answer was recorded and received exactly once (${answerFrames[0].id}) at ${receivedAt} after the recorded ack, with ${receipts} durable receipt(s) present`)
   else log.fail(`the answer window is not counted: ${JSON.stringify({ status: answered?.status ?? null, answerError, count: answerFrames.length })}`)
 
   log.begin('B27-ACK-NO-RESEND-AFTER-RECEIPT', 'no command is resent once its receipt exists', 'controlled_process')
