@@ -16,6 +16,7 @@ import {
   Bookmark,
   Check,
   CheckCheck,
+  ClipboardCheck,
   ChevronRight,
   CircleHelp,
   Copy,
@@ -77,6 +78,7 @@ import { ProposalWorkspace } from './ProposalWorkspace.tsx'
 import { ReplyCandidates } from './ReplyCandidates.tsx'
 import type { CandidateDraft } from './ReplyCandidates.tsx'
 import { ContextWorkspace } from './ContextWorkspace.tsx'
+import { TrialWorkspace, useTrialReadiness } from './trial/index.ts'
 import { ContextSourceRecord } from './ContextSources.tsx'
 import { WorkEvidencePanel } from './WorkEvidencePanel.tsx'
 import { blockedLabel, executionUnavailableLabel } from './configuration-labels.ts'
@@ -162,7 +164,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
   const [inspectorOpen, setInspectorOpen] = useState(!!validInitialWork)
   const [modelPanelOpen, setModelPanelOpen] = useState(false)
   const [workspaceOpen, setWorkspaceOpen] = useState(false)
-  const [workspaceView, setWorkspaceView] = useState<'conversation' | 'works' | 'decisions' | 'executors'>('conversation')
+  const [workspaceView, setWorkspaceView] = useState<'conversation' | 'works' | 'decisions' | 'executors' | 'trial'>('conversation')
   const [conversationTitle, setConversationTitle] = useState('主对话')
   const [catalogAvailable, setCatalogAvailable] = useState(false)
   const [decisionSource, setDecisionSource] = useState<ConversationMessage | null>()
@@ -656,6 +658,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
   const projectName = projectFilter
     ? configuration?.projects.find(project => project.id === projectFilter)?.displayName ?? projectFilter
     : '个人工作区'
+  const trial = useTrialReadiness(transport, auth === 'ready' && workspaceView === 'trial')
   const openView = (view: typeof workspaceView) => {
     attentionNavigation.current += 1
     setWorkspaceView(view)
@@ -876,6 +879,8 @@ export function App({ transport }: { transport: ConsoleTransport }) {
               </button>
               <button type="button" className={`rail-button${workspaceView === 'executors' ? ' active' : ''}`}
                 aria-current={workspaceView === 'executors' ? 'page' : undefined} title="执行器连接" aria-label="执行器目录" onClick={() => openView('executors')}><Bot size={19} /></button>
+              <button type="button" className={`rail-button${workspaceView === 'trial' ? ' active' : ''}`}
+                aria-current={workspaceView === 'trial' ? 'page' : undefined} title="试用准备" aria-label="试用准备" onClick={() => openView('trial')}><ClipboardCheck size={19} /></button>
             </div>
             <div className="rail-bottom">
               <button type="button" className="rail-button" title="偏好设置" aria-label="偏好设置" onClick={() => { setModelPanelOpen(true); setWorkspaceOpen(false) }}><Settings2 size={19} /></button>
@@ -1051,6 +1056,22 @@ export function App({ transport }: { transport: ConsoleTransport }) {
               active={workspaceView === 'decisions'} revision={snapshot?.cursor} onOpen={openAttention} onCount={setAttentionCount}
               fallback={loading ? <p className="empty" role="status">正在读取问题…</p> : <Questions questions={openQuestions} deliveries={deliveries} pending={pending} onAnswer={answerQuestion} />} /></div>
             {workspaceView === 'executors' && <ExecutorDirectory configuration={configuration} state={configState} onReload={() => void refreshConfiguration()} />}
+            {workspaceView === 'trial' && <TrialWorkspace readiness={trial.readiness} loading={trial.loading} error={trial.error}
+              unavailable={trial.unavailable} configuration={configuration} activeProjectId={projectFilter} activeConversationTitle={conversationTitle}
+              onReload={() => { trial.reload(); void refreshConfiguration() }}
+              onAction={action => {
+                switch (action) {
+                  case 'configure_model':
+                    setWorkspaceOpen(false); setInspectorOpen(false); setModelPanelOpen(true); break
+                  case 'import_project':
+                    if (!transport.registerProject || executionUnavailable === 'recovery_readonly') {
+                      setProblem({ code: 'unsupported_capability', message: executionUnavailable === 'recovery_readonly' ? '恢复数据只读，暂不支持导入项目' : '当前服务未提供项目导入', retry: 'none' }); break
+                    }
+                    openView('conversation'); setCreateOpen(false); setProjectImportOpen(true); setWorkspaceOpen(true); break
+                  case 'inspect_executor': openView('executors'); break
+                  case 'open_conversation': openView('conversation'); break
+                }
+              }} />}
             <div className="conversation-surface" hidden={workspaceView !== 'conversation'}>
             <div className="workspace-summary" aria-label="当前对话工作概况"><span><span className="summary-count">{activeWorks.length}</span>进行中</span><button type="button" onClick={() => openView('decisions')}><span className="summary-count">{openQuestions.length}</span>待决定</button><span><CheckCheck size={13} /><span className="summary-count">{works.filter(work => work.phase === 'delivered').length}</span>已交付</span></div>
             <Conversation
