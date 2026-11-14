@@ -1,6 +1,6 @@
 # F 包 wave-27 最终报告：身份稳定的日常体验、两项目闭环与草案预览
 
-日期：2026-11-14 · 分支 `codex/g4-trial-experience` · 基线 main `ca01e17`（已合并），main 实际 App `967dc0c`，本包最终源码提交在 `wave27-status.json` 记录。
+日期：2026-11-14 · 分支 `codex/g4-trial-experience` · 基线 main `ca01e17`（已合并），main 实际 App `967dc0c`，本包最终源码提交 `d6823f2`（之后仅有文档/状态更新）。
 
 ## 五个结果
 

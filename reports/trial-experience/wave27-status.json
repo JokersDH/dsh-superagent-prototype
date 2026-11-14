@@ -17,7 +17,7 @@
     "apps/console/src/trial/useTrialReadiness.ts",
     "apps/console/test/trial/trial-view.case.ts"
   ],
-  "finalSourceCommit": null,
+  "finalSourceCommit": "d6823f2",
   "state": "DELIVERED_WITH_DECLARED_DEPENDENCIES",
   "fiveResults": {
     "R1_F4": "identity-stable actual App entry: same-transport identity change, auth failure, late response, disabled mid-flight",
