@@ -1,0 +1,11 @@
+WAVE25_DUAL_C_DRIVER {"format":1,"pid":41538,"manifestDigest":"a2e14663da477440e9b64af8b58eeb6bfdf04c346e61bfab1288a164b911dae7","aHead":"ab33f6cd99abc3d2e0fab101fb67ca4c29687e6e","targetProof":"ok","driftProof":"mismatch"}
+WAVE25_DUAL_C_DRIVER {"format":2,"pid":41565,"manifestDigest":"3d4b7807eccf1ef6028df8a72630e04d364b2d54519a928a078b4f9fb2cf5be4","aHead":"ab33f6cd99abc3d2e0fab101fb67ca4c29687e6e","targetProof":"ok","driftProof":"mismatch"}
+✔ the same real Store restores v1 and v2 separately through actual personal readonly (4050.490125ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4410.87975

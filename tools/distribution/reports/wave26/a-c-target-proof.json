@@ -1,0 +1,42 @@
+{
+  "protocol": "wave26-a-c-target-proof/1",
+  "status": "PASS_DEV_CHAIN_PACKAGE_CONSUMER_NOT_REACHED",
+  "aWorktree": "/Users/hh/Desktop/joker/superagent-agent-a",
+  "aHead": "ab33f6c",
+  "aDirtyContentProof": true,
+  "cTool": "packages/context/tools/wave26-target-proof.mjs",
+  "cToolSha256": "2fcc8cb01af2eda48f54c339d1ec405b14c7e5d7358ed5bbd10e45254ef203d1",
+  "cManifestToolSha256": "a79be7eb42cb4c3a83ded6a293f258efb57827e7e4e5747f9054ab9edcb9bf29",
+  "cases": [
+    {
+      "format": 1,
+      "pid": 41538,
+      "manifestDigest": "a2e14663da477440e9b64af8b58eeb6bfdf04c346e61bfab1288a164b911dae7",
+      "aHead": "ab33f6cd99abc3d2e0fab101fb67ca4c29687e6e",
+      "targetProof": "ok",
+      "driftProof": "mismatch"
+    },
+    {
+      "format": 2,
+      "pid": 41565,
+      "manifestDigest": "3d4b7807eccf1ef6028df8a72630e04d364b2d54519a928a078b4f9fb2cf5be4",
+      "aHead": "ab33f6cd99abc3d2e0fab101fb67ca4c29687e6e",
+      "targetProof": "ok",
+      "driftProof": "mismatch"
+    }
+  ],
+  "aTest": "packages/workflows/test/wave25-dual-snapshot-personal.case.ts",
+  "log": "a-dual-target-proof.log",
+  "asserts": [
+    "v1 and v2 separately restored to fresh roots",
+    "target proof ok on both",
+    "legal target-only message drift proof mismatch on both",
+    "C tool digest/manifest integration",
+    "original A reader still verifies"
+  ],
+  "limitations": [
+    "A target-content proof is uncommitted working-tree source; A build/strict admission not claimed",
+    "C target-proof is dev tooling, not the installed wave26 package consumer",
+    "full same-package prepare/start UI chain still NOT_REACHED"
+  ]
+}
