@@ -1,0 +1,220 @@
+{
+  "protocol": "wave27-core-admission/1",
+  "date": "2026-11-14",
+  "status": "PARTIAL_NODE_AND_CHUNKS_FIXED_CONTENT_EXCEPTIONS_AND_ACTUAL_REBIND_REMAIN",
+  "mainDispatch": "6787bd09c83916a1a3551908598344f36194653e",
+  "fixedSources": {
+    "A": "06390aedd1c36e5bd8eec2cabf685e827873af28",
+    "B": "36c0e60dfb7deaae6ec8767b81ab5c97481104d4",
+    "C": "2296c38be3aacfb5516805740c7d7607ff1c078f"
+  },
+  "dirtyBeforeAndAfter": {
+    "A": [],
+    "B": ["reports/releases/wave11-admission/runtime.json", "reports/releases/wave12-admission/runtime.json", "tests/native-acceptance/b16-real-begin.mjs (untracked)"],
+    "C": ["pnpm-lock.yaml"]
+  },
+  "executed": [
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "command": "node --test packages/workflows/test/wave25-input-guards.case.ts packages/workflows/test/wave25-original-result.case.ts packages/workflows/test/wave25-dual-snapshot-personal.case.ts packages/storage/test/content-proof.case.ts",
+      "exitCode": 0,
+      "passed": 4,
+      "failed": 0,
+      "scope": "Actual supported Node24 entry loads; strict expectation refusals, original-result idempotence/unknown/data-level tuple refusals, two independent workflow snapshot restores and personal source reads, actual C target-proof positive/message-drift refusal, new content proof bounds"
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "command": "pnpm --filter @personal-agent/storage --filter @personal-agent/workflows typecheck",
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "command": "node /tmp/pa-wave25-b-audit.mjs",
+      "exitCode": 1,
+      "passed": 10,
+      "failed": 1,
+      "actualImportedSource": "36c0e60dfb7deaae6ec8767b81ab5c97481104d4",
+      "probeOutputHistoricalSourceLabel": "4af2a3eb6cb84195a8f7f774b0c836f2cfc4b1ee",
+      "scope": "Actual Runner service/FileCriticalJournal/recovery server/client and private command backend; no native child/Driver/product DB/model. Legal135540-byte payload reassembles in5 chunks and SHA256 matches, units/ref discovery/foreign-source refusal pass. Real160-entry small journal facts(0,131072) now fails unknown_outcome instead of a bounded page.",
+      "cases": [
+        { "id": "exact-complete-command-positive", "status": "PASS" },
+        { "id": "assignment-attempt-contract-valid-schema-refusals", "status": "PASS", "cases": 3 },
+        { "id": "actual-small-journal-cumulative-page-budget", "status": "FAIL", "code": "unknown_outcome" },
+        { "id": "large-schema-valid-journal-positive", "status": "PASS" },
+        { "id": "five-chunks-original135540bytes-final-digest", "status": "PASS" },
+        { "id": "large-first-fact-reference-discovery", "status": "PASS" },
+        { "id": "foreign-source-payload-refusal", "status": "PASS" },
+        { "id": "decoded-chunk-length-unit", "status": "PASS" },
+        { "id": "invalid-chunk-size-refusal", "status": "PASS" }
+      ]
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "command": "pnpm exec tsc --ignoreConfig --noEmit --strict --exactOptionalPropertyTypes --skipLibCheck --target ES2024 --module NodeNext --moduleResolution NodeNext --allowImportingTsExtensions --types node apps/runner/src/business-attach.ts apps/runner/src/runner-service.ts",
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "command": "node --test --test-name-pattern='package identity requires' packages/knowledge/test/wave23-driver-lib.case.ts",
+      "exitCode": 0,
+      "passed": 1,
+      "scope": "Previously admitted complete launcher/API identity and required-check omissions remain correctly refused"
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "command": "pnpm --filter @personal-agent/context --filter @personal-agent/knowledge typecheck",
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "command": "node --experimental-strip-types /tmp/pa-wave27-core-audit-oZCuZQ/probe-proofs.ts",
+      "exitCode": 0,
+      "report": "/tmp/pa-wave27-core-audit-oZCuZQ/proofs/result.json",
+      "positiveControls": 3,
+      "acceptedNegativeMutations": 3,
+      "scope": "Private real controlled same-Store data/snapshot and current A/C modules, no daemon signaling. A independent content-digest positive and missing-file refusal pass, but deleting report inventory makes missing artifact pass; C accepts an arbitrary added work.accepted event as operational delta; A content digest ignores a new durable conversation_search_private_audit table."
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "command": "node --experimental-strip-types /tmp/pa-wave27-core-audit-oZCuZQ/probe-current-package.ts",
+      "exitCode": 0,
+      "positiveFlows": 2,
+      "report": "/tmp/pa-wave27-core-audit-oZCuZQ/current-package/result.json",
+      "scope": "Exact immutablea826 package, two real independent v1/v2 snapshot/bundle restores, current A manifest and C single driver/target proof, actual readiness and original-ID HTTP reads, package stop independently STOPPED for both; provider2->2. Includes readiness/older source UI, not later F App or current-main installed verdict."
+    }
+  ],
+  "scopedPackageCheckpoint": {
+    "source": "a826b5e7c8843c28a527567ac33955ff061f85dc",
+    "tar": "/Users/hh/Desktop/joker/pa-artifacts/wave25-target/wave25-target-a826b5e.tar.gz",
+    "sha256": "d3e79749426c796085895abc73d76c4b26cd48427d8e6f748155bec00a103f3c",
+    "buildId": "fefd93219cea0d4a",
+    "schema": 18,
+    "formats": [1, 2],
+    "driverResults": ["verified-flow", "verified-flow"],
+    "targetProofResults": ["ok", "ok"],
+    "statusesAfter": ["STOPPED", "STOPPED"],
+    "readiness": { "authorization": "none", "mode": "personal", "startupMode": "recovery_readonly", "development": "readonly", "execution": "unavailable", "discussion": "unknown" },
+    "providerBefore": 2,
+    "providerAfter": 2,
+    "laterFAppIncluded": false,
+    "businessReconnectOrNativeAdmission": false,
+    "independentCurrentMainInstalledVerdict": false
+  },
+  "closedPriorScopes": [
+    { "id": "A-NODE-ENTRY-AND-STRICT", "result": "Duplicate import and assert predicate typing fixed. Supported Node new4/4 and storage/workflows strict0 now pass; stop redispatching the old compile failure." },
+    { "id": "A-LEGAL-MESSAGE-CONTENT-DRIFT", "result": "New content report reverify rejects an ordinary target-only message and unchanged original restore passes. New inventory/prefix limitations below are independent." },
+    { "id": "C-PATH-ONLY-LEGAL-MESSAGE-PROVENANCE", "result": "The actual target-proof helper now compares original subject, business families and target artifact bytes; legal message drift refusal is exercised in A's actual dual test. Complete source and same-package positives remain." },
+    { "id": "B-LEGAL-INTERMEDIATE-CHUNK", "result": "Actual historical135540-byte payload reads in5 chunks, including first/middle/final, and independent byte equality/SHA256 pass; decoded unit/ref/foreign-source positives preserved." }
+  ],
+  "findings": [
+    {
+      "id": "B27-CUMULATIVE-FACT-PAGE-BUDGET-REMOVED",
+      "priority": "P1_NEW_CHANNEL_ADMISSION",
+      "file": "apps/runner/src/runner-service.ts",
+      "line": 280,
+      "problem": "The latest change deletes the only cumulative frames/bytes guard before pushing records. Both small inline records and reference records now accumulate without stopping, done remains true, and any legitimate journal whose total page exceeds64KB trips the unchanged response cap. The actual160-small-entry positive facts(0,131072), previously51 bounded records, now returns unknown_outcome.",
+      "scope": "B's still-unadmitted recovery/business channel. It does not revoke current main's ordinary personal UI/install/control scopes or the newly fixed5-chunk payload positive.",
+      "requiredOutcome": "Choose inline versus reference first, then account for the complete encoded candidate page/envelope and stop before the effective bound; preserve original seq and done=false with progress. Prove real small/mixed/large journal multi-page and descriptor-to-all-chunks together, not only a fixture-shaped backend."
+    },
+    {
+      "id": "A27-REPORT-INVENTORY-OMISSION-BYPASSES-INDEPENDENT-ARTIFACT-PROOF",
+      "priority": "P2_DATA_INTEGRITY_HELPER",
+      "file": "packages/workflows/src/restore.ts",
+      "line": 255,
+      "problem": "After an actual restore, pinning the independently computed original contentDigest yields ok/independent. Deleting one real artifact correctly blocks while the original report remains. Setting only report.artifacts=[] then yields ok/independent again, even though report.snapshot.artifacts is still23 and the unchanged pinned database content includes the original artifact metadata. The verifier trusts the mutable report inventory instead of closing it against the independently bound database/snapshot artifact set.",
+      "evidence": "/tmp/pa-wave27-core-audit-oZCuZQ/proofs/result.json#aInventory",
+      "scope": "New A restore data proof, not an executable or release grant; initial restore byte verification and ordinary message-drift refusal are preserved.",
+      "requiredOutcome": "Derive/compare the complete required artifact inventory from the independently bound source/database subject, reject omission/duplicates/foreign records and mismatched counts, then hash required target bytes. Report-only input cannot shrink the independent subject."
+    },
+    {
+      "id": "A27-ARBITRARY-FTS-PREFIX-OMITS-DURABLE-CONTENT",
+      "priority": "P2_DATA_INTEGRITY_HELPER",
+      "file": "packages/storage/src/content-proof.ts",
+      "line": 88,
+      "problem": "The filter excludes every table whose name startsWith('conversation_search'), not just actual FTS virtual/shadow tables. Adding a durable conversation_search_private_audit table with a row leaves the digest unchanged and complete=true; omittedTables records only coordinator_instances/writer_claim, so the missing durable table is not even disclosed in the proof header.",
+      "evidence": "/tmp/pa-wave27-core-audit-oZCuZQ/proofs/result.json#prefix",
+      "requiredOutcome": "Use exact known derived-table identities or SQLite structured virtual/shadow metadata, include every other durable table, and bind the actual omission set/protocol. Unknown prefix-matching business tables must be included or explicitly incomplete, not silently omitted."
+    },
+    {
+      "id": "C27-ENTIRE-EVENT-LOG-IS-AN-OVERBROAD-OPERATIONAL-EXCEPTION",
+      "priority": "P2_TARGET_PROVENANCE_HELPER",
+      "file": "packages/context/tools/wave26-target-proof.mjs",
+      "line": 40,
+      "problem": "ALLOWED_FAMILIES permits any event_log change as an operational delta. From an actual unchanged target positive, appending a work.accepted business event for an unrelated candidate/acceptance via the existing public EventLog changes the target event family65->66 but still returns ok/allowed-operational-delta. The payload is not a startup/audit transform and no row-level source/operation restriction is checked.",
+      "evidence": "/tmp/pa-wave27-core-audit-oZCuZQ/proofs/result.json#cEvent",
+      "scope": "C's data/consumer integrity helper. The injected event does not actually apply a Work acceptance or bypass main command authority; selected data and legal-message drift controls remain accurate.",
+      "requiredOutcome": "Compare durable events exactly, or admit only narrowly defined observed startup transformations with original prefix/row identity and exact operation binding. A whole-table exception cannot establish the claimed complete restored-data relation. Reuse A's formal content API rather than growing a second arbitrary exclusion policy."
+    }
+  ],
+  "wholePackageAssessment": {
+    "A": "wholePackageComplete=false in submitted status is accurate. Supported tools and real content/delta checks improved, but inventory/prefix proof gaps and admitted B actual result landing remain. The same-package consumer exists independently on C's side; do not deny it just because no tar is in A's checkout.",
+    "B": "wholePackageComplete=false and checkpoint1/4 are accurate. Only the chunk repair plus one pager guard deletion and a fixture-shaped endpoint harness were added. Actual shared dispatch, fact-receipt/payload/native-write callback rebinding, true sameRunner dual-client, sameA original-ID SIGKILL/answer, recovered currentWork check/candidate/manualaccept and2/4-slot resources are still absent.",
+    "C": "Currenta826 actual single-manifest two-format package/readiness positives are real; F App is explicitly not in that artifact. Broad operational exceptions still prevent a complete data-integrity claim, and no B native recovery or current-main installed verdict is supplied."
+  },
+  "integrationGuidance": {
+    "A": "Narrow content/data APIs may be evaluated as non-authorizing inputs after exact main consumer compilation, but do not treat the new verifier as a complete artifact/durable-content gate until the independent omission controls pass. No new migration is required.",
+    "B": "Do not import the new channel into the default product. Preserve existing main registered-control and normal-path admission; fix the actual page regression and deliver one coherent runtime handover result with I.",
+    "C": "Reuse precise actual package/source observations and typed consumer examples. Keep target proof explicit about scope until row-level transforms and artifact/content closure are complete. No new production UI/HTTP slice is needed from C."
+  },
+  "deliveryDirection": {
+    "schedule": "The user cancelled the same-day deadline. Continue normal scoped development and rigorous admission; do not reduce the agreed architecture merely to declare a date-based MVP.",
+    "independentProductLine": "Current main F App/readiness and existing daily product flows can continue through D clean frozen bytes, E independent exact-package/actual-browser acceptance and ordinary user documentation, independently of blocked research/private target and B recovery. This is a parallel release boundary, not a claim that unfinished recovery is complete.",
+    "runtimeBottleneck": "B plus explicitly scoped I should produce actual reusable connection/callback channel rebinding while B keeps the unique Runner lifecycle/dispatch. A and C supply original data/result/provenance consumers. Complete dualclient/crash/currentWork acceptance only after the callable first runtime result is real.",
+    "projectUsabilityLine": "J can independently prepare bounded project/check recipes using existing registry/verifier/environment policy and explicit user confirmation, without taking over A/B/C authority."
+  },
+  "proposedIWorkBoundary": {
+    "purpose": "Replace the actual three static coordinator callback/waiter paths with one concrete rebindable channel, not another Runner, coordinator, ledger, socket server or permanent parallel pipeline.",
+    "explicitOwnershipTransferRequired": ["apps/runner/src/attach-channel/", "apps/runner/test/attach-channel/"],
+    "existingCodeToExtract": [
+      "apps/runner/src/runner-service.ts factWaiters/payloadWaiters/writeWaiters, hooks.beforeNativeWrite and receipt/payload/write-admission/ack-failed handling",
+      "apps/runner/src/runner-link-client.ts fact ingress responder, immutable payload responder and main/Broker beforeNativeWrite responder"
+    ],
+    "newConcreteFiles": [
+      "apps/runner/src/attach-channel/coordinator-channel.ts",
+      "apps/runner/src/attach-channel/coordinator-responder.ts",
+      "apps/runner/src/attach-channel/index.ts",
+      "apps/runner/test/attach-channel/coordinator-channel.test.ts"
+    ],
+    "minimumInterface": [
+      "Runner-facing recordFact(fact): Promise<DurableReceipt>, readPayload(reference): Promise<Json>, beforeNativeWrite(originalCommand): Promise<void>",
+      "bind({registeredProducer,connectionId,writeFrame}) returns the current generation receive(frame)/close adapter; exact full producer and original request/fact IDs bind every response",
+      "Coordinator-facing responder is injected with the existing original A fact sink, immutable payload reader and main/Broker current beforeNativeWrite callback; it may not synthesize permission",
+      "One active binding with bounded pending/timeouts/backpressure; detach invalidates old write approvals/callbacks, preserves spool/unknown semantics and lets the existing journal/sink supply original fact receipt replay"
+    ],
+    "BRetains": [
+      "runner-service.ts composition and the unique begin/prepared-policy/launch/cancel/physical resource lifecycle",
+      "recovery-transport.ts and existing authenticated endpoint route adapters",
+      "runner-link-client.ts composition, business-attach facade and unified command dispatch",
+      "all shared bridge/wire changes require main review; existing BridgeFrame meanings are reused"
+    ],
+    "firstRunnableResult": "I ships the actual concrete channel and responder using two real client lifecycles over one controller with all3 callbacks, stale-generation refusal and exact receipt/payload/write-admission results. B imports it and removes the old duplicate waiter maps/handler paths. I helper tests alone do not certify same live Runner/child or crash recovery.",
+    "handoffRule": "Publish this ownership exclusion and minimal callable interface before concurrent edits. I never edits B's flat lifecycle/transport files; B never implements a second competing channel in the new subtree."
+  },
+  "proposedJWorkBoundary": {
+    "purpose": "Practical project execution/check recipe preparation against the already established verifier and environment policy, not another scheduler, proposal authority or script executor.",
+    "suggestedNewPaths": ["packages/project-recipes/", "tools/project-recipes/", "reports/project-recipes/"],
+    "reuse": [
+      "packages/verification/src/checks.ts CheckDefinition/CheckRegistry immutable id+revision, checkDefinitionRef, argv/cwd/environment/deadline/output bounds",
+      "packages/verification/src/runner.ts registered Verifier completion behavior",
+      "existing environment-preparation inspection and existing_only/offline_install policy observations",
+      "main existing project/profile/configuration and explicit Work command confirmation"
+    ],
+    "concreteOutput": "A bounded pure planProjectRecipe(projectFacts, admittedProfiles, registeredChecks, policyFacts) output with proposed scope, criteria/checkDefinitionRefs, unsupported/missing reasons and input/configuration identity. Structured package.json/lock facts are data; unregistered package scripts remain requires_registration or unsupported.",
+    "prohibited": "No automatic install/run/network/model/native, no direct trusted CheckRegistry registration from untrusted project text, no SQL/writes to C proposals, no alternate command authority or execution lifecycle. Main/operator reviews any new check draft and keeps the original policy/confirmation gate.",
+    "firstRunnableResult": "Three actual bounded project fixtures and recipes, including a no-compatible-profile and unregistered-check negative, produce reviewable current-policy inputs consumable by main's existing project/task setup. Main later composes its UI/API; J does not edit that root integration."
+  },
+  "preservation": {
+    "realVendorModelCalls": 0,
+    "nativeTurnStarts": 0,
+    "userServiceActions": 0,
+    "globalSocketDiscovery": false,
+    "foreignCredentialsRead": false,
+    "candidateOrMainProductionSourceEdited": false,
+    "eAssertionsEdited": false,
+    "allPrivateExecSessionsCompleted": true,
+    "exactPackagePrivateStatusesAfter": ["STOPPED", "STOPPED"],
+    "privateEvidenceRoot": "/tmp/pa-wave27-core-audit-oZCuZQ",
+    "budgetsAndLedgersUnchanged": true,
+    "releaseApproved": false
+  }
+}

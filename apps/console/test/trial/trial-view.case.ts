@@ -6,7 +6,8 @@ import {
   formatObservedAt, shortRevision, trialActions, trialDevelopmentValue, trialDiscussionValue, trialHeadline,
   trialModeValue, trialProjectValue, trialStrip,
 } from '../../src/trial/trial-view.ts'
-import { trialInsightsCount, trialInsightsRows } from '../../src/trial/insights.ts'
+import { trialInsightsAdmission, trialInsightsCount } from '../../src/trial/insights.ts'
+import { trialProbeError } from '../../src/trial/useTrialReadiness.ts'
 import type { TrialInsightsView } from '../../src/trial/insights.ts'
 
 const observedAt = '2026-11-14T04:00:00.000Z'
@@ -161,11 +162,54 @@ test('observed time and revision formatting stay bounded and safe', () => {
   assert.equal(shortRevision('abcdef0123456789'), 'abcdef01')
 })
 
-test('optional insights never show measurements when the producer says they are insufficient', () => {
-  const insufficient: TrialInsightsView = { status: 'insufficient_data', sampleCount: null, metrics: [{ id: 'm', label: '等待时长', value: null }], limitations: ['样本不足'] }
-  assert.equal(trialInsightsRows(insufficient).length, 0)
+test('optional insights only show measurements after scope, window and coverage are declared', () => {
+  const metric = { id: 'm', label: '交付到接受的等待', value: '3.2 小时' } as const
+  const scoped = {
+    status: 'ready' as const, windowLabel: '11月1日–11月14日', coverage: 'partial: 3/5 sources', sampleCount: 12,
+    scope: { projectIds: ['project-atlas'], aggregation: 'single_project' as const },
+    metrics: [metric], unknownCount: 2, limitations: ['界面活动只是可见性代理。'],
+  }
+  assert.equal(trialInsightsAdmission(scoped, 'project-atlas').rows.length, 1)
+  assert.equal(trialInsightsAdmission(scoped, 'project-other').rows.length, 0)
+  assert.match(trialInsightsAdmission(scoped, 'project-other').message ?? '', /不包含当前项目/)
+  assert.equal(trialInsightsAdmission(scoped, undefined).admitted, true)
+
+  const insufficient = { status: 'insufficient_data' as const, sampleCount: null, metrics: [metric], limitations: [] }
+  assert.equal(trialInsightsAdmission(insufficient).admitted, false)
   assert.equal(trialInsightsCount(insufficient), '样本数未知')
-  const ready: TrialInsightsView = { status: 'ready', sampleCount: 3, windowLabel: '11月1日–11月14日', coverage: 'partial', metrics: [{ id: 'm', label: '等待时长', value: '2.4 小时' }], limitations: [] }
-  assert.equal(trialInsightsRows(ready).length, 1)
-  assert.equal(trialInsightsCount(ready), '3 个样本')
+
+  const unavailable = { status: 'unavailable' as const, sampleCount: 0, metrics: [], limitations: [] }
+  assert.equal(trialInsightsAdmission(unavailable).admitted, false)
+
+  const { scope: _scope, ...withoutScope } = scoped
+  assert.equal(trialInsightsAdmission(withoutScope).admitted, false)
+  assert.match(trialInsightsAdmission(withoutScope).message ?? '', /范围/)
+  const { windowLabel: _window, ...withoutWindow } = scoped
+  assert.equal(trialInsightsAdmission(withoutWindow, 'project-atlas').admitted, false)
+  assert.match(trialInsightsAdmission(withoutWindow, 'project-atlas').message ?? '', /窗口/)
+  const { coverage: _coverage, ...withoutCoverage } = scoped
+  assert.equal(trialInsightsAdmission(withoutCoverage, 'project-atlas').admitted, false)
+  assert.match(trialInsightsAdmission(withoutCoverage, 'project-atlas').message ?? '', /覆盖/)
+  const emptyScope = { ...scoped, scope: { projectIds: [], aggregation: 'single_project' as const } }
+  assert.equal(trialInsightsAdmission(emptyScope, 'project-atlas').admitted, false)
+  const multi = { ...scoped, scope: { projectIds: ['project-atlas', 'project-harbor'], aggregation: 'declared_multi_project' as const } }
+  assert.equal(trialInsightsAdmission(multi, 'project-harbor').admitted, true)
+
+  const unknownMetric = { ...scoped, metrics: [{ id: 'x', label: '审阅计时覆盖', value: null }], sampleCount: null }
+  const admitted = trialInsightsAdmission(unknownMetric, 'project-atlas')
+  assert.equal(admitted.admitted, true)
+  assert.equal(admitted.rows[0]?.value, null)
+  assert.equal(trialInsightsCount(unknownMetric), '样本数未知')
+})
+
+test('probe failures map to bounded copy without raw stacks, paths or credentials', () => {
+  for (const code of ['auth_required', 'storage_unavailable', 'invalid_request', 'schema_mismatch', 'unsupported_capability']) {
+    const message = trialProbeError(Object.assign(new Error('raw /Users/secret token=abc stack'), { code }))
+    assert.ok(message.length > 0)
+    assert.doesNotMatch(message, /\/Users|token|stack|abc|secret/)
+  }
+  const raw = trialProbeError(new Error('raw /Users/secret token=abc'))
+  assert.equal(raw, '试用状态暂时无法读取；请重试。')
+  assert.doesNotMatch(trialProbeError({ code: 'something_new' }), /\/Users|abc/)
+  assert.doesNotMatch(trialProbeError(undefined), /\/Users|abc/)
 })
