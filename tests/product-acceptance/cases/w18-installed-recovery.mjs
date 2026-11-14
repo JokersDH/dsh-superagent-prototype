@@ -426,14 +426,16 @@ async function packagedFormatEvidence(install, restoredRoot, marker, workRoot, t
           }
         } finally { db.close() }
       } catch (error) { format.targetDriftError = String(error?.message ?? error).slice(0, 200) }
-      finally { try { targetStore.close() } catch { /* closed */ } }
       let targetVerify = null
-      if (appended) {
-        const targetWorkflows = new workflows.WorkflowSnapshots(targetStore)
-        const targetSnapshot = await targetWorkflows.create({ destination: join(work, 'target-snapshot'), formatVersion: 2 }).catch(error => ({ status: 'THREW', error: String(error?.message ?? error).slice(0, 200) }))
-        targetVerify = { status: targetSnapshot.status, error: targetSnapshot.error ?? null,
-          verified: targetSnapshot.status === 'ok' ? targetWorkflows.verify(join(work, 'target-snapshot')).status : null }
-      }
+      try {
+        if (appended) {
+          const targetWorkflows = new workflows.WorkflowSnapshots(targetStore)
+          const targetSnapshot = await targetWorkflows.create({ destination: join(work, 'target-snapshot'), formatVersion: 2 })
+            .catch(error => ({ status: 'THREW', error: String(error?.message ?? error).slice(0, 200) }))
+          targetVerify = { status: targetSnapshot.status, error: targetSnapshot.error ?? null,
+            verified: targetSnapshot.status === 'ok' ? targetWorkflows.verify(join(work, 'target-snapshot')).status : null }
+        }
+      } finally { try { targetStore.close() } catch { /* closed */ } }
       format.targetDrift = { appended, verify: targetVerify, consumerContentBinding: 'NOT_AVAILABLE_IN_MAIN',
         reason: targetVerify?.status === 'ok'
           ? 'the packaged producer accepted a snapshot of the drifted target: its verify covers database integrity, schema and artifact digests, not source-content equality'
