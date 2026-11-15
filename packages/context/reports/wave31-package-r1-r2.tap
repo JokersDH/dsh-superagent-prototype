@@ -1,0 +1,18 @@
+TAP version 13
+# Subtest: immutable 829RC and the successor R2 package carry distinct identity and the J/export closure
+ok 1 - immutable 829RC and the successor R2 package carry distinct identity and the J/export closure
+  ---
+  duration_ms: 580.910166
+  type: 'test'
+  ...
+# R2 asset install/app/apps/console/dist/assets/index-2CheocB2.js mentions insights: true
+# R1 entries 7405, R2 entries 7421
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 647.199292
