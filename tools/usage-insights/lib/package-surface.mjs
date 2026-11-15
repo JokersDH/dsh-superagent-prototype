@@ -1,0 +1,118 @@
+/**
+ * Read-only capability report for a released artifact.
+ *
+ * It answers one question with evidence from the archive itself: which observation capabilities does
+ * this exact package actually contain? A source checkout is not a package, and a tool shipped next to
+ * a package is not a feature inside it, so the report reads only the packaged files.
+ */
+import { readArchive } from './tar.mjs'
+
+const APP_ROOT = 'install/app/'
+const USAGE_PACKAGE = `${APP_ROOT}packages/usage-insights/`
+
+export const CAPABILITIES = ['pageObservation', 'numericExport', 'displayDownload']
+
+const count = (text, needle) => (text === null ? 0 : text.split(needle).length - 1)
+
+/** Capabilities the package exposes, each backed by a packaged file rather than a checkout. */
+export function inspectArchive(path, options = {}) {
+  const archive = readArchive(path, options)
+  const isAppleDouble = entry => entry.name.split('/').pop().startsWith('._')
+  const regular = archive.entries.filter(entry => entry.type === 'file' && !isAppleDouble(entry))
+  const appleDouble = archive.entries.filter(entry => entry.type === 'file' && isAppleDouble(entry))
+  const links = archive.entries.filter(entry => entry.type === 'symlink')
+  const directories = archive.entries.filter(entry => entry.type === 'directory')
+  const paxHeaders = archive.entries.filter(entry => entry.type === 'other')
+
+  const installText = archive.text('install/install.json')
+  let install = null
+  if (installText !== null) {
+    try { install = JSON.parse(installText) } catch { install = null }
+  }
+
+  const manifestText = archive.text(`${USAGE_PACKAGE}package.json`)
+  let manifest = null
+  if (manifestText !== null) {
+    try { manifest = JSON.parse(manifestText) } catch { manifest = null }
+  }
+  const indexEntry = manifest?.exports?.['.']?.import ?? './dist/index.js'
+  const indexText = archive.text(`${USAGE_PACKAGE}${indexEntry.replace(/^\.\//, '')}`)
+  const distFiles = regular
+    .filter(entry => entry.name.startsWith(`${USAGE_PACKAGE}dist/`))
+    .map(entry => entry.name.slice(`${USAGE_PACKAGE}dist/`.length))
+    .sort()
+
+  const httpText = archive.text(`${APP_ROOT}apps/coordinator/http/app.ts`)
+  const observationText = archive.text(`${APP_ROOT}apps/coordinator/product/usage-observation.ts`)
+  const transportText = archive.text(`${APP_ROOT}apps/console/src/transport.ts`)
+
+  const usageInsights = {
+    version: manifest?.version ?? null,
+    distEntry: indexEntry,
+    distFiles,
+    exports: {
+      analyze: count(indexText, 'analyzeUsageInsights'),
+      numericExport: count(indexText, 'buildInsightExport'),
+      displayExport: count(indexText, 'buildDisplayExport'),
+      crossCheck: count(indexText, 'crossCheckAnalysisWithDisplay'),
+    },
+  }
+  const coordinator = {
+    pageRoute: count(httpText, "'/v1/insights'"),
+    downloadRoute: count(httpText, "'/v1/insights/export'"),
+    downloadMethod: count(observationText, 'download('),
+    downloadContract: count(observationText, 'UsageObservationDownloadSchema'),
+  }
+  const console = {
+    downloadInterface: count(transportText, 'downloadUsageObservation'),
+  }
+
+  // A capability needs both the library function and the product path that serves it: a dist
+  // function alone is a library feature, not a downloadable observation.
+  const capabilities = {
+    pageObservation: coordinator.pageRoute > 0 && usageInsights.exports.analyze > 0,
+    numericExport: usageInsights.exports.numericExport > 0,
+    displayDownload: usageInsights.exports.displayExport > 0 && coordinator.downloadRoute > 0 &&
+      coordinator.downloadMethod > 0 && console.downloadInterface > 0,
+  }
+  return {
+    protocol: 'usage-insights-package-surface/1',
+    archive: {
+      sha256: archive.sha256,
+      bytes: archive.bytes,
+      inflatedBytes: archive.inflatedBytes,
+      headers: archive.entries.length,
+      contentFiles: regular.length,
+      appleDouble: appleDouble.length,
+      paxHeaders: paxHeaders.length,
+      symlinks: links.length,
+      directories: directories.length,
+    },
+    manifest: install === null ? null : {
+      format: install.format ?? null,
+      formatVersion: install.formatVersion ?? null,
+      sourceCommit: install.source?.commit ?? null,
+      sourceBranch: install.source?.branch ?? null,
+      sourceDirty: install.source?.dirty ?? null,
+      buildId: install.buildId ?? null,
+      declaredFiles: Array.isArray(install.files) ? install.files.length
+        : (typeof install.files === 'number' ? install.files : null),
+      supportMatrix: install.supportMatrix ?? null,
+      limitations: Array.isArray(install.limitations) ? install.limitations.slice(0, 8) : [],
+    },
+    usageInsights,
+    coordinator,
+    console,
+    capabilities,
+    absent: Object.entries(capabilities).filter(([, present]) => !present).map(([name]) => name),
+    accounting: {
+      // Content files and symlinks are what an install manifest lists; the manifest does not list
+      // itself, so one file of difference is expected and anything else is a real discrepancy.
+      accountedFiles: regular.length + links.length,
+      manifestDelta: install === null || !Array.isArray(install.files) ? null
+        : (regular.length + links.length) - install.files.length,
+    },
+    authorization: 'none',
+    note: 'This report reads packaged files only. It is not an install, a runtime probe or a release verdict.',
+  }
+}
