@@ -1,0 +1,23 @@
+{
+  "status": "PASS_THREE_TIMES_OUTCOME_PROGRAM_STATIC_ONLY",
+  "externalAgents": 10,
+  "ownersIncludingMain": 11,
+  "packagesPerOwner": 3,
+  "completeOutcomesPerOwner": 12,
+  "scopeMultiplier": 3,
+  "totalPlannedOutcomesIncludingMain": 132,
+  "mechanicalMicroPhaseExpansion": false,
+  "checkpoints": 24,
+  "localLinks": 263,
+  "localWorkspacesChecked": 11,
+  "ownershipDisjoint": true,
+  "acyclic": true,
+  "lockedR1": true,
+  "R2Separate": true,
+  "sourceAndInstalledSeparate": true,
+  "budgetUnchanged": true,
+  "preservedServicePairs": 12,
+  "runtimeTests": 0,
+  "nativeTurnStarts": 0,
+  "releaseApproved": false
+}

@@ -5,7 +5,7 @@
  */
 import { useId, useRef } from 'react'
 import {
-  Activity, ArrowUpRight, Bot, ClipboardList, FolderCheck, FolderPlus, Gauge, Info, LockKeyhole, MessageSquare,
+  Activity, ArrowUpRight, Bot, ClipboardList, Download, FolderCheck, FolderPlus, Gauge, Info, LockKeyhole, MessageSquare,
   RefreshCw, Settings2, TriangleAlert,
 } from 'lucide-react'
 import type { ApplicationConfiguration, TrialNavigationAction, TrialReadiness } from '@personal-agent/contracts'
@@ -31,6 +31,9 @@ export interface TrialWorkspaceProps {
   readonly insightsLoading?: boolean | undefined
   readonly insightsError?: string | undefined
   readonly onReloadInsights?: (() => void) | undefined
+  readonly onDownloadInsights?: (() => void) | undefined
+  readonly insightsDownloading?: boolean | undefined
+  readonly insightsDownloadError?: string | undefined
   readonly recipes?: readonly TrialRecipeSuggestion[] | undefined
   readonly recipesLoading?: boolean | undefined
   readonly recipesError?: string | undefined
@@ -91,7 +94,8 @@ function CountRow({ label, value, detail }: { readonly label: string; readonly v
 export function TrialWorkspace({
   readiness, loading = false, error, unavailable = false, configuration, activeProjectId,
   activeConversationTitle, insights, insightWindow, onSelectInsightWindow, insightsLoading = false,
-  insightsError, onReloadInsights, recipes, recipesLoading = false, recipesError, onOpenRecipe,
+  insightsError, onReloadInsights, onDownloadInsights, insightsDownloading = false, insightsDownloadError,
+  recipes, recipesLoading = false, recipesError, onOpenRecipe,
   onAction, onReload, headingLevel = 2, className,
 }: TrialWorkspaceProps) {
   const base = useId()
@@ -311,6 +315,7 @@ export function TrialWorkspace({
                 {' · '}{insights?.coverage ?? '覆盖未声明'}
               </span>
             </div>
+            <div className="trial-observation-toolbar">
             {onSelectInsightWindow !== undefined && (
               <div className="trial-insight-controls" role="group" aria-label="观察窗口">
                 {([7, 30] as const).map(days => (
@@ -320,6 +325,14 @@ export function TrialWorkspace({
                 ))}
               </div>
             )}
+            {onDownloadInsights !== undefined && (
+              <button type="button" className="icon-button" title="重新读取当前范围并导出新快照" aria-label="导出当前范围观察"
+                disabled={insightsDownloading || insightsLoading || insights === undefined || insights.status === 'unavailable'} onClick={onDownloadInsights}>
+                <Download size={16} aria-hidden="true" />
+              </button>
+            )}
+            </div>
+            {insightsDownloadError && <p className="trial-muted" role="alert">{insightsDownloadError}</p>}
             {insightsError !== undefined && (
               <div className="trial-banner trial-banner-danger" role="alert">
                 <TriangleAlert size={17} aria-hidden="true" />

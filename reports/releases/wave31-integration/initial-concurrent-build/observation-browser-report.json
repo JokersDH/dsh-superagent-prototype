@@ -1,0 +1,83 @@
+{
+  "status": "FAIL",
+  "sourceCommit": "303b2c6a974856661c21d0617bd710ebe87374d1",
+  "sourceWorktreeClean": true,
+  "cases": [
+    {
+      "id": "DEFAULT-CONVERSATION-DOES-NOT-COLLECT-INSIGHTS",
+      "status": "PASS"
+    },
+    {
+      "id": "WINDOW-SELECTOR-READS-EXACT-SEVEN-AND-THIRTY-DAY-SERVER-WINDOWS",
+      "status": "PASS"
+    },
+    {
+      "id": "OLD-WINDOW-ROWS-HIDE-IMMEDIATELY-AND-LATE-REPLY-CANNOT-REPLACE-NEW-WINDOW",
+      "status": "PASS"
+    },
+    {
+      "id": "FAILED-NEW-WINDOW-NEVER-REUSES-THE-PREVIOUS-WINDOW-AND-CAN-RETRY",
+      "status": "PASS"
+    },
+    {
+      "id": "REAL-PROJECT-SELECTION-SCOPES-OBSERVATIONS",
+      "status": "PASS"
+    },
+    {
+      "id": "LATE-OLD-PROJECT-RESPONSE-CANNOT-REPLACE-CURRENT-DATA",
+      "status": "PASS"
+    },
+    {
+      "id": "REAL-DOWNLOAD-PRESERVES-CURRENT-PROJECT-WINDOW-AND-DISPLAY-VALUES",
+      "status": "PASS"
+    },
+    {
+      "id": "BAD-DOWNLOAD-DIGEST-REFUSES-FILE-WITH-SANITIZED-ERROR",
+      "status": "PASS"
+    },
+    {
+      "id": "SCOPE-AND-WINDOW-CHANGES-CANCEL-PENDING-DOWNLOADS",
+      "status": "PASS"
+    },
+    {
+      "id": "LEGACY-DOWNLOAD-ABSENCE-KEEPS-OBSERVATION-AND-ORIGINAL-ACTIONS",
+      "status": "PASS"
+    },
+    {
+      "id": "INVALID-OR-FAILED-READ-KEEPS-DATED-OBSERVATION-WITH-SANITIZED-ERROR",
+      "status": "PASS"
+    },
+    {
+      "id": "LEGACY-OPTIONAL-ABSENCE-KEEPS-THE-OLD-WORKBENCH-USABLE",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "insightReads": 16,
+  "exportReads": 6,
+  "downloads": 2,
+  "requestedWindows": [
+    7,
+    30,
+    7,
+    30,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    30,
+    30,
+    7,
+    7,
+    7,
+    7
+  ],
+  "postRequests": 0,
+  "readonlyRecipePreviewPosts": 21,
+  "eventDelta": 0,
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "scope": "Actual App/React/Product/Broker/SQLite/HTTP/G Node analyzer, private controlled question fixtures; no installed/native/recovery/benefit admission"
+}
