@@ -15,7 +15,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { CaseLog, writeReport } from './harness.mjs'
-import { capture, confirmExit, observe, signalOwned } from './signal-guard.mjs'
+import { born, capture, confirmExit, observe, signalOwned } from './signal-guard.mjs'
 const CHILD_ENTRY = fileURLToPath(new URL('./b27-coordinator-child.mjs', import.meta.url))
 import { RunnerLink } from '../../apps/runner/src/runner-link-client.ts'
 import { makeAttemptSpec, makeCommand } from '../../packages/testing/src/index.ts'
@@ -41,7 +41,8 @@ const runChild = (mode, registration) => new Promise(resolve => {
     childA = child
     setTimeout(() => {
       // Safe tooling: capture the complete birth identity, then signal only after a FRESH verification.
-      const captured = capture(child.pid, { markers: [CHILD_ENTRY] })
+      // Exact spawn arguments, registered from the probe's own spawn: no substring ownership.
+      const captured = born(child.pid, { exactArgs: [CHILD_ENTRY], expectedChildren: [] })
       const sent = captured.ok ? signalOwned(captured.record, 'SIGKILL') : { sent: false, refused: true, unknown: captured.unknown }
       writeFileSync(join(root, 'kill-proof.json'), JSON.stringify({ captured: captured.ok, sent }, null, 2))
     }, 1200)
@@ -92,7 +93,8 @@ try {
   else log.fail(`coordinator A read nothing usable: ${JSON.stringify(aReport)}`)
 
   log.begin('B27-SIGKILL-COORDINATOR-A-DIED', 'A was killed by SIGKILL and the Runner survived', 'controlled_process')
-  const runnerStill = observe(runnerPid).alive
+  // UNKNOWN is not "still running" and not "exited": only a live observation counts as still up.
+  const runnerStill = observe(runnerPid).state === 'live'
   log.evidence({ coordinatorPid: a.pid, killedBy: a.signal, runnerPid, runnerStill })
   if (a.signal === 'SIGKILL' && runnerStill) log.pass(`coordinator pid ${a.pid} died by SIGKILL while Runner pid ${runnerPid} kept running`)
   else log.fail(`the kill window is not what was claimed: ${JSON.stringify({ signal: a.signal, runnerStill })}`)

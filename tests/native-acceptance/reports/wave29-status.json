@@ -42,13 +42,13 @@
     "b27-ack-points": "5/0/1",
     "b28-budget": "4/0/1",
     "b28-faults": "5/0/1",
-    "b28-signal": "7/0/0",
+    "b28-signal": "9/0/0",
     "apps/runner/test": "137/137",
     "attach-channel": "65/65"
   },
   "notDone": [
-    "B5/B6: exact birth/root/config/operation signal tool and UNKNOWN-not-gone (current tool still substring markers)",
-    "B7-B8: original A/Broker three callbacks and same-runner dual-client on original authority",
+    "B6 remaining: use the tool for the product-lane live kill window (not only fixture children)",
+    "B7/B8: native-write third callback on the same attempt and the original main/Broker authority variant",
     "B9-B12: new-process original-ID recovery and original question/ACK windows",
     "B13-B16: recovered candidate/manual accept on the original completion chain",
     "B17-B20: original scheduler 2/4 slot matrix with true release",
@@ -57,5 +57,19 @@
   "modelTurns": 0,
   "nativeTurns": 0,
   "cap4UnknownUnspendable": true,
-  "wholePackageComplete": false
+  "wholePackageComplete": false,
+  "b5_b6_signalOwnership": {
+    "status": "PURE CONTROLS PASS; live harnesses route through it",
+    "tool": "tests/native-acceptance/signal-guard.mjs: born() registers a probe-born handle (pid/uid/start/ppid/full argv + exact root/config/operation args + declared child set); verify() re-reads all of it exactly; verifyResources() checks the declared child set BEFORE the first signal; signalOwned/escalate re-verify before EVERY TERM/KILL; observe/confirmExit distinguish GONE (ps silent absence / explicit no-such-process) from UNKNOWN (ps failure/unparseable/too-large/permission)",
+    "exactMatch": "exact argv-token equality, so --root=/tmp/x never matches --root=/tmp/x-old (prefix/sibling)",
+    "controls": "tests/native-acceptance/b28-signal.mjs 9/9: own positive with child-set check; foreign root/config refused; sibling-prefix root refused; missing birth/start refused; recycled start refused; unreadable pid is UNKNOWN not exited; a real exit is GONE from ps; TERM->fresh check->KILL; identity change before escalation => zero signals",
+    "liveUse": "b27-sigkill and b27-chain now register exact spawn args with born(), require state==='gone' for death (never alive=false from UNKNOWN), and keep passing 7/0 and 4/0"
+  },
+  "b7_b8_callbacks": {
+    "status": "PARTIAL / NOT_REACHED for the native-write callback",
+    "observed": "the same Runner serves fact callbacks through the bound lease before begin, and after a SIGKILL-verified coordinator death the SUCCESSOR lease serves callbacks on the SAME attempt/epoch with the same original ids (b27-chain 4/0)",
+    "gap": "the codex-fake-approval lane did not raise a native-write-intent even for the first coordinator, so the third callback is not observed on the same attempt; the harness says so explicitly instead of claiming three callbacks",
+    "authority": "fixture lane only; the original A/Broker authority variant is still open"
+  },
+  "b7Harness": "b27-chain 4/0/1 (three-callback gap recorded)"
 }

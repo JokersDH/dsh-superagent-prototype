@@ -44,6 +44,10 @@ if (mode === 'serve') {
     } else if (request?.type === 'payload-read') {
       await client.channelReply(leaseId, { v: 1, type: 'payload', id: request.requestId, requestId: request.requestId, value: { requestId: request.requestId } }).catch(() => undefined)
       process.stdout.write(`${JSON.stringify({ served: 'payload-read', id: request.id })}\n`)
+    } else if (request?.type === 'native-write-intent') {
+      // The third callback: the intent's FRAME id is fresh, while the business command id stays original.
+      await client.channelReply(leaseId, { v: 1, type: 'write-admission', id: request.id, allowed: true }).catch(() => undefined)
+      process.stdout.write(`${JSON.stringify({ served: 'native-write-intent', id: request.id, commandId: request.command?.id })}\n`)
     } else await new Promise(resolve => setTimeout(resolve, 30))
   }
 }

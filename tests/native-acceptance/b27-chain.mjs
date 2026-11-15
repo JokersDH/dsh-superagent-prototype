@@ -12,7 +12,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { CaseLog, writeReport } from './harness.mjs'
-import { capture, observe, signalOwned } from './signal-guard.mjs'
+import { born, capture, observe, signalOwned } from './signal-guard.mjs'
 import { RunnerLink } from '../../apps/runner/src/runner-link-client.ts'
 import { makeAttemptSpec, makeCommand } from '../../packages/testing/src/index.ts'
 import { endpointDirectory } from '../../apps/runner/src/recovery-endpoint.ts'
@@ -80,14 +80,16 @@ try {
   log.begin('B27-CHAIN-KILL-A-MID-FLIGHT', 'A is killed by SIGKILL while it owns the lease', 'controlled_process')
   const pidA = first.pid
   // Kill through the safe tool: capture A's complete birth identity, then signal once it is re-verified.
-  const aCaptured = capture(pidA, { markers: [CHILD] })
+  // B10: exact spawn arguments registered from our own spawn; no substring/PID-only ownership.
+  const aCaptured = born(pidA, { exactArgs: [CHILD], expectedChildren: [] })
   const aSent = aCaptured.ok ? signalOwned(aCaptured.record, 'SIGKILL') : { sent: false, refused: true, unknown: aCaptured.unknown }
   let diedBy = null
   for (let index = 0; index < 100 && diedBy === null; index += 1) {
-    if (!observe(pidA).alive) diedBy = aSent.sent ? 'SIGKILL' : 'unknown_exit'
+    const observed = observe(pidA)
+    if (observed.state === 'gone') diedBy = aSent.sent ? 'SIGKILL' : 'unknown_exit'
     if (diedBy === null) await new Promise(resolve => setTimeout(resolve, 20))
   }
-  const runnerAlive = observe(runnerPid).alive
+  const runnerAlive = observe(runnerPid).state === 'live'
   log.evidence({ pidA, diedBy, sent: aSent.sent, refused: aSent.refused ?? false, markers: aCaptured.ok ? aCaptured.record.markers : null, runnerPid, runnerAlive })
   if (diedBy === 'SIGKILL' && runnerAlive) log.pass(`coordinator ${pidA} died by SIGKILL while Runner ${runnerPid} kept running`)
   else log.fail(`the kill window is not what was claimed: ${JSON.stringify({ diedBy, runnerAlive })}`)
@@ -112,6 +114,12 @@ try {
     servedByB = second.lines.filter(line => line.served)
     if (servedByB.length === 0) await new Promise(resolve => setTimeout(resolve, 25))
   }
+  // The answer raises the NATIVE-WRITE callback: wait for it alongside the fact callbacks so the three
+  // callback kinds are observed on the same attempt, served by the successor that holds the lease.
+  for (let index = 0; index < 200 && !servedByB.some(line => line.served === 'native-write-intent'); index += 1) {
+    servedByB = second.lines.filter(line => line.served)
+    if (!servedByB.some(line => line.served === 'native-write-intent')) await new Promise(resolve => setTimeout(resolve, 25))
+  }
   const inspection = await (async () => {
     const { connectRunnerRecovery } = await import('../../packages/execution/src/recovery-transport.ts')
     const client = connectRunnerRecovery(registered, { attempt: JSON.parse(readFileSync(registration, 'utf8')).attempt, ...producer }, 3000)
@@ -133,7 +141,7 @@ try {
 } finally {
   for (const child of children) {
     // Cleanup goes through the same tool, so even our own leftovers are identity-checked before a signal.
-    const captured = capture(child.pid, { markers: [CHILD] })
+    const captured = born(child.pid, { exactArgs: [CHILD], expectedChildren: [] })
     if (captured.ok) signalOwned(captured.record, 'SIGKILL')
   }
   try { await runner?.close() } catch {}
