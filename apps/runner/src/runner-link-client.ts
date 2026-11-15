@@ -206,6 +206,7 @@ export class RunnerLink {
         if (settled) return
         settled = true
         clearInterval(timer)
+        clearTimeout(timeout)
         if (error) reject(error)
         else resolve()
       }
@@ -216,6 +217,12 @@ export class RunnerLink {
       }, 10)
       const timeout = setTimeout(() => settle(new Error(`runner did not become ready within 10s: ${stderr}`)), 10_000)
       if (typeof (timeout as { unref?: () => void }).unref === 'function') (timeout as { unref: () => void }).unref()
+    }).catch(error => {
+      // Bootstrap refusal must also close the original bridge; no attempt handle is returned.
+      try { write({ v: 1, type: 'shutdown', id: 'bootstrap-refused' }) } catch { /* EOF still closes a refused bridge. */ }
+      closing = true
+      try { child.stdin.end() } catch { /* Preserve the original bootstrap failure. */ }
+      throw error
     })
 
     return {

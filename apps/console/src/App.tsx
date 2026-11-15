@@ -75,6 +75,7 @@ import { TransportError } from './transport.ts'
 import { ProjectSettings } from './ProjectSettings.tsx'
 import { useReviewActivity } from './useReviewActivity.ts'
 import { useUsageObservation } from './useUsageObservation.ts'
+import { useObservationDownload } from './useObservationDownload.ts'
 import { useProjectRecipe } from './useProjectRecipe.ts'
 import { useProjectRecipeSuggestions } from './useProjectRecipeSuggestions.ts'
 import { AttentionInbox } from './AttentionInbox.tsx'
@@ -669,6 +670,8 @@ export function App({ transport }: { transport: ConsoleTransport }) {
   const usage = useUsageObservation(transport, { enabled: auth === 'ready' && workspaceView === 'trial', identity: trialIdentity,
     projectId: projectFilter, days: usageDays, configurationRevision: configuration?.revision })
   const usageView = usage.error && usage.data ? { ...usage.data, coverage: `${usage.data.coverage} · 上次观察` } : usage.data
+  const observationDownload = useObservationDownload(transport, { enabled: auth === 'ready' && workspaceView === 'trial',
+    identity: trialIdentity, projectId: projectFilter, days: usageDays, configurationRevision: configuration?.revision })
   const recipes = useProjectRecipeSuggestions(transport, { enabled: auth === 'ready' && workspaceView === 'trial',
     identity: trialIdentity, configuration, projectId: projectFilter })
   const openView = (view: typeof workspaceView) => {
@@ -1076,6 +1079,8 @@ export function App({ transport }: { transport: ConsoleTransport }) {
               insights={usageView}
               insightWindow={usageDays} onSelectInsightWindow={setUsageDays} insightsLoading={usage.loading}
               insightsError={usage.error} onReloadInsights={usage.reload}
+              onDownloadInsights={transport.downloadUsageObservation ? observationDownload.download : undefined}
+              insightsDownloading={observationDownload.loading} insightsDownloadError={observationDownload.error}
               recipes={recipes.rows} recipesLoading={recipes.loading} recipesError={recipes.error}
               onOpenRecipe={selection => {
                 const input = ProjectRecipePreviewInputSchema.parse({ projectId: selection.projectId, kind: selection.kind,

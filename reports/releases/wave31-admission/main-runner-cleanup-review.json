@@ -1,0 +1,82 @@
+{
+  "protocol": "wave31-main-runner-bootstrap-cleanup-read-review/1",
+  "date": "2026-11-15",
+  "status": "NARROW_PROTOCOL_SHUTDOWN_AND_EOF_APPROACH_SUPPORTED_WITH_FAILURE_PRESERVING_CLEANUP",
+  "scope": "Read-only review of main's in-progress RunnerLink readiness failure cleanup, existing runner service entry and selected tests. No source/test edits, test execution, spawned runtime, native/vendor call, discovery or process signal performed by this review.",
+  "mainBaseline": "6f385a545d8ae38fcdaa494a0fd0646f45721a15",
+  "reviewedFiles": [
+    "apps/runner/src/runner-link-client.ts",
+    "apps/runner/src/runner-service.ts",
+    "apps/runner/src/runner-service-entry.ts",
+    "apps/runner/src/bridge-protocol.ts",
+    "apps/runner/test/runner-service.test.ts",
+    "apps/runner/test/preparation-service.test.ts"
+  ],
+  "problem": {
+    "file": "apps/runner/src/runner-link-client.ts",
+    "readinessWaitLine": 203,
+    "detail": "spawnAttempt can reject before returning a SpawnedRunner handle. The original child and stdio pipes remain retained, so the caller cannot invoke close. Existing malformed-bootstrap test only accepts an Error and does not assert original child/stdio shutdown.",
+    "observedSuiteOutcomeSource": "Parent reported 20 test assertions passed but the test file remained alive until its bound and was cancelled. This read review did not rerun or independently certify that runtime outcome."
+  },
+  "serviceReasoning": [
+    {
+      "file": "apps/runner/src/runner-service.ts",
+      "line": 105,
+      "fact": "The input pump iterates options.input and sets finished only on EOF/error; the service's finally awaits that same pumping promise."
+    },
+    {
+      "file": "apps/runner/src/runner-service.ts",
+      "line": 559,
+      "fact": "A parsed shutdown closes admission and calls finish, which clears the callback pump interval. The state loop still calls next before its next closed check, so ending input is necessary to unblock normal idle shutdown too."
+    },
+    {
+      "file": "apps/runner/src/runner-service.ts",
+      "line": 569,
+      "fact": "If bootstrap handling has already thrown, execution is in finally awaiting pumping and cannot dispatch a later shutdown frame. EOF is the operation that permits the original failure to propagate and the entry process to end."
+    },
+    {
+      "file": "apps/runner/src/runner-service.ts",
+      "line": 518,
+      "fact": "Eager preparation launches after the ready frame is written. The ordinary genuine pre-ready bootstrap rejection has not launched business work; the reviewed narrow cleanup does not need a new physical stop or OS signal."
+    },
+    {
+      "file": "apps/runner/src/runner-service-entry.ts",
+      "line": 25,
+      "fact": "The entry awaits serveRunner, then handle.done and handle.shutdown. With no running attempt after input EOF, done is cancelled and shutdown closes the original endpoint/journal and timer. If bootstrap already threw, EOF permits the top-level await failure to exit instead."
+    }
+  ],
+  "recommendation": {
+    "minimalChange": [
+      "Keep clearing both readiness interval and readiness timeout on every settle, including ready success and refusal.",
+      "On readiness rejection, attempt the existing v1 shutdown frame on the original ChildProcess stdin; this adds no new business command or external resource operation.",
+      "In a failure-preserving cleanup path, always mark this link closing and end that same child.stdin even when write is unavailable or throws. Catch cleanup transport exceptions and rethrow the original readiness error.",
+      "Do not call SpawnedRunner.close from the bootstrap failure catch: its existing two-second SIGKILL fallback is outside this narrow change.",
+      "Do not delete state/journal/recovery roots or claim physical quiescence merely because shutdown was sent or EOF requested."
+    ],
+    "reviewOfInProgressCatch": "The newly visible catch correctly sends a v1 shutdown and ends the original stdin, and settle clears the timeout. A small try/finally or equivalent best-effort cleanup should ensure a synchronous shutdown-write failure cannot skip stdin.end or replace the original readiness error.",
+    "normalCompatibility": "Keep the successful ready path, current command digest/live answer admission, producer identity and existing public SpawnedRunner shape unchanged. No shared contracts/config or new recovery policy are required."
+  },
+  "verificationRecommendationsOnly": [
+    "Use a bounded outer fixture process around the malformed-bootstrap case and assert that process actually exits after spawnAttempt rejects, rather than only counting passed assertions.",
+    "In a pure ChildProcess/stream mock, make shutdown write throw and assert original stdin.end is still called, original readiness error is preserved and kill spies remain zero.",
+    "Check the normal ready path still remains usable and does not receive failure cleanup; check both readiness timers are cleared on success and refusal.",
+    "Keep any process-level validation within its exact own fixture resources. This review authorizes no live run or signal and does not certify actual runtime cleanup."
+  ],
+  "limits": [
+    "Protocol shutdown plus EOF is a sufficient minimal fix for the described pre-ready refusal/stdio retention path under the current service control flow; source inspection alone does not prove actual process exit.",
+    "An arbitrary service stuck in a filesystem await, custom executable ignoring EOF, or driver already running after an unobserved ready frame is not guaranteed to terminate by this narrow approach. Do not expand the runtime claim to those cases.",
+    "Existing child.kill(SIGTERM) in immutable payload failure and child.kill(SIGKILL) in successful-handle close are historical scope. They were read for context, are not new in this cleanup proposal, and are not automatically admitted, repaired or broadened by this review.",
+    "No B/H signal-helper P1, original Store/Broker recovery, native model, installed package or release admission is changed."
+  ],
+  "actions": {
+    "productionEdits": 0,
+    "testEdits": 0,
+    "testsRun": 0,
+    "runtimeSpawns": 0,
+    "nativeOrModelCalls": 0,
+    "signals": 0,
+    "discovery": 0,
+    "userServiceChanges": 0,
+    "newArtifact": "reports/releases/wave31-admission/main-runner-cleanup-review.json"
+  }
+}

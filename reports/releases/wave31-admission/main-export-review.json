@@ -1,0 +1,99 @@
+{
+  "protocol": "main-observation-export-review/1",
+  "date": "2026-11-15",
+  "observedMain": "6f385a545d8ae38fcdaa494a0fd0646f45721a15",
+  "scope": "Independent read-only audit of the uncommitted main observation export contract, product reader, authenticated Hono route, transport, React download hook and actual TrialWorkspace button wiring. Pure contract/transport/Hono and React/jsdom probes only; no listening server, browser runtime, model, native process, lifecycle signal or user state change.",
+  "reviewedSourceHashes": {
+    "originalContract": "3234646e818d53def894393509d1efc5986eee9ad80a0782ebf3ff3ea8cd69cf",
+    "intermediateCorrectedContract": "6ea22d4f8d1c5f9f05d8bde6cd5e7d02e03dd4b7450aa5c70f637e1cd083f04f",
+    "finalCorrectedContract": "caa8c26787d9e6da7fd732617e51130f134d51324fada90071cbb7d1cab8110b",
+    "productReader": "74079ab52aa7280ec74be78b55068d5cda902f00540e4d4f7024b8ed875d6e8b",
+    "http": "a8eb0e8f53d00dabef18ed774ca13e93b505c8f1c73d35415be2caa0265ee6aa",
+    "transport": "428410454c7a5b7f752d02b4f32050b115191029579d3dca2b6c8b0e92d98fb3",
+    "downloadHook": "c24fa145f52a04d57bec22eb34f186f01f0e8910169984483ab85824b7dedc8f",
+    "trialWorkspace": "d207d3c4e697629c4948d159ffe31df6127a1cd3e59c815c71baa1db893d29e4",
+    "displayExport": "eec2e7ee57e8a49149b0c417422f5654937e1d5d7273e460e0db20aac4356f1d",
+    "boundedSerializer": "63cbd322f2459f98a73234dae3fa90298f1685856a04b815c5cf270ea88f8878"
+  },
+  "positiveObservations": [
+    "ProductUsageObservation.download invokes a fresh authorized read rather than exporting stale page state. The snapshot identity, observedAt, project scope, days and timezone travel in both envelope and text.",
+    "The product reader reuses configured project-scoped evidence readers, retains its work/record/byte/deadline limits and guards scope changes. The export component has no writer or execution port.",
+    "The normal producer uses the strict display-only serializer, copies formatted strings without fabricating numeric values, bounds the file at 65536 bytes and computes SHA256 over the exact serialized UTF8 text.",
+    "The export route is under the existing authentication/origin middleware. It rejects duplicate/unknown query fields through the strict observation query parser, checks selected project/days/timezone and returns cache-control no-store.",
+    "HttpTransport checks the response query identity and exact UTF8 SHA256 digest before returning download data. Optional absence remains compatible with older servers.",
+    "The actual App passes observationDownload.download to TrialWorkspace. Its Download icon has an accessible label and fresh-snapshot tooltip, and is disabled while observations/downloads are pending or the current observation is unavailable.",
+    "The hook suppresses duplicate in-flight requests, aborts on identity/project/window/configuration/enable changes, checks the current identity before Blob creation, removes the temporary link and schedules URL revocation. Controlled late-response probes did not download stale data."
+  ],
+  "closedFinding": {
+    "id": "EXPORT_BODY_VALIDATION_DID_NOT_BIND_METADATA_OR_REJECT_RAW_FIELDS",
+    "priority": "P2",
+    "file": "/Users/hh/Desktop/joker/superagent/packages/contracts/src/usage-observation.ts",
+    "originalLine": 51,
+    "originalIssue": "The nested text parser accepted unknown top-level fields and arbitrary row metadata while retaining the original text. It checked rowId/formatted but not layer/unit/sampleCount/detail/header/truncation. A matching digest proved bytes, not the claimed sanitized display semantics.",
+    "originalIndependentReproduction": [
+      { "mutation": "Append rawEvidence/prompt canaries to the top level and a row", "contractAccepted": true, "transportAccepted": true, "authenticatedHttpStatus": 200, "originalTextPreserved": true },
+      { "mutation": "Change controlled row to native, sampleCount to999, unit toUSD and header partial tocomplete", "contractAccepted": true, "transportAccepted": true, "authenticatedHttpStatus": 200, "originalTextPreserved": true },
+      { "mutation": "Delete all rows and claim untruncated total/included0", "contractAccepted": true, "transportAccepted": true, "authenticatedHttpStatus": 200, "originalTextPreserved": true },
+      { "mutation": "Use30d/unrelated-summary filename for7d observation", "contractAccepted": true }
+    ],
+    "boundary": "These are injected public-reader/transport responses. The normal ProductUsageObservation producer was sanitized; this did not demonstrate an existing raw-evidence leak through that producer.",
+    "mainCorrectionReviewed": "The embedded document is now strict at every object boundary, binds the full row metadata/header/capturedAt/scope/window and public first-observation identity to the DTO, verifies byte/count declarations and binds filename to days and summaryId.",
+    "correctedIndependentReproduction": [
+      { "case": "Legitimate public export maxRows32/maxBytes65536", "contractAccepted": true },
+      { "case": "Unknown-body/row-field canaries", "contractAccepted": false },
+      { "case": "Changed layer/unit/sample/header claims", "contractAccepted": false },
+      { "case": "Silent rows removed with fabricated total0", "contractAccepted": false },
+      { "case": "Unrelated filename", "contractAccepted": false }
+    ],
+    "correctedProbeStrength": "Each changed document has its truncation.bytes recomputed to a serialization fixed point and its SHA256 recomputed before validation; rejection is not merely a stale byte count or digest.",
+    "status": "CLOSED_IN_REVIEWED_SOURCE_FOR_THE_ORIGINAL_MUTATIONS"
+  },
+  "closedFollowup": {
+    "id": "EXPORT_BYTE_TRUNCATION_DECLARATION_IS_NOT_PROVEN",
+    "priority": "P2_EVIDENCE_COMPLETENESS",
+    "file": "/Users/hh/Desktop/joker/superagent/packages/contracts/src/usage-observation.ts",
+    "summary": "The intermediate correction only checked byBytes equals includedRows less than totalRows. It accepted removing a row that readily fit, provided the document claimed byBytes true and preserved totalRows.",
+    "independentReproduction": {
+      "source": "Valid controlled1-row public display export,2111 UTF8 bytes when complete",
+      "mutation": "Delete the sole row; retain totalRows1; set includedRows0/byBytestrue; recompute truncation.bytes to a fixed point and SHA256",
+      "fullDocumentFits65536": true,
+      "byteAccountingExact": true,
+      "intermediateContractAccepted": true,
+      "expected": "Refuse a fabricated byte-limit truncation when the next original metric row would fit"
+    },
+    "impact": "The intermediate output could hide available metrics while claiming the file budget caused the omission. This was output-evidence validation, not an observed flaw in serializeBounded or the normal product producer.",
+    "mainCorrectionReviewed": "For a byBytes declaration the final schema reconstructs the next original DTO metric row, resolves pretty-encoded byte accounting to a fixed point and refuses an omission when that row fits the public65536-byte budget.",
+    "finalIndependentReproduction": [
+      { "case": "Valid fresh1-row export", "contractAccepted": true, "byteAccountingExact": true },
+      { "case": "Unknown top-level and row raw fields", "contractAccepted": false, "byteAccountingExact": true },
+      { "case": "Contradictory row metadata and coverage", "contractAccepted": false, "byteAccountingExact": true },
+      { "case": "Silent omitted rows and false total0", "contractAccepted": false, "byteAccountingExact": true },
+      { "case": "False byte-limit declaration although complete file fits", "contractAccepted": false, "byteAccountingExact": true },
+      { "case": "Legitimate multibyte byte truncation", "contractAccepted": true, "includedRows": 25, "totalRows": 32, "utf8Bytes": 63843, "byBytes": true }
+    ],
+    "regressionTestsReviewed": "Main updated negative mutations to recompute truncation.bytes and SHA256, and reports5 focused tests passing. This independent audit separately reproduced the final cases above.",
+    "status": "CLOSED_IN_FINAL_REVIEWED_SOURCE"
+  },
+  "remainingFindings": [],
+  "reactHookProbes": {
+    "method": "Actual useObservationDownload imported into React18 createRoot with jsdom; transport ignores abort and completes its original deferred promise after the new scope is rendered. Blob URL and anchor click are in-memory stubs.",
+    "cases": [
+      { "change": "project one to two", "duplicateClicksProduceRequests": 1, "staleDownloads": 0, "signalAborted": true },
+      { "change": "window7 to30", "duplicateClicksProduceRequests": 1, "staleDownloads": 0, "signalAborted": true },
+      { "change": "session identity", "duplicateClicksProduceRequests": 1, "staleDownloads": 0, "signalAborted": true },
+      { "change": "enabled tofalse", "duplicateClicksProduceRequests": 1, "staleDownloads": 0, "signalAborted": true },
+      { "change": "disable commit resolves request in layout effect", "staleDownloads": 0, "signalEventuallyAborted": true }
+    ],
+    "exitCodes": [0, 0],
+    "findings": []
+  },
+  "verificationScope": {
+    "parentPreviouslyReportedBaseline": "4 targeted download tests passed before this independent review; not rerun unnecessarily by this reviewer.",
+    "additionalCommands": "Three bounded inline Node contract/transport/Hono probes and two React/jsdom probes, all exit0; no test or source files created by those probes.",
+    "browserOrInstalledDelivery": "NOT_MEASURED_BY_THIS_REVIEW",
+    "actualVendorModelNativeTurns": 0,
+    "signalsOrServiceRestarts": 0,
+    "modifiedByReviewer": ["reports/releases/wave31-admission/main-export-review.json"],
+    "limitations": "This audit checks the current uncommitted source and in-memory HTTP/DOM behavior, not frozen installed bytes, real browser download permissions, native lifecycle, target activation, performance benefit or release admission. Parent continues source changes and owns final build/test/freeze decisions."
+  }
+}
