@@ -1,0 +1,10 @@
+{
+  "protocol": "wave29-completion-facts-consumer/1",
+  "tool": "packages/context/tools/wave29-completion-facts.mjs",
+  "inputs": ["--a-worktree", "--db", "--work", "--project"],
+  "reads": ["A WorkflowIndex.work(...).completion.reviews", "unclassifiedReviews", "verifications", "acceptances"],
+  "reviewRule": "reviews derive from completion_verifications and canonical productReviewCommandId(candidate); raw receipts never become reviews/current/accepted",
+  "outputs": ["status", "contract", "authorityState", "reviews[].canonical", "unclassifiedReviews", "verifications", "acceptances"],
+  "authority": ["ProductCompletion current/preflight/accept remains the application authority", "facts are data only", "no candidates table, ledger or second confirmation"],
+  "missing": ["live B/I callback consumer NOT_REACHED", "J module not present in current 1ba package", "installed/release verdict owned by E"]
+}
