@@ -1,0 +1,86 @@
+{
+  "date": "2026-11-15",
+  "baselineMain": "22d0c759c59e6387ee397476f3d15d28425818df",
+  "roles": [
+    {
+      "id": "A",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "branch": "codex/g2-workspaces-verification",
+      "head": "aeeced18907a548e0f21263f99ec826d55402aef",
+      "dirty": "",
+      "evidencePath": "packages/workflows/reports/wave27-status.json"
+    },
+    {
+      "id": "B",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "branch": "codex/g1-runtime",
+      "head": "cb4e97504157e500799284bfd63d51768740c9fc",
+      "dirty": "M reports/releases/wave11-admission/runtime.json\n M reports/releases/wave12-admission/runtime.json\n?? tests/native-acceptance/b16-real-begin.mjs",
+      "evidencePath": "tests/native-acceptance/reports/wave27-status.json"
+    },
+    {
+      "id": "C",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "branch": "codex/g3-assistant-context",
+      "head": "f2c4af69bb0ed495822ae3ed6f8cdda53c21a0bf",
+      "dirty": "M pnpm-lock.yaml",
+      "evidencePath": "packages/context/reports/wave27-status.json"
+    },
+    {
+      "id": "D",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-d",
+      "branch": "codex/g3-local-distribution",
+      "head": "26f8ad6ca5c6c1c0764ce426e4fb5dd073e6a8a1",
+      "dirty": "",
+      "evidencePath": "tools/distribution/reports/wave27-status.json"
+    },
+    {
+      "id": "E",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-e",
+      "branch": "codex/g3-product-acceptance",
+      "head": "03349a6c4567b9b832ad3ff0f9612d2ef18cc74e",
+      "dirty": "?? tests/product-acceptance/reports/runs/2026-11-14T11-55-21-036Z/",
+      "evidencePath": "tests/product-acceptance/reports/wave27-status.json"
+    },
+    {
+      "id": "F",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-f",
+      "branch": "codex/g4-trial-experience",
+      "head": "2a862525894b89cdfe17b4ea84862624447ee609",
+      "dirty": "",
+      "evidencePath": "reports/trial-experience/wave27-status.json"
+    },
+    {
+      "id": "G",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-g",
+      "branch": "codex/g4-usage-insights",
+      "head": "2b41765a58687fc286af07e53eca5f37c21e6d53",
+      "dirty": "",
+      "evidencePath": "reports/usage-insights/wave27-status.json"
+    },
+    {
+      "id": "H",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-h",
+      "branch": "codex/g4-trial-operations",
+      "head": "0651a50f70e589570aef6a2a91961ee94abbc839",
+      "dirty": "",
+      "evidencePath": "reports/trial-operations/wave27-status.json"
+    },
+    {
+      "id": "I",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-i",
+      "branch": "codex/g5-coordinator-channel",
+      "head": "d95df88bb9dfdeaef74fa49629dcc2aba25d4d1b",
+      "dirty": "",
+      "evidencePath": "reports/runtime-channel/wave27-status.json"
+    },
+    {
+      "id": "J",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-j",
+      "branch": "codex/g5-project-recipes",
+      "head": "46020ff2e2d748961835a64cc8bf1a39cb91d378",
+      "dirty": "",
+      "evidencePath": "reports/project-recipes/wave27-status.json"
+    }
+  ]
+}

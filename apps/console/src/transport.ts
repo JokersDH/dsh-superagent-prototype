@@ -50,8 +50,12 @@ import {
   ContextHistorySchema,
   ContextSourcesSchema,
   TrialReadinessSchema,
+  UsageObservationQuerySchema,
+  UsageObservationSchema,
 } from '@personal-agent/contracts'
 import type {
+  UsageObservationQuery,
+  UsageObservation,
   AgentProfile,
   ApplicationConfiguration,
   AssistantProviderStatus,
@@ -168,6 +172,7 @@ export interface ConsoleTransport {
   contextHistory?(query: ContextHistoryQuery): Promise<ContextHistory>
   contextSources?(messageId: string, options?: { scopeReview: true }): Promise<ContextSources | undefined>
   readiness?(): Promise<TrialReadiness | undefined>
+  usageObservation?(query: UsageObservationQuery, signal?: AbortSignal): Promise<UsageObservation | undefined>
   /** Authenticated local session check/bootstrap (HTTP lane); the fixture lane is always authenticated. */
   session?(): Promise<boolean>
   bootstrap?(bootstrapToken: string): Promise<void>
@@ -531,6 +536,25 @@ export class HttpTransport implements ConsoleTransport {
     try {
       const value = await this.request('/v1/readiness', { signal: AbortSignal.timeout(10000) }, 'json404')
       return value === missingOptionalResource ? undefined : TrialReadinessSchema.parse(value)
+    } catch (error) {
+      if (error instanceof TransportError && error.code === 'unsupported_capability') return undefined
+      throw error
+    }
+  }
+  async usageObservation(input: UsageObservationQuery, signal?: AbortSignal): Promise<UsageObservation | undefined> {
+    const query = UsageObservationQuerySchema.parse(input), params = new URLSearchParams()
+    if (query.projectId) params.set('projectId', query.projectId)
+    params.set('days', String(query.days ?? 7)); params.set('timezone', query.timezone ?? 'UTC')
+    try {
+      const value = await this.request(`/v1/insights?${params}`, {
+        signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(5000)]) : AbortSignal.timeout(5000),
+      }, 'json404')
+      if (value === missingOptionalResource) return undefined
+      const result = UsageObservationSchema.parse(value)
+      if ((query.projectId && (result.scope.projectIds.length !== 1 || result.scope.projectIds[0] !== query.projectId)) ||
+        result.days !== (query.days ?? 7) || result.timezone !== (query.timezone ?? 'UTC'))
+        throw new TransportError('schema_mismatch', '使用观察的范围或窗口不一致')
+      return result
     } catch (error) {
       if (error instanceof TransportError && error.code === 'unsupported_capability') return undefined
       throw error
