@@ -98,6 +98,26 @@ const respond = createCoordinatorSinkResponder({
 - fact 失败回答 `ack-failed`；payload 读取失败不回答，交由模块 deadline。
 - 该 responder 没有策略：它只是把"缺 guard 就不许写"变成源码结构，而不是 `!businessClosed` 之类默认放行。
 
+## 4.3 一个 callback 只有一个 transport owner（wave-30）
+
+`next(connectionId)` / `receive(connectionId, …)` 都按**连接**寻址：请求只在该连接自己的 lease 上可读、可答，被替换的连接直接被拒（`stale_connection`）且不产生副作用。所以正确的服务端循环是：
+
+- stdio 连接 → 允许 `write(frame)`；
+- sink 连接 → 只交给 in-process responder；
+- remote lease → 只通过它自己的 `next` 返回、由它自己的 `receive` 结算，**绝不镜像到 stdout**。
+
+`lane-ownership.test.ts`（5 例）固定了该契约：remote 接管后 stdio 车道 `next/receive` 被拒、同一请求只暴露一次、跨车道不能双重结算、foreign producer 在每条车道都被拒。请求被"读走"不是投递：`next` 幂等返回 head，只有结算才出队，所以重复轮询不会造成重复写。
+
+## 4.4 协调器 handover / 崩溃对账支持（wave-30）
+
+模块只提供通信语义，不新建 coordinator：
+
+- 原协调器离开（`lease.close`）后，未决 **fact/payload 保持原 id/引用与剩余窗口**，继任用显式 CAS（`expectedGeneration`）绑定后重发同一原始输入；
+- 未决 **native 意图立即 `indeterminate`**，不迁移、不重放，旧连接的回执被结构性拒绝；
+- `timeout` / `closed` / `stale_connection` / denial 语义互不混同：超时不是"未发送"，关闭不是"已写"，拒绝不是超时；
+- 模块**从不**产生 begin/answer/cancel 等业务帧（`handover.test.ts` 断言帧类型集合仅为三种 v1 数据帧）；
+- channel generation 不是业务 `fenceEpoch`/principal/target 许可；原 Work 的 check/candidate/manualaccept/slot 仍由 main/B 原链路完成。
+
 ## 5. 错误与失败码
 
 模块只抛两类拒绝：
@@ -162,14 +182,15 @@ attach.drop(leaseRef, 'socket closed')
 # 严格类型（strict + noUncheckedIndexedAccess + exactOptionalPropertyTypes）
 node_modules/.bin/tsc -p apps/runner/src/attach-channel/tsconfig.json
 # 行为矩阵（注入时钟，无 sleep、无真实网络/模型）
-cd apps/runner && node --test --test-timeout=8000 test/attach-channel/*.test.ts   # 84/84
+cd apps/runner && node --test --test-timeout=8000 test/attach-channel/*.test.ts   # 100/100
 ```
 
-覆盖：CAS/generation/fencing、三回调、跨客户端重绑、fresh intent 与旧 allowed 重放、timeout/capacity/late/close、共享契约与 freeze 守卫、B 路由形状、kind 命名空间与 id 碰撞、独立 consumer、in-process guard responder（缺失/拒绝/抛错）、typed refusal 映射。wave-27 的 44 个历史用例保留在原 scope 内。
+覆盖：CAS/generation/fencing、三回调、跨客户端重绑、fresh intent 与旧 allowed 重放、timeout/capacity/late/close、共享契约与 freeze 守卫、B 路由形状、kind 命名空间与 id 碰撞、单 transport owner（remote/stdio/sink 车道）、handover（协调器离开→继任）、并发/饱和/恢复、in-process guard responder（缺失/拒绝/抛错）、typed refusal 映射。wave-27 的 44 个历史用例保留在原 scope 内。
 
 ## 9. 本文明确不证明的事
 
-- **B 已实际接入**（观察源 `1930278c`）：B merge 本分支后 import `RunnerAttachChannel`，旧三张 waiter map 与自建 connections 队列已删除，sink 车道的 native 意图必须经过注入的 `beforeNativeWrite`（缺失/拒绝/抛错都不得许可）。当前 B 的唯一阻塞是它自己 `runner-service.ts` 里两处遗留的 `channel` 引用导致 strict 编译失败，修法见 `adoption-manifest.zh-CN.md` §2。
+- **B 已实际接入并闭合单 owner**（观察源 `fbc9331`）：B import `RunnerAttachChannel`，旧三张 waiter map 与自建 poll queue 已删除，sink 意图必须经过注入的 `beforeNativeWrite`（缺失/拒绝/抛错零效果）；remote 接管后旧 stdio 收到 0 帧（B 自己的 `b30-transport-owner` 探针与 focused 8/8、direct strict 0）。
+- 历史上"B 仍有 stale channel 编译错误"的观察属于中间 working tree（`1930278`），当前 source 不再成立，已从本文件与 adoption 清单删除。
 - 未证明：同 Runner 进程双 client、coordinator SIGKILL 后原问题→交付、跨 coordinator 崩溃恢复、durable exactly-once、物理 writer quiescence。
 - 测试中的 `DurableSink`/`ImmutablePayloads`/guard 都是契约/语义 double，不代表 A 的持久化 ingress 或 main/Broker 的真实许可。
 - `readPayload` 只承载 immutable payload **JSON 值**（受 `maxPayloadBytes` 约束），不替代 B 的 journal/descriptor 分块回放路线。

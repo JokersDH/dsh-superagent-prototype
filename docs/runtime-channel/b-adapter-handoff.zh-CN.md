@@ -1,65 +1,41 @@
-# B 接入交接：唯一通道的实际采用与剩余 owner 工作
+# B 接入交接：唯一通道、单 transport owner 与剩余 owner 工作
 
-2026-11-15（wave-29 修订）。目标读者：B（`apps/runner` 中除 `src/attach-channel/`、`test/attach-channel/` 外的所有者）、main。I 不修改 `runner-service.ts`、`RunnerLinkClient`、routes/auth/dispatch/lifecycle。
+2026-11-15（wave-30 修订）。目标读者：B（`apps/runner` 中除 `src/attach-channel/`、`test/attach-channel/` 外的所有者）、main。I 不修改 `runner-service.ts`、`RunnerLinkClient`、routes/auth/dispatch/lifecycle。
 
-## 0. 当前事实（以实际 tree 为准）
-
-观察源：B `1930278c`（含 merge `codex/g5-coordinator-channel` 到 `4d85cc3`）。
+## 0. 当前事实（观察源 B `fbc9331`，含 wave-30 单 owner 提交）
 
 | 事实 | 状态 |
 | --- | --- |
-| B import `RunnerAttachChannel` | 是（`runner-service.ts:35`，bootstrap 处实例化） |
-| adapter 是否持有 pending/queue | 是；B 自己的 `connections`/`currentConnection`/per-lease queue 已删除 |
-| 旧三张 waiter map | 0 处 |
-| vendored I blob | `coordinator-channel.ts`/`errors.ts`/`attach.ts` 与 I `4d85cc3` 完全一致 |
-| sink 车道 native 许可 | 已修：必须由注入的 `options.beforeNativeWrite` 决定；缺失/拒绝/抛错 → `allowed:false` |
-| 剩余跟踪记录 | B 保留 `dispatched` map，仅避免重复投递同一 head（`kind:correlation`），reply/rebind 时删除；不是 pending owner |
-| 当前 B strict 编译 | **FAIL**：`runner-service.ts(283,10)`/`(286,12)` TS2304 `channel`（重构遗留引用） |
+| import `RunnerAttachChannel` | 是，adapter 是唯一 pending/queue owner |
+| 旧三张 waiter map / B 自建 `connections`+poll queue | 已删除 |
+| vendored I 核心 blob | `coordinator-channel.ts d1ef81`、`attach.ts 321738`，与本分支一致 |
+| sink 车道 native 许可 | 必须经过注入的 `beforeNativeWrite`；缺失/拒绝/抛错 → 零 native 效果；同命令两次意图 → guard 两次 |
+| remote lease 回调 | 只经该 lease 自己的 `next`/`receive`；`pump()` 只服务 stdio/sink 两个 adapter 连接，不再写 stdout |
+| direct strict 编译 | PASS（`runner-service.ts` + `recovery-transport.ts`，exit 0） |
+| focused 通道测试 | 8/8（adapter/sink/native admission） |
+| B 自己的 owner 探针 | `b30-transport-owner.mjs`：remote 接管后 remote 服务回调、旧 stdio 0 帧 |
 
-wave-28 之前"B 还有旧 maps / 自建 channel"的说法已经作废；本文件不再重复。
+wave-29 报告中"B 仍有 stale `channel` 编译错误 / 未用 adapter"的描述属于中间 working tree（`1930278`），当前 source 不再成立；本文件与 adoption 清单已删除该结论，只保留历史时间范围。
 
-## 1. B 需要做的两件事（都在 B owner 内）
+## 1. I 为单 owner 提供的接口契约（B 已按此实现）
 
-### 1.1 修掉两处遗留引用（唯一阻塞）
-
-```ts
-// 现在（283/286）：channel 已不存在
-const hooks = { beforeNativeWrite: (command: RunnerCommand) => {
-  if (!channel || businessClosed || command.kind !== 'answer') return Promise.reject(...)
-  return channel.beforeNativeWrite(command)
-} }
-
-// 改为：adapter 已经暴露同一语义的 hooks
-const hooks = { beforeNativeWrite: (command: RunnerCommand) => {
-  if (!attach || businessClosed || command.kind !== 'answer')
-    return Promise.reject(new Error('Native write admission is closed'))
-  return attach.hooks.beforeNativeWrite(command)
-} }
-```
-
-`attach.hooks` 的三个方法与模块完全一致（`factSink.record`/`payloads.read`/`beforeNativeWrite`），语义、错误码与 correlation 均由模块负责。
-
-### 1.2 （可选）收口 transport 的 refusal 类型
-
-B 的 `recovery-transport.ts` 已用 base code + `serverError` 的分离写法，wave-28 的 TS2345 已不复现。若后续再需要总映射，可直接消费 I 的导出：
+`RunnerAttachChannel` 只按连接寻址，因此"一个 callback 一个 transport owner"是可直接表达的：
 
 ```ts
-import { toAttachFailure, refusalFailure, type AttachFailureCode } from './attach-channel/index.ts'
-
-type MyErrorCode = 'transport_lost' | 'process_exited' | AttachFailureCode   // 扩宽 union，不 cast
+const page = attach.next(connectionId, producer)      // 只读；被替换连接 => refused
+attach.receive(connectionId, frame, producer)         // 只结算该连接的 pending
+attach.drop(connectionId, reason)                     // 该连接消失；未决写 indeterminate
 ```
 
-`toAttachFailure` 对未知错误返回 `protocol_error/unexpected_error`，不保留原始 message（避免路径/秘密进入日志）。
+- **remote**：请求只能由它自己的 `next` 返回、由它自己的 `receive` 结算；**不得**镜像到 stdout。
+- **stdio**：只有 `stdio-<pid>` 连接可 `write(frame)`。
+- **sink**：只交给 in-process responder。
+- 请求"被读走"不是投递：`next` 幂等返回 head，结算后才出队；重复轮询不会造成重复写。
+- 旧连接的回执被结构性拒绝（lease 身份），不需要业务侧再写第二套 fencing。
 
-## 2. B 当前实现里值得保留/注意的点
+`apps/runner/test/attach-channel/lane-ownership.test.ts` 固定上述契约（5 例），可直接作为 B 的回归参照。
 
-- `channelNext`：先用 `attach.next(leaseId, producer)`；只有 `refused === 'stale_connection'`（未知/被替换连接）才用调用方给出的 `expectedGeneration` 做 **显式 CAS bind**。poll 本身不改 generation。
-- `channelReply`：`attach.receive(leaseId, frame, producer)`，仅在该连接仍是当前 lease 时 accepted；stale/foreign 不产生副作用。
-- `dispatched` map 的 key 是 `kind:correlation`，reply/rebind 时删除；若增加连接类型，记得在 `drop` 路径也清理。
-- stdio 的 `write-admission` 目前还 AND 了 `!businessClosed`（更严格，不是绕过）；语义上应理解为"当前 admission 仍开且当前 guard 同意"。
-- B 在 `closeAdmission` 里对所有连接 `drop`，但保留 channel 打开；`module.close` 才结算全部 pending。**channel close 不证明 writer 静止**。
-
-## 3. 三类回调的权威归属（不要合并）
+## 2. 三类回调的权威归属（不要合并）
 
 | 回答 | 权威 | I 的职责 |
 | --- | --- | --- |
@@ -67,27 +43,26 @@ type MyErrorCode = 'transport_lost' | 'process_exited' | AttachFailureCode   // 
 | payload value | 原 immutable Store/responder | 原 ref 关联、bytes 限额、重读 |
 | write-admission | 当前 main/Broker fresh guard | 每意图 fresh `frame.id`、结算、不缓存 |
 
-事实落库**不是** native 许可：`createCoordinatorSinkResponder` 已把"缺 guard 就不许写"固化为源码结构（guard 必填、运行时缺失 fail-closed）。B 用自己的 `beforeNativeWrite` 注入也能达到同等语义；两种方式都不要回退到 `!businessClosed` 默认放行。
+`sink-responder.ts`/`refusals.ts` 是可选示例：B 用自己的 void/throw guard adapter 已达到同等语义，**不要求**导入这两个文件；它们存在的意义是让"缺 guard 就不许写"和"有限 code union"在源码层面可复用。
 
-## 4. 业务恢复仍需要的 interface（I 只提供通信语义）
+## 3. handover / 崩溃对账：I 提供什么、不提供什么
 
-以下都由 B/main 完成，I 不扩成 coordinator：
+提供（`handover.test.ts` 6 例）：
 
-- 原 A 新进程与 `native_applied` / `ACK unknown` 的业务对账：I 只保证 fact 可用**原 id/body** 重发并等待原 durable ACK；超时是 unknown，不是"未发送"。
-- begin/answer/cancel 等业务命令的重新准入：I 不自动重发任何业务命令；意图 `indeterminate` 后必须回原 command reconciliation。
-- Completion/candidate/manualaccept/slot 释放：走原 ProductCompletion/WorkView/Verification，I 不建表、不建账本。
-- generation 只代表本地连接代际，不能替代业务 `fenceEpoch`、principal 或 native target 许可。
+- 原协调器离开后，fact/payload 保持原 id/引用与**剩余窗口**，继任 CAS 绑定后重发同一原始输入；
+- 未决 native 意图变 `indeterminate`，不迁移/不重放；旧连接回执被拒；
+- `timeout` / `closed` / `stale_connection` / denial 语义分离；超时不是"未发送"；
+- 模块从不产生 begin/answer/cancel 业务帧；generation 不是业务 epoch。
 
-## 5. 接入后回归（B 自有断言）
+不提供（B/main 产品工作）：
 
-1. 正常链：bootstrap → begin → question → answer（native admission）→ delivery → stop；无旧 maps、无第二 pending 所有者。
-2. 同命令二次意图：旧 allowed 重放不得批准；guard 调用次数 = 意图数。
-3. 重绑：原 factId/body 重发并得原 ACK；未决 write 变 `indeterminate`；stale 连接 next/reply 被拒且 generation 不变。
-4. sink 车道无 guard / deny / throw：零 native 写。
-5. 关闭：`drop` 后旧连接无副作用；`attach.close` 后无悬挂 pending、无假成功。
+- 原 A 新进程、`question → native_applied → ACK unknown` 的业务对账；
+- 业务命令重新准入、Completion/check/currentCandidate/manualaccept、slot 释放；
+- 物理资源身份、信号/出生证明、installed/native 事实。
 
-## 6. 仍未达（I 侧如实记录）
+## 4. 仍未达（I 侧如实记录）
 
-- B 当前 strict 编译未过（§1.1），因此"latest source 已编译并运行"在 B 侧不成立，直到 B 自己修复。
-- 同 Runner 进程双 client、coordinator SIGKILL 后原问题→交付、跨 coordinator 崩溃恢复、durable exactly-once、物理 quiescence：仍属 B/main/A。
-- H 尚未绑定当前 source 执行（见 `h-independent-consumer.zh-CN.md`）。
+- B/H 的 signal-guard 出生/full argv/资源计划与 H mutable-registry-origin 是 B/H 测试工具工作，不由 module 测试替代。
+- 同 Runner 双 client、coordinator SIGKILL 后原问题→交付、recovered candidate/manualaccept、slot 释放：B/main。
+- 真实 A 持久化 ingress / 真实 Broker guard / native/installed：module 测试中的 sink/payload/guard 是语义 double，不作业务证明。
+- H 需把"旧 sink-only bug 必须存在"的期望改成非回归断言（H owner），否则其当前报告仍会 UNEXPECTED。

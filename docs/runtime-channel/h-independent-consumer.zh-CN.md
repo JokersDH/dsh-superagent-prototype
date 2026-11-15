@@ -1,16 +1,18 @@
 # H 独立 consumer 复现指南
 
-2026-11-15（wave-29 修订）。H 在自己的测试目录（`tests/operational-soak/` 等，按 H 自己所有权）写独立 consumer；I 不改 H 断言，也不为 H 另造测试专用 class。
+2026-11-15（wave-30 修订）。H 在自己的测试目录（`tests/operational-soak/` 等，按 H 自己所有权）写独立 consumer；I 不改 H 断言，也不为 H 另造测试专用 class。
 
-## 0. 当前 source 绑定（wave-29）
+## 0. 当前 source 绑定（wave-30）
 
-H 的现状：观察源 `2d1e4941`，默认 materialization 仍是旧 `d95df88`（I）/`cb4e975`（B），并因 main-root pin 与自身 HEAD 不一致而在导入前拒绝——这是**正确的** source 检查，不是通道失败。
+H 的现状（观察源 `f8cf5713`）：已绑定当前 I/B source 执行，`sourceUnchanged`/`materializedUnchanged` 均通过，I 侧 12/12、B 侧 5/6。
+
+唯一失败原因是 **H 仍要求历史上的 sink-only bug 存在**：当前 B 已在该 hook 上拒绝，所以 H 的报告变成 UNEXPECTED。这不是产品回归，也不是 I 的缺陷——H 需要把该断言改成**非回归**（"当前 B 必须拒绝"，而不是"必须复现旧缺陷"）。
 
 要求：
 
-1. 显式绑定 I 的当前 commit（见 `reports/runtime-channel/wave29-adoption.json` 的 `i.sourceCommit` 与 blob 列表），不要用旧快照代表 current。
-2. 绑定后在 H 自有目录实际执行三 callback / CAS / late / fresh replay / namespace / bounds 正负例，并记录 method/计数，而不是只列 contract scenario 数据。
-3. 旧材料继续作为历史证据保留，但不得标为当前修复 PASS。
+1. 绑定 I 当前 commit（见 `reports/runtime-channel/wave30-adoption.json` 的 `i.sourceCommit` 与 blob 列表）。
+2. 在 H 自有目录执行三 callback / CAS / late / fresh replay / namespace / bounds 正负例，记录 method/计数。
+3. 历史材料保留为历史，不标为当前修复 PASS；当前 B 的"拒绝"是正确结果。
 
 ## 1. 可复制的最小输入
 
