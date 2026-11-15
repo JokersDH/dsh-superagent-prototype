@@ -3,12 +3,12 @@
   "tier": "full-product",
   "status": "FAIL",
   "ok": false,
-  "checkedAt": "2026-11-15T09:52:40.152Z",
+  "checkedAt": "2026-11-15T10:08:34.746Z",
   "source": {
-    "commit": "a77cab4f41ab6f39975541606fc0f15df1655e55",
+    "commit": "1675ccbe9217b26660c5c9b237c1390fd168a83f",
     "dirty": false
   },
-  "expectedSource": "a77cab4f41ab6f39975541606fc0f15df1655e55",
+  "expectedSource": "1675ccbe9217b26660c5c9b237c1390fd168a83f",
   "requirements": [
     {
       "id": "E1-GATE-CONTROL",
@@ -968,11 +968,6 @@
   ],
   "failures": [
     {
-      "code": "recipePreview_invalid",
-      "detail": "recipePreview issues",
-      "caseId": "E6-RECIPE-PREVIEW"
-    },
-    {
       "code": "missing_required_case",
       "detail": "Required case E5-NATIVE-DELIVERY is absent",
       "caseId": "E5-NATIVE-DELIVERY"
@@ -1001,7 +996,7 @@
   "claimedBy": {
     "status": "PASS",
     "tier": "controlled-product-workflow",
-    "decidedAt": "2026-11-15T09:44:41.094Z",
+    "decidedAt": "2026-11-15T10:00:44.882Z",
     "failureCodes": []
   },
   "notes": [

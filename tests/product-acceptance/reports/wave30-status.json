@@ -3,10 +3,10 @@
   "agent": "E",
   "branch": "codex/g3-product-acceptance",
   "base": "6369eea",
-  "checkpoint": "a77cab4",
-  "head": "a77cab4f41ab6f39975541606fc0f15df1655e55",
+  "checkpoint": "1675ccb",
+  "head": "1675ccbe9217b26660c5c9b237c1390fd168a83f",
   "worktreeDirtyAtRun": false,
-  "checkedAt": "2026-11-15T09:44:41.079Z",
+  "checkedAt": "2026-11-15T10:00:44.858Z",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -1584,12 +1584,12 @@
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-15T09:44:41.094Z",
+    "checkedAt": "2026-11-15T10:00:44.882Z",
     "source": {
-      "commit": "a77cab4f41ab6f39975541606fc0f15df1655e55",
+      "commit": "1675ccbe9217b26660c5c9b237c1390fd168a83f",
       "dirty": false
     },
-    "expectedSource": "a77cab4f41ab6f39975541606fc0f15df1655e55",
+    "expectedSource": "1675ccbe9217b26660c5c9b237c1390fd168a83f",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -2354,31 +2354,31 @@
       "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability; there is no allow-gap switch."
     ]
   },
-  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z",
+  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-54-24-555Z",
   "evidence": {
-    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/report.json",
-    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/release.json",
+    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-54-24-555Z/report.json",
+    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-54-24-555Z/release.json",
     "screenshots": [
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/screenshots/desktop-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/screenshots/notebook-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/screenshots/mobile-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/screenshots/mobile-navigation.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/screenshots/mobile-detail.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/screenshots/desktop-delivered.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/screenshots/desktop-error.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/screenshots/desktop-offline.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/screenshots/desktop-keyboard.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/screenshots/mobile-conversations.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/screenshots/desktop-verification-blocked.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/screenshots/desktop-verification-recovered.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/screenshots/desktop-review-activity.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/screenshots/mobile-attention-inbox.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/proposal-preview-desktop.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/proposal-preview-notebook.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/proposal-preview-mobile.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/screenshots/context-confirm-desktop.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/screenshots/context-confirm-mobile.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/screenshots/context-history-mobile.png"
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-54-24-555Z/screenshots/desktop-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-54-24-555Z/screenshots/notebook-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-54-24-555Z/screenshots/mobile-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-54-24-555Z/screenshots/mobile-navigation.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-54-24-555Z/screenshots/mobile-detail.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-54-24-555Z/screenshots/desktop-delivered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-54-24-555Z/screenshots/desktop-error.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-54-24-555Z/screenshots/desktop-offline.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-54-24-555Z/screenshots/desktop-keyboard.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-54-24-555Z/screenshots/mobile-conversations.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-54-24-555Z/screenshots/desktop-verification-blocked.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-54-24-555Z/screenshots/desktop-verification-recovered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-54-24-555Z/screenshots/desktop-review-activity.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-54-24-555Z/screenshots/mobile-attention-inbox.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-54-24-555Z/proposal-preview-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-54-24-555Z/proposal-preview-notebook.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-54-24-555Z/proposal-preview-mobile.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-54-24-555Z/screenshots/context-confirm-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-54-24-555Z/screenshots/context-confirm-mobile.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-54-24-555Z/screenshots/context-history-mobile.png"
     ],
     "matrix": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/release-matrix.json",
     "executionStatus": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/execution-status.json",
@@ -2694,8 +2694,8 @@
       "proof": {
         "proven": true,
         "stopped": [
-          45342,
-          45343
+          66873,
+          66874
         ],
         "unknownLive": []
       }
@@ -2799,8 +2799,8 @@
     "value": "BLOCKED: review pilot unchanged"
   },
   "functional": {
-    "alphaVerdict": "FAIL",
-    "verdict": "FAIL",
+    "alphaVerdict": "PASS",
+    "verdict": "PASS",
     "detector": "PASS",
     "functionalCase": "PASS",
     "evidence": {
@@ -2829,38 +2829,38 @@
           "present": true,
           "mode": "personal",
           "startupMode": "normal",
-          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/seed-state",
-          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/app",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/seed-state",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/install/app",
           "resources": [
             {
               "label": "launcher",
-              "pid": 75776,
-              "start": "Sun Nov 15 17:44:19 2026",
+              "pid": 97201,
+              "start": "Sun Nov 15 18:00:22 2026",
               "uid": 501,
               "parentPid": null,
-              "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/app/apps/launcher/bin/pa.mjs start --json --port 49488 --api-port 49489 --discussion-only"
+              "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/install/app/apps/launcher/bin/pa.mjs start --json --port 52025 --api-port 52026 --discussion-only"
             },
             {
               "label": "child",
-              "pid": 75812,
-              "start": "Sun Nov 15 17:44:19 2026",
+              "pid": 97237,
+              "start": "Sun Nov 15 18:00:23 2026",
               "uid": 501,
-              "parentPid": 75776,
-              "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/app/apps/coordinator/product/demo.ts --port 49489 --state /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/seed-state --console-origin htt"
+              "parentPid": 97201,
+              "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/install/app/apps/coordinator/product/demo.ts --port 52026 --state /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/seed-state --console-origin htt"
             }
           ]
         },
         "after": [
           {
-            "pid": 75776,
-            "expectedStart": "Sun Nov 15 17:44:19 2026",
+            "pid": 97201,
+            "expectedStart": "Sun Nov 15 18:00:22 2026",
             "alive": false,
             "start": null,
             "sameIdentity": false
           },
           {
-            "pid": 75812,
-            "expectedStart": "Sun Nov 15 17:44:19 2026",
+            "pid": 97237,
+            "expectedStart": "Sun Nov 15 18:00:23 2026",
             "alive": false,
             "start": null,
             "sameIdentity": false
@@ -2884,38 +2884,38 @@
           "present": true,
           "mode": "personal",
           "startupMode": "recovery_readonly",
-          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/restored",
-          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/app",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/restored",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/install/app",
           "resources": [
             {
               "label": "launcher",
-              "pid": 76089,
-              "start": "Sun Nov 15 17:44:21 2026",
+              "pid": 97515,
+              "start": "Sun Nov 15 18:00:24 2026",
               "uid": 501,
               "parentPid": null,
-              "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/app/apps/launcher/bin/pa.mjs start --json --port 49497 --api-port 49498 --discussion-only"
+              "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/install/app/apps/launcher/bin/pa.mjs start --json --port 52034 --api-port 52035 --discussion-only"
             },
             {
               "label": "child",
-              "pid": 76125,
-              "start": "Sun Nov 15 17:44:21 2026",
+              "pid": 97553,
+              "start": "Sun Nov 15 18:00:24 2026",
               "uid": 501,
-              "parentPid": 76089,
-              "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/app/apps/coordinator/product/demo.ts --port 49498 --state /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/restored --console-origin http:"
+              "parentPid": 97515,
+              "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/install/app/apps/coordinator/product/demo.ts --port 52035 --state /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/restored --console-origin http:"
             }
           ]
         },
         "after": [
           {
-            "pid": 76089,
-            "expectedStart": "Sun Nov 15 17:44:21 2026",
+            "pid": 97515,
+            "expectedStart": "Sun Nov 15 18:00:24 2026",
             "alive": false,
             "start": null,
             "sameIdentity": false
           },
           {
-            "pid": 76125,
-            "expectedStart": "Sun Nov 15 17:44:21 2026",
+            "pid": 97553,
+            "expectedStart": "Sun Nov 15 18:00:24 2026",
             "alive": false,
             "start": null,
             "sameIdentity": false
@@ -2948,7 +2948,7 @@
     "restoredPersonalReview": {
       "status": "PASS",
       "consumerOrigin": "package",
-      "healthDigest": "f28ddc5fd9614504df6cb031e91aff9cf675967f2a8f8ed78dd6ef936fa937a7"
+      "healthDigest": "9d3576bc6be761bfa047ca388bb858bd9a5e9a070c8002f652c01cfb91509b72"
     },
     "restoredReviewRefusals": "PASS",
     "reviewReuse": {
@@ -2968,7 +2968,7 @@
       "status": "PASS",
       "normal": {
         "protocol": "trial-readiness/1",
-        "observedAt": "2026-11-15T09:44:16.760Z",
+        "observedAt": "2026-11-15T10:00:20.055Z",
         "configurationRevision": "a9c826f123324b2d8f1a07902775e6a1c453f4de86b467027490a903c324e84b",
         "mode": "personal",
         "startupMode": "normal",
@@ -2999,8 +2999,8 @@
       },
       "readonly": {
         "protocol": "trial-readiness/1",
-        "observedAt": "2026-11-15T09:44:17.854Z",
-        "configurationRevision": "af1e9636a40f4e9339d3f6edb94ef6087650f7b70ea078bed8847fba70a8bf06",
+        "observedAt": "2026-11-15T10:00:21.132Z",
+        "configurationRevision": "4c728175d403bc447bcc1fcda3abc5d313b3cd9f3ec31130e40225822ca85e2a",
         "mode": "personal",
         "startupMode": "recovery_readonly",
         "discussion": "unknown",
@@ -3030,7 +3030,7 @@
       },
       "fixture": {
         "protocol": "trial-readiness/1",
-        "observedAt": "2026-11-15T09:44:19.176Z",
+        "observedAt": "2026-11-15T10:00:22.435Z",
         "configurationRevision": "83d2a00c18fe919d4671f2916ce9baec23e44fc5cfd8f51b3ba2d241462e06af",
         "mode": "fixture",
         "startupMode": "normal",
@@ -3076,21 +3076,21 @@
       "screenshots": [
         {
           "path": "tests/product-acceptance/reports/wave27/browser/desktop.png",
-          "sha256": "19ff8f9cc54b815f2ac8d347032a0432f156407119c7f29f715b21e84377b134",
-          "bytes": 124724,
-          "size": 124724
+          "sha256": "d19890d05e3ff4c77e0d7772b1b13a4eda7b9d06e15625c6e4a88d8303d60fac",
+          "bytes": 124851,
+          "size": 124851
         },
         {
           "path": "tests/product-acceptance/reports/wave27/browser/mobile.png",
-          "sha256": "57337e0250d4a69c30b5e398768c168bbc9eb96d7de06f688e5e4af9f18de324",
-          "bytes": 55834,
-          "size": 55834
+          "sha256": "273d9e0f0d87f3c237359ee1ca9228b68d07cc10015614b65f035928742f4508",
+          "bytes": 55961,
+          "size": 55961
         },
         {
           "path": "tests/product-acceptance/reports/wave27/browser/configured-conversation.png",
-          "sha256": "78c0eb1d366de861cc08c882c53d924e090ab5b0c76f40b230e0da0847a88a68",
-          "bytes": 76516,
-          "size": 76516
+          "sha256": "1db9470e1d7c1f06b92ae0fa7c45dc3edabecf82fffa91c16f0385c71ef85151",
+          "bytes": 76517,
+          "size": 76517
         }
       ],
       "bundle": {
@@ -3106,10 +3106,10 @@
           "copied": 22,
           "digests": [
             {
-              "id": "b3c82dc1faade816426c3a61ca7104d8580182f5861c75875d6615f0380b15c0",
+              "id": "b0ad8ecb908f324191d22c60521326dce3dcd1ba9756fdb5757d2db733b6418f",
               "present": true,
-              "digest": "b3c82dc1faade816426c3a61ca7104d8580182f5861c75875d6615f0380b15c0",
-              "registryDigest": "b3c82dc1faade816426c3a61ca7104d8580182f5861c75875d6615f0380b15c0",
+              "digest": "b0ad8ecb908f324191d22c60521326dce3dcd1ba9756fdb5757d2db733b6418f",
+              "registryDigest": "b0ad8ecb908f324191d22c60521326dce3dcd1ba9756fdb5757d2db733b6418f",
               "match": true,
               "bytes": 412
             },
@@ -3122,34 +3122,34 @@
               "bytes": 234
             },
             {
-              "id": "688b96281aec53d8f1dd9681e49d855039621aade67d20edef3a9f3c866a3904",
+              "id": "0ee837cc71963885ef936089dbfa0e97900725612fea8244be603453df44ed3d",
               "present": true,
-              "digest": "688b96281aec53d8f1dd9681e49d855039621aade67d20edef3a9f3c866a3904",
-              "registryDigest": "688b96281aec53d8f1dd9681e49d855039621aade67d20edef3a9f3c866a3904",
+              "digest": "0ee837cc71963885ef936089dbfa0e97900725612fea8244be603453df44ed3d",
+              "registryDigest": "0ee837cc71963885ef936089dbfa0e97900725612fea8244be603453df44ed3d",
               "match": true,
               "bytes": 704
             },
             {
-              "id": "9e2d326a300067e159437360c33c94d8f828fd7dd9db7c322b43e7f0af7fb49f",
+              "id": "d075ced1ba190aa7a09c79c598d876f0ee83ca878e74ed85c163e3458b9858f7",
               "present": true,
-              "digest": "9e2d326a300067e159437360c33c94d8f828fd7dd9db7c322b43e7f0af7fb49f",
-              "registryDigest": "9e2d326a300067e159437360c33c94d8f828fd7dd9db7c322b43e7f0af7fb49f",
+              "digest": "d075ced1ba190aa7a09c79c598d876f0ee83ca878e74ed85c163e3458b9858f7",
+              "registryDigest": "d075ced1ba190aa7a09c79c598d876f0ee83ca878e74ed85c163e3458b9858f7",
               "match": true,
               "bytes": 712
             },
             {
-              "id": "fc4c51a2eecf0ffaf50c896d85d5093416d6b90e730b5b546d14def3487fa5bd",
+              "id": "02aae82329c5e3167d1c118150811f867aa8a701e7976b8e31fb3ae78aa67c70",
               "present": true,
-              "digest": "fc4c51a2eecf0ffaf50c896d85d5093416d6b90e730b5b546d14def3487fa5bd",
-              "registryDigest": "fc4c51a2eecf0ffaf50c896d85d5093416d6b90e730b5b546d14def3487fa5bd",
+              "digest": "02aae82329c5e3167d1c118150811f867aa8a701e7976b8e31fb3ae78aa67c70",
+              "registryDigest": "02aae82329c5e3167d1c118150811f867aa8a701e7976b8e31fb3ae78aa67c70",
               "match": true,
               "bytes": 262
             },
             {
-              "id": "67068857a1fb359aa0ce0206c933abb562adc8ddd1beb71adfcc9ad762cc4117",
+              "id": "c1608b86bf15c9350784bc56c0b318003e0e2469057be352ba2b982a8b983814",
               "present": true,
-              "digest": "67068857a1fb359aa0ce0206c933abb562adc8ddd1beb71adfcc9ad762cc4117",
-              "registryDigest": "67068857a1fb359aa0ce0206c933abb562adc8ddd1beb71adfcc9ad762cc4117",
+              "digest": "c1608b86bf15c9350784bc56c0b318003e0e2469057be352ba2b982a8b983814",
+              "registryDigest": "c1608b86bf15c9350784bc56c0b318003e0e2469057be352ba2b982a8b983814",
               "match": true,
               "bytes": 267
             },
@@ -3162,50 +3162,50 @@
               "bytes": 153
             },
             {
-              "id": "e8ecbc7085cfc8ed345ace491f0b67b1e906d94a1152a1c6ac0e61bf863b3968",
+              "id": "172de36259855350cb2a90e9d1d8c434915a69db4988b65870fbbaebdf1f7a58",
               "present": true,
-              "digest": "e8ecbc7085cfc8ed345ace491f0b67b1e906d94a1152a1c6ac0e61bf863b3968",
-              "registryDigest": "e8ecbc7085cfc8ed345ace491f0b67b1e906d94a1152a1c6ac0e61bf863b3968",
+              "digest": "172de36259855350cb2a90e9d1d8c434915a69db4988b65870fbbaebdf1f7a58",
+              "registryDigest": "172de36259855350cb2a90e9d1d8c434915a69db4988b65870fbbaebdf1f7a58",
               "match": true,
               "bytes": 1330
             },
             {
-              "id": "a681f3caae83d438088bc044d51d6b6c664429c8c014b2c4b17450230c598b72",
+              "id": "3fdbd2b20427d289d22e78170fa3787b4973ef0f922c042349a6cb5d23f68539",
               "present": true,
-              "digest": "a681f3caae83d438088bc044d51d6b6c664429c8c014b2c4b17450230c598b72",
-              "registryDigest": "a681f3caae83d438088bc044d51d6b6c664429c8c014b2c4b17450230c598b72",
+              "digest": "3fdbd2b20427d289d22e78170fa3787b4973ef0f922c042349a6cb5d23f68539",
+              "registryDigest": "3fdbd2b20427d289d22e78170fa3787b4973ef0f922c042349a6cb5d23f68539",
               "match": true,
               "bytes": 570
             },
             {
-              "id": "deffc242dd597bdd4f6f0694501b6e737121e4bed9588e1ecf7429b4e19cc2ab",
+              "id": "bda836fbe3428c8508b12b694357c2b3321dd0e1fca80888504cc7f6734487fb",
               "present": true,
-              "digest": "deffc242dd597bdd4f6f0694501b6e737121e4bed9588e1ecf7429b4e19cc2ab",
-              "registryDigest": "deffc242dd597bdd4f6f0694501b6e737121e4bed9588e1ecf7429b4e19cc2ab",
+              "digest": "bda836fbe3428c8508b12b694357c2b3321dd0e1fca80888504cc7f6734487fb",
+              "registryDigest": "bda836fbe3428c8508b12b694357c2b3321dd0e1fca80888504cc7f6734487fb",
               "match": true,
               "bytes": 790
             },
             {
-              "id": "154ac59e7ed8902c78926b4363ead6395fb74f750f41727cad36251af7ff5926",
+              "id": "621ea269e816c7dcfc9fa923f66a7276a0cf980227f13a89248471639c5a9961",
               "present": true,
-              "digest": "154ac59e7ed8902c78926b4363ead6395fb74f750f41727cad36251af7ff5926",
-              "registryDigest": "154ac59e7ed8902c78926b4363ead6395fb74f750f41727cad36251af7ff5926",
+              "digest": "621ea269e816c7dcfc9fa923f66a7276a0cf980227f13a89248471639c5a9961",
+              "registryDigest": "621ea269e816c7dcfc9fa923f66a7276a0cf980227f13a89248471639c5a9961",
               "match": true,
               "bytes": 174
             },
             {
-              "id": "4f838b6834e78e9301ec85c79646e9c22d8a1160feb2422453ba665fff227522",
+              "id": "940ebd2a252746aef346ecf2b8e916807d79c034d106502ab46a6a5e1b386652",
               "present": true,
-              "digest": "4f838b6834e78e9301ec85c79646e9c22d8a1160feb2422453ba665fff227522",
-              "registryDigest": "4f838b6834e78e9301ec85c79646e9c22d8a1160feb2422453ba665fff227522",
+              "digest": "940ebd2a252746aef346ecf2b8e916807d79c034d106502ab46a6a5e1b386652",
+              "registryDigest": "940ebd2a252746aef346ecf2b8e916807d79c034d106502ab46a6a5e1b386652",
               "match": true,
               "bytes": 187
             },
             {
-              "id": "10c2c9a2bac5ba4431ed362fc5d4c26403b835a20a5ed0813b24833d5cd46ec4",
+              "id": "6f0965e4ba1c78bdeaf622a3edce3ceb685da7b7cc7c3eaaea6f96abe7729ff0",
               "present": true,
-              "digest": "10c2c9a2bac5ba4431ed362fc5d4c26403b835a20a5ed0813b24833d5cd46ec4",
-              "registryDigest": "10c2c9a2bac5ba4431ed362fc5d4c26403b835a20a5ed0813b24833d5cd46ec4",
+              "digest": "6f0965e4ba1c78bdeaf622a3edce3ceb685da7b7cc7c3eaaea6f96abe7729ff0",
+              "registryDigest": "6f0965e4ba1c78bdeaf622a3edce3ceb685da7b7cc7c3eaaea6f96abe7729ff0",
               "match": true,
               "bytes": 253
             },
@@ -3218,18 +3218,18 @@
               "bytes": 142
             },
             {
-              "id": "05203a48c6c9b712300da00728df8c5bed237b657146cf8cf28fc93a962e5755",
+              "id": "c578f866178814c97a269a0bfeb027444a0fafcef62d48cf147fb0f7aa004952",
               "present": true,
-              "digest": "05203a48c6c9b712300da00728df8c5bed237b657146cf8cf28fc93a962e5755",
-              "registryDigest": "05203a48c6c9b712300da00728df8c5bed237b657146cf8cf28fc93a962e5755",
+              "digest": "c578f866178814c97a269a0bfeb027444a0fafcef62d48cf147fb0f7aa004952",
+              "registryDigest": "c578f866178814c97a269a0bfeb027444a0fafcef62d48cf147fb0f7aa004952",
               "match": true,
               "bytes": 874
             },
             {
-              "id": "bc8d74956fb69895f58bc2b86e4de79b2b483a3ec813a2a7f37aaa77a3c030c3",
+              "id": "658ab3f04f4910f33dcf85c5baa3ba59c1cb7f36dd5b393f96ccb3087416611f",
               "present": true,
-              "digest": "bc8d74956fb69895f58bc2b86e4de79b2b483a3ec813a2a7f37aaa77a3c030c3",
-              "registryDigest": "bc8d74956fb69895f58bc2b86e4de79b2b483a3ec813a2a7f37aaa77a3c030c3",
+              "digest": "658ab3f04f4910f33dcf85c5baa3ba59c1cb7f36dd5b393f96ccb3087416611f",
+              "registryDigest": "658ab3f04f4910f33dcf85c5baa3ba59c1cb7f36dd5b393f96ccb3087416611f",
               "match": true,
               "bytes": 234
             },
@@ -3250,10 +3250,10 @@
               "bytes": 213
             },
             {
-              "id": "8fb32b0a605194be74b143d6d65072ccd2b829b22058659d83ff712555ada2e3",
+              "id": "af775e1d1d2a2dd7a981621e53596583bed7016b0be25c1b5580b856a8cf082d",
               "present": true,
-              "digest": "8fb32b0a605194be74b143d6d65072ccd2b829b22058659d83ff712555ada2e3",
-              "registryDigest": "8fb32b0a605194be74b143d6d65072ccd2b829b22058659d83ff712555ada2e3",
+              "digest": "af775e1d1d2a2dd7a981621e53596583bed7016b0be25c1b5580b856a8cf082d",
+              "registryDigest": "af775e1d1d2a2dd7a981621e53596583bed7016b0be25c1b5580b856a8cf082d",
               "match": true,
               "bytes": 1143
             },
@@ -3266,10 +3266,10 @@
               "bytes": 376
             },
             {
-              "id": "ee5731a554e275c017a213e34843376e64186005eebb6ea38114c8ae1062788d",
+              "id": "f4d8504b96bfd03e327dd07359a05ca13e970fa0d26e66e528e7cce6dc5751a4",
               "present": true,
-              "digest": "ee5731a554e275c017a213e34843376e64186005eebb6ea38114c8ae1062788d",
-              "registryDigest": "ee5731a554e275c017a213e34843376e64186005eebb6ea38114c8ae1062788d",
+              "digest": "f4d8504b96bfd03e327dd07359a05ca13e970fa0d26e66e528e7cce6dc5751a4",
+              "registryDigest": "f4d8504b96bfd03e327dd07359a05ca13e970fa0d26e66e528e7cce6dc5751a4",
               "match": true,
               "bytes": 1615
             },
@@ -3288,10 +3288,10 @@
           "copied": 22,
           "digests": [
             {
-              "id": "b3c82dc1faade816426c3a61ca7104d8580182f5861c75875d6615f0380b15c0",
+              "id": "b0ad8ecb908f324191d22c60521326dce3dcd1ba9756fdb5757d2db733b6418f",
               "present": true,
-              "digest": "b3c82dc1faade816426c3a61ca7104d8580182f5861c75875d6615f0380b15c0",
-              "registryDigest": "b3c82dc1faade816426c3a61ca7104d8580182f5861c75875d6615f0380b15c0",
+              "digest": "b0ad8ecb908f324191d22c60521326dce3dcd1ba9756fdb5757d2db733b6418f",
+              "registryDigest": "b0ad8ecb908f324191d22c60521326dce3dcd1ba9756fdb5757d2db733b6418f",
               "match": true,
               "bytes": 412
             },
@@ -3304,34 +3304,34 @@
               "bytes": 234
             },
             {
-              "id": "688b96281aec53d8f1dd9681e49d855039621aade67d20edef3a9f3c866a3904",
+              "id": "0ee837cc71963885ef936089dbfa0e97900725612fea8244be603453df44ed3d",
               "present": true,
-              "digest": "688b96281aec53d8f1dd9681e49d855039621aade67d20edef3a9f3c866a3904",
-              "registryDigest": "688b96281aec53d8f1dd9681e49d855039621aade67d20edef3a9f3c866a3904",
+              "digest": "0ee837cc71963885ef936089dbfa0e97900725612fea8244be603453df44ed3d",
+              "registryDigest": "0ee837cc71963885ef936089dbfa0e97900725612fea8244be603453df44ed3d",
               "match": true,
               "bytes": 704
             },
             {
-              "id": "9e2d326a300067e159437360c33c94d8f828fd7dd9db7c322b43e7f0af7fb49f",
+              "id": "d075ced1ba190aa7a09c79c598d876f0ee83ca878e74ed85c163e3458b9858f7",
               "present": true,
-              "digest": "9e2d326a300067e159437360c33c94d8f828fd7dd9db7c322b43e7f0af7fb49f",
-              "registryDigest": "9e2d326a300067e159437360c33c94d8f828fd7dd9db7c322b43e7f0af7fb49f",
+              "digest": "d075ced1ba190aa7a09c79c598d876f0ee83ca878e74ed85c163e3458b9858f7",
+              "registryDigest": "d075ced1ba190aa7a09c79c598d876f0ee83ca878e74ed85c163e3458b9858f7",
               "match": true,
               "bytes": 712
             },
             {
-              "id": "fc4c51a2eecf0ffaf50c896d85d5093416d6b90e730b5b546d14def3487fa5bd",
+              "id": "02aae82329c5e3167d1c118150811f867aa8a701e7976b8e31fb3ae78aa67c70",
               "present": true,
-              "digest": "fc4c51a2eecf0ffaf50c896d85d5093416d6b90e730b5b546d14def3487fa5bd",
-              "registryDigest": "fc4c51a2eecf0ffaf50c896d85d5093416d6b90e730b5b546d14def3487fa5bd",
+              "digest": "02aae82329c5e3167d1c118150811f867aa8a701e7976b8e31fb3ae78aa67c70",
+              "registryDigest": "02aae82329c5e3167d1c118150811f867aa8a701e7976b8e31fb3ae78aa67c70",
               "match": true,
               "bytes": 262
             },
             {
-              "id": "67068857a1fb359aa0ce0206c933abb562adc8ddd1beb71adfcc9ad762cc4117",
+              "id": "c1608b86bf15c9350784bc56c0b318003e0e2469057be352ba2b982a8b983814",
               "present": true,
-              "digest": "67068857a1fb359aa0ce0206c933abb562adc8ddd1beb71adfcc9ad762cc4117",
-              "registryDigest": "67068857a1fb359aa0ce0206c933abb562adc8ddd1beb71adfcc9ad762cc4117",
+              "digest": "c1608b86bf15c9350784bc56c0b318003e0e2469057be352ba2b982a8b983814",
+              "registryDigest": "c1608b86bf15c9350784bc56c0b318003e0e2469057be352ba2b982a8b983814",
               "match": true,
               "bytes": 267
             },
@@ -3344,50 +3344,50 @@
               "bytes": 153
             },
             {
-              "id": "e8ecbc7085cfc8ed345ace491f0b67b1e906d94a1152a1c6ac0e61bf863b3968",
+              "id": "172de36259855350cb2a90e9d1d8c434915a69db4988b65870fbbaebdf1f7a58",
               "present": true,
-              "digest": "e8ecbc7085cfc8ed345ace491f0b67b1e906d94a1152a1c6ac0e61bf863b3968",
-              "registryDigest": "e8ecbc7085cfc8ed345ace491f0b67b1e906d94a1152a1c6ac0e61bf863b3968",
+              "digest": "172de36259855350cb2a90e9d1d8c434915a69db4988b65870fbbaebdf1f7a58",
+              "registryDigest": "172de36259855350cb2a90e9d1d8c434915a69db4988b65870fbbaebdf1f7a58",
               "match": true,
               "bytes": 1330
             },
             {
-              "id": "a681f3caae83d438088bc044d51d6b6c664429c8c014b2c4b17450230c598b72",
+              "id": "3fdbd2b20427d289d22e78170fa3787b4973ef0f922c042349a6cb5d23f68539",
               "present": true,
-              "digest": "a681f3caae83d438088bc044d51d6b6c664429c8c014b2c4b17450230c598b72",
-              "registryDigest": "a681f3caae83d438088bc044d51d6b6c664429c8c014b2c4b17450230c598b72",
+              "digest": "3fdbd2b20427d289d22e78170fa3787b4973ef0f922c042349a6cb5d23f68539",
+              "registryDigest": "3fdbd2b20427d289d22e78170fa3787b4973ef0f922c042349a6cb5d23f68539",
               "match": true,
               "bytes": 570
             },
             {
-              "id": "deffc242dd597bdd4f6f0694501b6e737121e4bed9588e1ecf7429b4e19cc2ab",
+              "id": "bda836fbe3428c8508b12b694357c2b3321dd0e1fca80888504cc7f6734487fb",
               "present": true,
-              "digest": "deffc242dd597bdd4f6f0694501b6e737121e4bed9588e1ecf7429b4e19cc2ab",
-              "registryDigest": "deffc242dd597bdd4f6f0694501b6e737121e4bed9588e1ecf7429b4e19cc2ab",
+              "digest": "bda836fbe3428c8508b12b694357c2b3321dd0e1fca80888504cc7f6734487fb",
+              "registryDigest": "bda836fbe3428c8508b12b694357c2b3321dd0e1fca80888504cc7f6734487fb",
               "match": true,
               "bytes": 790
             },
             {
-              "id": "154ac59e7ed8902c78926b4363ead6395fb74f750f41727cad36251af7ff5926",
+              "id": "621ea269e816c7dcfc9fa923f66a7276a0cf980227f13a89248471639c5a9961",
               "present": true,
-              "digest": "154ac59e7ed8902c78926b4363ead6395fb74f750f41727cad36251af7ff5926",
-              "registryDigest": "154ac59e7ed8902c78926b4363ead6395fb74f750f41727cad36251af7ff5926",
+              "digest": "621ea269e816c7dcfc9fa923f66a7276a0cf980227f13a89248471639c5a9961",
+              "registryDigest": "621ea269e816c7dcfc9fa923f66a7276a0cf980227f13a89248471639c5a9961",
               "match": true,
               "bytes": 174
             },
             {
-              "id": "4f838b6834e78e9301ec85c79646e9c22d8a1160feb2422453ba665fff227522",
+              "id": "940ebd2a252746aef346ecf2b8e916807d79c034d106502ab46a6a5e1b386652",
               "present": true,
-              "digest": "4f838b6834e78e9301ec85c79646e9c22d8a1160feb2422453ba665fff227522",
-              "registryDigest": "4f838b6834e78e9301ec85c79646e9c22d8a1160feb2422453ba665fff227522",
+              "digest": "940ebd2a252746aef346ecf2b8e916807d79c034d106502ab46a6a5e1b386652",
+              "registryDigest": "940ebd2a252746aef346ecf2b8e916807d79c034d106502ab46a6a5e1b386652",
               "match": true,
               "bytes": 187
             },
             {
-              "id": "10c2c9a2bac5ba4431ed362fc5d4c26403b835a20a5ed0813b24833d5cd46ec4",
+              "id": "6f0965e4ba1c78bdeaf622a3edce3ceb685da7b7cc7c3eaaea6f96abe7729ff0",
               "present": true,
-              "digest": "10c2c9a2bac5ba4431ed362fc5d4c26403b835a20a5ed0813b24833d5cd46ec4",
-              "registryDigest": "10c2c9a2bac5ba4431ed362fc5d4c26403b835a20a5ed0813b24833d5cd46ec4",
+              "digest": "6f0965e4ba1c78bdeaf622a3edce3ceb685da7b7cc7c3eaaea6f96abe7729ff0",
+              "registryDigest": "6f0965e4ba1c78bdeaf622a3edce3ceb685da7b7cc7c3eaaea6f96abe7729ff0",
               "match": true,
               "bytes": 253
             },
@@ -3400,18 +3400,18 @@
               "bytes": 142
             },
             {
-              "id": "05203a48c6c9b712300da00728df8c5bed237b657146cf8cf28fc93a962e5755",
+              "id": "c578f866178814c97a269a0bfeb027444a0fafcef62d48cf147fb0f7aa004952",
               "present": true,
-              "digest": "05203a48c6c9b712300da00728df8c5bed237b657146cf8cf28fc93a962e5755",
-              "registryDigest": "05203a48c6c9b712300da00728df8c5bed237b657146cf8cf28fc93a962e5755",
+              "digest": "c578f866178814c97a269a0bfeb027444a0fafcef62d48cf147fb0f7aa004952",
+              "registryDigest": "c578f866178814c97a269a0bfeb027444a0fafcef62d48cf147fb0f7aa004952",
               "match": true,
               "bytes": 874
             },
             {
-              "id": "bc8d74956fb69895f58bc2b86e4de79b2b483a3ec813a2a7f37aaa77a3c030c3",
+              "id": "658ab3f04f4910f33dcf85c5baa3ba59c1cb7f36dd5b393f96ccb3087416611f",
               "present": true,
-              "digest": "bc8d74956fb69895f58bc2b86e4de79b2b483a3ec813a2a7f37aaa77a3c030c3",
-              "registryDigest": "bc8d74956fb69895f58bc2b86e4de79b2b483a3ec813a2a7f37aaa77a3c030c3",
+              "digest": "658ab3f04f4910f33dcf85c5baa3ba59c1cb7f36dd5b393f96ccb3087416611f",
+              "registryDigest": "658ab3f04f4910f33dcf85c5baa3ba59c1cb7f36dd5b393f96ccb3087416611f",
               "match": true,
               "bytes": 234
             },
@@ -3432,10 +3432,10 @@
               "bytes": 213
             },
             {
-              "id": "8fb32b0a605194be74b143d6d65072ccd2b829b22058659d83ff712555ada2e3",
+              "id": "af775e1d1d2a2dd7a981621e53596583bed7016b0be25c1b5580b856a8cf082d",
               "present": true,
-              "digest": "8fb32b0a605194be74b143d6d65072ccd2b829b22058659d83ff712555ada2e3",
-              "registryDigest": "8fb32b0a605194be74b143d6d65072ccd2b829b22058659d83ff712555ada2e3",
+              "digest": "af775e1d1d2a2dd7a981621e53596583bed7016b0be25c1b5580b856a8cf082d",
+              "registryDigest": "af775e1d1d2a2dd7a981621e53596583bed7016b0be25c1b5580b856a8cf082d",
               "match": true,
               "bytes": 1143
             },
@@ -3448,10 +3448,10 @@
               "bytes": 376
             },
             {
-              "id": "ee5731a554e275c017a213e34843376e64186005eebb6ea38114c8ae1062788d",
+              "id": "f4d8504b96bfd03e327dd07359a05ca13e970fa0d26e66e528e7cce6dc5751a4",
               "present": true,
-              "digest": "ee5731a554e275c017a213e34843376e64186005eebb6ea38114c8ae1062788d",
-              "registryDigest": "ee5731a554e275c017a213e34843376e64186005eebb6ea38114c8ae1062788d",
+              "digest": "f4d8504b96bfd03e327dd07359a05ca13e970fa0d26e66e528e7cce6dc5751a4",
+              "registryDigest": "f4d8504b96bfd03e327dd07359a05ca13e970fa0d26e66e528e7cce6dc5751a4",
               "match": true,
               "bytes": 1615
             },
@@ -3471,7 +3471,7 @@
           "status": "blocked",
           "artifacts": [
             {
-              "id": "b3c82dc1faade816426c3a61ca7104d8580182f5861c75875d6615f0380b15c0",
+              "id": "b0ad8ecb908f324191d22c60521326dce3dcd1ba9756fdb5757d2db733b6418f",
               "status": "corrupt"
             },
             {
@@ -3479,19 +3479,19 @@
               "status": "ok"
             },
             {
-              "id": "688b96281aec53d8f1dd9681e49d855039621aade67d20edef3a9f3c866a3904",
+              "id": "0ee837cc71963885ef936089dbfa0e97900725612fea8244be603453df44ed3d",
               "status": "ok"
             },
             {
-              "id": "9e2d326a300067e159437360c33c94d8f828fd7dd9db7c322b43e7f0af7fb49f",
+              "id": "d075ced1ba190aa7a09c79c598d876f0ee83ca878e74ed85c163e3458b9858f7",
               "status": "ok"
             },
             {
-              "id": "fc4c51a2eecf0ffaf50c896d85d5093416d6b90e730b5b546d14def3487fa5bd",
+              "id": "02aae82329c5e3167d1c118150811f867aa8a701e7976b8e31fb3ae78aa67c70",
               "status": "ok"
             },
             {
-              "id": "67068857a1fb359aa0ce0206c933abb562adc8ddd1beb71adfcc9ad762cc4117",
+              "id": "c1608b86bf15c9350784bc56c0b318003e0e2469057be352ba2b982a8b983814",
               "status": "ok"
             },
             {
@@ -3499,27 +3499,27 @@
               "status": "ok"
             },
             {
-              "id": "e8ecbc7085cfc8ed345ace491f0b67b1e906d94a1152a1c6ac0e61bf863b3968",
+              "id": "172de36259855350cb2a90e9d1d8c434915a69db4988b65870fbbaebdf1f7a58",
               "status": "ok"
             },
             {
-              "id": "a681f3caae83d438088bc044d51d6b6c664429c8c014b2c4b17450230c598b72",
+              "id": "3fdbd2b20427d289d22e78170fa3787b4973ef0f922c042349a6cb5d23f68539",
               "status": "ok"
             },
             {
-              "id": "deffc242dd597bdd4f6f0694501b6e737121e4bed9588e1ecf7429b4e19cc2ab",
+              "id": "bda836fbe3428c8508b12b694357c2b3321dd0e1fca80888504cc7f6734487fb",
               "status": "ok"
             },
             {
-              "id": "154ac59e7ed8902c78926b4363ead6395fb74f750f41727cad36251af7ff5926",
+              "id": "621ea269e816c7dcfc9fa923f66a7276a0cf980227f13a89248471639c5a9961",
               "status": "ok"
             },
             {
-              "id": "4f838b6834e78e9301ec85c79646e9c22d8a1160feb2422453ba665fff227522",
+              "id": "940ebd2a252746aef346ecf2b8e916807d79c034d106502ab46a6a5e1b386652",
               "status": "ok"
             },
             {
-              "id": "10c2c9a2bac5ba4431ed362fc5d4c26403b835a20a5ed0813b24833d5cd46ec4",
+              "id": "6f0965e4ba1c78bdeaf622a3edce3ceb685da7b7cc7c3eaaea6f96abe7729ff0",
               "status": "ok"
             },
             {
@@ -3527,11 +3527,11 @@
               "status": "ok"
             },
             {
-              "id": "05203a48c6c9b712300da00728df8c5bed237b657146cf8cf28fc93a962e5755",
+              "id": "c578f866178814c97a269a0bfeb027444a0fafcef62d48cf147fb0f7aa004952",
               "status": "ok"
             },
             {
-              "id": "bc8d74956fb69895f58bc2b86e4de79b2b483a3ec813a2a7f37aaa77a3c030c3",
+              "id": "658ab3f04f4910f33dcf85c5baa3ba59c1cb7f36dd5b393f96ccb3087416611f",
               "status": "ok"
             },
             {
@@ -3543,7 +3543,7 @@
               "status": "ok"
             },
             {
-              "id": "8fb32b0a605194be74b143d6d65072ccd2b829b22058659d83ff712555ada2e3",
+              "id": "af775e1d1d2a2dd7a981621e53596583bed7016b0be25c1b5580b856a8cf082d",
               "status": "ok"
             },
             {
@@ -3551,7 +3551,7 @@
               "status": "ok"
             },
             {
-              "id": "ee5731a554e275c017a213e34843376e64186005eebb6ea38114c8ae1062788d",
+              "id": "f4d8504b96bfd03e327dd07359a05ca13e970fa0d26e66e528e7cce6dc5751a4",
               "status": "ok"
             },
             {
@@ -3691,7 +3691,7 @@
     "command": "node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record",
     "exitCode": 0,
     "source": {
-      "commit": "a77cab4f41ab6f39975541606fc0f15df1655e55",
+      "commit": "1675ccbe9217b26660c5c9b237c1390fd168a83f",
       "dirty": false
     }
   },
@@ -3861,9 +3861,9 @@
       "status": "ok",
       "mode": "personal",
       "startupMode": "recovery_readonly",
-      "digest": "f28ddc5fd9614504df6cb031e91aff9cf675967f2a8f8ed78dd6ef936fa937a7"
+      "digest": "9d3576bc6be761bfa047ca388bb858bd9a5e9a070c8002f652c01cfb91509b72"
     },
-    "healthDigest": "f28ddc5fd9614504df6cb031e91aff9cf675967f2a8f8ed78dd6ef936fa937a7",
+    "healthDigest": "9d3576bc6be761bfa047ca388bb858bd9a5e9a070c8002f652c01cfb91509b72",
     "scopeDiagnostics": "present",
     "packageCapability": {
       "source": "1fbaf940d426fa34ff6289304e073b9159586ed9",
@@ -3873,7 +3873,7 @@
     },
     "registry": {
       "present": true,
-      "digest": "9650946a063a850dd549fa9848bb4f5852856d89371a7260c2ae88de0b33c416"
+      "digest": "bc2be7faea08debe1b650ff71f8bd54614650abd6faa343b040d0cf8226ac676"
     },
     "restore": {
       "verify": "VERIFIED",
@@ -3929,69 +3929,69 @@
       "tarSha256": "daee1a94b43156cec659f7df2a3b08e1ecb89b645fde1ea81c35a81d75b47d7a",
       "digestSupported": true
     },
-    "healthDigest": "c9bdd3fc17b503e9610db81b3fec3f361b5650841a831bc92abbb8500d6e9640",
+    "healthDigest": "522842bde8f7d0a47625d26d4072f3a3b1016132e031e3c86689110c83dc45cb",
     "digestAvailable": true,
-    "sameDigest": "c9bdd3fc17b503e9610db81b3fec3f361b5650841a831bc92abbb8500d6e9640",
+    "sameDigest": "522842bde8f7d0a47625d26d4072f3a3b1016132e031e3c86689110c83dc45cb",
     "processes": {
-      "live": "Sun Nov 15 17:44:10 2026",
-      "reused": "Sun Nov 15 17:44:10 2026"
+      "live": "Sun Nov 15 18:00:14 2026",
+      "reused": "Sun Nov 15 18:00:14 2026"
     },
-    "firstPid": 73617,
-    "unboundPid": 74521,
-    "pidAfterRefusals": 73617,
-    "pidAfterUnbound": 74521,
+    "firstPid": 95039,
+    "unboundPid": 95956,
+    "pidAfterRefusals": 95039,
+    "pidAfterUnbound": 95956,
     "outcomes": {
       "sameFile": {
         "status": "REUSED",
         "instance": {
           "protocol": "personal-product-instance/1",
-          "pid": 73617,
-          "processStart": "Sun Nov 15 17:44:10 2026",
-          "apiPid": 73653,
-          "consolePid": 73617,
-          "apiURL": "http://127.0.0.1:49429",
-          "consoleURL": "http://127.0.0.1:49428",
-          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/restored",
-          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/app",
+          "pid": 95039,
+          "processStart": "Sun Nov 15 18:00:14 2026",
+          "apiPid": 95075,
+          "consolePid": 95039,
+          "apiURL": "http://127.0.0.1:51966",
+          "consoleURL": "http://127.0.0.1:51965",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/restored",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/install/app",
           "buildId": "2d94a7c31ef97b57",
           "mode": "personal",
           "access": "local-development",
           "startupMode": "recovery_readonly",
           "launcherArgv": [
             "/Users/hh/.nvm/versions/node/v24.21.0/bin/node",
-            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/app/apps/launcher/bin/pa.mjs",
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/install/app/apps/launcher/bin/pa.mjs",
             "start",
             "--json",
             "--port",
-            "49428",
+            "51965",
             "--api-port",
-            "49429",
+            "51966",
             "--discussion-only",
             "--review-restored-scope",
-            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/reuse-first.json"
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/reuse-first.json"
           ],
-          "launcherCwd": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo",
+          "launcherCwd": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796",
           "apiArgv": [
             "/Users/hh/.nvm/versions/node/v24.21.0/bin/node",
-            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/app/apps/coordinator/product/demo.ts",
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/install/app/apps/coordinator/product/demo.ts",
             "--port",
-            "49429",
+            "51966",
             "--state",
-            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/restored",
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/restored",
             "--console-origin",
-            "http://127.0.0.1:49428",
+            "http://127.0.0.1:51965",
             "--startup-mode",
             "recovery_readonly",
             "--assistant",
             "--discussion-only",
             "--review-restored-scope",
-            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/reuse-first.json",
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/reuse-first.json",
             "--local-access"
           ],
-          "apiProcessStart": "Sun Nov 15 17:44:11 2026",
+          "apiProcessStart": "Sun Nov 15 18:00:14 2026",
           "apiUid": 501,
-          "startedAt": "2026-11-15T09:44:11.523Z",
-          "configRoot": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/config"
+          "startedAt": "2026-11-15T10:00:14.820Z",
+          "configRoot": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/config"
         },
         "recovery": {
           "startupMode": "recovery_readonly",
@@ -4005,22 +4005,22 @@
             "Project bindings not explicitly remapped stay pending and must be rebound to a local path."
           ],
           "pendingRebind": [
-            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/historical-project"
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/historical-project"
           ]
         },
         "stderr": "",
         "birth": {
-          "pid": 73679,
-          "start": "Sun Nov 15 17:44:11 2026",
+          "pid": 95100,
+          "start": "Sun Nov 15 18:00:14 2026",
           "uid": 501,
-          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/bin/pa start --json --port 49428 --api-port 49429 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/reuse-first.json",
-          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install",
-          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/restored",
-          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/config",
-          "consolePort": 49428,
-          "apiPort": 49429,
+          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/install/bin/pa start --json --port 51965 --api-port 51966 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/reuse-first.json",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/restored",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/config",
+          "consolePort": 51965,
+          "apiPort": 51966,
           "argvExact": false,
-          "recordedAt": "2026-11-15T09:44:11.536Z"
+          "recordedAt": "2026-11-15T10:00:14.832Z"
         }
       },
       "differentFile": {
@@ -4028,24 +4028,24 @@
         "code": "restored_review_selection_mismatch",
         "message": "本次显式 review 选择与已运行实例的实际选择不同；保留旧 PID，不复用、不结束",
         "detail": {
-          "requestedReviewIdentity": "00a13f66fdac3e78b5ca8b3efe9cfabc8c8c71bfdb7ebe982f43224c12c06bfe",
-          "liveReviewIdentity": "c9bdd3fc17b503e9610db81b3fec3f361b5650841a831bc92abbb8500d6e9640",
-          "pid": 73617
+          "requestedReviewIdentity": "3af5560fc11c0e54782a83f1bd3059d6b56120aa327f8b80fa5d469ee3bbdfd4",
+          "liveReviewIdentity": "522842bde8f7d0a47625d26d4072f3a3b1016132e031e3c86689110c83dc45cb",
+          "pid": 95039
         },
         "hint": "用与运行实例相同的已验证文件复用，或先 `pa stop` 旧实例再以新选择启动；不会重新签发/刷新旧窗口。",
         "stderr": "",
         "birth": {
-          "pid": 73835,
-          "start": "Sun Nov 15 17:44:11 2026",
+          "pid": 95257,
+          "start": "Sun Nov 15 18:00:15 2026",
           "uid": 501,
-          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/bin/pa start --json --port 49428 --api-port 49429 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/reuse-narrow.json",
-          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install",
-          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/restored",
-          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/config",
-          "consolePort": 49428,
-          "apiPort": 49429,
+          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/install/bin/pa start --json --port 51965 --api-port 51966 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/reuse-narrow.json",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/restored",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/config",
+          "consolePort": 51965,
+          "apiPort": 51966,
           "argvExact": false,
-          "recordedAt": "2026-11-15T09:44:12.001Z"
+          "recordedAt": "2026-11-15T10:00:15.306Z"
         }
       },
       "missingFile": {
@@ -4054,23 +4054,23 @@
         "message": "本次显式 review 选择与已运行实例的实际选择不同；保留旧 PID，不复用、不结束",
         "detail": {
           "requestedReviewIdentity": null,
-          "liveReviewIdentity": "c9bdd3fc17b503e9610db81b3fec3f361b5650841a831bc92abbb8500d6e9640",
-          "pid": 73617
+          "liveReviewIdentity": "522842bde8f7d0a47625d26d4072f3a3b1016132e031e3c86689110c83dc45cb",
+          "pid": 95039
         },
         "hint": "用与运行实例相同的已验证文件复用，或先 `pa stop` 旧实例再以新选择启动；不会重新签发/刷新旧窗口。",
         "stderr": "",
         "birth": {
-          "pid": 73991,
-          "start": "Sun Nov 15 17:44:12 2026",
+          "pid": 95415,
+          "start": "Sun Nov 15 18:00:15 2026",
           "uid": 501,
-          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/bin/pa start --json --port 49428 --api-port 49429 --discussion-only",
-          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install",
-          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/restored",
-          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/config",
-          "consolePort": 49428,
-          "apiPort": 49429,
+          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/install/bin/pa start --json --port 51965 --api-port 51966 --discussion-only",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/restored",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/config",
+          "consolePort": 51965,
+          "apiPort": 51966,
           "argvExact": false,
-          "recordedAt": "2026-11-15T09:44:12.473Z"
+          "recordedAt": "2026-11-15T10:00:15.774Z"
         }
       },
       "missingFilePath": {
@@ -4078,22 +4078,22 @@
         "code": "review_scope_missing",
         "message": "显式 review 配置文件不存在",
         "detail": {
-          "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/reuse-gone.json"
+          "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/reuse-gone.json"
         },
         "hint": "用 main 的 review-restored 命令重新生成新的私有文件。",
         "stderr": "",
         "birth": {
-          "pid": 74148,
-          "start": "Sun Nov 15 17:44:12 2026",
+          "pid": 95580,
+          "start": "Sun Nov 15 18:00:16 2026",
           "uid": 501,
-          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/bin/pa start --json --port 49428 --api-port 49429 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/reuse-gone.json",
-          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install",
-          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/restored",
-          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/config",
-          "consolePort": 49428,
-          "apiPort": 49429,
+          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/install/bin/pa start --json --port 51965 --api-port 51966 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/reuse-gone.json",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/restored",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/config",
+          "consolePort": 51965,
+          "apiPort": 51966,
           "argvExact": false,
-          "recordedAt": "2026-11-15T09:44:12.951Z"
+          "recordedAt": "2026-11-15T10:00:16.255Z"
         }
       },
       "portChange": {
@@ -4104,35 +4104,35 @@
           "differences": [
             {
               "field": "consoleURL",
-              "expected": "http://127.0.0.1:49442",
-              "actual": "http://127.0.0.1:49428"
+              "expected": "http://127.0.0.1:51979",
+              "actual": "http://127.0.0.1:51965"
             },
             {
               "field": "apiURL",
-              "expected": "http://127.0.0.1:49443",
-              "actual": "http://127.0.0.1:49429"
+              "expected": "http://127.0.0.1:51980",
+              "actual": "http://127.0.0.1:51966"
             }
           ],
           "running": {
-            "pid": 73617,
-            "consoleURL": "http://127.0.0.1:49428",
-            "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/restored"
+            "pid": 95039,
+            "consoleURL": "http://127.0.0.1:51965",
+            "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/restored"
           }
         },
         "hint": "用与运行实例相同的参数复用；要切换请先 `pa stop`，再以新参数启动。",
         "stderr": "",
         "birth": {
-          "pid": 74184,
-          "start": "Sun Nov 15 17:44:13 2026",
+          "pid": 95616,
+          "start": "Sun Nov 15 18:00:16 2026",
           "uid": 501,
-          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/bin/pa start --json --port 49442 --api-port 49443 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/reuse-first.json",
-          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install",
-          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/restored",
-          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/config",
-          "consolePort": 49442,
-          "apiPort": 49443,
+          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/install/bin/pa start --json --port 51979 --api-port 51980 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/reuse-first.json",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/restored",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/config",
+          "consolePort": 51979,
+          "apiPort": 51980,
           "argvExact": false,
-          "recordedAt": "2026-11-15T09:44:13.357Z"
+          "recordedAt": "2026-11-15T10:00:16.648Z"
         }
       },
       "unboundThenSelection": {
@@ -4140,24 +4140,24 @@
         "code": "restored_review_selection_mismatch",
         "message": "本次显式 review 选择与已运行实例的实际选择不同；保留旧 PID，不复用、不结束",
         "detail": {
-          "requestedReviewIdentity": "c9bdd3fc17b503e9610db81b3fec3f361b5650841a831bc92abbb8500d6e9640",
+          "requestedReviewIdentity": "522842bde8f7d0a47625d26d4072f3a3b1016132e031e3c86689110c83dc45cb",
           "liveReviewIdentity": null,
-          "pid": 74521
+          "pid": 95956
         },
         "hint": "用与运行实例相同的已验证文件复用，或先 `pa stop` 旧实例再以新选择启动；不会重新签发/刷新旧窗口。",
         "stderr": "",
         "birth": {
-          "pid": 74592,
-          "start": "Sun Nov 15 17:44:14 2026",
+          "pid": 96019,
+          "start": "Sun Nov 15 18:00:18 2026",
           "uid": 501,
-          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/bin/pa start --json --port 49447 --api-port 49448 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/reuse-first.json",
-          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install",
-          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/restored",
-          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/config",
-          "consolePort": 49447,
-          "apiPort": 49448,
+          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/install/bin/pa start --json --port 51984 --api-port 51985 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/reuse-first.json",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/restored",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/config",
+          "consolePort": 51984,
+          "apiPort": 51985,
           "argvExact": false,
-          "recordedAt": "2026-11-15T09:44:14.801Z"
+          "recordedAt": "2026-11-15T10:00:18.113Z"
         }
       }
     },
@@ -4262,7 +4262,7 @@
         "status": 200,
         "body": {
           "protocol": "trial-readiness/1",
-          "observedAt": "2026-11-15T09:44:16.760Z",
+          "observedAt": "2026-11-15T10:00:20.055Z",
           "configurationRevision": "a9c826f123324b2d8f1a07902775e6a1c453f4de86b467027490a903c324e84b",
           "mode": "personal",
           "startupMode": "normal",
@@ -4330,8 +4330,8 @@
         "status": 200,
         "body": {
           "protocol": "trial-readiness/1",
-          "observedAt": "2026-11-15T09:44:16.874Z",
-          "configurationRevision": "7b5a6a82ab75d5c8402f695412b03a2bf3183c5678386022ffd7cdc1dd962a48",
+          "observedAt": "2026-11-15T10:00:20.160Z",
+          "configurationRevision": "40bdd3643f12e23a52a030e4bf36d89aa513c2d43b8a991a4659044ebb0c996f",
           "mode": "personal",
           "startupMode": "normal",
           "discussion": "configuration_present",
@@ -4369,8 +4369,8 @@
         "status": 200,
         "body": {
           "protocol": "trial-readiness/1",
-          "observedAt": "2026-11-15T09:44:17.854Z",
-          "configurationRevision": "af1e9636a40f4e9339d3f6edb94ef6087650f7b70ea078bed8847fba70a8bf06",
+          "observedAt": "2026-11-15T10:00:21.132Z",
+          "configurationRevision": "4c728175d403bc447bcc1fcda3abc5d313b3cd9f3ec31130e40225822ca85e2a",
           "mode": "personal",
           "startupMode": "recovery_readonly",
           "discussion": "unknown",
@@ -4400,7 +4400,7 @@
         }
       },
       "configuration": {
-        "revision": "af1e9636a40f4e9339d3f6edb94ef6087650f7b70ea078bed8847fba70a8bf06",
+        "revision": "4c728175d403bc447bcc1fcda3abc5d313b3cd9f3ec31130e40225822ca85e2a",
         "projects": [
           {
             "discussionOnly": true,
@@ -4449,7 +4449,7 @@
         "status": "ok",
         "mode": "personal",
         "startupMode": "recovery_readonly",
-        "restoredReviewDigest": "c94f071827d96814262c753beb2991b4ef43f3e66639ce27d05187635466743f",
+        "restoredReviewDigest": "64ee7b9d01f96be54b243013142f9947dc6de3cb8cd9151bda34a5af58fbf991",
         "access": "local-development"
       },
       "code": null,
@@ -4463,7 +4463,7 @@
         "status": 200,
         "body": {
           "protocol": "trial-readiness/1",
-          "observedAt": "2026-11-15T09:44:19.176Z",
+          "observedAt": "2026-11-15T10:00:22.435Z",
           "configurationRevision": "83d2a00c18fe919d4671f2916ce9baec23e44fc5cfd8f51b3ba2d241462e06af",
           "mode": "fixture",
           "startupMode": "normal",
@@ -4632,38 +4632,38 @@
         "present": true,
         "mode": "personal",
         "startupMode": "normal",
-        "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/seed-state",
-        "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/app",
+        "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/seed-state",
+        "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/install/app",
         "resources": [
           {
             "label": "launcher",
-            "pid": 75776,
-            "start": "Sun Nov 15 17:44:19 2026",
+            "pid": 97201,
+            "start": "Sun Nov 15 18:00:22 2026",
             "uid": 501,
             "parentPid": null,
-            "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/app/apps/launcher/bin/pa.mjs start --json --port 49488 --api-port 49489 --discussion-only"
+            "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/install/app/apps/launcher/bin/pa.mjs start --json --port 52025 --api-port 52026 --discussion-only"
           },
           {
             "label": "child",
-            "pid": 75812,
-            "start": "Sun Nov 15 17:44:19 2026",
+            "pid": 97237,
+            "start": "Sun Nov 15 18:00:23 2026",
             "uid": 501,
-            "parentPid": 75776,
-            "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/app/apps/coordinator/product/demo.ts --port 49489 --state /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/seed-state --console-origin htt"
+            "parentPid": 97201,
+            "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/install/app/apps/coordinator/product/demo.ts --port 52026 --state /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/seed-state --console-origin htt"
           }
         ]
       },
       "after": [
         {
-          "pid": 75776,
-          "expectedStart": "Sun Nov 15 17:44:19 2026",
+          "pid": 97201,
+          "expectedStart": "Sun Nov 15 18:00:22 2026",
           "alive": false,
           "start": null,
           "sameIdentity": false
         },
         {
-          "pid": 75812,
-          "expectedStart": "Sun Nov 15 17:44:19 2026",
+          "pid": 97237,
+          "expectedStart": "Sun Nov 15 18:00:23 2026",
           "alive": false,
           "start": null,
           "sameIdentity": false
@@ -4687,38 +4687,38 @@
         "present": true,
         "mode": "personal",
         "startupMode": "recovery_readonly",
-        "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/restored",
-        "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/app",
+        "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/restored",
+        "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/install/app",
         "resources": [
           {
             "label": "launcher",
-            "pid": 76089,
-            "start": "Sun Nov 15 17:44:21 2026",
+            "pid": 97515,
+            "start": "Sun Nov 15 18:00:24 2026",
             "uid": 501,
             "parentPid": null,
-            "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/app/apps/launcher/bin/pa.mjs start --json --port 49497 --api-port 49498 --discussion-only"
+            "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/install/app/apps/launcher/bin/pa.mjs start --json --port 52034 --api-port 52035 --discussion-only"
           },
           {
             "label": "child",
-            "pid": 76125,
-            "start": "Sun Nov 15 17:44:21 2026",
+            "pid": 97553,
+            "start": "Sun Nov 15 18:00:24 2026",
             "uid": 501,
-            "parentPid": 76089,
-            "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/app/apps/coordinator/product/demo.ts --port 49498 --state /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/restored --console-origin http:"
+            "parentPid": 97515,
+            "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/install/app/apps/coordinator/product/demo.ts --port 52035 --state /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-RTC796/restored --console-origin http:"
           }
         ]
       },
       "after": [
         {
-          "pid": 76089,
-          "expectedStart": "Sun Nov 15 17:44:21 2026",
+          "pid": 97515,
+          "expectedStart": "Sun Nov 15 18:00:24 2026",
           "alive": false,
           "start": null,
           "sameIdentity": false
         },
         {
-          "pid": 76125,
-          "expectedStart": "Sun Nov 15 17:44:21 2026",
+          "pid": 97553,
+          "expectedStart": "Sun Nov 15 18:00:24 2026",
           "alive": false,
           "start": null,
           "sameIdentity": false
@@ -4799,8 +4799,8 @@
       "abi": "137"
     },
     "bundle": {
-      "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-support-lcmvIp/support-one.pab",
-      "bytes": 13961,
+      "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-support-OEps8e/support-one.pab",
+      "bytes": 13960,
       "mode": "600"
     },
     "repeated": {
@@ -4923,27 +4923,27 @@
     "screenshots": [
       {
         "path": "tests/product-acceptance/reports/wave27/browser/desktop.png",
-        "sha256": "19ff8f9cc54b815f2ac8d347032a0432f156407119c7f29f715b21e84377b134",
-        "bytes": 124724,
-        "size": 124724
+        "sha256": "d19890d05e3ff4c77e0d7772b1b13a4eda7b9d06e15625c6e4a88d8303d60fac",
+        "bytes": 124851,
+        "size": 124851
       },
       {
         "path": "tests/product-acceptance/reports/wave27/browser/mobile.png",
-        "sha256": "57337e0250d4a69c30b5e398768c168bbc9eb96d7de06f688e5e4af9f18de324",
-        "bytes": 55834,
-        "size": 55834
+        "sha256": "273d9e0f0d87f3c237359ee1ca9228b68d07cc10015614b65f035928742f4508",
+        "bytes": 55961,
+        "size": 55961
       },
       {
         "path": "tests/product-acceptance/reports/wave27/browser/configured-conversation.png",
-        "sha256": "78c0eb1d366de861cc08c882c53d924e090ab5b0c76f40b230e0da0847a88a68",
-        "bytes": 76516,
-        "size": 76516
+        "sha256": "1db9470e1d7c1f06b92ae0fa7c45dc3edabecf82fffa91c16f0385c71ef85151",
+        "bytes": 76517,
+        "size": 76517
       }
     ],
     "problems": [
       "console: Failed to load resource: net::ERR_FAILED",
       "console: Failed to load resource: the server responded with a status of 404 (Not Found)",
-      "console: Failed to load resource: net::ERR_EMPTY_RESPONSE",
+      "console: Failed to load resource: net::ERR_CONNECTION_REFUSED",
       "console: Failed to load resource: net::ERR_CONNECTION_REFUSED"
     ],
     "readinessReads": 9,
@@ -4952,26 +4952,26 @@
     "providerAfter": 0,
     "lifecycle": {
       "stages": [],
-      "root": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-PMww89",
+      "root": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-Tkxuub",
       "startA": {
         "status": "RUNNING",
         "code": null,
         "birth": {
-          "pid": 76723,
-          "start": "Sun Nov 15 17:44:27 2026",
+          "pid": 98169,
+          "start": "Sun Nov 15 18:00:31 2026",
           "uid": 501,
-          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-PMww89/install/bin/pa start --json --port 49517 --api-port 49518 --discussion-only",
-          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-PMww89/install",
-          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-PMww89/state",
-          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-PMww89/config",
-          "consolePort": 49517,
-          "apiPort": 49518,
+          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-Tkxuub/install/bin/pa start --json --port 52068 --api-port 52069 --discussion-only",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-Tkxuub/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-Tkxuub/state",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-Tkxuub/config",
+          "consolePort": 52068,
+          "apiPort": 52069,
           "argvExact": false,
-          "recordedAt": "2026-11-15T09:44:27.749Z"
+          "recordedAt": "2026-11-15T10:00:31.735Z"
         },
         "instance": {
           "mode": "personal",
-          "processStart": "Sun Nov 15 17:44:27 2026"
+          "processStart": "Sun Nov 15 18:00:31 2026"
         }
       },
       "stageAStop": {
@@ -4986,21 +4986,21 @@
         "status": "RUNNING",
         "code": null,
         "birth": {
-          "pid": 76971,
-          "start": "Sun Nov 15 17:44:30 2026",
+          "pid": 98416,
+          "start": "Sun Nov 15 18:00:34 2026",
           "uid": 501,
-          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-PMww89/install/bin/pa start --json --port 49540 --api-port 49541 --discussion-only",
-          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-PMww89/install",
-          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-PMww89/state",
-          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-PMww89/config",
-          "consolePort": 49540,
-          "apiPort": 49541,
+          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-Tkxuub/install/bin/pa start --json --port 52087 --api-port 52088 --discussion-only",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-Tkxuub/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-Tkxuub/state",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-Tkxuub/config",
+          "consolePort": 52087,
+          "apiPort": 52088,
           "argvExact": false,
-          "recordedAt": "2026-11-15T09:44:30.388Z"
+          "recordedAt": "2026-11-15T10:00:34.227Z"
         },
         "instance": {
           "mode": "personal",
-          "processStart": "Sun Nov 15 17:44:30 2026"
+          "processStart": "Sun Nov 15 18:00:34 2026"
         }
       },
       "stageBStop": {
@@ -5036,7 +5036,7 @@
     "UNKNOWN": 0
   },
   "testCodeSource": {
-    "commit": "a77cab4f41ab6f39975541606fc0f15df1655e55",
+    "commit": "1675ccbe9217b26660c5c9b237c1390fd168a83f",
     "dirty": false,
     "branch": "codex/g3-product-acceptance"
   },
