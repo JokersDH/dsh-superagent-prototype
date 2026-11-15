@@ -13,6 +13,8 @@ import type { TrialInsightsLayer, TrialInsightsView } from './insights.ts'
 import { trialInsightsAdmission, trialInsightsCount } from './insights.ts'
 import type { TrialRecipeSelection, TrialRecipeSuggestion } from './recipes.ts'
 import { trialRecipeContext, trialRecipeOutcome } from './recipes.ts'
+import type { TrialSupportInfo } from './support.ts'
+import { trialSupportRows } from './support.ts'
 import type { TrialStatusValue, TrialTone } from './trial-view.ts'
 import { formatObservedAt, shortRevision, trialActions, trialHeadline, trialProjectValue, trialStrip } from './trial-view.ts'
 import './trial.css'
@@ -34,6 +36,7 @@ export interface TrialWorkspaceProps {
   readonly onDownloadInsights?: (() => void) | undefined
   readonly insightsDownloading?: boolean | undefined
   readonly insightsDownloadError?: string | undefined
+  readonly support?: TrialSupportInfo | undefined
   readonly recipes?: readonly TrialRecipeSuggestion[] | undefined
   readonly recipesLoading?: boolean | undefined
   readonly recipesError?: string | undefined
@@ -95,7 +98,7 @@ export function TrialWorkspace({
   readiness, loading = false, error, unavailable = false, configuration, activeProjectId,
   activeConversationTitle, insights, insightWindow, onSelectInsightWindow, insightsLoading = false,
   insightsError, onReloadInsights, onDownloadInsights, insightsDownloading = false, insightsDownloadError,
-  recipes, recipesLoading = false, recipesError, onOpenRecipe,
+  support, recipes, recipesLoading = false, recipesError, onOpenRecipe,
   onAction, onReload, headingLevel = 2, className,
 }: TrialWorkspaceProps) {
   const base = useId()
@@ -104,6 +107,7 @@ export function TrialWorkspace({
   const projectsId = `${base}-projects`
   const executorsId = `${base}-executors`
   const insightsId = `${base}-insights`
+  const supportId = `${base}-support`
   const recipesId = `${base}-recipes`
   const Heading = headingLevel === 3 ? 'h3' : 'h2'
   const strip = readiness === undefined ? undefined : trialStrip(readiness)
@@ -125,9 +129,17 @@ export function TrialWorkspace({
   const capabilities = readiness?.capabilities
   const insightAdmission = insights === undefined ? undefined : trialInsightsAdmission(insights, activeProjectId, insightWindow)
   const insightDays = insightWindow ?? insights?.days
+  const exportDisabledReason = insightsDownloading ? '正在导出…'
+    : insightsLoading ? '正在读取当前范围'
+      : insights === undefined ? '当前范围尚未读取'
+        : insights.status === 'unavailable' ? '当前范围没有可导出的观察' : undefined
   const activeProjectLabel = activeProjectId === undefined
     ? '全部项目'
     : configuration?.projects.find(project => project.id === activeProjectId)?.displayName ?? '当前项目（名称未读取）'
+  const supportRows = trialSupportRows({
+    readiness, projectLabel: activeProjectLabel, conversationLabel: activeConversationTitle ?? '主对话',
+    windowDays: insightDays, info: support,
+  })
   const recipeContext = trialRecipeContext(configuration, activeProjectId)
   const recipeRows = recipes?.slice(0, 6).map(suggestion => ({ suggestion, outcome: trialRecipeOutcome(suggestion, recipeContext) }))
   const recipeTotal = recipes?.length
@@ -313,6 +325,7 @@ export function TrialWorkspace({
                 {insights === undefined ? '等待读取' : trialInsightsCount(insights)}
                 {' · '}{insights?.windowLabel ?? '窗口未声明'}
                 {' · '}{insights?.coverage ?? '覆盖未声明'}
+                {insights?.observedAt === undefined ? '' : ` · 观察于 ${formatObservedAt(insights.observedAt)}`}
               </span>
             </div>
             <div className="trial-observation-toolbar">
@@ -326,13 +339,23 @@ export function TrialWorkspace({
               </div>
             )}
             {onDownloadInsights !== undefined && (
-              <button type="button" className="icon-button" title="重新读取当前范围并导出新快照" aria-label="导出当前范围观察"
-                disabled={insightsDownloading || insightsLoading || insights === undefined || insights.status === 'unavailable'} onClick={onDownloadInsights}>
+              <button type="button" className="icon-button"
+                title={exportDisabledReason ?? '重新读取当前范围并导出新快照'} aria-label="导出当前范围观察"
+                disabled={exportDisabledReason !== undefined} onClick={onDownloadInsights}>
                 <Download size={16} aria-hidden="true" />
               </button>
             )}
+            {insightsDownloading && <span className="trial-export-status" role="status">正在导出…</span>}
             </div>
-            {insightsDownloadError && <p className="trial-muted" role="alert">{insightsDownloadError}</p>}
+            {insightsDownloadError && (
+              <div className="trial-banner trial-banner-danger" role="alert">
+                <TriangleAlert size={17} aria-hidden="true" />
+                <p><strong>导出未完成</strong><span>{insightsDownloadError}</span></p>
+                {onDownloadInsights !== undefined && (
+                  <button type="button" className="quiet" disabled={insightsDownloading} onClick={onDownloadInsights}>重试</button>
+                )}
+              </div>
+            )}
             {insightsError !== undefined && (
               <div className="trial-banner trial-banner-danger" role="alert">
                 <TriangleAlert size={17} aria-hidden="true" />
@@ -383,6 +406,9 @@ export function TrialWorkspace({
               <ul className="trial-limits">
                 {insights.limitations.map(limit => <li key={limit}>{limit}</li>)}
               </ul>
+            )}
+            {onDownloadInsights !== undefined && (
+              <p className="trial-note">导出会重新读取当前项目/窗口的观察；文件只含展示数据，不是执行或收益证明。</p>
             )}
             </>}
           </section>
@@ -443,6 +469,20 @@ export function TrialWorkspace({
             <p className="trial-note">这里只显示声明并带上受限选择；完整字段由原表单的模板预览给出，创建、检查与执行仍由你在原确认页决定。</p>
           </section>
         )}
+
+        <details className="trial-support" aria-labelledby={supportId}>
+          <summary id={supportId}>支持与诊断</summary>
+          <dl className="trial-support-rows">
+            {supportRows.map(row => (
+              <div key={row.label} className="trial-fact">
+                <dt>{row.label}</dt>
+                <dd>{row.value}</dd>
+              </div>
+            ))}
+          </dl>
+          {support?.note !== undefined && <p className="trial-note">{support.note}</p>}
+          <p className="trial-note">只读摘要，不含凭据、绝对路径或命令；支持材料由 main/H 提供。</p>
+        </details>
 
         <footer className="trial-boundary">
           <span>只读配置观察</span>

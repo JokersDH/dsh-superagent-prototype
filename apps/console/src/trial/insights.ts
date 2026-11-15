@@ -34,6 +34,8 @@ export interface TrialInsightsView {
   readonly status: 'ready' | 'insufficient_data' | 'unavailable'
   /** Main's selected window (7/30 days) when supplied by the observation endpoint. */
   readonly days?: 7 | 30
+  /** Snapshot identity supplied with the observation (read-only display only). */
+  readonly observedAt?: string
   readonly timezone?: string
   /** Human-readable observation window, e.g. "11月1日–11月14日". Required to show measurements. */
   readonly windowLabel?: string

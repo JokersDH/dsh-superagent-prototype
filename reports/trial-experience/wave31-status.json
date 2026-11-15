@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 7,
+  "owner": "F",
+  "wave": "product-wave-31",
+  "program": "three continuous delivery packages / twelve complete outcomes",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-f",
+  "branch": "codex/g4-trial-experience",
+  "baseMain": "8deda18d",
+  "mergedMain": "8deda18d",
+  "startSource": "876fc970",
+  "mainAppSource": "303b2c6a974856661c21d0617bd710ebe87374d1",
+  "mainExportSource": "303b2c6a",
+  "finalSourceCommit": null,
+  "dirty": [],
+  "state": "DELIVERED_SOURCE_AND_CONTROLLED_INSTALLED_NOT_REACHED",
+  "r1": {
+    "artifact": "/Users/hh/Desktop/joker/pa-artifacts/wave30-target/wave30-target-8296720.tar.gz",
+    "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+    "build": "8296720d8a25f38c",
+    "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+    "bytes": 20458670,
+    "entries": 6849,
+    "bundle": "install/app/apps/console/dist/assets/index-DTOhkXHZ.js",
+    "contains": ["试用准备", "使用观察", "观察窗口[7,30]", "配方草案", "打开原表单模板", "模板草稿"],
+    "missing": ["/insights/export", "导出当前范围观察"],
+    "fVerdict": "RC bundle inspected read-only; export is R2 source only; no instance started; installed user flow remains E-owned"
+  },
+  "r2": {
+    "source": "303b2c6a974856661c21d0617bd710ebe87374d1",
+    "export": "GET /v1/insights/export via ConsoleTransport.downloadUsageObservation, fresh read, WebCrypto digest, explicit click only",
+    "successorTar": "NOT_FOUND in /Users/hh/Desktop/joker/pa-artifacts/wave31-target (empty)",
+    "fVerdict": "source/controlled consumer verified; installed NOT_REACHED until D freezes successor and E verifies same tar"
+  },
+  "packages": {
+    "P1_FIXED_RC_WORKBENCH": {
+      "outcomes": {
+        "P1.1": { "implementation": "export/support absence-safe states and observedAt/current-scope display in F components", "consumer": "F states + RC bundle audit", "positive": "RC markers verified", "negative": "no export button when callback absent", "status": "SOURCE + RC_INSPECTED; E installed" },
+        "P1.2": { "implementation": "two-project work/evidence return preserved in real App", "consumer": "app-daily-flow (real App controlled), main trial 8/8", "positive": "two accepted works, reload evidence", "negative": "wrong project/reload draft not fabricated", "status": "CONTROLLED PASS" },
+        "P1.3": { "implementation": "declared scope vs preview atoms consistency; exclusion preservation", "consumer": "F states + main recipes 8/8 + main usage 13/13", "positive": "valid narrow selection", "negative": "blocked/expired/exclusion/mismatch refused", "status": "SOURCE + CONTROLLED PASS" },
+        "P1.4": { "implementation": "desktop/mobile/keyboard/error audit of P1 states", "consumer": "trial-states 33/33", "positive": "complete journey reachable", "negative": "no overflow/overlap; no read-triggered business", "status": "CONTROLLED PASS; RC interaction E-owned" }
+      }
+    },
+    "P2_R2_EXPORT_AND_WORKBENCH": {
+      "outcomes": {
+        "P2.1": { "implementation": "export toolbar: explicit click, display-only note, downloading status, disabled reason, retry, old-package absence", "consumer": "main useObservationDownload + transport download; F EXPORT-TOOLBAR", "positive": "one explicit click -> one callback; rows remain", "negative": "no auto download; loading/error/no-endpoint handled", "status": "SOURCE + CONTROLLED PASS" },
+        "P2.2": { "implementation": "observedAt + scope/window/coverage/sources display; new snapshot not presented as old", "consumer": "main usage-observation 13/13 (window/scope/late/503/404/export)", "positive": "page/export same source fields", "negative": "old window hidden; no cross-project reuse", "status": "CONTROLLED PASS" },
+        "P2.3": { "implementation": "template selection + original form + history/observation continuity", "consumer": "main project-recipes 8/8 + app-daily-flow", "positive": "two template works to manual accept", "negative": "cancel/stale/legacy fallback", "status": "CONTROLLED PASS" },
+        "P2.4": { "implementation": "export/support focus, keyboard, 390 layout, error recovery", "consumer": "F states mobile/keyboard + main desktop/mobile tests", "positive": "keyboard opens support/export", "negative": "no overlap/secret leak", "status": "SOURCE + CONTROLLED; successor installed NOT_REACHED" }
+      }
+    },
+    "P3_LONG_USE_SUPPORT_GUIDE": {
+      "outcomes": {
+        "P3.1": { "implementation": "long-use identity/return preserved (two conversations/projects, reload, decisions/works/delivery)", "consumer": "app-daily-flow 7/7 + hook async 7/7", "positive": "draft returns in-app; delivered history after reload", "negative": "reload does not fabricate drafts; late identity isolated", "status": "CONTROLLED PASS" },
+        "P3.2": { "implementation": "support/diagnostics details panel (mode/startup/project/conversation/window/config/observedAt/package/source) with no secrets", "consumer": "F SUPPORT-PANEL + support fixture", "positive": "collapsed by default; keyboard opens; package/source labels", "negative": "no /Users/token; missing labels explicit", "status": "SOURCE + CONTROLLED PASS" },
+        "P3.3": { "implementation": "user guide updated for export/support/R1-R2/7-30/templates and error paths", "consumer": "docs/user-guide six chapters; link check", "positive": "real entry instructions", "negative": "no main-missing claims, no old package-as-installed", "status": "DELIVERED DOCS" },
+        "P3.4": { "implementation": "typed props/callbacks, 9-file package handoff, status/report", "consumer": "main App source + E/D inputs", "positive": "strict/build/10 suites", "negative": "installed R1/R2 separated and NOT_REACHED where absent", "status": "DELIVERED HANDOFF" }
+      }
+    }
+  },
+  "evidence": {
+    "runner": "node e2e/trial/run-all.mjs",
+    "suites": [
+      { "id": "unit", "exit": 0, "result": "20 PASS" },
+      { "id": "typecheck-app", "exit": 0 },
+      { "id": "typecheck-e2e", "exit": 0 },
+      { "id": "build", "exit": 0 },
+      { "id": "hook-async", "exit": 0, "result": "7/7" },
+      { "id": "browser-states", "exit": 0, "result": "33/33" },
+      { "id": "http-journey", "exit": 0, "result": "6/6" },
+      { "id": "app-targets", "exit": 0, "result": "6/6" },
+      { "id": "app-two-projects", "exit": 0, "result": "8/8" },
+      { "id": "app-daily-flow", "exit": 0, "result": "7/7" }
+    ],
+    "runAll": "10/10 suites exit 0",
+    "mainTrialApp": "8/8 PASS",
+    "mainObservation": "13/13 PASS (7/30, project scope, late/503/404, export/download)",
+    "mainRecipeTemplate": "8/8 PASS",
+    "viewports": ["1440x900", "390x844"],
+    "browser": "Chromium (Playwright 1.65)",
+    "visualGate": "programmatic layout/contrast/control audit; no F pixel verdict",
+    "modelNativeTurns": 0,
+    "businessSideEffects": "none except explicit user commands in controlled flows; export only on click"
+  },
+  "handoff": {
+    "runtimeSources": [
+      "apps/console/src/trial/index.ts",
+      "apps/console/src/trial/TrialWorkspace.tsx",
+      "apps/console/src/trial/useTrialReadiness.ts",
+      "apps/console/src/trial/trial-view.ts",
+      "apps/console/src/trial/insights.ts",
+      "apps/console/src/trial/recipes.ts",
+      "apps/console/src/trial/support.ts",
+      "apps/console/src/trial/trial.css",
+      "apps/console/test/trial/trial-view.case.ts"
+    ],
+    "mustNotPackage": ["apps/console/e2e/trial/**", "apps/console/test/trial/**", "harness", "fixtures", "screenshots", "temporary state"],
+    "dependencies": "existing React 18, lucide-react, @personal-agent/contracts; type-only transport/configuration labels; no dependency/lock change; CSS imported by component",
+    "mainIntegration": "export via onDownloadInsights/insightsDownloading/insightsDownloadError; support via optional {packageLabel,sourceLabel,note}; recipes/window already wired",
+    "docs": ["reports/trial-experience/main-integration.zh-CN.md", "reports/trial-experience/wave31-rc-baseline.zh-CN.md", "docs/user-guide/"]
+  },
+  "remaining": [
+    "R2 successor tar not frozen; installed R2 NOT_REACHED",
+    "R1 installed user-flow verdict is E-owned; F only inspected bundle bytes",
+    "manual screen-reader, non-Chromium, 200% zoom/forced-colors, real long auth-expiry",
+    "native/vendor/model and efficiency-value claims not measured",
+    "main may pass support package/source labels; absent labels stay explicit"
+  ],
+  "preserved": {
+    "userServicesChanged": 0,
+    "stateProfileTarLedgerTouched": false,
+    "newCheckout": false,
+    "resetOrClean": false,
+    "privateTempRoots": "created under /tmp and removed"
+  }
+}

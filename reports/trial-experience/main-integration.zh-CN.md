@@ -39,7 +39,11 @@ main 0077 已把试用准备的真实 server-preview 建议接到原 NewWorkForm
 - 选择范围必须同时是项目 atoms 与声明模板范围的子集；项目排除项必须保留，且额外排除项因受限选择无法携带而被拒绝。
 - 同一草案 300ms 内重复点击只回调一次；取消/编辑/stale/未知 commandId 重试由原表单负责。
 
-### 2.2 真实观察（main 已实现 7/30，F 为消费者）
+### 2.2 观察导出与支持（main 已实现，F 为消费者）
+
+main 已通过 `onDownloadInsights/insightsDownloading/insightsDownloadError` 接入 `POST` 后的下载副作用。F 的组件只负责：明确点击、显示-only 说明、下载中状态、失败重试和旧包隐藏；真实文件生成/鉴权/取消仍由 main `useObservationDownload` 与 transport 完成。支持摘要通过可选 `support={{packageLabel, sourceLabel, note}}` 传入；缺少标签时显示“未提供/未声明”，不要伪造包身份。
+
+### 2.3 真实观察（main 已实现 7/30，F 为消费者）
 
 main 的 `useUsageObservation`/App 已实现 7/30 天真实读取并向 F 传 `insightWindow/onSelectInsightWindow/insightsLoading/insightsError/onReloadInsights`；它与 F 的 `TrialInsightsView` 结构兼容（`windowLabel/coverage/coverageState/scope/sampleCount/unknownCount/metrics/layer/unit/limitations`）。
 

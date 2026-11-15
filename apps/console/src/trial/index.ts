@@ -9,6 +9,8 @@ export {
 export type { TrialAction, TrialActionsInput, TrialProjectValue, TrialStatusStrip, TrialStatusValue, TrialTone } from './trial-view.ts'
 export { trialInsightsAdmission, trialInsightsCount, trialInsightsScopeLabel } from './insights.ts'
 export { trialRecipeContext, trialRecipeOutcome } from './recipes.ts'
+export type { TrialSupportInfo, TrialSupportRow } from './support.ts'
+export { trialSupportRows } from './support.ts'
 export type {
   TrialRecipeCheckRef, TrialRecipeCheckView, TrialRecipeContext, TrialRecipeContextProject, TrialRecipeKind,
   TrialRecipeMissingInput, TrialRecipeOutcome, TrialRecipeProfileRef, TrialRecipeProfileView, TrialRecipeProject,

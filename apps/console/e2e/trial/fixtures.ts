@@ -7,6 +7,7 @@ import { ApplicationConfigurationSchema, TrialReadinessSchema } from '@personal-
 import type { ApplicationConfiguration, TrialReadiness } from '@personal-agent/contracts'
 import type { TrialInsightsView } from '../../src/trial/insights.ts'
 import type { TrialRecipeSuggestion } from '../../src/trial/recipes.ts'
+import type { TrialSupportInfo } from '../../src/trial/support.ts'
 
 const revision = (character: string) => character.repeat(64)
 const observedAt = '2026-11-14T04:00:00.000Z'
@@ -143,7 +144,8 @@ const recipeScopeCases: readonly TrialRecipeSuggestion[] = [
 ]
 
 const longInsights: TrialInsightsView = {
-  status: 'ready', windowLabel: '11月1日–11月14日', coverage: 'partial：3/5 来源可读', coverageState: 'partial',
+  status: 'ready', observedAt: '2026-11-15T04:00:00.000Z', days: 7,
+  windowLabel: '11月1日–11月14日', coverage: 'partial：3/5 来源可读', coverageState: 'partial',
   scope: { projectIds: ['project-quartz', 'project-atlas', 'project-harbor', 'project-requirements', 'project-notes'], aggregation: 'declared_multi_project', label: '本项目群 5 个项目' },
   sampleCount: 12, unknownCount: 2, sources: { known: 3, unknown: 2 },
   metrics: [
@@ -206,6 +208,7 @@ export const trialStates = [
   'noreadiness', 'loading', 'unavailable', 'error', 'long', 'insights-empty', 'insights-unscoped', 'insights-wrong-project',
   'insights-truncated', 'insights-partial', 'recipes', 'recipes-scope', 'recipes-all-projects',
   'recipes-loading', 'recipes-error', 'insights-window', 'insights-window-mismatch', 'insights-loading',
+  'insights-export', 'insights-export-loading', 'insights-export-error', 'insights-no-export', 'support',
   'recipes-blocked', 'recipes-expired', 'recipes-exclusions', 'recipes-scope-mismatch',
 ] as const
 export type TrialHarnessState = (typeof trialStates)[number]
@@ -222,6 +225,10 @@ export interface TrialHarnessProps {
   readonly insightWindow?: 7 | 30 | undefined
   readonly insightsLoading?: boolean | undefined
   readonly insightsError?: string | undefined
+  readonly insightsDownloading?: boolean | undefined
+  readonly insightsDownloadError?: string | undefined
+  readonly noExport?: boolean | undefined
+  readonly support?: TrialSupportInfo | undefined
   readonly recipes?: readonly TrialRecipeSuggestion[] | undefined
   readonly recipesLoading?: boolean | undefined
   readonly recipesError?: string | undefined
@@ -294,6 +301,31 @@ export function trialHarnessProps(state: TrialHarnessState): TrialHarnessProps {
     case 'insights-window-mismatch': return {
       readiness: readiness(), configuration: configured, activeProjectId: 'project-atlas',
       insights: { ...longInsights, days: 7 }, insightWindow: 30,
+    }
+    case 'insights-export': return {
+      readiness: readiness(), configuration: configured, activeProjectId: 'project-atlas',
+      insights: { ...longInsights, days: 7 }, insightWindow: 7,
+      support: { packageLabel: '8296720 / tar 049267…', sourceLabel: 'main 303b2c6a', note: '包内为 R1 准确构建；导出属于 R2 source。' },
+    }
+    case 'insights-export-loading': return {
+      readiness: readiness(), configuration: configured, activeProjectId: 'project-atlas',
+      insights: { ...longInsights, days: 7 }, insightWindow: 7, insightsDownloading: true,
+    }
+    case 'insights-export-error': return {
+      readiness: readiness(), configuration: configured, activeProjectId: 'project-atlas',
+      insights: { ...longInsights, days: 7 }, insightWindow: 7, insightsDownloadError: '导出失败，请重新读取后重试。',
+    }
+    case 'insights-no-export': return {
+      readiness: readiness(), configuration: configured, activeProjectId: 'project-atlas',
+      insights: { ...longInsights, days: 7 }, insightWindow: 7, noExport: true,
+    }
+    case 'support': return {
+      readiness: readiness(), configuration: configured, activeProjectId: 'project-atlas',
+      support: {
+        packageLabel: '8296720d8a25f38c / tarSHA04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543',
+        sourceLabel: 'main 303b2c6a974856661c21d0617bd710ebe87374d1',
+        note: '这是一个用于检查长文本换行的支持备注：安装包与当前源码不同层，导出/7 月窗口能力按 source 范围说明，不把旧包贴新功能。'.repeat(3),
+      },
     }
     case 'insights-loading': return {
       readiness: readiness(), configuration: configured, activeProjectId: 'project-atlas',

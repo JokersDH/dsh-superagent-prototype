@@ -32,6 +32,7 @@ declare global {
     __TRIAL_RECIPES__?: string[]
     __TRIAL_RECIPE_SELECTION__?: unknown
     __TRIAL_WINDOWS__?: number[]
+    __TRIAL_EXPORTS__?: number
     __TRIAL_SAME_READS__?: number
   }
 }
@@ -47,6 +48,7 @@ window.__TRIAL_INLINE_READS__ = 0
 window.__TRIAL_DISABLED_READS__ = 0
 window.__TRIAL_RECIPES__ = []
 window.__TRIAL_WINDOWS__ = []
+window.__TRIAL_EXPORTS__ = 0
 const nativeFetch = window.fetch.bind(window)
 window.fetch = ((input: RequestInfo | URL, init?: RequestInit) => {
   requests.push(typeof input === 'string' ? input : input instanceof URL ? input.href : input.url)
@@ -94,6 +96,10 @@ function PropsHarness({ state }: { readonly state: TrialHarnessState }) {
         insightWindow={props.insightWindow}
         insightsLoading={props.insightsLoading}
         insightsError={props.insightsError}
+        insightsDownloading={props.insightsDownloading}
+        insightsDownloadError={props.insightsDownloadError}
+        onDownloadInsights={props.noExport ? undefined : () => { window.__TRIAL_EXPORTS__ = (window.__TRIAL_EXPORTS__ ?? 0) + 1 }}
+        support={props.support}
         onSelectInsightWindow={props.insightWindow === undefined ? undefined : days => { window.__TRIAL_WINDOWS__?.push(days) }}
         onOpenRecipe={selection => {
           window.__TRIAL_RECIPES__?.push(selection.suggestionId)

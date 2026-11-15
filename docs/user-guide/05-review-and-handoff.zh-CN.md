@@ -27,9 +27,9 @@
 交接的是**范围与证据**，不是账号或数据：
 
 - 仓库与分支：`codex/g4-trial-experience`（F 自有路径）。
-- 状态记录：`reports/trial-experience/wave30-status.json`（source、endpoints、视口、命令、未测范围、source/controlled/installed 分层）。
+- 状态记录：`reports/trial-experience/wave31-status.json`（三包 12 成果、source/controlled/installed/native 分层、R1/R2 分列）。
 - 集成说明：`reports/trial-experience/main-integration.zh-CN.md`（main 接线与 props 语义）。
-- 证据：`apps/console/e2e/trial/report-*.json` 与 `screenshots/`；真实两项目日常见 `report-daily-flow.json`；真实 7/30 观察与模板预填由 main 的 `usage-observation-browser.mjs`、`project-recipes-browser.mjs` 独立覆盖。
+- 证据：`apps/console/e2e/trial/report-*.json` 与 `screenshots/`；真实两项目日常见 `report-daily-flow.json`；真实 7/30/导出与模板由 main 的 `usage-observation-browser.mjs`（13）、`project-recipes-browser.mjs`（8）独立覆盖。
 - 用户文档：本目录。
 
 不要交接：`bootstrap.key`、`api.key`、模型 key、`model.json`、`.assistant-settings.json`、SQLite、原生 profile、`.local-state` 副本。

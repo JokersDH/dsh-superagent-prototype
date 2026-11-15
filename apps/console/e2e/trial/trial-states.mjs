@@ -130,7 +130,7 @@ try {
     assert(cells[2].includes('配置事实，非连接验证'), 'configuration is not a connection proof')
     assert((await labels()).join('|') === '打开主对话', 'only the conversation entry is offered')
     assert(await page.getByText('当前', { exact: true }).count() === 1, 'active project marker')
-    assert((await page.locator('.trial-fact').filter({ hasText: '当前项目' }).innerText()).includes('流程测试项目'), 'the current project is named explicitly')
+    assert((await page.locator('.trial-facts .trial-fact').filter({ hasText: '当前项目' }).innerText()).includes('流程测试项目'), 'the current project is named explicitly')
     assert((await page.locator('.trial-boundary').innerText()).includes('未授予执行权限'), 'the absence of execution authority is explicit')
     await page.locator('.trial-view').screenshot({ path: join(screenshots, 'configured.png') })
   }, 'configured state shows facts only and one navigation action')
@@ -241,7 +241,7 @@ try {
   await step('LONG-CONTENT', async () => {
     await open('state=long')
     assert(await page.locator('.trial-project').count() === 5, 'five projects render')
-    assert((await page.locator('.trial-fact').filter({ hasText: '当前对话' }).innerText()).includes('把本机执行器'), 'long conversation title renders')
+    assert((await page.locator('.trial-facts .trial-fact').filter({ hasText: '当前对话' }).innerText()).includes('把本机执行器'), 'long conversation title renders')
     const overflow = await page.evaluate(() => {
       const root = document.querySelector('.trial-view')
       return { page: document.documentElement.scrollWidth, client: document.documentElement.clientWidth,
@@ -302,7 +302,7 @@ try {
     await open('state=insights-wrong-project')
     assert((await page.locator('.trial-insights').innerText()).includes('不包含当前项目'), 'foreign-project summary is refused')
     assert(await page.locator('.trial-insight-row').count() === 0, 'no foreign metric row is shown')
-    assert((await page.locator('.trial-fact').filter({ hasText: '当前项目' }).innerText()).includes('流程测试项目'), 'the current project identity is still visible')
+    assert((await page.locator('.trial-facts .trial-fact').filter({ hasText: '当前项目' }).innerText()).includes('流程测试项目'), 'the current project identity is still visible')
     await page.locator('.trial-view').screenshot({ path: join(screenshots, 'insights-wrong-project.png') })
   }, 'a summary for another project cannot be read as the current project result')
 
@@ -418,6 +418,53 @@ try {
     await page.locator('.trial-view').screenshot({ path: join(screenshots, 'insights-window.png') })
   }, '7/30-day selection is delegated to main and stale-window values are hidden')
 
+  await step('EXPORT-TOOLBAR', async () => {
+    await open('state=insights-export')
+    const button = page.getByRole('button', { name: '导出当前范围观察', exact: true })
+    await button.waitFor()
+    assert(await button.isEnabled(), 'export is available for a ready current snapshot')
+    assert((await page.locator('.trial-insights').innerText()).includes('观察于'), 'the snapshot observation time is shown')
+    assert((await page.locator('.trial-insights').innerText()).includes('文件只含展示数据'), 'the export is labelled display-only')
+    assert(await page.evaluate(() => window.__TRIAL_EXPORTS__) === 0, 'no export happens without a click')
+    await button.click()
+    await page.waitForTimeout(80)
+    assert(await page.evaluate(() => window.__TRIAL_EXPORTS__) === 1, 'one explicit click requests one export')
+    assert((await requests()).length === 0, 'the component itself performs no transport request')
+    await open('state=insights-export-loading')
+    const loadingButton = page.getByRole('button', { name: '导出当前范围观察', exact: true })
+    assert(await loadingButton.isDisabled(), 'export is disabled while a download is in flight')
+    assert((await loadingButton.getAttribute('title')) === '正在导出…', 'the disabled reason is explicit')
+    assert((await page.locator('.trial-insights').innerText()).includes('正在导出'), 'download progress is announced')
+    await open('state=insights-export-error')
+    assert((await page.locator('.trial-insights [role=alert]').innerText()).includes('导出未完成'), 'an export failure is an explicit alert')
+    const before = await page.evaluate(() => window.__TRIAL_EXPORTS__)
+    await page.locator('.trial-insights [role=alert]').getByRole('button', { name: '重试', exact: true }).click()
+    await page.waitForTimeout(80)
+    assert(await page.evaluate(() => window.__TRIAL_EXPORTS__) === before + 1, 'retry asks main for one new export')
+    await open('state=insights-no-export')
+    assert(await page.getByRole('button', { name: '导出当前范围观察', exact: true }).count() === 0, 'an older package without export shows no button')
+    assert(await page.locator('.trial-insight-row').count() === 3, 'observation rows remain readable without export')
+    await page.locator('.trial-view').screenshot({ path: join(screenshots, 'insights-export.png') })
+  }, 'export is explicit, display-only, cancellable by scope and degrades without the endpoint')
+
+  await step('SUPPORT-PANEL', async () => {
+    await open('state=support')
+    const support = page.locator('.trial-support')
+    const summary = support.locator('summary')
+    await summary.waitFor()
+    assert(!(await support.locator('.trial-support-rows').isVisible()), 'diagnostics stay collapsed until requested')
+    await summary.focus()
+    await page.keyboard.press('Enter')
+    await page.waitForTimeout(80)
+    const text = await support.innerText()
+    for (const label of ['运行模式', '当前项目', '当前对话', '观察窗口', '配置', '观察时间', '包', '来源']) assert(text.includes(label), `support lists ${label}`)
+    assert(text.includes('8296720') && text.includes('main 303b2c6a'), 'package and source labels are shown when provided')
+    assert(!text.includes('/Users') && !text.includes('token'), 'support summary never contains private paths or tokens')
+    const violations = await layoutAudit(page)
+    assert(violations.length === 0, `support layout violations: ${violations.join('; ')}`)
+    await page.locator('.trial-view').screenshot({ path: join(screenshots, 'support-panel.png') })
+  }, 'support/diagnostics expose only a bounded read-only summary on demand')
+
   await step('RECIPES-LOADING-AND-ERROR', async () => {
     await open('state=recipes-loading')
     assert((await page.locator('.trial-recipes').innerText()).includes('正在读取项目声明'), 'recipe loading is announced')
@@ -500,7 +547,7 @@ try {
     const mobilePage = await mobile.newPage()
     const mobileErrors = []
     mobilePage.on('pageerror', error => mobileErrors.push(error.message))
-    for (const state of ['configured', 'unconfigured', 'blocked', 'unknown', 'readonly', 'long', 'insights-unscoped', 'insights-wrong-project', 'insights-partial', 'recipes', 'recipes-scope', 'recipes-project-state', 'recipes-all-projects', 'recipes-error', 'insights-window']) {
+    for (const state of ['configured', 'unconfigured', 'blocked', 'unknown', 'readonly', 'long', 'insights-unscoped', 'insights-wrong-project', 'insights-partial', 'recipes', 'recipes-scope', 'recipes-project-state', 'recipes-all-projects', 'recipes-error', 'insights-window', 'insights-export', 'support']) {
       await mobilePage.goto(`${base}/e2e/trial/harness.html?state=${state}`, { waitUntil: 'networkidle' })
       await mobilePage.waitForSelector('.trial-view')
       const overflow = await mobilePage.evaluate(() => ({ page: document.documentElement.scrollWidth, client: document.documentElement.clientWidth }))
