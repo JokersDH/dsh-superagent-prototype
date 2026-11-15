@@ -542,7 +542,8 @@ export function lifecycleForeignChildIssues(value) {
   const issues = []
   if (value.sameUid !== true) issues.push('not_same_uid_control')
   if (value.foreignArgvExactForRequestedRoot !== false) issues.push('argv_match')
-  if (value.reason !== 'fresh_identity_changed') issues.push('reason')
+  if (value.reason !== 'fresh_identity_changed' && value.reason !== 'resource_scope_mismatch') issues.push('reason')
+  if (value.reason === 'resource_scope_mismatch' && (!value.blocked || value.blocked.ok !== false)) issues.push('blocked')
   if (value.signalled !== null && value.signalled !== false) issues.push('signalled')
   if (value.foreignAlive?.alive !== true) issues.push('killed')
   return issues

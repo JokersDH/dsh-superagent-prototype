@@ -603,7 +603,7 @@ const evidenceFor = (key) => {
     case 'lifecycleSibling':
       return { reason: 'requested_root_mismatch', scope: { stateMatches: false }, signals: [], substringMatch: false, exactMatch: true, alive: { alive: true } }
     case 'lifecycleForeignChild':
-      return { sameUid: true, foreignArgvExactForRequestedRoot: false, reason: 'fresh_identity_changed', signalled: null, foreignAlive: { alive: true } }
+      return { sameUid: true, foreignArgvExactForRequestedRoot: false, reason: 'fresh_identity_changed', blocked: null, signalled: null, foreignAlive: { alive: true } }
     case 'lifecycleMixedUnknown':
       return { reason: 'unknown_live_resource', gaps: [{ label: 'console', reason: 'start_missing' }], signals: [], alive: [true, true], recordPresent: true }
     case 'lifecycleStartWindow':

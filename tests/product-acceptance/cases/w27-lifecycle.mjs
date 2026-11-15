@@ -121,7 +121,7 @@ export async function runLifecycle() {
         stopped = await stopOwned(root, { packageStop: false, proofSignal: true,
           birth: { pid: foreign.pid, start: foreignIdentity.start, uid: foreignIdentity.uid, state: other.state, config: other.config, install: other.install } })
         foreignAlive = liveIdentity(foreign.pid)
-        evidence.lifecycleForeignChild = { sameUid: foreignIdentity.uid === liveIdentity(sleeper.pid).uid, reason: stopped.reason,
+        evidence.lifecycleForeignChild = { sameUid: foreignIdentity.uid === liveIdentity(sleeper.pid).uid, reason: stopped.reason, blocked: stopped.blocked ?? null,
           signalled: stopped.signals?.[0]?.signalled ?? null, foreignAlive,
           foreignArgvExactForRequestedRoot: argvHasExactPath(foreignIdentity.command, root.state), command: foreignIdentity.command }
       } finally { try { sleeper.child.kill('SIGKILL') } catch { /* gone */ } try { foreign.child.kill('SIGKILL') } catch { /* gone */ }
