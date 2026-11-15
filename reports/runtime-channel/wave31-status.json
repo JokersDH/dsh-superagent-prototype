@@ -1,0 +1,311 @@
+{
+  "wave": "product-wave-31",
+  "role": "I",
+  "title": "Original-business communication adoption, recovery support and long-term compatibility",
+  "date": "2026-11-15",
+  "workdir": "/Users/hh/Desktop/joker/superagent-agent-i",
+  "branch": "codex/g5-coordinator-channel",
+  "baseline": "4bce0673388f22952513b5e530381f7a95e7a794",
+  "mergedOriginMain": "8deda18d",
+  "implementationCommits": [
+    "9ea185a4",
+    "0491f89c",
+    "61904db5"
+  ],
+  "status": "TWELVE_OUTCOME_CONSUMERS_PUBLISHED_PRODUCT_RECOVERY_AND_B_SHUTDOWN_LEASE_NOT_REACHED",
+  "statement": "The channel is now exercised through the real runner service, the real ProductStore ingress, a real-store Broker-equivalent guard, and real authenticated endpoints (dual client, succession, ACK windows, backpressure, four slots, shutdown, interface compatibility). Module scope only: original Work recovery, candidate/manualaccept/slot release, native/vendor and installed facts remain outside this evidence.",
+  "sourceClosure": {
+    "runtime": [
+      "apps/runner/src/attach-channel/coordinator-channel.ts",
+      "apps/runner/src/attach-channel/attach.ts",
+      "apps/runner/src/attach-channel/errors.ts",
+      "apps/runner/src/attach-channel/index.ts"
+    ],
+    "optional": [
+      "apps/runner/src/attach-channel/sink-responder.ts",
+      "apps/runner/src/attach-channel/refusals.ts"
+    ],
+    "consumers": [
+      "apps/runner/test/attach-channel/actual-*.test.ts",
+      "apps/runner/test/attach-channel/actual-harness.ts",
+      "apps/runner/test/attach-channel/product-ingress-harness.ts"
+    ],
+    "docs": [
+      "docs/runtime-channel/adoption-manual.zh-CN.md",
+      "docs/runtime-channel/README.zh-CN.md",
+      "docs/runtime-channel/b-adapter-handoff.zh-CN.md",
+      "docs/runtime-channel/h-independent-consumer.zh-CN.md"
+    ],
+    "blobs": {
+      "coordinator-channel.ts": "d1ef81eb9d51b24417645151440eb1e262c20546",
+      "attach.ts": "321738dae3b87e6ad7d235f52aaa65e6f63ab527",
+      "errors.ts": "ec8ce909d0f30ab1d96488db56cdf3b6a4ab7f49",
+      "index.ts": "6314546e1d1facde00d0d2195edf1c14ad7a85d2"
+    }
+  },
+  "mainAndBSources": {
+    "mainSource": "303b2c6a",
+    "mergedMain": "8deda18d",
+    "bObserved": "4b693eae30610fba134a2f151f835368e8903953",
+    "bSharedBlobsMatchLe": true,
+    "bFocusedChannelTests": "8/8",
+    "bDirectStrict": "exit 0",
+    "bDirtyPreserved": [
+      "reports/releases/wave11-admission/runtime.json",
+      "reports/releases/wave12-admission/runtime.json",
+      "tests/native-acceptance/b16-real-begin.mjs"
+    ]
+  },
+  "outcomes": [
+    {
+      "id": "I1",
+      "title": "Actual main/B source closure adopted",
+      "status": "PASS",
+      "implementation": "shared module/pull adapter already adopted at main 303b2c6a and B 4b693eae",
+      "consumer": "actual-service-adoption.test.ts (real serveRunner)",
+      "positive": "original fact id on the wire, fresh intent correlation, one write after admission",
+      "negative": "retired allowed replay, foreign fact, duplicate bootstrap",
+      "evidence": "4 cases + blobs above"
+    },
+    {
+      "id": "I2",
+      "title": "Original Store sink adoption",
+      "status": "PASS",
+      "implementation": "sink bound to real ProductStore ingress",
+      "consumer": "actual-store-callbacks.test.ts",
+      "positive": "receipt read back from original fact table with matching seq and payload digest",
+      "negative": "foreign producer and missing payload refused with no row",
+      "evidence": "3 cases; fixture only seeds ticket/binding"
+    },
+    {
+      "id": "I3",
+      "title": "Original Broker-style admission per intent",
+      "status": "PASS_WITH_BROKER_NOT_REACHED",
+      "implementation": "guard reads real current binding + recorded command digest + one-shot admission",
+      "consumer": "actual-broker-guard.test.ts",
+      "positive": "allow only for current binding/body/admission",
+      "negative": "missing/deny/throw/mismatched body/stale binding/reused admission => zero writes",
+      "evidence": "5 cases; full NativeProductAttempt spawn NOT_REACHED"
+    },
+    {
+      "id": "I4",
+      "title": "Same Work normal + dual client",
+      "status": "PASS_COMMUNICATION_SCOPE",
+      "implementation": "real endpoint + connectRunnerRecovery clients",
+      "consumer": "actual-dual-client.test.ts",
+      "positive": "B takes over by CAS mid-attempt and continues the same fact ids",
+      "negative": "old A poll/reply fenced, foreign producer refused, no stdio mirroring",
+      "evidence": "2 cases"
+    },
+    {
+      "id": "I5",
+      "title": "Lease succession and remaining window",
+      "status": "PASS_COMMUNICATION_SCOPE",
+      "implementation": "CAS successor over real endpoint",
+      "consumer": "actual-succession.test.ts",
+      "positive": "same original fact id retried with reported window not refreshed",
+      "negative": "replaced client poll/reply refused; stale/future generation refused",
+      "evidence": "2 cases"
+    },
+    {
+      "id": "I6",
+      "title": "ACK window and reply correlation",
+      "status": "PASS",
+      "implementation": "module settlement + transport refusals",
+      "consumer": "actual-ack-window.test.ts",
+      "positive": "first exact ACK settles; original pending stays until its own id",
+      "negative": "duplicate, wrong kind, wrong id and post-close replies refused",
+      "evidence": "3 cases"
+    },
+    {
+      "id": "I7",
+      "title": "Backpressure and control availability",
+      "status": "PASS",
+      "implementation": "constructor bounds in the active implementation",
+      "consumer": "actual-backpressure.test.ts",
+      "positive": "64 queued facts serve and capacity recovers for a later record",
+      "negative": "65th concurrent fact refused with capacity, not a hang or success",
+      "evidence": "1 case; verified against the real service's DEFAULT_LIMITS"
+    },
+    {
+      "id": "I8",
+      "title": "Recovery-chain communication support",
+      "status": "PARTIAL_NORMAL_ONLY",
+      "implementation": "normal chain + remote denial support",
+      "consumer": "actual-recovery-support.test.ts",
+      "positive": "one fact, one fresh intent, termination; single guard call",
+      "negative": "remote denial leaves zero writes; late admission refused",
+      "notReached": "recovered original A process / native_applied / ACK-unknown / candidate / manualaccept / slot release (B/main)"
+    },
+    {
+      "id": "I9",
+      "title": "Two- and four-slot isolation",
+      "status": "PASS_I_OWNED_PROBE",
+      "implementation": "independent attempts/endpoints/leases",
+      "consumer": "actual-multislot.test.ts",
+      "positive": "each slot serves only its own fact and keeps generation 2",
+      "negative": "denial/drain in one slot does not touch others",
+      "notReached": "product scheduler aggregate slot release (B/main); this probe is communication-only"
+    },
+    {
+      "id": "I10",
+      "title": "Fault and shutdown terminal states",
+      "status": "PASS_WITH_REPORTED_B_GAP",
+      "implementation": "module terminal semantics + real service shutdown",
+      "consumer": "actual-shutdown.test.ts",
+      "positive": "idle shutdown terminates; malformed frame refused without owner change",
+      "negative": "pending fact stays unknown (no fabricated receipt); no silent success",
+      "reportedGap": "B's closeAdmission drops only fixed stdio/sink ids, so a remote lease remains current after shutdown and a late reply can still settle; B should use attach.close() on terminal shutdown"
+    },
+    {
+      "id": "I11",
+      "title": "Public interface and historical-call compatibility",
+      "status": "PASS",
+      "implementation": "unchanged v1 envelope/exports/typed failures",
+      "consumer": "actual-compatibility.test.ts",
+      "positive": "entry surface, denial-vs-fault typing",
+      "negative": "v2 frame and missing-id envelope refused with protocol_error",
+      "evidence": "4 cases + direct strict commands"
+    },
+    {
+      "id": "I12",
+      "title": "Reproducible adoption manual and handoff",
+      "status": "PASS_SOURCE_HANDOFF",
+      "implementation": "adoption-manual + status",
+      "consumer": "docs/runtime-channel/adoption-manual.zh-CN.md",
+      "positive": "closure, call graph, authorities, runnable commands",
+      "negative": "layer table prevents module green from being read as product recovery",
+      "evidence": "this file"
+    }
+  ],
+  "checks": [
+    {
+      "command": "node_modules/.bin/tsc -p apps/runner/src/attach-channel/tsconfig.json",
+      "exit": 0
+    },
+    {
+      "command": "cd apps/runner && node --test --test-timeout=60000 test/attach-channel/*.test.ts",
+      "exit": 0,
+      "tests": 132,
+      "passed": 132,
+      "failed": 0,
+      "durationMs": 9111
+    },
+    {
+      "command": "node --test packages/contracts/test/coordinator-channel.case.ts",
+      "exit": 0,
+      "tests": 5,
+      "passed": 5
+    },
+    {
+      "command": "B focused attach/sink/native tests (cwd B 4b693eae)",
+      "exit": 0,
+      "tests": 8,
+      "passed": 8
+    },
+    {
+      "command": "B direct strict compile of runner-service.ts + recovery-transport.ts",
+      "exit": 0
+    }
+  ],
+  "testCounts": {
+    "actual-service-adoption.test.ts": 4,
+    "actual-store-callbacks.test.ts": 3,
+    "actual-broker-guard.test.ts": 5,
+    "actual-dual-client.test.ts": 2,
+    "actual-succession.test.ts": 2,
+    "actual-ack-window.test.ts": 3,
+    "actual-backpressure.test.ts": 1,
+    "actual-recovery-support.test.ts": 3,
+    "actual-multislot.test.ts": 2,
+    "actual-shutdown.test.ts": 3,
+    "actual-compatibility.test.ts": 4,
+    "historicalModuleCases": 100,
+    "total": 132
+  },
+  "artifacts": {
+    "R1": {
+      "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "buildId": "8296720d8a25f38c",
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "createdByI": false,
+      "note": "fixed historical artifact; not refrozen in wave-31"
+    },
+    "R2": {
+      "source": "303b2c6a",
+      "successors": "branch head",
+      "newTarCreatedBy": "none",
+      "installed": "NOT_INSTALLED"
+    },
+    "note": "I produces source and consumers only; D freezes and E verifies the same artifact independently. docs/test-only changes do not create a new runtime artifact."
+  },
+  "notReached": [
+    "original Work recovery: original A new process, question/native_applied/ACK-unknown reconciliation (B/main)",
+    "recovered check/currentCandidate/manualaccept and 2/4 slot release (B/main)",
+    "same Runner coordinator SIGKILL question->answer; not run (safe tools not admitted by I)",
+    "full NativeProductAttempt guard (spawned child) and real Broker question/answer",
+    "B terminal shutdown closing the remote lease (reported gap, B-owned)",
+    "real vendor/model/native turns (0) and installed/native facts",
+    "H independently executing this wave's source in its own tree"
+  ],
+  "boundaries": {
+    "filesOutsideOwnershipModified": false,
+    "contractsRootWireChanged": false,
+    "runnerServiceOrLinkClientChanged": false,
+    "newServerDatabaseLedgerDriverLifecycle": false,
+    "realModelTurns": 0,
+    "nativeTurns": 0,
+    "processSignalsOrUserServiceOperations": 0,
+    "preservedUserServices": [
+      [
+        5180,
+        8796
+      ],
+      [
+        5181,
+        8797
+      ],
+      [
+        5182,
+        8798
+      ],
+      [
+        5183,
+        8799
+      ],
+      [
+        5184,
+        8800
+      ],
+      [
+        5185,
+        8801
+      ],
+      [
+        5186,
+        8802
+      ],
+      [
+        5187,
+        8803
+      ],
+      [
+        5188,
+        8804
+      ],
+      [
+        5189,
+        8805
+      ],
+      [
+        5190,
+        8806
+      ],
+      [
+        5191,
+        8807
+      ]
+    ],
+    "studyState": "BLOCKED_CURRENT_RECIPE_UNTOUCHED"
+  }
+}
