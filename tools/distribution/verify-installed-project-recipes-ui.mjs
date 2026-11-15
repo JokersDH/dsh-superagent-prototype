@@ -7,6 +7,7 @@ import { once } from 'node:events'
 import { createServer as createStaticServer } from 'node:http'
 import { createServer as portProbe } from 'node:net'
 import { createReadStream, existsSync, mkdirSync, mkdtempSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { Readable } from 'node:stream'
 import { execFileSync } from 'node:child_process'
 import { join, resolve } from 'node:path'
 const APP = process.argv[2], output = resolve(process.argv[3] ?? '/tmp/w29-installed-j-ui')
@@ -43,8 +44,11 @@ const staticServer = createStaticServer(async (req, res) => {
     const upstream = await fetch(`http://127.0.0.1:${api.address().port}${requestUrl.pathname}${requestUrl.search}`, {
       method: req.method, headers: req.headers, body: req.method === 'GET' || req.method === 'HEAD' ? undefined : Buffer.concat(chunks) }).catch(() => null)
     if (!upstream) { res.writeHead(502); res.end(); return }
-    res.writeHead(upstream.status, { 'content-type': upstream.headers.get('content-type') ?? 'application/json' })
-    res.end(Buffer.from(await upstream.arrayBuffer())); return
+    const headers = { 'content-type': upstream.headers.get('content-type') ?? 'application/json' }
+    for (const name of ['cache-control', 'connection', 'content-encoding', 'transfer-encoding']) { const value = upstream.headers.get(name); if (value) headers[name] = value }
+    res.writeHead(upstream.status, headers)
+    if (upstream.body) { const stream = Readable.fromWeb(upstream.body); stream.on('error', () => {}); res.on('close', () => stream.destroy()); stream.pipe(res) } else res.end()
+    return
   }
   let file = join(consoleDist, requestUrl.pathname === '/' ? 'index.html' : requestUrl.pathname)
   if (!existsSync(file) || !statSync(file).isFile()) file = join(consoleDist, 'index.html')

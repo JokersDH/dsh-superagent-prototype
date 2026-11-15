@@ -1,8 +1,10 @@
 {
   "protocol": "wave29-installed-j-ui/1",
-  "status": "PARTIAL_4_OF_6",
+  "status": "PASS",
   "ui": {
-    "status": "FAIL",
+    "status": "PASS_ACTUAL_PROJECT_RECIPE_WORKFLOW",
+    "sourceCommit": "405befa3423f32ea37e5102a598c628f6c8ddf58",
+    "sourceWorktreeClean": true,
     "cases": [
       {
         "id": "PREVIEW-AND-APPLY-ONLY-PREFILL-ORIGINAL-FORM",
@@ -19,11 +21,45 @@
       {
         "id": "ERROR-AND-LEGACY-ABSENCE-KEEP-MANUAL-DELEGATION-AVAILABLE",
         "status": "PASS"
+      },
+      {
+        "id": "TWO-EXPLICIT-TEMPLATE-WORKS-REACH-ORIGINAL-CANDIDATE-AND-MANUAL-ACCEPT",
+        "status": "PASS"
+      },
+      {
+        "id": "DESKTOP-MOBILE-TEMPLATE-CONTROLS-AND-TEXT-FIT",
+        "status": "PASS"
       }
     ],
-    "previewPosts": 10,
-    "acceptedWorks": 0,
-    "errors": []
+    "errors": [],
+    "previewPosts": 13,
+    "unknownAfterRecorded": true,
+    "commands": [
+      {
+        "kind": "create_work",
+        "commandId": "cmd-work-c3eb5ae3-1443-402a-b38d-891c34c5d0ed"
+      },
+      {
+        "kind": "create_work",
+        "commandId": "cmd-work-c3eb5ae3-1443-402a-b38d-891c34c5d0ed"
+      },
+      {
+        "kind": "accept_candidate",
+        "commandId": "cmd-accept-1460ca85-a59b-49e3-bc84-cef3055ba560"
+      },
+      {
+        "kind": "create_work",
+        "commandId": "cmd-work-38f3520d-77e0-4b73-84e4-ed2088706aa8"
+      },
+      {
+        "kind": "accept_candidate",
+        "commandId": "cmd-accept-661c6ef5-dc9b-4eb8-987c-a2b98fa390dd"
+      }
+    ],
+    "acceptedWorks": 2,
+    "realModelTurns": 0,
+    "nativeTurnStarts": 0,
+    "scope": "Installed package static console + installed runtime/J observer/registered project/HTTP/Product/Broker/check/accept controlled workflow; no daemon/native/recovered admission"
   },
   "apiDraft": {
     "status": "draft",
@@ -35,5 +71,5 @@
     "issues": [],
     "events": 0
   },
-  "limitation": "Installed package static UI passed preview/apply, changed-facts refusal, hidden atom and legacy fallback (4/6). Two-explicit-works candidate/manualaccept and desktop/mobile cases did not complete in static harness; acceptedWorks0. This is not a full installed J workflow pass."
+  "note": "Installed package static console + installed runtime/J API: 6/6 actual NewWorkForm cases including two-works candidate/manualaccept and desktop/mobile; preview13, acceptedWorks2, errors0. SSE proxy streaming fixed the harness, not product code."
 }
