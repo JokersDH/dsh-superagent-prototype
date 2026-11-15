@@ -208,6 +208,8 @@ try {
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false)
       assert.equal(await trial.evaluate(element => element.scrollWidth > element.clientWidth + 1), false)
       assert.equal(await trial.getByRole('button', { name: '打开原表单模板', exact: true }).count(), 3)
+      assert.equal(await trial.locator('.trial-recipe-fields').first().evaluate(element => getComputedStyle(element).display), 'grid')
+      assert.equal(await trial.locator('.trial-metric-value').first().evaluate(element => getComputedStyle(element).whiteSpace), 'nowrap')
       if (!process.argv.includes('--no-capture')) await page.screenshot({ path: join(output, `workbench-${name}.png`), fullPage: true, animations: 'disabled' })
     }
     assert.deepEqual(errors, [])

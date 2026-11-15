@@ -353,11 +353,12 @@ export function TrialWorkspace({
                     <div key={metric.id} className="trial-insight-row">
                       <dt>{metric.label}</dt>
                       <dd className={metric.value === null ? 'trial-unknown' : undefined}>
-                        {metric.value ?? '未知'}
-                        {metric.unit !== undefined && <small>{metric.unit}</small>}
-                        {metric.layer !== undefined && <small>{layerLabel[metric.layer]}</small>}
-                        {metric.sampleCount !== undefined && <small>{metric.sampleCount === null ? '样本未知' : `${metric.sampleCount} 个样本`}</small>}
-                        {metric.detail !== undefined && <small>{metric.detail}</small>}
+                        <span className="trial-metric-value">{metric.value ?? '未知'}{metric.unit && <small>{metric.unit}</small>}</span>
+                        <span className="trial-metric-meta">
+                          {metric.layer !== undefined && <small>{layerLabel[metric.layer]}</small>}
+                          {metric.sampleCount !== undefined && <small>{metric.sampleCount === null ? '样本未知' : `${metric.sampleCount} 个样本`}</small>}
+                          {metric.detail !== undefined && <small>{metric.detail}</small>}
+                        </span>
                       </dd>
                     </div>
                   ))}
