@@ -4,12 +4,12 @@
     "tier": "module",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-15T07:12:37.264Z",
+    "checkedAt": "2026-11-15T09:36:01.215Z",
     "source": {
-      "commit": "41693dd6335813da363d4be938736ee3ab7ddeb2",
+      "commit": "bbe7923e667f9268d26d8cf16948646711576e05",
       "dirty": false
     },
-    "expectedSource": "41693dd6335813da363d4be938736ee3ab7ddeb2",
+    "expectedSource": "bbe7923e667f9268d26d8cf16948646711576e05",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -378,6 +378,21 @@
       },
       {
         "id": "E1-MUTATE-PILOT-NO-ORACLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-NO-RECORD-UNVERIFIED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-SET-MISMATCH",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-BIRTH-CONFIG",
         "required": true,
         "status": "PASS"
       },
@@ -476,7 +491,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-15T07:08:47.012Z",
+      "decidedAt": "2026-11-15T09:27:57.763Z",
       "failureCodes": []
     },
     "notes": [
@@ -489,12 +504,12 @@
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-15T07:12:37.268Z",
+    "checkedAt": "2026-11-15T09:36:01.218Z",
     "source": {
-      "commit": "41693dd6335813da363d4be938736ee3ab7ddeb2",
+      "commit": "bbe7923e667f9268d26d8cf16948646711576e05",
       "dirty": false
     },
-    "expectedSource": "41693dd6335813da363d4be938736ee3ab7ddeb2",
+    "expectedSource": "bbe7923e667f9268d26d8cf16948646711576e05",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -863,6 +878,21 @@
       },
       {
         "id": "E1-MUTATE-PILOT-NO-ORACLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-NO-RECORD-UNVERIFIED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-SET-MISMATCH",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-BIRTH-CONFIG",
         "required": true,
         "status": "PASS"
       },
@@ -1241,7 +1271,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-15T07:08:47.012Z",
+      "decidedAt": "2026-11-15T09:27:57.763Z",
       "failureCodes": []
     },
     "notes": [
@@ -1254,12 +1284,12 @@
     "tier": "actual-native-control",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-15T07:12:37.270Z",
+    "checkedAt": "2026-11-15T09:36:01.221Z",
     "source": {
-      "commit": "41693dd6335813da363d4be938736ee3ab7ddeb2",
+      "commit": "bbe7923e667f9268d26d8cf16948646711576e05",
       "dirty": false
     },
-    "expectedSource": "41693dd6335813da363d4be938736ee3ab7ddeb2",
+    "expectedSource": "bbe7923e667f9268d26d8cf16948646711576e05",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -1628,6 +1658,21 @@
       },
       {
         "id": "E1-MUTATE-PILOT-NO-ORACLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-NO-RECORD-UNVERIFIED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-SET-MISMATCH",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-BIRTH-CONFIG",
         "required": true,
         "status": "PASS"
       },
@@ -2027,7 +2072,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-15T07:08:47.012Z",
+      "decidedAt": "2026-11-15T09:27:57.763Z",
       "failureCodes": []
     },
     "notes": [
@@ -2038,14 +2083,14 @@
   "installed-alpha": {
     "schema": "product-acceptance-release/1",
     "tier": "installed-alpha",
-    "status": "PASS",
-    "ok": true,
-    "checkedAt": "2026-11-15T07:12:37.271Z",
+    "status": "FAIL",
+    "ok": false,
+    "checkedAt": "2026-11-15T09:36:01.222Z",
     "source": {
-      "commit": "41693dd6335813da363d4be938736ee3ab7ddeb2",
+      "commit": "bbe7923e667f9268d26d8cf16948646711576e05",
       "dirty": false
     },
-    "expectedSource": "41693dd6335813da363d4be938736ee3ab7ddeb2",
+    "expectedSource": "bbe7923e667f9268d26d8cf16948646711576e05",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -2414,6 +2459,21 @@
       },
       {
         "id": "E1-MUTATE-PILOT-NO-ORACLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-NO-RECORD-UNVERIFIED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-SET-MISMATCH",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-BIRTH-CONFIG",
         "required": true,
         "status": "PASS"
       },
@@ -2879,8 +2939,8 @@
       },
       {
         "id": "E6-RECIPE-PREVIEW",
-        "required": false,
-        "status": "NOT_TESTED"
+        "required": true,
+        "status": "PASS"
       },
       {
         "id": "E11-TRIAL-IDENTITY-FIELDS",
@@ -2978,11 +3038,17 @@
         "status": "PASS"
       }
     ],
-    "failures": [],
+    "failures": [
+      {
+        "code": "recipePreview_invalid",
+        "detail": "recipePreview issues",
+        "caseId": "E6-RECIPE-PREVIEW"
+      }
+    ],
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-15T07:08:47.012Z",
+      "decidedAt": "2026-11-15T09:27:57.763Z",
       "failureCodes": []
     },
     "notes": [
@@ -2993,14 +3059,14 @@
   "installed-functional": {
     "schema": "product-acceptance-release/1",
     "tier": "installed-functional",
-    "status": "PASS",
-    "ok": true,
-    "checkedAt": "2026-11-15T07:12:37.273Z",
+    "status": "FAIL",
+    "ok": false,
+    "checkedAt": "2026-11-15T09:36:01.224Z",
     "source": {
-      "commit": "41693dd6335813da363d4be938736ee3ab7ddeb2",
+      "commit": "bbe7923e667f9268d26d8cf16948646711576e05",
       "dirty": false
     },
-    "expectedSource": "41693dd6335813da363d4be938736ee3ab7ddeb2",
+    "expectedSource": "bbe7923e667f9268d26d8cf16948646711576e05",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -3369,6 +3435,21 @@
       },
       {
         "id": "E1-MUTATE-PILOT-NO-ORACLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-NO-RECORD-UNVERIFIED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-SET-MISMATCH",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-BIRTH-CONFIG",
         "required": true,
         "status": "PASS"
       },
@@ -3834,8 +3915,8 @@
       },
       {
         "id": "E6-RECIPE-PREVIEW",
-        "required": false,
-        "status": "NOT_TESTED"
+        "required": true,
+        "status": "PASS"
       },
       {
         "id": "E11-TRIAL-IDENTITY-FIELDS",
@@ -3938,11 +4019,27 @@
         "status": "PASS"
       }
     ],
-    "failures": [],
+    "failures": [
+      {
+        "code": "recipePreview_invalid",
+        "detail": "recipePreview issues",
+        "caseId": "E6-RECIPE-PREVIEW"
+      },
+      {
+        "code": "stopFunctional_invalid",
+        "detail": "stopFunctional normal_resources_alive",
+        "caseId": "E5-STOP-FUNCTIONAL"
+      },
+      {
+        "code": "stopFunctional_invalid",
+        "detail": "stopFunctional restored_resources_alive",
+        "caseId": "E5-STOP-FUNCTIONAL"
+      }
+    ],
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-15T07:08:47.012Z",
+      "decidedAt": "2026-11-15T09:27:57.763Z",
       "failureCodes": []
     },
     "notes": [
@@ -3955,12 +4052,12 @@
     "tier": "advisory-routing",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-15T07:12:37.275Z",
+    "checkedAt": "2026-11-15T09:36:01.226Z",
     "source": {
-      "commit": "41693dd6335813da363d4be938736ee3ab7ddeb2",
+      "commit": "bbe7923e667f9268d26d8cf16948646711576e05",
       "dirty": false
     },
-    "expectedSource": "41693dd6335813da363d4be938736ee3ab7ddeb2",
+    "expectedSource": "bbe7923e667f9268d26d8cf16948646711576e05",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -4329,6 +4426,21 @@
       },
       {
         "id": "E1-MUTATE-PILOT-NO-ORACLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-NO-RECORD-UNVERIFIED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-SET-MISMATCH",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-BIRTH-CONFIG",
         "required": true,
         "status": "PASS"
       },
@@ -4733,7 +4845,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-15T07:08:47.012Z",
+      "decidedAt": "2026-11-15T09:27:57.763Z",
       "failureCodes": []
     },
     "notes": [
@@ -4746,12 +4858,12 @@
     "tier": "controlled-review",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-15T07:12:37.276Z",
+    "checkedAt": "2026-11-15T09:36:01.228Z",
     "source": {
-      "commit": "41693dd6335813da363d4be938736ee3ab7ddeb2",
+      "commit": "bbe7923e667f9268d26d8cf16948646711576e05",
       "dirty": false
     },
-    "expectedSource": "41693dd6335813da363d4be938736ee3ab7ddeb2",
+    "expectedSource": "bbe7923e667f9268d26d8cf16948646711576e05",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -5120,6 +5232,21 @@
       },
       {
         "id": "E1-MUTATE-PILOT-NO-ORACLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-NO-RECORD-UNVERIFIED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-SET-MISMATCH",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-BIRTH-CONFIG",
         "required": true,
         "status": "PASS"
       },
@@ -5544,7 +5671,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-15T07:08:47.012Z",
+      "decidedAt": "2026-11-15T09:27:57.763Z",
       "failureCodes": []
     },
     "notes": [
@@ -5557,12 +5684,12 @@
     "tier": "actual-heterogeneous-review",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-15T07:12:37.277Z",
+    "checkedAt": "2026-11-15T09:36:01.230Z",
     "source": {
-      "commit": "41693dd6335813da363d4be938736ee3ab7ddeb2",
+      "commit": "bbe7923e667f9268d26d8cf16948646711576e05",
       "dirty": false
     },
-    "expectedSource": "41693dd6335813da363d4be938736ee3ab7ddeb2",
+    "expectedSource": "bbe7923e667f9268d26d8cf16948646711576e05",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -5931,6 +6058,21 @@
       },
       {
         "id": "E1-MUTATE-PILOT-NO-ORACLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-NO-RECORD-UNVERIFIED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-SET-MISMATCH",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-BIRTH-CONFIG",
         "required": true,
         "status": "PASS"
       },
@@ -6365,7 +6507,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-15T07:08:47.012Z",
+      "decidedAt": "2026-11-15T09:27:57.763Z",
       "failureCodes": []
     },
     "notes": [
@@ -6378,12 +6520,12 @@
     "tier": "review-value",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-15T07:12:37.278Z",
+    "checkedAt": "2026-11-15T09:36:01.231Z",
     "source": {
-      "commit": "41693dd6335813da363d4be938736ee3ab7ddeb2",
+      "commit": "bbe7923e667f9268d26d8cf16948646711576e05",
       "dirty": false
     },
-    "expectedSource": "41693dd6335813da363d4be938736ee3ab7ddeb2",
+    "expectedSource": "bbe7923e667f9268d26d8cf16948646711576e05",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -6752,6 +6894,21 @@
       },
       {
         "id": "E1-MUTATE-PILOT-NO-ORACLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-NO-RECORD-UNVERIFIED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-SET-MISMATCH",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-BIRTH-CONFIG",
         "required": true,
         "status": "PASS"
       },
@@ -7151,7 +7308,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-15T07:08:47.012Z",
+      "decidedAt": "2026-11-15T09:27:57.763Z",
       "failureCodes": []
     },
     "notes": [
@@ -7162,14 +7319,14 @@
   "local-alpha": {
     "schema": "product-acceptance-release/1",
     "tier": "local-alpha",
-    "status": "PASS",
-    "ok": true,
-    "checkedAt": "2026-11-15T07:12:37.279Z",
+    "status": "FAIL",
+    "ok": false,
+    "checkedAt": "2026-11-15T09:36:01.232Z",
     "source": {
-      "commit": "41693dd6335813da363d4be938736ee3ab7ddeb2",
+      "commit": "bbe7923e667f9268d26d8cf16948646711576e05",
       "dirty": false
     },
-    "expectedSource": "41693dd6335813da363d4be938736ee3ab7ddeb2",
+    "expectedSource": "bbe7923e667f9268d26d8cf16948646711576e05",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -7538,6 +7695,21 @@
       },
       {
         "id": "E1-MUTATE-PILOT-NO-ORACLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-NO-RECORD-UNVERIFIED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-SET-MISMATCH",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-BIRTH-CONFIG",
         "required": true,
         "status": "PASS"
       },
@@ -8003,8 +8175,8 @@
       },
       {
         "id": "E6-RECIPE-PREVIEW",
-        "required": false,
-        "status": "NOT_TESTED"
+        "required": true,
+        "status": "PASS"
       },
       {
         "id": "E11-TRIAL-IDENTITY-FIELDS",
@@ -8102,11 +8274,17 @@
         "status": "PASS"
       }
     ],
-    "failures": [],
+    "failures": [
+      {
+        "code": "recipePreview_invalid",
+        "detail": "recipePreview issues",
+        "caseId": "E6-RECIPE-PREVIEW"
+      }
+    ],
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-15T07:08:47.012Z",
+      "decidedAt": "2026-11-15T09:27:57.763Z",
       "failureCodes": []
     },
     "notes": [
@@ -8119,12 +8297,12 @@
     "tier": "full-product",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-15T07:12:37.282Z",
+    "checkedAt": "2026-11-15T09:36:01.234Z",
     "source": {
-      "commit": "41693dd6335813da363d4be938736ee3ab7ddeb2",
+      "commit": "bbe7923e667f9268d26d8cf16948646711576e05",
       "dirty": false
     },
-    "expectedSource": "41693dd6335813da363d4be938736ee3ab7ddeb2",
+    "expectedSource": "bbe7923e667f9268d26d8cf16948646711576e05",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -8493,6 +8671,21 @@
       },
       {
         "id": "E1-MUTATE-PILOT-NO-ORACLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-NO-RECORD-UNVERIFIED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-SET-MISMATCH",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-BIRTH-CONFIG",
         "required": true,
         "status": "PASS"
       },
@@ -8958,8 +9151,8 @@
       },
       {
         "id": "E6-RECIPE-PREVIEW",
-        "required": false,
-        "status": "NOT_TESTED"
+        "required": true,
+        "status": "PASS"
       },
       {
         "id": "E11-TRIAL-IDENTITY-FIELDS",
@@ -9069,6 +9262,11 @@
     ],
     "failures": [
       {
+        "code": "recipePreview_invalid",
+        "detail": "recipePreview issues",
+        "caseId": "E6-RECIPE-PREVIEW"
+      },
+      {
         "code": "missing_required_case",
         "detail": "Required case E5-NATIVE-DELIVERY is absent",
         "caseId": "E5-NATIVE-DELIVERY"
@@ -9097,7 +9295,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-15T07:08:47.012Z",
+      "decidedAt": "2026-11-15T09:27:57.763Z",
       "failureCodes": []
     },
     "notes": [

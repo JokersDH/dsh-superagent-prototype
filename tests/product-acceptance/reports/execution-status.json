@@ -2,11 +2,11 @@
   "schema": "agent-execution-status/1",
   "agent": "E",
   "branch": "codex/g3-product-acceptance",
-  "base": "53f828d",
-  "checkpoint": "41693dd",
-  "head": "41693dd6335813da363d4be938736ee3ab7ddeb2",
+  "base": "6369eea",
+  "checkpoint": "bbe7923",
+  "head": "bbe7923e667f9268d26d8cf16948646711576e05",
   "worktreeDirtyAtRun": false,
-  "checkedAt": "2026-11-15T07:08:46.999Z",
+  "checkedAt": "2026-11-15T09:27:57.744Z",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -20,14 +20,14 @@
   "stages": [
     {
       "id": "E1",
-      "title": "Fix the known-spawn/no-record gap",
+      "title": "Complete no-record resource policy",
       "command": "node tests/product-acceptance/cases/w27-lifecycle.mjs",
       "notes": [
-        "A record-less stop is separated into empty-unstarted, known-birth and complete-record states; \"no managed instance\" is never read as \"the spawned daemon stopped\"."
+        "Default retain is unchanged; a forced no-record proof may only act on the caller's complete immutable set. Process discovery was removed; an incomplete or unobservable set is UNKNOWN."
       ],
       "result": "PASS",
       "counts": {
-        "PASS": 130
+        "PASS": 133
       },
       "cases": [
         {
@@ -679,15 +679,30 @@
           "id": "E1-LIFECYCLE-STOP-NO-RECORD",
           "status": "PASS",
           "reason": null
+        },
+        {
+          "id": "E1-LIFECYCLE-NO-RECORD-UNVERIFIED",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-LIFECYCLE-SET-MISMATCH",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-LIFECYCLE-BIRTH-CONFIG",
+          "status": "PASS",
+          "reason": null
         }
       ]
     },
     {
       "id": "E2",
-      "title": "Independent birth and liveness verification",
+      "title": "Independent birth and set verification",
       "command": "node tests/product-acceptance/cases/w27-lifecycle.mjs",
       "notes": [
-        "Before the record exists the birth pid/start/uid/argv/roots and the discovered child set are verified; a live birth or unknown child keeps clean=false."
+        "Every resource is checked (pid/start/uid/argv/roots/parent) before the first signal and again fresh before each TERM/KILL; birth config/install/state must equal the request."
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
@@ -839,10 +854,10 @@
     },
     {
       "id": "E3",
-      "title": "Release and unknown material handling",
+      "title": "Release only after a fixed-set observation",
       "command": "node tests/product-acceptance/cases/w27-lifecycle.mjs",
       "notes": [
-        "releaseRoot accepts only a proven, self-owned exit; a missing record or default value can no longer absorb an unknown."
+        "Quiescence is an independent re-observation of the fixed pre-stop pids, never an empty array derived from a deleted record."
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
@@ -1024,10 +1039,10 @@
     },
     {
       "id": "E4",
-      "title": "First result: complete startup-phase tool",
+      "title": "First result: safe startup-phase tool",
       "command": "node tests/product-acceptance/run.mjs --suites=selftest",
       "notes": [
-        "Fourteen pure controls cover own, wrong start, sibling, foreign child, mixed unknown, start window, refused stop, idempotence, birth root, child scope, no-record birth/exit/reuse and package STOPPED with no record."
+        "Seventeen pure controls: own, wrong start, sibling, foreign child, mixed unknown, start window, refused stop, idempotence, birth root, child scope, no-record birth/exit/reuse/stop/unverified/set-mismatch/birth-config."
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
@@ -1159,10 +1174,10 @@
     },
     {
       "id": "E5",
-      "title": "Early alignment to the accurate target",
-      "command": "node -e \"require('node:fs').readFileSync('/Users/hh/Desktop/joker/pa-artifacts/wave28-target/install-artifact.json')\"",
+      "title": "Align to the current D target",
+      "command": "node -e \"require('node:fs').readFileSync('/Users/hh/Desktop/joker/pa-artifacts/wave29-target/install-artifact.json')\"",
       "notes": [
-        "The subject is D 1ba0032 (sour ce/build/schema/tar/bytes read from its own manifest); ce64 stays a historical scope and the successor is not inferred from a checkout."
+        "Subject is D 1fba (source/build/schema/tar/bytes read from its manifest); 1ba and ce64 remain their own historical scopes."
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
@@ -1214,15 +1229,15 @@
     },
     {
       "id": "E6",
-      "title": "Actual template preview in main",
+      "title": "Actual template preview",
       "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "The recipe preview route is absent from the frozen 1ba bytes and recorded as an exact capability difference; main source already serves it."
+        "POST /v1/projects/:id/recipes/preview is real: exact input echo, draft fields/digests, zero Work writes, query/project/atom/kind/auth negatives."
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
-        "NOT_TESTED": 4,
-        "PASS": 4
+        "NOT_TESTED": 3,
+        "PASS": 5
       },
       "cases": [
         {
@@ -1262,17 +1277,17 @@
         },
         {
           "id": "E6-RECIPE-PREVIEW",
-          "status": "NOT_TESTED",
-          "reason": "NOT_REACHED: the frozen 1ba package predates the 0073 recipe preview route (its HTTP entry has no recipes/preview). Main already serves it in source, but an installed claim needs a successor frozen package; the route is not inferred from a newer checkout."
+          "status": "PASS",
+          "reason": null
         }
       ]
     },
     {
       "id": "E7",
-      "title": "Apply and revalidation before explicit create",
+      "title": "Apply and revalidation before create",
       "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "An installed apply/create claim needs a successor package; no route or field is fabricated for 1ba."
+        "Apply/edit and pre-create revalidation are browser-level work; the preview digest is recorded as data, not as a command token."
       ],
       "result": "PASS",
       "counts": {
@@ -1316,7 +1331,7 @@
       "title": "Second result: current package template loop",
       "command": "node tests/product-acceptance/build-handoff.mjs",
       "notes": [
-        "The template loop is reported as NOT_REACHED for these bytes with the exact missing route, not as a passing J/F unit test."
+        "The preview positive and its negatives are reported for the exact 1fba bytes; the apply/create chain keeps its own scope note."
       ],
       "result": "PASS",
       "counts": {
@@ -1342,10 +1357,10 @@
     },
     {
       "id": "E9",
-      "title": "Actual statistics entry and 7/30 days",
+      "title": "Statistics entry and 7/30 days",
       "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "GET /v1/insights is exercised on 1ba: schema, 7/30 windows, scope, coverage, layers and auth/duplicate/invalid-day/timezone negatives."
+        "GET /v1/insights validated against its public schema with 7/30 windows, scope, coverage, layers and auth/query negatives."
       ],
       "result": "PASS",
       "counts": {
@@ -1390,7 +1405,7 @@
       "title": "F identity and two-project daily flow",
       "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "The installed selector, four navigations, draft and identity isolation are browser-verified on the frozen bundle; stale responses are not accepted."
+        "Installed selector, four navigations, draft and identity isolation remain browser-verified on the frozen bundle."
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
@@ -1409,7 +1424,7 @@
       "title": "Third result: visible same-package chain",
       "command": "node tests/product-acceptance/build-handoff.mjs",
       "notes": [
-        "Template, statistics, context, source and UI results are reported with HTTP/actions/screenshots and exact remaining component differences."
+        "Template preview, statistics, context, source and UI results carry HTTP/actions/screenshots and exact remaining gaps."
       ],
       "result": "SEE_RUN",
       "counts": {},
@@ -1417,10 +1432,10 @@
     },
     {
       "id": "E13",
-      "title": "New package function mode/start/stop",
+      "title": "Function mode/start/stop",
       "command": "node tests/product-acceptance/run.mjs --tier=installed-functional",
       "notes": [
-        "On 1ba the packaged launcher stops both a normal and a restored discussion-only instance by itself; detection and function are still separate cases."
+        "On 1fba the packaged launcher stops a normal and a restored no-file instance; detection and function stay separate."
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
@@ -1439,7 +1454,7 @@
       "title": "Two formats and recovery data",
       "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "v1/v2 snapshots, artifact closure, unknown-table boundary and the target-content gap are kept with their own evidence."
+        "v1/v2 snapshots, artifact closure, unknown-table boundary and the target-content gap keep their own evidence."
       ],
       "result": "SEE_RUN",
       "counts": {},
@@ -1461,7 +1476,7 @@
       "title": "Fourth result: ordinary and functional on the current tar",
       "command": "node tests/product-acceptance/build-handoff.mjs",
       "notes": [
-        "Function stop, two-format recovery, multi-root upgrade and reopen are reported for the exact 1ba bytes; native/private/target/value stay separate."
+        "All ordinary and functional results are reported for the exact 1fba bytes; native/private/target/value stay separate."
       ],
       "result": "SEE_RUN",
       "counts": {},
@@ -1472,7 +1487,7 @@
       "title": "Bounded new-risk observation",
       "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "Only new risks are re-verified within a deadline; the old 600/1800 fixtures are not rerun or advertised as a product soak."
+        "Only new risks are re-verified within a deadline; no old 600/1800 fixture is rerun as a product soak."
       ],
       "result": "PASS",
       "counts": {
@@ -1502,7 +1517,7 @@
       "title": "Support and colleague guide",
       "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "Packaged support output stays 0600, non-overwriting and credential-free; the guide matches the real preview/create and start/stop entries."
+        "Support output stays 0600, non-overwriting and credential-free; the guide matches the real preview/start/stop entries."
       ],
       "result": "SEE_RUN",
       "counts": {},
@@ -1513,7 +1528,7 @@
       "title": "Fifth result: daily trial and observation handoff",
       "command": "node tests/product-acceptance/build-handoff.mjs",
       "notes": [
-        "Short availability, raw observation, support and explicit not-reached items are delivered with ordinary and functional results separated."
+        "Short availability, raw observation, support and explicit not-reached items are delivered with ordinary and functional separated."
       ],
       "result": "SEE_RUN",
       "counts": {},
@@ -1524,7 +1539,7 @@
       "title": "Complete real positives and failure attribution",
       "command": "node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record",
       "notes": [
-        "Every case binds the 1ba subject and its own evidence; the ce64 functional failure stays historical and is not relabelled."
+        "Every case binds the 1fba subject and its own evidence; 1ba and ce64 scopes stay historical."
       ],
       "result": "SEE_RUN",
       "counts": {},
@@ -1557,7 +1572,7 @@
       "title": "Sixth result and complete handoff",
       "command": "node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record",
       "notes": [
-        "wave29-status, six checkpoints, real commands and remaining gates; owned paths only are pushed to the original origin branch."
+        "wave30-status, four deliverables and the remaining gates; only owned paths are pushed to the original origin branch."
       ],
       "result": "SEE_RUN",
       "counts": {},
@@ -1569,12 +1584,12 @@
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-15T07:08:47.012Z",
+    "checkedAt": "2026-11-15T09:27:57.763Z",
     "source": {
-      "commit": "41693dd6335813da363d4be938736ee3ab7ddeb2",
+      "commit": "bbe7923e667f9268d26d8cf16948646711576e05",
       "dirty": false
     },
-    "expectedSource": "41693dd6335813da363d4be938736ee3ab7ddeb2",
+    "expectedSource": "bbe7923e667f9268d26d8cf16948646711576e05",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -1943,6 +1958,21 @@
       },
       {
         "id": "E1-MUTATE-PILOT-NO-ORACLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-NO-RECORD-UNVERIFIED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-SET-MISMATCH",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-BIRTH-CONFIG",
         "required": true,
         "status": "PASS"
       },
@@ -2324,31 +2354,31 @@
       "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability; there is no allow-gap switch."
     ]
   },
-  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T07-03-05-041Z",
+  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z",
   "evidence": {
-    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T07-03-05-041Z/report.json",
-    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T07-03-05-041Z/release.json",
+    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/report.json",
+    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/release.json",
     "screenshots": [
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T07-03-05-041Z/screenshots/desktop-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T07-03-05-041Z/screenshots/notebook-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T07-03-05-041Z/screenshots/mobile-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T07-03-05-041Z/screenshots/mobile-navigation.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T07-03-05-041Z/screenshots/mobile-detail.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T07-03-05-041Z/screenshots/desktop-delivered.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T07-03-05-041Z/screenshots/desktop-error.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T07-03-05-041Z/screenshots/desktop-offline.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T07-03-05-041Z/screenshots/desktop-keyboard.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T07-03-05-041Z/screenshots/mobile-conversations.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T07-03-05-041Z/screenshots/desktop-verification-blocked.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T07-03-05-041Z/screenshots/desktop-verification-recovered.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T07-03-05-041Z/screenshots/desktop-review-activity.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T07-03-05-041Z/screenshots/mobile-attention-inbox.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T07-03-05-041Z/proposal-preview-desktop.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T07-03-05-041Z/proposal-preview-notebook.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T07-03-05-041Z/proposal-preview-mobile.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T07-03-05-041Z/screenshots/context-confirm-desktop.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T07-03-05-041Z/screenshots/context-confirm-mobile.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T07-03-05-041Z/screenshots/context-history-mobile.png"
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/screenshots/desktop-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/screenshots/notebook-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/screenshots/mobile-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/screenshots/mobile-navigation.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/screenshots/mobile-detail.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/screenshots/desktop-delivered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/screenshots/desktop-error.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/screenshots/desktop-offline.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/screenshots/desktop-keyboard.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/screenshots/mobile-conversations.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/screenshots/desktop-verification-blocked.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/screenshots/desktop-verification-recovered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/screenshots/desktop-review-activity.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/screenshots/mobile-attention-inbox.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/proposal-preview-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/proposal-preview-notebook.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/proposal-preview-mobile.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/screenshots/context-confirm-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/screenshots/context-confirm-mobile.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/screenshots/context-history-mobile.png"
     ],
     "matrix": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/release-matrix.json",
     "executionStatus": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/execution-status.json",

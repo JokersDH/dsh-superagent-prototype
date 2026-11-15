@@ -484,7 +484,15 @@ export function stopFunctionalIssues(value) {
     if (!item || item.status !== 'RUNNING') { issues.push(`${key}_not_started`); continue }
     if (item.packageStatus !== 'STOPPED' && item.packageStatus !== 'STOPPED_ORPHAN') issues.push(`${key}_package_${item.packageStatus ?? 'missing'}`)
     if (item.recordPresent !== false) issues.push(`${key}_record_kept`)
-    if (!Array.isArray(item.resourcesAlive) || item.resourcesAlive.some(alive => alive !== false)) issues.push(`${key}_resources_alive`)
+    // Quiescence is an independent re-observation of the fixed pre-stop pids, never an empty array
+    // obtained after the record was removed.
+    const before = item.before?.resources
+    if (!Array.isArray(before) || before.length === 0) issues.push(`${key}_no_prestop_set`)
+    else {
+      if (before.some(resource => !Number.isSafeInteger(resource.pid) || !isSubstantive(resource.start))) issues.push(`${key}_prestop_identity`)
+      if (!Array.isArray(item.after) || item.after.length !== before.length) issues.push(`${key}_after_set`)
+      else if (item.after.some(resource => resource.alive === true && resource.sameIdentity === true)) issues.push(`${key}_resources_alive`)
+    }
   }
   return issues
 }
@@ -503,8 +511,16 @@ export function recipePreviewIssues(value) {
     if (!Array.isArray(fields.atoms) || fields.atoms.length !== 1 || fields.atoms[0] !== value.atom) issues.push('field_atoms')
     if (!(fields.goalLength >= 1)) issues.push('field_goal')
     if (!HEX64(String(value.digests?.facts ?? '')) || !HEX64(String(value.digests?.catalog ?? ''))) issues.push('digests')
-  } else if (!Array.isArray(value.issues) || value.issues.length === 0) issues.push('issues')
-  if (!Array.isArray(value.issues) || value.issues.length > 0) issues.push('unexpected_issues')
+    if (!Array.isArray(value.issues) || value.issues.length !== 0) issues.push('draft_issues')
+  } else {
+    // A non-draft preview must explain itself and must not carry draft fields; this is a legitimate
+    // observation (needs_input/unsupported/unavailable), not a defect.
+    if (value.fields !== null && value.fields !== undefined) issues.push('fields_for_non_draft')
+    const reasoned = Array.isArray(value.issues) && value.issues.length > 0
+    const recordedGap = value.schemaViolation?.kind === 'non_draft_without_issues' && value.schemaViolation?.status === value.status &&
+      isSubstantive(value.schemaViolation?.contract) && isSubstantive(value.schemaViolation?.owner)
+    if (!reasoned && !recordedGap) issues.push('issues')
+  }
   const negatives = value.negatives ?? {}
   if (negatives.query !== 400 || negatives.mismatch !== 400 || negatives.duplicate !== 400 || negatives.badKind !== 400) issues.push('request_negatives')
   if (negatives.crossSite !== 403 || negatives.badBearer !== 401 || negatives.noJson !== 400) issues.push('auth_negatives')

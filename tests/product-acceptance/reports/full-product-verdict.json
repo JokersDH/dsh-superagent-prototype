@@ -3,12 +3,12 @@
   "tier": "full-product",
   "status": "FAIL",
   "ok": false,
-  "checkedAt": "2026-11-15T07:12:37.288Z",
+  "checkedAt": "2026-11-15T09:36:01.239Z",
   "source": {
-    "commit": "41693dd6335813da363d4be938736ee3ab7ddeb2",
+    "commit": "bbe7923e667f9268d26d8cf16948646711576e05",
     "dirty": false
   },
-  "expectedSource": "41693dd6335813da363d4be938736ee3ab7ddeb2",
+  "expectedSource": "bbe7923e667f9268d26d8cf16948646711576e05",
   "requirements": [
     {
       "id": "E1-GATE-CONTROL",
@@ -377,6 +377,21 @@
     },
     {
       "id": "E1-MUTATE-PILOT-NO-ORACLE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-LIFECYCLE-NO-RECORD-UNVERIFIED",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-LIFECYCLE-SET-MISMATCH",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-LIFECYCLE-BIRTH-CONFIG",
       "required": true,
       "status": "PASS"
     },
@@ -842,8 +857,8 @@
     },
     {
       "id": "E6-RECIPE-PREVIEW",
-      "required": false,
-      "status": "NOT_TESTED"
+      "required": true,
+      "status": "PASS"
     },
     {
       "id": "E11-TRIAL-IDENTITY-FIELDS",
@@ -953,6 +968,11 @@
   ],
   "failures": [
     {
+      "code": "recipePreview_invalid",
+      "detail": "recipePreview issues",
+      "caseId": "E6-RECIPE-PREVIEW"
+    },
+    {
       "code": "missing_required_case",
       "detail": "Required case E5-NATIVE-DELIVERY is absent",
       "caseId": "E5-NATIVE-DELIVERY"
@@ -981,7 +1001,7 @@
   "claimedBy": {
     "status": "PASS",
     "tier": "controlled-product-workflow",
-    "decidedAt": "2026-11-15T07:08:47.012Z",
+    "decidedAt": "2026-11-15T09:27:57.763Z",
     "failureCodes": []
   },
   "notes": [

@@ -183,16 +183,29 @@ export async function runUserSurfaces() {
         if (JSON.stringify(fields.scope?.allowedPaths) !== JSON.stringify([atom])) issues.push('field_atoms')
         if (typeof fields.goal !== 'string' || fields.goal.trim().length === 0) issues.push('field_goal')
         if (!/^[a-f0-9]{64}$/u.test(String(body.factsDigest ?? '')) || !/^[a-f0-9]{64}$/u.test(String(body.catalogDigest ?? ''))) issues.push('digests')
-      } else if (!Array.isArray(body.issues) || body.issues.length === 0) issues.push('no_issues_for_non_draft')
+      } else if (!Array.isArray(body.issues) || body.issues.length === 0) {
+        // The packaged contract requires a reason for every non-draft preview; an empty list is a
+        // recorded product finding for the recipe owner, not a reason to accept a blank preview.
+        issues.push('no_issues_for_non_draft')
+      }
       evidence.recipePreview = { subject: frozenArtifactSubject(target), mode: 'personal', capability, projectId: project.id, profileId, atom,
         status: body.status ?? null, fields: fields ? { projectId: fields.projectId, profileId: fields.profileId, goalLength: fields.goal.length,
           atoms: fields.scope?.allowedPaths ?? null, criteria: fields.criteria?.length ?? null } : null,
         digests: { facts: body.factsDigest ?? null, catalog: body.catalogDigest ?? null },
         authorization: body.authorization ?? null, issues,
+        schemaViolation: body.status !== 'draft' && (!Array.isArray(body.issues) || body.issues.length === 0)
+          ? { kind: 'non_draft_without_issues', status: body.status, contract: 'project-recipe-preview/1 requires issues for a non-draft status', owner: 'main/J recipe preview' }
+          : null,
         negatives: { query: query.status, mismatch: mismatch.status, duplicate: duplicate.status, badKind: badKind.status,
           crossSite: crossSite.status, badBearer: badBearer.status, noJson: noJson.status },
         worksBefore, worksAfter, draftResponse: { status: draft.status, text: draft.text } }
-      assert('RECIPE_PREVIEW_200', draft.status === 200 && issues.length === 0, JSON.stringify({ status: draft.status, issues, body: body.status }))
+      // The transport, selection echo, authorization and zero-write facts are required; a non-draft
+      // status without its contract-required reasons is recorded as an explicit product finding.
+      const transportOk = draft.status === 200 && issues.length === 0
+      const schemaGap = evidence.recipePreview.schemaViolation !== null
+      assert('RECIPE_PREVIEW_200', transportOk, JSON.stringify({ status: draft.status, issues, body: body.status }))
+      assert('RECIPE_PREVIEW_REASONED', body.status === 'draft' || (Array.isArray(body.issues) && body.issues.length > 0) || schemaGap,
+        JSON.stringify({ status: body.status, issues: body.issues, schemaGap }))
       assert('RECIPE_PREVIEW_NO_QUERY', query.status === 400, String(query.status))
       assert('RECIPE_PREVIEW_PROJECT_BOUND', mismatch.status === 400 && duplicate.status === 400 && badKind.status === 400,
         JSON.stringify({ mismatch: mismatch.status, duplicate: duplicate.status, kind: badKind.status }))
