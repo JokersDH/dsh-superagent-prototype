@@ -1,0 +1,187 @@
+{
+  "protocol": "wave29-delivery-admission/1",
+  "date": "2026-11-15",
+  "scope": "Pinned D/E source and immutable artifact audit; independent pure argv and mocked lifecycle controls; complete recorded release-gate evaluation. No live install/stop matrix, long soak, global discovery, real vendor/model/native call or user-resource operation.",
+  "candidates": {
+    "D": "083c4fa9d30f6e8db45f54803bce9cab3c0515f3",
+    "DDirty": false,
+    "E": "53f828d1be457e555458a44c566fdb6bf50bb394",
+    "ETrackedDirty": false,
+    "EHistoricalUntrackedRuns": "Preserved",
+    "ETestSourceAtFinalRun": "516203efa95fcd0b08bdcc5127545c6d8996c745",
+    "observedMain": "ea82d8f2a923f623899eed043c1402708074e3b3"
+  },
+  "newDArtifact": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave28-target/wave28-target-1ba0032.tar.gz",
+    "source": "1ba003239237d3fc7a92bde8cbe897549abcbd5d",
+    "sourceDirty": false,
+    "buildId": "67abd96690030eb7",
+    "sha256": "504dfdc1ceb191828d3836017cc47d9d0023dc27cc1291e6caf28e08aafcfb9e",
+    "tarBytes": 20333302,
+    "schema": 18,
+    "platform": "darwin",
+    "arch": "arm64",
+    "node": "24.21.0",
+    "abi": "137",
+    "sqlite": "3.53.4",
+    "verifiedEntries": 6778,
+    "verifiedRegularFiles": 6756,
+    "verifiedInternalSymlinks": 22,
+    "verifiedRegularBytes": 67908135,
+    "fileDigestMismatches": [],
+    "verifiedInstall": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-wave29-package-yq6DAM/install",
+    "verificationExitCode": 0,
+    "method": "Check expected tar SHA/bytes and safe member names, extract into a fresh private root, verify every manifest regular file size/hash and realpath-bounded internal link",
+    "usageInsightsPackagePresent": true,
+    "usageObservationEntryPresent": true,
+    "projectRecipesPresent": false,
+    "main18fIsAncestor": true,
+    "ancestryCommand": "git merge-base --is-ancestor 18f892daab756fb2dbcebc9f591bd808ace686db 1ba003239237d3fc7a92bde8cbe897549abcbd5d",
+    "ancestryExitCode": 0,
+    "daemonSha256": "f16c1a88020972fcfe4aedf2e41a02e350e29202da1d98b7d3d8086b7ec4a62f",
+    "startSha256": "de21a1cf0117ecee9794442e679da90abea1a6d2971fb6dea28abcb226233e09",
+    "independentEInstalledVerdictForTheseBytes": "NOT_REACHED",
+    "scope": "A real clean successor containing statistics/readiness/F identity source, unlike old1cd. It does not contain J recipes or inherit E's oldce64 functional/installed verdict."
+  },
+  "dClosureAndNarrowIntegration": {
+    "manifest": "/Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/reports/wave28/ordinary-source-closure.json",
+    "source": "1ba0032",
+    "entriesChecked": 109,
+    "matches": 109,
+    "mismatches": [],
+    "runtimeFilesDifferentFromMain": ["apps/launcher/lib/daemon.mjs", "apps/launcher/lib/start.mjs"],
+    "portabilitySourceDifferentFromMain": false,
+    "distributionBuildDifferentFromMain": false,
+    "distributionStageDifferentFromMain": false,
+    "advice": "The general health.mode/startup-mode check is a useful narrow main integration. Correct daemonArgv by requested mode and preserve existing consumers before importing that whole branch. No wholesale portability/distribution import or docs-only refreeze is needed. Runtime corrections do require an accurately frozen successor."
+  },
+  "dOriginalModeFinding": {
+    "status": "CLOSED_FOR_REQUESTED_PERSONAL_READONLY_AT_SOURCE_AND_SUBMITTED_D_SCOPE",
+    "sourceChange": "Recovery readonly now forwards discussion-only and start validates general health.mode before recording RUNNING; original root/identity/stop guards remain.",
+    "independentCommand": "node --input-type=module heredoc importing actual D daemonArgv and evaluating five mode classes",
+    "exitCode": 0,
+    "pureControls": [
+      { "case": "normal personal discussion", "requestedMode": "personal", "argvSelectsPersonal": true, "matches": true },
+      { "case": "restored personal without review", "requestedMode": "personal", "argvSelectsPersonal": true, "matches": true },
+      { "case": "restored personal with review", "requestedMode": "personal", "argvSelectsPersonal": true, "matches": true },
+      { "case": "normal fixture", "requestedMode": "fixture", "argvSelectsPersonal": false, "matches": true },
+      { "case": "restored fixture", "requestedMode": "fixture", "argvSelectsPersonal": true, "matches": false }
+    ],
+    "dSubmittedLiveEvidence": {
+      "path": "/Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/reports/wave28/startup-mode-consistency.json",
+      "personalWithoutReview": "RUNNING personal/recovery_readonly -> STOPPED, record removed",
+      "normalPersonal": "RUNNING personal/normal -> STOPPED, record removed",
+      "personalWithReview": "RUNNING personal/recovery_readonly with actual digest -> STOPPED, record removed",
+      "fixtureEvidence": "Normal fixture only; restored fixture is not covered",
+      "auditLiveRerun": false
+    },
+    "newCompatibilityGap": "daemonArgv unconditionally adds discussion-only for any recovery_readonly request. A restored --fixture request therefore becomes personal and is rejected by the correctly strengthened general health-mode check. This is fail-closed and not a wrong-root kill, but it regresses the existing restored-fixture consumer.",
+    "normalFixtureCompatibilityQuestion": "The change also removes the previous lazy --assistant flag from normal fixture. demo.ts constructs PrivateModelProvider only with that flag in non-recovery mode. Existing E w18-installed-recovery seeds a --fixture instance with an explicit local mock model and uses context/candidate APIs. That consumer has not been rerun against1ba; preserve its capability or explicitly resolve the intended scope rather than silently deleting the functional contract.",
+    "guardAdvice": "Do not loosen health, root, start/UID or stop verification. Respect requested personal/fixture mode in argv and retain the original inert fixture assistant surface where required; constructor availability is not automatic model sending."
+  },
+  "eDetectionFunctionalSplit": {
+    "status": "CLOSED_AT_RECORDED_SCOPE",
+    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T02-56-43-489Z/report.json",
+    "testSource": "516203efa95fcd0b08bdcc5127545c6d8996c745",
+    "counts": { "PASS": 265, "FAIL": 1, "NOT_TESTED": 19 },
+    "subjectSource": "ce64fc1fd986bde9a6eba5ace1a4658beadcda21",
+    "subjectBuildId": "d4b1780d999a4b74",
+    "subjectTarSha256": "8c36aaeb472263bbb7c6ab5e4dafb3e9394306c83b3b6e1ab257d8770480c33a",
+    "ordinaryTier": { "name": "installed-alpha", "required": 180, "reportedStatus": "PASS", "independentGateOk": true },
+    "functionalTier": { "name": "installed-functional", "required": 181, "reportedStatus": "FAIL", "independentGateOk": false, "failingCase": "E5-STOP-FUNCTIONAL" },
+    "functionalFailure": "Oldce64 restored discussion-only remains RUNNING with personal record, fixture health and BLOCKED package stop. The failure is now honestly recorded and no longer represented as functional success.",
+    "independentGateCommand": "node --input-type=module heredoc importing actual E evaluateRelease/tier/resolveFixtureDigest; evaluate full real report at recorded checkedAt",
+    "exitCode": 0,
+    "negativeControl": "Changing only E5-STOP-FUNCTIONAL status from FAIL to PASS is still rejected by assertion_failed and stopFunctional_invalid; a documented refusal or equivalent cleanup cannot satisfy the functional tier.",
+    "preservedHistory": "Originalce64 normal164 ordinary/UI/readiness scope and intermediate ordinary source ranges remain valid within their own measured limits. Do not apply the oldce64 failure to the new1ba as if it had been tested.",
+    "new1baTargetActuallyMeasuredByE": false
+  },
+  "eFullSetPrecheck": {
+    "status": "CLOSED_FOR_PRESENT_RECORD_SCOPE",
+    "source": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/lib/packaged-instance.mjs",
+    "change": "Independent birth install/state/config/PID/start is required for launcher proof, and the entire resource set is prevalidated before the first signal; individual TERM/KILL fresh checks remain.",
+    "independentPureCommand": "node --experimental-test-module-mocks --input-type=module heredoc; actual E module, own temporary synthetic records and injected ps/timers/process.kill",
+    "exitCode": 0,
+    "cases": [
+      { "case": "complete own positive", "clean": true, "retained": false, "signals": ["TERM101", "TERM102"] },
+      { "case": "birth and actual API belong to other state", "clean": false, "retained": true, "reason": "resource_scope_mismatch", "signals": [] },
+      { "case": "API other root only", "clean": false, "retained": true, "reason": "resource_scope_mismatch", "signals": [] },
+      { "case": "birth config mismatch", "clean": false, "retained": true, "reason": "resource_scope_mismatch", "signals": [] },
+      { "case": "missing launcher birth", "clean": false, "retained": true, "reason": "launcher_birth_missing", "signals": [] }
+    ],
+    "realSignals": 0,
+    "interpretation": "The previously demonstrated launcher-TERM-before-child-refusal issue is genuinely closed in the tested present-record cases. Do not reassign that same root/config repair."
+  },
+  "eRemainingStartupWindow": {
+    "finding": "E_KNOWN_SPAWN_WITHOUT_INSTANCE_RECORD_TREATED_CLEAN",
+    "priority": "P1_TEST_TOOL_STARTUP_MATERIAL_SAFETY",
+    "source": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/lib/packaged-instance.mjs",
+    "summary": "Before instance.json exists, stopOwned ignores a supplied spawn birth: with packageStop=false it returns clean immediately; with packageStop=true a package STOPPED/no-managed-record result also returns clean. Neither path checks whether that known spawn or its unknown children are still alive.",
+    "independentPureCommand": "node --experimental-test-module-mocks --input-type=module heredoc; new private empty root, explicit synthetic spawn birth, mocked package STOPPED/no-record, no real process",
+    "exitCode": 0,
+    "controls": [
+      { "packageStop": false, "knownSpawnBirthProvided": true, "recordPresent": false, "identityQueries": 0, "clean": true, "retained": false, "releaseRootDeletedMaterial": true },
+      { "packageStop": true, "knownSpawnBirthProvided": true, "recordPresent": false, "identityQueries": 0, "clean": true, "retained": false, "releaseRootDeletedMaterial": true }
+    ],
+    "next": "A no-record response is not proof that a known spawned resource set is gone. Reconcile independent spawn liveness/identities and keep unknown children/material before declaring clean or deleting the root. Add no-record/pre-RUNNING tests without inserting a synthetic instance record before cleanup; retain the present-record fixes already passed.",
+    "noPublicProductBypassOrActualLeakedUserProcessClaimed": true
+  },
+  "findingsOrdered": [
+    {
+      "id": "E_NO_RECORD_KNOWN_SPAWN_FALSE_CLEAN",
+      "priority": "P1_TEST_TOOL_ONLY",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/lib/packaged-instance.mjs",
+      "summary": "Known spawn with no instance record can be marked clean and its material deleted without any identity/liveness query. This startup-window case is distinct from the now-fixed full-record precheck."
+    },
+    {
+      "id": "D_RECOVERY_FIXTURE_ARGV_REGRESSION",
+      "priority": "P2_SUPPORTED_MODE_COMPATIBILITY",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-d/apps/launcher/lib/daemon.mjs",
+      "summary": "The personal recovery fix is applied to fixture recovery as well, producing personal argv for a fixture request. General health validation correctly rejects it, so the existing restored-fixture installed reader is no longer startable.",
+      "consumer": "tests/product-acceptance/cases/w18-installed-recovery.mjs starts --fixture before and after restore and requires the second root to be RUNNING/recovery_readonly. That is an existing consumer, not an invented mode."
+    },
+    {
+      "id": "D_NORMAL_FIXTURE_ASSISTANT_COMPATIBILITY_UNMEASURED",
+      "priority": "P2_CONSUMER_REGRESSION_RISK_WITH_DIRECT_SOURCE_EVIDENCE",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-d/apps/launcher/lib/daemon.mjs",
+      "summary": "Removing the previous lazy --assistant flag from normal fixture disables provider construction used by E's explicit mock context/candidate seed. Actual new-tar HTTP failure was not invoked in this audit; resolve and test this existing consumer before declaring the full installed suite compatible."
+    }
+  ],
+  "minimalIntegrationAdvice": {
+    "candidateSourceScope": "The new1ba bytes contain main18f statistics and no J recipes; byte validity does not certify all restored modes or an E functional verdict.",
+    "mainSourceSlice": ["apps/launcher/lib/start.mjs general health-mode check", "apps/launcher/lib/daemon.mjs requested-mode-correct recovery propagation, with existing fixture consumers preserved"],
+    "doNotWholeImportUncorrectedDaemonBranch": true,
+    "unchangedSources": ["packages/portability/src", "tools/distribution/build.mjs", "tools/distribution/stage.mjs"],
+    "testAdvice": "Expand the pure matrix to normal/restored personal and fixture, with and without explicit review where valid; then independently owned functional package start/stop/context-reader evidence. Do not loosen guards or delete failing required cases.",
+    "freezeAdvice": "A runtime argv correction needs a necessary successor. E test-tool repairs, reports and docs alone do not require a refreeze. Keep ce64/1cd/1ba immutable and preserve their actual measured scopes."
+  },
+  "nextCompleteCapabilities": {
+    "D": [
+      "Finish the complete mode matrix without regressing restored fixture or explicitly configured fixture assistant consumers; preserve health/root/stop guards",
+      "Deliver one precise current statistics/UI/runtime successor, with actual source/tar/build/schema/ABI and any later J/F only if composed",
+      "Verify owned normal, personal restored with/without review, fixture restoration, two-state isolation and package stop plus existing context/candidate consumers",
+      "Preserve actual precise A/C/manual proof progress and cold-install/source closure evidence without upgrading them to executable authorization"
+    ],
+    "E": [
+      "Keep the now-correct detector/ordinary/functional tier split and full birth-root/config/child prevalidation",
+      "Close known-spawn/no-record false clean and preserve unknown startup material before further live reruns",
+      "Consume the exact corrected1ba successor instead of indefinitely remeasuring ce64; functional failure on oldce64 is history, not a verdict on untested new bytes",
+      "Independently verify current statistics/context/source UI and actual same-package modes, using original APIs and no fallback cleanup to turn a functional failure green",
+      "Keep native/business recovery/private/target/value scopes and budgets separate"
+    ]
+  },
+  "safety": {
+    "realVendorSends": 0,
+    "realModelTurns": 0,
+    "nativeTurnStarts": 0,
+    "realSignals": 0,
+    "liveInstallationOrStopMatricesRun": 0,
+    "longSoakRunsStarted": 0,
+    "globalDiscoveryOrOtherCredentialsUsed": false,
+    "userTwelveServicesTouched": false,
+    "allStateProfilesTarsLedgersDirtyAndERunsPreserved": true,
+    "dEImplementationsAssertionsOrRootEdited": false,
+    "allExecSessionsCompleted": true,
+    "onlyDurableNewWorkspaceArtifact": "reports/releases/wave29-admission/delivery.json"
+  }
+}

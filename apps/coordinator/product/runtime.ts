@@ -42,6 +42,7 @@ import { ProductContextRecords } from './context-records.ts'
 import { createDiscussionEffects } from './discussion-effects.ts'
 import type { ExecutionConsumer } from './discussion-effects.ts'
 import { ProductUsageObservation } from './usage-observation.ts'
+import { ProductProjectRecipes } from './project-recipes.ts'
 
 export const FIXTURE_CHECK = 'check-fixture-output'
 /** Operator-selected fixed executable/argv; contract or user text can only reference its registered ID. */
@@ -211,6 +212,7 @@ export function createProductRuntime(
     cursor: () => store.events.cursor(), listWorks: (projectIds, limit) => store.workflows.index.listWorks({ projectIds, limit }),
     workEvidence: workId => read.workEvidence!(workId) }, options.now)
   const read: NonNullable<LocalHttpOptions['read']> = {
+    projectRecipePreview: input => recipes.preview(input),
     usageObservation: query => usage.read(query),
     recovery: async () => recovery.inspect(),
     recoveryActivation: async activationId => readRecoveryActivationRecord(store, activationId, options.principal),
@@ -433,6 +435,9 @@ export function createProductRuntime(
       }
     },
   }
+  const recipes = new ProductProjectRecipes({ configuration: () => read.configuration!(),
+    rootFor: projectId => configuredProjects.some(project => project.id === projectId)
+      ? options.projectRegistry?.list().find(project => project.id === projectId)?.path : undefined }, options.now)
   const contextPreview = new ProductContextPreview(store, application, options.principal,
     () => configuredProjects.map(project => ({ ...project,
       ...(projectSettings?.has(project.id) ? { displayName: projectSettings.displayName(project.id) } : {}) })),
