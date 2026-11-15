@@ -715,6 +715,12 @@ const gate = (report) =>
 
 const codes = (result) => result.failures.map((item) => item.code)
 
+const rejectWithTier = (assert, label, requirement, mutate, expected) => {
+  const result = gateFor(requirement, buildReportFor(requirement, mutate))
+  assert(`${label}_REJECTED`, result.ok === false, `gate accepted ${label}`)
+  assert(`${label}_CODE`, codes(result).includes(expected), `expected ${expected}, got ${[...new Set(codes(result))].join(',')}`)
+  return result
+}
 const rejectWith = (assert, label, mutate, expected) => {
   const result = gate(buildReport(mutate))
   assert(`${label}_REJECTED`, result.ok === false, `gate accepted ${label}`)
@@ -1588,7 +1594,7 @@ const CASES = [
     id: 'E28-MUTATE-FUNCTIONAL-STOP-DETECTOR',
     title: 'A detector-only BLOCKED stop cannot satisfy the functional stop requirement',
     check: ({ assert }) =>
-      rejectWith(assert, 'FUNCTIONAL_BLOCKED', (report) => {
+      rejectWithTier(assert, 'FUNCTIONAL_BLOCKED', tier('installed-functional'), (report) => {
         findCase(report, 'E5-STOP-FUNCTIONAL').evidence.stopFunctional.restored.packageStatus = 'BLOCKED'
         return report
       }, 'stopFunctional_invalid'),
@@ -1597,7 +1603,7 @@ const CASES = [
     id: 'E28-MUTATE-FUNCTIONAL-STOP-FALLBACK',
     title: 'A functional stop that used the proof fallback is rejected',
     check: ({ assert }) =>
-      rejectWith(assert, 'FUNCTIONAL_FALLBACK', (report) => {
+      rejectWithTier(assert, 'FUNCTIONAL_FALLBACK', tier('installed-functional'), (report) => {
         findCase(report, 'E5-STOP-FUNCTIONAL').evidence.stopFunctional.proofFallbackUsed = true
         return report
       }, 'stopFunctional_invalid'),
