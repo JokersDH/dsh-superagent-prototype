@@ -7,3 +7,4 @@ coverage/
 .local-state/
 product-spec/research/sources/
 packages/usage-insights/dist/
+packages/project-recipes/dist/

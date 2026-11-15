@@ -67,12 +67,15 @@ import type {
   ConversationCommand,
   ConversationSummary,
   AttentionItem,
+  ProjectRecipeFields,
+  ProjectRecipePreviewInput,
 } from '@personal-agent/contracts'
 import type { ConsoleTransport, ExecutorSnapshot, TargetDelivery, VerificationDetail } from './transport.ts'
 import { TransportError } from './transport.ts'
 import { ProjectSettings } from './ProjectSettings.tsx'
 import { useReviewActivity } from './useReviewActivity.ts'
 import { useUsageObservation } from './useUsageObservation.ts'
+import { useProjectRecipe } from './useProjectRecipe.ts'
 import { AttentionInbox } from './AttentionInbox.tsx'
 import { DecisionWorkspace } from './DecisionWorkspace.tsx'
 import { ProposalWorkspace } from './ProposalWorkspace.tsx'
@@ -981,23 +984,24 @@ export function App({ transport }: { transport: ConsoleTransport }) {
                 key={createDraft.id}
                 initialGoal={createDraft.goal}
                 initialProjectId={createDraft.projectId}
+                recipeTransport={transport}
                 configuration={configuration}
                 state={configState}
                 problem={configProblem}
                 pending={pending === 'create_work'}
                 onReload={() => void refreshConfiguration()}
                 onCancel={() => setCreateOpen(false)}
-                onCreate={async (goal, project: ConfiguredProjectView, profileId) => {
+                onCreate={async (goal, project: ConfiguredProjectView, profileId, fields, commandId) => {
                   if (!project.dispatchAllowed) return
                   const receipt = await send(
                     {
-                      commandId: newId('cmd-work'),
+                      commandId,
                       conversationId,
                       kind: 'create_work',
                       projectId: project.id,
                       goal,
-                      scope: project.scope,
-                      criteria: project.defaultCriteria,
+                      scope: fields?.scope ?? project.scope,
+                      criteria: fields?.criteria ?? project.defaultCriteria,
                       profileId,
                     },
                     'create_work',
@@ -1012,6 +1016,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
                     if (configuration?.profiles.find((profile) => profile.id === profileId)?.kind === 'native')
                       setActivateWorkId(receipt.workId)
                   }
+                  return receipt
                 }}
               />
             )}
@@ -1820,6 +1825,7 @@ function ProjectImportForm({
 function NewWorkForm({
   initialGoal = '',
   initialProjectId = '',
+  recipeTransport,
   configuration,
   state,
   problem,
@@ -1830,17 +1836,23 @@ function NewWorkForm({
 }: {
   initialGoal?: string
   initialProjectId?: string
+  recipeTransport?: ConsoleTransport
   configuration: ApplicationConfiguration | undefined
   state: 'loading' | 'ready' | 'unavailable' | 'failed'
   problem: Problem | undefined
   pending: boolean
   onReload: () => void
-  onCreate: (goal: string, project: ConfiguredProjectView, profileId: string) => Promise<unknown>
+  onCreate: (goal: string, project: ConfiguredProjectView, profileId: string, fields: ProjectRecipeFields | undefined, commandId: string) => Promise<unknown>
   onCancel: () => void
 }) {
   const [goal, setGoal] = useState(initialGoal)
   const [projectChoice, setProjectChoice] = useState(initialProjectId)
   const [profileChoice, setProfileChoice] = useState('')
+  const [recipeKind, setRecipeKind] = useState<'' | ProjectRecipePreviewInput['kind']>('')
+  const [scopeChoice, setScopeChoice] = useState<readonly string[]>()
+  const [submitting, setSubmitting] = useState(false)
+  const submittingRef = useRef(false)
+  const [commandId, setCommandId] = useState(() => newId('cmd-work'))
   const projects = configuration?.projects ?? []
   const nativeProfiles = new Set(
     configuration?.profiles.filter((profile) => profile.kind === 'native').map((profile) => profile.id) ?? [],
@@ -1854,20 +1866,34 @@ function NewWorkForm({
     profiles.find((item) => item.id === profileChoice) ??
     profiles.find((item) => item.id === project?.defaultProfileId) ??
     profiles[0]
-  const usable = state === 'ready' && project?.dispatchAllowed === true && profile !== undefined && !pending
+  const projectPaths = project?.scope.allowedPaths
+  const allowedPaths = useMemo(() => (scopeChoice ?? projectPaths ?? []).filter(atom => projectPaths?.includes(atom)), [scopeChoice, projectPaths])
+  const recipeInput = useMemo(() => recipeKind && project && profile && allowedPaths.length
+    ? { projectId: project.id, kind: recipeKind, allowedPaths, profileId: profile.id } : undefined,
+  [recipeKind, project?.id, profile?.id, allowedPaths])
+  const recipe = useProjectRecipe(recipeTransport, recipeInput, configuration?.revision)
+  const fields = recipe.applied?.fields ?? undefined
+  const usable = state === 'ready' && project?.dispatchAllowed === true && profile !== undefined && !pending && !submitting &&
+    (!recipeKind || (fields !== undefined && recipe.validApplied && !recipe.stale))
   return (
     <form
       className="new-work"
+      aria-label="新建委托"
       onSubmit={async (event) => {
         event.preventDefault()
-        if (!usable || !project || !profile || !goal.trim()) return
-        await onCreate(goal.trim(), project, profile.id)
+        if (!usable || !project || !profile || !goal.trim() || submittingRef.current) return
+        submittingRef.current = true; setSubmitting(true)
+        try {
+          if (recipeKind && !await recipe.revalidate()) return
+          const result = await onCreate(goal.trim(), project, profile.id, fields, commandId)
+          if (result && typeof result === 'object' && 'status' in result && result.status === 'rejected') setCommandId(newId('cmd-work'))
+        } finally { submittingRef.current = false; setSubmitting(false) }
       }}
     >
       <div className="config-line">
-        <span>应用配置</span>
+        <span>配置</span>
         {state === 'ready' && configuration ? (
-          <span className="mini">revision {configuration.revision.slice(0, 10)}…</span>
+          <span className="mini" title={`配置版本 ${configuration.revision}`}>版本 {configuration.revision.slice(0, 6)}</span>
         ) : (
           <span className="mini warn">{state === 'loading' ? '读取中' : '不可用'}</span>
         )}
@@ -1905,6 +1931,7 @@ function NewWorkForm({
           onChange={(event) => {
             setProjectChoice(event.target.value)
             setProfileChoice('')
+            setScopeChoice(undefined)
           }}
         >
           {projects.map((item) => (
@@ -1930,11 +1957,46 @@ function NewWorkForm({
           ))}
         </select>
       </label>
+      {recipeTransport?.previewProjectRecipe && <>
+        <label>
+          <span>任务模板</span>
+          <select aria-label="任务模板" value={recipeKind} disabled={pending || submitting}
+            onChange={event => { setRecipeKind(event.target.value as typeof recipeKind); recipe.clear() }}>
+            <option value="">手动填写</option>
+            <option value="regression_fix">回归修复</option>
+            <option value="scoped_change">有限范围变更</option>
+            <option value="verification_followup">验证跟进</option>
+          </select>
+        </label>
+        {recipeKind && project && <div className="recipe-fields">
+          <fieldset disabled={pending || submitting}>
+            <legend>工作范围</legend>
+            <div className="recipe-atoms">{project.scope.allowedPaths.map(atom => <label key={atom} className="recipe-atom">
+              <input type="checkbox" checked={allowedPaths.includes(atom)} onChange={event => setScopeChoice(event.target.checked
+                ? [...allowedPaths, atom] : allowedPaths.filter(value => value !== atom))} />
+              <code>{atom}</code>
+            </label>)}</div>
+          </fieldset>
+          <div className="actions">
+            <button type="button" className="quiet" disabled={!recipeInput || recipe.loading || pending || submitting}
+              onClick={() => void recipe.read()}><Eye size={14} />{recipe.loading ? '读取中' : '预览草稿'}</button>
+            <button type="button" className="quiet" disabled={recipe.preview?.status !== 'draft' || recipe.loading || pending || submitting}
+              onClick={() => { recipe.apply(); if (recipe.preview?.fields) setGoal(recipe.preview.fields.goal) }}><SquarePen size={14} />应用草稿</button>
+          </div>
+          {(recipe.error || recipe.stale) && <p className="warn-text" role="alert">{recipe.error ?? '配置或选择已变化，请重新预览并应用草稿。'}</p>}
+          {recipe.preview && <div className="recipe-preview" aria-label="模板草稿">
+            <strong>{recipe.preview.title}</strong>
+            {recipe.preview.fields && <p>{recipe.preview.fields.goal}</p>}
+            {recipe.preview.issues.map(issue => <p key={`${issue.code}:${issue.message}`} className="warn-text">{issue.message}</p>)}
+            {fields && <span className="mini" role="status">草稿已应用</span>}
+          </div>}
+        </div>}
+      </>}
       {project && (
         <div className="config-summary">
           <p>
             <span>允许路径</span>
-            <code>{project.scope.allowedPaths.join(', ') || '—'}</code>
+            <code>{(fields?.scope ?? project.scope).allowedPaths.join(', ') || '—'}</code>
           </p>
           {project.scope.excludedPaths.length > 0 && (
             <p>
@@ -1944,7 +2006,7 @@ function NewWorkForm({
           )}
           <p>
             <span>初始标准</span>
-            {project.defaultCriteria
+            {(fields?.criteria ?? project.defaultCriteria)
               .map(
                 (criterion) =>
                   `${criterion.description}（${criterion.kind === 'machine' ? '机器' : '人工'}${criterion.required ? ' · 必需' : ''}）`,
@@ -1955,7 +2017,7 @@ function NewWorkForm({
       )}
       <div className="actions">
         <button type="submit" disabled={!usable || !goal.trim()}>
-          {pending ? '创建中…' : '创建委托'}
+          {pending || submitting ? '创建中…' : '创建委托'}
         </button>
         <button type="button" className="quiet" onClick={onCancel}>
           取消

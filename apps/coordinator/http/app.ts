@@ -72,6 +72,8 @@ import {
   ContextSourcesSchema,
   UsageObservationQuerySchema,
   UsageObservationSchema,
+  ProjectRecipePreviewInputSchema,
+  ProjectRecipePreviewSchema,
 } from '@personal-agent/contracts'
 import type {
   RecoveryTargetPrepareInput,
@@ -131,6 +133,8 @@ import type {
   RecoverySourceConfirm,
   UsageObservation,
   UsageObservationQuery,
+  ProjectRecipePreviewInput,
+  ProjectRecipePreview,
 } from '@personal-agent/contracts'
 import { ApplicationFault } from '@personal-agent/application'
 import { QuestionFault } from '@personal-agent/questions'
@@ -198,6 +202,7 @@ export interface LocalHttpOptions {
     assistantContextSend?(input: AssistantContextSend, actor: TrustedActor): Promise<CommandReceipt>
   }
   read?: {
+    projectRecipePreview?(input: ProjectRecipePreviewInput): Promise<ProjectRecipePreview>
     usageObservation?(query: UsageObservationQuery): Promise<UsageObservation>
     attention?(query: AttentionQuery): Promise<AttentionPage>
     decisions?(query: DecisionQuery): Promise<DecisionPage>
@@ -453,6 +458,16 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
       value.days !== (query.days ?? 7) || value.timezone !== (query.timezone ?? 'UTC'))
       throw new ApplicationFault('storage_unavailable', 'Observation response scope mismatch', 'none')
     return c.json(value)
+  })
+  app.post('/v1/projects/:id/recipes/preview', async c => {
+    if (Object.keys(c.req.query()).length) throw new ApplicationFault('invalid_request', 'Recipe preview accepts no query parameters')
+    if (!c.req.header('content-type')?.toLowerCase().startsWith('application/json')) throw new ApplicationFault('invalid_request', 'Recipe preview requires JSON')
+    if (!options.read?.projectRecipePreview) throw new ApplicationFault('unsupported_capability', 'Project recipes are not connected')
+    const input = ProjectRecipePreviewInputSchema.parse(await c.req.json())
+    if (input.projectId !== IdSchema.parse(c.req.param('id'))) throw new ApplicationFault('invalid_request', 'Recipe preview project mismatch')
+    const result = ProjectRecipePreviewSchema.parse(await options.read.projectRecipePreview(input))
+    if (JSON.stringify(result.input) !== JSON.stringify(input)) throw new ApplicationFault('storage_unavailable', 'Recipe preview response mismatch', 'none')
+    return c.json(result)
   })
   app.post('/v1/context/preview', async (c) => {
     if (!c.req.header('content-type')?.toLowerCase().startsWith('application/json')) throw new ApplicationFault('invalid_request', 'Context preview requires JSON')
