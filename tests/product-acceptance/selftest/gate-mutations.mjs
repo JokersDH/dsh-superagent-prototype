@@ -583,6 +583,16 @@ const evidenceFor = (key) => {
       return { desktop: { horizontalOverflow: false } }
     case 'catalog':
       return { conversations: 3, archived: 1 }
+    case 'lifecycleNoRecord':
+      return { refused: { clean: false, retained: true, reason: 'record_missing_known_birth' }, released: false, aliveAfterRefusal: true,
+        stopped: { clean: true, source: 'birth', signals: [{ label: 'launcher', signalled: 'SIGTERM' }], aliveAfter: [] } }
+    case 'lifecycleNoRecordExit':
+      return { clean: true, reason: null, legitimateExit: true, signals: [], observedChildren: 0 }
+    case 'lifecycleNoRecordReuse':
+      return { clean: false, reason: 'birth_identity_mismatch', signals: [], alive: true,
+        birthAlive: { pid: 10, expectedStart: 'b', observedStart: 'c' } }
+    case 'lifecycleStopNoRecord':
+      return { clean: true, reason: null, sawNoRecord: true, signals: [{ label: 'launcher', signalled: 'SIGTERM' }], source: 'birth', alive: false }
     case 'lifecycleBirthRoot':
       return { reason: 'resource_scope_mismatch', blocked: { label: 'launcher', birthBound: true, birthOk: false, stateOk: false },
         signals: [], alive: true, recordPresent: true, birthState: '/tmp/a/state', requestedState: '/tmp/b/state' }
@@ -621,6 +631,9 @@ const evidenceFor = (key) => {
     case 'trialIdentity':
       return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
         packagedMarker: { entry: 'index.js', hasIdentity: false }, mainSourcePresent: true, mainSourceIdentity: true }
+    case 'recipePreview':
+      return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
+        capability: { '/v1/insights': true, 'recipes/preview': false }, mainSourcePresent: true }
     case 'targetDrift':
       return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
         appended: true, verify: { status: 'ok', verified: 'ok' }, consumerContentBinding: 'NOT_AVAILABLE_IN_MAIN', reason: 'integrity-only' }
@@ -1589,6 +1602,33 @@ const CASES = [
         findCase(report, 'E5-WORKFLOW-FORMATS').evidence.workflowFormats.artifactClosure.v1.digests[0].match = false
         return report
       }, 'workflowFormats_invalid'),
+  },
+  {
+    id: 'E29-MUTATE-NO-RECORD-RELEASED',
+    title: 'A known birth without a record cannot be released as clean',
+    check: ({ assert }) =>
+      rejectWith(assert, 'NOREC_RELEASE', (report) => {
+        findCase(report, 'E1-LIFECYCLE-NO-RECORD-BIRTH').evidence.lifecycleNoRecord.refused.clean = true
+        return report
+      }, 'lifecycleNoRecord_invalid'),
+  },
+  {
+    id: 'E29-MUTATE-PACKAGE-STOP-NO-RECORD-ACCEPTED',
+    title: 'A packaged STOPPED that saw no record cannot satisfy the release of a known birth',
+    check: ({ assert }) =>
+      rejectWith(assert, 'STOPNOREC_ACCEPT', (report) => {
+        findCase(report, 'E1-LIFECYCLE-STOP-NO-RECORD').evidence.lifecycleStopNoRecord.sawNoRecord = false
+        return report
+      }, 'lifecycleStopNoRecord_invalid'),
+  },
+  {
+    id: 'E29-MUTATE-NO-RECORD-EXIT-SIGNALLED',
+    title: 'A legitimate exit with no record cannot be reported as having signalled',
+    check: ({ assert }) =>
+      rejectWith(assert, 'NOEXIT_SIGNAL', (report) => {
+        findCase(report, 'E1-LIFECYCLE-NO-RECORD-EXIT').evidence.lifecycleNoRecordExit.signals = [{ pid: 1, signalled: 'SIGTERM' }]
+        return report
+      }, 'lifecycleNoRecordExit_invalid'),
   },
   {
     id: 'E28-MUTATE-FUNCTIONAL-STOP-DETECTOR',

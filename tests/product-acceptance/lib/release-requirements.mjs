@@ -86,6 +86,10 @@ export const SAFETY_CASES = [
  * window, a refused packaged stop, and idempotent repeat.
  */
 SAFETY_CASES.push(
+  case_('E1-LIFECYCLE-NO-RECORD-BIRTH', { layers: [LAYERS.READONLY], evidence: ['lifecycleNoRecord'] }),
+  case_('E1-LIFECYCLE-NO-RECORD-EXIT', { layers: [LAYERS.READONLY], evidence: ['lifecycleNoRecordExit'] }),
+  case_('E1-LIFECYCLE-NO-RECORD-REUSE', { layers: [LAYERS.READONLY], evidence: ['lifecycleNoRecordReuse'] }),
+  case_('E1-LIFECYCLE-STOP-NO-RECORD', { layers: [LAYERS.READONLY], evidence: ['lifecycleStopNoRecord'] }),
   case_('E1-LIFECYCLE-BIRTH-ROOT', { layers: [LAYERS.READONLY], evidence: ['lifecycleBirthRoot'] }),
   case_('E1-LIFECYCLE-CHILD-SCOPE', { layers: [LAYERS.READONLY], evidence: ['lifecycleChildScope'] }),
   case_('E1-LIFECYCLE-OWN', { layers: [LAYERS.READONLY], evidence: ['lifecycleOwn'] }),
@@ -183,6 +187,8 @@ export const INSTALL_CASES = [
   { id: 'E6-TARGET-CONTENT-DRIFT', required: false, layers: [LAYERS.INSTALLED], evidence: ['targetDrift'] },
   case_('E9-COORDINATOR-CHANNEL-CONTRACT', { layers: [LAYERS.READONLY] }),
   case_('E17-SUPPORT-MATERIAL', { layers: [LAYERS.INSTALLED], evidence: ['supportMaterial'] }),
+  case_('E9-INSIGHTS-HTTP', { layers: [LAYERS.INSTALLED] }),
+  { id: 'E6-RECIPE-PREVIEW', required: false, layers: [LAYERS.INSTALLED], evidence: ['recipePreview'] },
   // Tracked gaps: installed F identity fields and a wired G summary need successor frozen bytes.
   { id: 'E11-TRIAL-IDENTITY-FIELDS', required: false, layers: [LAYERS.INSTALLED], evidence: ['trialIdentity'] },
   { id: 'E13-G-SCOPED-SUMMARY', required: false, layers: [LAYERS.INSTALLED], evidence: ['gSummary'] },

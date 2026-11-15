@@ -824,7 +824,10 @@ export async function runInstall({ root, runDirectory, keep = false }) {
       assert('RECOVERY_MARKER', recovery.json?.markerPresent === true && recovery.json?.startupMode === 'recovery_readonly', JSON.stringify(recovery.json))
       assert('RECOVERY_AUTH_BLOCKED', recovery.json?.authorization?.status === 'BLOCKED', JSON.stringify(recovery.json?.authorization))
 
-      const restoredStart = startPa(install, { port: restoredPort, apiPort: restoredApi, env: { PA_DATA_ROOT: target } })
+      // A restored root is read-only personal data; the product's supported entry is discussion-only,
+      // never a fixture substitute for a restored state.
+      const restoredStart = startPersonalInstall(install, { port: restoredPort, apiPort: restoredApi,
+        env: { PA_DATA_ROOT: target }, extraArgs: ['--discussion-only'] })
       const readOnly = await restoredStart.attempt
       assert('RESTORED_RUNNING', readOnly.status === 'RUNNING', JSON.stringify({ status: readOnly.status, code: readOnly.code }))
       assert('RESTORED_MODE', readOnly.instance?.startupMode === 'recovery_readonly', String(readOnly.instance?.startupMode))
@@ -868,13 +871,13 @@ export async function runInstall({ root, runDirectory, keep = false }) {
         const first = pa(ownInstall, ['first-run', '--json'])
         assert('CONTEXT_BACKUP_FIRST_RUN', first.status === 0, first.stderr.slice(-300))
         const [port, apiPort] = await freePorts()
-        started = startPa(ownInstall, { port, apiPort, env: { PA_MODEL_CONFIG: mock.configPath } })
+        started = startPersonalInstall(ownInstall, { port, apiPort, env: { PA_MODEL_CONFIG: mock.configPath }, extraArgs: ['--discussion-only'] })
         const running = await started.attempt
         assert('CONTEXT_BACKUP_START', running.status === 'RUNNING', JSON.stringify({ status: running.status, code: running.code }))
         const state = running.instance.state
         const client = new LocalProductClient({ baseURL: running.instance.apiURL, stateDir: state, timeoutMs: 25_000 })
         const configuration = await client.configuration()
-        const project = configuration.projects.find(item => item.dispatchAllowed)
+        const project = configuration.projects.find(item => item.discussionOnly) ?? configuration.projects.find(item => item.dispatchAllowed) ?? configuration.projects[0]
         await client.dispatch({ commandId: 'w13-backup-seed', conversationId: 'conv-backup', kind: 'chat', projectId: project.id, text: 'W13 备份来源。' })
         await new Promise(resolve => setTimeout(resolve, 700))
         const prepared = await client.request('/v1/assistant/context/prepare', { method: 'POST', body: {
@@ -1019,7 +1022,7 @@ export async function runInstall({ root, runDirectory, keep = false }) {
       }
       const rollback = pa(install, ['rollback', '--bundle', join(workspace, 'pre-rollback.pab'), '--target', stateRoot, '--json'], { timeoutMs: 60_000 })
       assert('ROLLBACK', rollback.status === 0 && rollback.json?.status === 'ROLLED_BACK', rollback.stdout + rollback.stderr)
-      const restarted = startPa(install, { port, apiPort })
+      const restarted = startPersonalInstall(install, { port, apiPort, extraArgs: ['--discussion-only'] })
       const again = await restarted.attempt
       assert('STARTS_AFTER_ROLLBACK', again.status === 'RUNNING', JSON.stringify({ status: again.status, code: again.code }))
       try {
@@ -1229,7 +1232,7 @@ export async function runInstall({ root, runDirectory, keep = false }) {
       }
     })
 
-    await push(define('E6-INSTALLED-CONTEXT', 'The frozen D tar cold-starts fixture mode and sends selected context through its installed HTTP provider path', {
+    await push(define('E6-INSTALLED-CONTEXT', 'The frozen D tar cold-starts a personal discussion instance and sends selected context through its installed HTTP provider path', {
       layer: LAYERS.INSTALLED,
     }), async ({ assert, evidence }) => {
       const own = realpathSync(mkdtempSync(join(tmpdir(), 'pa-w12-ctx-install-')))
@@ -1242,13 +1245,13 @@ export async function runInstall({ root, runDirectory, keep = false }) {
         const first = pa(ownInstall, ['first-run', '--json'])
         assert('INSTALLED_CONTEXT_FIRST_RUN', first.status === 0, first.stderr.slice(-300))
         const [port, apiPort] = await freePorts()
-        started = startPa(ownInstall, { port, apiPort, env: { PA_MODEL_CONFIG: mock.configPath } })
+        started = startPersonalInstall(ownInstall, { port, apiPort, env: { PA_MODEL_CONFIG: mock.configPath }, extraArgs: ['--discussion-only'] })
         const running = await started.attempt
         assert('INSTALLED_CONTEXT_RUNNING', running.status === 'RUNNING', JSON.stringify({ status: running.status, code: running.code }))
         const client = new LocalProductClient({ baseURL: running.instance.apiURL, stateDir: running.instance.state, timeoutMs: 25_000 })
         const configuration = await client.configuration()
         assert('INSTALLED_CONTEXT_AVAILABLE', configuration.assistantContextAvailable === true, JSON.stringify({ available: configuration.assistantContextAvailable }))
-        const project = configuration.projects.find(item => item.dispatchAllowed)
+        const project = configuration.projects.find(item => item.discussionOnly) ?? configuration.projects.find(item => item.dispatchAllowed) ?? configuration.projects[0]
         const seeded = await client.dispatch({ commandId: 'w12-installed-seed', conversationId: 'conv-installed-ctx', kind: 'chat', projectId: project.id, text: '安装版上下文来源。' })
         assert('INSTALLED_SEED', seeded.receipt?.status === 'recorded', JSON.stringify(seeded.receipt)?.slice(0, 200))
         await new Promise(resolve => setTimeout(resolve, 800))
@@ -1269,7 +1272,7 @@ export async function runInstall({ root, runDirectory, keep = false }) {
         const binding = await client.request(`/v1/messages/${userMessage?.id ?? ''}/context`)
         assert('INSTALLED_AUDIT', binding.status === 200 && binding.body?.commandId === 'w12-installed-ctx', JSON.stringify(binding.body)?.slice(0, 200))
         assert('INSTALLED_MOCK_CALLED', mock.requests.length >= 1 && mock.requests.some(item => JSON.stringify(item.messages).includes('安装版上下文来源')), `calls ${mock.requests.length}`)
-        evidence.installedContext = { mode: 'fixture', subject: artifactSubject(ARTIFACTS.upgrade), artifact: { buildId: ARTIFACTS.upgrade.buildId, schema: ARTIFACTS.upgrade.productSchema, source: ARTIFACTS.upgrade.sourceCommit },
+        evidence.installedContext = { mode: 'personal', provider: 'loopback-mock', subject: artifactSubject(ARTIFACTS.upgrade), artifact: { buildId: ARTIFACTS.upgrade.buildId, schema: ARTIFACTS.upgrade.productSchema, source: ARTIFACTS.upgrade.sourceCommit },
           available: true, prepare: prepared.status, send: sent.body?.status, reply: reply?.text, audit: binding.status, modelCalls: mock.requests.length }
       } finally {
         try { pa(ownInstall, ['stop', '--json'], { timeoutMs: 20_000 }) } catch { /* best effort */ }

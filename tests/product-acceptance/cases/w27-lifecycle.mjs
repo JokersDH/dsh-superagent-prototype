@@ -285,5 +285,82 @@ export async function runLifecycle() {
       assert('CHILD_SCOPE_RECORD_KEPT', recordPresent === true, 'record was deleted')
     }))
 
+  cases.push(await runCase({ ...define('E1-LIFECYCLE-NO-RECORD-BIRTH', 'A known birth without any instance record is not clean: it is retained and only a verified birth proof stops it'), evidence: {} },
+    async ({ assert, evidence }) => {
+      const root = privateRoot('pa-e-life-norec-')
+      const sleeper = spawnSleeper(root)
+      let refused, stopped, released
+      try {
+        const identity = liveIdentity(sleeper.pid)
+        const birth = { pid: sleeper.pid, start: identity.start, uid: identity.uid, state: root.state, config: root.config, install: root.install }
+        refused = await stopOwned(root, { packageStop: false, proofSignal: false, birth })
+        released = releaseRoot(root, refused)
+        const aliveAfterRefusal = liveIdentity(sleeper.pid).alive
+        stopped = await stopOwned(root, { packageStop: false, proofSignal: true, birth })
+        evidence.lifecycleNoRecord = { refused: { clean: refused.clean, reason: refused.reason, retained: refused.retained },
+          released: released.removed, aliveAfterRefusal,
+          stopped: { clean: stopped.clean, source: stopped.source, signals: stopped.signals, aliveAfter: stopped.aliveAfter ?? [] } }
+      } finally { try { sleeper.child.kill('SIGKILL') } catch { /* gone */ } rmSync(root.own, { recursive: true, force: true }) }
+      assert('NOREC_REFUSED_CLEAN', refused?.clean !== true && refused?.retained === true && refused.reason === 'record_missing_known_birth', JSON.stringify(refused))
+      assert('NOREC_NOT_RELEASED', released?.removed === false && evidence.lifecycleNoRecord.aliveAfterRefusal === true, JSON.stringify(released))
+      assert('NOREC_BIRTH_PROOF_CLEAN', stopped?.clean === true && stopped.source === 'birth' && (stopped.signals ?? []).length > 0 &&
+        (stopped.signals ?? []).every(item => item.signalled === 'SIGTERM'), JSON.stringify(stopped?.signals))
+    }))
+
+  cases.push(await runCase({ ...define('E1-LIFECYCLE-NO-RECORD-EXIT', 'A known birth that already exited with no children is a legitimate exit, not an unknown resource'), evidence: {} },
+    async ({ assert, evidence }) => {
+      const root = privateRoot('pa-e-life-noexit-')
+      const sleeper = spawnSleeper(root)
+      let stopped
+      try {
+        const identity = liveIdentity(sleeper.pid)
+        const birth = { pid: sleeper.pid, start: identity.start, uid: identity.uid, state: root.state, config: root.config, install: root.install }
+        sleeper.child.kill('SIGKILL')
+        for (let attempt = 0; attempt < 40 && liveIdentity(sleeper.pid).alive; attempt += 1) await new Promise(r => setTimeout(r, 50))
+        stopped = await stopOwned(root, { packageStop: false, proofSignal: true, birth })
+        evidence.lifecycleNoRecordExit = { clean: stopped.clean, reason: stopped.reason ?? null, legitimateExit: stopped.legitimateExit ?? null,
+          signals: stopped.signals, observedChildren: stopped.observedChildren ?? null }
+      } finally { rmSync(root.own, { recursive: true, force: true }) }
+      assert('NOEXIT_CLEAN', stopped?.clean === true && stopped.legitimateExit === true, JSON.stringify(stopped))
+      assert('NOEXIT_NO_SIGNAL', (stopped?.signals ?? []).length === 0, JSON.stringify(stopped?.signals))
+      assert('NOEXIT_NO_CHILDREN', stopped?.observedChildren === 0, String(stopped?.observedChildren))
+    }))
+
+  cases.push(await runCase({ ...define('E1-LIFECYCLE-NO-RECORD-REUSE', 'A birth whose pid was reused by another process is retained without a signal'), evidence: {} },
+    async ({ assert, evidence }) => {
+      const root = privateRoot('pa-e-life-noreuse-')
+      const sleeper = spawnSleeper(root)
+      let stopped
+      try {
+        const identity = liveIdentity(sleeper.pid)
+        const birth = { pid: sleeper.pid, start: 'Wed Jan  1 00:00:00 2020', uid: identity.uid, state: root.state, config: root.config, install: root.install }
+        stopped = await stopOwned(root, { packageStop: false, proofSignal: true, birth })
+        evidence.lifecycleNoRecordReuse = { clean: stopped.clean, reason: stopped.reason, signals: stopped.signals,
+          birthAlive: stopped.birthAlive ?? null, alive: liveIdentity(sleeper.pid).alive }
+      } finally { try { sleeper.child.kill('SIGKILL') } catch { /* gone */ } rmSync(root.own, { recursive: true, force: true }) }
+      assert('NOREUSE_REFUSED', stopped?.clean !== true && stopped?.retained === true && stopped.reason === 'birth_identity_mismatch', JSON.stringify(stopped))
+      assert('NOREUSE_NO_SIGNAL', (stopped?.signals ?? []).length === 0, JSON.stringify(stopped?.signals))
+      assert('NOREUSE_ALIVE', evidence.lifecycleNoRecordReuse.alive === true, JSON.stringify(stopped?.birthAlive))
+    }))
+
+  cases.push(await runCase({ ...define('E1-LIFECYCLE-STOP-NO-RECORD', 'A packaged STOPPED that saw no record does not release a known live birth'), evidence: {} },
+    async ({ assert, evidence }) => {
+      const root = privateRoot('pa-e-life-stopnorec-')
+      const sleeper = spawnSleeper(root)
+      let stopped
+      try {
+        const identity = liveIdentity(sleeper.pid)
+        const birth = { pid: sleeper.pid, start: identity.start, uid: identity.uid, state: root.state, config: root.config, install: root.install }
+        mkdirSync(join(root.install, 'bin'), { recursive: true })
+        writeFileSync(join(root.install, 'bin/pa'), '#!/bin/sh\nprintf \'%s\\n\' \'{"status":"STOPPED"}\'\nexit 0\n', { mode: 0o755 })
+        stopped = await stopOwned(root, { birth, packageStop: true, equivalentProof: true })
+        evidence.lifecycleStopNoRecord = { clean: stopped.clean, reason: stopped.reason ?? null, sawNoRecord: stopped.packageStopSawNoRecord ?? null,
+          signals: stopped.signals, source: stopped.source ?? null, alive: liveIdentity(sleeper.pid).alive }
+      } finally { try { sleeper.child.kill('SIGKILL') } catch { /* gone */ } rmSync(root.own, { recursive: true, force: true }) }
+      assert('STOPNOREC_NOT_ACCEPTED', evidence.lifecycleStopNoRecord.sawNoRecord === true && stopped?.source === 'birth', JSON.stringify(stopped))
+      assert('STOPNOREC_CLEAN_WITH_PROOF', stopped?.clean === true && (stopped.signals ?? []).length > 0, JSON.stringify(stopped?.signals))
+      assert('STOPNOREC_ALIVE_BEFORE_PROOF', evidence.lifecycleStopNoRecord.alive === false, 'process should be gone after the verified proof')
+    }))
+
   return { cases, artifacts: {} }
 }

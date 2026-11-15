@@ -507,6 +507,43 @@ export function packagedStopIssues(value) {
   return issues
 }
 /** A record may not lend another state's birth to the launcher. */
+/** A known birth without a record is UNKNOWN until a verified proof stops it. */
+export function lifecycleNoRecordIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (value.refused?.clean === true || value.refused?.retained !== true || value.refused?.reason !== 'record_missing_known_birth') issues.push('refused')
+  if (value.released !== false) issues.push('released')
+  if (value.aliveAfterRefusal !== true) issues.push('killed_without_proof')
+  if (value.stopped?.clean !== true || value.stopped?.source !== 'birth') issues.push('proof')
+  if (!Array.isArray(value.stopped?.signals) || value.stopped.signals.length === 0 || value.stopped.signals.some(item => item.signalled !== 'SIGTERM')) issues.push('signals')
+  return issues
+}
+export function lifecycleNoRecordExitIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (value.clean !== true || value.legitimateExit !== true) issues.push('not_legitimate')
+  if (!Array.isArray(value.signals) || value.signals.length !== 0) issues.push('signalled')
+  if (value.observedChildren !== 0) issues.push('children')
+  return issues
+}
+export function lifecycleNoRecordReuseIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (value.clean === true || value.reason !== 'birth_identity_mismatch') issues.push('reason')
+  if (!Array.isArray(value.signals) || value.signals.length !== 0) issues.push('signalled')
+  if (value.alive !== true) issues.push('killed')
+  if (value.birthAlive?.expectedStart === value.birthAlive?.observedStart) issues.push('no_reuse_evidence')
+  return issues
+}
+export function lifecycleStopNoRecordIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (value.sawNoRecord !== true || value.source !== 'birth') issues.push('accepted_package_clean')
+  if (value.clean !== true) issues.push('not_cleaned')
+  if (!Array.isArray(value.signals) || value.signals.length === 0) issues.push('no_signal')
+  if (value.alive !== false) issues.push('still_alive')
+  return issues
+}
 export function lifecycleBirthRootIssues(value) {
   if (!value || typeof value !== 'object') return ['missing']
   const issues = []
@@ -948,7 +985,8 @@ export function backupContextReplyIssues(value) {
 export function installedContextIssues(value) {
   if (!value || typeof value !== 'object') return ['missing']
   const issues = []
-  if (value.mode !== 'fixture') issues.push('mode')
+  if (value.mode !== 'fixture' && value.mode !== 'personal') issues.push('mode')
+  if (value.mode === 'personal' && value.provider !== 'loopback-mock') issues.push('provider')
   if (value.available !== true) issues.push('availability')
   if (value.prepare !== 200 || value.send !== 'recorded') issues.push('send')
   if (!value.reply || value.audit !== 200) issues.push('reply_or_audit')
@@ -1381,7 +1419,8 @@ export function evaluateRelease({
           failures.push(fail('evidence_history_invalid', `Evidence history ${issue}`, entry.id))
       }
       for (const [key, fn] of [['contextUse', contextUseIssues], ['sse', contextSseIssues], ['guards', contextGuardIssues], ['sourceConfirm', sourceConfirmIssues], ['sourceConfirmRefusal', sourceConfirmRefusalIssues], ['candidateFlow', candidateFlowIssues], ['history', contextHistoryIssues], ['sources', contextSourcesIssues], ['contextUi', contextUiIssues], ['concurrency', concurrencyIssues], ['schemaMigration', schemaMigrationIssues], ['legacyMigration', legacyMigrationIssues], ['frozenScope', frozenScopeIssues], ['ownershipCopy', ownershipCopyIssues], ['ownershipMocks', ownershipMocksIssues], ['installedCandidates', installedCandidatesIssues], ['secondRoot', secondRootIssues], ['workflowFormats', workflowFormatsIssues], ['personalReview', personalReviewIssues], ['restoredReviewRefusals', restoredReviewRefusalsIssues], ['reviewReuse', reviewReuseIssues], ['scopeDiagnostics', scopeDiagnosticsIssues], ['readiness', readinessIssues], ['trialUi', trialUiIssues],
-      ['packagedStop', packagedStopIssues], ['stopFunctional', stopFunctionalIssues], ['lifecycleOwn', lifecycleOwnIssues], ['lifecycleBirthRoot', lifecycleBirthRootIssues], ['lifecycleChildScope', lifecycleChildScopeIssues], ['lifecycleWrongStart', lifecycleWrongStartIssues], ['lifecycleSibling', lifecycleSiblingIssues],
+      ['packagedStop', packagedStopIssues], ['stopFunctional', stopFunctionalIssues], ['lifecycleOwn', lifecycleOwnIssues], ['lifecycleNoRecord', lifecycleNoRecordIssues], ['lifecycleNoRecordExit', lifecycleNoRecordExitIssues],
+      ['lifecycleNoRecordReuse', lifecycleNoRecordReuseIssues], ['lifecycleStopNoRecord', lifecycleStopNoRecordIssues], ['lifecycleBirthRoot', lifecycleBirthRootIssues], ['lifecycleChildScope', lifecycleChildScopeIssues], ['lifecycleWrongStart', lifecycleWrongStartIssues], ['lifecycleSibling', lifecycleSiblingIssues],
       ['lifecycleForeignChild', lifecycleForeignChildIssues], ['lifecycleMixedUnknown', lifecycleMixedUnknownIssues],
       ['lifecycleStartWindow', lifecycleStartWindowIssues], ['lifecycleRefusedStop', lifecycleRefusedStopIssues],
       ['lifecycleIdempotent', lifecycleIdempotentIssues], ['installedSourceConfirm', installedSourceConfirmIssues], ['installedStability', installedStabilityIssues], ['upgradeFaults', upgradeFaultsIssues], ['currentInstall', currentInstallIssues], ['installedContext', installedContextIssues], ['backupContextReply', backupContextReplyIssues], ['replyDurable', replyDurableIssues], ['replyUnknown', replyUnknownIssues], ['replyMessageWindow', replyWindowIssues], ['replyBadArtifact', replyBadArtifactIssues], ['completedReply', completedReplyIssues], ['unknownReply', unknownReplyIssues]]) {

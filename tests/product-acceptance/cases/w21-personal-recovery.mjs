@@ -85,7 +85,9 @@ async function stopOwned(install, { state, config, mockFile, birth = null }) {
   // spawn on this state: a later instance must not lend its birth to an older record.
   const record = readRecord(config).value ?? null
   const candidates = births.get(birthKey(config, state)) ?? []
-  const matched = birth ?? candidates.find(item => item.pid === record?.pid && item.start === record?.processStart) ?? null
+  // Without a record the last spawn on this exact state is still a known birth of this lane; passing
+  // it is what makes a missing record UNKNOWN instead of a silent clean.
+  const matched = birth ?? (record ? candidates.find(item => item.pid === record.pid && item.start === record.processStart) ?? null : candidates.at(-1) ?? null)
   return stopOwnedInstance({ install, config, state, own: dirname(install) },
     { mockFile, birth: matched, equivalentProof: true })
 }
