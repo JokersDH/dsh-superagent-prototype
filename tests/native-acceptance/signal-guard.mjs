@@ -13,6 +13,10 @@
 import { spawnSync } from 'node:child_process'
 
 const PS_FIELDS = '-o pid=,uid=,ppid=,lstart=,command='
+/** Immutable birth registry: the caller's record must still equal what the probe registered. */
+const registry = new Map()
+const registryKey = record => `${record.pid}:${record.start}`
+const deepFreeze = value => { if (value && typeof value === 'object') { Object.freeze(value); for (const key of Object.keys(value)) deepFreeze(value[key]) } return value }
 
 const NO_SUCH = [/no such process/i, /no matching process/i, /nonexistent/i]
 
@@ -38,6 +42,12 @@ export function observe(pid) {
 
 /** Tokens of an observed command line, used for exact argument matching. */
 const tokens = argv => argv.split(/\s+/).filter(Boolean)
+/** Direct children of THIS probe: a readable pid that is not our child is never "owned". */
+function isDirectChild(pid) {
+  const result = spawnSync('pgrep', ['-P', String(process.pid)], { encoding: 'utf8' })
+  if (result.status !== 0 || !String(result.stdout ?? '').trim()) return false
+  return String(result.stdout).trim().split('\n').map(line => Number(line.trim())).includes(pid)
+}
 
 /**
  * Register the birth identity of a process THIS probe spawned. The caller must supply the exact argv
@@ -46,14 +56,26 @@ const tokens = argv => argv.split(/\s+/).filter(Boolean)
 export function born(pid, expectations = {}) {
   const live = observe(pid)
   if (live.state !== 'live') return { ok: false, unknown: live.reason ?? live.state, live }
+  // Only a process THIS probe spawned is a candidate: a readable pid from anywhere else is not ownership.
+  if (!isDirectChild(live.pid)) return { ok: false, unknown: 'not_a_probe_child', live }
+  // Full argv proof is mandatory: no empty/exactArgs-omitted birth may skip it.
+  if (typeof live.argv !== 'string' || live.argv.trim().length === 0) return { ok: false, unknown: 'no_full_argv', live }
+  const exactArgs = [...(expectations.exactArgs ?? [])]
+  if (exactArgs.length === 0) return { ok: false, unknown: 'no_exact_args', live }
+  const liveTokens = new Set(tokens(live.argv))
+  for (const arg of exactArgs) if (!liveTokens.has(arg)) return { ok: false, unknown: `arg_not_observed:${arg}`, live }
+  // The complete resource plan is a REQUIRED part of the birth, never an optional late check.
+  if (!Array.isArray(expectations.expectedChildren)) return { ok: false, unknown: 'no_resource_plan', live }
   const record = {
     kind: 'probe-born',
     pid: live.pid, uid: live.uid, ppid: live.ppid, start: live.start, argv: live.argv,
-    exactArgs: [...(expectations.exactArgs ?? [])],
+    exactArgs,
     markers: [...(expectations.markers ?? [])],
-    expectedChildren: expectations.expectedChildren ? [...expectations.expectedChildren] : null,
+    expectedChildren: [...expectations.expectedChildren],
     capturedAt: new Date().toISOString(),
   }
+  deepFreeze(record)
+  registry.set(registryKey(record), record)
   return { ok: true, record }
 }
 
@@ -77,6 +99,10 @@ export function verify(record) {
   if (!record || !Number.isSafeInteger(record.pid)) return { ok: false, unknown: 'no_record' }
   if (typeof record.start !== 'string' || record.start.length === 0) return { ok: false, unknown: 'no_start' }
   if (record.pid <= 0) return { ok: false, unknown: 'invalid_pid' }
+  // The caller may hold the record, but it is not the authority: a mutated/re-registered record is refused
+  // before any observation, so editing pid/birth cannot retarget an original handle onto a foreign pid.
+  const registered = registry.get(registryKey(record))
+  if (!registered || registered !== record) return { ok: false, unknown: 'unregistered_or_mutated' }
   const live = observe(record.pid)
   if (live.state === 'unknown') return { ok: false, unknown: live.reason ?? 'unreadable', live }
   if (live.state === 'gone') return { ok: false, unknown: 'already_gone', live }
@@ -101,6 +127,7 @@ export function verify(record) {
  */
 export function verifyResources(record) {
   if (!record || !Array.isArray(record.expectedChildren)) return { ok: false, unknown: 'no_resource_plan' }
+  if (!registry.has(registryKey(record)) || registry.get(registryKey(record)) !== record) return { ok: false, unknown: 'unregistered_or_mutated' }
   const observed = childPids(record.pid)
   if (observed.state !== 'ok') return { ok: false, unknown: observed.reason ?? 'children_unreadable' }
   const declared = [...record.expectedChildren].sort((a, b) => a - b)
@@ -110,13 +137,13 @@ export function verifyResources(record) {
 }
 
 /** Signal ONLY after fresh verification (and the resource precheck for the first signal). */
-export function signalOwned(record, signal = 'SIGKILL', { first = false } = {}) {
+export function signalOwned(record, signal = 'SIGKILL') {
   const check = verify(record)
   if (!check.ok) return { sent: false, refused: true, unknown: check.unknown ?? null, mismatches: check.mismatches ?? [], live: check.live ?? null }
-  if (first) {
-    const resources = verifyResources(record)
-    if (!resources.ok) return { sent: false, refused: true, unknown: resources.unknown ?? 'resource_mismatch', mismatches: resources.mismatches ?? [], resources }
-  }
+  // The full resource plan is verified for EVERY signal, not only the first: there is no `first` flag
+  // that a caller can leave false to skip it.
+  const resources = verifyResources(record)
+  if (!resources.ok) return { sent: false, refused: true, unknown: resources.unknown ?? 'resource_mismatch', mismatches: resources.mismatches ?? [], resources }
   try { process.kill(record.pid, signal) } catch (error) {
     const code = String(error?.code ?? error)
     // ESRCH after a fresh live observation is still an unknown transition, not a successful signal.
@@ -140,7 +167,7 @@ export async function confirmExit(pid, timeoutMs = 5000) {
 
 /** TERM, a FRESH verification, then KILL only if the same identity is still the one running. */
 export async function escalate(record, { termWaitMs = 1500 } = {}) {
-  const term = signalOwned(record, 'SIGTERM', { first: true })
+  const term = signalOwned(record, 'SIGTERM')
   if (!term.sent) return { term, kill: null, exit: term.refused ? { exited: false, retained: term.unknown ?? 'refused' } : { exited: false, unknown: term.unknown } }
   const first = await confirmExit(record.pid, termWaitMs)
   if (first.exited) return { term, kill: null, exit: first }

@@ -1,0 +1,72 @@
+{
+  "agent": "B",
+  "branch": "codex/g1-runtime",
+  "fixedBaseline": "695efad8066433e2e30eff4f776ed74117c61608",
+  "syncedMain": "6f385a54 (wave-30 dispatch) merged into codex/g1-runtime",
+  "sourceTruth": {
+    "B_head_before_this_commit": "205076f1",
+    "I_attach_channel": "apps/runner/src/attach-channel @ I 4d85cc3 (merged; I HEAD 861d5fea only merges the same origin/main, no attach-channel change since 4d85cc3)",
+    "B_consumer": "apps/runner/src/runner-service.ts (RunnerAttachChannel adapter), apps/runner/src/runner-link-client.ts, packages/execution/src/recovery-transport.ts",
+    "main_contracts": "packages/contracts/src/coordinator-channel.ts unchanged (frozen Runner v1)"
+  },
+  "b1_firstResult": {
+    "status": "RUNNABLE",
+    "singleTransportOwner": {
+      "defect": "a remote pull connection was also pumped through the adapter pump, so its request frame was written to the OLD stdio writer (remote reply still fenced, but that is not isolation)",
+      "fix": "pump() now only serves the two ADAPTER connections (stdio / in-process sink); a remote pull connection is delivered by the HTTP next handler itself and never touches the stdout writer",
+      "evidence": "tests/native-acceptance/b30-transport-owner.mjs 2 PASS / 0 FAIL: remote lease binds 1->2 before begin, remote serves 3 fact callbacks, old stdio sink sees 0"
+    },
+    "signalTool": {
+      "defectsClosed": [
+        "born() accepted a readable pid that the probe did not spawn",
+        "born() accepted a birth without full argv / with empty exactArgs",
+        "signalOwned(...,{first:false}) skipped the complete child/resource plan",
+        "the record handed to the caller was the same mutable object used as authority"
+      ],
+      "fix": "born() requires a DIRECT child of the probe, non-empty exact argv tokens present in the observed full argv, and an explicit child plan; records are deep-frozen and registered in a private registry, so any edited copy is refused as unregistered_or_mutated; signalOwned verifies the full resource plan for EVERY signal (there is no skip flag); verify() refuses before any observation when the record is not the registered object",
+      "evidence": "tests/native-acceptance/b28-signal.mjs 13 PASS / 0 FAIL adds: arbitrary readable pid refused (not_a_probe_child), empty/missing argv refused, missing resource plan refused, wrong child plan refused with the process still live, mutated pid retarget refused"
+    },
+    "preserved": [
+      "2KiB page / 161 facts / 135540-byte five-chunk continuity (b28-budget 4/0/1)",
+      "explicit CAS + old/foreign refusal (b28-cas 7/0/1)",
+      "sink missing/deny/throw zero native write (apps/runner/test/sink-write-admission 3/3)",
+      "fresh intent frame id vs original command id (apps/runner/test/native-write-admission 3/3)",
+      "direct consumer strict + exactOptionalPropertyTypes (tests/native-acceptance/tsconfig.direct.json exit 0)"
+    ],
+    "suites": {
+      "apps/runner/test": "137/137",
+      "I attach-channel": "65/65"
+    },
+    "harnessSweep": {
+      "b30-transport-owner": "2/0/1",
+      "b27-sigkill": "7/0/1",
+      "b27-chain": "4/0/1",
+      "b28-cas": "7/0/1",
+      "b27-dual-live": "6/0/1",
+      "b28-budget": "4/0/1",
+      "b28-faults": "5/0/1",
+      "b27-epoch-ack": "4/0/1",
+      "b28-signal": "13/0/0",
+      "b27-ack-points": "4-5 PASS/0 FAIL/1-2 NOT_TESTED (lane timing; persistence windows not observed when the lane raises no new fact)"
+    }
+  },
+  "notReached": [
+    "B2 原 A/Broker 同 Runner 双客户端真实三回调：only fixture-lane callbacks are observed; the original A duration/Store/Broker-authority variant is NOT implemented",
+    "B3 safe SIGKILL of the original Work/ID/ACK unknown window -> original check/currentCandidate/manual accept: NOT implemented (ordinary delivery 5 PASS is not recovery and is not relabelled)",
+    "B4 original scheduler 2/4 slots with true release/unknown cancel/persistent reopen: NOT implemented",
+    "B21-B24 consumer compatibility/docs are carried by the four subsystems above and are not claimed here"
+  ],
+  "scope": {
+    "ordinaryProduct": "untouched; ordinary delivery 5 PASS remains an ordinary positive control only",
+    "noNewAuthority": "no candidate table, ledger, second coordinator, migration or shared-contract change",
+    "modelTurns": 0,
+    "nativeTurns": 0,
+    "cap4UnknownUnspendable": true,
+    "preservedDirty": [
+      "reports/releases/wave11-admission/runtime.json",
+      "reports/releases/wave12-admission/runtime.json",
+      "tests/native-acceptance/b16-real-begin.mjs"
+    ]
+  },
+  "wholeRunComplete": false
+}

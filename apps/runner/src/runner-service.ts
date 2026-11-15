@@ -171,9 +171,16 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
   const dispatched = new Map<string, string>()
   const requestKey = (request: CoordinatorChannelRequest): string =>
     request.type === 'fact' ? `fact:${request.id}` : request.type === 'payload-read' ? `payload:${request.requestId}` : `write:${request.id}`
-  /** Adapter pump: hand each connection the next head of ITS OWN queue, once. */
+  /**
+   * Adapter pump: hand each ADAPTER connection the next head of ITS OWN queue, once.
+   *
+   * A remote pull connection is NOT an adapter: its requests are returned by the HTTP `next` handler
+   * itself, and nothing about it may ever touch the stdout writer. Pumping it here was the double-send
+   * defect - the remote lease's intent was also written to the old stdio socket.
+   */
   const pump = (connectionId: string): void => {
     if (!attach) return
+    if (connectionId !== stdioConnectionId && connectionId !== SINK_CONNECTION_ID) return
     const page = attach.next(connectionId, channelProducer)
     if (!page.ok || !page.request) return
     const key = requestKey(page.request)
@@ -476,16 +483,13 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
                 }
                 const page = attach!.next(leaseId, producer as never)
                 if (!page.ok) throw channelError(page.refused, page.refused === 'identity_mismatch' ? 'foreign_producer' : 'lease_not_current')
-                pump(leaseId)
+                // The page is the delivery for a remote pull connection; never mirror it onto stdio.
                 return { generation: page.generation, request: page.request, remainingMs: page.remainingMs }
               },
               channelReply: async (producer, reply, leaseId) => {
                 assertChannelProducer(producer)
                 const routed = attach!.receive(leaseId, asChannelReply(reply as object), producer as never)
-                if (routed.accepted) {
-                  dispatched.delete(leaseId)
-                  pump(leaseId)
-                }
+                if (routed.accepted) dispatched.delete(leaseId)
                 return { accepted: routed.accepted, generation: routed.generation }
               },
               payload: async (ref, offset, length) => {
