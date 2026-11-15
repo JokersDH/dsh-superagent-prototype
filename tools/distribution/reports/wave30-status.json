@@ -82,7 +82,13 @@
           "verification": "ok"
         }
       },
-      "note": "Raw restoredFixture now actual fixture/recovery_readonly; old wave29 raw personal report preserved as misbinding."
+      "note": "Raw restoredFixture now actual fixture/recovery_readonly; old wave29 raw personal report preserved as misbinding. Wrong mode/stale review refused before start.",
+      "negatives": {
+        "status": "PASS",
+        "fixtureWithReview": "review_requires_restored_personal",
+        "staleReview": "daemon_start_failed",
+        "report": "tools/distribution/reports/wave30/negatives.json"
+      }
     },
     "d2": {
       "status": "PASS",
