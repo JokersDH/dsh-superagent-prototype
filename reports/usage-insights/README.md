@@ -7,10 +7,13 @@ G（`codex/g4-usage-insights`）的只读观测证据。全部内容都是从已
 | --- | --- |
 | [`probe/two-project-20261114T074222.bundle.json`](probe/two-project-20261114T074222.bundle.json) | 由受控产品运行时经真实 HTTP 读接口采集的 bundle（`usage-insights-input/1`），两项目、含问答/接受/ReviewTiming |
 | [`probe/two-project-20261114T074222.report.md`](probe/two-project-20261114T074222.report.md) | 同一 bundle 的可读报告：指标定义、逐指标来源 id、观察 subject、限制 |
+| [`probe/two-project-20261114T074222.export.json`](probe/two-project-20261114T074222.export.json) | 同一观察的有界导出（`usage-insights-export/1`，12 行、无截断、0600） |
 | [`f-integration/consumer-view.example.json`](f-integration/consumer-view.example.json) | 给 F 的稳定投影样例（`TrialInsightsView` 形状） |
 | [`f-integration/README.md`](f-integration/README.md) | F 接入契约与语义规则 |
 | [`wave26-status.json`](wave26-status.json) | 第二轮（G1–G16）范围/未知/硬界/流式预算的交付与实测值 |
-| [`wave27-status.json`](wave27-status.json) | 本轮（G1–G20）嵌套计数、永久冲突、Node composition、F scope 对齐与五个结果 |
+| [`wave27-status.json`](wave27-status.json) | 第三轮（G1–G20）嵌套计数、永久冲突、Node composition、F scope 对齐与五个结果 |
+| [`wave28-status.json`](wave28-status.json) | 第四轮（G1–G24）真实 /v1/insights 前身 reader/DTO/F admission 验证 |
+| [`wave29-status.json`](wave29-status.json) | 本轮（G1–G24）真实 `/v1/insights`、7/30 窗口、行语义与有界导出 |
 
 ## 与主线的实际接线（2026-11-15）
 

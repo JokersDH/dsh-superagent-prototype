@@ -14,6 +14,7 @@ node tools/usage-insights/cli.mjs catalogue                 # 指标目录：单
 node tools/usage-insights/cli.mjs analyze --input /abs/bundle.json [--format terminal|json|markdown] [--out /abs/out]
 node tools/usage-insights/cli.mjs report  --input /abs/bundle.json --out /abs/report.md
 node tools/usage-insights/cli.mjs verify  --input /abs/bundle.json [--expect-digest <sha256>]
+node tools/usage-insights/cli.mjs export  --input /abs/bundle.json --out /abs/export.json [--max-rows 200] [--max-bytes 1048576]
 node tools/usage-insights/cli.mjs analyze --input /abs/bundle.json --days 7      # 与主线相同的滚动窗口
 node tools/usage-insights/cli.mjs collect --base-url http://127.0.0.1:<port> \
   --token-file /abs/private/token --from 2026-11-13T00:00:00Z --to 2026-11-14T00:00:00Z \
@@ -184,6 +185,19 @@ main 的接线依据；`actual_native`、真实 vendor 与 operator baseline 仍
 targetLayer、sampleCount、value、coverage；手填工时/预期节省写在 `operatorNote`。
 只有同 metric/单位/聚合/币种/层、baseline 完整、分母非 0、窗口不重叠时才比较，结果恒为
 `observation: observational_only`，delta/ratio 是原始数字，不生成百分比节省或因果结论。
+
+## 导出（`usage-insights-export/1`）
+
+`export` 用同一份分析生成有界、脱敏的 JSON：
+
+- `exportedFrom`：`inputId`、输入 digest、`summaryId`、来源类型/描述、捕获时间；
+- `window`/`timezone`/`scope.projectIds`/`aggregation`/`sourceCoverage` 与当前 attention 快照；
+- `rows`：每行 `rowId`（metric+layer+currency 的稳定身份）、`metricId`、`layer`、`currency`、`unit`、
+  数值与显示值、`sampleCount`/`unknownCount`/`excludedCount`、行覆盖与缺失原因；
+- `truncation`：`byRows`/`byBytes`、总数/已含数、上限与实际字节数（实际写入大小，精确到字节）。
+
+行数上限默认 200（硬上限 2000），字节上限默认 1 MiB；被截断时命令 exit 3 且文档明确标注，
+信封本身放不下时直接拒绝而不写出片段。文件 0600 独占创建，不覆盖旧导出。
 
 ## 输出安全
 

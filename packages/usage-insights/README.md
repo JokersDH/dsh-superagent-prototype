@@ -86,6 +86,14 @@ function, so a drift in either consumer fails here.
 `analyzeUsageInsights` reads no clock, no filesystem and no network. `capturedAt` comes from the
 bundle, so a stored bundle always reproduces its summary.
 
+## Export
+
+`buildInsightExport(summary, { maxRows, maxBytes })` produces the `usage-insights-export/1` document: the
+input digest and summary id, window/timezone/scope, per-source coverage, the attention snapshot and one
+row per metric+layer+currency with a stable `rowId`, unit, numeric and formatted value, sample/unknown/
+excluded counts, row coverage and the missing reason. Row and byte truncation are explicit. The document
+contains no raw evidence, prompt, path or credential.
+
 ## CLI
 
 ```sh
@@ -93,6 +101,7 @@ node tools/usage-insights/cli.mjs help
 node tools/usage-insights/cli.mjs analyze --input /abs/bundle.json --format terminal
 node tools/usage-insights/cli.mjs report  --input /abs/bundle.json --out /abs/report.md
 node tools/usage-insights/cli.mjs verify  --input /abs/bundle.json
+node tools/usage-insights/cli.mjs export  --input /abs/bundle.json --out /abs/export.json
 node tools/usage-insights/cli.mjs catalogue
 node tools/usage-insights/cli.mjs collect --base-url http://127.0.0.1:5180 \
   --token-file /abs/private/token --from 2026-11-13T00:00:00Z --to 2026-11-14T00:00:00Z \
