@@ -1,0 +1,16 @@
+TAP version 13
+# Subtest: two projects reopen from the same store with their works, conversations and previews intact
+ok 1 - two projects reopen from the same store with their works, conversations and previews intact
+  ---
+  duration_ms: 2443.553209
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2788.611292
