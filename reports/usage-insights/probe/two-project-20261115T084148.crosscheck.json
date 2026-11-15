@@ -1,0 +1,36 @@
+{
+  "protocol": "usage-insights-cross-check-evidence/1",
+  "servedSummaryId": "13e9e3142faaf9d7fc874e9996a0b72305ad84c12d572ec9c75882ac5e87d0a6",
+  "page": {
+    "sameObservation": false,
+    "comparable": true,
+    "snapshot": {
+      "display": "13e9e3142faaf9d7fc874e9996a0b72305ad84c12d572ec9c75882ac5e87d0a6",
+      "analysis": "50b9fe472a68c09a3f1560fdc19f9fda93bf1a5db1e0b95464db8f072ea4a619"
+    },
+    "checked": 13,
+    "agreements": 13,
+    "disagreements": [],
+    "notes": [],
+    "tolerance": {
+      "absolute": 0.05,
+      "note": "Agreement is bounded by half the display rounding; the parsed value is used only here and is never exported."
+    }
+  },
+  "http": {
+    "sameObservation": false,
+    "comparable": true,
+    "snapshot": {
+      "display": "13e9e3142faaf9d7fc874e9996a0b72305ad84c12d572ec9c75882ac5e87d0a6",
+      "analysis": "b23f6f61124a4240a1a82c82ae5ec2e235a4fba8690d913be420a7027af07e3a"
+    },
+    "checked": 13,
+    "agreements": 13,
+    "disagreements": [],
+    "notes": [],
+    "tolerance": {
+      "absolute": 0.05,
+      "note": "Agreement is bounded by half the display rounding; the parsed value is used only here and is never exported."
+    }
+  }
+}

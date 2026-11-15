@@ -7,13 +7,19 @@ G（`codex/g4-usage-insights`）的只读观测证据。全部内容都是从已
 | --- | --- |
 | [`probe/two-project-20261114T074222.bundle.json`](probe/two-project-20261114T074222.bundle.json) | 由受控产品运行时经真实 HTTP 读接口采集的 bundle（`usage-insights-input/1`），两项目、含问答/接受/ReviewTiming |
 | [`probe/two-project-20261114T074222.report.md`](probe/two-project-20261114T074222.report.md) | 同一 bundle 的可读报告：指标定义、逐指标来源 id、观察 subject、限制 |
-| [`probe/two-project-20261114T074222.export.json`](probe/two-project-20261114T074222.export.json) | 同一观察的有界导出（`usage-insights-export/1`，12 行、无截断、0600） |
+| [`probe/two-project-20261114T074222.export.json`](probe/two-project-20261114T074222.export.json) | 上一轮的有界导出（`usage-insights-export/1`，12 行、无截断、0600）；v1 文档保留为历史证据 |
+| [`probe/two-project-20261115T084148.bundle.json`](probe/two-project-20261115T084148.bundle.json) | 本轮受控两项目 bundle（同一产品运行时、真实 HTTP 读面） |
+| [`probe/two-project-20261115T084148.report.md`](probe/two-project-20261115T084148.report.md) | 同一 snapshot 的报告（含 `Summary id` 与快照说明） |
+| [`probe/two-project-20261115T084148.export.json`](probe/two-project-20261115T084148.export.json) | 同一 snapshot 的数值导出（`usage-insights-export/2`，含 `snapshot` 块） |
+| [`probe/two-project-20261115T084148.display-export.json`](probe/two-project-20261115T084148.display-export.json) | 由真实 `/v1/insights` 响应生成的 display-only 导出（`usage-insights-display-export/1`，无数值字段） |
+| [`probe/two-project-20261115T084148.crosscheck.json`](probe/two-project-20261115T084148.crosscheck.json) | 页面↔分析（`page`）与页面↔CLI 独立 HTTP 读（`http`）的逐行核对结果 |
 | [`f-integration/consumer-view.example.json`](f-integration/consumer-view.example.json) | 给 F 的稳定投影样例（`TrialInsightsView` 形状） |
 | [`f-integration/README.md`](f-integration/README.md) | F 接入契约与语义规则 |
 | [`wave26-status.json`](wave26-status.json) | 第二轮（G1–G16）范围/未知/硬界/流式预算的交付与实测值 |
 | [`wave27-status.json`](wave27-status.json) | 第三轮（G1–G20）嵌套计数、永久冲突、Node composition、F scope 对齐与五个结果 |
 | [`wave28-status.json`](wave28-status.json) | 第四轮（G1–G24）真实 /v1/insights 前身 reader/DTO/F admission 验证 |
-| [`wave29-status.json`](wave29-status.json) | 本轮（G1–G24）真实 `/v1/insights`、7/30 窗口、行语义与有界导出 |
+| [`wave29-status.json`](wave29-status.json) | 第二十九轮（G1–G24）真实 `/v1/insights`、7/30 窗口、行语义与有界导出 |
+| [`wave30-status.json`](wave30-status.json) | 本轮（G1–G4 四成果）同授权窗口的报告/导出闭环、display-only 导出、跨读者逐行核对与快照连续性 |
 
 ## 与主线的实际接线（2026-11-15）
 
@@ -31,6 +37,21 @@ main 已把本包源码接回产品并实现真实路径：
 `reports/usage-insights/probe/` 里的 bundle/report 仍来自 G 自己的只读采集（HTTP/file），用于 CLI 与
 报告的可复现证据；`weekly`/`7-30` 的窗口语义与 main 一致。安装包层面：当前 `1cd` 包**没有**
 usage-insights/observation 入口，本包源码能力不能贴到它的 installed 结论上（由 D 冻结新包后另行核对）。
+
+## 本轮新增（wave 30）
+
+- **一份观察、三个出口**：同一 bundle 分析同时产出报告与 `usage-insights-export/2`，两者都带同一个
+  `snapshotId`；`collect --report --export` 在**一次**读取后写出全部产物。
+- **页面↔报告/导出可互核**：`two-project-20261115T084148.crosscheck.json` 记录两次逐行核对——
+  `page`（main 的 reader 服务的 DTO ↔ 同窗口分析）与 `http`（同一 DTO ↔ CLI 独立 HTTP 采集的分析）
+  都是 13/13 一致、0 分歧。`crossCheckAnalysisWithDisplay` 只在核验时解析服务端字符串，解析值不进入任何导出。
+- **display-only 导出**：`display-export.json` 直接由真实 `/v1/insights` 响应生成，只有服务端已格式化的
+  字符串与身份/层/单位/样本数，没有数值字段，因此不可能被反解成“测量值”。
+- **重新读取即新快照**：同一窗口再次采集得到不同的 `snapshotId`，第二次导出声明
+  `continuity: new_snapshot` 并写出 `previous`；旧导出只提供身份，不复用任何旧值。
+- `two-project-20261115T084148.export.json` 的 `snapshot.snapshotId` 与同目录报告中的 `Summary id`
+  相同；`display-export.json` 的 `snapshot.snapshotId` 是服务端 DTO 的 `summaryId`（`13e9e314…`），
+  两个 identity 属于两条 reader 路径，不互相冒充。
 
 ## 这批证据说明了什么
 

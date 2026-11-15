@@ -133,3 +133,16 @@ node -e "import('./packages/usage-insights/dist/index.js').then(async m => {
 ```
 
 `toInsightConsumerView` 只做投影：同输入必得同输出，不读时钟、不读文件、不做网络请求。
+
+## 用户下载（wave 30）
+
+工作台展示的是 coordinator 服务的 `usage-observation/1`；用户/同事要带走数据时有两条明确路径：
+
+| 路径 | 产物 | 数值来源 | 适用 |
+| --- | --- | --- | --- |
+| `export --dto <served.json>` | `usage-insights-display-export/1` | **无**：只复制服务端已格式化的字符串、身份、层、单位、样本数 | 只有页面/HTTP 响应时；忠实复现用户看到的内容，不冒充数值分析 |
+| `collect --days 7 --export` / `export --input <bundle>` | `usage-insights-export/2` | 同授权的分析 summary（数值 + 格式化值 + 覆盖/未知） | 需要可核对数字时；报告与导出共享同一 `snapshotId` |
+
+两条路径都不会把 `12.3` 反解成数字：display-only 文档里根本没有数值字段，数值导出只从 summary 取值。
+再次读取（`--previous-export`）会明确写出 `new_snapshot`，旧导出的值不会被扩展或复用。F 仍只消费
+`TrialInsightsView` 形状的数据，不解析导出文件，也不由导出推导收益或人力工时。

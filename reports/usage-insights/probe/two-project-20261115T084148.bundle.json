@@ -1,0 +1,762 @@
+{
+  "protocol": "usage-insights-input/1",
+  "inputId": "probe-two-projects",
+  "capturedAt": "2026-11-15T08:41:48.337Z",
+  "timezone": "UTC",
+  "window": {
+    "from": "2026-11-15T07:41:40.549Z",
+    "to": "2026-11-15T10:41:40.550Z"
+  },
+  "projects": [
+    {
+      "projectId": "project-arcade"
+    },
+    {
+      "projectId": "project-beacon"
+    }
+  ],
+  "source": {
+    "kind": "http_read",
+    "descriptor": "loopback 127.0.0.1:61246 read-only",
+    "digest": null,
+    "layerAssertion": "recorded_by_producer",
+    "capturedAt": "2026-11-15T08:41:48.337Z"
+  },
+  "declaredCoverage": {
+    "outcomes": "complete",
+    "workEvidence": "complete",
+    "attention": "complete"
+  },
+  "limits": {
+    "maxRecords": 50000,
+    "maxWorks": 50,
+    "maxPages": 7,
+    "requestTimeoutMs": 5000,
+    "deadlineMs": 60000
+  },
+  "outcomes": [],
+  "attentionPages": [
+    {
+      "protocol": "attention-inbox/1",
+      "observedAt": "2026-11-15T08:41:48.328Z",
+      "items": [],
+      "ranks": [],
+      "ranking": "deterministic_priority",
+      "scannedWorks": 1,
+      "questionCoverage": "complete",
+      "hasMore": false
+    },
+    {
+      "protocol": "attention-inbox/1",
+      "observedAt": "2026-11-15T08:41:48.334Z",
+      "items": [],
+      "ranks": [],
+      "ranking": "deterministic_priority",
+      "scannedWorks": 1,
+      "questionCoverage": "complete",
+      "hasMore": false
+    }
+  ],
+  "workEvidence": [
+    {
+      "protocol": "work-evidence/1",
+      "workId": "6a68304fcf11eb9e8ec1e1221e0169b7",
+      "projection": "recorded",
+      "entries": [
+        {
+          "at": "2026-11-15T08:41:47.711Z",
+          "kind": "execution.outcome",
+          "sourceRef": "accepted-outcome-f3f004593dd5bc7306b0f92782509e06f4fbf705",
+          "detail": {
+            "acceptance": "accepted",
+            "layer": "controlled",
+            "reviewTiming": {
+              "candidateReadyAt": "2026-11-15T08:41:46.462Z",
+              "acceptedAt": "2026-11-15T08:41:47.711Z",
+              "readyToAcceptanceMs": 1249,
+              "activeReviewMs": 700,
+              "activeReviewSource": "ui_visibility_proxy",
+              "activeReviewCompleteness": "partial",
+              "evidenceRefs": [
+                "verification:30494414-6cc3-4650-b385-9f1b75bdd37e",
+                "review-activity:100"
+              ]
+            }
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:47.708Z",
+          "kind": "acceptance.recorded",
+          "sourceRef": "c84809741f5b9bbb1f6010c9715e2a31",
+          "detail": {
+            "artifactDigest": "0aa6fb66982d5648fef8c193413bbe45c768f749453817b02d3a88e6145a4ca4"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:46.461Z",
+          "kind": "verification.recorded",
+          "sourceRef": "verification:30494414-6cc3-4650-b385-9f1b75bdd37e",
+          "detail": {
+            "artifactDigest": "0aa6fb66982d5648fef8c193413bbe45c768f749453817b02d3a88e6145a4ca4",
+            "criteriaDigest": "4b09fef65d32edaef888e4d0ac6d0ea25c53c993044181eb464f6ee715f9f2d6"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:45.573Z",
+          "kind": "runtime.writer.observed",
+          "sourceRef": "7cd371eace070bd19e16c306046bab22",
+          "detail": {
+            "disposition": "physical_only"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:45.482Z",
+          "kind": "runtime.turn.ended",
+          "sourceRef": "fact-attempt-0f34d52b-30f4-4228-ad2e-da971bf3f4ad-6",
+          "detail": {
+            "disposition": "business"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:45.481Z",
+          "kind": "runtime.answer.observed",
+          "sourceRef": "fact-attempt-0f34d52b-30f4-4228-ad2e-da971bf3f4ad-5",
+          "detail": {
+            "disposition": "business"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:45.452Z",
+          "kind": "runtime.dispatch.observed",
+          "sourceRef": "fact-attempt-0f34d52b-30f4-4228-ad2e-da971bf3f4ad-4",
+          "detail": {
+            "disposition": "business"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:45.398Z",
+          "kind": "runtime.question.opened",
+          "sourceRef": "fact-attempt-0f34d52b-30f4-4228-ad2e-da971bf3f4ad-3",
+          "detail": {
+            "disposition": "business"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:45.385Z",
+          "kind": "question.opened",
+          "sourceRef": "8aeacf76d999a1e010243408a39e990d",
+          "detail": {
+            "version": 2,
+            "validity": "answered"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:45.384Z",
+          "kind": "runtime.dispatch.observed",
+          "sourceRef": "fact-attempt-0f34d52b-30f4-4228-ad2e-da971bf3f4ad-2",
+          "detail": {
+            "disposition": "business"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:45.372Z",
+          "kind": "runtime.dispatch.observed",
+          "sourceRef": "fact-attempt-0f34d52b-30f4-4228-ad2e-da971bf3f4ad-1",
+          "detail": {
+            "disposition": "business"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:44.015Z",
+          "kind": "contract.revision",
+          "sourceRef": "6a68304fcf11eb9e8ec1e1221e0169b7@1/06f64a86c8ed8422386b938c9e8b0befe9198fb8935dcfecd6dcb38e58cb1e39",
+          "detail": {
+            "revision": 1,
+            "digest": "06f64a86c8ed8422386b938c9e8b0befe9198fb8935dcfecd6dcb38e58cb1e39"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:44.015Z",
+          "kind": "ticket.link",
+          "sourceRef": "07b74fd8f95e7cca5d84852719279584",
+          "detail": {
+            "revision": 1,
+            "digest": "06f64a86c8ed8422386b938c9e8b0befe9198fb8935dcfecd6dcb38e58cb1e39",
+            "role": "primary"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:44.015Z",
+          "kind": "work.created",
+          "sourceRef": "6a68304fcf11eb9e8ec1e1221e0169b7",
+          "detail": {
+            "title": "Produce the same reported goal in both projects"
+          }
+        }
+      ],
+      "outcomes": [
+        {
+          "protocol": "execution-outcome/1",
+          "id": "accepted-outcome-f3f004593dd5bc7306b0f92782509e06f4fbf705",
+          "projectId": "project-beacon",
+          "attempt": {
+            "ticketId": "07b74fd8f95e7cca5d84852719279584",
+            "assignmentId": "c78624b08dcb2e6e9c4c58927bf96736",
+            "contract": {
+              "workId": "6a68304fcf11eb9e8ec1e1221e0169b7",
+              "revision": 1,
+              "digest": "06f64a86c8ed8422386b938c9e8b0befe9198fb8935dcfecd6dcb38e58cb1e39"
+            },
+            "attemptId": "attempt-0f34d52b-30f4-4228-ad2e-da971bf3f4ad",
+            "fenceEpoch": 1
+          },
+          "profileRef": {
+            "profileId": "profile-fixture-question",
+            "revision": 1,
+            "identityDigest": "da349f232c14a62dc33bd5f15d3bf04cc2ab3c734ffb9e09d95716e0d4834ac7"
+          },
+          "candidate": {
+            "ticketId": "07b74fd8f95e7cca5d84852719279584",
+            "assignmentId": "c78624b08dcb2e6e9c4c58927bf96736",
+            "contract": {
+              "workId": "6a68304fcf11eb9e8ec1e1221e0169b7",
+              "revision": 1,
+              "digest": "06f64a86c8ed8422386b938c9e8b0befe9198fb8935dcfecd6dcb38e58cb1e39"
+            },
+            "candidateGeneration": 3
+          },
+          "verificationRef": "verification:30494414-6cc3-4650-b385-9f1b75bdd37e",
+          "artifactDigest": "0aa6fb66982d5648fef8c193413bbe45c768f749453817b02d3a88e6145a4ca4",
+          "acceptance": "accepted",
+          "acceptanceRef": "c84809741f5b9bbb1f6010c9715e2a31",
+          "evidenceRefs": [
+            "verification:30494414-6cc3-4650-b385-9f1b75bdd37e",
+            "c84809741f5b9bbb1f6010c9715e2a31",
+            "accepted-event-104",
+            "review-activity:100"
+          ],
+          "layer": "controlled",
+          "usage": {
+            "completeness": "unknown",
+            "evidenceRefs": []
+          },
+          "observedAt": "2026-11-15T08:41:47.711Z",
+          "reviewTiming": {
+            "candidateReadyAt": "2026-11-15T08:41:46.462Z",
+            "acceptedAt": "2026-11-15T08:41:47.711Z",
+            "readyToAcceptanceMs": 1249,
+            "activeReviewMs": 700,
+            "activeReviewSource": "ui_visibility_proxy",
+            "activeReviewCompleteness": "partial",
+            "evidenceRefs": [
+              "verification:30494414-6cc3-4650-b385-9f1b75bdd37e",
+              "review-activity:100"
+            ]
+          }
+        }
+      ],
+      "truncated": false
+    },
+    {
+      "protocol": "work-evidence/1",
+      "workId": "84bda6f3469b8c9c279c28b4f12115c1",
+      "projection": "recorded",
+      "entries": [
+        {
+          "at": "2026-11-15T08:41:44.011Z",
+          "kind": "execution.outcome",
+          "sourceRef": "accepted-outcome-53dab22023a211d1af9030ec5b001428ea212e6e",
+          "detail": {
+            "acceptance": "accepted",
+            "layer": "controlled",
+            "reviewTiming": {
+              "candidateReadyAt": "2026-11-15T08:41:43.165Z",
+              "acceptedAt": "2026-11-15T08:41:44.009Z",
+              "readyToAcceptanceMs": 844,
+              "activeReviewMs": 700,
+              "activeReviewSource": "ui_visibility_proxy",
+              "activeReviewCompleteness": "partial",
+              "evidenceRefs": [
+                "verification:2febb791-ef42-4e3f-9dd8-b56c2f6ccfbc",
+                "review-activity:47"
+              ]
+            }
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:44.008Z",
+          "kind": "acceptance.recorded",
+          "sourceRef": "8a8db09b9ced110b5a40b87965833329",
+          "detail": {
+            "artifactDigest": "0aa6fb66982d5648fef8c193413bbe45c768f749453817b02d3a88e6145a4ca4"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:43.163Z",
+          "kind": "verification.recorded",
+          "sourceRef": "verification:2febb791-ef42-4e3f-9dd8-b56c2f6ccfbc",
+          "detail": {
+            "artifactDigest": "0aa6fb66982d5648fef8c193413bbe45c768f749453817b02d3a88e6145a4ca4",
+            "criteriaDigest": "4b09fef65d32edaef888e4d0ac6d0ea25c53c993044181eb464f6ee715f9f2d6"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:41.536Z",
+          "kind": "runtime.writer.observed",
+          "sourceRef": "e04f9ae434331cf4dd071f7d3f766ac8",
+          "detail": {
+            "disposition": "physical_only"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:41.432Z",
+          "kind": "runtime.turn.ended",
+          "sourceRef": "fact-attempt-afa337c5-c747-4208-b5ca-a1fc0f267f59-6",
+          "detail": {
+            "disposition": "business"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:41.416Z",
+          "kind": "runtime.answer.observed",
+          "sourceRef": "fact-attempt-afa337c5-c747-4208-b5ca-a1fc0f267f59-5",
+          "detail": {
+            "disposition": "business"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:41.392Z",
+          "kind": "runtime.dispatch.observed",
+          "sourceRef": "fact-attempt-afa337c5-c747-4208-b5ca-a1fc0f267f59-4",
+          "detail": {
+            "disposition": "business"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:41.295Z",
+          "kind": "runtime.question.opened",
+          "sourceRef": "fact-attempt-afa337c5-c747-4208-b5ca-a1fc0f267f59-3",
+          "detail": {
+            "disposition": "business"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:41.280Z",
+          "kind": "question.opened",
+          "sourceRef": "827fe7b791813ab8ed31eb352cd106b2",
+          "detail": {
+            "version": 2,
+            "validity": "answered"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:41.258Z",
+          "kind": "runtime.dispatch.observed",
+          "sourceRef": "fact-attempt-afa337c5-c747-4208-b5ca-a1fc0f267f59-2",
+          "detail": {
+            "disposition": "business"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:41.234Z",
+          "kind": "runtime.dispatch.observed",
+          "sourceRef": "fact-attempt-afa337c5-c747-4208-b5ca-a1fc0f267f59-1",
+          "detail": {
+            "disposition": "business"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:40.699Z",
+          "kind": "contract.revision",
+          "sourceRef": "84bda6f3469b8c9c279c28b4f12115c1@1/95d52886aef7a0a2ac311331702825cdedba58c877e205323bc6ce27fad9cb99",
+          "detail": {
+            "revision": 1,
+            "digest": "95d52886aef7a0a2ac311331702825cdedba58c877e205323bc6ce27fad9cb99"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:40.698Z",
+          "kind": "ticket.link",
+          "sourceRef": "3d6a3a50d7732c6fe5d6da95b06d90f8",
+          "detail": {
+            "revision": 1,
+            "digest": "95d52886aef7a0a2ac311331702825cdedba58c877e205323bc6ce27fad9cb99",
+            "role": "primary"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:40.698Z",
+          "kind": "work.created",
+          "sourceRef": "84bda6f3469b8c9c279c28b4f12115c1",
+          "detail": {
+            "title": "Produce the same reported goal in both projects"
+          }
+        }
+      ],
+      "outcomes": [
+        {
+          "protocol": "execution-outcome/1",
+          "id": "accepted-outcome-53dab22023a211d1af9030ec5b001428ea212e6e",
+          "projectId": "project-arcade",
+          "attempt": {
+            "ticketId": "3d6a3a50d7732c6fe5d6da95b06d90f8",
+            "assignmentId": "dab81c8247b0a7e54a3d3341f9d889ae",
+            "contract": {
+              "workId": "84bda6f3469b8c9c279c28b4f12115c1",
+              "revision": 1,
+              "digest": "95d52886aef7a0a2ac311331702825cdedba58c877e205323bc6ce27fad9cb99"
+            },
+            "attemptId": "attempt-afa337c5-c747-4208-b5ca-a1fc0f267f59",
+            "fenceEpoch": 1
+          },
+          "profileRef": {
+            "profileId": "profile-fixture-question",
+            "revision": 1,
+            "identityDigest": "83fb24876ee2b72a2ba4e588dc84d1d27e4afe81e242afcabd7d449708d51aec"
+          },
+          "candidate": {
+            "ticketId": "3d6a3a50d7732c6fe5d6da95b06d90f8",
+            "assignmentId": "dab81c8247b0a7e54a3d3341f9d889ae",
+            "contract": {
+              "workId": "84bda6f3469b8c9c279c28b4f12115c1",
+              "revision": 1,
+              "digest": "95d52886aef7a0a2ac311331702825cdedba58c877e205323bc6ce27fad9cb99"
+            },
+            "candidateGeneration": 3
+          },
+          "verificationRef": "verification:2febb791-ef42-4e3f-9dd8-b56c2f6ccfbc",
+          "artifactDigest": "0aa6fb66982d5648fef8c193413bbe45c768f749453817b02d3a88e6145a4ca4",
+          "acceptance": "accepted",
+          "acceptanceRef": "8a8db09b9ced110b5a40b87965833329",
+          "evidenceRefs": [
+            "verification:2febb791-ef42-4e3f-9dd8-b56c2f6ccfbc",
+            "8a8db09b9ced110b5a40b87965833329",
+            "accepted-event-51",
+            "review-activity:47"
+          ],
+          "layer": "controlled",
+          "usage": {
+            "completeness": "unknown",
+            "evidenceRefs": []
+          },
+          "observedAt": "2026-11-15T08:41:44.011Z",
+          "reviewTiming": {
+            "candidateReadyAt": "2026-11-15T08:41:43.165Z",
+            "acceptedAt": "2026-11-15T08:41:44.009Z",
+            "readyToAcceptanceMs": 844,
+            "activeReviewMs": 700,
+            "activeReviewSource": "ui_visibility_proxy",
+            "activeReviewCompleteness": "partial",
+            "evidenceRefs": [
+              "verification:2febb791-ef42-4e3f-9dd8-b56c2f6ccfbc",
+              "review-activity:47"
+            ]
+          }
+        }
+      ],
+      "truncated": false
+    }
+  ],
+  "workIndex": [
+    {
+      "workId": "6a68304fcf11eb9e8ec1e1221e0169b7",
+      "projectId": "project-beacon"
+    },
+    {
+      "workId": "84bda6f3469b8c9c279c28b4f12115c1",
+      "projectId": "project-arcade"
+    }
+  ],
+  "workHistories": [
+    {
+      "protocol": "work-evidence-history/1",
+      "workId": "6a68304fcf11eb9e8ec1e1221e0169b7",
+      "contract": {
+        "workId": "6a68304fcf11eb9e8ec1e1221e0169b7",
+        "revision": 1,
+        "digest": "06f64a86c8ed8422386b938c9e8b0befe9198fb8935dcfecd6dcb38e58cb1e39"
+      },
+      "observedAt": "2026-11-15T08:41:48.301Z",
+      "entries": [
+        {
+          "at": "2026-11-15T08:41:47.711Z",
+          "kind": "execution.outcome",
+          "sourceRef": "accepted-outcome-f3f004593dd5bc7306b0f92782509e06f4fbf705",
+          "detail": {
+            "acceptance": "accepted",
+            "layer": "controlled",
+            "reviewTiming": {
+              "candidateReadyAt": "2026-11-15T08:41:46.462Z",
+              "acceptedAt": "2026-11-15T08:41:47.711Z",
+              "readyToAcceptanceMs": 1249,
+              "activeReviewMs": 700,
+              "activeReviewSource": "ui_visibility_proxy",
+              "activeReviewCompleteness": "partial",
+              "evidenceRefs": [
+                "verification:30494414-6cc3-4650-b385-9f1b75bdd37e",
+                "review-activity:100"
+              ]
+            }
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:47.708Z",
+          "kind": "acceptance.recorded",
+          "sourceRef": "c84809741f5b9bbb1f6010c9715e2a31",
+          "detail": {
+            "artifactDigest": "0aa6fb66982d5648fef8c193413bbe45c768f749453817b02d3a88e6145a4ca4"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:46.461Z",
+          "kind": "verification.recorded",
+          "sourceRef": "verification:30494414-6cc3-4650-b385-9f1b75bdd37e",
+          "detail": {
+            "artifactDigest": "0aa6fb66982d5648fef8c193413bbe45c768f749453817b02d3a88e6145a4ca4",
+            "criteriaDigest": "4b09fef65d32edaef888e4d0ac6d0ea25c53c993044181eb464f6ee715f9f2d6"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:45.573Z",
+          "kind": "runtime.writer.observed",
+          "sourceRef": "7cd371eace070bd19e16c306046bab22",
+          "detail": {
+            "disposition": "physical_only"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:45.482Z",
+          "kind": "runtime.turn.ended",
+          "sourceRef": "fact-attempt-0f34d52b-30f4-4228-ad2e-da971bf3f4ad-6",
+          "detail": {
+            "disposition": "business"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:45.481Z",
+          "kind": "runtime.answer.observed",
+          "sourceRef": "fact-attempt-0f34d52b-30f4-4228-ad2e-da971bf3f4ad-5",
+          "detail": {
+            "disposition": "business"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:45.452Z",
+          "kind": "runtime.dispatch.observed",
+          "sourceRef": "fact-attempt-0f34d52b-30f4-4228-ad2e-da971bf3f4ad-4",
+          "detail": {
+            "disposition": "business"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:45.398Z",
+          "kind": "runtime.question.opened",
+          "sourceRef": "fact-attempt-0f34d52b-30f4-4228-ad2e-da971bf3f4ad-3",
+          "detail": {
+            "disposition": "business"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:45.385Z",
+          "kind": "question.opened",
+          "sourceRef": "8aeacf76d999a1e010243408a39e990d",
+          "detail": {
+            "version": 2,
+            "validity": "answered"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:45.384Z",
+          "kind": "runtime.dispatch.observed",
+          "sourceRef": "fact-attempt-0f34d52b-30f4-4228-ad2e-da971bf3f4ad-2",
+          "detail": {
+            "disposition": "business"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:45.372Z",
+          "kind": "runtime.dispatch.observed",
+          "sourceRef": "fact-attempt-0f34d52b-30f4-4228-ad2e-da971bf3f4ad-1",
+          "detail": {
+            "disposition": "business"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:44.015Z",
+          "kind": "contract.revision",
+          "sourceRef": "6a68304fcf11eb9e8ec1e1221e0169b7@1/06f64a86c8ed8422386b938c9e8b0befe9198fb8935dcfecd6dcb38e58cb1e39",
+          "detail": {
+            "revision": 1,
+            "digest": "06f64a86c8ed8422386b938c9e8b0befe9198fb8935dcfecd6dcb38e58cb1e39"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:44.015Z",
+          "kind": "ticket.link",
+          "sourceRef": "07b74fd8f95e7cca5d84852719279584",
+          "detail": {
+            "revision": 1,
+            "digest": "06f64a86c8ed8422386b938c9e8b0befe9198fb8935dcfecd6dcb38e58cb1e39",
+            "role": "primary"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:44.015Z",
+          "kind": "work.created",
+          "sourceRef": "6a68304fcf11eb9e8ec1e1221e0169b7",
+          "detail": {
+            "title": "Produce the same reported goal in both projects"
+          }
+        }
+      ],
+      "hasMore": false,
+      "window": "complete",
+      "sourcesCapped": []
+    },
+    {
+      "protocol": "work-evidence-history/1",
+      "workId": "84bda6f3469b8c9c279c28b4f12115c1",
+      "contract": {
+        "workId": "84bda6f3469b8c9c279c28b4f12115c1",
+        "revision": 1,
+        "digest": "95d52886aef7a0a2ac311331702825cdedba58c877e205323bc6ce27fad9cb99"
+      },
+      "observedAt": "2026-11-15T08:41:48.319Z",
+      "entries": [
+        {
+          "at": "2026-11-15T08:41:44.011Z",
+          "kind": "execution.outcome",
+          "sourceRef": "accepted-outcome-53dab22023a211d1af9030ec5b001428ea212e6e",
+          "detail": {
+            "acceptance": "accepted",
+            "layer": "controlled",
+            "reviewTiming": {
+              "candidateReadyAt": "2026-11-15T08:41:43.165Z",
+              "acceptedAt": "2026-11-15T08:41:44.009Z",
+              "readyToAcceptanceMs": 844,
+              "activeReviewMs": 700,
+              "activeReviewSource": "ui_visibility_proxy",
+              "activeReviewCompleteness": "partial",
+              "evidenceRefs": [
+                "verification:2febb791-ef42-4e3f-9dd8-b56c2f6ccfbc",
+                "review-activity:47"
+              ]
+            }
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:44.008Z",
+          "kind": "acceptance.recorded",
+          "sourceRef": "8a8db09b9ced110b5a40b87965833329",
+          "detail": {
+            "artifactDigest": "0aa6fb66982d5648fef8c193413bbe45c768f749453817b02d3a88e6145a4ca4"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:43.163Z",
+          "kind": "verification.recorded",
+          "sourceRef": "verification:2febb791-ef42-4e3f-9dd8-b56c2f6ccfbc",
+          "detail": {
+            "artifactDigest": "0aa6fb66982d5648fef8c193413bbe45c768f749453817b02d3a88e6145a4ca4",
+            "criteriaDigest": "4b09fef65d32edaef888e4d0ac6d0ea25c53c993044181eb464f6ee715f9f2d6"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:41.536Z",
+          "kind": "runtime.writer.observed",
+          "sourceRef": "e04f9ae434331cf4dd071f7d3f766ac8",
+          "detail": {
+            "disposition": "physical_only"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:41.432Z",
+          "kind": "runtime.turn.ended",
+          "sourceRef": "fact-attempt-afa337c5-c747-4208-b5ca-a1fc0f267f59-6",
+          "detail": {
+            "disposition": "business"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:41.416Z",
+          "kind": "runtime.answer.observed",
+          "sourceRef": "fact-attempt-afa337c5-c747-4208-b5ca-a1fc0f267f59-5",
+          "detail": {
+            "disposition": "business"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:41.392Z",
+          "kind": "runtime.dispatch.observed",
+          "sourceRef": "fact-attempt-afa337c5-c747-4208-b5ca-a1fc0f267f59-4",
+          "detail": {
+            "disposition": "business"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:41.295Z",
+          "kind": "runtime.question.opened",
+          "sourceRef": "fact-attempt-afa337c5-c747-4208-b5ca-a1fc0f267f59-3",
+          "detail": {
+            "disposition": "business"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:41.280Z",
+          "kind": "question.opened",
+          "sourceRef": "827fe7b791813ab8ed31eb352cd106b2",
+          "detail": {
+            "version": 2,
+            "validity": "answered"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:41.258Z",
+          "kind": "runtime.dispatch.observed",
+          "sourceRef": "fact-attempt-afa337c5-c747-4208-b5ca-a1fc0f267f59-2",
+          "detail": {
+            "disposition": "business"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:41.234Z",
+          "kind": "runtime.dispatch.observed",
+          "sourceRef": "fact-attempt-afa337c5-c747-4208-b5ca-a1fc0f267f59-1",
+          "detail": {
+            "disposition": "business"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:40.699Z",
+          "kind": "contract.revision",
+          "sourceRef": "84bda6f3469b8c9c279c28b4f12115c1@1/95d52886aef7a0a2ac311331702825cdedba58c877e205323bc6ce27fad9cb99",
+          "detail": {
+            "revision": 1,
+            "digest": "95d52886aef7a0a2ac311331702825cdedba58c877e205323bc6ce27fad9cb99"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:40.698Z",
+          "kind": "ticket.link",
+          "sourceRef": "3d6a3a50d7732c6fe5d6da95b06d90f8",
+          "detail": {
+            "revision": 1,
+            "digest": "95d52886aef7a0a2ac311331702825cdedba58c877e205323bc6ce27fad9cb99",
+            "role": "primary"
+          }
+        },
+        {
+          "at": "2026-11-15T08:41:40.698Z",
+          "kind": "work.created",
+          "sourceRef": "84bda6f3469b8c9c279c28b4f12115c1",
+          "detail": {
+            "title": "Produce the same reported goal in both projects"
+          }
+        }
+      ],
+      "hasMore": false,
+      "window": "complete",
+      "sourcesCapped": []
+    }
+  ]
+}

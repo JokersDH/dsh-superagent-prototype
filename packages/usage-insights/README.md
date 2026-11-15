@@ -88,11 +88,40 @@ bundle, so a stored bundle always reproduces its summary.
 
 ## Export
 
-`buildInsightExport(summary, { maxRows, maxBytes })` produces the `usage-insights-export/1` document: the
-input digest and summary id, window/timezone/scope, per-source coverage, the attention snapshot and one
-row per metric+layer+currency with a stable `rowId`, unit, numeric and formatted value, sample/unknown/
-excluded counts, row coverage and the missing reason. Row and byte truncation are explicit. The document
-contains no raw evidence, prompt, path or credential.
+Two exports exist, and they are distinguishable on purpose.
+
+`buildInsightExport(summary, { maxRows, maxBytes, previous })` produces the numeric
+`usage-insights-export/2` document: the input digest and summary id, window/timezone/scope, per-source
+coverage, the attention snapshot, a `snapshot` block and one row per metric+layer+currency with a
+stable `rowId`, unit, numeric and formatted value, sample/unknown/excluded counts, row coverage and
+the missing reason. Row and byte truncation are explicit, and the recorded `bytes` equals the written
+file size.
+
+The `snapshot` block binds the document to exactly one observation: `snapshotId` is the analysis
+summary id, `continuity` is `first_observation` (no previous declared), `same_snapshot` (the declared
+previous export carries the same id) or `new_snapshot` (a re-read — the document then names the
+previous id in `previous`, states `note`, and repeats that note as the first limitation). A previous
+export contributes **only** its identity: no value is copied, so an earlier export is never extended
+with newer numbers. `previousSnapshotOf(document)` reads that identity from a v2 export, from a
+display export, or from a v1 export (`exportedFrom.summaryId`).
+
+`buildDisplayExport(servedDocument, { maxRows, maxBytes, previous })` produces
+`usage-insights-display-export/1` from the document the coordinator serves. That document carries
+formatted strings only, so the display export has **no numeric field at all**: each row keeps the
+served `rowId`, label, layer, unit, formatted string and sample count verbatim, and the document
+declares `sourceIdentity.numericValues = false`. Parsing `12.3` back into a number would invent
+precision the source never had, so nothing here does it.
+
+`crossCheckAnalysisWithDisplay({ dto, summary })` verifies that the served page and an analysis of the
+same window/scope agree row by row. It parses the served strings **for comparison only**; the parsed
+value never leaves that module. Agreement is bounded by half the coordinator's one-decimal rounding,
+and the result reports every disagreement (`window_mismatch`, `metric_missing_in_display`,
+`value_mismatch`, `sample_mismatch`, `header_sample_mismatch`, …) instead of reconciling it.
+
+`expectedDisplayId(row)` mirrors the coordinator's `metricId@layer@currency` id (with the literal
+`product` when a row has no evidence layer, and a trailing separator when there is no currency) so a
+consumer can map G's `metricRowKey` onto the served id; `metricRowKey` itself stays the stable
+identity of the export row.
 
 ## CLI
 
@@ -102,11 +131,21 @@ node tools/usage-insights/cli.mjs analyze --input /abs/bundle.json --format term
 node tools/usage-insights/cli.mjs report  --input /abs/bundle.json --out /abs/report.md
 node tools/usage-insights/cli.mjs verify  --input /abs/bundle.json
 node tools/usage-insights/cli.mjs export  --input /abs/bundle.json --out /abs/export.json
+node tools/usage-insights/cli.mjs export  --dto /abs/served-observation.json --out /abs/display.json
 node tools/usage-insights/cli.mjs catalogue
 node tools/usage-insights/cli.mjs collect --base-url http://127.0.0.1:5180 \
   --token-file /abs/private/token --from 2026-11-13T00:00:00Z --to 2026-11-14T00:00:00Z \
   --project project-atlas --include-attention --out /abs/bundle.json --report /abs/report.md
+node tools/usage-insights/cli.mjs collect --base-url http://127.0.0.1:5180 \
+  --token-file /abs/private/token --days 7 --project project-atlas \
+  --out /abs/bundle.json --report /abs/report.md --export /abs/export.json
 ```
+
+`collect --days 7|30` uses exactly the coordinator's rolling window ending at `--to` (default: now) and
+defaults the capture time to that end, so the bundle reproduces the served window; `--days` and
+`--from` are mutually exclusive. `--report`, `--export` and `--analyze` all derive from **one**
+analysis of the written bundle, so the artifacts of a single run describe one snapshot. Passing
+`--previous-export <file>` makes the new export state `same_snapshot` or `new_snapshot` explicitly.
 
 Exit codes: `0` complete observation · `3` partial/bounded or quarantined · `4` insufficient data ·
 `5` source unavailable or integrity refused · `2` invalid arguments · `1` internal.

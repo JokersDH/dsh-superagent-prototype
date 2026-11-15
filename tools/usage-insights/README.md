@@ -14,8 +14,12 @@ node tools/usage-insights/cli.mjs catalogue                 # 指标目录：单
 node tools/usage-insights/cli.mjs analyze --input /abs/bundle.json [--format terminal|json|markdown] [--out /abs/out]
 node tools/usage-insights/cli.mjs report  --input /abs/bundle.json --out /abs/report.md
 node tools/usage-insights/cli.mjs verify  --input /abs/bundle.json [--expect-digest <sha256>]
-node tools/usage-insights/cli.mjs export  --input /abs/bundle.json --out /abs/export.json [--max-rows 200] [--max-bytes 1048576]
+node tools/usage-insights/cli.mjs export  --input /abs/bundle.json --out /abs/export.json [--max-rows 200] [--max-bytes 1048576] [--previous-export /abs/old.json]
+node tools/usage-insights/cli.mjs export  --dto /abs/served-observation.json --out /abs/display.json   # display-only，无数值字段
 node tools/usage-insights/cli.mjs analyze --input /abs/bundle.json --days 7      # 与主线相同的滚动窗口
+node tools/usage-insights/cli.mjs collect --base-url http://127.0.0.1:<port> \
+  --token-file /abs/private/token --days 7 --project <id> \
+  --out /abs/bundle.json --report /abs/report.md --export /abs/export.json [--previous-export /abs/old.json]
 node tools/usage-insights/cli.mjs collect --base-url http://127.0.0.1:<port> \
   --token-file /abs/private/token --from 2026-11-13T00:00:00Z --to 2026-11-14T00:00:00Z \
   --project project-atlas --include-attention --out /abs/bundle.json [--report /abs/report.md]
@@ -186,18 +190,34 @@ targetLayer、sampleCount、value、coverage；手填工时/预期节省写在 `
 只有同 metric/单位/聚合/币种/层、baseline 完整、分母非 0、窗口不重叠时才比较，结果恒为
 `observation: observational_only`，delta/ratio 是原始数字，不生成百分比节省或因果结论。
 
-## 导出（`usage-insights-export/1`）
+## 导出（`usage-insights-export/2`、`usage-insights-display-export/1`）
 
-`export` 用同一份分析生成有界、脱敏的 JSON：
+`export --input` 用同一份分析生成有界、脱敏的**数值**导出：
 
 - `exportedFrom`：`inputId`、输入 digest、`summaryId`、来源类型/描述、捕获时间；
+- `snapshot`：`snapshotId`（= summary id，一次观察一个身份）、`capturedAt`、`continuity`
+  （`first_observation` / `same_snapshot` / `new_snapshot`）、`previous` 与 `note`；
 - `window`/`timezone`/`scope.projectIds`/`aggregation`/`sourceCoverage` 与当前 attention 快照；
 - `rows`：每行 `rowId`（metric+layer+currency 的稳定身份）、`metricId`、`layer`、`currency`、`unit`、
   数值与显示值、`sampleCount`/`unknownCount`/`excludedCount`、行覆盖与缺失原因；
 - `truncation`：`byRows`/`byBytes`、总数/已含数、上限与实际字节数（实际写入大小，精确到字节）。
 
+`export --dto` 导出**coordinator 实际服务的 `usage-observation/1` 文档**（display-only）：
+
+- 行只保留服务端已给的 `rowId`/`label`/`layer`/`unit`/`formatted`/`sampleCount`/`detail`，**没有数值字段**；
+- `sourceIdentity` 明确 `kind: display_dto`、`numericValues: false`；`crossCheck` 说明没有数值可比；
+- 已格式化字符串照原样保留，不反解成数字、不补币种、不当作数值分析结果。
+
+`--previous-export <file>` 声明本次替换的旧导出：只有两边 `snapshotId` 相同才是 `same_snapshot`，
+否则是 `new_snapshot` —— 文档会写出旧身份、`note` 与首条 limitation，并在 stderr 提示
+`new_snapshot`。旧导出只提供身份，**不会复用任何旧值**；重新采集就是新快照。
+
 行数上限默认 200（硬上限 2000），字节上限默认 1 MiB；被截断时命令 exit 3 且文档明确标注，
 信封本身放不下时直接拒绝而不写出片段。文件 0600 独占创建，不覆盖旧导出。
+
+`collect --report/--export/--analyze` 由**同一份**写出 bundle 的分析派生，因此一次运行报告与导出
+指向同一 `snapshotId`；`--days 7|30` 使用 coordinator 的滚动窗口（`--to` 默认当前，capture 时间
+默认等于窗口末端），可与服务端 7/30 观察对齐。
 
 ## 输出安全
 
