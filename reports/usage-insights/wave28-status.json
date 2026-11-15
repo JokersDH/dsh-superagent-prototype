@@ -1,0 +1,172 @@
+{
+  "protocol": "wave28-usage-insights-status/1",
+  "agent": "G",
+  "branch": "codex/g4-usage-insights",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-g",
+  "origin": "https://github.com/JokersDH/dsh-superagent-prototype.git",
+  "fixedStart": "2b41765a",
+  "syncedMain": "623cccb",
+  "generatedAt": "2026-11-15T02:15:06Z",
+  "goal": {
+    "statement": "A trustworthy observation tool against the product's actual authorized readers: verify the real usage-observation reader/DTO and workspace admission, keep layered/currency/unknown semantics and per-row coverage honest, and hand over reproducible reports, CLI and docs.",
+    "tokenBudget": "none",
+    "vendorModelNativeTurns": 0,
+    "blockedPilot": "E original 24turn/200000token/USD5 single-in-flight pilot remains BLOCKED; G did not reset, top up, refund, replace samples or research pricing/recipes.",
+    "notReDispatched": [
+      "the nested atomic record cap (closed in wave-27; kept and re-verified here)",
+      "the permanent A→B→A work-mapping tombstone (closed in wave-27; kept and re-verified here)"
+    ]
+  },
+  "ownedPaths": ["packages/usage-insights/", "tools/usage-insights/", "reports/usage-insights/"],
+  "checkpointCommits": ["f57859a", "b893744", "e165c53", "0bc079d", "683fc80"],
+  "finalCommit": "the commit that introduces this file",
+  "mainIntegrationAsObserved": {
+    "reader": "apps/coordinator/product/usage-observation.ts ProductUsageObservation over authorized projectIds/listWorks/workEvidence",
+    "limits": { "works": 50, "nestedRecords": 10000, "encodedBytes": 2097152, "deadlineMs": 2000, "pages": 1 },
+    "window": "days=7|30, window.to=observedAt, from=to-days*86400000, half-open [from,to)",
+    "dto": "usage-observation/1 with header sampleCount = enumerated works and per-row sampleCount/layer/unit",
+    "http": "GET /v1/usage-observation (Bearer, project scope, days 7|30)",
+    "app": "useUsageObservation reads only inside the trial view when authenticated; TrialWorkspace renders the DTO as TrialInsightsView",
+    "quarantine": "any analysis quarantine returns status unavailable instead of numbers",
+    "sourceBytes": "main imports G's package sources unchanged; G does not create another collector"
+  },
+  "phases": [
+    { "id": "G1", "status": "done", "result": "read main's actual reader/API/DTO/F admission and recorded its sources and independent limits; stale 'main route missing' claims removed from the docs", "evidence": ["reports/usage-insights/README.md", "tools/usage-insights/README.md"] },
+    { "id": "G2", "status": "done", "result": "verified the authorized-port path without a new collector: scope, source loss, work-mapping isolation and budgets are main's, and a rejected read never becomes a complete empty set", "evidence": ["packages/usage-insights/test/main-consumer.case.ts"] },
+    { "id": "G3", "status": "done", "result": "header sample = enumerated works while rows keep their own sample/layer/currency; the DTO compiles as the workspace view type and the real admission is called", "evidence": ["packages/usage-insights/test/main-consumer.case.ts"] },
+    { "id": "G4", "status": "done", "result": "first runnable result: main reader → G analysis → usage-observation DTO → F admission", "evidence": ["f57859a"] },
+    { "id": "G5", "status": "done", "result": "two-project controlled data driven through the coordinator reader itself, not through a G collector", "evidence": ["tools/usage-insights/probe/observe-two-projects.mjs"] },
+    { "id": "G6", "status": "done", "result": "history filtered by entry.at and outcomes by observedAt; current attention is not part of the DTO and stays a separate product snapshot", "evidence": ["packages/usage-insights/test/main-consumer.case.ts"] },
+    { "id": "G7", "status": "done", "result": "7- and 30-day reads verified against the same facts, with the half-open boundary (start counts, end does not) and an exact days*86400000 window", "evidence": ["packages/usage-insights/test/main-consumer.case.ts"] },
+    { "id": "G8", "status": "done", "result": "second runnable result: same two-project source through the public reader for both windows, repeated reads without accumulation", "evidence": ["b893744"] },
+    { "id": "G9", "status": "done", "result": "layers stay separate rows end to end (controlled vs a recorded actual_native label), never averaged together", "evidence": ["packages/usage-insights/test/main-consumer.case.ts", "packages/usage-insights/test/report-semantics.case.ts"] },
+    { "id": "G10", "status": "done", "result": "one cost row per currency, unknown tokens/cost stay null, queue time only from real endpoints", "evidence": ["packages/usage-insights/test/report-semantics.case.ts"] },
+    { "id": "G11", "status": "done", "result": "per-row coverage preserved: a partial UI-visibility proxy sits next to a complete source in both the DTO and the report; unknown counts of different things are not summed", "evidence": ["packages/usage-insights/test/report-semantics.case.ts"] },
+    { "id": "G12", "status": "done", "result": "third runnable result: semantic report whose printed numbers match the coordinator-served values", "evidence": ["e165c53"] },
+    { "id": "G13", "status": "done", "result": "CLI keeps explicit arguments/exits/source entry, refuses a stale dist over newer sources, and now offers --days 7|30 matching the coordinator window", "evidence": ["tools/usage-insights/lib/module-entry.mjs", "tools/usage-insights/test/cli.case.mjs"] },
+    { "id": "G14", "status": "done", "result": "existing loopback GET collector and file reader are reused unchanged: streaming byte budget, redirect refusal, digest pin, 0600 exclusive output", "evidence": ["tools/usage-insights/lib/http.mjs", "tools/usage-insights/test/http-adapter.case.mjs"] },
+    { "id": "G15", "status": "done", "result": "reports stay sanitized: a canary in raw work detail, collection diagnostics and private paths never appear; hostile text is escaped", "evidence": ["tools/usage-insights/test/cli.case.mjs"] },
+    { "id": "G16", "status": "done", "result": "fourth runnable result: daily CLI with rolling windows, repeat reads and privacy boundaries", "evidence": ["0bc079d"] },
+    { "id": "G17", "status": "done", "result": "the workspace's real admission is exercised with the DTO: missing window/coverage/scope/metrics refuse, a foreign active project refuses, declared projects admit", "evidence": ["packages/usage-insights/test/main-consumer.case.ts"] },
+    { "id": "G18", "status": "done", "result": "main's API/App boundary recorded from its actual code: authorization/query/identity/late results are main's, and the App reads only inside the trial view", "evidence": ["reports/usage-insights/README.md"] },
+    { "id": "G19", "status": "done", "result": "package boundary verified: console never imports the Node package, runtime deps stay contracts+zod, browser entry has no node: builtin; the current 1cd package has no usage-insights entry so installed scope is not claimed", "evidence": ["packages/usage-insights/test/package-consumer.case.ts"] },
+    { "id": "G20", "status": "done", "result": "fifth runnable result: real presentation path verified and the package boundary handed over honestly", "evidence": ["683fc80"] },
+    { "id": "G21", "status": "done", "result": "bounded new-risk regression: coordinator-scale 50-work/1050-unit case is exact, the 10000-record cap is not reached at that size, and the earlier nested/limit decks still pass", "evidence": ["packages/usage-insights/test/bounds.case.ts"] },
+    { "id": "G22", "status": "done", "result": "baseline boundary: without a comparable baseline the report says so and prints no percentage, saved-hour or quality figure; currency/unit/window mismatches stay not comparable", "evidence": ["packages/usage-insights/test/report-semantics.case.ts", "packages/usage-insights/test/analyze.case.ts"] },
+    { "id": "G23", "status": "done", "result": "docs updated for the current reader, 7/30 windows, separate attention, partial proxy, usage, Node/browser entries and source losses; old nested/tombstone items marked closed", "evidence": ["packages/usage-insights/README.md", "tools/usage-insights/README.md", "reports/usage-insights/README.md", "reports/usage-insights/f-integration/README.md"] },
+    { "id": "G24", "status": "done", "result": "this sixth-result status file", "evidence": ["reports/usage-insights/wave28-status.json"] }
+  ],
+  "results": [
+    { "id": "G1-G4", "title": "Real coordinator reader and workspace admission verified", "publishedCommit": "f57859a", "runnable": true,
+      "commands": ["node --test packages/usage-insights/test/main-consumer.case.ts"],
+      "tests": { "package": 94, "tool": 40, "result": "pass" } },
+    { "id": "G5-G8", "title": "Same two-project source through the public reader, 7 and 30 days", "publishedCommit": "b893744", "runnable": true,
+      "commands": ["node tools/usage-insights/probe/observe-two-projects.mjs"],
+      "tests": { "package": 97, "tool": 40, "probe": "pass", "result": "pass" } },
+    { "id": "G9-G12", "title": "Layered, per-currency, per-row-coverage semantic report", "publishedCommit": "e165c53", "runnable": true,
+      "commands": ["node tools/usage-insights/cli.mjs report --input /abs/bundle.json --out /abs/new-report.md"],
+      "tests": { "package": 101, "tool": 40, "result": "pass" } },
+    { "id": "G13-G16", "title": "Daily CLI with rolling windows and canary-safe reports", "publishedCommit": "0bc079d", "runnable": true,
+      "commands": ["node tools/usage-insights/cli.mjs analyze --input /abs/bundle.json --days 7", "node tools/usage-insights/cli.mjs verify --input /abs/bundle.json --expect-digest <sha256>"],
+      "tests": { "package": 101, "tool": 42, "result": "pass" } },
+    { "id": "G17-G20", "title": "Real presentation path and honest package boundary", "publishedCommit": "683fc80", "runnable": true,
+      "commands": ["node --test packages/usage-insights/test/main-consumer.case.ts packages/usage-insights/test/package-consumer.case.ts"],
+      "tests": { "package": 107, "tool": 42, "result": "pass" } },
+    { "id": "G21-G24", "title": "Bounded new-risk regression, baseline boundary, docs and handoff", "publishedCommit": "branch head (this commit)", "runnable": true,
+      "commands": ["node --test packages/usage-insights/test/*.case.ts", "node --test tools/usage-insights/test/*.case.mjs", "node tools/usage-insights/probe/observe-two-projects.mjs"],
+      "tests": { "package": 106, "tool": 42, "probe": "pass", "result": "pass" } }
+  ],
+  "measured": {
+    "coordinatorObservation": {
+      "source": "main's ProductUsageObservation over the controlled two-project product data",
+      "status": "ready",
+      "days": 7,
+      "scope": { "projectIds": ["project-arcade", "project-beacon"], "aggregation": "declared_multi_project", "label": "本次 2 个项目" },
+      "headerSampleCount": 2,
+      "summaryId": "099d4b1d41fe95afb7cf0d5f81468b2267585395b16fabf64c6b1ea25a469cba",
+      "rows": [
+        { "id": "outcomes.count@controlled", "value": "2" },
+        { "id": "outcomes.accepted@controlled", "value": "2" },
+        { "id": "interventions.questions@product", "value": "2" },
+        { "id": "interventions.answers@product", "value": "2" },
+        { "id": "interventions.acceptances@product", "value": "2" },
+        { "id": "review.readyToAcceptanceMs@controlled", "value": "≈799" },
+        { "id": "review.activeMs@controlled", "value": "≈700", "detail": "partial proxy" },
+        { "id": "usage.inputTokens@controlled", "value": null },
+        { "id": "usage.cost", "value": "absent (no recorded currency)" },
+        { "id": "queue.waitMs@controlled", "value": null },
+        { "id": "execution.durationMs@controlled", "value": null }
+      ],
+      "days30": "same facts inside both windows; window length differs only",
+      "fAdmission": "admitted for the declared projects, refused for a project outside the scope"
+    },
+    "cliChain": {
+      "bundle": "reports/usage-insights/probe/two-project-20261114T074222.bundle.json",
+      "report": "reports/usage-insights/probe/two-project-20261114T074222.report.md",
+      "inputDigest": "95400df5276e0ac5daf896e75a5650e4bc3b9b3efef48a3f1a37d9bfb5ebe766",
+      "summaryId": "aa7636b2c9ec4643045845925aae9cffbd48b0fd7ebc53e7a61faf551b2bd045",
+      "coverage": { "outcomes": "complete", "workEvidence": "complete", "attention": "complete", "overall": "complete" },
+      "limits": { "recordUnit": "outcome+container+entry+page+item", "recordsSeen": 64, "recordsAdmitted": 64, "recordsNotParsed": 0, "worksSeen": 2, "pagesSeen": 4, "stoppedBy": "none" },
+      "reportMatchesServedValues": true,
+      "compositionAgreesWithCli": true
+    },
+    "findingsForMain": [
+      "The coordinator folds a partial row (review.activeMs) into the header coverageState, so a completely enumerated source is served as 'partial'. G keeps source coverage and row coverage separate in its own projection; main may want the header to describe enumeration only.",
+      "Metric ids from the coordinator end with a trailing '@' when no currency is present (e.g. execution.durationMs@controlled@). Cosmetic, but a UI key comparison would need to tolerate it."
+    ],
+    "negatives": {
+      "reader": ["forbidden project refuses", "duplicate work identity refuses", "missing evidence is partial with null header sample", "reader error text never reaches the DTO", "deadline bounds a slow source", "window start counts and end does not", "repeat read does not accumulate"],
+      "dto": ["one row per layer and per currency", "unknown usage stays null and no cost row is invented", "partial proxy detail next to a complete source", "current attention is not part of the DTO"],
+      "report": ["canary in raw detail never printed", "no percentage or saved-hours claim without a baseline", "collection diagnostics never republished", "exclusive 0600 output, no overwrite"],
+      "package": ["console never imports the Node package", "runtime deps remain contracts+zod", "browser entry has no node: builtin"]
+    },
+    "bounds": { "coordinatorWorks": 50, "coordinatorUnits": 1050, "coordinatorRecordCap": 10000, "nestedExact": 300, "nestedShort": 299, "multiLayerOutcomes": 4500, "worksUnderMaxWorks": 200, "pagesUnderMaxPages": 40, "quarantinedRecords": 1000, "currencies": 30 }
+  },
+  "notReached": [
+    "actual_native execution data: NOT_TESTED — the controlled fixture driver ran; no vendor model or native turn was performed",
+    "operator production instance: NOT_ATTEMPTED — main's reader is the production path and G did not read a user instance",
+    "real operator baseline: none supplied; no comparison is produced",
+    "installed package with observation entry: the current 1cd package has none; installed scope is D's to freeze and is not claimed from source progress",
+    "7/30-day history on real operator data: only controlled data spanning minutes was available; long-window absence is reported as unknown, not as a complete zero",
+    "long-running stability and cross-machine performance: out of scope"
+  ],
+  "limitations": [
+    "All numbers are observations of recorded facts. Nothing here proves saved hours, efficiency gains, causality or quality.",
+    "review.activeMs is a partial UI-visibility proxy, never human working time.",
+    "Interaction metrics are product-record counts and carry no evidence layer.",
+    "Unknown usage and cost stay unknown; currencies are never combined and prices are not looked up.",
+    "Decimals are formatted by the coordinator to one fraction digit; G's report keeps up to three and they agree within 0.05.",
+    "A bundle keeps product record detail and diagnostic text and is a private 0600 input; only reports are sanitized."
+  ],
+  "boundaries": {
+    "noSqlOrPrivateDb": true,
+    "noRuntimeHttpUiChanges": true,
+    "noSecondCollector": true,
+    "noSecondLedger": true,
+    "noModelOrNativeCalls": true,
+    "noRootLockOrContractsChanges": true,
+    "noEAssertionsChanged": true,
+    "noBrowserNodeImports": true,
+    "userServicesPreserved": "twelve 5180/8796 … 5191/8807 instances and all state/profile/tar/ledger left untouched",
+    "evidenceLayers": ["controlled", "operator_note", "synthetic_fixture"],
+    "nativeLayerPresent": false
+  },
+  "verification": {
+    "commands": [
+      "packages/usage-insights/node_modules/.bin/tsc -p packages/usage-insights/tsconfig.json",
+      "packages/usage-insights/node_modules/.bin/tsc -p packages/usage-insights/tsconfig.build.json",
+      "packages/contracts/node_modules/.bin/tsc -p packages/contracts/tsconfig.build.json",
+      "node --test packages/usage-insights/test/*.case.ts",
+      "node --test tools/usage-insights/test/*.case.mjs",
+      "node tools/usage-insights/probe/observe-two-projects.mjs"
+    ],
+    "results": {
+      "typecheck": "pass",
+      "build": "pass",
+      "packageTests": { "total": 106, "pass": 106, "fail": 0 },
+      "toolTests": { "total": 42, "pass": 42, "fail": 0 },
+      "probe": "pass (all assertions, exit 0)"
+    },
+    "staticChecksConfer": "no runtime, native or release admission"
+  }
+}

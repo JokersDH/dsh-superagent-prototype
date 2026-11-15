@@ -86,3 +86,12 @@ test('the report states the window, projects and coverage it actually observed',
   assert.ok(markdown.includes('## Coverage'))
   assert.ok(markdown.includes('## Source losses'))
 })
+
+test('without a comparable baseline the report says so and prints no benefit figure', () => {
+  const analysis = analyzeUsageInsights(bundle([controlled, native]))
+  const markdown = renderMarkdown(analysis)
+  assert.ok(markdown.includes('No operator baseline was supplied'))
+  assert.equal(/\d+%|percent|saved hours|节省/i.test(markdown.split('## Baseline comparison')[1] ?? ''), false,
+    'no percentage or saved-hours claim appears in the baseline section')
+  assert.equal(markdown.includes('observational only'), false, 'nothing is compared when no baseline exists')
+})

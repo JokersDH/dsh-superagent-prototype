@@ -204,3 +204,25 @@ test('a large nested input stays bounded and exact at the cap boundary', () => {
   assert.equal(short.summary.limits.recordsNotParsed, 3, 'the last container does not fit and is skipped whole')
   assert.equal(short.summary.metrics.find(row => row.metricId === 'outcomes.count')?.value, 99)
 })
+
+test('the coordinator-scale bounds are reproducible in the analyzer', () => {
+  // The coordinator caps at 50 works / 10 000 nested records before calling the analyzer; the same
+  // numbers must behave predictably here so a downstream reader cannot be surprised.
+  const works = Array.from({ length: 50 }, (_, number) => {
+    const workId = `work-coord-${number}`
+    return makeWorkEvidence(workId, Array.from({ length: 20 }, (_, inner) => ({
+      kind: 'question.opened', sourceRef: `q-${number}-${inner}`,
+    })), { outcomes: [] })
+  })
+  const index = works.map((_, number) => ({ workId: `work-coord-${number}`, projectId: 'project-atlas' }))
+  // Each container costs 1 + 20 entries = 21 units; 50 containers cost 1050 units.
+  const exact = analyzeUsageInsights(bundle({ workEvidence: works, workIndex: index, limits: { maxRecords: 1_050, maxWorks: 50 } }))
+  assert.equal(exact.summary.limits.recordsSeen, 1_050)
+  assert.equal(exact.summary.limits.recordsNotParsed, 0)
+  assert.equal(exact.summary.limits.worksSeen, 50)
+  assert.equal(exact.summary.metrics.find(row => row.metricId === 'interventions.questions')?.value, 1_000)
+
+  const capped = analyzeUsageInsights(bundle({ workEvidence: works, workIndex: index, limits: { maxRecords: 10_000, maxWorks: 50 } }))
+  assert.equal(capped.summary.limits.recordsNotParsed, 0, 'the coordinator caps below this size, so nothing is dropped here')
+  assert.equal(capped.summary.metrics.find(row => row.metricId === 'interventions.questions')?.sampleCount, 50)
+})
