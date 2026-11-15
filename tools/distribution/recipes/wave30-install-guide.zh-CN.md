@@ -43,6 +43,7 @@ node "$APP/apps/launcher/bin/pa.mjs" restore --json --install "$APP" ... --from 
 node tools/distribution/verify-startup-mode-argv.mjs
 node tools/distribution/verify-installed-project-recipes-ui.mjs /tmp/w30frozen/install/app /tmp/w30-jui
 node tools/distribution/verify-installed-trial-workbench.mjs --install /tmp/w30frozen/install --output /tmp/w30-browser
+node tools/distribution/verify-installed-window-ui.mjs /tmp/w30frozen/install/app /tmp/w30-window
 node tools/distribution/verify-personal-install.mjs --install /tmp/w30frozen/install --json
 node tools/distribution/verify-backup-schema16.mjs --install /tmp/w30frozen/install --json
 ```
@@ -54,7 +55,7 @@ node tools/distribution/support-bundle.mjs --install /tmp/w30frozen/install --ou
 输出目录 0700、文件 0600、拒绝覆盖；只含 release 事实，不含 token/model key/credential/native profile/用户 state。它不是停止权或 release 授权。
 
 ## 边界
-- 0076 窗口 selector 已在当前 source/包 console；source actual 9/9 通过，**同一 installed 静态包交互尚未单独重跑**。
+- 0076 窗口 selector 已在冻结包静态 console 实际 **9/9**（7/30 请求、旧窗口隔离、错误重试、桌面/移动），无 POST。
 - installed J 6/6、installed F 8/8 使用冻结包 actual static/runtime。
 - E 尚未对 `8296720d/82ee5b8f/049267…` 出独立 verdict；D 自测不是 release 准入。
 - 未做：真实 vendor/model/native、private/target、跨平台、48h/跨机、真实 native 成本。

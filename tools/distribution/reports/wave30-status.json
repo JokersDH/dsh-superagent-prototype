@@ -94,12 +94,21 @@
       "status": "PASS",
       "features": {
         "main": "0077",
-        "window": "0076 source actual 9/9",
+        "window": "installed static 9/9",
         "templates": "0073",
         "J": "installed 6/6",
         "F": "installed 8/8"
       },
-      "note": "Single new source/build/tar freeze after current main merge; window installed interaction not separately rerun."
+      "note": "Single source/build/tar freeze after current main merge; installed J6/F8/window9 all pass on frozen package.",
+      "windowEvidence": {
+        "status": "PASS",
+        "report": "tools/distribution/reports/wave30/installed-window-ui.json",
+        "requestedWindows": [
+          7,
+          30
+        ],
+        "posts": 0
+      }
     },
     "d3": {
       "status": "PASS_WITH_LIMITS",
@@ -139,7 +148,6 @@
     "verdict": "PENDING"
   },
   "notDone": [
-    "installed window selector interaction on static package",
     "E independent verdict for same tar",
     "native/private/target/real vendor"
   ],
