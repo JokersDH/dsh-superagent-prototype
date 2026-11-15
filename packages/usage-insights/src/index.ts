@@ -85,5 +85,13 @@ export { attentionSummary } from './attention.ts'
 export { interventionMetrics, metricRow, outcomeMetrics, workInterventions } from './metrics.ts'
 export { outcomeSubject, parseAttentionPages, parseOutcomes, parseWorkRecords } from './subject.ts'
 export { renderMarkdown, renderTerminal, safeText } from './report.ts'
-export { consumerAdmission, consumerLayer, consumerScope, metricRowKey, observedOutcomeCount, toInsightConsumerView } from './facing.ts'
+export {
+  EXPORT_DEFAULT_MAX_BYTES, EXPORT_DEFAULT_MAX_ROWS, EXPORT_PROTOCOL, ExportDocumentSchema, ExportFault, ExportRowSchema,
+  buildInsightExport, exportDigest,
+} from './export.ts'
+export type { ExportDocument, ExportOptions, ExportRow } from './export.ts'
+export {
+  consumerAdmission, consumerLayer, consumerScope, formatMetricValue, metricRowKey, metricUnitLabel,
+  observedOutcomeCount, toInsightConsumerView,
+} from './facing.ts'
 export type { ConsumerViewOptions, InsightConsumerLayer, InsightConsumerMetric, InsightConsumerScope, InsightConsumerView } from './facing.ts'

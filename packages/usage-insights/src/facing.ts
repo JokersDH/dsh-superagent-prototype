@@ -96,7 +96,8 @@ const unitLabel = (row: MetricRow): string => {
   return row.unit
 }
 
-const formatValue = (row: MetricRow): string | null => {
+/** Display formatting shared by the projection, the report and the export. */
+export function formatMetricValue(row: MetricRow): string | null {
   if (row.value === null) return null
   const value = Number.isInteger(row.value) ? String(row.value) : String(Math.round(row.value * 1000) / 1000)
   // A count is rendered as a bare number: the row label already names what is counted, and the unit
@@ -128,6 +129,9 @@ const windowLabel = (summary: UsageInsightsSummary): string => {
 /** Unique, stable identity for a metric row: the metric plus its layer and currency. */
 export const metricRowKey = (row: MetricRow): string =>
   [row.metricId, row.layer ?? 'product', row.currency ?? ''].filter(Boolean).join('@')
+
+/** Unit label for a row: the currency code for money, otherwise the unit token. */
+export const metricUnitLabel = (row: MetricRow): string => unitLabel(row)
 
 /**
  * Total observed outcomes when it is genuinely known. A complete empty window is `0`; an
@@ -182,7 +186,7 @@ export function toInsightConsumerView(summary: UsageInsightsSummary, options: Co
   const metrics: InsightConsumerMetric[] = limited.map(row => ({
     id: metricRowKey(row),
     label: LABELS[row.metricId] ?? METRIC_DEFINITIONS[row.metricId].definition,
-    value: formatValue(row),
+    value: formatMetricValue(row),
     detail: `样本 ${row.sampleCount}，未知 ${row.unknownCount}，覆盖 ${coverageText(row.coverage)}${row.layer ? `，层级 ${row.layer}` : ''}`,
     unit: unitLabel(row),
     layer: consumerLayer(row.layer),
