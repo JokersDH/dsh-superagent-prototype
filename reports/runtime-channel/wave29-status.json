@@ -1,0 +1,247 @@
+{
+  "wave": "product-wave-29",
+  "role": "I",
+  "title": "Unique channel adoption, guard-bound responder and typed refusal surface",
+  "date": "2026-11-15",
+  "workdir": "/Users/hh/Desktop/joker/superagent-agent-i",
+  "branch": "codex/g5-coordinator-channel",
+  "baseline": "4d85cc349fba81a3f3d0149f1803e77d4ea454b8",
+  "implementationCommit": "d8263deda1f370bb9862d8a39ba8bf6736bfc55a",
+  "mergedOriginMain": "79525b6",
+  "status": "LATEST_SOURCE_ADOPTED_BY_B_WITH_ONE_B_COMPILE_BLOCKER_H_FROM_OLD_SNAPSHOT",
+  "statement": "B has merged this branch, imports RunnerAttachChannel, owns no waiter map or connection queue, and now requires an explicit sink guard. B's current tree still fails its own strict compile on two stale `channel` references. H still refuses before import because it pins the old snapshot. I contributes the guard-bound responder, typed refusal surface, service-shaped consumer and exact adoption manifest.",
+  "ownedPaths": [
+    "apps/runner/src/attach-channel/",
+    "apps/runner/test/attach-channel/",
+    "docs/runtime-channel/",
+    "reports/runtime-channel/"
+  ],
+  "sourceBlobs": {
+    "coordinator-channel.ts": "d1ef81eb9d51b24417645151440eb1e262c20546",
+    "errors.ts": "ec8ce909d0f30ab1d96488db56cdf3b6a4ab7f49",
+    "attach.ts": "321738dae3b87e6ad7d235f52aaa65e6f63ab527",
+    "sink-responder.ts": "992a8cc0fceb55d7b2a9e2e8c8068202a892acb3",
+    "refusals.ts": "25ebcd26f1fb4aad583048dc672ec2bf09066b32",
+    "index.ts": "6314546e1d1facde00d0d2195edf1c14ad7a85d2",
+    "tsconfig.json": "1e5af3ea23fb4288afad29954cb31927f3e1e564"
+  },
+  "results": [
+    {
+      "id": "I4",
+      "milestone": "first result",
+      "status": "PASS_SOURCE_ADOPTED",
+      "content": "Exact latest source/adapter adopted by B at blob level; adoption manifest published",
+      "evidence": [
+        "reports/runtime-channel/wave29-adoption.json",
+        "docs/runtime-channel/adoption-manifest.zh-CN.md"
+      ],
+      "notReached": [
+        "B strict compile (two stale channel references, B-owned)"
+      ]
+    },
+    {
+      "id": "I8",
+      "milestone": "second result",
+      "status": "PASS",
+      "content": "Three callbacks across sink -> attach CAS takeover through the service-shaped consumer; adapter is the only pending/poll-queue owner",
+      "evidence": [
+        "service-consumer.test.ts (5)",
+        "rebind.test.ts (7)",
+        "b-route.test.ts (10)"
+      ]
+    },
+    {
+      "id": "I12",
+      "milestone": "third result",
+      "status": "PASS_MODULE_SCOPE",
+      "content": "Active fault/capacity/late/close matrix with real consumer shape and single settlement",
+      "evidence": [
+        "faults.test.ts (18)",
+        "guard-responder.test.ts (8)",
+        "refusals.test.ts (6)"
+      ]
+    },
+    {
+      "id": "I16",
+      "milestone": "fourth result",
+      "status": "PASS_MODULE_SCOPE",
+      "content": "Cross-owner evidence: B source reconciliation, typed refusal union for consumers, H source-binding requirements",
+      "evidence": [
+        "wave29-adoption.json",
+        "docs/runtime-channel/b-adapter-handoff.zh-CN.md",
+        "docs/runtime-channel/h-independent-consumer.zh-CN.md"
+      ]
+    },
+    {
+      "id": "I20",
+      "milestone": "fifth result",
+      "status": "PARTIAL_H_NOT_REACHED",
+      "content": "Independent current-source consumer and reusable interface/docs delivered; H has not executed the selected source",
+      "evidence": [
+        "independent-consumer.test.ts (4)",
+        "docs/runtime-channel/README.zh-CN.md"
+      ],
+      "notReached": [
+        "H executed the current source in its own tree"
+      ]
+    },
+    {
+      "id": "I24",
+      "milestone": "sixth result",
+      "status": "PASS_SOURCE_HANDOFF",
+      "content": "Stable handoff: manifest, docs, evidence and this status file",
+      "evidence": [
+        "wave29-evidence.zh-CN.md",
+        "wave29-status.json"
+      ]
+    }
+  ],
+  "bReconciliation": {
+    "auditedSource": "c2ea8dbcbc3cdc75ef692b3bcdba585704240dc9",
+    "observedSource": "1930278ca56e9b82a638907af87c2727b63105f7",
+    "observedMerge": "merged codex/g5-coordinator-channel through 4d85cc3",
+    "usesRunnerAttachChannel": true,
+    "oldThreeWaiterMaps": 0,
+    "ownConnectionsAndQueueRemoved": true,
+    "vendoredBlobsMatchLatestI": [
+      "coordinator-channel.ts",
+      "errors.ts",
+      "attach.ts"
+    ],
+    "sinkNativeGuardFixed": true,
+    "transportRefusalUnionFixed": true,
+    "residualCompile": {
+      "status": "FAIL",
+      "errors": [
+        "runner-service.ts(283,10) TS2304 channel",
+        "runner-service.ts(286,12) TS2304 channel"
+      ],
+      "owner": "B",
+      "fix": "use attach.hooks.beforeNativeWrite(command) guarded by businessClosed"
+    }
+  },
+  "hReconciliation": {
+    "observedSource": "2d1e4941685dfa94f8ff991d7c5dd8c9fdf706db",
+    "currentConsumer": "NOT_REACHED_SOURCE_REFUSAL",
+    "note": "The refusal is correct source checking; H must bind the current I commit above and execute its own consumer."
+  },
+  "checks": [
+    {
+      "command": "node_modules/.bin/tsc -p apps/runner/src/attach-channel/tsconfig.json",
+      "exit": 0
+    },
+    {
+      "command": "cd apps/runner && node --test --test-timeout=8000 test/attach-channel/*.test.ts",
+      "exit": 0,
+      "tests": 84,
+      "passed": 84,
+      "failed": 0
+    },
+    {
+      "command": "node --test packages/contracts/test/coordinator-channel.case.ts",
+      "exit": 0,
+      "tests": 5,
+      "passed": 5
+    },
+    {
+      "command": "B direct strict compile of runner-service.ts + recovery-transport.ts",
+      "exit": "NONZERO",
+      "observed": "only two TS2304 channel references",
+      "owner": "B"
+    }
+  ],
+  "testCounts": {
+    "three-callbacks.test.ts": 11,
+    "binding.test.ts": 6,
+    "rebind.test.ts": 7,
+    "faults.test.ts": 18,
+    "compatibility.test.ts": 4,
+    "independent-consumer.test.ts": 4,
+    "fresh-intent.test.ts": 5,
+    "b-route.test.ts": 10,
+    "guard-responder.test.ts": 8,
+    "refusals.test.ts": 6,
+    "service-consumer.test.ts": 5,
+    "total": 84
+  },
+  "policySplit": {
+    "facts": "original A/public sink owns durability and idempotency",
+    "payload": "original immutable Store/responder owns content and permission",
+    "native": "current main/Broker guard owns every decision; fact recording or an open attempt never grants a write",
+    "iDoesNot": [
+      "implement policy",
+      "cache an allowed frame",
+      "resend business commands",
+      "claim quiescence",
+      "own auth/routes/DB/ledger/lifecycle"
+    ]
+  },
+  "notReached": [
+    "B strict compile (two stale channel references, B-owned)",
+    "H executed the selected current source in its own tree",
+    "real A persisted ingress and real main/Broker guard (doubles only)",
+    "same Runner dual client, coordinator SIGKILL question->answer, cross-coordinator recovery",
+    "durable exactly-once native execution and physical writer quiescence",
+    "recovered candidate/manualaccept and slot release (B/main product work)"
+  ],
+  "boundaries": {
+    "filesOutsideOwnershipModified": [],
+    "contractsRootWireChanged": false,
+    "runnerServiceOrLinkClientChanged": false,
+    "newServerDatabaseLedgerDriverLifecycle": false,
+    "realModelTurns": 0,
+    "nativeTurns": 0,
+    "processSignalsOrUserServiceOperations": 0,
+    "preservedUserServices": [
+      [
+        5180,
+        8796
+      ],
+      [
+        5181,
+        8797
+      ],
+      [
+        5182,
+        8798
+      ],
+      [
+        5183,
+        8799
+      ],
+      [
+        5184,
+        8800
+      ],
+      [
+        5185,
+        8801
+      ],
+      [
+        5186,
+        8802
+      ],
+      [
+        5187,
+        8803
+      ],
+      [
+        5188,
+        8804
+      ],
+      [
+        5189,
+        8805
+      ],
+      [
+        5190,
+        8806
+      ],
+      [
+        5191,
+        8807
+      ]
+    ],
+    "studyState": "BLOCKED_CURRENT_RECIPE_UNTOUCHED"
+  }
+}

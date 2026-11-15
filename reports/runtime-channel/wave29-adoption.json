@@ -1,0 +1,74 @@
+{
+  "protocol": "wave29-i-adoption/1",
+  "date": "2026-11-15",
+  "i": {
+    "branch": "codex/g5-coordinator-channel",
+    "baseline": "4d85cc349fba81a3f3d0149f1803e77d4ea454b8",
+    "sourceCommit": "d8263deda1f370bb9862d8a39ba8bf6736bfc55a",
+    "ownedPaths": [
+      "apps/runner/src/attach-channel/",
+      "apps/runner/test/attach-channel/",
+      "docs/runtime-channel/",
+      "reports/runtime-channel/"
+    ],
+    "blobs": {
+      "apps/runner/src/attach-channel/coordinator-channel.ts": "d1ef81eb9d51b24417645151440eb1e262c20546",
+      "apps/runner/src/attach-channel/errors.ts": "ec8ce909d0f30ab1d96488db56cdf3b6a4ab7f49",
+      "apps/runner/src/attach-channel/attach.ts": "321738dae3b87e6ad7d235f52aaa65e6f63ab527",
+      "apps/runner/src/attach-channel/sink-responder.ts": "992a8cc0fceb55d7b2a9e2e8c8068202a892acb3",
+      "apps/runner/src/attach-channel/refusals.ts": "25ebcd26f1fb4aad583048dc672ec2bf09066b32",
+      "apps/runner/src/attach-channel/index.ts": "6314546e1d1facde00d0d2195edf1c14ad7a85d2",
+      "apps/runner/src/attach-channel/tsconfig.json": "1e5af3ea23fb4288afad29954cb31927f3e1e564"
+    },
+    "checks": {
+      "strict": "node_modules/.bin/tsc -p apps/runner/src/attach-channel/tsconfig.json exit 0",
+      "module": "node --test test/attach-channel/*.test.ts 84/84",
+      "sharedContract": "packages/contracts/test/coordinator-channel.case.ts 5/5"
+    }
+  },
+  "b": {
+    "root": "/Users/hh/Desktop/joker/superagent-agent-b",
+    "branch": "codex/g1-runtime",
+    "observedSource": "1930278ca56e9b82a638907af87c2727b63105f7",
+    "observedMerge": "Merge branch 'codex/g5-coordinator-channel' into codex/g1-runtime (through 4d85cc3)",
+    "vendoredBlobs": {
+      "apps/runner/src/attach-channel/coordinator-channel.ts": "d1ef81eb9d51b24417645151440eb1e262c20546",
+      "apps/runner/src/attach-channel/errors.ts": "ec8ce909d0f30ab1d96488db56cdf3b6a4ab7f49",
+      "apps/runner/src/attach-channel/attach.ts": "321738dae3b87e6ad7d235f52aaa65e6f63ab527",
+      "apps/runner/src/attach-channel/index.ts": "b26154f343634cb6c7536aa5cd5bcb7169e0b980"
+    },
+    "usesRunnerAttachChannel": true,
+    "adapterOwnsPendingAndQueue": true,
+    "ownConnectionsMapRemoved": true,
+    "oldThreeWaiterMaps": 0,
+    "sinkLaneNativeGuard": "explicit options.beforeNativeWrite is required; missing/deny/throw produce allowed:false (guardCalls hazard from the wave-29 audit source c2ea is fixed at this source)",
+    "transportBookkeeping": "runner-service keeps a per-connection `dispatched` map only to avoid re-sending the same head on repeated polls; it holds no pending, timer, generation or reply permission",
+    "currentDirectCompile": {
+      "command": "pnpm exec tsc --ignoreConfig --noEmit --strict --exactOptionalPropertyTypes --skipLibCheck --target ES2024 --module NodeNext --moduleResolution NodeNext --allowImportingTsExtensions --types node apps/runner/src/runner-service.ts packages/execution/src/recovery-transport.ts",
+      "status": "FAIL",
+      "errors": [
+        "runner-service.ts(283,10) TS2304 Cannot find name 'channel'",
+        "runner-service.ts(286,12) TS2304 Cannot find name 'channel'"
+      ],
+      "owner": "B",
+      "note": "Leftover references in hooks.beforeNativeWrite after the refactor to RunnerAttachChannel; the adapter already exposes attach.hooks.beforeNativeWrite, which is the drop-in fix. Not an I module defect."
+    },
+    "residualGaps": [
+      "B's current tree does not compile at the two channel references above",
+      "B has not taken the wave-29 additions (sink-responder/refusals) and does not need the responder because it fixed the guard itself; the typed refusal surface is available if B prefers a total mapping",
+      "sameRunner dual client, coordinator SIGKILL question->answer recovery, recovered candidate/accept and slot release remain B/main work"
+    ]
+  },
+  "h": {
+    "root": "/Users/hh/Desktop/joker/superagent-agent-h",
+    "observedSource": "2d1e4941685dfa94f8ff991d7c5dd8c9fdf706db",
+    "currentConsumer": "NOT_REACHED_SOURCE_REFUSAL",
+    "needed": "Bind the selected current I source commit/blob above (not the old d95df88/cb4e975 materialization) and execute the independent three-callback/CAS/late/fresh/namespace/bounds consumer in its own tree."
+  },
+  "minimalMergeList": [
+    "B merges this branch through the wave-29 commit (or takes the blobs above); no manual fork of the I subtree",
+    "B replaces the two stale `channel` references in hooks.beforeNativeWrite with `attach.hooks.beforeNativeWrite(command)` guarded by businessClosed",
+    "B keeps auth/routes/dispatch/begin/prepared/process/lifecycle; I supplies no policy",
+    "H materializes the exact I commit above and runs its own consumer; old snapshots stay historical"
+  ]
+}
