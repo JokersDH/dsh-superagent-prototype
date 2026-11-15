@@ -2,12 +2,80 @@
 
 工作树 `/Users/hh/Desktop/joker/superagent-agent-j`，分支 `codex/g5-project-recipes`。
 
-- 当前（wave-28）机读状态：[wave28-status.json](wave28-status.json)
-- 历史（wave-27）机读状态：[wave27-status.json](wave27-status.json)
+- 当前（wave-29）机读状态：[wave29-status.json](wave29-status.json)
+- 历史（wave-28）：[wave28-status.json](wave28-status.json)
+- 历史（wave-27）：[wave27-status.json](wave27-status.json)
 
 ---
 
-# wave-28（2026-11-15）
+# wave-29（2026-11-15）
+
+起点 `448a414e`，合并 `origin/main`（wave-29 派工，`79525b6`；含 main `a40232e` 的 0073 接入）后按 `agent-tasks/product-wave-29/agent-j-project-recipes.zh-CN.md` 推进。**本轮不再把 main 的 HTTP/App 标为未实现**：0073 的实际入口已存在，我消费它并独立跑了 main 的集成测试。
+
+## 1. 与 0073 实际契约对齐
+
+- main 的 `POST /v1/projects/:id/recipes/preview` → 原 NewWorkForm 预填 → 创建前重验 → 原 `create_work`，两项目已走到原 Work/check/currentCandidate/manualaccept。
+- 我消费 `packages/contracts/src/project-recipe-preview.ts`（不修改它）：`ProjectRecipePreviewInput` 拒绝注入 root/命令/重复原子；我产出的字段通过 `ProjectRecipeFieldsSchema`；合成的 `project-recipe-preview/1`（draft 与 needs_input 两态）通过其 schema。测试：`tools/project-recipes/test/main-contract.case.ts`。
+- 独立执行 main 的 5 项真实链路测试：`node --test tests/integration/project-recipes.case.mjs` → 5/5 PASS（含两项目 preview→创建→候选→人工接受）。
+
+## 2. 观察时间与稳定内容分离
+
+`provenance.facts` 现在同时携带：
+
+| 字段 | 含义 |
+| --- | --- |
+| `digest` | 整份观察（含 `observedAt`） |
+| `contentDigest` | 去掉 `observedAt` 的稳定内容摘要 |
+| `observedAt` | 本次观察时间（provenance，不是授权） |
+
+- 同字节重读（时间不同）：`contentDigest` 相同，`digest` 不同；内容变化（即使长度不变）：两者都变。
+- 复用：`previewInputs` 只比较内容与配置；再观察一次相同内容不会误判过期。传入 `now` 时，超过 60 分钟保留期的观察被拒绝——旧观察不能升级为新的授权。
+- 导出 `factsContentDigest`，与 main 未公开公式 `canonicalDigest(facts 去掉 observedAt)` 逐值一致（测试断言），main 后续可替换其内联实现。
+
+## 3. 读取一致性与可编辑目标
+
+- observer 每次打开都比对 `dev/ino/size`（lstat↔fstat），读完后再次比对 `size/mtime`；读取期间被替换或改写以 `replaced` / `changed_during_read` 拒绝，不返回半份内容。白名单、NOFOLLOW、`/`+home 拒绝、预算（256 KiB/4 MiB/12 文件/8 MiB）不变。
+- 用户可改写目标：`previewInputs(draft, current, { goal })` / `toCreateWorkCommand(draft, ids, { goal })` 只换 goal 文本，scope/criteria/profile 与草稿一致；空/超长目标 `not_actionable`。
+- CLI 与库同一实现：测试断言同一输入的 CLI stdout 与库结果深度相等。
+
+## 4. 实际验证（本机，Node 24.21.0）
+
+| 命令 | exit | 结果 |
+| --- | --- | --- |
+| `./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.json` | 0 | strict |
+| `node --test packages/project-recipes/test/*.case.ts` | 0 | 67 tests / 67 pass |
+| `./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.build.json` | 0 | dist |
+| `./node_modules/.bin/tsc -p tools/project-recipes/tsconfig.json` | 0 | strict |
+| `node --test tools/project-recipes/test/*.case.ts` | 0 | 26 tests / 26 pass |
+| `node packages/project-recipes/examples/preview-consumer.ts` | 0 | 三态自检 |
+| `node --test tests/integration/project-recipes.case.mjs` | 0 | main 真实链路 5/5 |
+| `node agent-tasks/product-wave-29/verify.mjs` | 0 | 静态派工校验 |
+| `npm pack --dry-run` | 0 | 34 files / 38,991 bytes（dist+README） |
+
+## 5. 日常流程观察（J22，零模型）
+
+对真实授权的 monorepo 根（本工作树，只读）观察一次：`pnpm`、workspace 声明、TypeScript 标记、脚本名；配合受控配置产出 `draft`（goal 文案、`packages/` 原子、配置 criteria、profile），并记录 `contentDigest` 与 `observedAt`。人工基线需要手写这四类字段；本轮不声称时间或质量收益。
+
+## 6. 分层与未达
+
+| 层 | 状态 |
+| --- | --- |
+| source | PASS（67 库 / 26 工具 / strict / build / example） |
+| controlled | PASS（真实 Application 两项目 dispatch；main 集成测试 5/5，fixture 模式） |
+| installed | NOT_REACHED（无安装包；仅 pack 列表） |
+| native | NOT_APPLICABLE（真实 vendor/model/native = 0） |
+| value | NOT_CLAIMED |
+| activation | PASS_PRODUCT_PATH_CONTROLLED（main 实际 HTTP/App 已存在并通过其测试；无 installed/native 准入） |
+
+未达：F 的食谱表单呈现验证（F-owned）、E 独立断言、安装包/native 结论、收益主张。
+
+## 7. main 重新导入时的差异
+
+本轮改动的包内文件：`src/facts.ts`、`src/draft.ts`、`src/match.ts`、`src/preview.ts`、`src/observe.ts`（另有测试/文档）。新增公开导出：`factsContentDigest`、`factsContentOf`、`DEFAULT_REUSE_MAX_FACTS_AGE_MS`、`CreateWorkOverrides`（goal-only）。公开函数签名向后兼容（`previewInputs` 第三参可选）；draft schema 增加 `provenance.facts.contentDigest`。根依赖/锁、HTTP、App、SQL 均未改。
+
+---
+
+# 历史：wave-28（2026-11-15）
 
 起点 `46020ff2`，合并 `origin/main`（wave-28 派工，`ea82d8f`）后按 `agent-tasks/product-wave-28/agent-j-project-recipes.zh-CN.md` 推进。
 

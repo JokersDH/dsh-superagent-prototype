@@ -1,0 +1,279 @@
+{
+  "protocol": "project-recipes-wave29-status/1",
+  "owner": "J",
+  "date": "2026-11-15",
+  "branch": "codex/g5-project-recipes",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-j",
+  "baseline": "448a414ed116e4db33b4e23d0ff1a2283cfe4b23",
+  "mergedOriginMain": "79525b6 (wave-29 dispatch), merged as 0dea505; main a40232e/0a0d5a0 included",
+  "packet": "agent-tasks/product-wave-29/agent-j-project-recipes.zh-CN.md",
+  "consumesMainContract": {
+    "rfc": "docs/rfcs/WP-16/0073-main-project-recipe-preview.md",
+    "contract": "packages/contracts/src/project-recipe-preview.ts",
+    "consumer": "apps/coordinator/product/project-recipes.ts",
+    "state": "PASS_ACTUAL",
+    "note": "main's POST /v1/projects/:id/recipes/preview -> original NewWorkForm prefill -> creation-time revalidation -> original create_work is implemented and executable; J no longer reports it as unimplemented."
+  },
+  "layers": {
+    "source": {
+      "status": "PASS",
+      "evidence": ["packages/project-recipes", "tools/project-recipes"],
+      "note": "Strict typecheck 0, 67 package tests, 26 tools tests, build 0, example 0."
+    },
+    "controlled": {
+      "status": "PASS_CONTROLLED_CONFIG",
+      "evidence": [
+        "tools/project-recipes/test/actual-application.case.ts",
+        "tests/integration/project-recipes.case.mjs"
+      ],
+      "note": "Real ProductStore + createProductApplication (two projects, dispatch recorded) and main's own 5-case integration test executed independently: metadata -> exact scoped fields, content digests, HTTP refusals, unavailable states, two previews through original Work/check/currentCandidate/manualaccept. Controlled fixture mode, no real model/native turn."
+    },
+    "installed": { "status": "NOT_REACHED", "note": "No packaged installation produced or admitted; npm pack --dry-run only lists 34 files / 38,991 bytes." },
+    "native": { "status": "NOT_APPLICABLE", "note": "Real vendor/model/native turns: 0." },
+    "value": { "status": "NOT_CLAIMED", "note": "J22 is a field-level observation; no benefit or time saving asserted." },
+    "activation": {
+      "status": "PASS_PRODUCT_PATH_CONTROLLED",
+      "note": "main's actual HTTP + App path is implemented and its integration test passes; no installed/native admission and no user-service restart."
+    }
+  },
+  "evidence": {
+    "package": { "typecheckExit": 0, "tests": 67, "pass": 67, "fail": 0, "buildExit": 0 },
+    "tools": { "typecheckExit": 0, "tests": 26, "pass": 26, "fail": 0 },
+    "exampleExit": 0,
+    "wave29VerifierExit": 0,
+    "mainIntegration": { "command": "node --test tests/integration/project-recipes.case.mjs", "exit": 0, "tests": 5, "pass": 5 },
+    "packDryRun": { "files": 34, "bytes": 38991, "contains": ["dist/", "README.md"] },
+    "cliParity": "the CLI JSON deep-equals the library result for the same inputs (tools test)",
+    "contentDigest": "factsContentDigest equals the coordinator formula canonicalDigest(facts without observedAt) (tools test)"
+  },
+  "stages": [
+    {
+      "id": "J1",
+      "title": "consume the actual main interface",
+      "status": "PASS",
+      "source": ["tools/project-recipes/test/main-contract.case.ts", "apps/coordinator/product/project-recipes.ts"],
+      "capability": "Aligned with 0073 and ProjectRecipePreviewInput/Fields: root lookup -> observer -> matcher -> fields -> original form -> create_work. The published ProjectRecipeFieldsSchema accepts my fields; the same-config Application consumer and two-project path are regressions, not new claims."
+    },
+    {
+      "id": "J2",
+      "title": "metadata read consistency",
+      "status": "PASS",
+      "source": ["packages/project-recipes/src/observe.ts"],
+      "capability": "Every open compares dev/ino/size before and after fstat and re-checks size/mtime after the read: replacement or in-place rewrite is refused (replaced / changed_during_read) instead of returning partial content. Whitelist, NOFOLLOW and no script execution unchanged."
+    },
+    {
+      "id": "J3",
+      "title": "runtime and CLI share one implementation",
+      "status": "PASS",
+      "source": ["packages/project-recipes/src/observe.ts", "tools/project-recipes/cli.ts", "tools/project-recipes/test/cli.case.ts"],
+      "capability": "CLI imports the package; a test proves CLI output deep-equals the library result for identical inputs. dist imports are only builtins/contracts/zod/siblings. Missing build yields one actionable refusal."
+    },
+    {
+      "id": "J4",
+      "title": "first result: real sustainable consumption",
+      "status": "PASS",
+      "source": ["packages/project-recipes", "tools/project-recipes"],
+      "capability": "Current main consumer plus complete metadata consistency/refusal/budget positives and negatives with strict types; old atom fix kept only as regression."
+    },
+    {
+      "id": "J5",
+      "title": "observation content and time semantics",
+      "status": "PASS",
+      "source": ["packages/project-recipes/src/facts.ts", "packages/project-recipes/src/draft.ts", "packages/project-recipes/test/observed-at.case.ts"],
+      "capability": "provenance.facts carries digest (whole observation), contentDigest (stable content) and observedAt. Same bytes re-observed later stay applicable; changed bytes or an expired observation do not. Timestamps are provenance, never authorization."
+    },
+    {
+      "id": "J6",
+      "title": "precise project facts",
+      "status": "PASS",
+      "source": ["packages/project-recipes/src/observe.ts", "packages/project-recipes/test/observe.case.ts"],
+      "capability": "Root comes only from the caller's registered lookup; the port input has no path; unregistered project refuses. Missing manager/lock/engine stays missing; Node manifest presence never implies an installed or tested native tool."
+    },
+    {
+      "id": "J7",
+      "title": "three templates on current inputs",
+      "status": "PASS",
+      "source": ["packages/project-recipes/src/catalog.ts", "packages/project-recipes/src/match.ts"],
+      "capability": "Catalog/facts/config/selection versions and stable fields; actionable issue codes; no fabricated source message, no model Proposal, no hash-as-approval."
+    },
+    {
+      "id": "J8",
+      "title": "second result: current runtime facts module",
+      "status": "PASS",
+      "source": ["packages/project-recipes/src/observe.ts", "packages/project-recipes/src/index.ts"],
+      "capability": "One observation/template implementation for main's registered projects and the CLI; packaging closure refreshed for D (34 files, builtins+contracts+zod); zero execution/install/SQL writes."
+    },
+    {
+      "id": "J9",
+      "title": "original field compatibility",
+      "status": "PASS",
+      "source": ["tools/project-recipes/test/main-contract.case.ts", "packages/project-recipes/src/scope.ts"],
+      "capability": "Scope atoms, full exclusions, expiry, criteria/profile/goal map exactly to main's public fields; unknown or contradictory input never becomes an executable default and the original Application still refuses."
+    },
+    {
+      "id": "J10",
+      "title": "revalidation and editable goal",
+      "status": "PASS",
+      "source": ["packages/project-recipes/src/preview.ts", "packages/project-recipes/test/preview.case.ts"],
+      "capability": "Revalidation compares content digests (configuration and facts) and reports which input changed; user goal edits are supported without changing scope/criteria/profile or the original commandId/commit semantics."
+    },
+    {
+      "id": "J11",
+      "title": "two-project original delegation",
+      "status": "PASS",
+      "source": ["tools/project-recipes/test/actual-application.case.ts", "tests/integration/project-recipes.case.mjs"],
+      "capability": "Two independent roots with their own atoms/profile/check dispatch recorded in one Application; main's integration test takes two previews through the original Work/check/currentCandidate/manualaccept chain. Real calls and controlled fixture layers are stated separately."
+    },
+    {
+      "id": "J12",
+      "title": "third result: template to product confirmation",
+      "status": "PASS",
+      "source": ["tests/integration/project-recipes.case.mjs", "reports/releases/wave29-integration/status.json"],
+      "capability": "J module -> main HTTP -> original form fields -> two-project delegation evidence exists and was executed (5/5). J did not modify App or E assertions; package needs are listed for D."
+    },
+    {
+      "id": "J13",
+      "title": "multi-project and same-name isolation",
+      "status": "PASS",
+      "source": ["tools/project-recipes/test/multi-project.case.ts", "packages/project-recipes/test/compatibility.case.ts"],
+      "capability": "Two real roots with different manager/profile/check; same display name but distinct IDs never share provenance, criteria or revision; repeated observation is side-effect free."
+    },
+    {
+      "id": "J14",
+      "title": "monorepo exact scope",
+      "status": "PASS",
+      "source": ["tools/project-recipes/test/multi-project.case.ts"],
+      "capability": "Workspace root/member only accepts declared atoms; undeclared sibling member is needs_input; no member guessing, no parent/sibling reads, no silent widening."
+    },
+    {
+      "id": "J15",
+      "title": "three templates and checks",
+      "status": "PASS",
+      "source": ["packages/project-recipes/src/catalog.ts", "packages/project-recipes/test/catalog.case.ts"],
+      "capability": "Each kind gives a practical goal/criteria set from registered checks and the project profile; unknown stack/manager, missing required machine check and disabled profile are explained without switching executor."
+    },
+    {
+      "id": "J16",
+      "title": "fourth result: multi-project template library",
+      "status": "PASS",
+      "source": ["packages/project-recipes", "tools/project-recipes"],
+      "capability": "Complete suggestions and independent negatives across two projects, monorepo atoms and missing capabilities; reuse is proven by the actual Application dispatch, not by catalog size."
+    },
+    {
+      "id": "J17",
+      "title": "resources and failure recovery",
+      "status": "PASS",
+      "source": ["packages/project-recipes/src/observe.ts", "packages/project-recipes/test/observe.case.ts"],
+      "capability": "Reads/parse/total work bounded; refusals leave project files unchanged; output only creates a new file; repeated observation reproduces identical content digest; failure material is bounded ids/status/digest only."
+    },
+    {
+      "id": "J18",
+      "title": "distribution and consumer compatibility",
+      "status": "PASS",
+      "source": ["packages/project-recipes/test/distribution.case.ts", "packages/project-recipes/package.json"],
+      "capability": "Source/dist/exports consistent; a test asserts dist imports are only builtins/contracts/zod/siblings and that files are dist+README; main keeps the root lock, J changed none."
+    },
+    {
+      "id": "J19",
+      "title": "privacy and observable data",
+      "status": "PASS",
+      "source": ["packages/project-recipes/src/observe.ts", "packages/project-recipes/test/observe.case.ts"],
+      "capability": "Output only public facts names/counts/digests/missing and the read scope; refusals never echo metadata bodies or secrets; configuration presence never proves a tool is installed or native-tested; no executable/install/network action."
+    },
+    {
+      "id": "J20",
+      "title": "fifth result: complete tool and support",
+      "status": "PASS",
+      "source": ["tools/project-recipes", "docs/project-recipes/README.zh-CN.md"],
+      "capability": "Real Node/CLI entry, failure/limit/new-file behavior, documentation and reproducible consumers; zero model/native, zero install/SQL/check registration, original project mtime/content preserved."
+    },
+    {
+      "id": "J21",
+      "title": "main actual integration review",
+      "status": "PASS",
+      "source": ["apps/coordinator/product/project-recipes.ts", "apps/console/src/useProjectRecipe.ts", "tests/integration/project-recipes.case.mjs"],
+      "capability": "Consumed 0073's actual HTTP/form source and F field mapping; verified same project/config/facts/revision and the original confirm; only J-owned gaps were changed (content/time digest, goal edit, read identity), no second matcher or App edit."
+    },
+    {
+      "id": "J22",
+      "title": "useful daily flow",
+      "status": "PASS_OBSERVATION_ONLY",
+      "source": ["reports/project-recipes/README.zh-CN.md"],
+      "capability": "One real authorized monorepo root observed with the shipped CLI produced a draft (goal text, 'packages/' atom, configured criteria, profile) with contentDigest and observedAt recorded. Field-level observation only; no user study, no efficiency claim, no BLOCKED pilot."
+    },
+    {
+      "id": "J23",
+      "title": "public development handoff",
+      "status": "PASS",
+      "source": ["docs/project-recipes/README.zh-CN.md", "docs/project-recipes/main-integration.zh-CN.md", "packages/project-recipes/README.md"],
+      "capability": "Support range, interface invariants/order/errors/budgets, three template examples and fresh run commands updated; content-vs-time digest, goal edit, read identity and main integration documented; historical wave-27/28 numbers kept labelled."
+    },
+    {
+      "id": "J24",
+      "title": "sixth result and final delivery",
+      "status": "PASS",
+      "source": ["reports/project-recipes/wave29-status.json"],
+      "capability": "This status lists J1–J24, six results, main/F consumer state, exact source/commands/exits and layered source/controlled/installed/native/value/activation accounting."
+    }
+  ],
+  "results": [
+    { "checkpoint": 4, "name": "main-consumable draft and consistency", "stages": ["J1", "J2", "J3", "J4"], "status": "PASS" },
+    { "checkpoint": 8, "name": "current runtime facts module", "stages": ["J5", "J6", "J7", "J8"], "status": "PASS" },
+    { "checkpoint": 12, "name": "template to product confirmation", "stages": ["J9", "J10", "J11", "J12"], "status": "PASS" },
+    { "checkpoint": 16, "name": "multi-project template library", "stages": ["J13", "J14", "J15", "J16"], "status": "PASS" },
+    { "checkpoint": 20, "name": "complete tool and support", "stages": ["J17", "J18", "J19", "J20"], "status": "PASS" },
+    { "checkpoint": 24, "name": "handoff and final status", "stages": ["J21", "J22", "J23", "J24"], "status": "PASS" }
+  ],
+  "consumerState": {
+    "main": {
+      "status": "INTEGRATED_AND_EXECUTED",
+      "evidence": ["docs/rfcs/WP-16/0073-main-project-recipe-preview.md", "a40232e", "tests/integration/project-recipes.case.mjs (5/5 executed by J)"],
+      "note": "main computes the stable facts digest independently; my exported factsContentDigest matches it, so a later re-import can replace the inline formula."
+    },
+    "f": {
+      "status": "CONSUMES_MAIN_PREVIEW",
+      "note": "F renders main's preview result and its own applicability finding is F-owned; J does not pass suggestions directly."
+    },
+    "e": {
+      "status": "NOT_SUPPLIED",
+      "note": "J did not create or modify product-acceptance assertions; fixtures, failure matrix and the main integration test are available as independent inputs."
+    }
+  },
+  "handoff": {
+    "changedPackageFilesForReimport": ["packages/project-recipes/src/facts.ts", "packages/project-recipes/src/draft.ts", "packages/project-recipes/src/match.ts", "packages/project-recipes/src/preview.ts", "packages/project-recipes/src/observe.ts"],
+    "newPublicExports": ["factsContentDigest", "factsContentOf", "DEFAULT_REUSE_MAX_FACTS_AGE_MS", "CreateWorkOverrides (goal-only edit)"],
+    "mainConsumes": ["matchRecipe", "parseProjectRecipeDraft", "previewInputs", "toCreateWorkCommand", "createProjectFactsObserver", "catalogDigest", "factsContentDigest"],
+    "mainMustKeep": ["root workspace importer/lock (unchanged by J)", "registered-root lookup", "HTTP/App/form authority"],
+    "dConsumes": ["package build order: contracts -> project-recipes", "dist closure: builtins + @personal-agent/contracts + zod"],
+    "reproduce": [
+      "./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.json && node --test packages/project-recipes/test/*.case.ts",
+      "./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.build.json",
+      "./node_modules/.bin/tsc -p tools/project-recipes/tsconfig.json && node --test tools/project-recipes/test/*.case.ts",
+      "pnpm -r --workspace-concurrency=2 run build && node --test tests/integration/project-recipes.case.mjs",
+      "node packages/project-recipes/examples/preview-consumer.ts"
+    ]
+  },
+  "notReached": [
+    "F form behaviour verification for recipe fields (F-owned)",
+    "E independent product-acceptance assertions",
+    "packaged installation and installed verdict",
+    "real model/native/runtime admission",
+    "value/efficiency claims"
+  ],
+  "limits": {
+    "realModelTurns": 0,
+    "nativeTurns": 0,
+    "vendorCalls": 0,
+    "dependencyInstalls": 0,
+    "executedProjectCommands": 0,
+    "checkRegistrations": 0,
+    "sqlWrites": 0,
+    "executionLifecycles": 0,
+    "userServicesTouched": 0,
+    "newWorktreesCreated": 0
+  },
+  "ownership": {
+    "owned": ["packages/project-recipes/", "tools/project-recipes/", "docs/project-recipes/", "reports/project-recipes/"],
+    "untouchedByDesign": ["pnpm-lock.yaml", "root package.json", "packages/contracts/", "apps/", "A/B/C/D/E/F/G/H/I paths"]
+  }
+}
