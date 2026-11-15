@@ -114,3 +114,24 @@ test('the export contains no raw evidence, path or prompt text', () => {
   assert.equal(text.includes('/Users/private'), false)
   assert.equal(text.includes('title'), false)
 })
+
+test('the default row bound truncates a many-currency observation explicitly', () => {
+  // Valid ISO-shaped codes are three uppercase letters; 26*26 gives more than the row bound.
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  const codes = Array.from({ length: 210 }, (_, index) =>
+    `${letters[Math.floor(index / 26) % 26]}${letters[index % 26]}X`)
+  const outcomes = codes.map((currency, index) => makeOutcome({
+    seed: `export-currency-${index}`, acceptance: 'unknown', cost: { currency, amount: index + 1 },
+  }))
+  const summary = summaryOf(bundle(outcomes))
+  assert.ok(summary.metrics.length > 200, `the fixture must exceed the default row bound, got ${summary.metrics.length}`)
+  const { document } = buildInsightExport(summary)
+  assert.equal(document.truncation.byRows, true)
+  assert.equal(document.truncation.includedRows, 200)
+  assert.ok(document.truncation.totalRows > 200)
+  assert.equal(document.rows.length, 200)
+  assert.ok(document.truncation.bytes <= document.truncation.maxBytes)
+  // Ordering is stable, so the same bound keeps the same rows.
+  const again = buildInsightExport(summary)
+  assert.deepEqual(again.document.rows.map(row => row.rowId), document.rows.map(row => row.rowId))
+})
