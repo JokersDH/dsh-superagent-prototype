@@ -1,0 +1,16 @@
+WAVE28_COMPLETION_FACTS {"reviews":1,"verifications":1,"acceptances":1,"unclassified":0}
+WAVE29_REVIEW_CLASSIFICATION {"reviews":1,"unclassified":["artifact_or_attempt_shape","foreign_work_or_binding","noncanonical_review_key","review_shape"]}
+✔ accepted event projects one exact outcome and preserves unknown timing as null (37.7975ms)
+✔ missing attempt/verification/acceptance or wrong project yields an auditable gap and writes no outcome (10.945875ms)
+✔ acceptance.consume joins the accepting transaction and a later failure rolls the outcome back (10.1755ms)
+✔ a new candidate on the same work gets its own outcome; the older accepted outcome stays readable (12.423208ms)
+✔ completion history reports an explicit per-ticket truncation instead of complete coverage (15.079583ms)
+✔ reviews require canonical key and full work/contract/candidate shape; failures are unclassified (11.895666ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 260.030292

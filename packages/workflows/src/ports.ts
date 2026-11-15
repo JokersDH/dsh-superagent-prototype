@@ -6,7 +6,7 @@
 import type {
   AcceptanceProjectionInput, AcceptanceProjectionResult, AssistantState, Conversation, ConversationPage, ConversationSearchPage, DecisionRecord, LegacyDecisionRecord,
   ProductStore, ProjectCurrent, ProjectSettings, ProjectVersion, EvidencePage, RecoveryIntentInput, RecoveryIntentPage, RecoveryIntentRecord,
-  SourceMessageMetadata, TimelineEntry, WorkflowStateFacts, WorkIndexEntry, CompletionFacts, CompletionReviewFact, CompletionVerificationFact, CompletionAcceptanceFact,
+  SourceMessageMetadata, TimelineEntry, WorkflowStateFacts, WorkIndexEntry, CompletionFacts, UnclassifiedReviewFact, CompletionReviewFact, CompletionVerificationFact, CompletionAcceptanceFact,
 } from '@personal-agent/storage'
 import { WorkflowConflict as StorageWorkflowConflict } from '@personal-agent/storage'
 import type {
@@ -20,7 +20,7 @@ export type {
   SnapshotManifest, SnapshotArtifact, SnapshotResult, SnapshotVerification,
 } from './snapshot.ts'
 
-export type { Conversation, ConversationPage, ConversationSearchPage, DecisionRecord, ProjectCurrent, ProjectSettings, ProjectVersion, WorkIndexEntry, CompletionFacts, CompletionReviewFact, CompletionVerificationFact, CompletionAcceptanceFact, SourceMessageMetadata, TimelineEntry, WorkflowStateFacts, EvidencePage, RecoveryActivationIntent }
+export type { Conversation, ConversationPage, ConversationSearchPage, DecisionRecord, ProjectCurrent, ProjectSettings, ProjectVersion, WorkIndexEntry, CompletionFacts, UnclassifiedReviewFact, CompletionReviewFact, CompletionVerificationFact, CompletionAcceptanceFact, SourceMessageMetadata, TimelineEntry, WorkflowStateFacts, EvidencePage, RecoveryActivationIntent }
 export { StorageWorkflowConflict as WorkflowConflict }
 
 export interface ConversationDiscoveryPort {

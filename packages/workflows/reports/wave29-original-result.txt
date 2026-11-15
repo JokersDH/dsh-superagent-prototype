@@ -1,0 +1,11 @@
+WAVE25_ORIGINAL_RESULT {"answerId":"760767aad402ce5c62f6c746438f9163","targetId":"b0e636835e85d0db7b749a121ac33c84","duplicate":"duplicate","unknown":"indeterminate","observed":"native_applied","refusals":["ticket","assignment","attempt","epoch","contract","answer","question","target"]}
+WAVE25_ORIGINAL_RESULT_READBACK {"pid":22812,"first":[{"targetBindingId":"b0e636835e85d0db7b749a121ac33c84","status":"native_applied"}],"second":[{"targetBindingId":"b0e636835e85d0db7b749a121ac33c84","status":"native_applied"}]}
+✔ the original IDs land the observed result once, keep unknown unknown and refuse a foreign tuple (932.144833ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1405.336167
