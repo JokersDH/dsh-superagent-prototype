@@ -1,0 +1,34 @@
+{
+  "protocol": "wave30-ui-input/1",
+  "owner": "C provides data/consumer only; main/F own UI subtree and root form composition",
+  "completionHistory": {
+    "states": ["current_attempt", "historical_attempt"],
+    "fields": ["canonical", "bindingState", "historical", "currentEligibility", "coverage.state", "coverage.reviews.{returned,available,truncated}", "unclassifiedReviews[]"],
+    "copy": "历史有效性不等于当前资格；当前资格由原完成读取决定",
+    "constraints": ["bounded 不得显示为完整", "canonical:true 不是接受或许可", "missing Work 明确空态"]
+  },
+  "templatePreview": {
+    "states": ["draft", "needs_input", "unsupported", "unavailable"],
+    "fields": ["factsDigest", "catalogDigest", "configurationRevision", "fields", "authorization:'none'"],
+    "constraints": ["facts/配置变化必须重新预览", "旧 preview/digest 不是 token", "preview 不创建 Work"],
+    "sharedMapping": "main/F 使用同一 fields 映射；不一致 suggestion 不构成新权限"
+  },
+  "observation": {
+    "windows": [7, 30],
+    "fields": ["windowLabel", "scope.projectIds", "scope.aggregation", "coverage", "coverageState", "sampleCount", "metrics[].layer", "unknownCount", "authorization:'none'"],
+    "constraints": ["按项目/窗口/层/币种", "partial/unknown 保留", "不推导 native 准入、质量或效率收益"],
+    "packagedConsole": "1fba 有'观察窗口'缺失校验文案与 /v1/insights 读取，无 30 天 selector 控件"
+  },
+  "readiness": { "fields": ["authorization:'none'", "startupMode:'recovery_readonly'", "development:'readonly'", "dispatchable:0", "admitted:0"], "samplePackage": "1fbaf94" },
+  "support": {
+    "accepted": "原人工接受；显示 actorRef/接受时间来源事实",
+    "unknown": "indeterminate 显示为未知并可核对，不显示成功/零成本",
+    "decisions": ["recorded", "superseded", "revoked"],
+    "constraints": ["撤销/替代只审计，不复活", "旧 token replay 不改变当前上下文"]
+  },
+  "examples": {
+    "history": { "canonical": true, "currentLink": "historical_attempt", "currentEligibility": "historical_only", "coverage": { "state": "complete", "returned": 1, "truncated": false } },
+    "preview": { "status": "draft", "authorization": "none", "token": false },
+    "observation": { "days": 30, "scope": { "aggregation": "single_project" }, "authorization": "none" }
+  }
+}

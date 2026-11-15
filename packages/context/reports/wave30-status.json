@@ -1,0 +1,87 @@
+{
+  "protocol": "wave30-status/1",
+  "agent": "C",
+  "branch": "codex/g3-assistant-context",
+  "base": { "mergeCommit": "8a00a7bc", "originMain": "6f385a54", "rfcs": ["WP-16/0077", "WP-16/0078", "WP-16/0079"] },
+  "wave": 30,
+  "checkpoints": [
+    { "commit": "50038c8b", "result": "C1 A per-attempt historical completion binding consumer with explicit coverage" },
+    { "commit": "3df2c3f5", "result": "C2 two controlled projects + C3 current 1fbaf94 J package dual restore" },
+    { "commit": "9afa7fff", "result": "C4 accepted/unknown + supersede/revoke/replay support flow" },
+    { "commit": "ac5569fb", "result": "deterministic knowledge suite serialization and honest readiness waits" }
+  ],
+  "sources": {
+    "aHead": "40626989dbfe4ffd86ab30983a0916d6bac285cb",
+    "aWorkflowsDirty": { "path": "packages/storage/src/workflows.ts", "sha256": "7199eed006d52304a0ee485d55d44009b972a2f27d2fcd6712b778d460e4add3", "onOriginMain": false, "note": "per-attempt historical binding + bindingState/currentLink; packaged A integration NOT_REACHED" },
+    "completionHistoryTool": "packages/context/tools/wave30-completion-history.mjs",
+    "completionHistoryProtocol": "wave30-completion-history/1",
+    "currentPackage": { "tar": "wave29-target-1fbaf94.tar.gz", "sha256": "daee1a94b43156cec659f7df2a3b08e1ecb89b645fde1ea81c35a81d75b47d7a", "source": "1fbaf940d426fa34ff6289304e073b9159586ed9", "build": "2d94a7c31ef97b57", "schema": 18, "node": "24.21.0", "abi": 137, "containsJ": true, "containsWindowSelector": false },
+    "dStatus": "1fba contains project-recipes + usage-observation; no 30-day window selector control; later wave30 freeze not present",
+    "eStatus": "independent verdict still binds ce64; 1ba/1cd/ce64 not relabelled as 1fba"
+  },
+  "results": {
+    "C1": {
+      "source": ["packages/context/tools/wave30-completion-history.mjs", "packages/knowledge/test/main-personal-completion-history.case.ts"],
+      "consumer": "A WorkflowIndex.work(...).completion through source Store and A-restored target",
+      "command": "node --experimental-strip-types --test --test-reporter=tap packages/knowledge/test/main-personal-completion-history.case.ts",
+      "exit": 0,
+      "positive": ["canonical review + verification + acceptance on source and restored copy", "epoch+1 keeps old review canonical with currentLink historical_attempt and historical_only", "missing Work exit 1", "bounded limit 0 reports truncated"],
+      "negative": ["raw receipt never becomes review", "binding identity change refused", "ended attempt cannot become current"],
+      "limits": ["packaged A strict facts NOT_REACHED", "single review; no multi-page review cursor beyond --limit"]
+    },
+    "C2": {
+      "source": ["packages/knowledge/test/main-personal-two-project-flow.case.ts"],
+      "consumer": "current main HTTP: recipes preview, context prepare/send, candidates, proposals, commands, evidence/history, insights 7/30, snapshot",
+      "command": "node --experimental-strip-types --test --test-reporter=tap packages/knowledge/test/main-personal-two-project-flow.case.ts",
+      "exit": 0,
+      "positive": ["two projects chat/candidate/confirm/frozen", "preview draft authorization none no token", "original create_work/accept delivered each project", "evidence/history and 7/30 observation per project"],
+      "negative": ["cross/unknown project 400/403", "preview creates no Work", "same commandId+body idempotent; changed body conflict", "facts change invalidates digest", "days=90 400"],
+      "limits": ["no questions/native turns in this fixture path", "window selector UI not asserted"]
+    },
+    "C3": {
+      "source": ["packages/knowledge/test/main-personal-package-j-window.case.ts"],
+      "consumer": "exact 1fbaf94 package, single driver, A restore + manifest/target proof + package prepare/start/read/STOPPED + package HTTP readiness",
+      "command": "node --experimental-strip-types --test --test-reporter=tap packages/knowledge/test/main-personal-package-j-window.case.ts",
+      "exit": 0,
+      "positive": ["v1 and v2 restore to distinct roots from one manifest expectation", "targetProof independent + allowed ['subject.dataRoot']", "work delivered, native_applied, sources verified, readiness recovery_readonly", "facts canonical/verification/acceptance equal per format", "console bundles insights reader"],
+      "negative": ["chat 422 and candidatePrepare 422 in readonly", "STOPPED status exit path verified"],
+      "limits": ["console has no 30-day selector control (validation copy only)", "no newer D freeze with 0076 selector", "E release verdict not claimed"]
+    },
+    "C4": {
+      "source": ["packages/knowledge/test/main-personal-decision-support-flow.case.ts"],
+      "consumer": "A facts + dispatch ledger + real decision HTTP (/v1/decisions prepare/commands, /v1/context/preview)",
+      "command": "node --experimental-strip-types --test --test-reporter=tap packages/knowledge/test/main-personal-decision-support-flow.case.ts",
+      "exit": 0,
+      "positive": ["accepted from original acceptance", "unknown indeterminate preserved and resend refused", "record -> supersede -> revoke with audit statuses", "replay does not resurrect; revoked decisions leave context group"],
+      "negative": ["supersede inactive predecessor refused 409/422", "no acceptance/verification/model increment"],
+      "limits": ["live B/I callback NOT_REACHED", "recovery source confirm already covered by wave22/27 scope; not repeated"]
+    }
+  },
+  "suites": {
+    "context": { "tests": 129, "pass": 129, "fail": 0, "tap": "packages/context/reports/wave30-final-context.tap" },
+    "proposals": { "tests": 41, "pass": 41, "fail": 0, "tap": "packages/context/reports/wave30-final-proposals.tap" },
+    "knowledge": { "tests": 123, "pass": 123, "fail": 0, "tap": "packages/context/reports/wave30-final-knowledge.tap", "note": "serialized with --test-concurrency=1 to keep process-heavy cases deterministic" },
+    "routing": { "tests": 44, "pass": 44, "fail": 0, "tap": "packages/context/reports/wave30-final-routing.tap" },
+    "total": { "tests": 337, "pass": 337, "fail": 0 },
+    "typecheck": "pass (context/proposals/knowledge/routing)",
+    "build": "pnpm -r --workspace-concurrency=4 run build exit 0"
+  },
+  "layers": {
+    "source": "C four packages + A dirty per-attempt history binding",
+    "package": "1fbaf94 exact tuple; J modules present, window selector absent",
+    "installed": "not independently verified by C (E owns)",
+    "normal": "two controlled projects through preview/context/create/accept/evidence/insights",
+    "recovered": "readonly dual-format restored data read + strict history facts",
+    "native": "0; private activation/target not attempted"
+  },
+  "notReached": [
+    "packaged A strict completion facts (A dirty only)",
+    "live B/I callback and private activation/target/native",
+    "J 30-day window selector UI (main/F)",
+    "later D freeze containing 0076 selector",
+    "long-term revocation, concurrent writers, soak",
+    "F UI and E release verdict"
+  ],
+  "preserved": ["pnpm-lock.yaml diff uncommitted", "twelve services 5180-5191/8796-8807", "state/profile/tar/ledger/historical reports", "no control of user instances"],
+  "budgets": { "realVendorModelTurns": 0, "realNativeTurns": 0, "bCap4": "UNKNOWN unspendable", "ePilot": "BLOCKED, not reset/top-up/refund/replaced" }
+}

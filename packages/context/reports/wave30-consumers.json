@@ -1,0 +1,27 @@
+{
+  "protocol": "wave30-consumers/1",
+  "completionHistory": {
+    "tool": "packages/context/tools/wave30-completion-history.mjs",
+    "inputs": ["--a-worktree", "--db", "--work", "--project", "--limit"],
+    "outputs": ["status", "contract", "authorityState", "classification", "currentEligibility", "completion.reviews[].canonical/currentLink/bindingState/historical/currentEligibility", "completion.unclassifiedReviews", "completion.verifications", "completion.acceptances", "coverage", "limits", "authorization:'none'"],
+    "authority": "ProductCompletion metadata/current/preflight/accept; facts never grant acceptance, execution or startup",
+    "sourceLevel": "A dirty workflows.ts at 40626989/workflows-sha 7199eed0; packaged A integration NOT_REACHED"
+  },
+  "twoProjectFlow": {
+    "surfaces": ["POST /v1/projects/:id/recipes/preview", "POST /v1/context/preview", "POST /v1/assistant/candidates/prepare", "POST /v1/proposals/commands", "POST /v1/assistant/context/prepare|send", "GET /v1/messages/:id/context", "POST /v1/commands", "GET /v1/works/:id/evidence(/history)", "GET /v1/insights?days=7|30&projectId=", "GET /v1/snapshot"],
+    "identity": "project/conversation/Work/evidence/frozen bundle each remain project-scoped; preview fields are prefill only",
+    "limits": ["no model/provider call for reads", "no native layer from fixture data", "foreign project 403 or 400"]
+  },
+  "packageDualRestore": {
+    "artifact": { "tar": "wave29-target-1fbaf94.tar.gz", "sha256": "daee1a94b43156cec659f7df2a3b08e1ecb89b645fde1ea81c35a81d75b47d7a", "source": "1fbaf940d426fa34ff6289304e073b9159586ed9", "build": "2d94a7c31ef97b57", "schema": 18 },
+    "contains": ["packages/project-recipes", "apps/coordinator/product/project-recipes.ts", "apps/coordinator/product/usage-observation.ts"],
+    "missing": ["30-day window selector control in console (main/F)", "later D freeze with 0076 selector"],
+    "runs": "v1 and v2 each through A restore + manifest/target proof + package prepare/start/read/STOPPED"
+  },
+  "support": {
+    "accepted": "only the original manual acceptance; actorRef from original acceptance record",
+    "unknown": "dispatch indeterminate preserved; beginSend refuses resend",
+    "decisions": "record -> supersede -> revoke via real HTTP; superseded/revoked are audit-only, replay does not resurrect",
+    "notReached": ["live B/I callback", "private activation/target/native", "F UI", "E release verdict"]
+  }
+}
