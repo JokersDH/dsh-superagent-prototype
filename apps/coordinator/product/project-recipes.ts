@@ -1,7 +1,6 @@
 import { ApplicationFault } from '@personal-agent/application'
 import { ApplicationConfigurationSchema, ProjectRecipePreviewInputSchema, ProjectRecipePreviewSchema, ProjectRecipeFieldsSchema } from '@personal-agent/contracts'
-import { canonicalDigest } from '@personal-agent/contracts/canonical'
-import type { ApplicationConfiguration, Json, ProjectRecipePreview, ProjectRecipePreviewInput } from '@personal-agent/contracts'
+import type { ApplicationConfiguration, ProjectRecipePreview, ProjectRecipePreviewInput } from '@personal-agent/contracts'
 
 export interface ProjectRecipeReaders {
   configuration(): Promise<ApplicationConfiguration>
@@ -42,8 +41,7 @@ export class ProductProjectRecipes {
     try { facts = api.createProjectFactsObserver({ rootFor: id => id === input.projectId ? root : undefined },
       { provider: 'coordinator-project-recipes/1' }).observe({ projectId: input.projectId, observedAt: base.observedAt }).facts }
     catch { return unavailable('metadata_unavailable', '项目元数据暂时无法读取，请检查后重新预览。') }
-    const { observedAt: _, ...content } = facts
-    const factsDigest = canonicalDigest(content as unknown as Json), catalogDigest = api.catalogDigest()
+    const factsDigest = api.factsContentDigest(facts), catalogDigest = api.catalogDigest()
     const draft = api.parseProjectRecipeDraft(api.matchRecipe({ facts, configuration: config, kind: input.kind,
       selection: { paths: input.allowedPaths, profileId: input.profileId }, now: base.observedAt }))
     const current = ApplicationConfigurationSchema.parse(await this.readers.configuration())
@@ -52,7 +50,7 @@ export class ProductProjectRecipes {
     const shared = { ...base, factsDigest, catalogDigest }
     if (draft.status !== 'draft') return ProjectRecipePreviewSchema.parse({ ...shared, status: draft.status, fields: null,
       issues: (draft.status === 'needs_input' ? draft.needsInput : draft.unsupported).map(issue => ({ code: issue.code, message: issue.message })) })
-    const { projectId, goal, scope, criteria, profileId } = api.previewInputs(draft, { configuration: current, facts })
+    const { projectId, goal, scope, criteria, profileId } = api.previewInputs(draft, { configuration: current, facts, now: base.observedAt })
     const fields = ProjectRecipeFieldsSchema.parse({ projectId, goal, scope, criteria, profileId })
     return ProjectRecipePreviewSchema.parse({ ...shared, status: 'draft', fields, issues: [] })
   }

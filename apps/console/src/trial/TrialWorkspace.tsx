@@ -306,7 +306,7 @@ export function TrialWorkspace({
             <div className="trial-panel-head">
               <h3 id={insightsId} className="trial-section-title"><Activity size={15} aria-hidden="true" />使用观察</h3>
               <span className="trial-panel-meta">
-                {insightDays === undefined ? '窗口未选择' : `${insightDays} 天`}
+                {insights === undefined ? '等待读取' : trialInsightsCount(insights)}
                 {' · '}{insights?.windowLabel ?? '窗口未声明'}
                 {' · '}{insights?.coverage ?? '覆盖未声明'}
               </span>
@@ -315,7 +315,7 @@ export function TrialWorkspace({
               <div className="trial-insight-controls" role="group" aria-label="观察窗口">
                 {([7, 30] as const).map(days => (
                   <button key={days} type="button" className={insightDays === days ? 'active' : 'quiet'}
-                    aria-pressed={insightDays === days} disabled={insightDays === days}
+                    aria-pressed={insightDays === days}
                     onClick={() => onSelectInsightWindow(days)}>{days} 天</button>
                 ))}
               </div>
@@ -328,52 +328,48 @@ export function TrialWorkspace({
               </div>
             )}
             {insightsLoading && <p className="trial-muted" role="status">正在读取使用观察…</p>}
-            {insights !== undefined && insightAdmission !== undefined && (
-              <>
-                <dl className="trial-insight-scope">
-                  <div className="trial-fact">
-                    <dt>观测范围</dt>
-                    <dd>{insightAdmission.scopeLabel ?? '未声明'}</dd>
-                  </div>
-                  <div className="trial-fact">
-                    <dt>来源与未知</dt>
-                    <dd>
-                      {insights.scope?.aggregation === 'declared_multi_project' ? '声明多项目'
-                        : insights.scope?.aggregation === 'cross_project' ? '跨项目聚合'
-                          : insights.scope?.aggregation === 'single_project' ? '单项目' : '聚合未声明'}
-                      {' · '}
-                      {insights.sources !== undefined
-                        ? `来源已知 ${insights.sources.known ?? '未知'} · 未知 ${insights.sources.unknown ?? '未知'}`
-                        : insights.unknownCount === undefined || insights.unknownCount === null ? '未知数未声明' : `${insights.unknownCount} 个未知`}
-                    </dd>
-                  </div>
+            {insights !== undefined && insightAdmission !== undefined && <>
+            <dl className="trial-insight-scope">
+              <div className="trial-fact">
+                <dt>观测范围</dt>
+                <dd>{insightAdmission.scopeLabel ?? '未声明'}</dd>
+              </div>
+              <div className="trial-fact">
+                <dt>来源与未知</dt>
+                <dd>
+                  {insights.scope?.aggregation === 'declared_multi_project' ? '声明多项目'
+                    : insights.scope?.aggregation === 'cross_project' ? '跨项目聚合'
+                      : insights.scope?.aggregation === 'single_project' ? '单项目' : '聚合未声明'}
+                  {' · '}
+                  {insights.unknownCount === undefined || insights.unknownCount === null ? '未知数未声明' : `${insights.unknownCount} 个未知`}
+                </dd>
+              </div>
+            </dl>
+            {insightAdmission.rows.length === 0
+              ? <p className="trial-muted" role="status">{insightAdmission.message ?? '暂不展示指标。'}</p>
+              : (
+                <dl className="trial-insight-rows">
+                  {insightAdmission.rows.map(metric => (
+                    <div key={metric.id} className="trial-insight-row">
+                      <dt>{metric.label}</dt>
+                      <dd className={metric.value === null ? 'trial-unknown' : undefined}>
+                        <span className="trial-metric-value">{metric.value ?? '未知'}{metric.unit && <small>{metric.unit}</small>}</span>
+                        <span className="trial-metric-meta">
+                          {metric.layer !== undefined && <small>{layerLabel[metric.layer]}</small>}
+                          {metric.sampleCount !== undefined && <small>{metric.sampleCount === null ? '样本未知' : `${metric.sampleCount} 个样本`}</small>}
+                          {metric.detail !== undefined && <small>{metric.detail}</small>}
+                        </span>
+                      </dd>
+                    </div>
+                  ))}
                 </dl>
-                {insightAdmission.rows.length === 0
-                  ? <p className="trial-muted" role="status">{insightAdmission.message ?? '暂不展示指标。'}</p>
-                  : (
-                    <dl className="trial-insight-rows">
-                      {insightAdmission.rows.map(metric => (
-                        <div key={metric.id} className="trial-insight-row">
-                          <dt>{metric.label}</dt>
-                          <dd className={metric.value === null ? 'trial-unknown' : undefined}>
-                            {metric.value ?? '未知'}
-                            {metric.unit !== undefined && <small>{metric.unit}</small>}
-                            {metric.currency !== undefined && <small>{metric.currency}</small>}
-                            {metric.layer !== undefined && <small>{layerLabel[metric.layer]}</small>}
-                            {metric.sampleCount !== undefined && <small>{metric.sampleCount === null ? '样本未知' : `${metric.sampleCount} 个样本`}</small>}
-                            {metric.detail !== undefined && <small>{metric.detail}</small>}
-                          </dd>
-                        </div>
-                      ))}
-                    </dl>
-                  )}
-                {insights.limitations.length > 0 && (
-                  <ul className="trial-limits">
-                    {insights.limitations.map(limit => <li key={limit}>{limit}</li>)}
-                  </ul>
-                )}
-              </>
+              )}
+            {insights.limitations.length > 0 && (
+              <ul className="trial-limits">
+                {insights.limitations.map(limit => <li key={limit}>{limit}</li>)}
+              </ul>
             )}
+            </>}
           </section>
         )}
 

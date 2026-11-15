@@ -1,0 +1,99 @@
+{
+  "protocol": "parallel-development-workspaces/1",
+  "date": "2026-11-15",
+  "repository": "https://github.com/JokersDH/dsh-superagent-prototype",
+  "mainRuntimeSource": "f9bd5bc211a8b2f62ba25e930587885e3b221ff2",
+  "externalAgentCount": 10,
+  "mainOwnsIntegration": true,
+  "createdUserThreads": false,
+  "externalPromptsSent": false,
+  "nativeModelAllowanceAdded": 0,
+  "sourceControl": "git-worktree",
+  "newRootsCopyUntrackedOrUserState": false,
+  "roles": {
+    "A": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "branch": "codex/g2-workspaces-verification",
+      "packet": "agent-tasks/product-wave-30/agent-a-data.zh-CN.md",
+      "newlyPrepared": false,
+      "startup": "Preserve all edits/history; fetch and merge origin/main on original branch. Read the whole current package and complete four whole-subsystem deliverables; publish runnable checkpoints then continue without per-fix dispatch."
+    },
+    "B": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "branch": "codex/g1-runtime",
+      "packet": "agent-tasks/product-wave-30/agent-b-runtime.zh-CN.md",
+      "newlyPrepared": false,
+      "startup": "Preserve all edits/history; fetch and merge origin/main on original branch. Read the whole current package and complete four whole-subsystem deliverables; publish runnable checkpoints then continue without per-fix dispatch."
+    },
+    "C": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "branch": "codex/g3-assistant-context",
+      "packet": "agent-tasks/product-wave-30/agent-c-context.zh-CN.md",
+      "newlyPrepared": false,
+      "startup": "Preserve all edits/history; fetch and merge origin/main on original branch. Read the whole current package and complete four whole-subsystem deliverables; publish runnable checkpoints then continue without per-fix dispatch."
+    },
+    "D": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-d",
+      "branch": "codex/g3-local-distribution",
+      "packet": "agent-tasks/product-wave-30/agent-d-delivery.zh-CN.md",
+      "newlyPrepared": false,
+      "startup": "Preserve all edits/history; fetch and merge origin/main on original branch. Read the whole current package and complete four whole-subsystem deliverables; publish runnable checkpoints then continue without per-fix dispatch."
+    },
+    "E": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-e",
+      "branch": "codex/g3-product-acceptance",
+      "packet": "agent-tasks/product-wave-30/agent-e-acceptance.zh-CN.md",
+      "newlyPrepared": false,
+      "startup": "Preserve all edits/history; fetch and merge origin/main on original branch. Read the whole current package and complete four whole-subsystem deliverables; publish runnable checkpoints then continue without per-fix dispatch."
+    },
+    "main": {
+      "workdir": "/Users/hh/Desktop/joker/superagent",
+      "branch": "codex/g2-execution-integration",
+      "packet": "agent-tasks/product-wave-30/main.zh-CN.md",
+      "newlyPrepared": false,
+      "startup": "Preserve all edits/history; fetch and merge origin/main on original branch. Read the whole current package and complete four whole-subsystem deliverables; publish runnable checkpoints then continue without per-fix dispatch."
+    },
+    "F": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-f",
+      "branch": "codex/g4-trial-experience",
+      "packet": "agent-tasks/product-wave-30/agent-f-experience.zh-CN.md",
+      "newlyPrepared": false,
+      "preparedFrom": "fdb3f160b1d867f7167fb034d96a5c13bd16cdfb",
+      "startup": "Preserve all edits/history; fetch and merge origin/main on original branch. Read the whole current package and complete four whole-subsystem deliverables; publish runnable checkpoints then continue without per-fix dispatch."
+    },
+    "G": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-g",
+      "branch": "codex/g4-usage-insights",
+      "packet": "agent-tasks/product-wave-30/agent-g-insights.zh-CN.md",
+      "newlyPrepared": false,
+      "preparedFrom": "fdb3f160b1d867f7167fb034d96a5c13bd16cdfb",
+      "startup": "Preserve all edits/history; fetch and merge origin/main on original branch. Read the whole current package and complete four whole-subsystem deliverables; publish runnable checkpoints then continue without per-fix dispatch."
+    },
+    "H": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-h",
+      "branch": "codex/g4-trial-operations",
+      "packet": "agent-tasks/product-wave-30/agent-h-trial-operations.zh-CN.md",
+      "newlyPrepared": false,
+      "preparedFrom": "fdb3f160b1d867f7167fb034d96a5c13bd16cdfb",
+      "startup": "Preserve all edits/history; fetch and merge origin/main on original branch. Read the whole current package and complete four whole-subsystem deliverables; publish runnable checkpoints then continue without per-fix dispatch."
+    },
+    "I": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-i",
+      "branch": "codex/g5-coordinator-channel",
+      "packet": "agent-tasks/product-wave-30/agent-i-coordinator-channel.zh-CN.md",
+      "newlyPrepared": false,
+      "preparedFrom": "967dc0c677333ec307c215c0ed67e838b5487d92",
+      "startup": "Preserve all edits/history; fetch and merge origin/main on original branch. Read the whole current package and complete four whole-subsystem deliverables; publish runnable checkpoints then continue without per-fix dispatch."
+    },
+    "J": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-j",
+      "branch": "codex/g5-project-recipes",
+      "packet": "agent-tasks/product-wave-30/agent-j-project-recipes.zh-CN.md",
+      "newlyPrepared": false,
+      "preparedFrom": "967dc0c677333ec307c215c0ed67e838b5487d92",
+      "startup": "Preserve all edits/history; fetch and merge origin/main on original branch. Read the whole current package and complete four whole-subsystem deliverables; publish runnable checkpoints then continue without per-fix dispatch."
+    }
+  },
+  "createdNewWorktreesThisWave": 0,
+  "packetDistribution": "FETCH_AND_MERGE_ORIGIN_MAIN_ON_ASSIGNED_BRANCH"
+}

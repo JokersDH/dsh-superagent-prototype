@@ -1,0 +1,76 @@
+{
+  "protocol": "wave29-main-window-control/1",
+  "date": "2026-11-15",
+  "source": "84b34c2507159526e519e793750f5f7127707bc8",
+  "baseline": "79525b6de32bb9a2db3bbd500f64e6b9e1e6f1cf",
+  "mainStagesCompleted": [
+    "M9"
+  ],
+  "mainWholePackageComplete": false,
+  "externalPacketsChanged": false,
+  "fSource": "f7d80b9a3c31c47ef97cbb1c8031d64f27a2135f",
+  "fSlice": "Window/error/loading/admission/CSS only, with incumbent header and selected-focus adaptation",
+  "recipesSourceImported": false,
+  "days": [
+    7,
+    30
+  ],
+  "identityFields": [
+    "auth_transport",
+    "configurationRevision",
+    "project",
+    "days",
+    "timezone"
+  ],
+  "newKeyHidesOldRowsImmediately": true,
+  "lateReplyAbortedAndIgnored": true,
+  "responseSchemaAndWindowScopeRevalidated": true,
+  "sameKeyErrorKeepsDatedData": true,
+  "newWindowErrorDoesNotUsePreviousData": true,
+  "selectedWindowKeyboardFocusable": true,
+  "selectedWindowRepeatAddsNoGet": true,
+  "browserReport": "reports/releases/wave29-window/clean-browser/browser-report.json",
+  "recipeRegressionReport": "reports/releases/wave29-window/recipe-regression/browser-report.json",
+  "screenshots": [
+    "reports/releases/wave29-window/clean-browser/desktop.png",
+    "reports/releases/wave29-window/clean-browser/mobile.png"
+  ],
+  "checks": {
+    "pureStateAdmissionAndTransports": 15,
+    "actualReadOnlyAppCases": 9,
+    "actualRecipeRegressionCases": 6,
+    "consoleStrictExit": 0,
+    "consoleBuildExit": 0,
+    "mainUiDetectorFindings": 0,
+    "independentNarrowReviewBlockers": 0
+  },
+  "postRequestsDuringObservation": 0,
+  "eventDeltaDuringObservation": 0,
+  "acceptedControlledRecipeWorks": 2,
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "newBackendEndpoints": 0,
+  "sharedContractsChanged": false,
+  "rootLockChanged": false,
+  "migrationsAdded": 0,
+  "newExternalDependencies": 0,
+  "fCandidateWorkingTreeEdited": false,
+  "bILifecycleEdited": false,
+  "aMigrationEdited": false,
+  "dToolsEdited": false,
+  "eAssertionsEdited": false,
+  "newPersistentPreviewStarted": false,
+  "userInstancesRestarted": false,
+  "allTwelveUserInstancesPreserved": true,
+  "frozenTarCreated": false,
+  "independentInstalledAdmission": false,
+  "nativeRecoveryAdmission": false,
+  "valueBenefitAdmission": false,
+  "privateTargetActivationAdmission": false,
+  "releaseApproved": false,
+  "limitations": [
+    "Controlled current data, not real operator30-day history",
+    "Source and UI composition only; D/E frozen successor remains separate",
+    "Existing console bundle-size warning remains"
+  ]
+}

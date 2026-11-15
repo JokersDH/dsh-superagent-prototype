@@ -355,6 +355,15 @@ async function startInstanceLocked({ installRoot, roots, values, log = (line) =>
   }
 
   const observedStartupMode = health?.startupMode === 'recovery_readonly' ? 'recovery_readonly' : 'normal'
+  if (health?.mode !== mode) {
+    await stopFailedStart()
+    return blocked(
+      'startup_mode_mismatch',
+      '产品服务报告的模式与请求不一致，拒绝记录或复用错误实例',
+      { expectedMode: mode, observedMode: health?.mode ?? null, startupMode, health },
+      '核对 launcher argv 与包内 demo.ts；不会修改 health、删除 marker 或把错误实例留下。',
+    )
+  }
   if (requestedReviewIdentity !== null) {
     if (health?.mode !== 'personal' || observedStartupMode !== 'recovery_readonly' || health?.restoredReviewDigest !== requestedReviewIdentity) {
       await stopFailedStart()
