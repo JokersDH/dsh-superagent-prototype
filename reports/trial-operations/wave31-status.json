@@ -5,8 +5,8 @@
   "branch": "codex/g4-trial-operations",
   "base": "55766f412bde0a4bf3b7b2569e8ae9c5b4c5f3ec",
   "mergedMain": "928e3ce4",
-  "currentH": "PENDING_COMMIT",
-  "updatedAt": "2026-11-15T15:57:37.225Z",
+  "currentH": "21d8c41",
+  "updatedAt": "2026-11-15T16:01:10.783Z",
   "goal": {
     "established": true,
     "tokenBudget": null,
@@ -811,5 +811,6 @@
       "result": "timeouts in package/restore, recovery third case, selected/current under load; each passed individually immediately after",
       "hidden": false
     }
-  }
+  },
+  "evidenceCommit": "21d8c41"
 }
