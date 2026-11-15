@@ -1,0 +1,59 @@
+{
+  "status": "PASS_ACTUAL_PROJECT_RECIPE_WORKFLOW",
+  "sourceCommit": "a40232ed65a38022b255ce7c07b6dd2ebd0ce35d",
+  "sourceWorktreeClean": true,
+  "cases": [
+    {
+      "id": "PREVIEW-AND-APPLY-ONLY-PREFILL-ORIGINAL-FORM",
+      "status": "PASS"
+    },
+    {
+      "id": "CHANGED-FACTS-REFUSE-EXPLICIT-CREATION-UNTIL-REAPPLIED",
+      "status": "PASS"
+    },
+    {
+      "id": "SELECTION-AND-CONFIG-CHANGES-CANNOT-KEEP-HIDDEN-OLD-ATOMS",
+      "status": "PASS"
+    },
+    {
+      "id": "ERROR-AND-LEGACY-ABSENCE-KEEP-MANUAL-DELEGATION-AVAILABLE",
+      "status": "PASS"
+    },
+    {
+      "id": "TWO-EXPLICIT-TEMPLATE-WORKS-REACH-ORIGINAL-CANDIDATE-AND-MANUAL-ACCEPT",
+      "status": "PASS"
+    },
+    {
+      "id": "DESKTOP-MOBILE-TEMPLATE-CONTROLS-AND-TEXT-FIT",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "previewPosts": 13,
+  "commands": [
+    {
+      "kind": "create_work",
+      "commandId": "cmd-work-bfe45468-ffbb-4490-b3bc-884bd49b10f4"
+    },
+    {
+      "kind": "create_work",
+      "commandId": "cmd-work-bfe45468-ffbb-4490-b3bc-884bd49b10f4"
+    },
+    {
+      "kind": "accept_candidate",
+      "commandId": "cmd-accept-f0936080-8a58-4b5a-9286-1999559d249e"
+    },
+    {
+      "kind": "create_work",
+      "commandId": "cmd-work-f1bb8638-89ad-4cb4-bf77-94d8603b6593"
+    },
+    {
+      "kind": "accept_candidate",
+      "commandId": "cmd-accept-1508a0a3-edc5-4e57-b5d7-5d9863f1eb5d"
+    }
+  ],
+  "acceptedWorks": 2,
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "scope": "Actual App/React/J observer/registered project/HTTP/Product/Broker/check/accept controlled workflow; no installed, native or recovered admission"
+}
