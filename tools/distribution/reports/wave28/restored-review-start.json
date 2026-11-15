@@ -1,0 +1,23 @@
+{
+  "protocol": "wave28-restored-review-start/1",
+  "startStatus": "RUNNING",
+  "mode": "personal",
+  "startupMode": "recovery_readonly",
+  "apiArgv": [
+    "--startup-mode",
+    "recovery_readonly",
+    "--assistant",
+    "--discussion-only",
+    "--review-restored-scope"
+  ],
+  "health": {
+    "status": "ok",
+    "mode": "personal",
+    "startupMode": "recovery_readonly",
+    "restoredReviewDigest": "dd688b253b4e170b8f702aefb70914db29f0250e1cdc1beae436c559fd8ae1fe",
+    "access": "local-development"
+  },
+  "stopStatus": "STOPPED",
+  "stopped": true,
+  "recordRemoved": true
+}

@@ -1,0 +1,133 @@
+{
+  "protocol": "wave28-status/1",
+  "owner": "agent-d",
+  "branch": "codex/g3-local-distribution",
+  "base": "26f8ad6",
+  "mergedMain": "60376ca",
+  "frozenSource": "1ba0032",
+  "status": "CANDIDATE_SUCCESSOR",
+  "successor": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave28-target/wave28-target-1ba0032.tar.gz",
+    "sha256": "504dfdc1ceb191828d3836017cc47d9d0023dc27cc1291e6caf28e08aafcfb9e",
+    "tarBytes": 20333302,
+    "buildId": "67abd96690030eb7",
+    "source": {
+      "commit": "1ba003239237d3fc7a92bde8cbe897549abcbd5d",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "files": 6778,
+    "bytes": 67908135,
+    "productSchema": 18,
+    "environment": {
+      "node": "24.21.0",
+      "pnpm": "11.7.0",
+      "sqlite": "3.53.4",
+      "abi": "137",
+      "platform": "darwin",
+      "arch": "arm64"
+    }
+  },
+  "baseline": {
+    "ce64": "d4b1780d999a4b74",
+    "onecd": "ecffaa6d3f784426"
+  },
+  "closure": "109/109",
+  "phases": {
+    "d1": {
+      "status": "PASS",
+      "summary": "Fixed four startup classes and compared argv/health/record/stop; ce64/1cd preserved."
+    },
+    "d2": {
+      "status": "PASS",
+      "summary": "recovery_readonly always gets --assistant --discussion-only with or without review; fixture no longer gets assistant/native; explicit review unchanged."
+    },
+    "d3": {
+      "status": "PASS",
+      "summary": "RUNNING record only after health.mode and startupMode match request; mismatch path stops owned start and returns blocked."
+    },
+    "d4": {
+      "status": "PASS",
+      "summary": "Pure argv 5/5 and four actual start/health/STOPPED cases pass; no model/native turn."
+    },
+    "d5": {
+      "status": "PASS",
+      "summary": "normal, restored no-review, restored-with-review and fixture all STOPPED with record removed on own roots."
+    },
+    "d6": {
+      "status": "PASS",
+      "summary": "Config/state isolation and exact stop guard retained; wrong mode still refused by product."
+    },
+    "d7": {
+      "status": "PASS",
+      "summary": "Health/readiness/argv/record consistent; no authorization expansion."
+    },
+    "d8": {
+      "status": "PASS",
+      "summary": "Functional mode closure delivered; E independent required pending."
+    },
+    "d9": {
+      "status": "PASS_WITH_J_LIMIT",
+      "summary": "usage-insights package and coordinator API route present in install; J recipes not present."
+    },
+    "d10": {
+      "status": "PASS",
+      "summary": "Closure includes usageInsights 13 sources; installed F browser 8/8."
+    },
+    "d11": {
+      "status": "NOT_REACHED_J",
+      "summary": "No J recipes in current main; F identity is integrated."
+    },
+    "d12": {
+      "status": "PASS",
+      "summary": "Clean source closure 109/109 and successor frozen once."
+    },
+    "d13": {
+      "status": "PASS",
+      "summary": "Tar tuple re-extracted and tested; ce64/1cd/old tars preserved."
+    },
+    "d14": {
+      "status": "PASS",
+      "summary": "Cold no-executor4, same-schema3, managed upgrade7 pass."
+    },
+    "d15": {
+      "status": "PASS",
+      "summary": "Multi8, matrix19, data5, backup6, portable5 pass."
+    },
+    "d16": {
+      "status": "PASS_WITH_E_PENDING",
+      "summary": "Successor tuple and E recipe handed; E independent verdict pending."
+    }
+  },
+  "testLayers": {
+    "startupModeActual": 4,
+    "startupArgv": 5,
+    "browser": 8,
+    "readiness": 1,
+    "personal": 7,
+    "sameStore": 4,
+    "multi": 8,
+    "matrix": 19,
+    "noexec": 4,
+    "samebase": 3,
+    "upgrade": 7,
+    "data": 5,
+    "backup": 6,
+    "portable": 5
+  },
+  "notDone": [
+    "J recipe composition",
+    "A/C precise FTS/event exceptions (wave27)",
+    "E successor independent verdict",
+    "B/private/target"
+  ],
+  "limits": [
+    "zero real vendor/model/native turns",
+    "no J recipes",
+    "bounded observations only"
+  ],
+  "evidence": [
+    "tools/distribution/reports/wave28/*",
+    "tools/distribution/recipes/wave28-e-acceptance.zh-CN.md"
+  ]
+}

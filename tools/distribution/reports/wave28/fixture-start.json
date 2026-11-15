@@ -1,0 +1,17 @@
+{
+  "protocol": "wave28-fixture-start/1",
+  "mode": "fixture",
+  "startupMode": "normal",
+  "apiArgv": [
+    "--startup-mode",
+    "normal"
+  ],
+  "health": {
+    "status": "ok",
+    "mode": "fixture",
+    "access": "local-development"
+  },
+  "stopStatus": "STOPPED",
+  "stopped": true,
+  "recordRemoved": true
+}

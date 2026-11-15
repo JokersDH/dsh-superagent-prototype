@@ -1,0 +1,42 @@
+{
+  "protocol": "wave28-artifacts/1",
+  "successor": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave28-target/wave28-target-1ba0032.tar.gz",
+    "sha256": "504dfdc1ceb191828d3836017cc47d9d0023dc27cc1291e6caf28e08aafcfb9e",
+    "tarBytes": 20333302,
+    "buildId": "67abd96690030eb7",
+    "source": {
+      "commit": "1ba003239237d3fc7a92bde8cbe897549abcbd5d",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "files": 6778,
+    "bytes": 67908135,
+    "productSchema": 18,
+    "environment": {
+      "node": "24.21.0",
+      "pnpm": "11.7.0",
+      "sqlite": "3.53.4",
+      "abi": "137",
+      "platform": "darwin",
+      "arch": "arm64"
+    }
+  },
+  "features": {
+    "modeFix": "recovery_readonly always personal read-only discussion argv; fixture no assistant/native; health.mode mismatch rejected",
+    "usageInsights": "packages/usage-insights included in install and coordinator API route present",
+    "fApp": "installed browser 8/8",
+    "jRecipes": "NOT_PRESENT"
+  },
+  "closure": "109/109",
+  "baseline": {
+    "ce64": "d4b1780d999a4b74",
+    "onecd": "ecffaa6d3f784426"
+  },
+  "limits": [
+    "no J recipes in package",
+    "no native/private/target",
+    "E independent verdict pending",
+    "zero real vendor/model/native turns"
+  ]
+}
