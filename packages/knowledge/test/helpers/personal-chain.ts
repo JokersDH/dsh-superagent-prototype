@@ -31,7 +31,7 @@ async function until<T>(read: () => Promise<T> | T, predicate: (value: T) => boo
 }
 
 export interface PersonalChain {
-  readonly model: { file: string; requests: unknown[]; close(): Promise<void> }
+  readonly model: { file: string; requests: unknown[]; provider: unknown; close(): Promise<void> }
   readonly source: string
   readonly scratch: string
   readonly v1: { destination: string; manifest: { protocol: string; database: { integrity: string; foreignKeyViolations: number; productSchema: number }; evidence: { protocol: string; familySetVersion?: number } } }
@@ -51,6 +51,7 @@ export interface PersonalChain {
   readonly reviewedCandidate: { index: number; payloadDigest: string }
   readonly contextToken: string
   readonly confirmToken: string
+  readonly completionFacts: { candidate: unknown; verificationId: string | null; readyAt: string | null; eventCursor: number | null; acceptanceRef: string | null; artifactDigest: string | null }
   readonly frozenDigest: string
   readonly bindingScope: { projectId: string; allowedPaths: readonly string[]; excludedPaths: readonly string[]; externalActions: readonly string[]; expiresAt?: string }
   readonly frozenSourceIds: readonly string[]
@@ -99,13 +100,17 @@ export async function buildPersonalChain(root: string, options: { expiresAt?: st
       (value) => value !== undefined && value.actions.available.includes('accept_candidate'),
     )
     if (controlled.application.questions.currentDeliveries(question.id)[0]?.status !== 'native_applied') throw new Error('Delivery is not native_applied')
+    if (!ready!.actions.currentCandidate) throw new Error('Accepted Work has no current candidate')
+    const completionCandidate = ready!.actions.currentCandidate
+    const completionMetadata = controlled.completion.metadata(completionCandidate)
     const attemptId = original.bindings.current<{ attemptId: string }>(target.ticketId)!.attemptId
     original.dispatch.beginSend('w24-written', 'w24-target')
     original.dispatch.markWritten('w24-written', 'w24-target')
     original.dispatch.beginSend('w24-unknown', 'w24-target')
     original.dispatch.markIndeterminate('w24-unknown', 'w24-target', 'transport unknown')
     const answerId = (original.db.prepare('SELECT answer_id FROM answers WHERE question_id = ?').get(question.id) as { answer_id: string }).answer_id
-    await controlled.application.dispatch({ commandId: 'w22-accept', conversationId, kind: 'accept_candidate', candidate: ready!.actions.currentCandidate } as never, actor)
+    await controlled.application.dispatch({ commandId: 'w22-accept', conversationId, kind: 'accept_candidate', candidate: completionCandidate } as never, actor)
+    const completionReview = controlled.completion.current(completionCandidate)
     await controlled.close()
 
     const viewerScope = options.expiresAt ? { ...reviewScope, expiresAt: options.expiresAt } : reviewScope
@@ -153,11 +158,16 @@ export async function buildPersonalChain(root: string, options: { expiresAt?: st
       const v2 = await snapshots.create({ destination: join(root, 'snapshot-v2'), formatVersion: 2 })
       if (v1.status !== 'ok' || v2.status !== 'ok') throw new Error('Snapshot creation failed')
       return {
-        model: { file: model.file, requests: model.requests, close: () => model.close() },
+        model: { file: model.file, requests: model.requests, provider: model.provider, close: () => model.close() },
         source, scratch, v1: v1 as never, v2: v2 as never, workId, question, ticketId: target.ticketId,
         assignmentId: target.assignmentId, attemptId, fenceEpoch: target.fenceEpoch, contract: target.contract,
         deliveryTargetId: target.id, answerId,
         dispatchWindows: { written: { commandId: 'w24-written', target: 'w24-target' }, unknown: { commandId: 'w24-unknown', target: 'w24-target' } },
+        completionFacts: { candidate: completionCandidate, verificationId: completionMetadata?.verificationId ?? null,
+          readyAt: completionMetadata?.readyAt ?? null, eventCursor: completionMetadata?.eventCursor ?? null,
+          acceptanceRef: (() => { const value = (completionReview?.proposal as { humanAcceptanceRef?: unknown } | undefined)?.humanAcceptanceRef
+            return typeof value === 'string' ? value : (value as { id?: string } | undefined)?.id ?? null })(),
+          artifactDigest: completionReview?.proposal?.artifactDigest ?? null },
         sourceMessageId, contextMessageId,
         reviewedCandidate, contextToken: preparedContext.token, confirmToken, frozenDigest, bindingScope, frozenSourceIds, modelCalls,
       }
