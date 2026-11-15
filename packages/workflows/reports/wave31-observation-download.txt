@@ -1,0 +1,12 @@
+✔ actual authenticated export preserves one fresh authorized display snapshot and hashes exact JSON bytes (59.518041ms)
+✔ export authenticates and rejects injected or ambiguous query scope before returning any file (16.09625ms)
+✔ missing observations cannot be exported as a fabricated empty snapshot and malformed documents refuse (8.681833ms)
+✔ download refuses injected metadata, contradictory rows or coverage and hidden truncation (16.373083ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 112.974542

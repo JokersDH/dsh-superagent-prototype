@@ -1,0 +1,27 @@
+✔ real SQLite: A port + C prepare/commit, same-body replay and changed-body conflict (62.294833ms)
+✔ real SQLite: revoke appends a version, stale revoke conflicts and old commit does not resurrect (21.075875ms)
+✔ real SQLite: source deletion/change blocks commit and reports missing/stale without fabricated data (31.121542ms)
+✔ real SQLite: a receipt failure rolls back C decision rows, event and receipt together (19.5995ms)
+✔ conversation catalog, search, archive and message identity survive reopen (62.094875ms)
+✔ unresolved work/questions remain visible as attention after archive (24.260459ms)
+✔ project settings are append-only, CAS-protected and archive only visibility (20.162208ms)
+✔ explicit decision versions append and revoke without inferred rules (24.568ms)
+✔ read index is bounded, scoped and never invents a current setting or authority (20.06525ms)
+✔ a snapshot includes the database and digest-verified artifacts; missing bytes block it (252.433167ms)
+✔ a v7 database backfills the conversation catalog on upgrade and keeps message identity (14.827709ms)
+✔ catalog pagination, long/empty titles and message paging keep identity and bounds (29.009084ms)
+✔ a second Node process consumes the public workflow ports and snapshot verifier (248.011959ms)
+✔ AssistantState decisions are source-bound CAS records and legacy rows never become valid memory (15.7995ms)
+✔ AssistantState proposals preserve immutable source/grant and confirmation command identity (12.95675ms)
+✔ assistant persistence joins the caller transaction and rolls back all rows on failure (10.044625ms)
+✔ conversation membership is indexed across v7 chat, works without messages and new messages (15.626667ms)
+✔ source message metadata is scoped/digested and state facts stay observational (10.629041ms)
+✔ a v10 ledger upgrades to the current schema: old decisions stay auditable but missing-source, new assistant state reopens (15.211208ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 19
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1034.809916

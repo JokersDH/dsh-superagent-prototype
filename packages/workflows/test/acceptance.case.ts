@@ -96,6 +96,7 @@ test('accepted event projects one exact outcome and preserves unknown timing as 
     assert.equal(ports.routingEvidence.outcomes.get(result.outcome.id)!.acceptance, 'accepted')
     const completionWork = ports.index.work('work-author', ['project-1'])!
     assert.deepEqual(completionWork.completion.coverage, { reviews: 'complete', verifications: 'complete', acceptances: 'complete' })
+    assert.deepEqual(completionWork.completion.available, { reviewCandidates: 1, verifications: 1, acceptances: 1 })
     assert.equal(completionWork.completion.reviews.length, 1)
     assert.equal(completionWork.completion.unclassifiedReviews.length, 0)
     assert.equal(completionWork.completion.reviews[0]!.proposal.ticketId, 'author-ticket')
@@ -237,6 +238,8 @@ test('completion history reports an explicit per-ticket truncation instead of co
     const work = createWorkflowPorts(store).index.work('work-author', ['project-1'])!
     assert.equal(work.completion.verifications.length, 50)
     assert.equal(work.completion.coverage.verifications, 'truncated')
+    assert.equal(work.completion.available.verifications, 51)
+    assert.equal(work.completion.available.acceptances, 1)
     assert.equal(work.completion.limits.perTicket, 50)
   } finally { store.close(); rmSync(join(store.database.path, '..'), { recursive: true, force: true }) }
 })

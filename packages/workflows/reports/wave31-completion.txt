@@ -1,0 +1,19 @@
+WAVE28_COMPLETION_FACTS {"reviews":1,"verifications":1,"acceptances":1,"unclassified":0}
+WAVE29_REVIEW_CLASSIFICATION {"reviews":1,"unclassified":["artifact_or_attempt_shape","foreign_work_or_binding","noncanonical_review_key","review_shape"]}
+WAVE30_C_COMPLETION_CONSUMER {"pid":19978,"status":"ok","reviews":1,"unclassified":4}
+WAVE30_HISTORICAL_REVIEW {"attemptId":"author-attempt","bindingState":"ended","currentLink":"historical_attempt","currentAttemptId":"author-attempt-2"}
+✔ accepted event projects one exact outcome and preserves unknown timing as null (25.640958ms)
+✔ missing attempt/verification/acceptance or wrong project yields an auditable gap and writes no outcome (8.80475ms)
+✔ acceptance.consume joins the accepting transaction and a later failure rolls the outcome back (10.035875ms)
+✔ a new candidate on the same work gets its own outcome; the older accepted outcome stays readable (9.322125ms)
+✔ completion history reports an explicit per-ticket truncation instead of complete coverage (18.941917ms)
+✔ reviews require canonical key and full work/contract/candidate shape; failures are unclassified (131.557166ms)
+✔ a later current epoch does not erase or reclassify an older canonical review (139.798291ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 481.205542

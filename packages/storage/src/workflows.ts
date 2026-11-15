@@ -643,6 +643,8 @@ export interface CompletionFacts {
   acceptances: readonly CompletionAcceptanceFact[]
   /** Per-ticket read bound; `truncated` means more historical rows exist than returned. */
   coverage: { reviews: 'complete' | 'truncated'; verifications: 'complete' | 'truncated'; acceptances: 'complete' | 'truncated' }
+  /** Source-side availability per ticket; returned arrays may be smaller when coverage is truncated. */
+  available: { reviewCandidates: number; verifications: number; acceptances: number }
   limits: { perTicket: 50 }
 }
 /** Exact public orchestrator-core `key('product-review', canonicalDigest(candidate))` algorithm. */
@@ -772,6 +774,7 @@ export class WorkflowIndex {
     const reviews: CompletionReviewFact[] = []
     const unclassifiedReviews: UnclassifiedReviewFact[] = []
     let verificationsTruncated = false, acceptancesTruncated = false
+    let reviewCandidateCount = 0, verificationCount = 0, acceptanceCount = 0
     const completionVerifications: CompletionVerificationFact[] = []
     const completionAcceptances: CompletionAcceptanceFact[] = []
     for (const ticketId of ticketIds) {
@@ -781,6 +784,9 @@ export class WorkflowIndex {
       const acceptances = this.db.prepare(`SELECT id, ticket_id, assignment_id, candidate_generation, artifact_digest,
         criterion_ids, actor_ref, accepted_at FROM completion_acceptances
         WHERE ticket_id = ? ORDER BY accepted_at DESC LIMIT 51`).all(ticketId) as Row[]
+      const verificationTotal = Number((this.db.prepare('SELECT COUNT(*) AS count FROM completion_verifications WHERE ticket_id = ?').get(ticketId) as Row).count)
+      const acceptanceTotal = Number((this.db.prepare('SELECT COUNT(*) AS count FROM completion_acceptances WHERE ticket_id = ?').get(ticketId) as Row).count)
+      reviewCandidateCount += verificationTotal; verificationCount += verificationTotal; acceptanceCount += acceptanceTotal
       if (verifications.length > 50) { verificationsTruncated = true; verifications.length = 50 }
       if (acceptances.length > 50) { acceptancesTruncated = true; acceptances.length = 50 }
       verificationIds.push(...verifications.map(item => text(item.id)))
@@ -867,7 +873,8 @@ export class WorkflowIndex {
       deliverables,
       completion: { reviews, unclassifiedReviews, verifications: completionVerifications, acceptances: completionAcceptances,
         coverage: { reviews: verificationsTruncated ? 'truncated' : 'complete', verifications: verificationsTruncated ? 'truncated' : 'complete',
-          acceptances: acceptancesTruncated ? 'truncated' : 'complete' }, limits: { perTicket: 50 } },
+          acceptances: acceptancesTruncated ? 'truncated' : 'complete' }, available: { reviewCandidates: reviewCandidateCount,
+          verifications: verificationCount, acceptances: acceptanceCount }, limits: { perTicket: 50 } },
       project: { id: work.projectId, settings: project.current, state: project.state },
       provenance: [
         ...(project.current ? [project.current.settings.sourceRef] : []),
