@@ -110,7 +110,7 @@ async function main() {
       materializedUnchanged: Object.values(afterMaterialized).every((value) => value.ok === true),
       iChecks: Object.values(i.checks).every(Boolean),
       bChecks: Object.values(b.checks).every(Boolean),
-      bSinkFinding: b.findings.some((entry) => entry.id === 'B29-SINK-ONLY-NATIVE-HOOK-AUTOBYPASS'),
+      bSinkGuardClosed: b.checks.sinkMissingGuardRefused === true && b.checks.sinkDenyRefused === true && b.checks.sinkAllowFresh === true,
       zeroModel: i.modelCalls === 0 && b.modelCalls === 0 && i.vendorTurns === 0 && b.vendorTurns === 0,
       zeroSignals: i.signalsSent === 0 && b.signalsSent === 0,
     }
@@ -121,8 +121,8 @@ async function main() {
         B: { commit: bindings.B.commit, branch: bindings.B.branch, files: bindings.B.files, zod: bindings.B.zod },
         main: { commit: bindings.main.commit, branch: bindings.main.branch, files: bindings.main.files },
       },
-      results: { i: i.cases, b: { normal: b.normal.counts, deny: b.deny.counts, sinkOnly: b.sinkOnly.counts } },
-      findings: [...b.findings],
+      results: { i: i.cases, b: { normal: b.normal.counts, deny: b.deny.counts, sinkMissing: b.sinkMissing.counts, sinkDeny: b.sinkDeny.counts, sinkAllow: b.sinkAllow.counts } },
+      findings: [],
       checks, ok: Object.values(checks).every(Boolean),
       notReached: [
         'same-Runner dual client as a real process handover on a product/B route',
@@ -130,7 +130,7 @@ async function main() {
         'recovered candidate/accept; B ordinary5PASS is not recovery',
         'real product readonly/SSE target and vendor/native',
       ],
-      note: 'B now imports the current I attach-channel blobs; sink-only native hook still resolves without an external guard and is reported, not fixed.',
+      note: 'B now imports the current I attach-channel blobs; the current sink guard refuses missing/deny/throw and asks a fresh guard per intent. The wave29 sink-only auto-allow is historical scope, not current.',
       modelCalls: 0, vendorTurns: 0, signalsSent: 0,
     }
     writeJson(join(out, 'report.json'), report)
@@ -138,7 +138,7 @@ async function main() {
     else process.stdout.write([
       `current-produce: ${report.ok ? 'OK' : 'UNEXPECTED'}`,
       `  I ${bindings.I.commit?.slice(0, 12)} checks=${Object.values(i.checks).filter(Boolean).length}/${Object.keys(i.checks).length} freshIntentFixed=${i.checks.freshIntentFixed}`,
-      `  B ${bindings.B.commit?.slice(0, 12)} checks=${Object.values(b.checks).filter(Boolean).length}/${Object.keys(b.checks).length} sinkOnlyFinding=${checks.bSinkFinding}`,
+      `  B ${bindings.B.commit?.slice(0, 12)} checks=${Object.values(b.checks).filter(Boolean).length}/${Object.keys(b.checks).length} sinkGuardClosed=${checks.bSinkGuardClosed}`,
       `  source/materialized unchanged=${checks.sourcesUnchanged && checks.materializedUnchanged}; model=0 signals=0`,
       '  NOT_REACHED: same-Runner route, SIGKILL recovery, recovered candidate/accept, product target',
     ].join('\n'))

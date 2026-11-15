@@ -1,0 +1,199 @@
+{
+  "protocol": "trial-soak/1",
+  "startedAt": "2026-11-15T08:28:25.898Z",
+  "endedAt": "2026-11-15T08:28:35.908Z",
+  "elapsedMs": 10008,
+  "wallElapsedSeconds": 10,
+  "requestedDurationSeconds": 10,
+  "stoppedBy": "duration",
+  "status": "COMPLETED_WITH_OBSERVED_DEFECT",
+  "scenario": {
+    "scenario": "mixed",
+    "defect": "truncate",
+    "expectedDefectObservation": "sse_disconnect",
+    "defectObserved": true,
+    "config": {
+      "pollMs": 250,
+      "sseIntervalMs": 200,
+      "reconnectBackoffMs": 100,
+      "sseIdleTimeoutMs": 5000,
+      "reopenSeconds": 3,
+      "sampleMs": 1000,
+      "maxRequests": 100000,
+      "maxSseEvents": 100000,
+      "maxReconnects": 2000,
+      "maxErrors": 50,
+      "pollTimeoutMs": 500
+    }
+  },
+  "fixture": {
+    "url": "http://127.0.0.1:59493",
+    "port": 59493,
+    "defect": "truncate",
+    "stats": {
+      "connections": 63,
+      "activeConnections": 0,
+      "maxConcurrentConnections": 2,
+      "readinessRequests": 43,
+      "readinessBytes": 25241,
+      "readinessStatuses": {
+        "200": 43
+      },
+      "sseConnections": 20,
+      "sseEvents": 56,
+      "sseBytes": 6272,
+      "sseClosed": 16
+    }
+  },
+  "counters": {
+    "pollRequests": 43,
+    "pollOk": 43,
+    "pollFailed": 0,
+    "latencyMs": {
+      "count": 43,
+      "p50": 1.25,
+      "p95": 3.61,
+      "max": 24.63
+    },
+    "httpStatuses": {
+      "200": 43
+    },
+    "sseConnections": 20,
+    "sseEvents": 40,
+    "sseBytes": 4480,
+    "sseFailedConnections": 0,
+    "duplicates": 0,
+    "gaps": 0,
+    "reconnects": 19,
+    "reopens": 3,
+    "samples": 11,
+    "lastEventAt": "2026-11-15T08:28:35.725Z"
+  },
+  "failures": {
+    "total": 16,
+    "counts": {
+      "sse:disconnect:error": 16
+    },
+    "samples": [
+      {
+        "at": "2026-11-15T08:28:26.339Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-15T08:28:26.846Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-15T08:28:27.350Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-15T08:28:27.867Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-15T08:28:28.530Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-15T08:28:29.415Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-15T08:28:29.921Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-15T08:28:30.425Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-15T08:28:30.931Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-15T08:28:31.435Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-15T08:28:32.417Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-15T08:28:32.920Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-15T08:28:33.422Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-15T08:28:33.925Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-15T08:28:34.429Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-15T08:28:35.422Z",
+        "kind": "sse:disconnect:error"
+      }
+    ]
+  },
+  "samples": {
+    "path": "samples.ndjson",
+    "count": 11,
+    "sha256": "91cd8db3653b11bb21b35e2f86daad10975c26da80d13d5065d52f16c1eecbdc",
+    "bytes": 2973
+  },
+  "cleanup": {
+    "closed": true,
+    "activeSockets": 0,
+    "activeConnections": 0
+  },
+  "consistency": {
+    "ok": true,
+    "issues": [],
+    "lastSampleElapsedMs": 10008
+  },
+  "unknowns": [
+    "client reopen is a new HTTP/SSE connection, not daemon process recovery",
+    "provider/queue/old-request behaviour is not observable from this fixture and is not claimed",
+    "server-side handler timing is not separately instrumented; client latency is reported",
+    "resource samples cover this process and the fixture server only, never another user process"
+  ],
+  "resume": {
+    "arguments": [
+      "node tools/trial-kit/bin/trial-soak.mjs",
+      "--scenario mixed",
+      "--duration-seconds 10",
+      "--poll-ms 250",
+      "--sse-interval-ms 200",
+      "--reconnect-backoff-ms 100",
+      "--reopen-seconds 3",
+      "--sample-ms 1000",
+      "--max-errors 50",
+      "--failure-mode truncate",
+      "--out <NEW-OUT>"
+    ],
+    "note": "replace <NEW-OUT>; the same duration and failure mode are required for comparability",
+    "line": "node tools/trial-kit/bin/trial-soak.mjs --scenario mixed --duration-seconds 10 --poll-ms 250 --sse-interval-ms 200 --reconnect-backoff-ms 100 --reopen-seconds 3 --sample-ms 1000 --max-errors 50 --failure-mode truncate --out <NEW-OUT>"
+  },
+  "tool": {
+    "name": "trial-kit",
+    "version": "0.1.0",
+    "command": "soak"
+  },
+  "outputRoot": "reports/trial-operations/wave30/soak-10s",
+  "measurementScope": {
+    "measured": "one finite fixture scenario of 10s (actual 10s)",
+    "notMeasured": [
+      "24h/48h soak",
+      "daemon recovery",
+      "provider/queue stability",
+      "other machines",
+      "real model/native execution"
+    ]
+  }
+}

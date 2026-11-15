@@ -1,0 +1,103 @@
+{
+  "I": {
+    "ok": true,
+    "issues": [],
+    "dest": "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave30/selected-current/source/I",
+    "commit": "861d5feae61aad690be25be104db7f8883e0ab73",
+    "bytes": 225280,
+    "verify": {
+      "ok": true,
+      "issues": [],
+      "files": [
+        {
+          "rel": "apps/runner/src/attach-channel/attach.ts",
+          "sha256": "79b3189bfdd589b17cbc41fa8b359b85128e076db77716b9efb75c47f1626c59",
+          "bytes": 8655
+        },
+        {
+          "rel": "apps/runner/src/attach-channel/coordinator-channel.ts",
+          "sha256": "5cb142ac905fdcd08063aa678aea768a0397f2341fb60a38b56b7832eadfa7b0",
+          "bytes": 25538
+        },
+        {
+          "rel": "apps/runner/src/attach-channel/errors.ts",
+          "sha256": "b9c9bd111cd672b479314faf284d308ba6a1c2d3f5520af6decbded220d08b10",
+          "bytes": 1693
+        },
+        {
+          "rel": "apps/runner/src/attach-channel/index.ts",
+          "sha256": "6cb777c2fcc13fc7b81afd1890da5914ffbfac79aabb9b064cc79b7e964a3971",
+          "bytes": 1556
+        },
+        {
+          "rel": "apps/runner/src/attach-channel/refusals.ts",
+          "sha256": "6908ad2cbc96a01bd71f479ea57e7613c8db3beb88bedffd535ab118ff5f804f",
+          "bytes": 2573
+        },
+        {
+          "rel": "apps/runner/src/attach-channel/sink-responder.ts",
+          "sha256": "9d20a0fb932dce4d235b53253139cc155f3f112d7a6a047d275f5c9dd56fea32",
+          "bytes": 3950
+        },
+        {
+          "rel": "packages/contracts/src/coordinator-channel.ts",
+          "sha256": "a1445944e47379a13a3f47593173d35c5a20cd0d27a02daa6a880bce98a4f3c1",
+          "bytes": 6362
+        },
+        {
+          "rel": "packages/contracts/src/schemas.ts",
+          "sha256": "763732584c3b9150f90b644301b679465e252498d75dec19ad601b536f0db045",
+          "bytes": 30887
+        },
+        {
+          "rel": "packages/contracts/src/types.ts",
+          "sha256": "ed6661e6bcaa26a24892ad82086bcd5375a19aec3a184f1d6f256af8655103ac",
+          "bytes": 6016
+        }
+      ]
+    }
+  },
+  "B": {
+    "ok": true,
+    "issues": [],
+    "dest": "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave30/selected-current/source/B",
+    "commit": "205076f1472555d970e8b83e39cc8f6e4f091996",
+    "bytes": 839680,
+    "verify": {
+      "ok": true,
+      "issues": [],
+      "files": [
+        {
+          "rel": "apps/runner/src/attach-channel/attach.ts",
+          "sha256": "79b3189bfdd589b17cbc41fa8b359b85128e076db77716b9efb75c47f1626c59",
+          "bytes": 8655
+        },
+        {
+          "rel": "apps/runner/src/attach-channel/coordinator-channel.ts",
+          "sha256": "5cb142ac905fdcd08063aa678aea768a0397f2341fb60a38b56b7832eadfa7b0",
+          "bytes": 25538
+        },
+        {
+          "rel": "apps/runner/src/attach-channel/errors.ts",
+          "sha256": "b9c9bd111cd672b479314faf284d308ba6a1c2d3f5520af6decbded220d08b10",
+          "bytes": 1693
+        },
+        {
+          "rel": "apps/runner/src/attach-channel/index.ts",
+          "sha256": "709e4dc2b046b40f4d1748875d37984b8aec81ff16008405193ecb5831dfac40",
+          "bytes": 1252
+        },
+        {
+          "rel": "apps/runner/src/runner-service.ts",
+          "sha256": "4fd58b7e634335aa1ff17659c8ffb051d47f3eb728006aaad77a6a2002d6fa25",
+          "bytes": 30073
+        },
+        {
+          "rel": "apps/runner/src/business-attach.ts",
+          "sha256": "9f3a4640c27847f624c0496c262dfb0789014c6fbaf40e73ce55d2b6e2d78f9e",
+          "bytes": 6481
+        }
+      ]
+    }
+  }
+}

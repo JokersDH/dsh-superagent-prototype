@@ -1,6 +1,6 @@
 /**
- * Current-source consumer controls (wave-29): exact committed I/B, fresh-intent fix, B sink-only
- * finding, wrong root/commit refusal and materialized-byte tamper detection.
+ * Current-source consumer controls: exact committed I/B, fresh-intent fix, current B sink guard
+ * (missing/deny/throw refused, fresh allow), wrong root/commit refusal and materialized-byte tamper detection.
  */
 import assert from 'node:assert/strict'
 import { spawn } from 'node:child_process'
@@ -23,7 +23,7 @@ function run(args) {
   })
 }
 
-test('current committed I/B run: fresh intent fixed, B sink-only finding, source unchanged', async () => {
+test('current committed I/B run: fresh intent fixed, B sink guard closed, source unchanged', async () => {
   const root = mkdtempSync(join(tmpdir(), 'trial-current-'))
   const out = join(root, 'run')
   try {
@@ -44,14 +44,16 @@ test('current committed I/B run: fresh intent fixed, B sink-only finding, source
 
     const b = JSON.parse(readFileSync(join(out, 'b.json'), 'utf8'))
     assert.equal(Object.values(b.checks).every(Boolean), true, JSON.stringify(b.checks))
-    assert.equal(b.checks.sinkOnlyFinding, true)
-    assert.equal(b.sinkOnly.counts.externalGuardCalls, 0)
+    assert.equal(b.checks.sinkMissingGuardRefused, true)
+    assert.equal(b.checks.sinkDenyRefused, true)
+    assert.equal(b.checks.sinkAllowFresh, true)
+    assert.equal(b.findings.length, 0)
 
     const report = JSON.parse(readFileSync(join(out, 'report.json'), 'utf8'))
     assert.equal(report.ok, true)
     assert.equal(report.modelCalls, 0)
     assert.equal(report.signalsSent, 0)
-    assert.ok(report.findings.some((entry) => entry.id === 'B29-SINK-ONLY-NATIVE-HOOK-AUTOBYPASS'))
+    assert.equal(report.findings.length, 0)
     assert.ok(report.notReached.some((entry) => entry.includes('SIGKILL')))
     assert.ok(!readFileSync(join(out, 'report.json'), 'utf8').includes(process.env.HOME ?? '/Users/'))
   } finally {

@@ -75,11 +75,24 @@ readiness 只代表配置事实：它不含包身份（报告会写 `package_bin
 ## 3b. wave-29 current source、可信出生与原交付
 
 - `tests/operational-soak/selected/produce2.mjs` 以当前 I/B/H commits 物化 exact source，不 pin 旧 head；先 source 拒绝再 import/执行。
-- I current 12/12（含 fresh intent/namespace/prune）；B current 三回调通过，但 **sink-only guard 仍自批**（`externalGuardCalls=0`），B/main 必须在写前接原 fresh guard。
-- `procguard/produce2.mjs` 是新的安全 helper：仅注册 handle 可 signal，root/config/operation 与 spawn 精确匹配，ps UNKNOWN 不等于 gone；纯控制通过后才对本 run probe 发 TERM/KILL。
+- I current 12/12（含 fresh intent/namespace/prune）；B current 三回调通过。wave-29 看到的 **sink-only guard 自批是旧 B 范围**，当前 B（205076f）已改为 missing/deny/throw 拒绝、每次 intent fresh guard，produce2 的 8/8 正向即为当前语义。
+- `procguard/produce3.mjs`（wave-30）是当前安全 helper：WeakMap + 不可变 birth facts + handle；仅注册 handle 可 signal，root/config/operation 与 spawn 精确匹配，ps UNKNOWN 不等于 gone。
+- 旧 `procguard/produce2.mjs` 仅保留历史材料；它返回的 record 与内部共享，不能作为当前 helper 使用。
 - 原交付：question/answer→currentCandidate→manual accept→delivered；begin/answer/accept 同 commandId 重放均幂等；2/4 works 观察有，native slot 资源集 NOT_REACHED。
 - 包：1fbaf94（6849 项）只作只读预检输入。
 - 仍未达：same-Runner route、SIGKILL 原问答、recovered candidate/accept、真实产品 readonly/SSE。
+
+## 3c. wave-30 不可变 handle、current I/B 与原 A 读回
+
+- `tests/operational-soak/procguard/guard3.mjs` 关闭 wave-30 P1：registry 以 opaque handle 为 WeakMap key，只保存 private deep-frozen birth facts；返回的 observation 是防御性副本。修改 pid/argv/root/config/operation/birth/plan、伪造或复制 handle 都不会改变目标。
+- 每次 TERM/KILL 都重新核完整 identity（PID/start/UID/command/argv/root/config/op/birth/resource plan）；`ps` 失败/不可解析保持 UNKNOWN，`waitGone` 不返回 gone。
+- 运行顺序固定：先 `mockSuite()`（0 spawn/0 signal/0 ps），再 `pureControls()`，最后只对本 run 的 own probe 发有限 TERM/KILL；不重跑旧 SIGKILL/procguard/long soak。
+- `tests/operational-soak/selected/produce2.mjs` 绑定当前 I/B commit：I 12/12、B 8/8（含 missing/deny/throw 与 fresh allow），source/materialized 前后不变。
+- `selected/produce-original2.mjs` 用原 Application/QuestionBroker/A Store 生成并读回同一 Work/question/answer/attempt/native_applied；**B sink 的 runner facts 未接到该 question/answer ingress**，business ingress join 明确 NOT_REACHED。
+- `delivery/windows2.mjs` 用原 A facts/answers/deliveries 判定 begin/answer 写前、receiver 后 receipt 前、durable、written、terminal、missing delivery 与 late duplicate；所有窗口 `resend:false`。
+- `delivery/resources2.mjs` 只有每个已知资源都有 end evidence 才称 quiescent；`module.close`/parent gone 单独不算，UNKNOWN/缺 plan 不放行。
+
+当前精确包 `wave30-target-8296720`（build `8296720d8a25f38c`，source `82ee5b8f`）的只读预检为 `DEGRADED`：32 PASS / 1 UNKNOWN（host_sqlite 需运行包内 doctor）；绑定 machinecheck 为 46 PASS / 3 UNKNOWN（host_sqlite、package_binding、support.reference），0 FAIL。`pa status` 在新空根返回 `STOPPED` exit 2，`doctor` 因无 managed instance 为 DEGRADED，这是空根预期而不是功能失败。
 
 ## 4. wave-28 selected source、信号与原交付
 

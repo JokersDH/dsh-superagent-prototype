@@ -1,0 +1,122 @@
+{
+  "protocol": "trial-operations/wave30-h1/1",
+  "generatedAt": "2026-11-15T08:35:30.395Z",
+  "command": "node tests/operational-soak/procguard/produce3.mjs --out <new-private-root>",
+  "exitCode": 0,
+  "sources": {
+    "tests/operational-soak/procguard/guard3.mjs": "682dd52583ea9c653a79e4a89f5a61266822cc97578d48feab626692e9cf31e9",
+    "tests/operational-soak/procguard/produce3.mjs": "1965d232bfa0ca6c26eed24b5473be79deb8c93e4ff6d0c50525f4285f49cbf1",
+    "tests/operational-soak/procguard/guard3.case.mjs": "ff8caab973b09e0befeb4682483cc6511b619ed503c8d58093509e3b83f1fe4a",
+    "reports/trial-operations/wave30/procguard/mock.json": "af48c9a2663281e31705328c1daffbf96e5eea4daa292e40026608f92a5bd17a",
+    "reports/trial-operations/wave30/procguard/report.json": "c9119b410918b34468e0d73b6a4719f7fda7fbd5e5aa9ba7637cb633edcff507"
+  },
+  "defectClosed": {
+    "id": "wave30-p1-shared-mutable-record-retarget",
+    "was": "returned record and REGISTRY stored the same mutable object; mutating pid made the original handle signal a foreign pid",
+    "now": "WeakMap keyed by opaque frozen handle; private deep-frozen birth facts; observation is a defensive clone; every signal requires the complete resource plan",
+    "demonstratedBy": [
+      "caller_mutation_does_not_retarget",
+      "returned_observation_is_copy",
+      "mock_external_mutation_does_not_change_facts",
+      "copied_handle_rejected",
+      "plain_observation_rejected"
+    ]
+  },
+  "mock": {
+    "ok": true,
+    "checks": 17,
+    "spawns": 0,
+    "signals": 0,
+    "ps": 0,
+    "ids": [
+      "mock_frozen_birth_facts",
+      "mock_defensive_copy_is_distinct",
+      "mock_external_mutation_does_not_change_facts",
+      "mock_own_positive",
+      "mock_foreign_pid_refused",
+      "mock_foreign_uid_refused",
+      "mock_recycled_start_refused",
+      "mock_sibling_root_refused",
+      "mock_sibling_operation_refused",
+      "mock_missing_birth_refused",
+      "mock_missing_argv_refused",
+      "mock_birth_argv_mismatch_refused",
+      "mock_missing_plan_refused",
+      "mock_missing_resources_refused",
+      "mock_argv_change_refused",
+      "mock_ps_fixture_alive",
+      "mock_ps_fixture_gone_only_on_not_found"
+    ]
+  },
+  "live": {
+    "status": "LIVE_OK",
+    "checks": [
+      {
+        "id": "born_normal",
+        "ok": true
+      },
+      {
+        "id": "returned_observation_is_copy",
+        "ok": true
+      },
+      {
+        "id": "caller_mutation_does_not_retarget",
+        "ok": true
+      },
+      {
+        "id": "pure_controls",
+        "ok": true
+      },
+      {
+        "id": "unknown_wait_not_gone",
+        "ok": true
+      },
+      {
+        "id": "first_signal_plan_verified",
+        "ok": true
+      },
+      {
+        "id": "normal_term_gone",
+        "ok": true
+      },
+      {
+        "id": "stubborn_survived_term",
+        "ok": true
+      },
+      {
+        "id": "stubborn_kill_gone",
+        "ok": true
+      }
+    ],
+    "signals": [
+      {
+        "target": "normal",
+        "step": "TERM",
+        "sent": true,
+        "refused": null,
+        "pid": 92292
+      },
+      {
+        "target": "stubborn",
+        "step": "TERM",
+        "sent": true,
+        "refused": null,
+        "pid": 92312
+      },
+      {
+        "target": "stubborn",
+        "step": "KILL",
+        "sent": true,
+        "refused": null,
+        "pid": 92312
+      }
+    ],
+    "observedPid": 92292,
+    "unknownNeverGone": true
+  },
+  "limits": [
+    "covers one own probe process only; not Runner/daemon/product lifecycle",
+    "no global discovery, no foreign pid, no signal before mock suite",
+    "live requires a fresh private output root"
+  ]
+}

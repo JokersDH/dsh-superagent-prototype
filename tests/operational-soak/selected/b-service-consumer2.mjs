@@ -33,6 +33,7 @@ async function until(read, predicate, timeoutMs = READY_TIMEOUT_MS) {
 }
 
 async function runService({ treeRoot, root, mode }) {
+  const sinkMode = mode.startsWith('sink')
   const stateRoot = join(root, 'state')
   const payloadRoot = join(root, 'payloads')
   mkdirSync(stateRoot, { recursive: true, mode: 0o700 })
@@ -41,7 +42,7 @@ async function runService({ treeRoot, root, mode }) {
   const spec = makeAttemptSpec()
   const input = new PassThrough()
   const frames = []
-  const counts = { factFrames: 0, payloadReadFrames: 0, writeIntentFrames: 0, receipts: 0, ackFailed: 0, externalGuardCalls: 0, externalDenied: 0, sinkOnlyHookResolved: false }
+  const counts = { factFrames: 0, payloadReadFrames: 0, writeIntentFrames: 0, receipts: 0, ackFailed: 0, externalGuardCalls: 0, externalDenied: 0, sinkHookResolved: 0, sinkHookRejected: 0, sinkGuardCalls: 0 }
   const observed = { payload: null, ackFailure: null, duplicateSameSeq: null, admitted: null, deniedReason: null }
   const send = (frame) => input.write(`${JSON.stringify({ v: 1, ...frame })}\n`)
   const respond = (frame) => {
@@ -70,9 +71,14 @@ async function runService({ treeRoot, root, mode }) {
       send({ type: 'write-admission', id: frame.id, allowed })
     }
   }
-  const sink = mode === 'sink-only'
+  const sink = sinkMode
     ? { record: async (fact) => store.facts.record(fact.factId, sha256(JSON.stringify(fact)), () => {}) }
     : undefined
+  const sinkGuard = mode === 'sink-deny'
+    ? async () => { counts.sinkGuardCalls += 1; throw new Error('fixture guard denied') }
+    : mode === 'sink-allow'
+      ? async () => { counts.sinkGuardCalls += 1 }
+      : undefined
   const { serveRunner } = await import(new URL(`file://${treeRoot}/apps/runner/src/runner-service.ts`).href)
   let hooks
   const serving = serveRunner({
@@ -81,29 +87,34 @@ async function runService({ treeRoot, root, mode }) {
     payloads: { read: async () => null },
     eagerPrepare: false,
     ...(sink === undefined ? {} : { sink }),
+    ...(sinkGuard === undefined ? {} : { beforeNativeWrite: sinkGuard }),
     createDriver: (_spec, providedHooks) => {
       hooks = providedHooks
       return {
         inspect: async () => { throw new Error('fixture') },
         reconcile: async () => { throw new Error('fixture') },
         serve: async (_attempt, io) => {
-          if (mode !== 'sink-only') {
+          if (!sinkMode) {
             try {
               observed.payload = await io.payloads.read(PAYLOAD_REFERENCE)
             } catch (error) { observed.payloadFailure = String(error?.message ?? error) }
-            const fact = makeFact('turn.ended', 'payload-1', { factId: 'fact-duplicate-wave29', source: SOURCE })
+            const fact = makeFact('turn.ended', 'payload-1', { factId: 'fact-duplicate-wave30', source: SOURCE })
             const first = await io.record(fact)
             const second = await io.record(fact)
             observed.duplicateSameSeq = first.seq === second.seq
             try { await io.record(makeFact('candidate.observed', 'payload-2', { factId: ACK_FAILED_FACT, source: SOURCE })) } catch (error) { observed.ackFailure = String(error?.message ?? error) }
           }
-          try {
-            await hooks.beforeNativeWrite(makeCommand('answer'))
-            observed.admitted = true
-            if (mode === 'sink-only') counts.sinkOnlyHookResolved = true
-          } catch (error) {
-            observed.admitted = false
-            observed.deniedReason = String(error?.message ?? error)
+          const intents = mode === 'sink-allow' ? 2 : 1
+          for (let index = 0; index < intents; index += 1) {
+            try {
+              await hooks.beforeNativeWrite(makeCommand('answer'))
+              if (sinkMode) counts.sinkHookResolved += 1
+              else observed.admitted = true
+            } catch (error) {
+              if (sinkMode) counts.sinkHookRejected += 1
+              else observed.admitted = false
+              observed.deniedReason = String(error?.message ?? error)
+            }
           }
           return { reason: 'terminal', evidenceRefs: ['fixture-consumer'] }
         },
@@ -125,23 +136,26 @@ async function runService({ treeRoot, root, mode }) {
 export async function runBCurrentConsumer({ treeRoot, root }) {
   const normal = await runService({ treeRoot, root: join(root, 'normal'), mode: 'allow' })
   const deny = await runService({ treeRoot, root: join(root, 'deny'), mode: 'deny' })
-  const sinkOnly = await runService({ treeRoot, root: join(root, 'sink-only'), mode: 'sink-only' })
+  const sinkMissing = await runService({ treeRoot, root: join(root, 'sink-missing'), mode: 'sink-missing' })
+  const sinkDeny = await runService({ treeRoot, root: join(root, 'sink-deny'), mode: 'sink-deny' })
+  const sinkAllow = await runService({ treeRoot, root: join(root, 'sink-allow'), mode: 'sink-allow' })
   const checks = {
     factThreeFrames: normal.counts.factFrames === 3 && normal.counts.receipts === 2 && normal.counts.ackFailed === 1,
     duplicateReceipt: normal.observed.duplicateSameSeq === true,
     payloadRead: normal.counts.payloadReadFrames >= 1 && normal.observed.payload !== null && normal.observed.payload.kind === 'coordinator-payload/1',
     externalAllow: normal.counts.writeIntentFrames === 1 && normal.observed.admitted === true,
     externalDeny: deny.counts.writeIntentFrames === 1 && deny.observed.admitted === false && deny.counts.externalDenied === 1,
-    sinkOnlyFinding: sinkOnly.counts.sinkOnlyHookResolved === true && sinkOnly.counts.externalGuardCalls === 0,
+    sinkMissingGuardRefused: sinkMissing.counts.sinkHookRejected === 1 && sinkMissing.counts.sinkGuardCalls === 0,
+    sinkDenyRefused: sinkDeny.counts.sinkHookRejected === 1 && sinkDeny.counts.sinkGuardCalls === 1,
+    sinkAllowFresh: sinkAllow.counts.sinkHookResolved === 2 && sinkAllow.counts.sinkGuardCalls === 2,
   }
   return {
-    protocol: 'selected-b-current-consumer/1',
-    surface: 'current committed B serveRunner with current I attach-channel (materialized)',
+    protocol: 'selected-b-current-consumer/2',
+    surface: 'current committed B serveRunner with current I attach-channel (materialized) and mandatory sink guard',
     executor: 'deterministic fixture driver',
     modelCalls: 0, vendorTurns: 0, signalsSent: 0,
-    normal, deny, sinkOnly, checks,
-    findings: checks.sinkOnlyFinding
-      ? [{ id: 'B29-SINK-ONLY-NATIVE-HOOK-AUTOBYPASS', owner: 'B', detail: 'sink-only native hook resolved with externalGuardCalls=0; main/Broker guard was not supplied or consulted' }]
-      : [],
+    normal, deny, sinkMissing, sinkDeny, sinkAllow, checks,
+    findings: [],
+    historical: 'wave29 observed the sink-only auto-allow on the older B commit; current B refuses missing/deny/throw and asks the fresh guard per intent.',
   }
 }

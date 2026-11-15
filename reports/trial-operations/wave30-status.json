@@ -1,0 +1,717 @@
+{
+  "protocol": "trial-operations-status/1",
+  "wave": "product-wave-30",
+  "owner": "H",
+  "branch": "codex/g4-trial-operations",
+  "base": "f8cf5713c269a3a920231f23baf11aadd90db736",
+  "mergedMain": "6f385a54",
+  "currentH": "d04e3ed1",
+  "updatedAt": "2026-11-15T08:42:34.179Z",
+  "goal": {
+    "established": true,
+    "tokenBudget": null,
+    "deliverables": [
+      "H1",
+      "H2",
+      "H3",
+      "H4"
+    ],
+    "continueAfterEach": true
+  },
+  "ownedPaths": [
+    "tools/trial-kit/",
+    "tests/operational-soak/",
+    "docs/internal-trial/",
+    "reports/trial-operations/"
+  ],
+  "sources": {
+    "H": {
+      "root": "~/Desktop/joker/superagent-agent-h",
+      "branch": "codex/g4-trial-operations",
+      "fixedBase": "f8cf5713c269a3a920231f23baf11aadd90db736",
+      "merge": "d04e3ed1"
+    },
+    "I": {
+      "root": "~/Desktop/joker/superagent-agent-i",
+      "commit": "861d5feae61aad690be25be104db7f8883e0ab73",
+      "branch": "codex/g5-coordinator-channel",
+      "files": [
+        {
+          "rel": "apps/runner/src/attach-channel/attach.ts",
+          "commitBlob": "321738dae3b87e6ad7d235f52aaa65e6f63ab527",
+          "sha256": "79b3189bfdd589b17cbc41fa8b359b85128e076db77716b9efb75c47f1626c59",
+          "bytes": 8655
+        },
+        {
+          "rel": "apps/runner/src/attach-channel/coordinator-channel.ts",
+          "commitBlob": "d1ef81eb9d51b24417645151440eb1e262c20546",
+          "sha256": "5cb142ac905fdcd08063aa678aea768a0397f2341fb60a38b56b7832eadfa7b0",
+          "bytes": 25538
+        },
+        {
+          "rel": "apps/runner/src/attach-channel/errors.ts",
+          "commitBlob": "ec8ce909d0f30ab1d96488db56cdf3b6a4ab7f49",
+          "sha256": "b9c9bd111cd672b479314faf284d308ba6a1c2d3f5520af6decbded220d08b10",
+          "bytes": 1693
+        },
+        {
+          "rel": "apps/runner/src/attach-channel/index.ts",
+          "commitBlob": "6314546e1d1facde00d0d2195edf1c14ad7a85d2",
+          "sha256": "6cb777c2fcc13fc7b81afd1890da5914ffbfac79aabb9b064cc79b7e964a3971",
+          "bytes": 1556
+        },
+        {
+          "rel": "apps/runner/src/attach-channel/refusals.ts",
+          "commitBlob": "25ebcd26f1fb4aad583048dc672ec2bf09066b32",
+          "sha256": "6908ad2cbc96a01bd71f479ea57e7613c8db3beb88bedffd535ab118ff5f804f",
+          "bytes": 2573
+        },
+        {
+          "rel": "apps/runner/src/attach-channel/sink-responder.ts",
+          "commitBlob": "992a8cc0fceb55d7b2a9e2e8c8068202a892acb3",
+          "sha256": "9d20a0fb932dce4d235b53253139cc155f3f112d7a6a047d275f5c9dd56fea32",
+          "bytes": 3950
+        },
+        {
+          "rel": "packages/contracts/src/coordinator-channel.ts",
+          "commitBlob": "cf451efe433b8f9140d992ccfb415df9cd74b92c",
+          "sha256": "a1445944e47379a13a3f47593173d35c5a20cd0d27a02daa6a880bce98a4f3c1",
+          "bytes": 6362
+        },
+        {
+          "rel": "packages/contracts/src/schemas.ts",
+          "commitBlob": "0eaafbf444c5ef099971fbc226c36a33002f983d",
+          "sha256": "763732584c3b9150f90b644301b679465e252498d75dec19ad601b536f0db045",
+          "bytes": 30887
+        },
+        {
+          "rel": "packages/contracts/src/types.ts",
+          "commitBlob": "423043fe2b999a2e71e0dd3995c7d33f522144de",
+          "sha256": "ed6661e6bcaa26a24892ad82086bcd5375a19aec3a184f1d6f256af8655103ac",
+          "bytes": 6016
+        }
+      ]
+    },
+    "B": {
+      "root": "~/Desktop/joker/superagent-agent-b",
+      "commit": "205076f1472555d970e8b83e39cc8f6e4f091996",
+      "branch": "codex/g1-runtime",
+      "files": [
+        {
+          "rel": "apps/runner/src/attach-channel/attach.ts",
+          "commitBlob": "321738dae3b87e6ad7d235f52aaa65e6f63ab527",
+          "sha256": "79b3189bfdd589b17cbc41fa8b359b85128e076db77716b9efb75c47f1626c59",
+          "bytes": 8655
+        },
+        {
+          "rel": "apps/runner/src/attach-channel/coordinator-channel.ts",
+          "commitBlob": "d1ef81eb9d51b24417645151440eb1e262c20546",
+          "sha256": "5cb142ac905fdcd08063aa678aea768a0397f2341fb60a38b56b7832eadfa7b0",
+          "bytes": 25538
+        },
+        {
+          "rel": "apps/runner/src/attach-channel/errors.ts",
+          "commitBlob": "ec8ce909d0f30ab1d96488db56cdf3b6a4ab7f49",
+          "sha256": "b9c9bd111cd672b479314faf284d308ba6a1c2d3f5520af6decbded220d08b10",
+          "bytes": 1693
+        },
+        {
+          "rel": "apps/runner/src/attach-channel/index.ts",
+          "commitBlob": "b26154f343634cb6c7536aa5cd5bcb7169e0b980",
+          "sha256": "709e4dc2b046b40f4d1748875d37984b8aec81ff16008405193ecb5831dfac40",
+          "bytes": 1252
+        },
+        {
+          "rel": "apps/runner/src/runner-service.ts",
+          "commitBlob": "95c383c96fe9de8105c15c20d3ded103b7185e2b",
+          "sha256": "4fd58b7e634335aa1ff17659c8ffb051d47f3eb728006aaad77a6a2002d6fa25",
+          "bytes": 30073
+        },
+        {
+          "rel": "apps/runner/src/business-attach.ts",
+          "commitBlob": "2f69fedf5b4a33343968b8cc8a0269598dacbc1f",
+          "sha256": "9f3a4640c27847f624c0496c262dfb0789014c6fbaf40e73ce55d2b6e2d78f9e",
+          "bytes": 6481
+        }
+      ]
+    },
+    "main": {
+      "commit": "d04e3ed195c2c6f73bcd0868a6aa946e84f3b65e",
+      "files": [
+        {
+          "rel": "packages/contracts/src/coordinator-channel.ts",
+          "commitBlob": "cf451efe433b8f9140d992ccfb415df9cd74b92c",
+          "sha256": "a1445944e47379a13a3f47593173d35c5a20cd0d27a02daa6a880bce98a4f3c1",
+          "bytes": 6362
+        }
+      ]
+    },
+    "artifact": {
+      "name": "wave30-target-8296720",
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "bytes": 20481470,
+      "buildId": "8296720d8a25f38c",
+      "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "schema": 18,
+      "closure": "3fa4b84a05421d67ba870caf5da6249deb45272d47fd0a2425f630e9a01b53c1"
+    }
+  },
+  "deliverables": {
+    "H1": {
+      "status": "COMPLETE",
+      "source": [
+        "tests/operational-soak/procguard/guard3.mjs",
+        "tests/operational-soak/procguard/produce3.mjs",
+        "tests/operational-soak/procguard/guard3.case.mjs"
+      ],
+      "consumer": "spawnOwnProbe/signalFresh/waitGone/pureControls share one private immutable registry",
+      "commands": [
+        {
+          "command": "node tests/operational-soak/procguard/produce3.mjs --out <new-private-root>",
+          "exitCode": 0,
+          "result": "LIVE_OK"
+        },
+        {
+          "command": "node --test tests/operational-soak/procguard/guard3.case.mjs",
+          "exitCode": 0,
+          "result": "3 pass / 0 fail"
+        }
+      ],
+      "defectClosed": {
+        "id": "wave30-p1-shared-mutable-record-retarget",
+        "was": "returned record and REGISTRY stored the same mutable object; mutating pid made the original handle signal a foreign pid",
+        "now": "WeakMap keyed by opaque frozen handle; private deep-frozen birth facts; observation is a defensive clone; every signal requires the complete resource plan",
+        "demonstratedBy": [
+          "caller_mutation_does_not_retarget",
+          "returned_observation_is_copy",
+          "mock_external_mutation_does_not_change_facts",
+          "copied_handle_rejected",
+          "plain_observation_rejected"
+        ]
+      },
+      "mock": {
+        "ok": true,
+        "checks": 17,
+        "spawns": 0,
+        "signals": 0,
+        "ps": 0,
+        "ids": [
+          "mock_frozen_birth_facts",
+          "mock_defensive_copy_is_distinct",
+          "mock_external_mutation_does_not_change_facts",
+          "mock_own_positive",
+          "mock_foreign_pid_refused",
+          "mock_foreign_uid_refused",
+          "mock_recycled_start_refused",
+          "mock_sibling_root_refused",
+          "mock_sibling_operation_refused",
+          "mock_missing_birth_refused",
+          "mock_missing_argv_refused",
+          "mock_birth_argv_mismatch_refused",
+          "mock_missing_plan_refused",
+          "mock_missing_resources_refused",
+          "mock_argv_change_refused",
+          "mock_ps_fixture_alive",
+          "mock_ps_fixture_gone_only_on_not_found"
+        ]
+      },
+      "live": {
+        "status": "LIVE_OK",
+        "checks": [
+          {
+            "id": "born_normal",
+            "ok": true
+          },
+          {
+            "id": "returned_observation_is_copy",
+            "ok": true
+          },
+          {
+            "id": "caller_mutation_does_not_retarget",
+            "ok": true
+          },
+          {
+            "id": "pure_controls",
+            "ok": true
+          },
+          {
+            "id": "unknown_wait_not_gone",
+            "ok": true
+          },
+          {
+            "id": "first_signal_plan_verified",
+            "ok": true
+          },
+          {
+            "id": "normal_term_gone",
+            "ok": true
+          },
+          {
+            "id": "stubborn_survived_term",
+            "ok": true
+          },
+          {
+            "id": "stubborn_kill_gone",
+            "ok": true
+          }
+        ],
+        "signals": [
+          {
+            "target": "normal",
+            "step": "TERM",
+            "sent": true,
+            "refused": null,
+            "pid": 92292
+          },
+          {
+            "target": "stubborn",
+            "step": "TERM",
+            "sent": true,
+            "refused": null,
+            "pid": 92312
+          },
+          {
+            "target": "stubborn",
+            "step": "KILL",
+            "sent": true,
+            "refused": null,
+            "pid": 92312
+          }
+        ],
+        "observedPid": 92292,
+        "unknownNeverGone": true
+      },
+      "resources": {
+        "ownProbePids": [
+          92292,
+          92312
+        ],
+        "foreignSignals": 0,
+        "globalDiscovery": false
+      },
+      "limits": [
+        "covers one own probe process only; not Runner/daemon/product lifecycle",
+        "no global discovery, no foreign pid, no signal before mock suite",
+        "live requires a fresh private output root"
+      ]
+    },
+    "H2": {
+      "status": "COMPLETE_WITH_NOT_REACHED",
+      "source": [
+        "tests/operational-soak/selected/source2.mjs",
+        "tests/operational-soak/selected/i-consumer2.mjs",
+        "tests/operational-soak/selected/b-service-consumer2.mjs",
+        "tests/operational-soak/selected/produce2.mjs",
+        "tests/operational-soak/selected/original-ingress2.mjs"
+      ],
+      "consumer": "current I module + current B serveRunner (materialized exact commit) and original Application/QuestionBroker + A ProductStore public readers",
+      "commands": [
+        {
+          "command": "node tests/operational-soak/selected/produce2.mjs --out <new-root> --i-commit 861d5fe --b-commit 205076f",
+          "exitCode": 0,
+          "result": "I 12/12, B 8/8, source/materialized unchanged"
+        },
+        {
+          "command": "node tests/operational-soak/selected/produce-original2.mjs --out /tmp/<new-root>",
+          "exitCode": 0
+        }
+      ],
+      "checks": {
+        "current": {
+          "sourcesOk": true,
+          "sourcesUnchanged": true,
+          "materializedUnchanged": true,
+          "iChecks": true,
+          "bChecks": true,
+          "bSinkGuardClosed": true,
+          "zeroModel": true,
+          "zeroSignals": true
+        },
+        "i": {
+          "fact": true,
+          "ackFailed": true,
+          "payload": true,
+          "writeAllow": true,
+          "writeDeny": true,
+          "freshIntentFixed": true,
+          "queueNamespace": true,
+          "timeoutPrune": true,
+          "generation": true,
+          "oldLease": true,
+          "capacity": true,
+          "close": true
+        },
+        "b": {
+          "factThreeFrames": true,
+          "duplicateReceipt": true,
+          "payloadRead": true,
+          "externalAllow": true,
+          "externalDeny": true,
+          "sinkMissingGuardRefused": true,
+          "sinkDenyRefused": true,
+          "sinkAllowFresh": true
+        },
+        "original": {
+          "workPersisted": true,
+          "questionPersisted": true,
+          "answerPersisted": true,
+          "commandReceipt": true,
+          "nativeApplied": true,
+          "attemptBound": true,
+          "contractStable": true,
+          "modelCalls0": true
+        }
+      },
+      "originalIds": {
+        "workId": "94012e1a1c7265c033f285a944656a04",
+        "questionId": "48b04cf56a15b0e8c04918f5463abe24",
+        "answerId": "0c4da78469ec2ca5857439d4cfb1837a",
+        "commandId": "recovery-command-2",
+        "attemptId": "attempt-d744ccb2-fd04-495e-ac14-90c8d2037c37",
+        "deliveries": [
+          {
+            "targetBindingId": "90ebe6a85da7f41c21997980755aefd0",
+            "status": "native_applied"
+          }
+        ]
+      },
+      "businessIngressJoin": "NOT_REACHED: current B sink records runner facts; the question/answer rows above come from the original Application/QuestionBroker fixture path.",
+      "historicalCorrection": "wave29 sink-only auto-allow is older B scope; current B refuses missing/deny/throw and requires a fresh guard per intent. No green condition requires the old bug.",
+      "notReached": [
+        "same-Runner dual client as a real process handover on a product/B route",
+        "SIGKILL original Work/question recovery; no product/B SIGKILL executed",
+        "recovered candidate/accept; B ordinary5PASS is not recovery",
+        "real product readonly/SSE target and vendor/native"
+      ]
+    },
+    "H3": {
+      "status": "PARTIAL_SUPPORT_ONLY",
+      "source": [
+        "tests/operational-soak/delivery/windows2.mjs",
+        "tests/operational-soak/delivery/resources2.mjs",
+        "tests/operational-soak/delivery/windows2.case.mjs",
+        "tests/operational-soak/delivery/consumer.mjs"
+      ],
+      "consumer": "original A commands/facts/answers/deliveries/events readers plus resource closure ledger",
+      "commands": [
+        {
+          "command": "node --test tests/operational-soak/delivery/windows2.case.mjs tests/operational-soak/delivery/delivery.case.mjs",
+          "exitCode": 0,
+          "result": "6 pass / 0 fail"
+        }
+      ],
+      "windows": {
+        "checks": {
+          "beginNotAccepted": true,
+          "answerNotAccepted": true,
+          "receiverUnknown": true,
+          "factDurable": true,
+          "conflictRefused": true,
+          "answerWrittenNotTerminal": true,
+          "lateDuplicateNoResend": true,
+          "terminalNative": true,
+          "missingDeliveryUnknown": true,
+          "zeroResend": true
+        },
+        "count": 8,
+        "zeroResend": true
+      },
+      "resourceLedger": {
+        "full": {
+          "quiescent": true,
+          "complete": true,
+          "counts": {
+            "total": 9,
+            "ended": 9,
+            "live": 0,
+            "unknown": 0,
+            "missingEvidence": 0
+          },
+          "unknown": [],
+          "live": [],
+          "missingEvidence": [],
+          "badKind": [],
+          "duplicates": false,
+          "moduleClosed": true,
+          "parentPidGone": true,
+          "reason": "all_known_resources_ended",
+          "closeIsQuiescence": false
+        },
+        "unknown": {
+          "quiescent": false,
+          "complete": true,
+          "counts": {
+            "total": 9,
+            "ended": 8,
+            "live": 0,
+            "unknown": 1,
+            "missingEvidence": 0
+          },
+          "unknown": [
+            {
+              "kind": "socket",
+              "id": "fixture-socket"
+            }
+          ],
+          "live": [],
+          "missingEvidence": [],
+          "badKind": [],
+          "duplicates": false,
+          "moduleClosed": true,
+          "parentPidGone": true,
+          "reason": "unknown_resource",
+          "closeIsQuiescence": false
+        },
+        "live": {
+          "quiescent": false,
+          "complete": true,
+          "counts": {
+            "total": 9,
+            "ended": 8,
+            "live": 1,
+            "unknown": 0,
+            "missingEvidence": 0
+          },
+          "unknown": [],
+          "live": [
+            {
+              "kind": "fd",
+              "id": "fixture-fd"
+            }
+          ],
+          "missingEvidence": [],
+          "badKind": [],
+          "duplicates": false,
+          "moduleClosed": true,
+          "parentPidGone": true,
+          "reason": "live_resource",
+          "closeIsQuiescence": false
+        },
+        "no-evidence": {
+          "quiescent": false,
+          "complete": true,
+          "counts": {
+            "total": 9,
+            "ended": 9,
+            "live": 0,
+            "unknown": 0,
+            "missingEvidence": 1
+          },
+          "unknown": [],
+          "live": [],
+          "missingEvidence": [
+            {
+              "kind": "timer",
+              "id": "fixture-timer"
+            }
+          ],
+          "badKind": [],
+          "duplicates": false,
+          "moduleClosed": true,
+          "parentPidGone": true,
+          "reason": "ended_without_evidence",
+          "closeIsQuiescence": false
+        },
+        "module-only": {
+          "quiescent": false,
+          "complete": true,
+          "counts": {
+            "total": 0,
+            "ended": 0,
+            "live": 0,
+            "unknown": 0,
+            "missingEvidence": 0
+          },
+          "unknown": [],
+          "live": [],
+          "missingEvidence": [],
+          "badKind": [],
+          "duplicates": false,
+          "moduleClosed": true,
+          "parentPidGone": true,
+          "reason": "empty_set",
+          "closeIsQuiescence": false
+        }
+      },
+      "originalDelivery": {
+        "source": "delivery/consumer.mjs",
+        "normalCandidateAcceptDelivered": true,
+        "wrongCandidateRefused": true,
+        "duplicateAcceptIdempotent": true,
+        "beginReplaySameWork": true,
+        "slots": "2/4 controlled works observed; native slot resource set NOT_REACHED"
+      },
+      "notReached": [
+        "actual B coordinator SIGKILL -> new process original A/question/answer/ACK recovery",
+        "same original Work recovered candidate/accept/delivered after a real rebind",
+        "live FD/socket/queue physical quiescence (H1 guard covers only own probes)"
+      ]
+    },
+    "H4": {
+      "status": "COMPLETE",
+      "source": [
+        "tools/trial-kit/",
+        "docs/internal-trial/README.zh-CN.md"
+      ],
+      "consumer": "exact wave30-target package readonly preflight/machinecheck + fixture readiness + bounded SSE fixture",
+      "commands": [
+        {
+          "command": "node tools/trial-kit/bin/trial-preflight.mjs --tar wave30-target-8296720.tar.gz --artifact install-artifact.json --expect-sha256/--expect-build/--expect-schema/--expect-source ...",
+          "exitCode": 1,
+          "result": "DEGRADED",
+          "pass": 32,
+          "unknown": 1,
+          "fail": 0
+        },
+        {
+          "command": "node tools/trial-kit/bin/trial-machinecheck.mjs ... --readiness-fixture --expect-mode fixture --expect-startup-mode normal",
+          "exitCode": 1,
+          "result": "DEGRADED",
+          "pass": 46,
+          "unknown": 3,
+          "fail": 0
+        },
+        {
+          "command": "node tools/trial-kit/bin/trial-soak.mjs --scenario mixed --duration-seconds 10 --failure-mode truncate",
+          "exitCode": 0,
+          "result": "COMPLETED_WITH_OBSERVED_DEFECT"
+        },
+        {
+          "command": "node tools/trial-kit/bin/trial-verify-run.mjs --run <soak-run>",
+          "exitCode": 0,
+          "result": "CONSISTENT"
+        }
+      ],
+      "package": {
+        "preflightUnknown": [
+          {
+            "id": "host_sqlite",
+            "status": "UNKNOWN",
+            "reason": "requires_executing_native_binding"
+          }
+        ],
+        "machineUnknown": [
+          {
+            "id": "host_sqlite",
+            "status": "UNKNOWN",
+            "reason": "requires_executing_native_binding"
+          },
+          {
+            "id": "readiness.package_binding",
+            "status": "UNKNOWN",
+            "reason": "readiness_has_no_package_identity"
+          },
+          {
+            "id": "support.reference",
+            "status": "UNKNOWN"
+          }
+        ],
+        "cli": [
+          {
+            "id": "help",
+            "exit": 0
+          },
+          {
+            "id": "status",
+            "exit": 2
+          },
+          {
+            "id": "doctor",
+            "exit": 1
+          }
+        ],
+        "readiness": {
+          "mode": "fixture",
+          "startupMode": "normal",
+          "authorizationNone": true,
+          "packageBinding": "UNKNOWN"
+        }
+      },
+      "soak": {
+        "requestedSeconds": 10,
+        "actualSeconds": 10,
+        "status": "COMPLETED_WITH_OBSERVED_DEFECT",
+        "sseConnections": null,
+        "failures": null,
+        "cleanup": {
+          "closed": true,
+          "activeSockets": 0,
+          "activeConnections": 0
+        },
+        "scope": "fixture only; not package daemon, not 48h soak"
+      },
+      "raw": [
+        "reports/trial-operations/wave30/package-preflight/",
+        "reports/trial-operations/wave30/package-machinecheck-bound/",
+        "reports/trial-operations/wave30/soak-10s/"
+      ]
+    }
+  },
+  "tests": {
+    "command": "node --test (guard3, original, windows2, current, delivery, recovery, channel)",
+    "exitCode": 0,
+    "passed": 17,
+    "failed": 0
+  },
+  "errors": [
+    {
+      "id": "original-output-under-reports-timeout",
+      "observed": "first produce-original2 run with --out reports/trial-operations/wave30/original-ingress timed out waiting for the question; partial state removed",
+      "workaround": "reran with a fresh /tmp root, exit 0, copied only normal.json/readback.json/report.json into reports",
+      "sourceChanged": false,
+      "note": "path-specific reproduction issue; not a product claim"
+    }
+  ],
+  "externalResources": {
+    "ownProbes": [
+      {
+        "target": "normal",
+        "step": "TERM",
+        "sent": true,
+        "refused": null,
+        "pid": 92292
+      },
+      {
+        "target": "stubborn",
+        "step": "TERM",
+        "sent": true,
+        "refused": null,
+        "pid": 92312
+      },
+      {
+        "target": "stubborn",
+        "step": "KILL",
+        "sent": true,
+        "refused": null,
+        "pid": 92312
+      }
+    ],
+    "twelveUserServices": "5180/8796 through 5191/8807 untouched",
+    "userStateProfilesTarsLedgers": "untouched",
+    "globalDiscovery": false,
+    "foreignSignals": 0
+  },
+  "usage": {
+    "modelCalls": 0,
+    "vendorTurns": 0,
+    "nativeTurns": 0,
+    "signals": 3,
+    "tokenBudget": null
+  },
+  "notReached": [
+    "actual B coordinator SIGKILL -> new process original A question/answer/ACK recovery",
+    "same-Runner dual client process handover on the original A/Broker route",
+    "recovered candidate/accept after real rebind (B ordinary 5/5 is not recovery)",
+    "B sink facts joined to the original question/answer business ingress",
+    "product target readonly/SSE/installed verdict; H observations are not E required or release authority",
+    "native 2/4 slot resource set and vendor/native compatibility"
+  ],
+  "hashes": {
+    "reports/trial-operations/wave30/procguard/evidence.json": "c909fc326f489bfed99fe51fdf4358667d91fdb2fbdead54c25c4a3aad24cf30",
+    "reports/trial-operations/wave30/selected-current/report.json": "db633c9c10d38c17938cc7931747bbdfc01feb4e6d30168b18f8ef6dc074e798",
+    "reports/trial-operations/wave30/original-ingress/readback.json": "b2ce5aab9ad9c808c2433fbd2eb26865f938c2053574244b3856639a030a092a",
+    "reports/trial-operations/wave30/windows/windows.json": "637afac546291de2aca8b533ccdbc00fd5d102969fff24fe90ffb95917f4acab",
+    "reports/trial-operations/wave30/package-preflight/preflight-report.json": "c2f6034d4a76cfe5704c16a039b432d330f96bac9943138f1bdb291b755b9b6b",
+    "reports/trial-operations/wave30/package-machinecheck-bound/machinecheck-report.json": "9e8d597c083f78e4968cb5da6503454f76e50e89533f462dcdd4f1e10621871a"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "tool": "trial-kit/original-ingress2",
+  "wave": 30,
+  "status": "OK",
+  "checks": {
+    "workPersisted": true,
+    "questionPersisted": true,
+    "answerPersisted": true,
+    "commandReceipt": true,
+    "nativeApplied": true,
+    "attemptBound": true,
+    "contractStable": true,
+    "modelCalls0": true
+  },
+  "failed": [],
+  "workId": "94012e1a1c7265c033f285a944656a04",
+  "questionId": "48b04cf56a15b0e8c04918f5463abe24",
+  "answerId": "0c4da78469ec2ca5857439d4cfb1837a",
+  "commandId": "recovery-command-2",
+  "attemptId": "attempt-d744ccb2-fd04-495e-ac14-90c8d2037c37",
+  "deliveries": [
+    {
+      "targetBindingId": "90ebe6a85da7f41c21997980755aefd0",
+      "status": "native_applied"
+    }
+  ],
+  "modelCalls": 0,
+  "vendorTurns": 0,
+  "businessIngressJoin": "NOT_REACHED: current B sink records runner facts; the question/answer rows above come from the original Application/QuestionBroker fixture path."
+}

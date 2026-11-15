@@ -1,0 +1,126 @@
+{
+  "protocol": "original-ingress-readback/1",
+  "surface": "controlled ProductRuntime/Application/QuestionBroker + original A ProductStore public readers",
+  "executor": "controlled_fixture",
+  "modelCalls": 0,
+  "vendorTurns": 0,
+  "workId": "94012e1a1c7265c033f285a944656a04",
+  "questionId": "48b04cf56a15b0e8c04918f5463abe24",
+  "answerId": "0c4da78469ec2ca5857439d4cfb1837a",
+  "commandId": "recovery-command-2",
+  "attemptId": "attempt-d744ccb2-fd04-495e-ac14-90c8d2037c37",
+  "contract": {
+    "workId": "94012e1a1c7265c033f285a944656a04",
+    "revision": 1,
+    "digest": "4d7f353c47e01fa098cc3254630cc65c19ba132f9c64362da6e5e5c98e67b78a"
+  },
+  "work": {
+    "id": "94012e1a1c7265c033f285a944656a04",
+    "projectId": "project-scratch",
+    "conversationId": "recovery-conversation",
+    "title": "Produce the controlled scratch artifact",
+    "createdAt": "2026-11-15T08:32:09.324Z"
+  },
+  "question": {
+    "id": "48b04cf56a15b0e8c04918f5463abe24",
+    "version": 2,
+    "validity": "answered"
+  },
+  "answer": {
+    "questionId": "48b04cf56a15b0e8c04918f5463abe24",
+    "expectedVersion": 1,
+    "digest": "b1d5ccb7f9fda2a3197b62fed2890435f3ddad008ab7b63f25308a05090c5f65",
+    "answer": {
+      "kind": "question-answer/1",
+      "question": {
+        "id": "48b04cf56a15b0e8c04918f5463abe24",
+        "version": 1,
+        "kind": "permission",
+        "contract": {
+          "workId": "94012e1a1c7265c033f285a944656a04",
+          "revision": 1,
+          "digest": "4d7f353c47e01fa098cc3254630cc65c19ba132f9c64362da6e5e5c98e67b78a"
+        },
+        "scope": {
+          "projectId": "project-scratch",
+          "allowedPaths": [
+            "src/"
+          ],
+          "excludedPaths": [],
+          "externalActions": []
+        },
+        "prompt": "Allow the controlled fixture to write its scratch artifact?",
+        "nativePayloadRef": "payload:8eefb66fc881f500f31c2cd9d5d0c92fb81c374fb1afda1a436c0654f1f976e0",
+        "presentation": {
+          "kind": "choices",
+          "options": [
+            {
+              "id": "allow",
+              "label": "Allow once",
+              "semantic": "allow_once"
+            },
+            {
+              "id": "deny",
+              "label": "Deny",
+              "semantic": "deny"
+            }
+          ],
+          "multiple": false
+        },
+        "targets": [
+          {
+            "ticketId": "30f6d8d0d6609603ed3f07d40626d394",
+            "assignmentId": "767b0cb31e66e2a307fc8a8a90b973fe",
+            "contract": {
+              "workId": "94012e1a1c7265c033f285a944656a04",
+              "revision": 1,
+              "digest": "4d7f353c47e01fa098cc3254630cc65c19ba132f9c64362da6e5e5c98e67b78a"
+            },
+            "attemptId": "attempt-d744ccb2-fd04-495e-ac14-90c8d2037c37",
+            "fenceEpoch": 1,
+            "id": "90ebe6a85da7f41c21997980755aefd0",
+            "connectionEpoch": 1,
+            "nativeRequestId": {
+              "kind": "integer",
+              "decimal": "9223372036854775807"
+            },
+            "nativeMethod": "fixture/approve",
+            "provenanceRef": "payload:8eefb66fc881f500f31c2cd9d5d0c92fb81c374fb1afda1a436c0654f1f976e0"
+          }
+        ],
+        "openedAt": "2026-11-15T08:32:10.931Z",
+        "validity": "open"
+      },
+      "answer": {
+        "kind": "choices",
+        "optionIds": [
+          "allow"
+        ]
+      },
+      "actor": {
+        "userId": "local-product-user",
+        "authorityRef": "local-product-authority",
+        "source": "local_cli"
+      },
+      "deferred": false
+    },
+    "recordedAt": "2026-11-15T08:32:10.963Z"
+  },
+  "deliveries": [
+    {
+      "targetBindingId": "90ebe6a85da7f41c21997980755aefd0",
+      "status": "native_applied"
+    }
+  ],
+  "checks": {
+    "workPersisted": true,
+    "questionPersisted": true,
+    "answerPersisted": true,
+    "commandReceipt": true,
+    "nativeApplied": true,
+    "attemptBound": true,
+    "contractStable": true,
+    "modelCalls0": true
+  },
+  "businessIngressJoin": "NOT_REACHED: current B sink records runner facts; the question/answer rows above come from the original Application/QuestionBroker fixture path."
+}

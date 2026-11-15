@@ -20,24 +20,26 @@ export const ROOTS = {
 
 export const FILES = {
   I: {
-    'apps/runner/src/attach-channel/attach.ts': '321738dae3b87e6ad7d235f52aaa65e6f63ab527',
-    'apps/runner/src/attach-channel/coordinator-channel.ts': 'd1ef81eb9d51b24417645151440eb1e262c20546',
-    'apps/runner/src/attach-channel/errors.ts': 'ec8ce909d0f30ab1d96488db56cdf3b6a4ab7f49',
-    'apps/runner/src/attach-channel/index.ts': 'b26154f343634cb6c7536aa5cd5bcb7169e0b980',
-    'packages/contracts/src/coordinator-channel.ts': 'cf451efe433b8f9140d992ccfb415df9cd74b92c',
-    'packages/contracts/src/schemas.ts': '0eaafbf444c5ef099971fbc226c36a33002f983d',
-    'packages/contracts/src/types.ts': '423043fe2b999a2e71e0dd3995c7d33f522144de',
+    'apps/runner/src/attach-channel/attach.ts': null,
+    'apps/runner/src/attach-channel/coordinator-channel.ts': null,
+    'apps/runner/src/attach-channel/errors.ts': null,
+    'apps/runner/src/attach-channel/index.ts': null,
+    'apps/runner/src/attach-channel/refusals.ts': null,
+    'apps/runner/src/attach-channel/sink-responder.ts': null,
+    'packages/contracts/src/coordinator-channel.ts': null,
+    'packages/contracts/src/schemas.ts': null,
+    'packages/contracts/src/types.ts': null,
   },
   B: {
-    'apps/runner/src/attach-channel/attach.ts': '321738dae3b87e6ad7d235f52aaa65e6f63ab527',
-    'apps/runner/src/attach-channel/coordinator-channel.ts': 'd1ef81eb9d51b24417645151440eb1e262c20546',
-    'apps/runner/src/attach-channel/errors.ts': 'ec8ce909d0f30ab1d96488db56cdf3b6a4ab7f49',
-    'apps/runner/src/attach-channel/index.ts': 'b26154f343634cb6c7536aa5cd5bcb7169e0b980',
-    'apps/runner/src/runner-service.ts': '1e7f0bd0fb5f9a7a20c0b19edaf1dc99e2811c29',
-    'apps/runner/src/business-attach.ts': '2f69fedf5b4a33343968b8cc8a0269598dacbc1f',
+    'apps/runner/src/attach-channel/attach.ts': null,
+    'apps/runner/src/attach-channel/coordinator-channel.ts': null,
+    'apps/runner/src/attach-channel/errors.ts': null,
+    'apps/runner/src/attach-channel/index.ts': null,
+    'apps/runner/src/runner-service.ts': null,
+    'apps/runner/src/business-attach.ts': null,
   },
   main: {
-    'packages/contracts/src/coordinator-channel.ts': 'cf451efe433b8f9140d992ccfb415df9cd74b92c',
+    'packages/contracts/src/coordinator-channel.ts': null,
   },
 }
 
@@ -75,7 +77,7 @@ export function bindCurrent({ role, root = ROOTS[role], commit = null, expectFil
     else if (git(real, ['merge-base', '--is-ancestor', selected, head ?? selected]).status !== 0) issues.push('commit_not_ancestor')
   }
   const files = []
-  const expectedMap = expectFiles ?? Object.fromEntries(Object.keys(FILES[role]).map((rel) => [rel, null]))
+  const expectedMap = Object.fromEntries(Object.keys(FILES[role]).map((rel) => [rel, expectFiles?.[rel] ?? null]))
   for (const [rel, expectedBlob] of Object.entries(expectedMap)) {
     const absolute = resolve(real, rel)
     let fileInfo
