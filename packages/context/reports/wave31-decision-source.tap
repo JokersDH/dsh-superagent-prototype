@@ -1,0 +1,16 @@
+TAP version 13
+# Subtest: accepted and unknown stay distinct while revoked or superseded decisions never revive or grant execution
+ok 1 - accepted and unknown stay distinct while revoked or superseded decisions never revive or grant execution
+  ---
+  duration_ms: 4000.934541
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4790.147166

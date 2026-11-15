@@ -8,12 +8,11 @@ import { tmpdir } from 'node:os'
 import { ProductStore } from '@personal-agent/storage'
 import { createProductRuntime } from '../../../apps/coordinator/product/runtime.ts'
 import { createLocalHttpApp } from '../../../apps/coordinator/http/app.ts'
-import { buildPersonalChain, conversationId, projectId, reviewScope } from './helpers/personal-chain.ts'
+import { buildPersonalChain, conversationId, principal, projectId, reviewScope } from './helpers/personal-chain.ts'
 
 const repoRoot = fileURLToPath(new URL('../../../', import.meta.url))
 const historyTool = join(repoRoot, 'packages/context/tools/wave30-completion-history.mjs')
 const aWorktree = process.env.PA_AGENT_A ?? '/Users/hh/Desktop/joker/superagent-agent-a'
-const principal = { userId: 'wave22-user', authorityRef: 'wave22-authority' }
 const actor = { ...principal, source: 'local_cli' as const }
 const apiToken = 'a'.repeat(64)
 const headers = { authorization: `Bearer ${apiToken}`, 'content-type': 'application/json' }
@@ -55,6 +54,9 @@ test('accepted and unknown stay distinct while revoked or superseded decisions n
   runtime.start()
 
   const sourceMessageId = chain.sourceMessageId
+  const frozenBeforeResponse = await app.request(`/v1/messages/${encodeURIComponent(chain.contextMessageId)}/context`, { headers })
+  assert.equal(frozenBeforeResponse.status, 200)
+  const frozenBefore = (await frozenBeforeResponse.json()) as Record<string, any>
   const decisionA = `decision-${Date.now()}`
   const preparedA = (await (await app.request('/v1/decisions/prepare', { method: 'POST', headers,
     body: JSON.stringify({ projectId, conversationId, sourceMessageId,
@@ -127,6 +129,12 @@ test('accepted and unknown stay distinct while revoked or superseded decisions n
       budget: { maxFiles: 16, maxBytes: 65536, maxTokens: 16384 } }) })).json()) as Record<string, any>
   const afterGroup = (previewAfter.groups as { name: string; used: { files: number } }[]).find((group) => group.name === 'decisions')
   assert.equal(afterGroup !== undefined && usedWithB !== undefined && afterGroup.used.files === usedWithB - 1, true)
+  // Revocation does not rewrite the frozen historical context; it only changes current eligibility.
+  const frozenAfterResponse = await app.request(`/v1/messages/${encodeURIComponent(chain.contextMessageId)}/context`, { headers })
+  assert.equal(frozenAfterResponse.status, 200)
+  const frozenAfter = (await frozenAfterResponse.json()) as Record<string, any>
+  assert.equal(frozenAfter.bundleDigest, frozenBefore.bundleDigest)
+  assert.deepEqual(frozenAfter.sources, frozenBefore.sources)
   const decisionSources = (previewAfter.sources as { kind: string; path: string }[]).filter((source) => source.kind === 'decision')
   assert.equal(decisionSources.some((source) => source.path.includes(decisionId) || source.path.includes(decisionB)), false)
 
