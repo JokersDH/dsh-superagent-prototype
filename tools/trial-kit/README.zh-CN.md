@@ -71,7 +71,7 @@ node tools/trial-kit/bin/trial-soak.mjs --scenario mixed --duration-seconds 600 
 node --test tests/operational-soak/*.case.mjs tests/operational-soak/{recovery,channel,selected,procguard,delivery}/*.case.mjs
 ```
 
-覆盖（36/36）：完整 tiny fixture 正负、错 hash/缺文件/多余文件/外部 symlink/坏 JSON/缺依赖/错 console stamp、绝对与 `..` 成员、截断 tar、ABI 不一致的 DEGRADED、输入与 home 无副作用、输出 0600/0700 与拒绝覆盖、含空格/中文路径、readiness 401/500/坏 JSON/超大/未知字段/过期/跨 subject/deadline、token 权限、support 白名单与空根采集、soak 正向/通道隔离/七类缺陷/中断/参数拒绝、REFUSED 零执行、token symlink/hardlink/FIFO、semver 上下界、checker 时间矛盾，以及合法零模型恢复包/foreign source/reader 复核、共享 CoordinatorChannel 合法 frames/拒绝边界和真实 B stdio 的 fact/payload/write 回调。恢复/渠道/selected-source/安全信号/原交付输入分别在 `tests/operational-soak/{recovery,channel,selected,procguard,delivery}/`，不在 trial-kit 内。
+覆盖（41/41）：完整 tiny fixture 正负、错 hash/缺文件/多余文件/外部 symlink/坏 JSON/缺依赖/错 console stamp、绝对与 `..` 成员、截断 tar、ABI 不一致的 DEGRADED、输入与 home 无副作用、输出 0600/0700 与拒绝覆盖、含空格/中文路径、readiness 401/500/坏 JSON/超大/未知字段/过期/跨 subject/deadline、token 权限、support 白名单与空根采集、soak 正向/通道隔离/七类缺陷/中断/参数拒绝、REFUSED 零执行、token symlink/hardlink/FIFO、semver 上下界、checker 时间矛盾，以及合法零模型恢复包/foreign source/reader 复核、共享 CoordinatorChannel 合法 frames/拒绝边界和真实 B stdio 的 fact/payload/write 回调。恢复/渠道/selected-source（历史与 current）/安全信号 v1+v2/原交付输入分别在 `tests/operational-soak/{recovery,channel,selected,procguard,delivery}/`，不在 trial-kit 内。
 
 ## 明确不声称
 

@@ -173,6 +173,22 @@ export async function runDeliveryConsumer({ root }) {
     rmSync(doubleRoot, { recursive: true, force: true })
   }
 
+  // 2b. begin replay: the same create_work command id returns the same original Work, not a second one.
+  {
+    const beginRoot = join(root, 'begin-replay')
+    const h = makeRuntime({ root: beginRoot, human: false })
+    try {
+      h.product.start()
+      const commandId = 'delivery-begin-replay'
+      const body = { commandId, conversationId: 'delivery-conversation', kind: 'create_work', projectId: SCOPE.projectId, goal: 'Begin replay fixture', profileId: 'profile-fixture-pass', scope: SCOPE, criteria: CRITERIA }
+      const first = await h.product.application.dispatch(body, ACTOR)
+      const second = await h.product.application.dispatch(body, ACTOR)
+      const works = (await h.product.application.inspect({})).works
+      report.beginReplay = { first: first.status, second: second.status, sameReceipt: JSON.stringify(first) === JSON.stringify(second), workCount: works.length, sameWork: first.workId === second.workId }
+    } finally { await h.close() }
+    rmSync(beginRoot, { recursive: true, force: true })
+  }
+
   // 3. 2 and 4 concurrent controlled works: attempt frames, queue, resource state per WorkView.work.id.
   for (const count of [2, 4]) {
     const slotRoot = join(root, `slots-${count}`)
@@ -220,6 +236,7 @@ export async function runDeliveryConsumer({ root }) {
     slots4: report.slots['4']?.delivered === 4 && report.slots['4']?.workViewIdsMatch === true,
     answerReplayIdempotent: report.normal?.answerReplaySame === true,
     answerConflictRejected: report.normal?.answerConflictStatus === 'rejected',
+    beginReplayIdempotent: report.beginReplay?.first === 'recorded' && report.beginReplay?.sameWork === true && report.beginReplay?.workCount === 1,
   }
   return report
 }

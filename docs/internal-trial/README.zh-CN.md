@@ -72,6 +72,15 @@ readiness 只代表配置事实：它不含包身份（报告会写 `package_bin
 - 不要手工粘贴 token、对话正文、个人绝对路径；诊断包已脱敏，仍请快速扫一眼；
 - `pa support` 不会自动运行，因为它会在有数据库时以可写 pragma 打开数据库。请在自己的副本上运行后，用 `--support <file>` 引用；或让工具在“空的自有新根”上采集。
 
+## 3b. wave-29 current source、可信出生与原交付
+
+- `tests/operational-soak/selected/produce2.mjs` 以当前 I/B/H commits 物化 exact source，不 pin 旧 head；先 source 拒绝再 import/执行。
+- I current 12/12（含 fresh intent/namespace/prune）；B current 三回调通过，但 **sink-only guard 仍自批**（`externalGuardCalls=0`），B/main 必须在写前接原 fresh guard。
+- `procguard/produce2.mjs` 是新的安全 helper：仅注册 handle 可 signal，root/config/operation 与 spawn 精确匹配，ps UNKNOWN 不等于 gone；纯控制通过后才对本 run probe 发 TERM/KILL。
+- 原交付：question/answer→currentCandidate→manual accept→delivered；begin/answer/accept 同 commandId 重放均幂等；2/4 works 观察有，native slot 资源集 NOT_REACHED。
+- 包：1fbaf94（6849 项）只作只读预检输入。
+- 仍未达：same-Runner route、SIGKILL 原问答、recovered candidate/accept、真实产品 readonly/SSE。
+
 ## 4. wave-28 selected source、信号与原交付
 
 - **唯一实现边界**：当前 B 有自己的 business channel，尚未导入 I 的 attach-channel，不能称“唯一通道已合一”。H 的 `tests/operational-soak/selected/` 只按 admitted commit 物化并消费实际模块，错误 root/blob 在运行前拒绝。

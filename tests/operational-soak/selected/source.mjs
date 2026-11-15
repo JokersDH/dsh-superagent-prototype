@@ -103,7 +103,6 @@ export const EXPECTED = {
     },
   },
   main: {
-    head: '089f401391fd2c51a179a4dc1760e7aca7004d73',
     blobs: {
       'packages/contracts/src/coordinator-channel.ts': 'cf451efe433b8f9140d992ccfb415df9cd74b92c',
     },
