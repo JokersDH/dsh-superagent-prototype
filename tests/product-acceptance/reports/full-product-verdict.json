@@ -3,12 +3,12 @@
   "tier": "full-product",
   "status": "FAIL",
   "ok": false,
-  "checkedAt": "2026-11-15T03:05:04.383Z",
+  "checkedAt": "2026-11-15T07:01:07.390Z",
   "source": {
-    "commit": "516203efa95fcd0b08bdcc5127545c6d8996c745",
+    "commit": "9027d03dcf9981c3161acce81482fa4872f06e29",
     "dirty": false
   },
-  "expectedSource": "516203efa95fcd0b08bdcc5127545c6d8996c745",
+  "expectedSource": "9027d03dcf9981c3161acce81482fa4872f06e29",
   "requirements": [
     {
       "id": "E1-GATE-CONTROL",
@@ -377,6 +377,26 @@
     },
     {
       "id": "E1-MUTATE-PILOT-NO-ORACLE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-LIFECYCLE-NO-RECORD-BIRTH",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-LIFECYCLE-NO-RECORD-EXIT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-LIFECYCLE-NO-RECORD-REUSE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-LIFECYCLE-STOP-NO-RECORD",
       "required": true,
       "status": "PASS"
     },
@@ -816,6 +836,16 @@
       "status": "PASS"
     },
     {
+      "id": "E9-INSIGHTS-HTTP",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E6-RECIPE-PREVIEW",
+      "required": false,
+      "status": "NOT_TESTED"
+    },
+    {
       "id": "E11-TRIAL-IDENTITY-FIELDS",
       "required": false,
       "status": "NOT_TESTED"
@@ -923,6 +953,31 @@
   ],
   "failures": [
     {
+      "code": "secondRoot_invalid",
+      "detail": "secondRoot business_data",
+      "caseId": "E7-SECOND-ROOT-READONLY"
+    },
+    {
+      "code": "secondRoot_invalid",
+      "detail": "secondRoot original_body",
+      "caseId": "E7-SECOND-ROOT-READONLY"
+    },
+    {
+      "code": "secondRoot_invalid",
+      "detail": "secondRoot candidates",
+      "caseId": "E7-SECOND-ROOT-READONLY"
+    },
+    {
+      "code": "secondRoot_invalid",
+      "detail": "secondRoot context",
+      "caseId": "E7-SECOND-ROOT-READONLY"
+    },
+    {
+      "code": "secondRoot_invalid",
+      "detail": "secondRoot data",
+      "caseId": "E7-SECOND-ROOT-READONLY"
+    },
+    {
       "code": "missing_required_case",
       "detail": "Required case E5-NATIVE-DELIVERY is absent",
       "caseId": "E5-NATIVE-DELIVERY"
@@ -951,7 +1006,7 @@
   "claimedBy": {
     "status": "PASS",
     "tier": "controlled-product-workflow",
-    "decidedAt": "2026-11-15T03:03:02.835Z",
+    "decidedAt": "2026-11-15T06:56:55.311Z",
     "failureCodes": []
   },
   "notes": [

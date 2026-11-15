@@ -528,6 +528,7 @@ export async function runInstalledRecovery() {
         afterDb.results === beforeDb.results && afterDb.messages === beforeDb.messages && afterDb.decisions === beforeDb.decisions,
         JSON.stringify({ providerRows, before: { ...beforeDb, effectRows: beforeDb.effectRows.length }, after: { ...afterDb, effectRows: afterDb.effectRows.length } }))
       evidence.secondRoot = { subject: frozenArtifactSubject(target), mode: 'recovery_readonly',
+        contextScope: observed.original.prepared === 200 && observed.original.send === 200 ? 'verified' : 'NOT_REACHED: no discussion provider in the controlled-execution seed',
         probeScope: 'fixture+recovery_readonly', personalRebinding: 'main_readonly_binding_entry_absent',
         businessData: { producer: 'installed fixture executor through the real App/Effects/queue',
           workPhase: observed.readOnly.workPhase, workArtifacts: observed.readOnly.workArtifacts,

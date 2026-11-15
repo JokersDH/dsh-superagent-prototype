@@ -520,7 +520,7 @@ const commandSummary = (prefixes) => {
     .join(' + ')
 }
 
-const handoff = `# Agent E 第二十八轮交付交接
+const handoff = `# Agent E 第二十九轮交付交接
 
 - 分支 \`${stages.branch}\`，基线 \`${stages.base}\`，检查点 \`${stages.checkpoint}\`，本次证据源 \`${report.source.commit}\`${report.source.dirty ? '（运行时尚有未提交文件，最终提交包含它们）' : '（干净工作树）'}。证据文件随源提交之后的提交一起交付；\`git log\` 的分支头即最终交付提交。
 - 拥有路径：\`tests/product-acceptance/\`。未修改生产实现、root manifest/lock、公共 schema 或迁移。
@@ -1063,7 +1063,9 @@ if (!existsSync(join(reports, 'wave23-status.json')))
     readiness: byId.get('E7-READINESS')?.evidence?.readiness ?? null,
     packagedStop: byId.get('E8-PACKAGED-STOP-CONSISTENCY')?.evidence?.packagedStop ?? null,
     stopFunctional: byId.get('E5-STOP-FUNCTIONAL')?.evidence?.stopFunctional ?? null,
-    lifecycle: ['E1-LIFECYCLE-BIRTH-ROOT', 'E1-LIFECYCLE-CHILD-SCOPE', 'E1-LIFECYCLE-OWN', 'E1-LIFECYCLE-WRONG-START', 'E1-LIFECYCLE-SIBLING', 'E1-LIFECYCLE-FOREIGN-CHILD',
+    insights: byId.get('E9-INSIGHTS-HTTP')?.evidence?.insights ?? null,
+    recipePreview: byId.get('E6-RECIPE-PREVIEW')?.evidence?.recipePreview ?? null,
+    lifecycle: ['E1-LIFECYCLE-NO-RECORD-BIRTH', 'E1-LIFECYCLE-NO-RECORD-EXIT', 'E1-LIFECYCLE-NO-RECORD-REUSE', 'E1-LIFECYCLE-STOP-NO-RECORD', 'E1-LIFECYCLE-BIRTH-ROOT', 'E1-LIFECYCLE-CHILD-SCOPE', 'E1-LIFECYCLE-OWN', 'E1-LIFECYCLE-WRONG-START', 'E1-LIFECYCLE-SIBLING', 'E1-LIFECYCLE-FOREIGN-CHILD',
       'E1-LIFECYCLE-MIXED-UNKNOWN', 'E1-LIFECYCLE-START-WINDOW', 'E1-LIFECYCLE-REFUSED-STOP', 'E1-LIFECYCLE-IDEMPOTENT']
       .map(id => ({ id, status: byId.get(id)?.status ?? 'MISSING' })),
     channel: byId.get('E9-COORDINATOR-CHANNEL-CONTRACT')?.evidence?.channelContract ?? null,
@@ -1198,12 +1200,12 @@ if (!existsSync(join(reports, 'wave24-status.json')))
   }, null, 2) + '\n',
 )
 writeFileSync(
-  join(reports, 'wave28-status.json'),
+  join(reports, 'wave29-status.json'),
   JSON.stringify({
     ...executionStatus,
-    schema: 'product-acceptance-wave28-status/1',
-    taskPackage: 'agent-tasks/product-wave-28/README.zh-CN.md',
-    supersedes: 'wave27-status.json',
+    schema: 'product-acceptance-wave29-status/1',
+    taskPackage: 'agent-tasks/product-wave-29/README.zh-CN.md',
+    supersedes: 'wave28-status.json',
     subject: { target: byId.get('E4-INSTALL-ARTIFACT-IDENTITY')?.evidence?.artifact?.tuple?.target ?? null,
       baseline: byId.get('E4-UPGRADE-ROLLBACK')?.evidence?.upgrade?.baseline ?? null,
       control: byId.get('E5-D-OWNERSHIP-MOCKS')?.evidence?.ownershipMocks?.previousPackageHelper ?? null },
@@ -1229,7 +1231,9 @@ writeFileSync(
       readiness: byId.get('E7-READINESS')?.status ?? 'MISSING',
       trialWorkbenchUi: byId.get('E3-TRIAL-WORKBENCH-UI')?.status ?? 'MISSING',
       functionalStop: byId.get('E5-STOP-FUNCTIONAL')?.status ?? 'MISSING',
-      lifecycleControls: ['E1-LIFECYCLE-BIRTH-ROOT', 'E1-LIFECYCLE-CHILD-SCOPE', 'E1-LIFECYCLE-OWN', 'E1-LIFECYCLE-WRONG-START', 'E1-LIFECYCLE-SIBLING', 'E1-LIFECYCLE-FOREIGN-CHILD',
+      insights: byId.get('E9-INSIGHTS-HTTP')?.status ?? 'MISSING',
+      recipePreview: byId.get('E6-RECIPE-PREVIEW')?.status ?? 'MISSING',
+      lifecycleControls: ['E1-LIFECYCLE-NO-RECORD-BIRTH', 'E1-LIFECYCLE-NO-RECORD-EXIT', 'E1-LIFECYCLE-NO-RECORD-REUSE', 'E1-LIFECYCLE-STOP-NO-RECORD', 'E1-LIFECYCLE-BIRTH-ROOT', 'E1-LIFECYCLE-CHILD-SCOPE', 'E1-LIFECYCLE-OWN', 'E1-LIFECYCLE-WRONG-START', 'E1-LIFECYCLE-SIBLING', 'E1-LIFECYCLE-FOREIGN-CHILD',
         'E1-LIFECYCLE-MIXED-UNKNOWN', 'E1-LIFECYCLE-START-WINDOW', 'E1-LIFECYCLE-REFUSED-STOP', 'E1-LIFECYCLE-IDEMPOTENT']
         .map(id => `${id}:${byId.get(id)?.status ?? 'MISSING'}`),
       native: 'NOT_TESTED: 0 vendor/native sends; B recovery/private permission/target remain separate',
@@ -1294,7 +1298,9 @@ writeFileSync(
       measured3b: '227 PASS / 0 FAIL / 17 NOT_TESTED at the recorded 162-required scope (wave25 target, preserved)',
       measuredCe64: 'wave-26 ce64 164-required ordinary installed scope preserved (238 PASS / 0 FAIL / 16 NOT_TESTED)',
       p1Tool: 'wave-27 closed substring/unproven-signal/unconditional-record-deletion; wave-28 closes birth-root and whole-set preflight (a record cannot lend another state birth)',
-      measuredCe64W28: '260 PASS / 0 FAIL / 19 NOT_TESTED ordinary scope; functional stop detected as BLOCKED and required to fail in installed-functional',
+      measuredCe64W28: '260 PASS / 0 FAIL / 19 NOT_TESTED ordinary scope; functional stop detected as BLOCKED and required to fail in installed-functional (preserved history)',
+      measured1ba: 'D 1ba0032 measured here; the packaged functional stop now returns STOPPED for both normal and restored no-file instances',
+      noRecordGap: 'wave-29 closes known-birth/no-record: a missing instance.json no longer releases a live spawn or deletes its private root',
       measuredA826: 'a826 readiness/UI absent from the frozen package; its exact bytes stay a separate scope and are not relabeled',
       measured595: '200 PASS / 0 FAIL / 15 NOT_TESTED at the recorded 161-required scope',
       measuredA9b: '208 PASS / 0 FAIL / 15 NOT_TESTED at the recorded 162-required scope',
@@ -1341,7 +1347,7 @@ writeFileSync(
     artifactTuple,
   }, null, 2) + '\n',
 )
-// Historical wave06-27 status files are frozen inputs; wave28 supersedes them.
+// Historical wave06-28 status files are frozen inputs; wave29 supersedes them.
 
 writeFileSync(join(reports, 'handoff.zh-CN.md'), handoff)
 
