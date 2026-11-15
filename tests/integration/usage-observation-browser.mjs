@@ -31,7 +31,7 @@ const api = listenLocalHttp(app, 0); await once(api, 'listening')
 const vite = await createServer({ root: resolve('apps/console'), configFile: resolve('apps/console/vite.config.ts'),
   define: { 'import.meta.env.VITE_CONSOLE_MODE': JSON.stringify('http') }, server: { host: '127.0.0.1', port, strictPort: true,
     proxy: { '/v1': { target: `http://127.0.0.1:${api.address().port}`, changeOrigin: true } } } })
-let browser, before, posts = 0, insightReads = 0
+let browser, before, posts = 0, previewPosts = 0, insightReads = 0
 const requestedWindows = []
 const cases = [], errors = []
 const check = async (id, action) => { await action(); cases.push({ id, status: 'PASS' }) }
@@ -55,7 +55,10 @@ try {
     if (new URL(request.url()).pathname === '/v1/insights') {
       insightReads++; requestedWindows.push(Number(new URL(request.url()).searchParams.get('days')))
     }
-    if (request.url().includes('/v1/') && request.method() === 'POST') posts++
+    if (request.url().includes('/v1/') && request.method() === 'POST') {
+      if (new URL(request.url()).pathname.endsWith('/recipes/preview')) previewPosts++
+      else posts++
+    }
   })
   const trial = page.getByRole('region', { name: '试用准备', exact: true })
   const questionValue = trial.locator('.trial-insight-row').filter({ has: page.getByText('提出问题', { exact: true }) }).locator('dd')
@@ -171,7 +174,8 @@ try {
   const report = { status: cases.length === 9 ? 'PASS_ACTUAL_SCOPED_INSIGHTS_APP' : 'FAIL',
     sourceCommit: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
     sourceWorktreeClean: execFileSync('git', ['status', '--porcelain', '--', 'apps', 'packages', 'tests/integration/usage-observation*'], { encoding: 'utf8' }).trim() === '',
-    cases, errors, insightReads, requestedWindows, postRequests: posts, eventDelta, realModelTurns: 0, nativeTurnStarts: 0,
+    cases, errors, insightReads, requestedWindows, postRequests: posts, readonlyRecipePreviewPosts: previewPosts,
+    eventDelta, realModelTurns: 0, nativeTurnStarts: 0,
     scope: 'Actual App/React/Product/Broker/SQLite/HTTP/G Node analyzer, private controlled question fixtures; no installed/native/recovery/benefit admission' }
   writeFileSync(join(output, 'browser-report.json'), JSON.stringify(report, null, 2) + '\n'); console.log(JSON.stringify(report, null, 2))
 }

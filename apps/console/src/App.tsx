@@ -4,7 +4,7 @@
  * the backend snapshot and `actions.available`; the UI never infers a phase or invents an action.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { ConversationMessageSchema, IdSchema } from '@personal-agent/contracts'
+import { ConversationMessageSchema, IdSchema, ProjectRecipePreviewInputSchema } from '@personal-agent/contracts'
 import {
   ArrowUp,
   ArrowUpRight,
@@ -76,6 +76,7 @@ import { ProjectSettings } from './ProjectSettings.tsx'
 import { useReviewActivity } from './useReviewActivity.ts'
 import { useUsageObservation } from './useUsageObservation.ts'
 import { useProjectRecipe } from './useProjectRecipe.ts'
+import { useProjectRecipeSuggestions } from './useProjectRecipeSuggestions.ts'
 import { AttentionInbox } from './AttentionInbox.tsx'
 import { DecisionWorkspace } from './DecisionWorkspace.tsx'
 import { ProposalWorkspace } from './ProposalWorkspace.tsx'
@@ -200,7 +201,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
   const [usageDays, setUsageDays] = useState<7 | 30>(7)
   const [offline, setOffline] = useState<boolean>(() => fixture?.modelOffline() ?? false)
   const [createOpen, setCreateOpen] = useState(false)
-  const [createDraft, setCreateDraft] = useState({ id: '', goal: '', projectId: '' })
+  const [createDraft, setCreateDraft] = useState<{ id: string; goal: string; projectId: string; recipe?: ProjectRecipePreviewInput }>({ id: '', goal: '', projectId: '' })
   const [projectImportOpen, setProjectImportOpen] = useState(false)
   const [contextOpen, setContextOpen] = useState(false)
   const [activateWorkId, setActivateWorkId] = useState<string | undefined>()
@@ -625,11 +626,11 @@ export function App({ transport }: { transport: ConsoleTransport }) {
     }
   }, [selectedWorkId, snapshot?.cursor, inspectorOpen, modelPanelOpen, transport])
 
-  const openWorkDraft = (goal = '', projectId = projectFilter ?? '') => {
+  const openWorkDraft = (goal = '', projectId = projectFilter ?? '', recipe?: ProjectRecipePreviewInput) => {
     setWorkspaceOpen(true)
     setInspectorOpen(false)
     setModelPanelOpen(false)
-    setCreateDraft({ id: newId('draft'), goal, projectId })
+    setCreateDraft({ id: newId('draft'), goal, projectId, ...(recipe ? { recipe } : {}) })
     setCreateOpen(true)
     setProjectImportOpen(false)
     setWorkspaceOpen(true)
@@ -668,6 +669,8 @@ export function App({ transport }: { transport: ConsoleTransport }) {
   const usage = useUsageObservation(transport, { enabled: auth === 'ready' && workspaceView === 'trial', identity: trialIdentity,
     projectId: projectFilter, days: usageDays, configurationRevision: configuration?.revision })
   const usageView = usage.error && usage.data ? { ...usage.data, coverage: `${usage.data.coverage} · 上次观察` } : usage.data
+  const recipes = useProjectRecipeSuggestions(transport, { enabled: auth === 'ready' && workspaceView === 'trial',
+    identity: trialIdentity, configuration, projectId: projectFilter })
   const openView = (view: typeof workspaceView) => {
     attentionNavigation.current += 1
     setWorkspaceView(view)
@@ -983,6 +986,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
                 key={createDraft.id}
                 initialGoal={createDraft.goal}
                 initialProjectId={createDraft.projectId}
+                initialRecipe={createDraft.recipe}
                 recipeTransport={transport}
                 configuration={configuration}
                 state={configState}
@@ -1072,6 +1076,12 @@ export function App({ transport }: { transport: ConsoleTransport }) {
               insights={usageView}
               insightWindow={usageDays} onSelectInsightWindow={setUsageDays} insightsLoading={usage.loading}
               insightsError={usage.error} onReloadInsights={usage.reload}
+              recipes={recipes.rows} recipesLoading={recipes.loading} recipesError={recipes.error}
+              onOpenRecipe={selection => {
+                const input = ProjectRecipePreviewInputSchema.parse({ projectId: selection.projectId, kind: selection.kind,
+                  allowedPaths: selection.allowedPaths, profileId: selection.profileId })
+                openView('conversation'); openWorkDraft('', input.projectId, input)
+              }}
               onReload={() => { trial.reload(); usage.reload(); void refreshConfiguration() }}
               onAction={action => {
                 switch (action) {
@@ -1826,6 +1836,7 @@ function ProjectImportForm({
 function NewWorkForm({
   initialGoal = '',
   initialProjectId = '',
+  initialRecipe,
   recipeTransport,
   configuration,
   state,
@@ -1837,6 +1848,7 @@ function NewWorkForm({
 }: {
   initialGoal?: string
   initialProjectId?: string
+  initialRecipe?: ProjectRecipePreviewInput | undefined
   recipeTransport?: ConsoleTransport
   configuration: ApplicationConfiguration | undefined
   state: 'loading' | 'ready' | 'unavailable' | 'failed'
@@ -1848,9 +1860,9 @@ function NewWorkForm({
 }) {
   const [goal, setGoal] = useState(initialGoal)
   const [projectChoice, setProjectChoice] = useState(initialProjectId)
-  const [profileChoice, setProfileChoice] = useState('')
-  const [recipeKind, setRecipeKind] = useState<'' | ProjectRecipePreviewInput['kind']>('')
-  const [scopeChoice, setScopeChoice] = useState<readonly string[]>()
+  const [profileChoice, setProfileChoice] = useState(initialRecipe?.profileId ?? '')
+  const [recipeKind, setRecipeKind] = useState<'' | ProjectRecipePreviewInput['kind']>(initialRecipe?.kind ?? '')
+  const [scopeChoice, setScopeChoice] = useState<readonly string[] | undefined>(initialRecipe?.allowedPaths)
   const [submitting, setSubmitting] = useState(false)
   const submittingRef = useRef(false)
   const [commandId, setCommandId] = useState(() => newId('cmd-work'))
