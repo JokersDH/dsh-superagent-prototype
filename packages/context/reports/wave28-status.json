@@ -1,0 +1,87 @@
+{
+  "protocol": "agent-c-wave28-status/1",
+  "wave": "product-wave-28",
+  "agent": "C",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-c",
+  "branch": "codex/g3-assistant-context",
+  "ownedPackages": ["packages/context", "packages/proposals", "packages/knowledge", "packages/routing"],
+  "base": {
+    "mergedOriginMain": "ea82d8f",
+    "mergeCommit": "0a093c1",
+    "previousC": "f2c4af6",
+    "rootLockDiffPreserved": true
+  },
+  "checkpoints": {
+    "completionConsumer": "dd23fe7",
+    "currentPackageEvidence": "11f8712",
+    "proofConsumerContract": "47c7e24",
+    "docsAndUi": "eb3922e",
+    "driverApiDelta": "59af621",
+    "finalStatus": "this commit"
+  },
+  "budget": { "modelCalls": 0, "nativeTurns": 0, "newAllowance": false },
+  "sixResults": {
+    "currentProofConsumer": "driver consumes explicit A restore/content proof with independent basis; public product-package integration NOT_REACHED (no vendored algorithm/default checkout)",
+    "producerToConsumer": "same Store data + v1/v2 A restore + manifest IDs through package HTTP; business 422/held/provider unchanged",
+    "currentSamePackageDual": "exact 1cdab25 package, v1/v2 restored roots, target proof, readiness actual, prepare/start/read/stop, STOPPED",
+    "originalFactRecoveryConsumer": "restored ProductCompletion metadata/current matches original verification/artifact/ready/cursor and Work delivered; live B/I callback NOT_REACHED",
+    "boundedFailureConsumer": "retained total deadline, silent/partial/early-exit/readiness/stop failures, identity reuse/keep/unknown material",
+    "toolApiHandoff": "wave28 driver API delta, proof consumer contract, recipe and UI inputs; E owns installed/release"
+  },
+  "proofSource": {
+    "head": "00d0498c7013054878b6b14f8c096b8255cc2b7c",
+    "dataManifestSha256": "f568580a39c07f7c77c102a27596f81f53b061870bcd16fe126addd9e4ebf7e2",
+    "contentProofSha256": "b3185adccac8c6fdeae9d2e4de6218112457ac8c592e745b6770fa330e80050e",
+    "apis": ["restoreWorkflowSnapshot", "verifyRestoredSnapshot", "readWorkflowContent", "buildDataManifest"]
+  },
+  "package": {
+    "tar": "/Users/hh/Desktop/joker/pa-artifacts/wave27-target/wave27-target-1cdab25.tar.gz",
+    "tarSha256": "dcfda014ce0ac04ff4a78ebcf27cea9c3659e12bc3156583c985b869401fa86e",
+    "source": "1cdab25a76748edad5054ce1a5150a69d5ad9361",
+    "buildId": "ecffaa6d3f784426",
+    "schema": 18,
+    "runtime": "Node 24.21.0 / darwin-arm64 / ABI137",
+    "readiness": { "authorization": "none", "startupMode": "recovery_readonly", "development": "readonly", "execution": "unavailable", "dispatchable": 0, "admittedNative": 0, "admittedControlled": 0, "decisions": false, "proposals": false }
+  },
+  "completionConsumer": {
+    "source": "restored root + existing ProductCompletion metadata/current",
+    "verified": ["verificationId", "readyAt", "eventCursor", "artifactDigest", "Work delivered"],
+    "notCreated": ["candidates table", "parallel ledger", "hand-written acceptance", "second confirmation authority"],
+    "liveBI": "NOT_REACHED"
+  },
+  "failureMatrix": {
+    "content": ["work.accepted event", "legal user message", "artifact bytes replacement"],
+    "identity": ["missing PID/API start", "foreign state/install/config/review"],
+    "selection": ["narrow scope_changed", "different/missing selection", "foreign root"],
+    "replay": ["context/confirm token 422"],
+    "cleanup": ["verified owned stop", "stop failure downgrade + materials", "reuse/keep untouched"],
+    "deadline": ["one budget across prepare/identity/manifest/proof/start/HTTP/status/stop", "actual elapsed/exit evidence"]
+  },
+  "uiInput": "packages/context/reports/wave28-ui-input.json",
+  "tests": { "context": 129, "proposals": 41, "knowledge": 117, "routing": 44, "total": 331, "result": "all PASS" },
+  "strict": { "tscNoEmit": "four owned packages PASS", "workspaceBuild": "pnpm -r build -> 0" },
+  "layers": {
+    "source": "stable strict/reuse/refusal",
+    "package": "exact 1cdab25 current; ce64/0ede historical retained",
+    "installed": "not claimed",
+    "normal": "no target/private permission/queue consumption",
+    "recovered": "read-only A workflow restore; no B/I live recovery",
+    "vendorNative": 0
+  },
+  "limitations": [
+    "current public A restore/content proof is not yet a product workspace package; explicit A module/worktree is required (NOT_REACHED for installed consumer)",
+    "B/I live callback/recovery not admitted; data-only completion read is not live native recovery",
+    "F/G/H/I/J UI/statistics/channel inputs are owner-scoped; C does not claim them",
+    "long-term revocation, concurrent writers, 48h soak, private/target/native unmeasured"
+  ],
+  "evidence": [
+    "packages/context/docs/WAVE28-RECIPE.md",
+    "packages/context/reports/wave28-ui-input.json",
+    "packages/context/reports/wave28-driver-api.json",
+    "packages/context/reports/wave28-proof-consumer.json",
+    "packages/context/reports/wave28-current-1cdab25.tap",
+    "packages/context/reports/wave28-completion-consumer.tap",
+    "packages/context/reports/wave28-knowledge-suite.tap",
+    "packages/context/reports/wave28-suites.json"
+  ]
+}
