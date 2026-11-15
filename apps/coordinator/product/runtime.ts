@@ -214,6 +214,7 @@ export function createProductRuntime(
   const read: NonNullable<LocalHttpOptions['read']> = {
     projectRecipePreview: input => recipes.preview(input),
     usageObservation: query => usage.read(query),
+    usageObservationDownload: query => usage.download(query),
     recovery: async () => recovery.inspect(),
     recoveryActivation: async activationId => readRecoveryActivationRecord(store, activationId, options.principal),
     ...(completedReplies ? { replyCandidates: async (messageId: string) => proposals.replyCandidates(messageId) } : {}),
