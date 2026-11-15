@@ -432,3 +432,94 @@ test('a declared previous export states whether the snapshot continued or was re
   assert.ok(replaced.stderr.includes('new_snapshot'), replaced.stderr)
   assert.equal(replacedDocument.limitations[0], replacedDocument.snapshot.note)
 })
+
+const servedDocument = (overrides = {}) => ({
+  protocol: 'usage-observation/1',
+  observedAt: '2026-11-15T06:00:00.000Z',
+  status: 'ready',
+  summaryId: 'a'.repeat(64),
+  days: 7,
+  timezone: 'UTC',
+  window: { from: '2026-11-08T06:00:00.000Z', to: '2026-11-15T06:00:00.000Z' },
+  windowLabel: '近 7 天 · +00:00',
+  coverage: '完整覆盖',
+  coverageState: 'complete',
+  scope: { projectIds: ['one', 'two'], aggregation: 'declared_multi_project', label: '本次 2 个项目' },
+  sampleCount: 2,
+  unknownCount: null,
+  metrics: [
+    { id: 'outcomes.count@controlled@', label: '已观察执行次数', value: '1', detail: '未知 0 · 完整', unit: 'count', layer: 'controlled', sampleCount: 1 },
+    { id: 'usage.cost@controlled@USD', label: '已知记录成本', value: '1.5', detail: '未知 0 · 完整', unit: 'USD', layer: 'controlled', sampleCount: 1 },
+    { id: 'queue.waitMs@controlled@', label: '平均记录排队耗时', value: null, detail: '未知 1 · 完整', unit: 'ms', layer: 'controlled', sampleCount: null },
+  ],
+  limitations: ['仅统计现有工作证据；未记录的执行耗时、排队、用量与成本保持未知。'],
+  authorization: 'none',
+  ...overrides,
+})
+
+test('verify --dto reports metadata only and never parses the served values', () => {
+  const directory = workspace()
+  const served = join(directory, 'served.json')
+  const document = servedDocument()
+  document.metrics[0].label = 'CANARY-SUPPORT-1'
+  document.metrics[0].detail = 'CANARY-DETAIL-1 /Users/private/secret'
+  writeFileSync(served, JSON.stringify(document))
+
+  const json = run(['verify', '--dto', served])
+  assert.equal(json.status, 0, json.stderr)
+  const summary = JSON.parse(json.stdout)
+  assert.equal(summary.protocol, 'usage-insights-support-summary/1')
+  assert.equal(summary.numericValues, false)
+  assert.equal(summary.counts.rows, 3)
+  assert.equal(summary.counts.withValue, 2)
+  assert.equal(summary.counts.unknown, 1)
+  assert.deepEqual(summary.rows.map(row => row.rowId), document.metrics.map(metric => metric.id))
+  assert.deepEqual(summary.rows.map(row => row.hasValue), [true, true, false])
+  assert.equal(summary.rows[2].sampleCount, null, 'an unknown row keeps a null sample count')
+  // Values, labels, detail strings and paths never reach a support summary.
+  for (const secret of ['1.5', 'CANARY-SUPPORT-1', 'CANARY-DETAIL-1', '/Users/private'])
+    assert.equal(json.stdout.includes(secret), false, `${secret} must not be in the support summary`)
+
+  const markdown = run(['verify', '--dto', served, '--format', 'markdown'])
+  assert.equal(markdown.status, 0, markdown.stderr)
+  assert.ok(markdown.stdout.includes('| Row id | Layer | Unit | Value present | Samples |'))
+  assert.equal(markdown.stdout.includes('CANARY'), false)
+
+  // A bundle is not a served document, and the two inputs are mutually exclusive.
+  assert.equal(run(['verify', '--dto', complete]).status, 5)
+  assert.equal(run(['verify', '--dto', served, '--input', complete]).status, 2)
+  assert.equal(run(['verify']).status, 2)
+})
+
+test('an insufficient or unavailable served document is reported with its own status', () => {
+  const directory = workspace()
+  const insufficient = join(directory, 'insufficient.json')
+  writeFileSync(insufficient, JSON.stringify(servedDocument({
+    status: 'insufficient_data', sampleCount: null,
+    metrics: [{ id: 'queue.waitMs@controlled@', label: '排队', value: null, detail: '未知 1', unit: 'ms', layer: 'controlled', sampleCount: null }],
+  })))
+  const result = run(['verify', '--dto', insufficient])
+  assert.equal(result.status, 4, result.stderr)
+  assert.ok(result.stderr.includes('insufficient_data'))
+
+  const unavailable = join(directory, 'unavailable.json')
+  writeFileSync(unavailable, JSON.stringify(servedDocument({
+    status: 'unavailable', summaryId: null, sampleCount: null, metrics: [], coverageState: 'unknown',
+  })))
+  const missing = run(['verify', '--dto', unavailable])
+  assert.equal(missing.status, 5, missing.stderr)
+  assert.equal(JSON.parse(missing.stdout).summaryId, null)
+})
+
+test('the tool runs from an unrelated directory with absolute inputs only', () => {
+  const directory = workspace()
+  const elsewhere = mkdtempSync(join(tmpdir(), 'usage-cwd-'))
+  const result = spawnSync(process.execPath, [CLI, 'analyze', '--input', complete], { cwd: elsewhere, encoding: 'utf8' })
+  assert.equal(result.status, 0, result.stderr)
+  const summary = JSON.parse(result.stdout).summary
+  assert.equal(summary.protocol, 'usage-insights/1')
+  const exported = spawnSync(process.execPath, [CLI, 'export', '--input', complete, '--out', join(elsewhere, 'out.json')], { cwd: elsewhere, encoding: 'utf8' })
+  assert.equal(exported.status, 0, exported.stderr)
+  assert.equal(JSON.parse(readFileSync(join(elsewhere, 'out.json'), 'utf8')).protocol, 'usage-insights-export/2')
+  void directory
+})

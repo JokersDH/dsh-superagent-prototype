@@ -14,6 +14,7 @@ import { fileURLToPath } from 'node:url'
 import { parseArguments, positiveInteger, requiredString, timestamp, UsageError } from './lib/args.mjs'
 import { CollectorError, LoopbackClient, deadlineController, helpers, parseLoopbackBase, readTokenFile, worksFromSnapshot } from './lib/http.mjs'
 import { OutputConflictError, writeExclusive } from './lib/output.mjs'
+import { CAPABILITIES, inspectArchive } from './lib/package-surface.mjs'
 
 const EXIT = { ok: 0, internal: 1, usage: 2, partial: 3, insufficient: 4, unavailable: 5 }
 const DEFAULT_MAX_INPUT_BYTES = 64 * 1024 * 1024
@@ -46,6 +47,8 @@ Commands
              With --dto, export the document the coordinator serves instead: that document carries
              formatted strings only, so the display export has no numeric field at all.
   catalogue  Print the metric catalogue: unit, aggregation and exact measurement definition.
+  package    Read a released .tar.gz and report which observation capabilities its packaged files
+             actually contain. Read-only: nothing is extracted, installed or executed.
   help       Print this text.
 
 Common options
@@ -71,6 +74,15 @@ export options
 
 verify only
   --expect-digest <sha256>    Refuse when the bundle bytes do not match the pinned digest
+  --dto <file>                Verify a served usage-observation/1 document instead of a bundle
+  --format json|markdown      Report format for verify (default json)
+
+package only
+  --tar <absolute path>       Release archive; read only in memory, never extracted
+  --expect-sha256 <hex>       Refuse when the archive bytes do not match this digest
+  --expect-build <id>         Refuse when the packaged build id differs
+  --expect <capability,...>   pageObservation|numericExport|displayDownload; exit 3 when absent
+  --max-archive-bytes <n>     Refuse a larger archive before reading (default 536870912)
 
 collect options
   --base-url <http://127.0.0.1:PORT>   Explicit loopback origin (required)
@@ -128,7 +140,11 @@ const SPECS = {
   },
   verify: {
     input: flag(), 'max-input-bytes': flag(), 'max-records': flag(), 'max-works': flag(), 'max-pages': flag(),
-    'expect-digest': flag(),
+    'expect-digest': flag(), dto: flag(), format: flag(),
+  },
+  package: {
+    tar: flag(), 'expect-sha256': flag(), 'expect-build': flag(), expect: flag(), 'max-archive-bytes': flag(),
+    json: flag('boolean'),
   },
   export: {
     input: flag(), dto: flag(), out: flag(), project: flag('list'), from: flag(), to: flag(), timezone: flag(),
@@ -349,6 +365,28 @@ async function commandExport(options, io) {
 async function commandVerify(options, io) {
   const insights = io.insights
   const maxBytes = positiveInteger(options['max-input-bytes'], 'max-input-bytes', DEFAULT_MAX_INPUT_BYTES)
+  if (options.dto !== undefined && options.input !== undefined)
+    throw new UsageError('--input and --dto are mutually exclusive')
+  if (options.dto === undefined && options.input === undefined)
+    throw new UsageError('verify needs --input (bundle) or --dto (served document)')
+  if (options.dto !== undefined) {
+    // A served document is metadata-verified only: its values are formatted strings, and treating
+    // them as numbers here would invent precision the coordinator never recorded.
+    const served = readBundle(requiredString(options.dto, 'dto'), maxBytes)
+    let summary
+    try {
+      summary = insights.describeDisplayDocument(served.value)
+    } catch (error) {
+      if (error?.name === 'SupportFault') throw new UsageInsightsError('source_unavailable', error.message)
+      throw error
+    }
+    const format = options.format ?? 'json'
+    if (!['json', 'markdown'].includes(format)) throw new UsageError('--format must be json or markdown for verify')
+    io.stdout(format === 'markdown' ? insights.renderSupportSummary(summary) : `${JSON.stringify({ ...summary, bytes: served.bytes, digest: served.digest }, null, 2)}\n`)
+    const status = summary.status === 'ready' ? 'complete' : summary.status === 'insufficient_data' ? 'insufficient_data' : 'unavailable'
+    io.stderr(`status=${status} coverage=${summary.coverageState} rows=${summary.counts.rows} unknown=${summary.counts.unknown} display-only\n`)
+    return summary.status === 'ready' ? EXIT.ok : summary.status === 'insufficient_data' ? EXIT.insufficient : EXIT.unavailable
+  }
   const bundle = readBundle(requiredString(options.input, 'input'), maxBytes)
   // A pinned digest turns "the file I analysed earlier" into a checkable identity.
   if (options['expect-digest'] !== undefined) {
@@ -384,6 +422,57 @@ async function commandCatalogue(_options, io) {
   const insights = io.insights
   io.stdout(`${JSON.stringify(insights.metricDefinitions, null, 2)}\n`)
   return EXIT.ok
+}
+
+/**
+ * Report what a released archive actually contains.
+ *
+ * The archive is read into memory from the path the caller names, never extracted, never installed
+ * and never executed. Capability is decided from the packaged files, so a checkout or a tool that
+ * happens to exist next to the package cannot be reported as a feature inside it.
+ */
+async function commandPackage(options, io) {
+  if (options.json && options.json !== true && options.json !== 'true') throw new UsageError('--json takes no value')
+  const tarPath = requiredString(options.tar, 'tar')
+  if (!isAbsolute(tarPath)) throw new UsageError('--tar must be an absolute path')
+  const maxBytes = positiveInteger(options['max-archive-bytes'], 'max-archive-bytes', 512 * 1024 * 1024)
+  let report
+  try {
+    report = inspectArchive(tarPath, { maxBytes })
+  } catch (error) {
+    if (error?.name === 'ArchiveError') throw new UsageInsightsError('source_unavailable', error.message)
+    throw error
+  }
+  for (const [flagName, field, actual] of [
+    ['expect-sha256', 'archive digest', report.archive.sha256],
+    ['expect-build', 'build id', report.manifest?.buildId ?? 'absent'],
+  ]) {
+    const expected = options[flagName]
+    if (expected === undefined) continue
+    const shape = flagName === 'expect-sha256' ? /^[a-f0-9]{64}$/ : /^[A-Za-z0-9._-]{1,64}$/
+    if (!shape.test(expected)) throw new UsageError(`--${flagName} is not a valid value`)
+    if (expected !== actual)
+      throw new UsageInsightsError('source_unavailable',
+        `The archive ${field} does not match the declared value (expected ${expected.slice(0, 16)}…, got ${String(actual).slice(0, 16)}…)`)
+  }
+  const expectedCapabilities = options.expect === undefined ? [] : options.expect.split(',').map(name => name.trim()).filter(Boolean)
+  const unknown = expectedCapabilities.filter(name => !CAPABILITIES.includes(name))
+  if (unknown.length) throw new UsageError(`--expect accepts ${CAPABILITIES.join(', ')}; unknown: ${unknown.join(', ')}`)
+  const missing = expectedCapabilities.filter(name => !report.capabilities[name])
+  if (options.json === true || options.json === 'true') {
+    io.stdout(`${JSON.stringify({ ...report, expected: expectedCapabilities, missing }, null, 2)}\n`)
+  } else {
+    const manifest = report.manifest
+    io.stdout(`package ${report.usageInsights.version ?? '?'}  sha256 ${report.archive.sha256.slice(0, 16)}…  ${report.archive.bytes} bytes\n`)
+    io.stdout(`  source      ${manifest?.sourceCommit?.slice(0, 16) ?? 'not recorded'}  build ${manifest?.buildId ?? 'not recorded'}  dirty ${manifest?.sourceDirty ?? 'unknown'}\n`)
+    io.stdout(`  files       content ${report.archive.contentFiles} + symlinks ${report.archive.symlinks} (manifest ${manifest?.declaredFiles ?? '—'}, delta ${report.accounting.manifestDelta ?? '—'})\n`)
+    io.stdout(`  entries     headers ${report.archive.headers}, appleDouble ${report.archive.appleDouble}, pax ${report.archive.paxHeaders}\n`)
+    for (const name of CAPABILITIES) io.stdout(`  ${name.padEnd(16)} ${report.capabilities[name] ? 'present' : 'absent'}\n`)
+    if (report.absent.length) io.stdout(`  absent      ${report.absent.join(', ')}\n`)
+    io.stdout(`  note        read-only report; not an install, runtime probe or release verdict\n`)
+    if (missing.length) io.stderr(`capability_missing: ${missing.join(', ')} are not packaged in this archive\n`)
+  }
+  return missing.length ? EXIT.partial : EXIT.ok
 }
 
 function soaInput(path, maxBytes) {
@@ -664,6 +753,7 @@ async function main(argv, io) {
     case 'verify': return commandVerify(options, io)
     case 'export': return commandExport(options, io)
     case 'catalogue': return commandCatalogue(options, io)
+    case 'package': return commandPackage(options, io)
     case 'collect': return commandCollect(options, io)
     default: return EXIT.usage
   }

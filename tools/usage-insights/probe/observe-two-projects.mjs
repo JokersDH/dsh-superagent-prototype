@@ -18,6 +18,7 @@
  */
 import assert from 'node:assert/strict'
 import { execFileSync, spawn } from 'node:child_process'
+import { createHash } from 'node:crypto'
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -33,6 +34,8 @@ import { analyzeUsageInsights } from '../../../packages/usage-insights/src/analy
 import { consumerAdmission, toInsightConsumerView } from '../../../packages/usage-insights/src/facing.ts'
 import { buildDisplayExport, displayExportDigest } from '../../../packages/usage-insights/src/display-export.ts'
 import { crossCheckAnalysisWithDisplay } from '../../../packages/usage-insights/src/crosscheck.ts'
+import { describeDisplayDocument } from '../../../packages/usage-insights/src/support.ts'
+import { UsageObservationDownloadSchema } from '../../../packages/contracts/dist/index.js'
 
 const CLI = fileURLToPath(new URL('../cli.mjs', import.meta.url))
 const principal = { userId: 'local-insights-probe', authorityRef: 'local-insights-authority' }
@@ -476,6 +479,71 @@ async function main() {
   // The display export of the same served document is stable: an identical document serializes identically.
   assert.equal(buildDisplayExport(served).text, display.text)
 
+  // ---- W31 R2: main's default download route, end to end (G5-G8) --------------------------------
+  // The real route calls the real `download`, which builds the display document through G's library.
+  const exportApp = createLocalHttpApp({
+    application: product.application,
+    principal,
+    apiToken: API_TOKEN,
+    bootstrapToken: 'b3'.repeat(32),
+    allowedOrigins: ['http://127.0.0.1:5173'],
+    mode: 'product',
+    read: { usageObservationDownload: query => new ProductUsageObservation(coordinatorReaders).download(query) },
+  })
+  const eventsBeforeExport = store.events.cursor()
+  const exportResponse = await exportApp.request('http://127.0.0.1/v1/insights/export?days=7&timezone=UTC',
+    { headers: { authorization: `Bearer ${API_TOKEN}` } })
+  assert.equal(exportResponse.status, 200, 'the default export route serves the observation')
+  assert.equal(exportResponse.headers.get('cache-control'), 'no-store')
+  const download = UsageObservationDownloadSchema.parse(await exportResponse.json())
+  assert.equal(download.sha256, createHash('sha256').update(download.text).digest('hex'),
+    'the advertised digest is of the delivered text')
+  assert.equal(download.fileName, `observation-7d-${download.observation.summaryId.slice(0, 12)}.json`)
+  const file = JSON.parse(download.text)
+  assert.equal(file.protocol, 'usage-insights-display-export/1')
+  assert.equal(file.sourceIdentity.numericValues, false)
+  assert.equal(file.snapshot.snapshotId, download.observation.summaryId, 'the file names its own observation')
+  assert.equal(file.snapshot.capturedAt, download.observation.observedAt)
+  assert.equal(file.truncation.bytes, Buffer.byteLength(download.text))
+  assert.equal(JSON.stringify(file.rows).includes('"value"'), false, 'no numeric field reaches the user file')
+  assert.equal(file.rows.length, download.observation.metrics.length)
+  // The downloaded observation and the analysis of its own window are the same facts.
+  const exportAligned = analyzeUsageInsights({
+    ...composed.bundle, window: download.observation.window, capturedAt: download.observation.observedAt,
+  }).summary
+  const fileCheck = crossCheckAnalysisWithDisplay({ dto: download.observation, summary: exportAligned })
+  assert.equal(fileCheck.comparable, true)
+  assert.deepEqual(fileCheck.disagreements, [], JSON.stringify(fileCheck.disagreements))
+  assert.equal(fileCheck.agreements, fileCheck.checked)
+  // The original work is still readable after the export, and nothing was written.
+  const afterExport = await product.application.inspect({ limit: 5 })
+  assert.ok(afterExport.works.length >= 2, 'the original works are still there')
+  assert.equal(store.events.cursor(), eventsBeforeExport, 'export and the following work read create no product events')
+  // An app without the optional download port reports the feature as absent, not an empty file.
+  const noPort = createLocalHttpApp({ application: product.application, principal, apiToken: API_TOKEN,
+    bootstrapToken: 'b4'.repeat(32), allowedOrigins: ['http://127.0.0.1:5173'], mode: 'product', read: {} })
+  assert.equal((await noPort.request('http://127.0.0.1/v1/insights/export?days=7',
+    { headers: { authorization: `Bearer ${API_TOKEN}` } })).status, 422)
+  assert.equal((await exportApp.request('http://127.0.0.1/v1/insights/export?days=7')).status, 401)
+
+  // ---- W31 R3: a re-read is a new snapshot and never backfills the previous one (G9) ------------
+  await new Promise(resolveDelay => setTimeout(resolveDelay, 25))
+  const repeatFile = UsageObservationDownloadSchema.parse(await (await exportApp.request(
+    'http://127.0.0.1/v1/insights/export?days=7&timezone=UTC',
+    { headers: { authorization: `Bearer ${API_TOKEN}` } })).json())
+  assert.notEqual(repeatFile.observation.summaryId, download.observation.summaryId,
+    'a later read is its own observation')
+  const repeatDocument = JSON.parse(repeatFile.text)
+  assert.equal(repeatDocument.snapshot.snapshotId, repeatFile.observation.summaryId)
+  assert.notEqual(repeatDocument.snapshot.snapshotId, file.snapshot.snapshotId)
+  // Same facts, same row identities; an unknown row stays unknown instead of inheriting a value.
+  assert.deepEqual(repeatDocument.rows.map(row => row.rowId), file.rows.map(row => row.rowId))
+  for (const [index, row] of repeatDocument.rows.entries()) {
+    if (row.formatted === null) assert.equal(file.rows[index].formatted, null, `${row.rowId} stays unknown`)
+  }
+  assert.ok(repeatDocument.rows.every((row, index) => row.formatted === file.rows[index].formatted),
+    'a repeated observation of unchanged facts reports the same values')
+
   // ---- single-project isolation from the same product (G9) ------------------------------------
   const singleBundlePath = join(directory, 'bundle-single.json')
   const single = await run(['collect', '--base-url', `http://127.0.0.1:${port}`, '--token-file', tokenFile,
@@ -552,13 +620,19 @@ async function main() {
       report: join(directoryOut, `two-project-${stamp}.report.md`),
       export: join(directoryOut, `two-project-${stamp}.export.json`),
       displayExport: join(directoryOut, `two-project-${stamp}.display-export.json`),
+      download: join(directoryOut, `two-project-${stamp}.download.json`),
+      support: join(directoryOut, `two-project-${stamp}.support.json`),
       crossCheck: join(directoryOut, `two-project-${stamp}.crosscheck.json`),
     }
     for (const [source, target] of [[bundlePath, published.bundle], [reportPath, published.report],
       [loopExport, published.export]])
       writeFileSync(target, readFileSync(source), { flag: 'wx', mode: 0o600 })
-    // The display export and the cross-check are generated in this run, not copied from a bundle.
+    // The display export, the delivered download, the support summary and the cross-check are
+    // generated in this run, not copied from a bundle.
     writeFileSync(published.displayExport, display.text, { flag: 'wx', mode: 0o600 })
+    writeFileSync(published.download, download.text, { flag: 'wx', mode: 0o600 })
+    writeFileSync(published.support, `${JSON.stringify(describeDisplayDocument(download.observation), null, 2)}\n`,
+      { flag: 'wx', mode: 0o600 })
     writeFileSync(published.crossCheck, `${JSON.stringify({
       protocol: 'usage-insights-cross-check-evidence/1',
       servedSummaryId: served.summaryId,
@@ -604,6 +678,21 @@ async function main() {
       cliExport: { snapshotId: loopDocument.snapshot.snapshotId, continuity: loopDocument.snapshot.continuity,
         rows: loopDocument.truncation.includedRows },
       secondRead: { continuity: secondDocument.snapshot.continuity, previous: secondDocument.snapshot.previous },
+    },
+    downloadSurface: {
+      route: 'GET /v1/insights/export',
+      status: exportResponse.status,
+      fileName: download.fileName,
+      sha256: download.sha256,
+      bytes: Buffer.byteLength(download.text),
+      rows: file.rows.length,
+      snapshotId: file.snapshot.snapshotId,
+      continuity: file.snapshot.continuity,
+      numericFields: false,
+      absentPortStatus: 422,
+      repeatIsNewSnapshot: repeatDocument.snapshot.snapshotId !== file.snapshot.snapshotId,
+      pageAgreesWithFile: fileCheck.agreements === fileCheck.checked && fileCheck.disagreements.length === 0,
+      eventsDuringExportAndWorkRead: store.events.cursor() - eventsBeforeExport,
     },
     digest: verified.digest,
     repeatedCollectionIdentical: true,
