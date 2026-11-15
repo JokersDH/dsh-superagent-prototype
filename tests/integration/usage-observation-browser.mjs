@@ -10,7 +10,7 @@ import { createControlledProduct, FIXTURE_CHECK } from '../../apps/coordinator/p
 import { createLocalHttpApp } from '../../apps/coordinator/http/app.ts'
 import { listenLocalHttp } from '../../apps/coordinator/http/server.ts'
 
-const output = resolve(process.argv[2] ?? 'reports/releases/wave27-insights/browser')
+const output = resolve(process.argv[2] ?? 'reports/releases/wave29-window/browser')
 mkdirSync(output, { recursive: true })
 const require = createRequire(new URL('../../apps/console/package.json', import.meta.url))
 const { chromium } = require('@playwright/test'), { createServer } = await import(require.resolve('vite'))
@@ -32,6 +32,7 @@ const vite = await createServer({ root: resolve('apps/console'), configFile: res
   define: { 'import.meta.env.VITE_CONSOLE_MODE': JSON.stringify('http') }, server: { host: '127.0.0.1', port, strictPort: true,
     proxy: { '/v1': { target: `http://127.0.0.1:${api.address().port}`, changeOrigin: true } } } })
 let browser, before, posts = 0, insightReads = 0
+const requestedWindows = []
 const cases = [], errors = []
 const check = async (id, action) => { await action(); cases.push({ id, status: 'PASS' }) }
 try {
@@ -51,19 +52,69 @@ try {
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, locale: 'zh-CN', timezoneId: 'Asia/Shanghai' })
   page.setDefaultTimeout(10000); page.on('pageerror', error => errors.push(error.message))
   page.on('request', request => {
-    if (new URL(request.url()).pathname === '/v1/insights') insightReads++
+    if (new URL(request.url()).pathname === '/v1/insights') {
+      insightReads++; requestedWindows.push(Number(new URL(request.url()).searchParams.get('days')))
+    }
     if (request.url().includes('/v1/') && request.method() === 'POST') posts++
   })
   const trial = page.getByRole('region', { name: '试用准备', exact: true })
   const questionValue = trial.locator('.trial-insight-row').filter({ has: page.getByText('提出问题', { exact: true }) }).locator('dd')
   const choose = name => page.getByRole('group', { name: '按项目筛选' }).getByRole('button', { name, exact: true }).click()
   const reload = () => trial.getByRole('button', { name: '重新读取试用状态', exact: true }).click()
+  const windowGroup = trial.getByRole('group', { name: '观察窗口', exact: true })
+  const selectWindow = days => windowGroup.getByRole('button', { name: `${days} 天`, exact: true }).click()
   await page.goto(origin)
   await check('DEFAULT-CONVERSATION-DOES-NOT-COLLECT-INSIGHTS', async () => {
     await page.getByRole('button', { name: '试用准备', exact: true }).waitFor(); assert.equal(insightReads, 0)
     await page.getByRole('button', { name: '试用准备', exact: true }).click(); await trial.waitFor()
     await page.waitForFunction(() => [...document.querySelectorAll('.trial-insight-row')].some(row => row.textContent.includes('提出问题') && row.querySelector('dd').firstChild.textContent === '3'))
     assert.match(await questionValue.textContent(), /^3/); assert.match(await trial.textContent(), /本次 2 个项目/)
+  })
+  await check('WINDOW-SELECTOR-READS-EXACT-SEVEN-AND-THIRTY-DAY-SERVER-WINDOWS', async () => {
+    assert.equal(await windowGroup.getByRole('button', { name: '7 天', exact: true }).getAttribute('aria-pressed'), 'true')
+    const read = page.waitForResponse(response => new URL(response.url()).pathname === '/v1/insights' && new URL(response.url()).searchParams.get('days') === '30')
+    await selectWindow(30)
+    const data = await (await read).json()
+    assert.equal(data.days, 30); assert.equal(data.timezone, 'Asia/Shanghai')
+    assert.equal(Date.parse(data.window.to) - Date.parse(data.window.from), 30 * 86400000)
+    await trial.getByText(/近 30 天/).waitFor(); assert.match(await questionValue.textContent(), /^3/)
+    const selected = windowGroup.getByRole('button', { name: '30 天', exact: true })
+    assert.equal(await selected.getAttribute('aria-pressed'), 'true')
+    const reads = insightReads
+    await selected.focus(); await page.keyboard.press('Enter')
+    await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))))
+    assert.equal(insightReads, reads)
+    assert.equal(await selected.evaluate(element => document.activeElement === element), true)
+  })
+  await check('OLD-WINDOW-ROWS-HIDE-IMMEDIATELY-AND-LATE-REPLY-CANNOT-REPLACE-NEW-WINDOW', async () => {
+    let capturedResolve, release
+    const captured = new Promise(resolve => { capturedResolve = resolve }), gate = new Promise(resolve => { release = resolve })
+    await page.route('**/v1/insights?**', async route => {
+      if (new URL(route.request().url()).searchParams.get('days') !== '7') return route.continue()
+      const response = await route.fetch(), body = await response.json(); capturedResolve(); await gate
+      body.metrics = body.metrics.map(row => ({ ...row, value: '999' }))
+      try { await route.fulfill({ response, json: body }) } catch { /* The superseded request is intentionally aborted. */ }
+    })
+    let timer
+    try {
+      await selectWindow(7)
+      await Promise.race([captured, new Promise((_, reject) => { timer = setTimeout(() => reject(new Error('Window request not captured')), 10000) })])
+      assert.equal(await trial.locator('.trial-insight-row').count(), 0)
+      await selectWindow(30)
+      await trial.getByText(/近 30 天/).waitFor(); await questionValue.waitFor()
+      release(); await page.waitForTimeout(200)
+      assert.doesNotMatch(await trial.textContent(), /999/); assert.match(await questionValue.textContent(), /^3/)
+    } finally { clearTimeout(timer); release(); await page.unroute('**/v1/insights?**') }
+  })
+  await check('FAILED-NEW-WINDOW-NEVER-REUSES-THE-PREVIOUS-WINDOW-AND-CAN-RETRY', async () => {
+    await page.route('**/v1/insights?**', route => route.fulfill({ status: 503, json: { error: { code: 'storage_unavailable', message: '/private/window-secret' } } }))
+    await selectWindow(7)
+    await trial.getByText('使用观察暂时无法读取，请重新读取。', { exact: true }).waitFor()
+    assert.equal(await trial.locator('.trial-insight-row').count(), 0); assert.doesNotMatch(await trial.textContent(), /window-secret/)
+    await page.unroute('**/v1/insights?**')
+    await trial.getByRole('alert').filter({ hasText: '使用观察暂时无法读取' }).getByRole('button', { name: '重试', exact: true }).click()
+    await trial.getByText(/近 7 天/).waitFor(); await questionValue.waitFor()
+    assert.equal(await windowGroup.getByRole('button', { name: '7 天', exact: true }).getAttribute('aria-pressed'), 'true')
   })
   await check('REAL-PROJECT-SELECTION-SCOPES-OBSERVATIONS', async () => {
     await choose('甲项目'); await page.waitForFunction(() => [...document.querySelectorAll('.trial-insight-row')].some(row => row.textContent.includes('提出问题') && row.querySelector('dd').firstChild.textContent === '1'))
@@ -90,6 +141,8 @@ try {
     await page.route('**/v1/insights?**', route => route.fulfill({ status: 503, json: { error: { code: 'storage_unavailable', message: '/private/key-secret' } } }))
     await reload(); await trial.getByText('使用观察暂时无法读取，请重新读取。', { exact: true }).waitFor()
     assert.match(await trial.textContent(), /上次观察/); assert.doesNotMatch(await trial.textContent(), /key-secret/)
+    assert.equal(await trial.getByRole('heading', { name: '使用观察', exact: true }).evaluate(element =>
+      element.getBoundingClientRect().height <= Number.parseFloat(getComputedStyle(element).lineHeight) + 2), true)
     await page.unroute('**/v1/insights?**')
   })
   await check('LEGACY-OPTIONAL-ABSENCE-KEEPS-THE-OLD-WORKBENCH-USABLE', async () => {
@@ -115,10 +168,10 @@ try {
   await browser?.close(); await vite.close(); api.closeAllConnections(); await new Promise(resolve => api.close(resolve))
   const eventDelta = before === undefined ? null : store.events.cursor() - before
   await product.close(); store.close(); rmSync(root, { recursive: true, force: true })
-  const report = { status: cases.length === 6 ? 'PASS_ACTUAL_SCOPED_INSIGHTS_APP' : 'FAIL',
+  const report = { status: cases.length === 9 ? 'PASS_ACTUAL_SCOPED_INSIGHTS_APP' : 'FAIL',
     sourceCommit: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
     sourceWorktreeClean: execFileSync('git', ['status', '--porcelain', '--', 'apps', 'packages', 'tests/integration/usage-observation*'], { encoding: 'utf8' }).trim() === '',
-    cases, errors, insightReads, postRequests: posts, eventDelta, realModelTurns: 0, nativeTurnStarts: 0,
+    cases, errors, insightReads, requestedWindows, postRequests: posts, eventDelta, realModelTurns: 0, nativeTurnStarts: 0,
     scope: 'Actual App/React/Product/Broker/SQLite/HTTP/G Node analyzer, private controlled question fixtures; no installed/native/recovery/benefit admission' }
   writeFileSync(join(output, 'browser-report.json'), JSON.stringify(report, null, 2) + '\n'); console.log(JSON.stringify(report, null, 2))
 }

@@ -391,9 +391,36 @@
   color: var(--danger);
 }
 
+.trial-insight-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.trial-insight-controls button {
+  min-height: 34px;
+  padding: 5px 11px;
+  border-color: var(--line);
+  background: #fff;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.trial-insight-controls button.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
 .trial-insights {
   padding: 18px 0 6px;
   border-top: 1px solid var(--line);
+}
+
+.trial-insights .trial-section-title {
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .trial-insight-rows {

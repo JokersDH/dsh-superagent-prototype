@@ -197,6 +197,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
   const [reviewOpening, setReviewOpening] = useState(false)
   const [attentionCount, setAttentionCount] = useState<{ count: number; partial: boolean }>()
   const [projectFilter, setProjectFilter] = useState<string | undefined>(undefined)
+  const [usageDays, setUsageDays] = useState<7 | 30>(7)
   const [offline, setOffline] = useState<boolean>(() => fixture?.modelOffline() ?? false)
   const [createOpen, setCreateOpen] = useState(false)
   const [createDraft, setCreateDraft] = useState({ id: '', goal: '', projectId: '' })
@@ -664,11 +665,9 @@ export function App({ transport }: { transport: ConsoleTransport }) {
     : '个人工作区'
   const trialIdentity = useMemo(() => newId('trial-client'), [transport, auth])
   const trial = useTrialReadiness(transport, { enabled: auth === 'ready' && workspaceView === 'trial', identity: trialIdentity })
-  const usage = useUsageObservation(transport, { enabled: auth === 'ready' && workspaceView === 'trial', identity: trialIdentity, projectId: projectFilter })
-  const usageView = usage.error ? usage.data
-    ? { ...usage.data, coverage: `${usage.data.coverage} · 上次观察`, limitations: [usage.error, ...usage.data.limitations] }
-    : { status: 'unavailable' as const, sampleCount: null, metrics: [], limitations: [usage.error] }
-    : usage.data
+  const usage = useUsageObservation(transport, { enabled: auth === 'ready' && workspaceView === 'trial', identity: trialIdentity,
+    projectId: projectFilter, days: usageDays, configurationRevision: configuration?.revision })
+  const usageView = usage.error && usage.data ? { ...usage.data, coverage: `${usage.data.coverage} · 上次观察` } : usage.data
   const openView = (view: typeof workspaceView) => {
     attentionNavigation.current += 1
     setWorkspaceView(view)
@@ -1071,6 +1070,8 @@ export function App({ transport }: { transport: ConsoleTransport }) {
             {workspaceView === 'trial' && <TrialWorkspace readiness={trial.readiness} loading={trial.loading} error={trial.error}
               unavailable={trial.unavailable} configuration={configuration} activeProjectId={projectFilter} activeConversationTitle={conversationTitle}
               insights={usageView}
+              insightWindow={usageDays} onSelectInsightWindow={setUsageDays} insightsLoading={usage.loading}
+              insightsError={usage.error} onReloadInsights={usage.reload}
               onReload={() => { trial.reload(); usage.reload(); void refreshConfiguration() }}
               onAction={action => {
                 switch (action) {

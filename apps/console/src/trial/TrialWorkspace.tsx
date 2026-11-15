@@ -24,6 +24,11 @@ export interface TrialWorkspaceProps {
   readonly activeProjectId?: string | undefined
   readonly activeConversationTitle?: string | undefined
   readonly insights?: TrialInsightsView | undefined
+  readonly insightWindow?: 7 | 30 | undefined
+  readonly onSelectInsightWindow?: ((days: 7 | 30) => void) | undefined
+  readonly insightsLoading?: boolean | undefined
+  readonly insightsError?: string | undefined
+  readonly onReloadInsights?: (() => void) | undefined
   readonly onAction: (action: TrialNavigationAction) => void
   readonly onReload?: (() => void) | undefined
   readonly headingLevel?: 2 | 3 | undefined
@@ -79,7 +84,8 @@ function CountRow({ label, value, detail }: { readonly label: string; readonly v
 
 export function TrialWorkspace({
   readiness, loading = false, error, unavailable = false, configuration, activeProjectId,
-  activeConversationTitle, insights, onAction, onReload, headingLevel = 2, className,
+  activeConversationTitle, insights, insightWindow, onSelectInsightWindow, insightsLoading = false,
+  insightsError, onReloadInsights, onAction, onReload, headingLevel = 2, className,
 }: TrialWorkspaceProps) {
   const base = useId()
   const titleId = `${base}-title`
@@ -105,7 +111,8 @@ export function TrialWorkspace({
   const phase = readiness !== undefined ? 'observed' : loading ? 'loading' : error !== undefined ? 'error' : unavailable ? 'unavailable' : 'idle'
   const observed = readiness === undefined ? undefined : formatObservedAt(readiness.observedAt)
   const capabilities = readiness?.capabilities
-  const insightAdmission = insights === undefined ? undefined : trialInsightsAdmission(insights, activeProjectId)
+  const insightAdmission = insights === undefined ? undefined : trialInsightsAdmission(insights, activeProjectId, insightWindow)
+  const insightDays = insightWindow ?? insights?.days
   const activeProjectLabel = activeProjectId === undefined
     ? '全部项目'
     : configuration?.projects.find(project => project.id === activeProjectId)?.displayName ?? '当前项目（名称未读取）'
@@ -270,16 +277,34 @@ export function TrialWorkspace({
           </section>
         </div>
 
-        {insights !== undefined && insightAdmission !== undefined && (
+        {(insights !== undefined || insightsLoading || insightsError !== undefined) && (
           <section className="trial-insights" aria-labelledby={insightsId}>
             <div className="trial-panel-head">
               <h3 id={insightsId} className="trial-section-title"><Activity size={15} aria-hidden="true" />使用观察</h3>
               <span className="trial-panel-meta">
-                {trialInsightsCount(insights)}
-                {' · '}{insights.windowLabel ?? '窗口未声明'}
-                {' · '}{insights.coverage ?? '覆盖未声明'}
+                {insights === undefined ? '等待读取' : trialInsightsCount(insights)}
+                {' · '}{insights?.windowLabel ?? '窗口未声明'}
+                {' · '}{insights?.coverage ?? '覆盖未声明'}
               </span>
             </div>
+            {onSelectInsightWindow !== undefined && (
+              <div className="trial-insight-controls" role="group" aria-label="观察窗口">
+                {([7, 30] as const).map(days => (
+                  <button key={days} type="button" className={insightDays === days ? 'active' : 'quiet'}
+                    aria-pressed={insightDays === days}
+                    onClick={() => onSelectInsightWindow(days)}>{days} 天</button>
+                ))}
+              </div>
+            )}
+            {insightsError !== undefined && (
+              <div className="trial-banner trial-banner-danger" role="alert">
+                <TriangleAlert size={17} aria-hidden="true" />
+                <p><strong>使用观察暂时无法读取</strong><span>{insightsError}</span></p>
+                {onReloadInsights !== undefined && <button type="button" className="quiet" onClick={onReloadInsights}>重试</button>}
+              </div>
+            )}
+            {insightsLoading && <p className="trial-muted" role="status">正在读取使用观察…</p>}
+            {insights !== undefined && insightAdmission !== undefined && <>
             <dl className="trial-insight-scope">
               <div className="trial-fact">
                 <dt>观测范围</dt>
@@ -319,6 +344,7 @@ export function TrialWorkspace({
                 {insights.limitations.map(limit => <li key={limit}>{limit}</li>)}
               </ul>
             )}
+            </>}
           </section>
         )}
 
