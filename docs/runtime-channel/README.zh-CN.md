@@ -51,10 +51,27 @@ const lease = channel.bind({ producer, connectionId, expectedGeneration: 0, send
 | --- | --- | --- | --- |
 | `recordFact(fact)` | `{v:1,type:'fact',id:factId,fact}` | 返回原 `DurableReceipt` | 保留 pending，用**原 factId/原 body** 在新 lease 重发，等原 A 幂等 durable ACK |
 | `readPayload(ref)` | `{v:1,type:'payload-read',id:requestId,requestId,reference}` | 返回原 immutable JSON | 保留 pending，用同一 `reference` 与新 lease 关联重读；不换引用 |
-| `beforeNativeWrite(cmd)` | `{v:1,type:'native-write-intent',id:cmd.id,command}` | resolve 仅表示**本次**许可 | 不迁移：立即以 `indeterminate` 拒绝，旧 allowed 不复用 |
+| `beforeNativeWrite(cmd)` | `{v:1,type:'native-write-intent',id:<fresh intent id>,command}` | resolve 仅表示**本次**许可 | 不迁移：立即以 `indeterminate` 拒绝，旧 allowed 不复用 |
 
 - `recordFact` 只接受属于登记 producer 的 fact（attempt 全字段 + source）。
 - `beforeNativeWrite` 只接受 `kind='answer'` 的原命令；每次调用都是一次新意图，成功许可**只结算本次**，后一次同文本/同 command id 调用仍要重新走当前 guard。
+
+### 4.1 native 意图的相关 id（wave-28 修正）
+
+原业务身份 `command.id`/attempt/native binding/body **逐字节不变**，但每个 frame 的 `id` 是模块生成的 fresh correlation：
+
+```
+{ v: 1, type: 'native-write-intent', id: 'intent-<module salt>-<n>', command: <原命令> }
+```
+
+共享 v1 本地 schema 本来就允许 `id` 与 `command.id` 独立，所以没有新 wire 版本、没有新账本、没有 contracts 改动。作用：
+
+- 旧 intent 的 `write-admission`（无论 allowed 还是 denied）即使被重放，也只能匹配它自己的 correlation；结算后该 correlation 不再存在，重放返回 `false`。
+- 同一 `command.id` 的**顺序**新意图会得到新的 correlation，必须由当前 coordinator 对**新** frame 作出新决定；不存在"第一次 allowed 批准第二次"的路径。
+- 同一 `command.id` 的**并发**第二意图被拒绝（`write_already_pending`），避免两个 promise 争同一次写前许可。
+- correlation 由 `intent-<每模块 8 位 salt>-<单调序号>` 组成：模块内不复用、跨模块/attempt 不碰撞；序号到安全整数上界后以 `capacity/intent_correlation_exhausted` 拒绝。
+
+断开/重绑行为不变：未决意图立即 `indeterminate`，旧 allowed 不迁移、不缓存；caller 必须回原 command reconciliation 后再发新意图。
 - `readPayload` 的请求 id 由模块生成且不重用；返回值的 `JSON` 字节数超过 `maxPayloadBytes` 时以 `capacity` 拒绝并释放 pending。
 - 每次请求都是"先注册 pending + 装 timer，再 send"；同步 send 抛错、同步 reply、异步 send 拒绝、timeout、close 竞争都最多结算一次。
 
@@ -94,18 +111,28 @@ const lease = channel.bind({ producer, connectionId, expectedGeneration: 0, send
 
 ## 7. 可运行 consumer
 
-`apps/runner/test/attach-channel/adapter.ts` 是可复制的 Runner 侧适配器（`RunnerAttachChannel`）：一 attempt 一 channel、一连接一 lease、三 hooks、`accept(connectionId, frame)`/`drop(connectionId)` 编码路由义务，自身不持有任何 waiter map。
-
-独立复现：`apps/runner/test/attach-channel/independent-consumer.test.ts` 只 import 公开入口与共享类型，自带 producer/时钟/对端，H 可原样复制到自己目录。
+生产适配器在 `apps/runner/src/attach-channel/attach.ts`（`RunnerAttachChannel`），面向 `runner-service` 的**拉取**形状：路由取下一个待答请求，coordinator 答复后再交回同一连接。它自身不保存 pending map、timer 或 generation。
 
 ```ts
 const attach = new RunnerAttachChannel({ producer, limits })
-const generation = attach.bind({ connectionId: 'conn-1', expectedGeneration: 0, transport: { send } })
-const driverHooks = attach.hooks               // { factSink, payloads, beforeNativeWrite }
-socket.on('frame', frame => attach.accept('conn-1', frame))   // 只喂本连接
-socket.on('close', () => attach.drop('conn-1', 'socket closed'))
-// 重连后：attach.bind({ connectionId: 'conn-2', expectedGeneration: generation, transport })
+
+// 唯一的变更入口：显式 full producer + CAS generation。
+const generation = attach.bind({ producer, connectionId: leaseRef, expectedGeneration: currentGeneration })
+
+// 只读轮询：不 bind、不替换 lease、不为别的连接作答。
+const next = attach.next(leaseRef, producer)
+if (next.ok && next.request) deliverOverAuthenticatedRoute(next.request)
+
+// 回复只交回产生它的连接；接受性与拒绝原因由模块判定。
+const reply = attach.receive(leaseRef, frame, producer)   // { accepted, generation, refused? }
+
+// 连接消失；未决写变 indeterminate，facts/payload 等重绑。
+attach.drop(leaseRef, 'socket closed')
 ```
+
+- `next`/`receive` 的 refusal 只有 `stale_connection` / `identity_mismatch` / `closed`，且**不产生副作用**；stale/foreign 调用者无法通过 poll 重新占位。
+- 出站队列按 correlation 去重（每个 pending 至多一条），重绑只重建当前 generation 的条目，结算即出队；长度不超过构造函数的三类 pending 上限。
+- 独立复现：`apps/runner/test/attach-channel/independent-consumer.test.ts`（只 import 公开入口），B 路由形状：`b-route.test.ts`。
 
 ## 8. 验证
 
@@ -113,12 +140,15 @@ socket.on('close', () => attach.drop('conn-1', 'socket closed'))
 # 严格类型（strict + noUncheckedIndexedAccess + exactOptionalPropertyTypes）
 node_modules/.bin/tsc -p apps/runner/src/attach-channel/tsconfig.json
 # 行为矩阵（注入时钟，无 sleep、无真实网络/模型）
-cd apps/runner && node --test --test-timeout=5000 test/attach-channel/*.test.ts
+cd apps/runner && node --test --test-timeout=8000 test/attach-channel/*.test.ts   # 63/63
 ```
+
+覆盖：CAS/generation/fencing、三回调、跨客户端重绑、fresh intent 与旧 allowed 重放、timeout/capacity/late/close、共享契约与 freeze 守卫、B 路由形状、独立 consumer。wave-27 的 44 个历史用例保留在原 scope 内。
 
 ## 9. 本文明确不证明的事
 
-- 没有接入真实 B `runner-service`/`RunnerLinkClient`，因此"原三 maps 已删除"未达（I9–I12 见 handoff 文档）。
-- 未证明同 Runner 进程双客户端、coordinator SIGKILL 后原问题→交付、跨 coordinator 崩溃恢复。这些仍属 B/main/A。
-- 未证明 durable exactly-once：fact 重传不等于业务命令重试；payload 重读不等于 effect 重放。
-- `close()` 不停止物理 writer；不提供 native 发送、执行生命周期或权限。
+- **B 实际接入仍未达**：B 的当前树确实删除了旧的 `factWaiters`/`payloadWaiters`/`writeWaiters`，但换成了它自己的 `business-channel.ts`/`business-dispatch.ts`，尚未 import 本模块。旧"runner-service 仍有 15 处 map"的说法只描述本分支的旧 main baseline，不是当前 B。
+- 未证明：同 Runner 进程双 client、coordinator SIGKILL 后原问题→交付、跨 coordinator 崩溃恢复、durable exactly-once、物理 writer quiescence。
+- 测试中的 `DurableSink` 只是**幂等语义 double**（同 id 重放同 receipt、冲突拒绝），不代表 A 的真实持久化 ingress；`ImmutablePayloads`/`FreshGuard` 同理。
+- `readPayload` 只承载 immutable payload **JSON 值**（受 `maxPayloadBytes` 约束），不替代 B 的 journal/descriptor 分块回放路线（135540 字节 5 块属于 B 的 journal 分页传输，不是本模块的 callback payload 能力）。
+- H 在其自身目录执行同一实现的独立 consumer 尚未发生；H 当前消费的是旧 stdio service blob。

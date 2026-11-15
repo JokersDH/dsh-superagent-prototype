@@ -43,10 +43,14 @@ test('the module emits exactly the existing v1 request frames', async () => {
   h.channel.beforeNativeWrite(makeCommand('answer', { id: 'cmd-wire' }))
 
   const frames = h.frames
-  assert.deepEqual(frames.map(frame => [frame.v, frame.type, frame.id]), [
+  const intent = frames.find(frame => frame.type === 'native-write-intent')
+  assert.ok(intent && intent.type === 'native-write-intent')
+  // Frame identity preserves the v1 envelope; only the native intent gets a fresh local correlation.
+  assert.deepEqual([intent.v, intent.type, intent.command.id], [1, 'native-write-intent', 'cmd-wire'])
+  assert.notEqual(intent.id, intent.command.id)
+  assert.deepEqual(frames.filter(frame => frame.type !== 'native-write-intent').map(frame => [frame.v, frame.type, frame.id]), [
     [1, 'fact', 'fact-wire'],
     [1, 'payload-read', 'payload-1'],
-    [1, 'native-write-intent', 'cmd-wire'],
   ])
   // Every frame is a valid shared-contract request and is frozen before it reaches the transport.
   for (const frame of frames) {

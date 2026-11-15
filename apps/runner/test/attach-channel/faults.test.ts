@@ -276,3 +276,82 @@ test('a rejected request is never half-registered: inspect stays consistent acro
   })
   assert.equal(h.clock.armed, 0)
 })
+
+test('a timed-out intent is dead: replaying its allowed frame cannot authorise a later one', async () => {
+  const h = channel()
+  const command = makeCommand('answer', { id: 'cmd-timeout-intent' })
+  const pending = h.instance.beforeNativeWrite(command)
+  const expired = h.frames.at(-1)
+  assert.ok(expired && expired.type === 'native-write-intent')
+
+  h.advance(1001)
+  await assert.rejects(pending, (error: unknown) => {
+    assert.ok(error instanceof CoordinatorChannelError)
+    assert.equal(error.code, 'timeout')
+    return true
+  })
+  assert.equal(h.lease.receive({ v: 1, type: 'write-admission', id: expired.id, allowed: true }), false)
+
+  const fresh = h.instance.beforeNativeWrite(command)
+  const freshIntent = h.frames.at(-1)
+  assert.ok(freshIntent && freshIntent.type === 'native-write-intent')
+  assert.notEqual(freshIntent.id, expired.id)
+  // The expired decision still cannot decide the new intent.
+  assert.equal(h.lease.receive({ v: 1, type: 'write-admission', id: expired.id, allowed: true }), false)
+  assert.equal(h.lease.receive({ v: 1, type: 'write-admission', id: freshIntent.id, allowed: true }), true)
+  await fresh
+})
+
+test('an old allowed frame cannot revive an intent after the module is closed', async () => {
+  const h = channel()
+  const pending = h.instance.beforeNativeWrite(makeCommand('answer', { id: 'cmd-closed-intent' }))
+  const intent = h.frames.at(-1)
+  assert.ok(intent && intent.type === 'native-write-intent')
+  h.instance.close('attempt closed')
+  await assert.rejects(pending, (error: unknown) => {
+    assert.ok(error instanceof CoordinatorChannelError)
+    assert.equal(error.code, 'indeterminate')
+    return true
+  })
+  assert.equal(h.lease.receive({ v: 1, type: 'write-admission', id: intent.id, allowed: true }), false)
+  assert.equal(h.instance.inspect().state, 'closed')
+})
+
+test('write capacity is released by timeout so a later intent is admitted again', async () => {
+  const h = channel({ maxPendingWrites: 1 })
+  const first = h.instance.beforeNativeWrite(makeCommand('answer', { id: 'cmd-cap-a' }))
+  await assert.rejects(h.instance.beforeNativeWrite(makeCommand('answer', { id: 'cmd-cap-b' })), (error: unknown) => {
+    assert.ok(error instanceof CoordinatorChannelError)
+    assert.equal(error.reason, 'pending_writes')
+    return true
+  })
+  h.advance(1001)
+  await assert.rejects(first, (error: unknown) => (error as { code?: string }).code === 'timeout')
+  const third = h.instance.beforeNativeWrite(makeCommand('answer', { id: 'cmd-cap-c' }))
+  const intent = h.frames.at(-1)
+  assert.ok(intent && intent.type === 'native-write-intent')
+  assert.equal(h.lease.receive({ v: 1, type: 'write-admission', id: intent.id, allowed: true }), true)
+  await third
+})
+
+test('a payload just inside the byte bound succeeds while just over is refused, without collateral damage', async () => {
+  const h = channel({ maxPayloadBytes: 1024 })
+  const inside = h.instance.readPayload('payload-inside')
+  const insideRequest = h.frames.at(-1)
+  assert.ok(insideRequest && insideRequest.type === 'payload-read')
+  assert.equal(h.lease.receive(payloadReply(insideRequest.requestId, 'x'.repeat(1000))), true)
+  assert.equal(await inside, 'x'.repeat(1000))
+
+  const over = h.instance.readPayload('payload-over')
+  const overRequest = h.frames.at(-1)
+  assert.ok(overRequest && overRequest.type === 'payload-read')
+  assert.equal(h.lease.receive(payloadReply(overRequest.requestId, 'y'.repeat(1100))), true)
+  await assert.rejects(over, (error: unknown) => {
+    assert.ok(error instanceof CoordinatorChannelError)
+    assert.equal(error.code, 'capacity')
+    return true
+  })
+  // The neighbouring read was not affected and the timer count returned to zero.
+  assert.equal(h.instance.inspect().pendingPayloads, 0)
+  assert.equal(h.clock.armed, 0)
+})
