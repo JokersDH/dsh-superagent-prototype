@@ -1,0 +1,145 @@
+{
+  "protocol": "wave30-status/1",
+  "owner": "agent-d",
+  "branch": "codex/g3-local-distribution",
+  "base": "f87034dd",
+  "mergedMain": "82ee5b8f",
+  "status": "CANDIDATE_SUCCESSOR",
+  "successor": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave30-target/wave30-target-8296720.tar.gz",
+    "sha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+    "tarBytes": 20481470,
+    "buildId": "8296720d8a25f38c",
+    "source": {
+      "commit": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "files": {
+      "count": 6849,
+      "bytes": 68474020
+    },
+    "productSchema": 18,
+    "environment": {
+      "node": "24.21.0",
+      "pnpm": "11.7.0",
+      "sqlite": "3.53.4",
+      "abi": "137",
+      "platform": "darwin",
+      "arch": "arm64"
+    }
+  },
+  "closure": "197/197",
+  "fourResults": {
+    "d1": {
+      "status": "PASS",
+      "modes": [
+        {
+          "id": "normal-personal-discussion",
+          "status": "PASS",
+          "mode": "personal",
+          "startupMode": "normal",
+          "reviewDigest": null
+        },
+        {
+          "id": "restored-personal-no-review",
+          "status": "PASS",
+          "mode": "personal",
+          "startupMode": "recovery_readonly",
+          "reviewDigest": null
+        },
+        {
+          "id": "normal-fixture",
+          "status": "PASS",
+          "mode": "fixture",
+          "startupMode": "normal",
+          "reviewDigest": null
+        },
+        {
+          "id": "restored-fixture",
+          "status": "PASS",
+          "mode": "fixture",
+          "startupMode": "recovery_readonly",
+          "reviewDigest": null
+        },
+        {
+          "id": "restored-personal-review",
+          "status": "PASS",
+          "mode": "personal",
+          "startupMode": "recovery_readonly",
+          "reviewDigest": "90f587e25fa41933ae3e8cc177e126cb8314899babbee505823154e7e48c996a"
+        }
+      ],
+      "precise": {
+        "v1": {
+          "status": "verified-flow",
+          "target": "ok",
+          "verification": "ok"
+        },
+        "v2": {
+          "status": "verified-flow",
+          "target": "ok",
+          "verification": "ok"
+        }
+      },
+      "note": "Raw restoredFixture now actual fixture/recovery_readonly; old wave29 raw personal report preserved as misbinding."
+    },
+    "d2": {
+      "status": "PASS",
+      "features": {
+        "main": "0077",
+        "window": "0076 source actual 9/9",
+        "templates": "0073",
+        "J": "installed 6/6",
+        "F": "installed 8/8"
+      },
+      "note": "Single new source/build/tar freeze after current main merge; window installed interaction not separately rerun."
+    },
+    "d3": {
+      "status": "PASS_WITH_LIMITS",
+      "lifecycle": {
+        "cold": [
+          "build:PASS",
+          "release-manifest:PASS",
+          "first-run:PASS",
+          "doctor:PASS"
+        ],
+        "personal": "PASS",
+        "same": "PASS",
+        "upgrade": "PASS",
+        "backup": "PASS",
+        "noexec": "PASS",
+        "portable": "PASS"
+      },
+      "limits": [
+        "E same-tar independent verdict pending",
+        "rollback not claimed"
+      ]
+    },
+    "d4": {
+      "status": "PASS",
+      "guide": "tools/distribution/recipes/wave30-install-guide.zh-CN.md",
+      "support": "tools/distribution/support-bundle.mjs (0700 dir/0600 file, refuses overwrite)"
+    }
+  },
+  "eHandoff": {
+    "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+    "build": "8296720d8a25f38c",
+    "source": {
+      "commit": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "verdict": "PENDING"
+  },
+  "notDone": [
+    "installed window selector interaction on static package",
+    "E independent verdict for same tar",
+    "native/private/target/real vendor"
+  ],
+  "limits": [
+    "zero real vendor/model/native turns",
+    "D selftest not release admission",
+    "historical tars/states/ledgers/services preserved"
+  ]
+}

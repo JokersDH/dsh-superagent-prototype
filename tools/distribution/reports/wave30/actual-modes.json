@@ -1,0 +1,181 @@
+{
+  "protocol": "wave30-actual-mode-matrix/1",
+  "cases": [
+    {
+      "id": "normal-personal-discussion",
+      "requested": "personal",
+      "status": "PASS",
+      "record": {
+        "mode": "personal",
+        "startupMode": "normal",
+        "apiArgv": [
+          "--startup-mode",
+          "normal",
+          "--assistant",
+          "--discussion-only"
+        ]
+      },
+      "health": {
+        "status": "ok",
+        "mode": "personal",
+        "access": "local-development"
+      },
+      "pid": 1834,
+      "birth": {
+        "ps": "1834  1700   501 Sun Nov 15 16:03:56 2026     /Users/hh/.nvm/versions/node/v24.21.0/bin/node /tmp/w30dev/install/app/apps/launcher/bin/pa.mjs start --json --install /tmp/w30dev/install/app --config-root /tmp/w30-normal-personal-discussion/config --data-root /tmp/w30-normal-personal-discussion/state --cache-root /tmp/w30-normal-personal-discussion/cache --logs-root /tmp/w30-normal-personal-discussion/logs --workspace-root /tmp/w30-normal-personal-discussion/ws --port 58100 --api-port 58101 --discussion-only",
+        "children": [
+          "2167"
+        ]
+      },
+      "stop": {
+        "exit": 0,
+        "status": "STOPPED",
+        "stopped": true,
+        "recordRemoved": true
+      },
+      "root": "/tmp/w30-normal-personal-discussion",
+      "data": "/tmp/w30-normal-personal-discussion/state"
+    },
+    {
+      "id": "restored-personal-no-review",
+      "requested": "personal",
+      "status": "PASS",
+      "record": {
+        "mode": "personal",
+        "startupMode": "recovery_readonly",
+        "apiArgv": [
+          "--startup-mode",
+          "recovery_readonly",
+          "--assistant",
+          "--discussion-only"
+        ]
+      },
+      "health": {
+        "status": "ok",
+        "mode": "personal",
+        "startupMode": "recovery_readonly",
+        "access": "local-development"
+      },
+      "pid": 2390,
+      "birth": {
+        "ps": "2390  1700   501 Sun Nov 15 16:03:58 2026     /Users/hh/.nvm/versions/node/v24.21.0/bin/node /tmp/w30dev/install/app/apps/launcher/bin/pa.mjs start --json --install /tmp/w30dev/install/app --config-root /tmp/w30-restored-personal-no-review/config --data-root /tmp/w30-v2 --cache-root /tmp/w30-restored-personal-no-review/cache --logs-root /tmp/w30-restored-personal-no-review/logs --workspace-root /tmp/w30-restored-personal-no-review/ws --port 58102 --api-port 58103",
+        "children": [
+          "2403"
+        ]
+      },
+      "stop": {
+        "exit": 0,
+        "status": "STOPPED",
+        "stopped": true,
+        "recordRemoved": true
+      },
+      "root": "/tmp/w30-restored-personal-no-review",
+      "data": "/tmp/w30-v2"
+    },
+    {
+      "id": "normal-fixture",
+      "requested": "fixture",
+      "status": "PASS",
+      "record": {
+        "mode": "fixture",
+        "startupMode": "normal",
+        "apiArgv": [
+          "--startup-mode",
+          "normal",
+          "--assistant"
+        ]
+      },
+      "health": {
+        "status": "ok",
+        "mode": "fixture",
+        "access": "local-development"
+      },
+      "pid": 5475,
+      "birth": {
+        "ps": "5475  1700   501 Sun Nov 15 16:04:40 2026     /Users/hh/.nvm/versions/node/v24.21.0/bin/node /tmp/w30dev/install/app/apps/launcher/bin/pa.mjs start --json --install /tmp/w30dev/install/app --config-root /tmp/w30-normal-fixture/config --data-root /tmp/w30-normal-fixture/state --cache-root /tmp/w30-normal-fixture/cache --logs-root /tmp/w30-normal-fixture/logs --workspace-root /tmp/w30-normal-fixture/ws --port 58106 --api-port 58107 --fixture",
+        "children": [
+          "5484"
+        ]
+      },
+      "stop": {
+        "exit": 0,
+        "status": "STOPPED",
+        "stopped": true,
+        "recordRemoved": true
+      },
+      "root": "/tmp/w30-normal-fixture",
+      "data": "/tmp/w30-normal-fixture/state"
+    },
+    {
+      "id": "restored-fixture",
+      "requested": "fixture",
+      "status": "PASS",
+      "record": {
+        "mode": "fixture",
+        "startupMode": "recovery_readonly",
+        "apiArgv": [
+          "--startup-mode",
+          "recovery_readonly"
+        ]
+      },
+      "health": {
+        "status": "ok",
+        "mode": "fixture",
+        "startupMode": "recovery_readonly",
+        "access": "local-development"
+      },
+      "pid": 5728,
+      "birth": {
+        "ps": "5728  1700   501 Sun Nov 15 16:04:42 2026     /Users/hh/.nvm/versions/node/v24.21.0/bin/node /tmp/w30dev/install/app/apps/launcher/bin/pa.mjs start --json --install /tmp/w30dev/install/app --config-root /tmp/w30-restored-fixture/config --data-root /tmp/w30-v1 --cache-root /tmp/w30-restored-fixture/cache --logs-root /tmp/w30-restored-fixture/logs --workspace-root /tmp/w30-restored-fixture/ws --port 58108 --api-port 58109 --fixture",
+        "children": [
+          "5738"
+        ]
+      },
+      "stop": {
+        "exit": 0,
+        "status": "STOPPED",
+        "stopped": true,
+        "recordRemoved": true
+      },
+      "root": "/tmp/w30-restored-fixture",
+      "data": "/tmp/w30-v1"
+    },
+    {
+      "id": "restored-personal-review",
+      "status": "PASS",
+      "requested": "personal",
+      "record": {
+        "mode": "personal",
+        "startupMode": "recovery_readonly",
+        "apiArgv": [
+          "--startup-mode",
+          "recovery_readonly",
+          "--assistant",
+          "--discussion-only",
+          "--review-restored-scope"
+        ]
+      },
+      "health": {
+        "status": "ok",
+        "mode": "personal",
+        "startupMode": "recovery_readonly",
+        "restoredReviewDigest": "90f587e25fa41933ae3e8cc177e126cb8314899babbee505823154e7e48c996a",
+        "access": "local-development"
+      },
+      "pid": 23364,
+      "birth": {
+        "ps": "23364 23227   501 Sun Nov 15 16:07:51 2026     /Users/hh/.nvm/versions/node/v24.21.0/bin/node /tmp/w30dev/install/app/apps/launcher/bin/pa.mjs start --json --install /tmp/w30dev/install/app --config-root /tmp/w30-restored-personal-review3/config --data-root /tmp/w30-v2 --cache-root /tmp/w30-restored-personal-review3/cache --logs-root /tmp/w30-restored-personal-review3/logs --workspace-root /tmp/w30-restored-personal-review3/ws --port 58112 --api-port 58113 --discussion-only --review-restored-scope /tmp/w30-review-2.json",
+        "children": [
+          "23715"
+        ]
+      },
+      "stop": {
+        "exit": 0,
+        "status": "STOPPED",
+        "stopped": true,
+        "recordRemoved": true
+      }
+    }
+  ],
+  "note": "Raw actual starts on new 82ee5b8f build; normal health omits startupMode by contract; restoredReviewDigest present only for review run."
+}

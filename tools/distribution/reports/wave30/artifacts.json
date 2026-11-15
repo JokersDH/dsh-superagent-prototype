@@ -1,0 +1,59 @@
+{
+  "protocol": "wave30-artifacts/1",
+  "successor": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave30-target/wave30-target-8296720.tar.gz",
+    "sha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+    "tarBytes": 20481470,
+    "buildId": "8296720d8a25f38c",
+    "source": {
+      "commit": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "files": {
+      "count": 6849,
+      "bytes": 68474020
+    },
+    "productSchema": 18,
+    "environment": {
+      "node": "24.21.0",
+      "pnpm": "11.7.0",
+      "sqlite": "3.53.4",
+      "abi": "137",
+      "platform": "darwin",
+      "arch": "arm64"
+    }
+  },
+  "closure": "197/197",
+  "workspace": {
+    "packages": [
+      "contracts",
+      "orchestrator-core",
+      "effects",
+      "storage",
+      "questions",
+      "application",
+      "workspaces",
+      "verification",
+      "environment-preparation",
+      "portability",
+      "workflows",
+      "context",
+      "proposals",
+      "knowledge",
+      "routing",
+      "usage-insights",
+      "project-recipes"
+    ],
+    "console": "static-http",
+    "coordinator": true
+  },
+  "features": {
+    "main": "0077 18e79cc3",
+    "window": "0076",
+    "templates": "0073",
+    "J": "installed UI 6/6",
+    "F": "installed 8/8",
+    "G": "packaged"
+  }
+}

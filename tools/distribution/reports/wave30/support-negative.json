@@ -1,0 +1,5 @@
+{
+  "protocol": "wave30-support-negative/1",
+  "exit": 1,
+  "output": "{\"status\":\"REFUSED\",\"code\":\"output_exists\"}"
+}

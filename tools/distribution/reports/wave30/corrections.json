@@ -1,0 +1,9 @@
+{
+  "protocol": "wave30-corrections/1",
+  "preserved": "tools/distribution/reports/wave29/fixture-mode.json raw case restoredFixture mode=personal",
+  "classification": "evidence misbinding, not proof of the requested restored-fixture mode",
+  "newObservation": "tools/distribution/reports/wave30/actual-modes.json: restored-fixture mode=fixture, startupMode=recovery_readonly, no personal flags, STOPPED, recordRemoved=true",
+  "newReviewObservation": "restored-personal-review mode=personal, recovery_readonly, discussion-only+review, restoredReviewDigest present, STOPPED, recordRemoved=true",
+  "oldSamplesModified": false,
+  "oldTarsRelabeled": false
+}

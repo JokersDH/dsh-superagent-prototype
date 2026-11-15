@@ -1,0 +1,94 @@
+{
+  "case": "WAVE07-ARTIFACT-UPGRADE",
+  "status": "PASS",
+  "startedAt": "2026-11-15T08:14:16.011Z",
+  "steps": [
+    {
+      "id": "extract-verify",
+      "status": "PASS",
+      "detail": {
+        "baseline": {
+          "buildId": "2d94a7c31ef97b57",
+          "commit": "1fbaf940d426fa34ff6289304e073b9159586ed9",
+          "files": 6849
+        },
+        "target": {
+          "buildId": "8296720d8a25f38c",
+          "commit": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+          "files": 6849
+        },
+        "tarSha256": {
+          "baseline": "daee1a94b43156cec659f7df2a3b08e1ecb89b645fde1ea81c35a81d75b47d7a",
+          "target": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543"
+        }
+      }
+    },
+    {
+      "id": "baseline-first-run-doctor",
+      "status": "PASS",
+      "detail": {
+        "release": "2d94a7c31ef97b57",
+        "doctor": "DEGRADED"
+      }
+    },
+    {
+      "id": "baseline-start-workbench",
+      "status": "PASS",
+      "detail": {
+        "api": "http://127.0.0.1:54724",
+        "workbench": true,
+        "openFilesSampled": 50
+      }
+    },
+    {
+      "id": "pre-upgrade-backup",
+      "status": "PASS",
+      "detail": {
+        "sha256": "6264d2f01b57c58b5ea0fda71de7336a0d322328e8285c6bd9537ab821a34db8",
+        "evidenceDigest": "ce82101cb59bce23de7463789c1cbbe99f1e466552790e77757040daf2631c70"
+      }
+    },
+    {
+      "id": "binary-switch",
+      "status": "PASS",
+      "detail": {
+        "from": "2d94a7c31ef97b57",
+        "to": "8296720d8a25f38c",
+        "stopped": "STOPPED",
+        "backup": "543321845f2e6315271c9f06fd22e02693492f38e7b86018187ddbd0e81ebcf7",
+        "instanceBuildId": "8296720d8a25f38c",
+        "evidenceDigest": "ce82101cb59bce23de7463789c1cbbe99f1e466552790e77757040daf2631c70",
+        "evidenceUnchanged": true
+      }
+    },
+    {
+      "id": "target-doctor-status-journal",
+      "status": "PASS",
+      "detail": {
+        "doctor": "DEGRADED",
+        "status": "RUNNING",
+        "journal": "confirmed",
+        "dataRolledBack": false
+      }
+    },
+    {
+      "id": "binary-rollback-no-data-loss",
+      "status": "PASS",
+      "detail": {
+        "pointer": "2d94a7c31ef97b57",
+        "instanceBuildId": "2d94a7c31ef97b57",
+        "dataRolledBack": false,
+        "evidenceDigest": "ce82101cb59bce23de7463789c1cbbe99f1e466552790e77757040daf2631c70",
+        "evidenceUnchanged": true,
+        "note": "Binary-only rollback: the state directory and any post-upgrade rows stay in place."
+      }
+    }
+  ],
+  "finishedAt": "2026-11-15T08:15:02.781Z",
+  "limitations": [
+    "Both artifacts use one product schema; this recipe proves install/switch/rollback mechanics, not a schema migration.",
+    "It does not seed business rows (product commands are main-owned); post-upgrade row preservation is covered by D smoke with its own harness.",
+    "darwin/arm64 + Node 24.21.x + SQLite ABI 137 only; other platforms/ABIs are NOT_TESTED.",
+    "A tar without its published sha256 cannot be attributed to a source commit; pass --baseline-sha256/--target-sha256."
+  ]
+}
