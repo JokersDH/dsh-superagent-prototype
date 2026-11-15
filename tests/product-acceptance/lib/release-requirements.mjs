@@ -195,6 +195,9 @@ export const INSTALL_CASES = [
   case_('E17-SUPPORT-MATERIAL', { layers: [LAYERS.INSTALLED], evidence: ['supportMaterial'] }),
   case_('E9-INSIGHTS-HTTP', { layers: [LAYERS.INSTALLED] }),
   case_('E6-RECIPE-PREVIEW', { layers: [LAYERS.INSTALLED], evidence: ['recipePreview'] }),
+  case_('E5-TWO-PROJECT-TEMPLATE-CREATE', { layers: [LAYERS.INSTALLED], evidence: ['journey'] }),
+  case_('E7-JOURNEY-CONTEXT-SOURCE', { layers: [LAYERS.INSTALLED], evidence: ['journeyContext'] }),
+  case_('E8-JOURNEY-STOP-REOPEN', { layers: [LAYERS.INSTALLED], evidence: ['journeyPhases', 'journeyReopen'] }),
   // Tracked gaps: installed F identity fields and a wired G summary need successor frozen bytes.
   { id: 'E11-TRIAL-IDENTITY-FIELDS', required: false, layers: [LAYERS.INSTALLED], evidence: ['trialIdentity'] },
   { id: 'E13-G-SCOPED-SUMMARY', required: false, layers: [LAYERS.INSTALLED], evidence: ['gSummary'] },
