@@ -1,0 +1,16 @@
+TAP version 13
+# Subtest: a failed machine check never becomes an acceptance and a corrected new Work keeps its own identity
+ok 1 - a failed machine check never becomes an acceptance and a corrected new Work keeps its own identity
+  ---
+  duration_ms: 3767.957
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4019.60725
