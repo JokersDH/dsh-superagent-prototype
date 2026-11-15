@@ -1,0 +1,21 @@
+{
+  "status": "PASS_TEN_AGENT_OUTCOME_DISPATCH_STATIC_ONLY",
+  "externalAgents": 10,
+  "ownersIncludingMain": 11,
+  "completeDeliverablesPerOwner": 4,
+  "totalDeliverablesIncludingMain": 44,
+  "mechanicalMicroPhaseExpansion": false,
+  "checkpoints": 47,
+  "localLinks": 250,
+  "localWorkspacesChecked": 11,
+  "acyclic": true,
+  "nonoverlappingOwnership": true,
+  "actualWorkbenchOriginalFlow": true,
+  "sameTarInstalledProductRequired": true,
+  "recoveredSameWorkNotNormalDemo": true,
+  "budgetUnchanged": true,
+  "preservedServicePairs": 12,
+  "runtimeTests": 0,
+  "nativeTurnStarts": 0,
+  "releaseApproved": false
+}
