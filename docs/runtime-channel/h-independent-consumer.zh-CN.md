@@ -1,12 +1,24 @@
 # H 独立 consumer 复现指南
 
-2026-11-15（wave-28 修订）。H 在自己的测试目录（`tests/operational-soak/` 等，按 H 自己所有权）写独立 consumer；I 不改 H 断言，也不为 H 另造测试专用 class。
+2026-11-15（wave-29 修订）。H 在自己的测试目录（`tests/operational-soak/` 等，按 H 自己所有权）写独立 consumer；I 不改 H 断言，也不为 H 另造测试专用 class。
+
+## 0. 当前 source 绑定（wave-29）
+
+H 的现状：观察源 `2d1e4941`，默认 materialization 仍是旧 `d95df88`（I）/`cb4e975`（B），并因 main-root pin 与自身 HEAD 不一致而在导入前拒绝——这是**正确的** source 检查，不是通道失败。
+
+要求：
+
+1. 显式绑定 I 的当前 commit（见 `reports/runtime-channel/wave29-adoption.json` 的 `i.sourceCommit` 与 blob 列表），不要用旧快照代表 current。
+2. 绑定后在 H 自有目录实际执行三 callback / CAS / late / fresh replay / namespace / bounds 正负例，并记录 method/计数，而不是只列 contract scenario 数据。
+3. 旧材料继续作为历史证据保留，但不得标为当前修复 PASS。
 
 ## 1. 可复制的最小输入
 
 - 公开入口：`apps/runner/src/attach-channel/index.ts`
   - `CoordinatorChannelModule`（三回调）
-  - `RunnerAttachChannel`（pull 路由：`bind` / `next` / `receive` / `drop`）
+  - `RunnerAttachChannel`（pull 路由：`bind` / `next` / `receive` / `drop` / remaining deadline）
+  - `createCoordinatorSinkResponder`（in-process 车道，guard 必填）
+  - `toAttachFailure` / `refusalFailure` / `AttachFailureCode`（typed 失败面）
   - `CoordinatorChannelError`、`NativeWriteDenied`、共享 schema 重导出
 - 共享类型：`packages/contracts/src/coordinator-channel.ts`（main 0068；不要复制"本地版"）
 - 可复制样例：
@@ -48,6 +60,11 @@
 
 报告附：exact 输入（producer/fact/请求顺序）、时钟推进值、`inspect()`、错误 `code/reason`、源码路径/行号、以及是否经过 B 的真实服务。
 
-## 5. 边界
+## 5. 本轮新增的两个可执行面
+
+- in-process guard：`createCoordinatorSinkResponder({ facts, payloads, guardNativeWrite })`。H 可复制来验证"缺 guard / deny / throw 都不得许可"，以及"每次意图一次 guard"。
+- typed 失败：`toAttachFailure` 的总映射与 `AttachFailureCode` union；H 可用它断言未知错误不会带出路径/秘密。
+
+## 6. 边界
 
 H 复现的是**通信模块**行为，不是产品/native/安装准入：不证明同 Runner 进程、coordinator SIGKILL 恢复、durable exactly-once 或物理 writer quiescence。H 当前若仍消费旧 stdio service blob，必须显式标注"非当前 I/B source"，并切换到本入口后再声称执行了同一实现。

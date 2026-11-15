@@ -7,6 +7,10 @@
 export { CoordinatorChannelModule, DEFAULT_LIMITS, sameCoordinatorChannelProducer } from './coordinator-channel.ts'
 export { RunnerAttachChannel } from './attach.ts'
 export type { AttachHooks, AttachNext, AttachOptions, AttachRefusal, AttachReply } from './attach.ts'
+export { createCoordinatorSinkResponder } from './sink-responder.ts'
+export type { CoordinatorSinkResponder, CoordinatorSinkResponderOptions } from './sink-responder.ts'
+export { toAttachFailure, refusalFailure } from './refusals.ts'
+export type { AttachFailure, AttachFailureCode } from './refusals.ts'
 export { CoordinatorChannelError, NativeWriteDenied, isCoordinatorChannelError } from './errors.ts'
 export {
   CoordinatorChannelLimitsSchema,

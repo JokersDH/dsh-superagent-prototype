@@ -9,7 +9,7 @@ import type {
   CoordinatorChannelRequest,
   CoordinatorChannelReply,
 } from '../../../../packages/contracts/src/coordinator-channel.ts'
-import type { CriticalFact, DurableReceipt, Json } from '../../../../packages/contracts/src/types.ts'
+import type { CriticalFact, DurableReceipt, Json, RunnerCommand } from '../../../../packages/contracts/src/types.ts'
 import { makeAttemptSpec, makeFact } from '../../../../packages/testing/src/index.ts'
 import { CoordinatorChannelModule } from '../../src/attach-channel/coordinator-channel.ts'
 
@@ -92,6 +92,24 @@ export function makeHarness(overrides: Partial<typeof LIMITS> = {}) {
   }
   const first = client('conn-1', 0)
   return { clock, channel, limits, sent, lease: first.lease, frames: first.frames, client }
+}
+
+/** A statically narrowed `answer` command: the v1 native-intent schema refines to this branch. */
+export type AnswerCommand = Extract<RunnerCommand, { kind: 'answer' }>
+
+export function answerCommand(id: string, overrides: Partial<AnswerCommand> = {}): AnswerCommand {
+  return {
+    ticketId: PRODUCER.attempt.ticketId,
+    assignmentId: PRODUCER.attempt.assignmentId,
+    attemptId: PRODUCER.attempt.attemptId,
+    fenceEpoch: PRODUCER.attempt.fenceEpoch,
+    contract: { ...PRODUCER.attempt.contract },
+    kind: 'answer',
+    id,
+    nativeBindingRef: 'binding-1',
+    answerRef: 'answer-1',
+    ...overrides,
+  }
 }
 
 export function factOf(overrides: Partial<CriticalFact> = {}): CriticalFact {

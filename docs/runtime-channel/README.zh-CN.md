@@ -81,6 +81,23 @@ const lease = channel.bind({ producer, connectionId, expectedGeneration: 0, send
 - 旧 lease 的 `close()`：no-op，不影响 replacement。
 - `module.close()`：终止**全部** pending/timer 并拒绝后续请求与 bind；facts/payloads → `closed`，writes → `indeterminate`。它只关闭通信，**不证明物理 writer 已停**；进程/barrier 仍由 B/main 原控制端证明。
 
+## 4.2 in-process 车道的权限分工（wave-29）
+
+事实落库与 native 写许可是**两种不同的权威**。`createCoordinatorSinkResponder` 把 in-process 车道的三个回答显式化：
+
+```ts
+const respond = createCoordinatorSinkResponder({
+  facts: { record },                 // 原 A/public sink
+  payloads: { read },                // 原 immutable Store/responder
+  guardNativeWrite: command => guard(command),   // 必填：当前 main/Broker fresh guard
+})
+```
+
+- 每个 native 意图调用一次 `guardNativeWrite`；返回 `false`、抛错、或根本没注入，都回答 `allowed:false`。
+- 回复回显该意图自己的 `frame.id`；成功不缓存、不跨意图复用。
+- fact 失败回答 `ack-failed`；payload 读取失败不回答，交由模块 deadline。
+- 该 responder 没有策略：它只是把"缺 guard 就不许写"变成源码结构，而不是 `!businessClosed` 之类默认放行。
+
 ## 5. 错误与失败码
 
 模块只抛两类拒绝：
@@ -100,6 +117,10 @@ const lease = channel.bind({ producer, connectionId, expectedGeneration: 0, send
 2. `NativeWriteDenied`：当前 coordinator guard 的**权威否定**。它不是通道故障（不等于 timeout/indeterminate），caller 不得写，之后可针对原 command 重新询问。
 
 `reason` 是稳定短标识（如 `generation_mismatch`、`write_intent_send_failed`、`fact_ack_failed`）。错误消息/堆栈**不含** payload 原文、凭据、私有绝对路径；至多出现有界 ID 与状态。
+
+消费者（如 B 的 recovery transport）可用 `toAttachFailure(error)` / `refusalFailure(refused)` 得到统一的
+`AttachFailureCode`（含 `native_write_denied`），把该类型并入自己的错误 union 即可，无需 unchecked cast；
+未知错误固定映射为 `protocol_error/unexpected_error` 且不保留原始 message。
 
 ## 6. 容量与结算规则
 
@@ -141,15 +162,15 @@ attach.drop(leaseRef, 'socket closed')
 # 严格类型（strict + noUncheckedIndexedAccess + exactOptionalPropertyTypes）
 node_modules/.bin/tsc -p apps/runner/src/attach-channel/tsconfig.json
 # 行为矩阵（注入时钟，无 sleep、无真实网络/模型）
-cd apps/runner && node --test --test-timeout=8000 test/attach-channel/*.test.ts   # 65/65
+cd apps/runner && node --test --test-timeout=8000 test/attach-channel/*.test.ts   # 84/84
 ```
 
-覆盖：CAS/generation/fencing、三回调、跨客户端重绑、fresh intent 与旧 allowed 重放、timeout/capacity/late/close、共享契约与 freeze 守卫、B 路由形状、kind 命名空间与 id 碰撞、独立 consumer。wave-27 的 44 个历史用例保留在原 scope 内。
+覆盖：CAS/generation/fencing、三回调、跨客户端重绑、fresh intent 与旧 allowed 重放、timeout/capacity/late/close、共享契约与 freeze 守卫、B 路由形状、kind 命名空间与 id 碰撞、独立 consumer、in-process guard responder（缺失/拒绝/抛错）、typed refusal 映射。wave-27 的 44 个历史用例保留在原 scope 内。
 
 ## 9. 本文明确不证明的事
 
-- **B 实际接入仍未达**：B 的当前树确实删除了旧的 `factWaiters`/`payloadWaiters`/`writeWaiters`，但换成了它自己的 `business-channel.ts`/`business-dispatch.ts`，尚未 import 本模块。旧"runner-service 仍有 15 处 map"的说法只描述本分支的旧 main baseline，不是当前 B。
+- **B 已实际接入**（观察源 `1930278c`）：B merge 本分支后 import `RunnerAttachChannel`，旧三张 waiter map 与自建 connections 队列已删除，sink 车道的 native 意图必须经过注入的 `beforeNativeWrite`（缺失/拒绝/抛错都不得许可）。当前 B 的唯一阻塞是它自己 `runner-service.ts` 里两处遗留的 `channel` 引用导致 strict 编译失败，修法见 `adoption-manifest.zh-CN.md` §2。
 - 未证明：同 Runner 进程双 client、coordinator SIGKILL 后原问题→交付、跨 coordinator 崩溃恢复、durable exactly-once、物理 writer quiescence。
-- 测试中的 `DurableSink` 只是**幂等语义 double**（同 id 重放同 receipt、冲突拒绝），不代表 A 的真实持久化 ingress；`ImmutablePayloads`/`FreshGuard` 同理。
-- `readPayload` 只承载 immutable payload **JSON 值**（受 `maxPayloadBytes` 约束），不替代 B 的 journal/descriptor 分块回放路线（135540 字节 5 块属于 B 的 journal 分页传输，不是本模块的 callback payload 能力）。
-- H 在其自身目录执行同一实现的独立 consumer 尚未发生；H 当前消费的是旧 stdio service blob。
+- 测试中的 `DurableSink`/`ImmutablePayloads`/guard 都是契约/语义 double，不代表 A 的持久化 ingress 或 main/Broker 的真实许可。
+- `readPayload` 只承载 immutable payload **JSON 值**（受 `maxPayloadBytes` 约束），不替代 B 的 journal/descriptor 分块回放路线。
+- H 仍消费旧快照并在导入前因 source pin 拒绝（`NOT_REACHED_SOURCE_REFUSAL`）；它需要绑定当前 source 后独立执行。
