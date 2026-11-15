@@ -1,6 +1,6 @@
 # F 包 wave-28 最终报告：项目内建议、两项目交付与真实观察
 
-日期：2026-11-15 · 分支 `codex/g4-trial-experience` · 基线 main `ea82d8f`（已合并，含 18f/623 真实观察），本包最终源码提交在 `wave28-status.json` 记录。
+日期：2026-11-15 · 分支 `codex/g4-trial-experience` · 基线 main `ea82d8f`（已合并，含 18f/623 真实观察），本包最终源码提交 `cf0bbd5`（之后仅有文档/状态更新）。
 
 ## 六个结果
 

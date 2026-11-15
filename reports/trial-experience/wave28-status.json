@@ -11,7 +11,7 @@
   "fixedStart": "2a862525894b89cdfe17b4ea84862624447ee609",
   "mainAppSource": "623cccb254c3324e91e99d1c3afb82b46ef703ab",
   "mainObservationSource": "18f892d",
-  "finalSourceCommit": null,
+  "finalSourceCommit": "cf0bbd5",
   "state": "DELIVERED_WITH_DECLARED_DEPENDENCIES",
   "layers": {
     "source": "DELIVERED (component, tests, docs, status)",
