@@ -159,6 +159,7 @@ export function startOwned(root, {
  *    identity immediately before each TERM/KILL; every attempt is recorded.
  */
 export async function stopOwned(root, { mockFile, birth = null, packageStop = true, proofSignal = false, equivalentProof = false, timeoutMs = 30_000 } = {}) {
+  const finish = value => { trace(`stop ${root.state} -> clean=${value.clean} reason=${value.reason ?? null} blocked=${JSON.stringify(value.blocked ?? null).slice(0, 160)} pkg=${value.packageStop?.json?.status ?? null}`); return value }
   const { install, config, state } = root
   const result = { install, state, config, attempts: [], signals: [], packageStop: null, record: null, clean: false, retained: false }
   if (packageStop) {
@@ -171,7 +172,7 @@ export async function stopOwned(root, { mockFile, birth = null, packageStop = tr
     if (stopped.status === 0 && (status === 'STOPPED' || status === 'STOPPED_ORPHAN')) {
       result.clean = true
       result.record = readRecord(config)
-      return result
+      return finish(result)
     }
     trace(`package stop refused: ${JSON.stringify(result.packageStop).slice(0, 300)}`)
     // A refused packaged stop is first recorded as a product finding. Without an explicit
@@ -182,7 +183,7 @@ export async function stopOwned(root, { mockFile, birth = null, packageStop = tr
     if (!equivalentProof) {
       result.retained = true
       result.reason = 'package_stop_refused'
-      return result
+      return finish(result)
     }
     trace('package stop refused; attempting equivalent independent proof')
   }
@@ -192,12 +193,12 @@ export async function stopOwned(root, { mockFile, birth = null, packageStop = tr
   if (!record.present) {
     // Nothing recorded: no pid can be attributed here, so nothing is signalled.
     result.clean = true
-    return result
+    return finish(result)
   }
   if (record.error || !value || typeof value !== 'object') {
     result.retained = true
     result.reason = 'unreadable_record'
-    return result
+    return finish(result)
   }
   // A tar install root holds `bin/` and `app/`; the product records the payload root (`app/`). The
   // request names the bin holder, so the payload root is what the record must match.
@@ -211,7 +212,7 @@ export async function stopOwned(root, { mockFile, birth = null, packageStop = tr
   if (!scope.stateMatches || !scope.installMatches) {
     result.retained = true
     result.reason = 'requested_root_mismatch'
-    return result
+    return finish(result)
   }
   // One pid is one process: a record that names the same pid twice (synthetic controls do) must not
   // produce a second, unprovable entry after the first signal.
@@ -234,11 +235,11 @@ export async function stopOwned(root, { mockFile, birth = null, packageStop = tr
     result.retained = true
     result.reason = 'unknown_live_resource'
     result.gaps = gaps.map(entry => ({ label: entry.label, pid: entry.pid, expected: entry.expected ?? null, observed: entry.start ?? null }))
-    return result
+    return finish(result)
   }
   const owned = live.filter(entry => entry.alive)
-  if (owned.length === 0) { result.clean = true; return result }
-  if (!proofSignal && !equivalentProof) { result.retained = true; result.reason = 'signal_not_allowed'; return result }
+  if (owned.length === 0) { result.clean = true; return finish(result) }
+  if (!proofSignal && !equivalentProof) { result.retained = true; result.reason = 'signal_not_allowed'; return finish(result) }
   // Independent ownership facts for one pid: recorded start == live start, our uid, an exact
   // (boundary-anchored) argv match to the payload install and requested state, and a recorded
   // parent-child relation for the coordinator/console children. A record alone is never enough.
@@ -247,20 +248,36 @@ export async function stopOwned(root, { mockFile, birth = null, packageStop = tr
     const argvState = argvHasExactPath(fresh.command ?? '', state)
     const ppid = fresh.pid ? Number(ps(fresh.pid, 'ppid')) : null
     const parentOk = entry.parent === null ? true : ppid === entry.parent
-    // The launcher carries the roots in its environment, not its argv, so its state proof is the
-    // independent birth fact captured at spawn (same start identity) plus the exact install path.
-    // The coordinator/console children must name the exact state and the recorded parent.
-    const birthOk = entry.parent === null && birth ? (birth.pid === entry.pid && birth.start === entry.expected) : true
-    const stateOk = entry.parent === null ? true : argvState
+    // The launcher carries the roots in its environment, not its argv. Its state/root proof must come
+    // from the birth record captured at spawn: identical pid/start and the same state/config/install
+    // this request names. A record that self-claims another root cannot substitute for that.
+    const birthBound = entry.parent === null && birth !== null && typeof birth === 'object'
+    const birthOk = entry.parent === null
+      ? birthBound && birth.pid === entry.pid && birth.start === entry.expected &&
+        birth.state === state && birth.config === config && resolve(birth.install) === resolve(install)
+      : true
+    const stateOk = entry.parent === null ? (birthBound && birth.state === state) || argvState : argvState
     return { expectedStart: entry.expected, freshStart: fresh.start ?? null, uid: fresh.uid ?? null, argvInstall, argvState,
-      ppid, parentOk, birthOk, stateOk, birthBound: entry.parent === null && birth !== null,
+      ppid, parentOk, birthOk, stateOk, birthBound,
       ok: fresh.alive && fresh.start === entry.expected && fresh.uid === process.getuid?.() && argvInstall && stateOk && parentOk && birthOk }
+  }
+  // Preflight the complete resource set before any signal: a wrong child root or an unbound launcher
+  // must stop the whole attempt, never leave a TERMed parent with a still-running child.
+  const preflight = owned.map(entry => ({ label: entry.label, pid: entry.pid, ...proofFor(entry, liveIdentity(entry.pid)) }))
+  result.preflight = preflight
+  const blocked = preflight.find(item => item.ok !== true)
+  if (blocked) {
+    result.retained = true
+    result.reason = blocked.birthBound === false && blocked.label === 'launcher' ? 'launcher_birth_missing' : 'resource_scope_mismatch'
+    result.blocked = { label: blocked.label, pid: blocked.pid, birthBound: blocked.birthBound, birthOk: blocked.birthOk,
+      stateOk: blocked.stateOk, argvState: blocked.argvState, parentOk: blocked.parentOk, argvInstall: blocked.argvInstall }
+    return finish(result)
   }
   for (const entry of owned) {
     const fresh = liveIdentity(entry.pid)
     const proof = proofFor(entry, fresh)
     const attempt = { label: entry.label, pid: entry.pid, ...proof, signalled: null }
-    if (!proof.ok) { attempt.signalled = false; result.signals.push(attempt); result.retained = true; result.reason = 'fresh_identity_changed'; return result }
+    if (!proof.ok) { attempt.signalled = false; result.signals.push(attempt); result.retained = true; result.reason = 'fresh_identity_changed'; return finish(result) }
     try { process.kill(entry.pid, 'SIGTERM'); attempt.signalled = 'SIGTERM' } catch { attempt.signalled = false }
     result.signals.push(attempt)
   }
@@ -270,7 +287,7 @@ export async function stopOwned(root, { mockFile, birth = null, packageStop = tr
     if (!after.alive) continue
     const proof = proofFor(entry, after)
     const attempt = { label: entry.label, pid: entry.pid, ...proof, signalled: null }
-    if (!proof.ok) { attempt.signalled = false; result.signals.push(attempt); result.retained = true; result.reason = 'fresh_identity_changed_after_term'; return result }
+    if (!proof.ok) { attempt.signalled = false; result.signals.push(attempt); result.retained = true; result.reason = 'fresh_identity_changed_after_term'; return finish(result) }
     try { process.kill(entry.pid, 'SIGKILL'); attempt.signalled = 'SIGKILL' } catch { attempt.signalled = false }
     result.signals.push(attempt)
   }
@@ -278,11 +295,11 @@ export async function stopOwned(root, { mockFile, birth = null, packageStop = tr
   const survivors = entries.map(entry => liveIdentity(entry.pid)).filter(item => item.alive)
   result.aliveAfter = survivors
   result.clean = survivors.length === 0
-  if (!result.clean) { result.retained = true; result.reason = 'survivors_after_signal'; return result }
+  if (!result.clean) { result.retained = true; result.reason = 'survivors_after_signal'; return finish(result) }
   // Only after every recorded pid is proven gone may the record be removed: it is the equivalent of
   // the packaged stop's own remove-after-verified-stop, and it is recorded as such.
   try { rmSync(recordPath(config), { force: true }); result.recordRemoved = true } catch { result.recordRemoved = false }
-  return result
+  return finish(result)
 }
 
 /**

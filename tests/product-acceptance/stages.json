@@ -1,10 +1,10 @@
 {
   "schema": "product-acceptance-stages/1",
   "agent": "E",
-  "taskPackage": "agent-tasks/product-wave-27/README.zh-CN.md",
+  "taskPackage": "agent-tasks/product-wave-28/README.zh-CN.md",
   "branch": "codex/g3-product-acceptance",
   "base": "ca01e17",
-  "checkpoint": "626be26",
+  "checkpoint": "pending",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -18,162 +18,194 @@
   "stages": [
     {
       "id": "E1",
-      "title": "Fix the accurate baseline and the dangerous tool boundary",
-      "command": "node tests/product-acceptance/run.mjs --suites=selftest",
+      "title": "Functional PASS separated from defect-detection PASS",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "The ce64 tuple, 164-required report and UI hashes stay the recorded subject; the old substring stop fallback, pre-registration window and unconditional record deletion are listed and never run live."
+        "The ce64 RUNNING/personal-record/fixture-health/BLOCKED-stop facts stay; the detector case may pass while the functional requirement fails."
       ]
     },
     {
       "id": "E2",
-      "title": "Reuse exact probe-owned proof",
+      "title": "Complete birth and scope binding",
       "command": "node tests/product-acceptance/cases/w27-lifecycle.mjs",
       "notes": [
-        "Own positive, wrong start, sibling root, foreign same-uid child, mixed known/unknown, refused packaged stop and idempotent repeat run as pure controls over plain sleepers."
+        "A launcher proof now needs the birth facts this request spawned (pid/start/state/config/install); a record that self-claims another root cannot stand in."
       ]
     },
     {
       "id": "E3",
-      "title": "Pre-spawn registration and failure closing",
+      "title": "Whole-set preflight and per-signal freshness",
       "command": "node tests/product-acceptance/cases/w27-lifecycle.mjs",
       "notes": [
-        "A start that never reports RUNNING keeps birth facts and its private root; only a proven stop releases it; the observed-assignment window is closed in the live provisioner."
+        "Every recorded pid and its root/child relation is verified before any signal; a wrong-root child blocks the launcher instead of being discovered after TERM."
       ]
     },
     {
       "id": "E4",
-      "title": "First result: safe complete browser tool",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4",
+      "title": "First result: safe tool and honest required",
+      "command": "node tests/product-acceptance/run.mjs --suites=selftest",
       "notes": [
-        "The packaged stop runs first and its real result is read; a refusal becomes a recorded product finding with per-pid equivalent proof, and unknown material is retained."
+        "Ten pure controls cover own, wrong start, sibling, foreign child, mixed unknown, start window, refused stop, idempotence, birth-root and child-scope."
       ]
     },
     {
       "id": "E5",
-      "title": "A/C artifact and derived content evidence",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4",
+      "title": "New package mode/start/stop function",
+      "command": "node tests/product-acceptance/run.mjs --tier=installed-functional",
       "notes": [
-        "Snapshot artifacts are closed over registry digests; corrupted and missing files are refused; an unknown persisted table cannot be a complete set."
+        "Functional stop requires the packaged launcher to return STOPPED for both a normal and a restored discussion-only instance without a proof fallback."
       ]
     },
     {
       "id": "E6",
-      "title": "Exact format and target identity",
+      "title": "Restored no-file recovery and permission boundary",
       "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "Default v1 and explicit v2 are produced and verified by the packaged bytes with original identities; target-only content drift is reported as an explicit gap."
+        "Restored start stays read-only, unselected historical content 403, explicit review reads 200 inside scope with business 422 and a held queue."
       ]
     },
     {
       "id": "E7",
-      "title": "Both roots' complete positive/negative chain",
+      "title": "Two states and exact formats",
       "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "Two fresh roots keep original bindings/attempts/questions/answers/candidates with business refusal, held queue and unchanged provider."
+        "Two states on one install never stop or reuse each other; v1/v2 come from real snapshots, not filenames or driver defaults."
       ]
     },
     {
       "id": "E8",
-      "title": "Second result: exact recovery format and drift",
+      "title": "Second result: recovery function and drift layers",
       "command": "node tests/product-acceptance/build-handoff.mjs",
       "notes": [
-        "Same-package two-format closure and the drift gap are stated with their own evidence and time, never from a summary."
+        "Functional stop, detector, data integrity, target drift and physical quiescence are separate verdicts."
       ]
     },
     {
       "id": "E9",
-      "title": "Qualified I/B normal threshold",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4",
+      "title": "Actual new tar alignment",
+      "command": "node -e \"require('node:fs').readdirSync('/Users/hh/Desktop/joker/pa-artifacts')\"",
       "notes": [
-        "The channel contract correlation rules are independently exercised; the actual attach-channel service is not integrated, so recovery stays NOT_REACHED."
+        "The successor tar is read from its own install-artifact.json; a missing successor keeps ce64 by its recorded time scope, never a checkout relabel."
       ]
     },
     {
       "id": "E10",
-      "title": "Same Runner and fault observation scope",
+      "title": "Readiness, auth and identity",
       "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "Without a channel consumer there is no two-client or SIGKILL business-resume claim; data readers remain legitimate."
+        "Normal/readonly/fixture public schema, revision binding, 401/bad query and unknown/legacy absence are checked with the real browser for the packaged selector."
       ]
     },
     {
       "id": "E11",
-      "title": "New F hook and J draft fields",
+      "title": "Actual context-use and source review",
       "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "Installed F identity fields need successor frozen bytes; the frozen package lacks them and is not relabelled from a newer main source."
+        "Existing prepare/send/audit/history/sources entries are exercised with a local mock provider in a private store; automatic reasoning stays NOT_REACHED."
       ]
     },
     {
       "id": "E12",
-      "title": "Third result: qualified controlled chain and visible fields",
+      "title": "Third result: current package user entry",
       "command": "node tests/product-acceptance/build-handoff.mjs",
       "notes": [
-        "The qualified channel contract, four callbacks and missing installed fields are listed separately; partial is not whole-goal completion."
+        "UI/readiness/context-use/source actions, HTTP and screenshots are reported with their exact bytes and limits."
       ]
     },
     {
       "id": "E13",
-      "title": "G scoped summary and layer boundary",
+      "title": "Real 7/30-day statistics",
       "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "G metrics are not wired into the default UI; no efficiency, coverage or completion claim is derived from G reports."
+        "Usage stays unknown where the product does not provide it; a G summary is not promoted to product completion or efficiency."
       ]
     },
     {
       "id": "E14",
-      "title": "Limited install upgrade and reopen",
+      "title": "Templates and draft recipes",
       "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "The unchanged ce64 tuple keeps its measured install/upgrade scope; only new risks are re-verified and no 600/1800 fixture is rerun as a product soak."
+        "J/F suggestions only fill the original template/draft; absent composed fields are listed precisely."
       ]
     },
     {
       "id": "E15",
-      "title": "I/J/H raw input verification",
+      "title": "Current product daily path",
       "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "Channel contract, draft boundaries and H observations are inputs; E keeps its own required assertions."
+        "Two projects, draft, statistics window, context/source and return paths run on one packaged instance with real network and UI results."
       ]
     },
     {
       "id": "E16",
-      "title": "Fourth result: same-package limited install and observation",
+      "title": "Fourth result: same-package daily chain",
       "command": "node tests/product-acceptance/build-handoff.mjs",
       "notes": [
-        "Installed ordinary, upgrade, short availability and input scope are reported with separate limits."
+        "Visible statistics/templates and two-project paths are required; I/B business recovery remains its own NOT_REACHED."
       ]
     },
     {
       "id": "E17",
-      "title": "Support and private material",
+      "title": "Limited install upgrade and reopen",
       "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "Packaged support output is 0600, non-overwriting and free of credential-shaped values; failures keep resource and package identity."
+        "Cold/no-executor/multi-state, baseline upgrade and 16->18 keep exit/status/pointer/operation/data; new data is never rolled back."
       ]
     },
     {
       "id": "E18",
-      "title": "Complete required and provenance consistency",
-      "command": "node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record",
+      "title": "Support and private material",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "Every required case binds source/consumer/hash/time/layer; historical scopes stay separate and full-product still refuses without native."
+        "Packaged support output is 0600, non-overwriting and credential-free; failures keep resource and subject identity."
       ]
     },
     {
       "id": "E19",
-      "title": "Docs and long-term not-reached items",
-      "command": "node tests/product-acceptance/build-handoff.mjs",
+      "title": "G/H/I/J raw input applicability",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "Current usable paths and unadmitted recovery/platform/model conditions are stated without raising completion by test count."
+        "Raw hashes, times, samples and failures are inputs only; no summary becomes stop authority or release evidence."
       ]
     },
     {
       "id": "E20",
-      "title": "Fifth result: credible complete delivery",
+      "title": "Fifth result: limited install and same-package observation",
+      "command": "node tests/product-acceptance/build-handoff.mjs",
+      "notes": [
+        "Install/upgrade/reopen, support and short availability are reported with unknown and untested platforms preserved."
+      ]
+    },
+    {
+      "id": "E21",
+      "title": "Complete real positives and failure attribution",
       "command": "node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record",
       "notes": [
-        "wave27-status, five checkpoints, real commands/exit/tuples/consumers/times and remaining gates; the goal continues where layers are NOT_REACHED."
+        "Every subject/consumer/hash/time/layer is bound; a functional case cannot pass by recording a bug or by proving cleanup only."
+      ]
+    },
+    {
+      "id": "E22",
+      "title": "Layered admission and compatibility",
+      "command": "node tests/product-acceptance/build-handoff.mjs",
+      "notes": [
+        "module/controlled/ordinary installed/context/source/statistics/templates/recovery/native/value keep separate requirements and scopes."
+      ]
+    },
+    {
+      "id": "E23",
+      "title": "Guide and version facts",
+      "command": "node tests/product-acceptance/build-handoff.mjs",
+      "notes": [
+        "Usable paths, mode limits, the repaired stop boundary and unadmitted capabilities are stated with exact differences."
+      ]
+    },
+    {
+      "id": "E24",
+      "title": "Sixth result: independent complete handoff",
+      "command": "node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record",
+      "notes": [
+        "wave28-status, six checkpoints, real commands/exit/tuples/consumers/times and remaining gates; the goal continues where layers are NOT_REACHED."
       ]
     }
   ]

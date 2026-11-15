@@ -583,6 +583,17 @@ const evidenceFor = (key) => {
       return { desktop: { horizontalOverflow: false } }
     case 'catalog':
       return { conversations: 3, archived: 1 }
+    case 'lifecycleBirthRoot':
+      return { reason: 'resource_scope_mismatch', blocked: { label: 'launcher', birthBound: true, birthOk: false, stateOk: false },
+        signals: [], alive: true, recordPresent: true, birthState: '/tmp/a/state', requestedState: '/tmp/b/state' }
+    case 'lifecycleChildScope':
+      return { reason: 'resource_scope_mismatch', blocked: { label: 'api', birthBound: true, birthOk: true, stateOk: false },
+        signals: [], alive: [true, true], recordPresent: true, childState: '/tmp/o/state', requestedState: '/tmp/a/state' }
+    case 'stopFunctional':
+      return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
+        proofFallbackUsed: false,
+        normal: { status: 'RUNNING', packageStatus: 'STOPPED', recordPresent: false, resourcesAlive: [false, false] },
+        restored: { status: 'RUNNING', packageStatus: 'STOPPED', recordPresent: false, resourcesAlive: [false, false] } }
     case 'lifecycleOwn':
       return { birth: { pid: 10, start: 'a', argvExact: true }, signals: [{ label: 'launcher', pid: 10, signalled: 'SIGTERM' }],
         aliveAfter: [], clean: true, released: { removed: true }, rootAfter: false }
@@ -1572,6 +1583,33 @@ const CASES = [
         findCase(report, 'E5-WORKFLOW-FORMATS').evidence.workflowFormats.artifactClosure.v1.digests[0].match = false
         return report
       }, 'workflowFormats_invalid'),
+  },
+  {
+    id: 'E28-MUTATE-FUNCTIONAL-STOP-DETECTOR',
+    title: 'A detector-only BLOCKED stop cannot satisfy the functional stop requirement',
+    check: ({ assert }) =>
+      rejectWith(assert, 'FUNCTIONAL_BLOCKED', (report) => {
+        findCase(report, 'E5-STOP-FUNCTIONAL').evidence.stopFunctional.restored.packageStatus = 'BLOCKED'
+        return report
+      }, 'stopFunctional_invalid'),
+  },
+  {
+    id: 'E28-MUTATE-FUNCTIONAL-STOP-FALLBACK',
+    title: 'A functional stop that used the proof fallback is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'FUNCTIONAL_FALLBACK', (report) => {
+        findCase(report, 'E5-STOP-FUNCTIONAL').evidence.stopFunctional.proofFallbackUsed = true
+        return report
+      }, 'stopFunctional_invalid'),
+  },
+  {
+    id: 'E28-MUTATE-BIRTH-ROOT-ACCEPTED',
+    title: 'A birth in another state accepted as the requested root is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'BIRTH_ROOT', (report) => {
+        findCase(report, 'E1-LIFECYCLE-BIRTH-ROOT').evidence.lifecycleBirthRoot.reason = 'fresh_identity_changed'
+        return report
+      }, 'lifecycleBirthRoot_invalid'),
   },
   {
     id: 'E27-MUTATE-STOP-FINDING-LOST',

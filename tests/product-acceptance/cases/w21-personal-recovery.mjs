@@ -11,7 +11,7 @@ import { runCase, notTested, LAYERS } from '../lib/status.mjs'
 import { LocalProductClient } from '../lib/http-client.mjs'
 import { candidateModel } from '../../../tests/integration/fixtures/assistant-candidate-model.mjs'
 import { DEFAULT_FROZEN_DIRS, frozenArtifactSubject, loadFrozenArtifact } from '../lib/frozen-package.mjs'
-import { stopOwned as stopOwnedInstance } from '../lib/packaged-instance.mjs'
+import { readRecord, startOwned, stopOwned as stopOwnedInstance } from '../lib/packaged-instance.mjs'
 
 /**
  * Wave-21 explicit restored-personal review with the *package's own* prepare and startup consumer.
@@ -59,39 +59,21 @@ function clearDeadRecord(config) {
   if (pids.length > 0 && pids.every(pid => !alive(pid))) rmSync(path, { force: true })
 }
 
+/** Birth facts are bound to the exact (config, state) this lane spawned, never inferred from a record. */
+const births = new Map()
+const birthKey = (config, state) => `${config}|${state}`
+
 function startPackage(install, { state, config, reviewFile, port, apiPort, mockFile, fixture = false, timeoutMs = 90_000 }) {
   clearDeadRecord(config)
-  const args = ['start', '--json', '--port', String(port), '--api-port', String(apiPort), '--discussion-only']
-  if (fixture) args.push('--fixture')
-  if (reviewFile) args.push('--review-restored-scope', reviewFile)
-  const child = spawn(join(install, 'bin/pa'), args, {
-    cwd: join(install, '..'), stdio: ['ignore', 'pipe', 'pipe'],
-    env: { ...process.env, PA_NODE: process.execPath, PA_MODEL_CONFIG: mockFile, PA_CONFIG_ROOT: config, PA_DATA_ROOT: state },
-  })
-  child.stdout.on('data', () => {})
-  let stderr = ''
-  child.stderr.on('data', chunk => { stderr += chunk })
-  let buffer = ''
-  const value = new Promise(resolve => {
-    const timer = setTimeout(() => resolve({ status: 'TIMEOUT' }), timeoutMs)
-    let attached = false
-    child.stdout.on('data', chunk => {
-      buffer += chunk
-      const text = buffer.trim()
-      if (!text.endsWith('}')) return
-      try { const json = JSON.parse(text); clearTimeout(timer); resolve({ ...json, stderr: stderr.slice(-800) }) } catch { /* buffering */ }
-    })
-    if (!attached) attached = true
-    child.once('exit', code => { clearTimeout(timer); resolve({ status: 'EXITED', code, stderr: stderr.slice(-800) }) })
-  })
-  return { child, value }
-}
-
-function stopPackage(install, { state, config, mockFile, timeoutMs = 30_000 }) {
-  return launcher(install, ['stop', '--json'], {
-    timeoutMs,
-    env: { PA_MODEL_CONFIG: mockFile, PA_CONFIG_ROOT: config, PA_DATA_ROOT: state },
-  })
+  const extraArgs = ['--discussion-only']
+  if (reviewFile) extraArgs.push('--review-restored-scope', reviewFile)
+  const started = startOwned({ install, config, state, own: dirname(install) },
+    { ports: [port, apiPort], mockFile, fixture, extraArgs, timeoutMs })
+  const list = births.get(birthKey(config, state)) ?? []
+  list.push(started.birth)
+  while (list.length > 8) list.shift()
+  births.set(birthKey(config, state), list)
+  return started
 }
 
 /**
@@ -99,7 +81,13 @@ function stopPackage(install, { state, config, mockFile, timeoutMs = 30_000 }) {
  * the record and the process; nothing is force-killed by path similarity and no record is deleted.
  */
 async function stopOwned(install, { state, config, mockFile, birth = null }) {
-  return stopOwnedInstance({ install, config, state, own: dirname(install) }, { mockFile, birth, equivalentProof: true })
+  // The birth is the one this lane captured for the exact recorded pid/start, never simply the last
+  // spawn on this state: a later instance must not lend its birth to an older record.
+  const record = readRecord(config).value ?? null
+  const candidates = births.get(birthKey(config, state)) ?? []
+  const matched = birth ?? candidates.find(item => item.pid === record?.pid && item.start === record?.processStart) ?? null
+  return stopOwnedInstance({ install, config, state, own: dirname(install) },
+    { mockFile, birth: matched, equivalentProof: true })
 }
 
 function messageFacts(state) {
@@ -211,7 +199,7 @@ async function provision(target) {
     const facts = messageFacts(restored)
     const user = facts.messages.find(item => item.text === text && item.role === 'user')
     if (!user) throw new Error('restored store has no original user message')
-    return { own, install, config, restored, mock, projectId: user.projectId, conversationId: user.conversationId,
+    return { own, install, config, restored, seedState, mock, projectId: user.projectId, conversationId: user.conversationId,
       messageId: user.id, text, facts, registry, verify: verify.json?.status ?? null, restore: restore.json?.status ?? null,
       modelRequests: mock.requests.length, target }
   } finally {
@@ -689,7 +677,59 @@ export async function runPersonalReview() {
   }
 
   if (observed) {
-    cases.push(await runCase({ ...define('E8-PACKAGED-STOP-CONSISTENCY', 'The packaged launcher can stop the restored discussion-only instance it recorded, and a refusal is a recorded product finding'),
+    cases.push(await runCase({ ...define('E5-STOP-FUNCTIONAL', 'The packaged launcher stops both a normal and a restored discussion-only instance by itself, without an equivalent-proof fallback'),
+      evidence: {} }, async ({ assert, evidence }) => {
+      const { install, restored, config, mock } = observed
+      const directStop = (state, ports) => {
+        const started = startPackage(install, { state, config, port: ports[0], apiPort: ports[1], mockFile: mock.file })
+        return started
+      }
+      const runStop = started => spawnSync(join(install, 'bin/pa'), ['stop', '--json'], {
+        cwd: join(install, '..'), encoding: 'utf8', timeout: 40_000,
+        env: { ...process.env, PA_NODE: process.execPath, PA_MODEL_CONFIG: mock.file, PA_CONFIG_ROOT: config, PA_DATA_ROOT: started.birth.state },
+      })
+      const observe = async started => {
+        const value = await started.value
+        if (value.status !== 'RUNNING') return { status: value.status, packageStatus: null, health: null, resources: null, record: readRecord(config).present }
+        const health = await fetch(`${value.instance.apiURL}/v1/health`, { signal: AbortSignal.timeout(5_000) }).then(item => item.json()).catch(() => null)
+        const stopped = runStop(started)
+        const json = parseJson(stopped.stdout) ?? null
+        await new Promise(resolvePromise => setTimeout(resolvePromise, 800))
+        const record = readRecord(config)
+        const pids = [record.value?.pid, record.value?.apiPid, record.value?.consolePid].filter(Number.isSafeInteger)
+        const alive = pids.map(pid => { try { process.kill(pid, 0); return true } catch { return false } })
+        return { status: value.status, mode: value.instance?.mode ?? null, startupMode: value.instance?.startupMode ?? null,
+          health: health ? { mode: health.mode, startupMode: health.startupMode ?? 'normal' } : null,
+          packageStatus: json?.status ?? null, packageCode: json?.code ?? null, exit: stopped.status,
+          resourcesAlive: alive, recordPresent: record.present, recordMode: record.value?.mode ?? null }
+      }
+      let normal = null, restoredStop = null
+      try {
+        const [p1, a1] = [await freePort(), await freePort()]
+        normal = await observe(directStop(observed.seedState, [p1, a1]))
+        const [p2, a2] = [await freePort(), await freePort()]
+        restoredStop = await observe(directStop(restored, [p2, a2]))
+      } catch (error) {
+        evidence.stopFunctional = { error: String(error?.message ?? error).slice(0, 300) }
+        throw error
+      } finally {
+        // Only proven cleanup may follow; a refusal is retained and reported, never force-killed.
+        await stopOwned(install, { state: observed.seedState, config, mockFile: mock.file })
+        await stopOwned(install, { state: restored, config, mockFile: mock.file })
+      }
+      const functional = value => value?.packageStatus === 'STOPPED' || value?.packageStatus === 'STOPPED_ORPHAN'
+      const cleaned = value => functional(value) && value.recordPresent === false && (value.resourcesAlive ?? []).every(item => item === false)
+      evidence.stopFunctional = { subject: frozenArtifactSubject(target), normal, restored: restoredStop,
+        detectorCase: 'E8-PACKAGED-STOP-CONSISTENCY records the refusal; this case is the product functional requirement',
+        proofFallbackUsed: false }
+      assert('STOP_FUNCTIONAL_NORMAL', cleaned(normal), JSON.stringify(normal))
+      assert('STOP_FUNCTIONAL_RESTORED', cleaned(restoredStop), JSON.stringify(restoredStop))
+      assert('STOP_FUNCTIONAL_NO_FALLBACK', true, 'no equivalent-proof signal was used in this case')
+    }))
+  }
+
+  if (observed) {
+    cases.push(await runCase({ ...define('E8-PACKAGED-STOP-CONSISTENCY', 'Detector: the packaged launcher refusal for a restored discussion-only instance is identified exactly and cleaned only by proven signals'),
       evidence: {} }, async ({ assert, evidence }) => {
       const { install, restored, config, mock } = observed
       const [port, apiPort] = [await freePort(), await freePort()]

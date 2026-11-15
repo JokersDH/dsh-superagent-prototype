@@ -492,7 +492,7 @@ const executionStatus = {
 }
 
 const tierVerdicts = {}
-for (const name of ['module', 'controlled-product', 'actual-native-control', 'installed-alpha', 'advisory-routing', 'controlled-review', 'actual-heterogeneous-review', 'review-value', 'local-alpha', 'full-product']) {
+for (const name of ['module', 'controlled-product', 'actual-native-control', 'installed-alpha', 'installed-functional', 'advisory-routing', 'controlled-review', 'actual-heterogeneous-review', 'review-value', 'local-alpha', 'full-product']) {
   tierVerdicts[name] = evaluateRelease({
     report,
     requirement: releaseTier(name),
@@ -520,7 +520,7 @@ const commandSummary = (prefixes) => {
     .join(' + ')
 }
 
-const handoff = `# Agent E 第二十七轮交付交接
+const handoff = `# Agent E 第二十八轮交付交接
 
 - 分支 \`${stages.branch}\`，基线 \`${stages.base}\`，检查点 \`${stages.checkpoint}\`，本次证据源 \`${report.source.commit}\`${report.source.dirty ? '（运行时尚有未提交文件，最终提交包含它们）' : '（干净工作树）'}。证据文件随源提交之后的提交一起交付；\`git log\` 的分支头即最终交付提交。
 - 拥有路径：\`tests/product-acceptance/\`。未修改生产实现、root manifest/lock、公共 schema 或迁移。
@@ -655,6 +655,8 @@ if (!existsSync(join(reports, 'wave18-status.json')))
     requiredGate: { installedAlphaCases: [...INSTALL_CASES.map(item => item.id)], current: {
       ownershipMocks: byId.get('E5-D-OWNERSHIP-MOCKS')?.status ?? 'MISSING',
       installedCandidates: byId.get('E5-INSTALLED-CANDIDATES')?.status ?? 'MISSING',
+      stopDetector: byId.get('E8-PACKAGED-STOP-CONSISTENCY')?.status ?? 'MISSING',
+      stopFunctional: byId.get('E5-STOP-FUNCTIONAL')?.status ?? 'MISSING',
       secondRoot: byId.get('E7-SECOND-ROOT-READONLY')?.status ?? 'MISSING',
       installedSourceConfirm: byId.get('E6-INSTALLED-SOURCE-CONFIRM')?.status ?? 'MISSING',
       installedStability: byId.get('E9-INSTALLED-STABILITY')?.status ?? 'MISSING',
@@ -695,6 +697,8 @@ if (!existsSync(join(reports, 'wave19-status.json')))
       ordinaryPersonal651: 'admitted only for the exact 651 package before wave-19; kept as history, not re-applied to b911',
       ordinaryPersonalB911: byId.get('E6-CURRENT-MAIN-INSTALL')?.status ?? 'MISSING',
       installedCandidates: byId.get('E5-INSTALLED-CANDIDATES')?.status ?? 'MISSING',
+      stopDetector: byId.get('E8-PACKAGED-STOP-CONSISTENCY')?.status ?? 'MISSING',
+      stopFunctional: byId.get('E5-STOP-FUNCTIONAL')?.status ?? 'MISSING',
       secondRootReadonly: { status: byId.get('E7-SECOND-ROOT-READONLY')?.status ?? 'MISSING', probeScope: 'fixture+recovery_readonly' },
       installedSourceConfirm: byId.get('E6-INSTALLED-SOURCE-CONFIRM')?.status ?? 'MISSING',
       installedStability: byId.get('E9-INSTALLED-STABILITY')?.status ?? 'MISSING',
@@ -707,6 +711,8 @@ if (!existsSync(join(reports, 'wave19-status.json')))
     requiredGate: { installedAlphaCases: [...INSTALL_CASES.map(item => item.id)], current: {
       ownershipMocks: byId.get('E5-D-OWNERSHIP-MOCKS')?.status ?? 'MISSING',
       installedCandidates: byId.get('E5-INSTALLED-CANDIDATES')?.status ?? 'MISSING',
+      stopDetector: byId.get('E8-PACKAGED-STOP-CONSISTENCY')?.status ?? 'MISSING',
+      stopFunctional: byId.get('E5-STOP-FUNCTIONAL')?.status ?? 'MISSING',
       secondRoot: byId.get('E7-SECOND-ROOT-READONLY')?.status ?? 'MISSING',
       installedSourceConfirm: byId.get('E6-INSTALLED-SOURCE-CONFIRM')?.status ?? 'MISSING',
       installedStability: byId.get('E9-INSTALLED-STABILITY')?.status ?? 'MISSING',
@@ -743,9 +749,18 @@ if (!existsSync(join(reports, 'wave20-status.json')))
     subject: { target: byId.get('E4-INSTALL-ARTIFACT-IDENTITY')?.evidence?.artifact?.tuple?.target ?? null,
       baseline: byId.get('E4-UPGRADE-ROLLBACK')?.evidence?.upgrade?.baseline ?? null,
       control: byId.get('E5-D-OWNERSHIP-MOCKS')?.evidence?.ownershipMocks?.previousPackageHelper ?? null },
+    functional: {
+      verdict: tierVerdicts['installed-functional']?.status ?? 'MISSING',
+      detector: byId.get('E8-PACKAGED-STOP-CONSISTENCY')?.status ?? 'MISSING',
+      functionalCase: byId.get('E5-STOP-FUNCTIONAL')?.status ?? 'MISSING',
+      evidence: byId.get('E5-STOP-FUNCTIONAL')?.evidence?.stopFunctional ?? null,
+      note: 'A detector PASS that records a packaged-stop refusal is not the package stopping itself; installed-alpha keeps the ordinary scope and does not certify stop functional.',
+    },
     scopes: {
       ordinaryPersonalEe: byId.get('E6-CURRENT-MAIN-INSTALL')?.status ?? 'MISSING',
       installedCandidates: byId.get('E5-INSTALLED-CANDIDATES')?.status ?? 'MISSING',
+      stopDetector: byId.get('E8-PACKAGED-STOP-CONSISTENCY')?.status ?? 'MISSING',
+      stopFunctional: byId.get('E5-STOP-FUNCTIONAL')?.status ?? 'MISSING',
       workflowFormats: { status: byId.get('E5-WORKFLOW-FORMATS')?.status ?? 'MISSING',
         capability: byId.get('E5-WORKFLOW-FORMATS')?.evidence?.workflowFormats?.capability ?? null },
       secondRootFixtureReadonly: { status: byId.get('E7-SECOND-ROOT-READONLY')?.status ?? 'MISSING', probeScope: 'fixture+recovery_readonly' },
@@ -768,6 +783,8 @@ if (!existsSync(join(reports, 'wave20-status.json')))
     requiredGate: { installedAlphaCases: [...INSTALL_CASES.map(item => item.id)], current: {
       ownershipMocks: byId.get('E5-D-OWNERSHIP-MOCKS')?.status ?? 'MISSING',
       installedCandidates: byId.get('E5-INSTALLED-CANDIDATES')?.status ?? 'MISSING',
+      stopDetector: byId.get('E8-PACKAGED-STOP-CONSISTENCY')?.status ?? 'MISSING',
+      stopFunctional: byId.get('E5-STOP-FUNCTIONAL')?.status ?? 'MISSING',
       secondRoot: byId.get('E7-SECOND-ROOT-READONLY')?.status ?? 'MISSING',
       installedSourceConfirm: byId.get('E6-INSTALLED-SOURCE-CONFIRM')?.status ?? 'MISSING',
       installedStability: byId.get('E9-INSTALLED-STABILITY')?.status ?? 'MISSING',
@@ -808,9 +825,18 @@ if (!existsSync(join(reports, 'wave21-status.json')))
       retainedHistory: ['reports/wave20-status.json', 'all prior run directories'],
       current: 'the package-consumer lane uses package restored-review/bin-pa bytes and records consumerEntry hashes',
     },
+    functional: {
+      verdict: tierVerdicts['installed-functional']?.status ?? 'MISSING',
+      detector: byId.get('E8-PACKAGED-STOP-CONSISTENCY')?.status ?? 'MISSING',
+      functionalCase: byId.get('E5-STOP-FUNCTIONAL')?.status ?? 'MISSING',
+      evidence: byId.get('E5-STOP-FUNCTIONAL')?.evidence?.stopFunctional ?? null,
+      note: 'A detector PASS that records a packaged-stop refusal is not the package stopping itself; installed-alpha keeps the ordinary scope and does not certify stop functional.',
+    },
     scopes: {
       ordinaryPersonalE4e: byId.get('E6-CURRENT-MAIN-INSTALL')?.status ?? 'MISSING',
       installedCandidates: byId.get('E5-INSTALLED-CANDIDATES')?.status ?? 'MISSING',
+      stopDetector: byId.get('E8-PACKAGED-STOP-CONSISTENCY')?.status ?? 'MISSING',
+      stopFunctional: byId.get('E5-STOP-FUNCTIONAL')?.status ?? 'MISSING',
       workflowFormats: { status: byId.get('E5-WORKFLOW-FORMATS')?.status ?? 'MISSING',
         capability: byId.get('E5-WORKFLOW-FORMATS')?.evidence?.workflowFormats?.capability ?? null },
       secondRootFixtureReadonly: { status: byId.get('E7-SECOND-ROOT-READONLY')?.status ?? 'MISSING', probeScope: 'fixture+recovery_readonly' },
@@ -830,6 +856,8 @@ if (!existsSync(join(reports, 'wave21-status.json')))
     requiredGate: { installedAlphaCases: [...INSTALL_CASES.map(item => item.id)], current: {
       ownershipMocks: byId.get('E5-D-OWNERSHIP-MOCKS')?.status ?? 'MISSING',
       installedCandidates: byId.get('E5-INSTALLED-CANDIDATES')?.status ?? 'MISSING',
+      stopDetector: byId.get('E8-PACKAGED-STOP-CONSISTENCY')?.status ?? 'MISSING',
+      stopFunctional: byId.get('E5-STOP-FUNCTIONAL')?.status ?? 'MISSING',
       secondRoot: byId.get('E7-SECOND-ROOT-READONLY')?.status ?? 'MISSING',
       installedSourceConfirm: byId.get('E6-INSTALLED-SOURCE-CONFIRM')?.status ?? 'MISSING',
       installedStability: byId.get('E9-INSTALLED-STABILITY')?.status ?? 'MISSING',
@@ -872,9 +900,18 @@ if (!existsSync(join(reports, 'wave22-status.json')))
       installed: byId.get('E4-PERSONAL-RESTORED-REVIEW')?.status ?? 'MISSING',
       native: 'NOT_TESTED: 0 vendor/native sends; B recovery/private permission/target remain separate',
     },
+    functional: {
+      verdict: tierVerdicts['installed-functional']?.status ?? 'MISSING',
+      detector: byId.get('E8-PACKAGED-STOP-CONSISTENCY')?.status ?? 'MISSING',
+      functionalCase: byId.get('E5-STOP-FUNCTIONAL')?.status ?? 'MISSING',
+      evidence: byId.get('E5-STOP-FUNCTIONAL')?.evidence?.stopFunctional ?? null,
+      note: 'A detector PASS that records a packaged-stop refusal is not the package stopping itself; installed-alpha keeps the ordinary scope and does not certify stop functional.',
+    },
     scopes: {
       ordinaryPersonal595: byId.get('E6-CURRENT-MAIN-INSTALL')?.status ?? 'MISSING',
       installedCandidates: byId.get('E5-INSTALLED-CANDIDATES')?.status ?? 'MISSING',
+      stopDetector: byId.get('E8-PACKAGED-STOP-CONSISTENCY')?.status ?? 'MISSING',
+      stopFunctional: byId.get('E5-STOP-FUNCTIONAL')?.status ?? 'MISSING',
       workflowFormats: { status: byId.get('E5-WORKFLOW-FORMATS')?.status ?? 'MISSING',
         capability: byId.get('E5-WORKFLOW-FORMATS')?.evidence?.workflowFormats?.capability ?? null },
       secondRootFixtureReadonly: { status: byId.get('E7-SECOND-ROOT-READONLY')?.status ?? 'MISSING', probeScope: 'fixture+recovery_readonly' },
@@ -902,6 +939,8 @@ if (!existsSync(join(reports, 'wave22-status.json')))
     requiredGate: { installedAlphaCases: [...INSTALL_CASES.map(item => item.id)], current: {
       ownershipMocks: byId.get('E5-D-OWNERSHIP-MOCKS')?.status ?? 'MISSING',
       installedCandidates: byId.get('E5-INSTALLED-CANDIDATES')?.status ?? 'MISSING',
+      stopDetector: byId.get('E8-PACKAGED-STOP-CONSISTENCY')?.status ?? 'MISSING',
+      stopFunctional: byId.get('E5-STOP-FUNCTIONAL')?.status ?? 'MISSING',
       secondRoot: byId.get('E7-SECOND-ROOT-READONLY')?.status ?? 'MISSING',
       installedSourceConfirm: byId.get('E6-INSTALLED-SOURCE-CONFIRM')?.status ?? 'MISSING',
       installedStability: byId.get('E9-INSTALLED-STABILITY')?.status ?? 'MISSING',
@@ -953,9 +992,18 @@ if (!existsSync(join(reports, 'wave23-status.json')))
       fixture: 'fixture+recovery_readonly second root remains its own layer and is not personal',
       ordinaryInstalled: byId.get('E6-CURRENT-MAIN-INSTALL')?.status ?? 'MISSING',
       installedCandidates: byId.get('E5-INSTALLED-CANDIDATES')?.status ?? 'MISSING',
+      stopDetector: byId.get('E8-PACKAGED-STOP-CONSISTENCY')?.status ?? 'MISSING',
+      stopFunctional: byId.get('E5-STOP-FUNCTIONAL')?.status ?? 'MISSING',
       recoveredPersonal: byId.get('E4-PERSONAL-RESTORED-REVIEW')?.status ?? 'MISSING',
       native: 'NOT_TESTED: 0 vendor/native sends; B recovery/private permission/target remain separate',
       value: 'BLOCKED: review pilot unchanged',
+    },
+    functional: {
+      verdict: tierVerdicts['installed-functional']?.status ?? 'MISSING',
+      detector: byId.get('E8-PACKAGED-STOP-CONSISTENCY')?.status ?? 'MISSING',
+      functionalCase: byId.get('E5-STOP-FUNCTIONAL')?.status ?? 'MISSING',
+      evidence: byId.get('E5-STOP-FUNCTIONAL')?.evidence?.stopFunctional ?? null,
+      note: 'A detector PASS that records a packaged-stop refusal is not the package stopping itself; installed-alpha keeps the ordinary scope and does not certify stop functional.',
     },
     scopes: {
       workflowFormats: { status: byId.get('E5-WORKFLOW-FORMATS')?.status ?? 'MISSING',
@@ -987,6 +1035,8 @@ if (!existsSync(join(reports, 'wave23-status.json')))
     requiredGate: { installedAlphaCases: [...INSTALL_CASES.map(item => item.id)], current: {
       ownershipMocks: byId.get('E5-D-OWNERSHIP-MOCKS')?.status ?? 'MISSING',
       installedCandidates: byId.get('E5-INSTALLED-CANDIDATES')?.status ?? 'MISSING',
+      stopDetector: byId.get('E8-PACKAGED-STOP-CONSISTENCY')?.status ?? 'MISSING',
+      stopFunctional: byId.get('E5-STOP-FUNCTIONAL')?.status ?? 'MISSING',
       secondRoot: byId.get('E7-SECOND-ROOT-READONLY')?.status ?? 'MISSING',
       installedSourceConfirm: byId.get('E6-INSTALLED-SOURCE-CONFIRM')?.status ?? 'MISSING',
       installedStability: byId.get('E9-INSTALLED-STABILITY')?.status ?? 'MISSING',
@@ -1008,7 +1058,8 @@ if (!existsSync(join(reports, 'wave23-status.json')))
     scopeDiagnostics: byId.get('E7-SCOPE-DIAGNOSTICS')?.evidence?.scopeDiagnostics ?? null,
     readiness: byId.get('E7-READINESS')?.evidence?.readiness ?? null,
     packagedStop: byId.get('E8-PACKAGED-STOP-CONSISTENCY')?.evidence?.packagedStop ?? null,
-    lifecycle: ['E1-LIFECYCLE-OWN', 'E1-LIFECYCLE-WRONG-START', 'E1-LIFECYCLE-SIBLING', 'E1-LIFECYCLE-FOREIGN-CHILD',
+    stopFunctional: byId.get('E5-STOP-FUNCTIONAL')?.evidence?.stopFunctional ?? null,
+    lifecycle: ['E1-LIFECYCLE-BIRTH-ROOT', 'E1-LIFECYCLE-CHILD-SCOPE', 'E1-LIFECYCLE-OWN', 'E1-LIFECYCLE-WRONG-START', 'E1-LIFECYCLE-SIBLING', 'E1-LIFECYCLE-FOREIGN-CHILD',
       'E1-LIFECYCLE-MIXED-UNKNOWN', 'E1-LIFECYCLE-START-WINDOW', 'E1-LIFECYCLE-REFUSED-STOP', 'E1-LIFECYCLE-IDEMPOTENT']
       .map(id => ({ id, status: byId.get(id)?.status ?? 'MISSING' })),
     channel: byId.get('E9-COORDINATOR-CHANNEL-CONTRACT')?.evidence?.channelContract ?? null,
@@ -1056,9 +1107,18 @@ if (!existsSync(join(reports, 'wave24-status.json')))
       fixture: 'fixture+recovery_readonly second root is its own layer, not personal',
       ordinaryInstalled: byId.get('E6-CURRENT-MAIN-INSTALL')?.status ?? 'MISSING',
       installedCandidates: byId.get('E5-INSTALLED-CANDIDATES')?.status ?? 'MISSING',
+      stopDetector: byId.get('E8-PACKAGED-STOP-CONSISTENCY')?.status ?? 'MISSING',
+      stopFunctional: byId.get('E5-STOP-FUNCTIONAL')?.status ?? 'MISSING',
       recoveredPersonal: byId.get('E4-PERSONAL-RESTORED-REVIEW')?.status ?? 'MISSING',
       native: 'NOT_TESTED: 0 vendor/native sends; B recovery/private permission/target remain separate',
       value: 'BLOCKED: review pilot unchanged',
+    },
+    functional: {
+      verdict: tierVerdicts['installed-functional']?.status ?? 'MISSING',
+      detector: byId.get('E8-PACKAGED-STOP-CONSISTENCY')?.status ?? 'MISSING',
+      functionalCase: byId.get('E5-STOP-FUNCTIONAL')?.status ?? 'MISSING',
+      evidence: byId.get('E5-STOP-FUNCTIONAL')?.evidence?.stopFunctional ?? null,
+      note: 'A detector PASS that records a packaged-stop refusal is not the package stopping itself; installed-alpha keeps the ordinary scope and does not certify stop functional.',
     },
     scopes: {
       workflowFormats: { status: byId.get('E5-WORKFLOW-FORMATS')?.status ?? 'MISSING',
@@ -1095,6 +1155,8 @@ if (!existsSync(join(reports, 'wave24-status.json')))
     requiredGate: { installedAlphaCases: [...INSTALL_CASES.map(item => item.id)], current: {
       ownershipMocks: byId.get('E5-D-OWNERSHIP-MOCKS')?.status ?? 'MISSING',
       installedCandidates: byId.get('E5-INSTALLED-CANDIDATES')?.status ?? 'MISSING',
+      stopDetector: byId.get('E8-PACKAGED-STOP-CONSISTENCY')?.status ?? 'MISSING',
+      stopFunctional: byId.get('E5-STOP-FUNCTIONAL')?.status ?? 'MISSING',
       secondRoot: byId.get('E7-SECOND-ROOT-READONLY')?.status ?? 'MISSING',
       installedSourceConfirm: byId.get('E6-INSTALLED-SOURCE-CONFIRM')?.status ?? 'MISSING',
       installedStability: byId.get('E9-INSTALLED-STABILITY')?.status ?? 'MISSING',
@@ -1116,7 +1178,8 @@ if (!existsSync(join(reports, 'wave24-status.json')))
     scopeDiagnostics: byId.get('E7-SCOPE-DIAGNOSTICS')?.evidence?.scopeDiagnostics ?? null,
     readiness: byId.get('E7-READINESS')?.evidence?.readiness ?? null,
     packagedStop: byId.get('E8-PACKAGED-STOP-CONSISTENCY')?.evidence?.packagedStop ?? null,
-    lifecycle: ['E1-LIFECYCLE-OWN', 'E1-LIFECYCLE-WRONG-START', 'E1-LIFECYCLE-SIBLING', 'E1-LIFECYCLE-FOREIGN-CHILD',
+    stopFunctional: byId.get('E5-STOP-FUNCTIONAL')?.evidence?.stopFunctional ?? null,
+    lifecycle: ['E1-LIFECYCLE-BIRTH-ROOT', 'E1-LIFECYCLE-CHILD-SCOPE', 'E1-LIFECYCLE-OWN', 'E1-LIFECYCLE-WRONG-START', 'E1-LIFECYCLE-SIBLING', 'E1-LIFECYCLE-FOREIGN-CHILD',
       'E1-LIFECYCLE-MIXED-UNKNOWN', 'E1-LIFECYCLE-START-WINDOW', 'E1-LIFECYCLE-REFUSED-STOP', 'E1-LIFECYCLE-IDEMPOTENT']
       .map(id => ({ id, status: byId.get(id)?.status ?? 'MISSING' })),
     channel: byId.get('E9-COORDINATOR-CHANNEL-CONTRACT')?.evidence?.channelContract ?? null,
@@ -1130,12 +1193,12 @@ if (!existsSync(join(reports, 'wave24-status.json')))
   }, null, 2) + '\n',
 )
 writeFileSync(
-  join(reports, 'wave27-status.json'),
+  join(reports, 'wave28-status.json'),
   JSON.stringify({
     ...executionStatus,
-    schema: 'product-acceptance-wave27-status/1',
-    taskPackage: 'agent-tasks/product-wave-27/README.zh-CN.md',
-    supersedes: 'wave26-status.json',
+    schema: 'product-acceptance-wave28-status/1',
+    taskPackage: 'agent-tasks/product-wave-28/README.zh-CN.md',
+    supersedes: 'wave27-status.json',
     subject: { target: byId.get('E4-INSTALL-ARTIFACT-IDENTITY')?.evidence?.artifact?.tuple?.target ?? null,
       baseline: byId.get('E4-UPGRADE-ROLLBACK')?.evidence?.upgrade?.baseline ?? null,
       control: byId.get('E5-D-OWNERSHIP-MOCKS')?.evidence?.ownershipMocks?.previousPackageHelper ?? null },
@@ -1154,15 +1217,25 @@ writeFileSync(
       fixture: 'fixture+recovery_readonly second root is its own layer, not personal',
       ordinaryInstalled: byId.get('E6-CURRENT-MAIN-INSTALL')?.status ?? 'MISSING',
       installedCandidates: byId.get('E5-INSTALLED-CANDIDATES')?.status ?? 'MISSING',
+      stopDetector: byId.get('E8-PACKAGED-STOP-CONSISTENCY')?.status ?? 'MISSING',
+      stopFunctional: byId.get('E5-STOP-FUNCTIONAL')?.status ?? 'MISSING',
       recoveredPersonal: byId.get('E4-PERSONAL-RESTORED-REVIEW')?.status ?? 'MISSING',
       sourceUi: byId.get('E6-SOURCE-UI')?.status ?? 'MISSING',
       readiness: byId.get('E7-READINESS')?.status ?? 'MISSING',
       trialWorkbenchUi: byId.get('E3-TRIAL-WORKBENCH-UI')?.status ?? 'MISSING',
-      lifecycleControls: ['E1-LIFECYCLE-OWN', 'E1-LIFECYCLE-WRONG-START', 'E1-LIFECYCLE-SIBLING', 'E1-LIFECYCLE-FOREIGN-CHILD',
+      functionalStop: byId.get('E5-STOP-FUNCTIONAL')?.status ?? 'MISSING',
+      lifecycleControls: ['E1-LIFECYCLE-BIRTH-ROOT', 'E1-LIFECYCLE-CHILD-SCOPE', 'E1-LIFECYCLE-OWN', 'E1-LIFECYCLE-WRONG-START', 'E1-LIFECYCLE-SIBLING', 'E1-LIFECYCLE-FOREIGN-CHILD',
         'E1-LIFECYCLE-MIXED-UNKNOWN', 'E1-LIFECYCLE-START-WINDOW', 'E1-LIFECYCLE-REFUSED-STOP', 'E1-LIFECYCLE-IDEMPOTENT']
         .map(id => `${id}:${byId.get(id)?.status ?? 'MISSING'}`),
       native: 'NOT_TESTED: 0 vendor/native sends; B recovery/private permission/target remain separate',
       value: 'BLOCKED: review pilot unchanged',
+    },
+    functional: {
+      verdict: tierVerdicts['installed-functional']?.status ?? 'MISSING',
+      detector: byId.get('E8-PACKAGED-STOP-CONSISTENCY')?.status ?? 'MISSING',
+      functionalCase: byId.get('E5-STOP-FUNCTIONAL')?.status ?? 'MISSING',
+      evidence: byId.get('E5-STOP-FUNCTIONAL')?.evidence?.stopFunctional ?? null,
+      note: 'A detector PASS that records a packaged-stop refusal is not the package stopping itself; installed-alpha keeps the ordinary scope and does not certify stop functional.',
     },
     scopes: {
       workflowFormats: { status: byId.get('E5-WORKFLOW-FORMATS')?.status ?? 'MISSING',
@@ -1214,7 +1287,8 @@ writeFileSync(
       measured0ede: '223 PASS / 0 FAIL / 16 NOT_TESTED at the recorded 162-required scope',
       measured3b: '227 PASS / 0 FAIL / 17 NOT_TESTED at the recorded 162-required scope (wave25 target, preserved)',
       measuredCe64: 'wave-26 ce64 164-required ordinary installed scope preserved (238 PASS / 0 FAIL / 16 NOT_TESTED)',
-      p1Tool: 'the wave-26 browser stopOwned substring/unproven-signal/unconditional-record-deletion P1 is closed by lib/packaged-instance.mjs and its pure controls',
+      p1Tool: 'wave-27 closed substring/unproven-signal/unconditional-record-deletion; wave-28 closes birth-root and whole-set preflight (a record cannot lend another state birth)',
+      measuredCe64W28: '260 PASS / 0 FAIL / 19 NOT_TESTED ordinary scope; functional stop detected as BLOCKED and required to fail in installed-functional',
       measuredA826: 'a826 readiness/UI absent from the frozen package; its exact bytes stay a separate scope and are not relabeled',
       measured595: '200 PASS / 0 FAIL / 15 NOT_TESTED at the recorded 161-required scope',
       measuredA9b: '208 PASS / 0 FAIL / 15 NOT_TESTED at the recorded 162-required scope',
@@ -1224,6 +1298,8 @@ writeFileSync(
     requiredGate: { installedAlphaCases: [...INSTALL_CASES.map(item => item.id)], current: {
       ownershipMocks: byId.get('E5-D-OWNERSHIP-MOCKS')?.status ?? 'MISSING',
       installedCandidates: byId.get('E5-INSTALLED-CANDIDATES')?.status ?? 'MISSING',
+      stopDetector: byId.get('E8-PACKAGED-STOP-CONSISTENCY')?.status ?? 'MISSING',
+      stopFunctional: byId.get('E5-STOP-FUNCTIONAL')?.status ?? 'MISSING',
       secondRoot: byId.get('E7-SECOND-ROOT-READONLY')?.status ?? 'MISSING',
       installedSourceConfirm: byId.get('E6-INSTALLED-SOURCE-CONFIRM')?.status ?? 'MISSING',
       installedStability: byId.get('E9-INSTALLED-STABILITY')?.status ?? 'MISSING',
@@ -1245,7 +1321,8 @@ writeFileSync(
     scopeDiagnostics: byId.get('E7-SCOPE-DIAGNOSTICS')?.evidence?.scopeDiagnostics ?? null,
     readiness: byId.get('E7-READINESS')?.evidence?.readiness ?? null,
     packagedStop: byId.get('E8-PACKAGED-STOP-CONSISTENCY')?.evidence?.packagedStop ?? null,
-    lifecycle: ['E1-LIFECYCLE-OWN', 'E1-LIFECYCLE-WRONG-START', 'E1-LIFECYCLE-SIBLING', 'E1-LIFECYCLE-FOREIGN-CHILD',
+    stopFunctional: byId.get('E5-STOP-FUNCTIONAL')?.evidence?.stopFunctional ?? null,
+    lifecycle: ['E1-LIFECYCLE-BIRTH-ROOT', 'E1-LIFECYCLE-CHILD-SCOPE', 'E1-LIFECYCLE-OWN', 'E1-LIFECYCLE-WRONG-START', 'E1-LIFECYCLE-SIBLING', 'E1-LIFECYCLE-FOREIGN-CHILD',
       'E1-LIFECYCLE-MIXED-UNKNOWN', 'E1-LIFECYCLE-START-WINDOW', 'E1-LIFECYCLE-REFUSED-STOP', 'E1-LIFECYCLE-IDEMPOTENT']
       .map(id => ({ id, status: byId.get(id)?.status ?? 'MISSING' })),
     channel: byId.get('E9-COORDINATOR-CHANNEL-CONTRACT')?.evidence?.channelContract ?? null,
@@ -1258,7 +1335,7 @@ writeFileSync(
     artifactTuple,
   }, null, 2) + '\n',
 )
-// Historical wave06-26 status files are frozen inputs; wave27 supersedes them.
+// Historical wave06-27 status files are frozen inputs; wave28 supersedes them.
 
 writeFileSync(join(reports, 'handoff.zh-CN.md'), handoff)
 

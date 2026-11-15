@@ -473,6 +473,21 @@ export function trialUiIssues(value) {
  * so a tool that silently force-killed, deleted a record or trusted a substring cannot pass.
  */
 /** A packaged stop either succeeds or is reported as an exact, reproducible product finding. */
+/** Functional stop: the packaged launcher must stop both instances by itself, with no proof fallback. */
+export function stopFunctionalIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (!value.subject || !HEX64(String(value.subject.tarSha256 ?? ''))) issues.push('subject')
+  if (value.proofFallbackUsed !== false) issues.push('proof_fallback')
+  for (const key of ['normal', 'restored']) {
+    const item = value[key]
+    if (!item || item.status !== 'RUNNING') { issues.push(`${key}_not_started`); continue }
+    if (item.packageStatus !== 'STOPPED' && item.packageStatus !== 'STOPPED_ORPHAN') issues.push(`${key}_package_${item.packageStatus ?? 'missing'}`)
+    if (item.recordPresent !== false) issues.push(`${key}_record_kept`)
+    if (!Array.isArray(item.resourcesAlive) || item.resourcesAlive.some(alive => alive !== false)) issues.push(`${key}_resources_alive`)
+  }
+  return issues
+}
 export function packagedStopIssues(value) {
   if (!value || typeof value !== 'object') return ['missing']
   const issues = []
@@ -1338,7 +1353,7 @@ export function evaluateRelease({
           failures.push(fail('evidence_history_invalid', `Evidence history ${issue}`, entry.id))
       }
       for (const [key, fn] of [['contextUse', contextUseIssues], ['sse', contextSseIssues], ['guards', contextGuardIssues], ['sourceConfirm', sourceConfirmIssues], ['sourceConfirmRefusal', sourceConfirmRefusalIssues], ['candidateFlow', candidateFlowIssues], ['history', contextHistoryIssues], ['sources', contextSourcesIssues], ['contextUi', contextUiIssues], ['concurrency', concurrencyIssues], ['schemaMigration', schemaMigrationIssues], ['legacyMigration', legacyMigrationIssues], ['frozenScope', frozenScopeIssues], ['ownershipCopy', ownershipCopyIssues], ['ownershipMocks', ownershipMocksIssues], ['installedCandidates', installedCandidatesIssues], ['secondRoot', secondRootIssues], ['workflowFormats', workflowFormatsIssues], ['personalReview', personalReviewIssues], ['restoredReviewRefusals', restoredReviewRefusalsIssues], ['reviewReuse', reviewReuseIssues], ['scopeDiagnostics', scopeDiagnosticsIssues], ['readiness', readinessIssues], ['trialUi', trialUiIssues],
-      ['packagedStop', packagedStopIssues], ['lifecycleOwn', lifecycleOwnIssues], ['lifecycleWrongStart', lifecycleWrongStartIssues], ['lifecycleSibling', lifecycleSiblingIssues],
+      ['packagedStop', packagedStopIssues], ['stopFunctional', stopFunctionalIssues], ['lifecycleOwn', lifecycleOwnIssues], ['lifecycleWrongStart', lifecycleWrongStartIssues], ['lifecycleSibling', lifecycleSiblingIssues],
       ['lifecycleForeignChild', lifecycleForeignChildIssues], ['lifecycleMixedUnknown', lifecycleMixedUnknownIssues],
       ['lifecycleStartWindow', lifecycleStartWindowIssues], ['lifecycleRefusedStop', lifecycleRefusedStopIssues],
       ['lifecycleIdempotent', lifecycleIdempotentIssues], ['installedSourceConfirm', installedSourceConfirmIssues], ['installedStability', installedStabilityIssues], ['upgradeFaults', upgradeFaultsIssues], ['currentInstall', currentInstallIssues], ['installedContext', installedContextIssues], ['backupContextReply', backupContextReplyIssues], ['replyDurable', replyDurableIssues], ['replyUnknown', replyUnknownIssues], ['replyMessageWindow', replyWindowIssues], ['replyBadArtifact', replyBadArtifactIssues], ['completedReply', completedReplyIssues], ['unknownReply', unknownReplyIssues]]) {

@@ -38,6 +38,9 @@ const recordFor = (root, { pid, start, apiPid = pid, apiStart = start, consolePi
   buildId: 'probe', mode: 'personal', access: 'local-development', startupMode: 'normal',
 })
 
+const birthFor = (root, sleeper) => ({ pid: sleeper.pid, start: sleeper.start, uid: sleeper.uid,
+  state: root.state, config: root.config, install: root.install })
+
 const define = (id, title) => ({ id, title, layer: LAYERS.READONLY, limitations: [
   'Pure control: a plain Node sleeper and a synthetic instance record in a private temporary root; no product runtime, packaged bytes or user process is involved.',
   'It proves the acceptance tool\'s ownership and cleanup behaviour only, never product behaviour or a product stop boundary.',
@@ -54,7 +57,7 @@ export async function runLifecycle() {
       try {
         const identity = liveIdentity(sleeper.pid)
         writeSyntheticRecord(root, recordFor(root, { pid: sleeper.pid, start: identity.start }))
-        stopped = await stopOwned(root, { packageStop: false, proofSignal: true })
+        stopped = await stopOwned(root, { packageStop: false, proofSignal: true, birth: birthFor(root, { pid: sleeper.pid, start: identity.start, uid: identity.uid }) })
         released = releaseRoot(root, stopped)
         evidence.lifecycleOwn = { birth: { pid: sleeper.pid, start: identity.start, uid: identity.uid,
           argvExact: argvHasExactPath(identity.command, root.install) && argvHasExactPath(identity.command, root.state) },
@@ -115,7 +118,8 @@ export async function runLifecycle() {
       try {
         const foreignIdentity = liveIdentity(foreign.pid)
         writeSyntheticRecord(root, recordFor(root, { pid: foreign.pid, start: foreignIdentity.start }))
-        stopped = await stopOwned(root, { packageStop: false, proofSignal: true })
+        stopped = await stopOwned(root, { packageStop: false, proofSignal: true,
+          birth: { pid: foreign.pid, start: foreignIdentity.start, uid: foreignIdentity.uid, state: other.state, config: other.config, install: other.install } })
         foreignAlive = liveIdentity(foreign.pid)
         evidence.lifecycleForeignChild = { sameUid: foreignIdentity.uid === liveIdentity(sleeper.pid).uid, reason: stopped.reason,
           signalled: stopped.signals?.[0]?.signalled ?? null, foreignAlive,
@@ -124,7 +128,7 @@ export async function runLifecycle() {
         rmSync(root.own, { recursive: true, force: true }); rmSync(other.own, { recursive: true, force: true }) }
       assert('FOREIGN_SAME_UID', evidence.lifecycleForeignChild?.sameUid === true, String(evidence.lifecycleForeignChild?.sameUid))
       assert('FOREIGN_ARGV_NOT_EXACT', evidence.lifecycleForeignChild?.foreignArgvExactForRequestedRoot === false, String(evidence.lifecycleForeignChild?.command))
-      assert('FOREIGN_REFUSED', stopped?.retained === true && stopped.reason === 'fresh_identity_changed', JSON.stringify(stopped?.signals))
+      assert('FOREIGN_REFUSED', stopped?.retained === true && (stopped.reason === 'resource_scope_mismatch' || stopped.reason === 'fresh_identity_changed'), JSON.stringify({ reason: stopped?.reason, blocked: stopped?.blocked }))
       assert('FOREIGN_ALIVE', foreignAlive?.alive === true, JSON.stringify(foreignAlive))
     }))
 
@@ -172,7 +176,8 @@ export async function runLifecycle() {
         freshExact = argvHasExactPath(fresh.command, root.install) && argvHasExactPath(fresh.command, root.state)
         writeSyntheticRecord(root, recordFor(root, { pid: birth.pid, start: fresh.start }))
         beforeStop = { rootExists: existsSync(root.own), record: readRecord(root.config).present }
-        stopped = await stopOwned(root, { packageStop: false, proofSignal: true })
+        stopped = await stopOwned(root, { packageStop: false, proofSignal: true,
+          birth: { pid: birth.pid, start: fresh.start, uid: fresh.uid, state: root.state, config: root.config, install: root.install } })
         released = releaseRoot(root, stopped)
         evidence.lifecycleStartWindow = { status: value.status, birth: { pid: birth.pid, start: birth.start, uid: birth.uid, recordedAt: birth.recordedAt },
           fresh: { start: fresh.start, uid: fresh.uid, command: fresh.command, argvExact: freshExact },
@@ -217,8 +222,9 @@ export async function runLifecycle() {
       try {
         const identity = liveIdentity(sleeper.pid)
         writeSyntheticRecord(root, recordFor(root, { pid: sleeper.pid, start: identity.start }))
-        first = await stopOwned(root, { packageStop: false, proofSignal: true })
-        second = await stopOwned(root, { packageStop: false, proofSignal: true })
+        const birthRecord = birthFor(root, { pid: sleeper.pid, start: identity.start, uid: identity.uid })
+        first = await stopOwned(root, { packageStop: false, proofSignal: true, birth: birthRecord })
+        second = await stopOwned(root, { packageStop: false, proofSignal: true, birth: birthRecord })
         released = releaseRoot(root, first)
         evidence.lifecycleIdempotent = { first: { clean: first.clean, signals: first.signals },
           second: { clean: second.clean, signalled: (second.signals ?? []).length }, released, rootAfter: existsSync(root.own) }
@@ -226,6 +232,57 @@ export async function runLifecycle() {
       assert('IDEMPOTENT_FIRST_CLEAN', first?.clean === true, JSON.stringify(first?.signals))
       assert('IDEMPOTENT_SECOND_NOOP', second?.clean === true && (second.signals ?? []).length === 0, JSON.stringify(second?.signals))
       assert('IDEMPOTENT_RELEASE', released?.removed === true, JSON.stringify(released))
+    }))
+
+  cases.push(await runCase({ ...define('E1-LIFECYCLE-BIRTH-ROOT', 'A record that self-claims another state than the process birth refuses every signal'), evidence: {} },
+    async ({ assert, evidence }) => {
+      const rootA = privateRoot('pa-e-life-birthA-')
+      const rootB = privateRoot('pa-e-life-birthB-')
+      const sleeper = spawnSleeper(rootA)
+      let stopped, alive, recordPresent
+      try {
+        const identity = liveIdentity(sleeper.pid)
+        // The record claims rootB while the birth facts and argv are rootA.
+        writeSyntheticRecord(rootB, recordFor(rootB, { pid: sleeper.pid, start: identity.start, state: rootB.state, install: rootB.install }))
+        stopped = await stopOwned({ ...rootB }, { packageStop: false, proofSignal: true,
+          birth: { pid: sleeper.pid, start: identity.start, uid: identity.uid, state: rootA.state, config: rootA.config, install: rootA.install } })
+        alive = liveIdentity(sleeper.pid)
+        recordPresent = readRecord(rootB.config).present
+        evidence.lifecycleBirthRoot = { reason: stopped.reason, blocked: stopped.blocked ?? null, signals: stopped.signals,
+          alive: alive.alive, recordPresent, birthState: rootA.state, requestedState: rootB.state }
+      } finally { try { sleeper.child.kill('SIGKILL') } catch { /* gone */ }
+        rmSync(rootA.own, { recursive: true, force: true }); rmSync(rootB.own, { recursive: true, force: true }) }
+      assert('BIRTH_ROOT_REFUSED', stopped?.retained === true && stopped.reason === 'resource_scope_mismatch', JSON.stringify({ reason: stopped?.reason, blocked: stopped?.blocked }))
+      assert('BIRTH_ROOT_BLOCKED_LAUNCHER', stopped?.blocked?.label === 'launcher' && stopped?.blocked?.birthOk === false, JSON.stringify(stopped?.blocked))
+      assert('BIRTH_ROOT_NO_SIGNAL', (stopped?.signals ?? []).length === 0, JSON.stringify(stopped?.signals))
+      assert('BIRTH_ROOT_ALIVE', alive?.alive === true, JSON.stringify(alive))
+      assert('BIRTH_ROOT_RECORD_KEPT', recordPresent === true, 'record was deleted')
+    }))
+
+  cases.push(await runCase({ ...define('E1-LIFECYCLE-CHILD-SCOPE', 'A wrong-root coordinator child blocks the whole set before the launcher is signalled'), evidence: {} },
+    async ({ assert, evidence }) => {
+      const root = privateRoot('pa-e-life-child-')
+      const other = privateRoot('pa-e-life-childother-')
+      const launcher = spawnSleeper(root)
+      const child = spawnSleeper(other, { name: 'api' })
+      let stopped, alive, recordPresent
+      try {
+        const l = liveIdentity(launcher.pid)
+        const c = liveIdentity(child.pid)
+        writeSyntheticRecord(root, recordFor(root, { pid: launcher.pid, start: l.start, apiPid: child.pid, apiStart: c.start }))
+        stopped = await stopOwned(root, { packageStop: false, proofSignal: true,
+          birth: { pid: launcher.pid, start: l.start, uid: l.uid, state: root.state, config: root.config, install: root.install } })
+        alive = [liveIdentity(launcher.pid).alive, liveIdentity(child.pid).alive]
+        recordPresent = readRecord(root.config).present
+        evidence.lifecycleChildScope = { reason: stopped.reason, blocked: stopped.blocked ?? null, signals: stopped.signals, alive, recordPresent,
+          childState: other.state, requestedState: root.state }
+      } finally { try { launcher.child.kill('SIGKILL') } catch { /* gone */ } try { child.child.kill('SIGKILL') } catch { /* gone */ }
+        rmSync(root.own, { recursive: true, force: true }); rmSync(other.own, { recursive: true, force: true }) }
+      assert('CHILD_SCOPE_REFUSED', stopped?.retained === true && stopped.reason === 'resource_scope_mismatch', JSON.stringify({ reason: stopped?.reason, blocked: stopped?.blocked }))
+      assert('CHILD_SCOPE_BLOCKED_API', stopped?.blocked?.label === 'api' && stopped?.blocked?.stateOk === false, JSON.stringify(stopped?.blocked))
+      assert('CHILD_SCOPE_NO_SIGNAL', (stopped?.signals ?? []).length === 0, JSON.stringify(stopped?.signals))
+      assert('CHILD_SCOPE_ALL_ALIVE', alive?.every(Boolean) === true, JSON.stringify(alive))
+      assert('CHILD_SCOPE_RECORD_KEPT', recordPresent === true, 'record was deleted')
     }))
 
   return { cases, artifacts: {} }

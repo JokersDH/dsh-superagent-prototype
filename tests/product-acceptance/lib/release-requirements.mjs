@@ -86,6 +86,8 @@ export const SAFETY_CASES = [
  * window, a refused packaged stop, and idempotent repeat.
  */
 SAFETY_CASES.push(
+  case_('E1-LIFECYCLE-BIRTH-ROOT', { layers: [LAYERS.READONLY], evidence: ['lifecycleBirthRoot'] }),
+  case_('E1-LIFECYCLE-CHILD-SCOPE', { layers: [LAYERS.READONLY], evidence: ['lifecycleChildScope'] }),
   case_('E1-LIFECYCLE-OWN', { layers: [LAYERS.READONLY], evidence: ['lifecycleOwn'] }),
   case_('E1-LIFECYCLE-WRONG-START', { layers: [LAYERS.READONLY], evidence: ['lifecycleWrongStart'] }),
   case_('E1-LIFECYCLE-SIBLING', { layers: [LAYERS.READONLY], evidence: ['lifecycleSibling'] }),
@@ -176,6 +178,7 @@ export const INSTALL_CASES = [
   case_('E7-SCOPE-DIAGNOSTICS', { layers: [LAYERS.INSTALLED], evidence: ['scopeDiagnostics'] }),
   case_('E7-READINESS', { layers: [LAYERS.INSTALLED], evidence: ['readiness'] }),
   case_('E8-PACKAGED-STOP-CONSISTENCY', { layers: [LAYERS.INSTALLED], evidence: ['packagedStop'] }),
+  // Functional stop is its own required scope: detecting a refusal is not the package stopping.
   // Tracked gap, not a gate: the frozen package has no content-binding consumer in main.
   { id: 'E6-TARGET-CONTENT-DRIFT', required: false, layers: [LAYERS.INSTALLED], evidence: ['targetDrift'] },
   case_('E9-COORDINATOR-CHANNEL-CONTRACT', { layers: [LAYERS.READONLY] }),
@@ -306,12 +309,23 @@ export const TIERS = {
   'installed-alpha': {
     tier: 'installed-alpha',
     description:
-      'Controlled product workflow plus a real staged installation outside the checkout. Native execution may remain separate.',
+      'Controlled product workflow plus a real staged installation outside the checkout. Native execution may remain separate. Functional stop is measured by the separate installed-functional tier and is not implied by this scope.',
     maxAgeMs: 6 * 60 * 60 * 1000,
     allowedLayers: [LAYERS.CONTROLLED, LAYERS.SDK_MOCK, LAYERS.READONLY, LAYERS.INSTALLED],
     requireCleanSource: true,
     requireCaseSource: true,
     cases: [...SAFETY_CASES, ...CONTROLLED_CASES, ...INSTALL_CASES],
+  },
+  'installed-functional': {
+    tier: 'installed-functional',
+    description:
+      'The same ordinary installed scope plus the functional stop requirement: the packaged launcher must stop a normal and a restored discussion-only instance by itself. A detector case that records a refusal does not satisfy it.',
+    maxAgeMs: 6 * 60 * 60 * 1000,
+    allowedLayers: [LAYERS.CONTROLLED, LAYERS.SDK_MOCK, LAYERS.READONLY, LAYERS.INSTALLED],
+    requireCleanSource: true,
+    requireCaseSource: true,
+    cases: [...SAFETY_CASES, ...CONTROLLED_CASES, ...INSTALL_CASES,
+      case_('E5-STOP-FUNCTIONAL', { layers: [LAYERS.INSTALLED], evidence: ['stopFunctional'] })],
   },
   'review-value': {
     tier: 'review-value',
