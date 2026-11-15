@@ -1,0 +1,229 @@
+{
+  "wave": "product-wave-30",
+  "role": "I",
+  "title": "Adopted communication subsystem and original recovery consumer support",
+  "date": "2026-11-15",
+  "workdir": "/Users/hh/Desktop/joker/superagent-agent-i",
+  "branch": "codex/g5-coordinator-channel",
+  "baseline": "861c03edf9e77c5c250fab59a02103ebb93e56c3",
+  "implementationCommit": "dc17c58a883b2c08b2e1726bf7eff138bb5ee903",
+  "mergedOriginMain": "6f385a54",
+  "status": "ADOPTION_AND_SINGLE_OWNER_CLOSED_PRODUCT_RECOVERY_NOT_REACHED",
+  "statement": "B has adopted the shared module and pull adapter, owns no waiter map or poll queue, requires an explicit sink guard, and no longer mirrors a remote lease onto old stdio (B's own probe: remote served, stdio 0). I contributes the per-connection ownership, handover, concurrency and capacity contracts plus accurate adoption records. Original Work recovery, SIGKILL question->answer, recovered candidate/manualaccept and slot release remain B/main product work.",
+  "sourceBlobs": {
+    "coordinator-channel.ts": "d1ef81eb9d51b24417645151440eb1e262c20546",
+    "errors.ts": "ec8ce909d0f30ab1d96488db56cdf3b6a4ab7f49",
+    "attach.ts": "321738dae3b87e6ad7d235f52aaa65e6f63ab527",
+    "sink-responder.ts": "992a8cc0fceb55d7b2a9e2e8c8068202a892acb3",
+    "refusals.ts": "25ebcd26f1fb4aad583048dc672ec2bf09066b32",
+    "index.ts": "6314546e1d1facde00d0d2195edf1c14ad7a85d2",
+    "tsconfig.json": "1e5af3ea23fb4288afad29954cb31927f3e1e564"
+  },
+  "results": [
+    {
+      "id": "I1",
+      "title": "Actual adoption, responder/type contract and single transport owner",
+      "status": "PASS",
+      "content": "Exact adoption manifest; per-connection next/receive contract; sink guard requirement acknowledged; stale wave-29 claims removed",
+      "evidence": [
+        "reports/runtime-channel/wave30-adoption.json",
+        "lane-ownership.test.ts (5)",
+        "B fbc9331 focused tests 8/8, direct strict 0, b30-transport-owner.mjs 2 PASS/0 FAIL"
+      ],
+      "notReached": [
+        "B/H signal-guard independent birth/resource ownership (B/H test-tool work)"
+      ]
+    },
+    {
+      "id": "I2",
+      "title": "Three-callback closure, concurrency and capacity on the active implementation",
+      "status": "PASS_MODULE_SCOPE",
+      "content": "Cross-kind raw ids never cross, sequential fresh intents per business command, saturation refuses before send and recovers, one queue entry per pending across rebinds",
+      "evidence": [
+        "concurrency.test.ts (5)",
+        "service-consumer.test.ts (5)",
+        "faults.test.ts (18)"
+      ],
+      "notReached": [
+        "actual B in-process native effect observations (B-owned, modeled only here)"
+      ]
+    },
+    {
+      "id": "I3",
+      "title": "Original handover / crash reconciliation communication support",
+      "status": "PASS_COMMUNICATION_SCOPE_PRODUCT_RECOVERY_NOT_REACHED",
+      "content": "Facts/payloads keep original ids/references and remaining window for a CAS successor; pending native intent is indeterminate and never replayed; timeout/closed/stale/denial distinct; no business command frame emitted; generation is not a business epoch",
+      "evidence": [
+        "handover.test.ts (6)"
+      ],
+      "notReached": [
+        "original A new process and question/native_applied/ACK-unknown reconciliation (B/main)",
+        "Completion/check/currentCandidate/manualaccept and slot release (B/main)"
+      ]
+    },
+    {
+      "id": "I4",
+      "title": "Published interface, stability and real adoption handoff",
+      "status": "PASS_SOURCE_HANDOFF",
+      "content": "Exports/bytes/deadline/nonce/business-id/close semantics unchanged; adoption manifest bound to runtime blobs; docs updated; H current-source status recorded",
+      "evidence": [
+        "docs/runtime-channel/README.zh-CN.md",
+        "b-adapter-handoff.zh-CN.md",
+        "wave30-evidence.zh-CN.md",
+        "wave30-status.json"
+      ],
+      "notReached": [
+        "H's stale sink-only expectation must become a nonregression (H-owned)",
+        "installed/native facts remain D/E/B"
+      ]
+    }
+  ],
+  "bReconciliation": {
+    "observedSource": "fbc933166758f446ba8907ce93795d04d34d11d7",
+    "observedCommitTitle": "feat(wave30): one transport owner per callback; birth/resource proof is mandatory",
+    "runnerServiceBlob": "b9f5f47c20d41d12254f6e6980e9b8e2dec357c3",
+    "sharedCoreBlobsMatchI": true,
+    "usesRunnerAttachChannel": true,
+    "oldWaiterMaps": 0,
+    "ownConnectionsAndPollQueueRemoved": true,
+    "singleTransportOwner": "CLOSED_AT_OBSERVED_SOURCE",
+    "sinkGuard": "explicit beforeNativeWrite required; missing/deny/throw zero effect; two same-command intents => guard twice",
+    "directStrictCompile": "PASS exit 0",
+    "focusedTests": "8/8",
+    "ownOwnerProbe": "b30-transport-owner.mjs 2 PASS / 0 FAIL / 1 NOT_TESTED (remote served, old stdio 0)"
+  },
+  "staleCorrections": [
+    "wave-29 B stale channel compile error described intermediate 1930278; current B compiles (direct strict 0)",
+    "wave-29 B not-using-adapter claim is superseded: B uses RunnerAttachChannel and owns no poll queue",
+    "B30 remote-to-old-stdio finding is closed at observed B by its own pump guard and probe"
+  ],
+  "hReconciliation": {
+    "observedSource": "f8cf5713c269a3a920231f23baf11aadd90db736",
+    "currentBinding": "current I/B sources execute; source/materialized unchanged checks pass",
+    "iChecks": "12/12",
+    "bChecks": "5/6",
+    "blocker": "H still requires the historical sink-only bug to exist; current B correctly denies it. H must convert the expectation to a nonregression (H-owned)."
+  },
+  "checks": [
+    {
+      "command": "node_modules/.bin/tsc -p apps/runner/src/attach-channel/tsconfig.json",
+      "exit": 0
+    },
+    {
+      "command": "cd apps/runner && node --test --test-timeout=8000 test/attach-channel/*.test.ts",
+      "exit": 0,
+      "tests": 100,
+      "passed": 100,
+      "failed": 0
+    },
+    {
+      "command": "node --test packages/contracts/test/coordinator-channel.case.ts",
+      "exit": 0,
+      "tests": 5,
+      "passed": 5
+    },
+    {
+      "command": "B focused channel tests (attach-adapter/sink-write-admission/native-write-admission)",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exit": 0,
+      "tests": 8,
+      "passed": 8
+    },
+    {
+      "command": "B direct strict compile of runner-service.ts + recovery-transport.ts",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exit": 0
+    },
+    {
+      "command": "node tests/native-acceptance/b30-transport-owner.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exit": 0,
+      "observed": "2 PASS / 0 FAIL / 1 NOT_TESTED"
+    }
+  ],
+  "testCounts": {
+    "three-callbacks.test.ts": 11,
+    "binding.test.ts": 6,
+    "rebind.test.ts": 7,
+    "faults.test.ts": 18,
+    "compatibility.test.ts": 4,
+    "independent-consumer.test.ts": 4,
+    "fresh-intent.test.ts": 5,
+    "b-route.test.ts": 10,
+    "guard-responder.test.ts": 8,
+    "refusals.test.ts": 6,
+    "service-consumer.test.ts": 5,
+    "lane-ownership.test.ts": 5,
+    "handover.test.ts": 6,
+    "concurrency.test.ts": 5,
+    "total": 100
+  },
+  "notReached": [
+    "original Work recovery: original A new process, question/native_applied/ACK-unknown reconciliation (B/main)",
+    "recovered check/currentCandidate/manualaccept and 2/4 slot release (B/main)",
+    "same Runner dual client and coordinator SIGKILL question->answer",
+    "real A persisted ingress, real main/Broker guard and native/installed facts (module doubles only)",
+    "B/H signal-guard birth/full-argv/resource ownership and H mutable-registry-origin (B/H test tools)",
+    "H executed the selected source with a corrected nonregression expectation (H-owned)"
+  ],
+  "boundaries": {
+    "filesOutsideOwnershipModified": [],
+    "contractsRootWireChanged": false,
+    "runnerServiceOrLinkClientChanged": false,
+    "newServerDatabaseLedgerDriverLifecycle": false,
+    "realModelTurns": 0,
+    "nativeTurns": 0,
+    "processSignalsOrUserServiceOperations": 0,
+    "preservedUserServices": [
+      [
+        5180,
+        8796
+      ],
+      [
+        5181,
+        8797
+      ],
+      [
+        5182,
+        8798
+      ],
+      [
+        5183,
+        8799
+      ],
+      [
+        5184,
+        8800
+      ],
+      [
+        5185,
+        8801
+      ],
+      [
+        5186,
+        8802
+      ],
+      [
+        5187,
+        8803
+      ],
+      [
+        5188,
+        8804
+      ],
+      [
+        5189,
+        8805
+      ],
+      [
+        5190,
+        8806
+      ],
+      [
+        5191,
+        8807
+      ]
+    ],
+    "studyState": "BLOCKED_CURRENT_RECIPE_UNTOUCHED"
+  }
+}

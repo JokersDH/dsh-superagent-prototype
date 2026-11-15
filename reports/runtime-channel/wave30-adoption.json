@@ -1,0 +1,81 @@
+{
+  "protocol": "wave30-i-adoption/1",
+  "date": "2026-11-15",
+  "i": {
+    "branch": "codex/g5-coordinator-channel",
+    "baseline": "861c03edf9e77c5c250fab59a02103ebb93e56c3",
+    "sourceCommit": "dc17c58a883b2c08b2e1726bf7eff138bb5ee903",
+    "blobs": {
+      "apps/runner/src/attach-channel/coordinator-channel.ts": "d1ef81eb9d51b24417645151440eb1e262c20546",
+      "apps/runner/src/attach-channel/errors.ts": "ec8ce909d0f30ab1d96488db56cdf3b6a4ab7f49",
+      "apps/runner/src/attach-channel/attach.ts": "321738dae3b87e6ad7d235f52aaa65e6f63ab527",
+      "apps/runner/src/attach-channel/sink-responder.ts": "992a8cc0fceb55d7b2a9e2e8c8068202a892acb3",
+      "apps/runner/src/attach-channel/refusals.ts": "25ebcd26f1fb4aad583048dc672ec2bf09066b32",
+      "apps/runner/src/attach-channel/index.ts": "6314546e1d1facde00d0d2195edf1c14ad7a85d2",
+      "apps/runner/src/attach-channel/tsconfig.json": "1e5af3ea23fb4288afad29954cb31927f3e1e564"
+    },
+    "checks": {
+      "strict": "node_modules/.bin/tsc -p apps/runner/src/attach-channel/tsconfig.json exit 0",
+      "module": "node --test test/attach-channel/*.test.ts 100/100",
+      "sharedContract": "packages/contracts/test/coordinator-channel.case.ts 5/5"
+    }
+  },
+  "b": {
+    "root": "/Users/hh/Desktop/joker/superagent-agent-b",
+    "branch": "codex/g1-runtime",
+    "observedSource": "fbc933166758f446ba8907ce93795d04d34d11d7",
+    "observedCommitTitle": "feat(wave30): one transport owner per callback; birth/resource proof is mandatory",
+    "runnerServiceBlob": "b9f5f47c20d41d12254f6e6980e9b8e2dec357c3",
+    "dirtyPreserved": [
+      "reports/releases/wave11-admission/runtime.json",
+      "reports/releases/wave12-admission/runtime.json",
+      "tests/native-acceptance/b16-real-begin.mjs (untracked)"
+    ],
+    "sharedCoreBlobs": {
+      "coordinator-channel.ts": "d1ef81eb9d51b24417645151440eb1e262c20546",
+      "attach.ts": "321738dae3b87e6ad7d235f52aaa65e6f63ab527"
+    },
+    "usesRunnerAttachChannel": true,
+    "oldWaiterMaps": 0,
+    "ownConnectionsAndPollQueueRemoved": true,
+    "singleTransportOwner": {
+      "status": "CLOSED_AT_OBSERVED_SOURCE",
+      "evidence": "pump() delivers only to the stdio/sink adapter connections; a remote lease's request is returned by channelNext and never mirrored onto stdout",
+      "independentProbe": "node tests/native-acceptance/b30-transport-owner.mjs -> 2 PASS / 0 FAIL / 1 NOT_TESTED; remote lease served the callback, old stdio sink saw 0"
+    },
+    "sinkNativeGuard": "explicit options.beforeNativeWrite required; missing/deny/throw => zero effect; two same-command intents => guard twice",
+    "directStrictCompile": {
+      "status": "PASS",
+      "command": "pnpm exec tsc --ignoreConfig --noEmit --strict --exactOptionalPropertyTypes ... apps/runner/src/runner-service.ts packages/execution/src/recovery-transport.ts",
+      "exit": 0
+    },
+    "focusedTests": {
+      "command": "node --test apps/runner/test/attach-adapter.test.ts apps/runner/test/sink-write-admission.test.ts apps/runner/test/native-write-admission.test.ts",
+      "tests": 8,
+      "passed": 8,
+      "failed": 0
+    },
+    "iNewResponderInB": false,
+    "iNewResponderNote": "sink-responder.ts/refusals.ts are optional shipped examples; B implements its own void/throw guard adapter and does not need those files for the adopted contract"
+  },
+  "staleCorrections": [
+    "wave-29 status recorded a B stale `channel` compile error; that described the intermediate 1930278 working tree and is deleted for current source (observed B compiles, direct strict exit 0)",
+    "wave-29 described B not using RunnerAttachChannel / keeping its own queue; current B uses the adapter and owns no waiter map or poll queue",
+    "B30's remote-callback-to-old-stdio finding was measured before B's single-owner commit; it is closed at the observed source by B's own pump guard and probe"
+  ],
+  "h": {
+    "root": "/Users/hh/Desktop/joker/superagent-agent-h",
+    "observedSource": "f8cf5713c269a3a920231f23baf11aadd90db736",
+    "currentBinding": "binds current I861/B695/H materialized source and passes source/materialized unchanged checks",
+    "observedChecks": {
+      "iChecks": "12/12",
+      "bChecks": "5/6"
+    },
+    "blocker": "H still requires the historical sink-only finding to exist; actual B now denies that hook, so its report is UNEXPECTED. H must convert that expectation into a nonregression case; this is H-owned and not an I defect."
+  },
+  "remainingNotI": [
+    "B signal-guard independent birth/full argv/complete resource-plan and H mutable-registry-origin findings are B/H test-tool work",
+    "same Runner dual client, coordinator SIGKILL question->answer, recovered candidate/manualaccept and slot release remain B/main product work",
+    "real A persisted ingress, real Broker guard and native/installed facts are not certified by module tests"
+  ]
+}
