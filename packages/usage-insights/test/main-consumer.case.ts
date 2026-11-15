@@ -267,3 +267,22 @@ test('the DTO carries no pending-attention or raw-source section', { skip }, asy
   ])
   assert.equal('attention' in dto, false, 'current attention is a separate snapshot in the product, not part of this DTO')
 })
+
+test('the workspace admission refuses a view that loses its declaration', { skip }, async () => {
+  const dto = await read([[{ id: 'work-a', projectId: 'one' }], workId => evidence(workId, { entries: [{}] })])
+  // These mutations model a consumer passing an incomplete view; the workspace must hide the rows.
+  assert.equal(trialInsightsAdmission({ ...dto, windowLabel: '' }).admitted, false)
+  assert.equal(trialInsightsAdmission({ ...dto, coverage: '' }).admitted, false)
+  assert.equal(trialInsightsAdmission({ ...dto, metrics: [] }).admitted, false)
+  assert.equal(trialInsightsAdmission({ ...dto, scope: { ...dto.scope, projectIds: [] } }).admitted, false)
+  assert.equal(trialInsightsAdmission({ ...dto, status: 'unavailable' }).admitted, false)
+  assert.equal(trialInsightsAdmission({ ...dto, status: 'insufficient_data' }).admitted, false)
+  // The untampered view stays admissible for its own declared projects only.
+  assert.equal(trialInsightsAdmission(dto, 'one').admitted, true)
+  assert.equal(trialInsightsAdmission(dto, 'two').admitted, true, 'both projects are declared by this observation')
+  const single = await read([[{ id: 'work-a', projectId: 'one' }], workId => evidence(workId, { entries: [{}] })], { projectId: 'one' })
+  assert.deepEqual(single.scope.projectIds, ['one'])
+  assert.equal(single.scope.aggregation, 'single_project')
+  assert.equal(trialInsightsAdmission(single, 'one').admitted, true)
+  assert.equal(trialInsightsAdmission(single, 'two').admitted, false, 'a project outside the declared scope hides the rows')
+})

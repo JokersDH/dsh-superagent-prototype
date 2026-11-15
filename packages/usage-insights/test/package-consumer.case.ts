@@ -6,7 +6,7 @@
  * forced to reimplement scope/limit/unknown logic.
  */
 import assert from 'node:assert/strict'
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { fileURLToPath } from 'node:url'
@@ -16,6 +16,7 @@ const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const manifest = JSON.parse(readFileSync(resolve(packageRoot, 'package.json'), 'utf8')) as {
   exports: Record<string, unknown>
   files: string[]
+  dependencies?: Record<string, string>
 }
 const distRoot = resolve(packageRoot, 'dist')
 const hasDist = existsSync(resolve(distRoot, 'index.js'))
@@ -83,4 +84,28 @@ test('the built browser entry loads without the Node analysis module', { skip: !
   assert.equal(view.status, 'ready')
   assert.deepEqual(view.scope, { projectIds: ['project-atlas'], aggregation: 'single_project', label: 'project-atlas' })
   assert.equal(browser.consumerAdmission(view).admitted, true)
+})
+
+test('the browser-side console never imports the Node analysis package', () => {
+  // The App renders main's usage-observation DTO; it must not pull the analyzer, its crypto digest or
+  // any raw evidence reader into the browser bundle.
+  const consoleRoot = resolve(packageRoot, '../../apps/console/src')
+  const offenders: string[] = []
+  const walk = (directory: string): void => {
+    for (const entry of readdirSync(directory, { withFileTypes: true })) {
+      const path = resolve(directory, entry.name)
+      if (entry.isDirectory()) { walk(path); continue }
+      if (!/\.(ts|tsx)$/.test(entry.name)) continue
+      const text = readFileSync(path, 'utf8')
+      if (/from ['"]@personal-agent\/usage-insights/.test(text) || /import\(['"]@personal-agent\/usage-insights/.test(text))
+        offenders.push(path)
+    }
+  }
+  walk(consoleRoot)
+  assert.deepEqual(offenders, [], 'the App consumes the DTO, not the Node package')
+})
+
+test('the package keeps its runtime dependency closure minimal', () => {
+  assert.deepEqual(Object.keys(manifest.dependencies ?? {}).sort(), ['@personal-agent/contracts', 'zod'])
+  assert.equal(JSON.stringify(manifest).includes('better-sqlite3'), false)
 })

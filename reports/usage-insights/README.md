@@ -12,6 +12,23 @@ G（`codex/g4-usage-insights`）的只读观测证据。全部内容都是从已
 | [`wave26-status.json`](wave26-status.json) | 第二轮（G1–G16）范围/未知/硬界/流式预算的交付与实测值 |
 | [`wave27-status.json`](wave27-status.json) | 本轮（G1–G20）嵌套计数、永久冲突、Node composition、F scope 对齐与五个结果 |
 
+## 与主线的实际接线（2026-11-15）
+
+main 已把本包源码接回产品并实现真实路径：
+
+| 组成 | 归属 | 现状 |
+| --- | --- | --- |
+| 授权 reader | main | `ProductUsageObservation` + 已授权 users 的 `listWorks`/`workEvidence` |
+| 独立上限 | main | 50 works / 10000 nested records / 2 MiB / 单次 2 秒 |
+| 窗口 | main | `days=7|30`，半开区间，`to = observedAt` |
+| DTO | main | `usage-observation/1`，header sample = 枚举 work 数，行保留 sample/layer/unit |
+| HTTP/App | main | `GET /v1/usage-observation`；`useUsageObservation` 按需读取，`TrialWorkspace` 直接渲染 |
+| 分析语义/工具/报告 | G | scope/去重/quarantine/limits/层/币种/unknown、CLI、报告 |
+
+`reports/usage-insights/probe/` 里的 bundle/report 仍来自 G 自己的只读采集（HTTP/file），用于 CLI 与
+报告的可复现证据；`weekly`/`7-30` 的窗口语义与 main 一致。安装包层面：当前 `1cd` 包**没有**
+usage-insights/observation 入口，本包源码能力不能贴到它的 installed 结论上（由 D 冻结新包后另行核对）。
+
 ## 这批证据说明了什么
 
 - 数据来自真实受控产品运行时：两个项目各有一条 work 经 `create_work → 原生问题 → 明确回答 →
