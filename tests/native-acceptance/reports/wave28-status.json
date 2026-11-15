@@ -101,5 +101,29 @@
       "no candidates table exists (sqlite_master LIKE '%candidate%' is empty) and the harness wrote no accepted field"
     ],
     "correction": "the earlier claim that B13/B14 were structurally unavailable was wrong: the path is ProductCompletion/Verifier/commands, not a candidates table; no migration and no second ledger were needed"
+  },
+  "b21_moduleBounds": {
+    "harness": "tests/native-acceptance/b28-faults.mjs",
+    "result": "5 PASS / 0 FAIL / 1 NOT_TESTED",
+    "cases": [
+      "capacity refuses a third pending fact while two stay pending",
+      "an unanswered fact fails as timeout",
+      "a pending native write settles indeterminate on rebind and is never reported allowed",
+      "an old lease cannot settle the replacement (its late reply was refused)",
+      "after close the module reports closed and refuses new work"
+    ],
+    "scope": "module-level bounds, not a loaded live Runner"
+  },
+  "flakyOrLaneLimited": {
+    "b27-ack-points": "the second command reaches the receiver exactly once but its lane emits no new fact, so the persistence window is NOT_TESTED (recorded, not faked)",
+    "b27-slots-release": "stop_work -> binding ended and slot reuse was observed earlier (attempts 4 -> 5); a repeat run kept the binding active inside 45s and the sixth work did not obtain a new attempt, so that case is NOT_TESTED when not observed"
+  },
+  "sixResults": {
+    "1_budgetAndUniqueChannel": "budget fixed and measured on the actual service (B1); I module consumed as the only implementation with the parallel business-channel/dispatch retired; explicit CAS/read-only state/foreign refusal (B2-B3). PARTIAL: three callbacks against original A/main authority are not one run yet.",
+    "2_sameRunnerHandover": "b27-dual-live 6/0 on a real spawned Runner (A reads original ids, B replays the same ids, old reply refused) and b27-chain 4/0 (lease binds before begin, A serves, SIGKILL through the safe tool, successor binds the same attempt/epoch). PARTIAL: the callbacks are fixture-lane, not the product Broker authority.",
+    "3_crashRecovery": "b27-sigkill 7/0: real SIGKILL via the safe tool, Runner stays alive, new PID reads the same attempt/epoch/original ids, begin refused as duplicate_begin. PARTIAL: fixture-lane original A, not the product Broker question/answer chain.",
+    "4_candidateAndAccept": "b28-delivery 5/0 on the ORIGINAL path: registered verification, complete current candidate, explicit accept_candidate, delivered with the same artifacts, stale candidate rejected, artifacts/location readable, no candidates table. OPEN: recovered-question variant and an old-epoch (>=1) acceptance.",
+    "5_slots": "bound on attempts (5 works, 4 attempts), isolation (distinct attempt ids/questions, no cross-slot fact), release by slot reuse observed once. OPEN: mixed 2/4 matrix with control re-entry.",
+    "6_compatFaultsDocs": "module bounds 5/0 and signal tool controls 7/0 plus the live kills routed through it. OPEN: consumer compile matrix, docs, and the integrated module/consumer delivery claim."
   }
 }

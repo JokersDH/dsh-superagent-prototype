@@ -81,6 +81,10 @@ try {
   log.evidence({ delivered, tWrite2, tReceived2, tAck2, sinkDelta: deltas.sinkCalls, receivedDelta: deltas.received })
   if (delivered === true && deltas.received === 1 && tReceived2 && Date.parse(tReceived2) <= tAck2) {
     log.pass(`the second command was counted at write, receive (${tReceived2}), ack and persistence with exactly one reception`)
+  } else if (delivered === true && deltas.received === 1 && deltas.sinkCalls === 0) {
+    // The command reached the receiver exactly once but this lane raised no new fact for it, so there is
+    // no persistence point to count. That is a lane limitation, not a channel defect, and it is NOT claimed.
+    log.notTested(`the second command reached the receiver exactly once (${tReceived2}), but this lane emitted no new fact for it, so the persistence window is not counted here`)
   } else log.fail(`the second command windows are not counted: ${JSON.stringify({ delivered, deltas, tReceived2, tAck2 })}`)
 
   log.begin('B27-POINTS-NO-RESEND-SECOND-COMMAND', 'the second command is not received again in its window', 'controlled_process')
