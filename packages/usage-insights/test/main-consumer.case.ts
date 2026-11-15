@@ -234,3 +234,36 @@ test('the reader deadline bounds a slow source instead of waiting', { skip }, as
   assert.equal(dto.coverageState, 'partial', 'a timed-out source is partial, never complete')
   assert.equal(dto.sampleCount, null)
 })
+
+test('the window is half-open: the start edge counts, the end edge does not', { skip }, async () => {
+  const from = new Date(Date.parse(AT) - 7 * DAY).toISOString()
+  const dto = await read([
+    [{ id: 'work-edge', projectId: 'one' }],
+    workId => evidence(workId, { entries: [{ at: from, sourceRef: 'at-start' }, { at: AT, sourceRef: 'at-end' }] }),
+  ])
+  assert.equal(row(dto, 'interventions.questions')?.value, '1', 'only the fact at the inclusive start edge counts')
+  assert.equal(dto.window.from, from)
+  assert.equal(dto.window.to, AT)
+})
+
+test('repeating the same observation does not accumulate facts', { skip }, async () => {
+  const readerOptions: Parameters<typeof readers> = [
+    [{ id: 'work-a', projectId: 'one' }, { id: 'work-b', projectId: 'two' }],
+    workId => evidence(workId, { entries: [{}] }),
+  ]
+  const first = await read(readerOptions)
+  const second = await read(readerOptions)
+  assert.deepEqual(second.metrics, first.metrics, 'a second read of the same window reports the same numbers')
+  assert.equal(second.sampleCount, first.sampleCount)
+  assert.equal(second.scope.aggregation, 'declared_multi_project')
+})
+
+test('the DTO carries no pending-attention or raw-source section', { skip }, async () => {
+  const dto = await read([[{ id: 'work-a', projectId: 'one' }], workId => evidence(workId, { entries: [{}] })])
+  const keys = Object.keys(dto).sort()
+  assert.deepEqual(keys, [
+    'authorization', 'coverage', 'coverageState', 'days', 'limitations', 'metrics', 'observedAt', 'protocol',
+    'sampleCount', 'scope', 'status', 'summaryId', 'timezone', 'unknownCount', 'window', 'windowLabel',
+  ])
+  assert.equal('attention' in dto, false, 'current attention is a separate snapshot in the product, not part of this DTO')
+})

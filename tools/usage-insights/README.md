@@ -146,7 +146,7 @@ main 已实现并保留以下真实路径，G 不另建 collector：
 | --- | --- | --- |
 | 授权/reader | main | `ProductUsageObservation` 用已授权 readers 枚举 work 并读 `WorkEvidence` |
 | 上限 | main | 50 works / 10000 nested records / 2 MiB 编码字节 / 单次 2 秒 deadline |
-| 窗口 | main | `days=7|30`，`window.to = observedAt`，`from = to - days*86400000` |
+| 窗口 | main | `days=7|30`，`window.to = observedAt`，`from = to - days*86400000`，半开区间 |
 | DTO | main | `usage-observation/1`，header `sampleCount` = 枚举 work 数，行保留自身 sample/layer/unit |
 | HTTP/App | main | `GET /v1/usage-observation`（Bearer，项目范围）与试用视图按需读取 |
 | 分析/语义 | G | 记录级 scope/去重/quarantine/limits/层/币种/unknown 与 summary |
@@ -154,6 +154,9 @@ main 已实现并保留以下真实路径，G 不另建 collector：
 
 G 的 `composeUsageInsightsInput` 仍可用于非 coordinator 的 Node 消费者；它不替代 main 的授权
 reader，也不新增 HTTP/SQL 路径。
+
+`usage-observation/1` **不含当前 attention**：待办是产品自己的即时快照，与历史工作量分开；G 的 CLI
+可以另外采集 attention 并在报告里作为独立 snapshot 展示。
 
 ## 当前产品的字段可用性（给 main）
 

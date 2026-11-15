@@ -15,6 +15,14 @@ unknown/coverage/限制。
 - 本目录的 `toInsightConsumerView` 仍可用于 Node/非 App 消费者，但与 main 的 DTO 使用同一套
   scope/aggregation/window/coverage 词汇（多项目为 `declared_multi_project`）。
 
+窗口与注意力：
+
+- `days=7|30`，`window.to` 恒等于 `observedAt`，`from = to - days*86400000`，半开区间
+  `[from, to)`；起始边界计入、结束边界不计入。
+- **当前 attention 不在这个 DTO 里**：待办是产品自己的当前快照，按需另行读取；效率观察只统计历史
+  Work 证据，不把待办积压画成历史工作量。
+- 重复读取同一窗口只重算、不累加：同一天两次读取的 metrics 相同。
+
 ## 契约
 
 浏览器只消费已验证的 summary，**不要** import 包根（分析依赖 Node `crypto`）：
