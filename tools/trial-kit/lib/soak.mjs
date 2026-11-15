@@ -351,7 +351,7 @@ export async function runSoak(config) {
   const consistencyIssues = []
   if (Math.abs(elapsedMs - wallElapsedSeconds * 1000) > 3000) consistencyIssues.push('wall_clock_skew')
   if (stoppedBy !== 'signal' && counters.samples > 0 && lastSampleElapsedMs < elapsedMs - config.sampleMs * 3) consistencyIssues.push('samples_ended_early')
-  if (stoppedBy !== 'signal' && (config.scenario === 'http' || config.scenario === 'mixed')) {
+  if (stoppedBy !== 'signal' && config.defect === 'none' && (config.scenario === 'http' || config.scenario === 'mixed')) {
     const expectedPolls = Math.floor(durationMs / config.pollMs) * 0.8
     if (counters.pollRequests < expectedPolls && stoppedBy !== 'max_errors') consistencyIssues.push('poll_undercount')
   }

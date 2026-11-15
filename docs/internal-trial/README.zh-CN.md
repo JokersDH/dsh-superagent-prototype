@@ -72,6 +72,14 @@ readiness 只代表配置事实：它不含包身份（报告会写 `package_bin
 - 不要手工粘贴 token、对话正文、个人绝对路径；诊断包已脱敏，仍请快速扫一眼；
 - `pa support` 不会自动运行，因为它会在有数据库时以可写 pragma 打开数据库。请在自己的副本上运行后，用 `--support <file>` 引用；或让工具在“空的自有新根”上采集。
 
+## 4. wave-28 selected source、信号与原交付
+
+- **唯一实现边界**：当前 B 有自己的 business channel，尚未导入 I 的 attach-channel，不能称“唯一通道已合一”。H 的 `tests/operational-soak/selected/` 只按 admitted commit 物化并消费实际模块，错误 root/blob 在运行前拒绝。
+- **安全信号**：`tests/operational-soak/procguard/` 是唯一可复用的出生/fresh helper；B 旧脚本在采用该 helper 前不要跑。只允许本次 spawn 的 probe，TERM 后 KILL 必须 fresh 再核；unknown 保留，不按 PID 盲杀。
+- **原交付读取**：WorkView 身份是 `view.work.id`；候选/接受走原 `currentCandidate` 与 `accept_candidate`，2/4 slot 在该 fixture 无 cap 配置，native slot 资源集 NOT_REACHED。
+- **当前包**：1cd（6759 项）只作只读预检输入；不是 installed/release 结论。
+- **仍未达**：B runner-service 使用 I 唯一通道、同 Runner 双 client、SIGKILL 原问答恢复、真实产品 readonly/SSE。
+
 ## 4a. wave-27 渠道与消费者输入
 
 - 当前 main（`967dc0c`）把试用观察绑定到 transport/auth identity：切换 identity 会立即隐藏旧观察并忽略晚到结果；这是 UI 观察键，不是 token 或权限。

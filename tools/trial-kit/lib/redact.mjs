@@ -33,7 +33,7 @@ export function redactText(value, { home = homeDir(), secrets = [] } = {}) {
   for (const secret of secrets) {
     if (typeof secret === 'string' && secret.length >= 8) text = text.split(secret).join('<redacted:token>')
   }
-  text = redactPath(text, home)
+  if (home && home.length >= 2) text = text.split(home).join('~')
   for (const pattern of SECRET_PATTERNS) {
     if (pattern === SECRET_PATTERNS[1]) continue // bare digests are evidence, only redact bearer values
     text = text.replace(pattern, '<redacted:bearer>')
