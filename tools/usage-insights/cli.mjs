@@ -43,6 +43,8 @@ Commands
   report     Write a Markdown/JSON report to a new 0600 file.
   verify     Validate a bundle, report its digest and coverage, and refuse digest mismatches.
   export     Write a bounded, sanitized JSON export of an analysis (0600, exclusive).
+             With --dto, export the document the coordinator serves instead: that document carries
+             formatted strings only, so the display export has no numeric field at all.
   catalogue  Print the metric catalogue: unit, aggregation and exact measurement definition.
   help       Print this text.
 
@@ -61,8 +63,11 @@ Common options
   --days <7|30>               Use the coordinator's rolling window ending at --to (or the bundle's end)
 
 export options
+  --dto <file>                Export the served usage-observation/1 document (display-only, no numbers)
   --max-rows <n>              Maximum metric rows in the export (default 200, hard cap 2000)
   --max-bytes <n>             Maximum serialized bytes (default 1048576)
+  --previous-export <file>    Declare the export this one replaces. The document then states whether it
+                              continues the same snapshot or is a new one; its values are never reused.
 
 verify only
   --expect-digest <sha256>    Refuse when the bundle bytes do not match the pinned digest
@@ -70,6 +75,8 @@ verify only
 collect options
   --base-url <http://127.0.0.1:PORT>   Explicit loopback origin (required)
   --token-file <absolute path>         Operator-supplied credential file (required); memory only
+  --days <7|30>                        Rolling window ending at --to (default: now), exactly the
+                                       coordinator's shape; --from cannot be combined with it
   --work <id>                          Collect these works (repeatable); otherwise discover from the snapshot
   --snapshot-limit <n>                 Snapshot page size used for work discovery (default 100)
   --include-attention                  Also read the current attention inbox per project
@@ -81,9 +88,13 @@ collect options
   --request-timeout-ms <n>             Per-request timeout (default 5000)
   --deadline-ms <n>                    Overall collection deadline (default 60000)
   --max-bytes <n>                      Total response byte budget (default 8000000)
-  --captured-at <UTC ISO>              Capture timestamp recorded in the bundle (default now)
+  --captured-at <UTC ISO>              Capture timestamp recorded in the bundle (default now, or --to)
   --input-id <name>                    Bundle identifier (default collect-<timestamp>)
   --readiness                          Append the configuration-only readiness observation (never a metric)
+  --report <file>                      Also write the Markdown report of the same bundle
+  --export <file>                      Also write the numeric export of the same bundle
+  --previous-export <file>             Declare the export this one replaces (new-snapshot continuity)
+  --max-rows <n> --export-max-bytes <n>  Export bounds, independent of the response byte budget
 
 Exit codes
   0 complete observation      3 partial/partial coverage or quarantined records
@@ -103,6 +114,7 @@ const SPECS = {
     'request-timeout-ms': flag(), 'deadline-ms': flag(), 'max-bytes': flag(), 'captured-at': flag(),
     'input-id': flag(), 'from': flag(), 'to': flag(), 'timezone': flag(), 'out': flag(),
     'baseline': flag(), 'readiness': flag('boolean'), 'report': flag(), 'analyze': flag('boolean'),
+    days: flag(), export: flag(), 'previous-export': flag(), 'max-rows': flag(), 'export-max-bytes': flag(),
   },
   analyze: {
     input: flag(), out: flag(), format: flag(), project: flag('list'), from: flag(), to: flag(),
@@ -119,9 +131,9 @@ const SPECS = {
     'expect-digest': flag(),
   },
   export: {
-    input: flag(), out: flag(), project: flag('list'), from: flag(), to: flag(), timezone: flag(),
+    input: flag(), dto: flag(), out: flag(), project: flag('list'), from: flag(), to: flag(), timezone: flag(),
     days: flag(), baseline: flag(), 'max-input-bytes': flag(), 'max-records': flag(), 'max-works': flag(),
-    'max-pages': flag(), 'max-rows': flag(), 'max-bytes': flag(),
+    'max-pages': flag(), 'max-rows': flag(), 'max-bytes': flag(), 'previous-export': flag(),
   },
   catalogue: {},
   help: {},
@@ -263,28 +275,75 @@ async function commandReport(options, io) {
   return exitFor(status)
 }
 
+/** Read the declared previous export and take only its snapshot identity; no value is reused. */
+function previousOf(options, maxBytes, insights) {
+  const path = options['previous-export']
+  if (path === undefined) return null
+  const value = readBundle(requiredString(path, 'previous-export'), maxBytes).value
+  const previous = insights.previousSnapshotOf(value)
+  if (!previous) throw new UsageError('--previous-export is not an export document')
+  return previous
+}
+
+function exportExit(truncated, status, coverageState) {
+  if (truncated) return EXIT.partial
+  if (status === 'unavailable') return EXIT.unavailable
+  if (status === 'insufficient_data') return EXIT.insufficient
+  if (coverageState === 'partial' || coverageState === 'unknown') return EXIT.partial
+  return EXIT.ok
+}
+
 async function commandExport(options, io) {
   const insights = io.insights
   if (!options.out) throw new UsageError('--out is required for export')
+  if (options.input !== undefined && options.dto !== undefined)
+    throw new UsageError('--input and --dto are mutually exclusive')
+  if (options.input === undefined && options.dto === undefined)
+    throw new UsageError('export needs --input (analysis) or --dto (the document the coordinator serves)')
   const maxBytes = positiveInteger(options['max-input-bytes'], 'max-input-bytes', DEFAULT_MAX_INPUT_BYTES)
+  const previous = previousOf(options, maxBytes, insights)
+  const maxRows = positiveInteger(options['max-rows'], 'max-rows', insights.EXPORT_DEFAULT_MAX_ROWS)
+  const maxDocumentBytes = positiveInteger(options['max-bytes'], 'max-bytes', insights.EXPORT_DEFAULT_MAX_BYTES)
+
+  if (options.dto !== undefined) {
+    // A served document is one fixed observation: re-scoping it would mean re-reading the source.
+    for (const name of ['project', 'from', 'to', 'timezone', 'days', 'baseline', 'max-records', 'max-works', 'max-pages'])
+      if (options[name] !== undefined)
+        throw new UsageError(`--${name} cannot be applied to a served document; collect a new snapshot instead`)
+    const served = readBundle(requiredString(options.dto, 'dto'), maxBytes).value
+    let built
+    try {
+      built = insights.buildDisplayExport(served, { maxRows, maxBytes: maxDocumentBytes, previous })
+    } catch (error) {
+      if (error?.name === 'DisplayExportFault') throw new UsageInsightsError('source_unavailable', error.message)
+      throw error
+    }
+    const written = writeExclusive(requiredString(options.out, 'out'), built.text)
+    const truncated = built.document.truncation.byRows || built.document.truncation.byBytes
+    io.stdout(`wrote ${basename(written)} (${Buffer.byteLength(built.text)} bytes) display-only rows=${built.document.truncation.includedRows}/${built.document.truncation.totalRows} snapshot=${built.document.snapshot.snapshotId ?? 'none'} continuity=${built.document.snapshot.continuity}${truncated ? (built.document.truncation.byRows ? ' truncated-by-rows' : ' truncated-by-bytes') : ''}\n`)
+    if (built.document.snapshot.continuity === 'new_snapshot')
+      io.stderr('new_snapshot: this document is a fresh read; the earlier export\'s values were not reused.\n')
+    return exportExit(truncated, built.document.header.status, built.document.header.coverageState)
+  }
+
   const bundle = readBundle(requiredString(options.input, 'input'), maxBytes)
   const formatted = applyOverrides(bundle.value, options, bundle.digest)
   if (options.baseline) formatted.baseline = readBundle(options.baseline, maxBytes).value
   const analysis = insights.analyzeUsageInsights(formatted)
   let built
   try {
-    built = insights.buildInsightExport(analysis.summary, {
-      maxRows: positiveInteger(options['max-rows'], 'max-rows', insights.EXPORT_DEFAULT_MAX_ROWS),
-      maxBytes: positiveInteger(options['max-bytes'], 'max-bytes', insights.EXPORT_DEFAULT_MAX_BYTES),
-    })
+    built = insights.buildInsightExport(analysis.summary, { maxRows, maxBytes: maxDocumentBytes, previous })
   } catch (error) {
     if (error?.name === 'ExportFault') throw new UsageInsightsError('source_unavailable', error.message)
     throw error
   }
   const written = writeExclusive(requiredString(options.out, 'out'), built.text)
   const status = statusOf(analysis)
-  io.stdout(`wrote ${basename(written)} (${Buffer.byteLength(built.text)} bytes) status=${status} rows=${built.document.truncation.includedRows}/${built.document.truncation.totalRows}${built.document.truncation.byRows ? ' truncated-by-rows' : ''}${built.document.truncation.byBytes ? ' truncated-by-bytes' : ''}\n`)
-  return built.document.truncation.byRows || built.document.truncation.byBytes ? EXIT.partial : exitFor(status)
+  const truncated = built.document.truncation.byRows || built.document.truncation.byBytes
+  io.stdout(`wrote ${basename(written)} (${Buffer.byteLength(built.text)} bytes) status=${status} rows=${built.document.truncation.includedRows}/${built.document.truncation.totalRows} snapshot=${built.document.snapshot.snapshotId} continuity=${built.document.snapshot.continuity}${built.document.truncation.byRows ? ' truncated-by-rows' : ''}${built.document.truncation.byBytes ? ' truncated-by-bytes' : ''}\n`)
+  if (built.document.snapshot.continuity === 'new_snapshot')
+    io.stderr('new_snapshot: this document is a fresh read; the earlier export\'s values were not reused.\n')
+  return truncated ? EXIT.partial : exitFor(status)
 }
 
 async function commandVerify(options, io) {
@@ -336,7 +395,18 @@ async function commandCollect(options, io) {
   if (!options.out) throw new UsageError('--out is required for collect')
   const base = parseLoopbackBase(requiredString(options['base-url'], 'base-url'))
   const token = readTokenFile(requiredString(options['token-file'], 'token-file'))
-  const window = { from: parseUtc(requiredString(options.from, 'from'), 'from'), to: parseUtc(requiredString(options.to, 'to'), 'to') }
+  // `--days` uses exactly the coordinator's rolling shape: `to - days` up to `to`, with the capture
+  // time equal to the window end. A caller that passes the served `observedAt` as `--to` therefore
+  // reproduces the same window the product displayed.
+  let window
+  if (options.days !== undefined) {
+    if (!['7', '30'].includes(options.days)) throw new UsageError('--days must be 7 or 30')
+    if (options.from !== undefined) throw new UsageError('--days and --from are mutually exclusive')
+    const to = options.to ? parseUtc(options.to, 'to') : new Date().toISOString()
+    window = { from: new Date(Date.parse(to) - Number(options.days) * 86_400_000).toISOString(), to }
+  } else {
+    window = { from: parseUtc(requiredString(options.from, 'from'), 'from'), to: parseUtc(requiredString(options.to, 'to'), 'to') }
+  }
   if (Date.parse(window.to) <= Date.parse(window.from)) throw new UsageError('--to must be after --from')
   const timezone = options.timezone ?? 'UTC'
   const requestTimeoutMs = positiveInteger(options['request-timeout-ms'], 'request-timeout-ms', 5000)
@@ -486,8 +556,11 @@ async function commandCollect(options, io) {
     }
 
     // The capture time is stamped now, after every read: a snapshot can never be observed later than
-    // the observation it belongs to.
-    const capturedAt = options['captured-at'] ? parseUtc(options['captured-at'], 'captured-at') : new Date().toISOString()
+    // the observation it belongs to. A rolling window defaults it to the window end so the bundle
+    // satisfies `window.to === capturedAt`, exactly like the coordinator's own observation.
+    const capturedAt = options['captured-at']
+      ? parseUtc(options['captured-at'], 'captured-at')
+      : (options.days !== undefined ? window.to : new Date().toISOString())
     const inputId = options['input-id'] ?? `collect-${capturedAt.replace(/[-:]/g, '').replace(/\..*$/, '')}`
     const bundle = {
       protocol: 'usage-insights-input/1',
@@ -514,21 +587,46 @@ async function commandCollect(options, io) {
     if (options.baseline) bundle.baseline = soaInput(options.baseline, DEFAULT_MAX_INPUT_BYTES).value
 
     const text = `${JSON.stringify(bundle, null, 2)}\n`
+    // The analysis of this run must be the analysis of the file that was written: pin the digest a
+    // later `analyze`/`export` will compute from those exact bytes, so both paths yield one snapshot.
+    bundle.source.digest = createHash('sha256').update(text).digest('hex')
     const written = writeExclusive(requiredString(options.out, 'out'), text)
     io.stdout(`wrote ${basename(written)} (${Buffer.byteLength(text)} bytes) works=${workEvidence.length} pages=${pagesSeen}\n`)
     if (issues.length) io.stderr(`collection issues: ${issues.length} (recorded in the bundle)\n`)
 
-    if (options.analyze || options.report) {
+    if (options.analyze || options.report || options.export) {
+      // One analysis of one bundle feeds every requested artifact, so the report and the export of a
+      // single run describe the same snapshot and can be checked against each other.
       const analysis = insights.analyzeUsageInsights(bundle)
       const status = statusOf(analysis)
       if (options.report) {
         const reportText = insights.renderMarkdown(analysis)
         const reportPath = writeExclusive(requiredString(options.report, 'report'), reportText)
         io.stdout(`wrote ${basename(reportPath)} (${Buffer.byteLength(reportText)} bytes) status=${status} coverage=${analysis.summary.coverage.overall}\n`)
-      } else {
-        io.stdout(io.stdoutIsTty ? `${insights.renderTerminal(analysis)}\n` : `${JSON.stringify(analysis.summary, null, 2)}\n`)
       }
-      return exitFor(status)
+      let exportTruncated = false
+      if (options.export) {
+        const previous = previousOf(options, DEFAULT_MAX_INPUT_BYTES, insights)
+        let built
+        try {
+          built = insights.buildInsightExport(analysis.summary, {
+            maxRows: positiveInteger(options['max-rows'], 'max-rows', insights.EXPORT_DEFAULT_MAX_ROWS),
+            maxBytes: positiveInteger(options['export-max-bytes'], 'export-max-bytes', insights.EXPORT_DEFAULT_MAX_BYTES),
+            previous,
+          })
+        } catch (error) {
+          if (error?.name === 'ExportFault') throw new UsageInsightsError('source_unavailable', error.message)
+          throw error
+        }
+        const written = writeExclusive(requiredString(options.export, 'export'), built.text)
+        exportTruncated = built.document.truncation.byRows || built.document.truncation.byBytes
+        io.stdout(`wrote ${basename(written)} (${Buffer.byteLength(built.text)} bytes) snapshot=${built.document.snapshot.snapshotId} continuity=${built.document.snapshot.continuity} rows=${built.document.truncation.includedRows}/${built.document.truncation.totalRows}${exportTruncated ? ' truncated' : ''}\n`)
+        if (built.document.snapshot.continuity === 'new_snapshot')
+          io.stderr('new_snapshot: this export is a fresh read; the earlier export\'s values were not reused.\n')
+      }
+      if (options.analyze && !options.report && !options.export)
+        io.stdout(io.stdoutIsTty ? `${insights.renderTerminal(analysis)}\n` : `${JSON.stringify(analysis.summary, null, 2)}\n`)
+      return exportTruncated ? EXIT.partial : exitFor(status)
     }
     return workCoverage === 'complete' && attentionCoverage !== 'source_missing' && issues.every(issue => issue.code === 'limits' || issue.code === 'unstable_cursor')
       ? EXIT.ok
