@@ -1,0 +1,23 @@
+{
+  "wave": "product-wave-28",
+  "role": "B",
+  "branch": "codex/g1-runtime",
+  "fixedInput": "cb4e975",
+  "mergedOriginMain": "ea82d8f",
+  "b1_effectiveBudget": {
+    "status": "FIXED AND OBSERVED ON THE ACTUAL SERVICE",
+    "defect": "the page was trimmed only against the 64 KiB transport cap, so a 2048-byte request could return a whole page far above it; the earlier small-page harness had copied the pager logic and therefore could not see this",
+    "fix": "the encoded page is trimmed against the EFFECTIVE requested budget (min(requested, inline limit)), falling back to the empty-envelope size only when even the envelope exceeds it",
+    "harness": "tests/native-acceptance/b28-budget.mjs (spawns the real runner-service with its own FileCriticalJournal and measures the bytes actually received)",
+    "result": "4 PASS / 0 FAIL / 1 NOT_TESTED",
+    "cases": [
+      "B28-ACTUAL-SERVICE-2048-BOUND - the real service returned 979 bytes for a 2048-byte request (1 frame, next 1, done false)",
+      "B28-ACTUAL-SERVICE-16384-BOUND - 2998 bytes for a 16384-byte request (3 frames)",
+      "B28-ACTUAL-SERVICE-CONTINUITY - walked the real journal over small pages with contiguous seq and no duplicates",
+      "B28-ACTUAL-SERVICE-REFUSALS - invalid cursor and out-of-range budgets (1 and 999999999) refused as invalid_since / invalid_page_budget instead of being clamped"
+    ],
+    "limit": "the fixture lane produced only 3 real journal facts, so the 160-small-record continuity is still only observed at the helper level (wave-27 b27-small-pages), not on the actual service"
+  },
+  "wholePackageComplete": false,
+  "budget": { "modelCallsThisWave": 0, "nativeTurnsThisWave": 0, "cap4": "UNKNOWN unspendable" }
+}

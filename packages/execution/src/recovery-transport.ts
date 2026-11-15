@@ -168,11 +168,18 @@ export async function serveRunnerRecovery(endpoint: Pick<RunnerEndpoint, 'socket
         producer: trusted, frames: pageFrames, next: pageNext, done: pageDone,
         requestedMaxBytes: maxBytes, budget: inlineBudget, inlineLimit: INLINE_PAGE_BYTES,
       })
+      // The page must respect the EFFECTIVE requested budget, not just the 64 KiB transport cap. Counting
+      // only frame bodies let a 2048-byte request return 64753 bytes of envelope plus frames, which made
+      // every small-page claim untrue. Trim against the effective budget so the encoded response the caller
+      // actually receives is inside what it asked for.
+      const effectiveBudget = Math.min(inlineBudget, MAX_BYTES)
       let encoded = encode(frames, next, done)
-      while (Buffer.byteLength(encoded) > MAX_BYTES && frames.length > 1) {
+      const envelopeBytes = Buffer.byteLength(encode([], since, false))
+      const limit = Math.max(effectiveBudget, envelopeBytes)
+      while (Buffer.byteLength(encoded) > limit && frames.length > 0) {
         frames = frames.slice(0, -1)
         const last = frames[frames.length - 1] as { seq?: unknown } | undefined
-        if (last && Number.isSafeInteger(last.seq)) next = last.seq as number
+        next = last && Number.isSafeInteger(last.seq) ? (last.seq as number) : since
         done = false
         encoded = encode(frames, next, done)
       }
