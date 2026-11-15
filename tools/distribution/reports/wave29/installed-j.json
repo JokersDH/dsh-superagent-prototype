@@ -1,7 +1,7 @@
 {
   "protocol": "wave29-installed-j/1",
-  "status": "PARTIAL",
-  "api": {
+  "status": "PARTIAL_REGISTERED_NEEDS_INPUT",
+  "fixtureUnregistered": {
     "previewStatus": "unavailable",
     "input": {
       "projectId": "project-atlas",
@@ -19,6 +19,20 @@
       }
     ],
     "authorization": "none"
+  },
+  "registered": {
+    "projectId": "project-823eea2bab6140336b86d1d7",
+    "status": "needs_input",
+    "title": "有限范围变更",
+    "issues": [
+      {
+        "code": "project_unavailable",
+        "message": "当前项目或执行器不可委托。"
+      }
+    ],
+    "authorization": "none",
+    "eventLogRows": 0,
+    "commandReceipts": 0
   },
   "sourceIntegration": {
     "status": "PASS_ACTUAL_PROJECT_RECIPE_WORKFLOW",
@@ -51,5 +65,5 @@
     "previewPosts": 13,
     "acceptedWorks": 2
   },
-  "limitation": "Installed fixture project has no registered metadata root, so preview is unavailable rather than draft; source integration with registered roots passes 6/6. No installed J draft/apply/create positive yet."
+  "limitation": "Installed personal discussion has a registered root but no dispatch profile for that project, so J returns needs_input rather than draft; installed draft/apply/create remains NOT_REACHED. Source integration with controlled fixture profiles passes 6/6. No business writes were observed."
 }

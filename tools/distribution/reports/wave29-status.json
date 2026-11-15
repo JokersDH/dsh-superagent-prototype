@@ -65,8 +65,8 @@
       "summary": "Functional mode closure with old personal scope preserved."
     },
     "d9": {
-      "status": "PARTIAL",
-      "summary": "Source J browser with registered roots 6/6 and package J dist/API present; installed fixture preview returns unavailable (no registered metadata root) with authorization none, so installed draft/apply positive remains NOT_REACHED."
+      "status": "PARTIAL_REGISTERED_NEEDS_INPUT",
+      "summary": "Source J browser 6/6; package J dist/API present. Installed fixture without root returns unavailable; installed personal registered project returns needs_input because discussion project has no dispatch profile, authorization none, event_log0/command_receipts0. Installed draft/apply remains NOT_REACHED."
     },
     "d10": {
       "status": "PASS",
