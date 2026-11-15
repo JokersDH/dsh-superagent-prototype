@@ -35,16 +35,22 @@
       ]
     },
     "B2_originalRegistrationAttachedEntry": {
-      "status": "NOT_REACHED",
-      "detail": "B needs a real original ProductExecution/RunningAttempt entry point that loads A's immutable registration and hands the already-registered Runner to an attached client. No such main port exists in this checkout and B does not own it; no replacement Work/attempt/Runner/credential was created."
+      "status": "PARTIAL (B-owned caller + fixture dual-client consumer; original Store/Broker wiring main-owned NOT_REACHED)",
+      "implementation": "packages/execution/src/attached-attempt.ts: attachRunnerAttempt() binds a caller-supplied lease on an already-registered Runner, serves fact/payload/native-write callbacks through caller handlers from the original store/guard, keeps original frame ids, reports served counters and callback errors, never originates commands or registration.",
+      "consumer": "tests/native-acceptance/b31-attached-consumer.mjs uses the caller against a real spawned Runner and the original attempt tuple/producer: client A serves the begin fact, client B takes over the same attempt (generation 2->3) and serves the delivery fact with original ids; the old lease poll is refused as stale_connection; the stdio sink sees 0 throughout.",
+      "commands": [
+        "npx tsc -p tests/native-acceptance/tsconfig.attached.json -> exit 0",
+        "node tests/native-acceptance/b31-attached-consumer.mjs -> exit 0, 3 PASS / 0 FAIL / 1 NOT_TESTED"
+      ],
+      "remaining": "main-owned ProductExecution must hand the original immutable registration/current binding to this caller; the original A durable Store/Broker ingress and native guard are not wired here, so the three-callback original-authority claim stays PARTIAL and the crash chain stays NOT_REACHED."
     },
     "B3_threeCallbacksOriginalStoreBroker": {
       "status": "PARTIAL (fixture lane only)",
-      "detail": "the remote lease proves the fact callback path (b30-transport-owner: remote serves 3 facts, old stdio 0) but the original A durable ACK ingress, immutable payload Store and main/Broker native guard are not wired, and a native-write callback was not observed on the codex-fake-approval lane. No synthetic receipt/empty participant is used as evidence."
+      "detail": "B-owned caller supports all three callback kinds and the fixture proves fact callbacks + original ids (b31-attached-consumer 3 PASS); the payload-read and native-write kinds are implemented in the caller but were not raised by the waiting-user fixture, and the original A Store/Broker authority is main-owned. No synthetic receipt is used as evidence."
     },
     "B4_sameRunnerDualClientHandover": {
-      "status": "NOT_REACHED",
-      "detail": "fixture-lane lease handover exists in b27-chain (A dies by verified spawn-intent SIGKILL, successor serves the same attempt), but the original question/version/native-target handover with client B on the same original Work is not implemented."
+      "status": "PARTIAL (fixture lane)",
+      "detail": "b31-attached-consumer proves A->B lease handover on the SAME spawned Runner/attempt with original fact ids, stale old lease refused, and zero stdio double-send. The original question/version/native-target handover on an original Work still needs the main-owned wiring."
     },
     "B5_B8_package2": {
       "status": "NOT_REACHED",
