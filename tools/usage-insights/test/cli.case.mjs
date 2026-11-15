@@ -4,7 +4,7 @@
  */
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
-import { chmodSync, copyFileSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, statSync, symlinkSync, writeFileSync } from 'node:fs'
+import { chmodSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, statSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
@@ -305,4 +305,41 @@ test('a canary in raw work detail never reaches the report', () => {
   // Source names appear in the loss table by design; raw record bodies do not.
   assert.equal(content.includes('"detail"'), false)
   assert.equal(content.includes('"entries"'), false)
+})
+
+test('export writes a bounded sanitized document with exclusive 0600 output', () => {
+  const directory = workspace()
+  const target = join(directory, 'export.json')
+  const result = run(['export', '--input', complete, '--out', target])
+  assert.equal(result.status, 0, result.stderr)
+  assert.equal(statSync(target).mode & 0o777, 0o600)
+  const document = JSON.parse(readFileSync(target, 'utf8'))
+  assert.equal(document.protocol, 'usage-insights-export/1')
+  assert.equal(document.authorization, 'none')
+  assert.equal(typeof document.exportedFrom.summaryId, 'string')
+  assert.equal(document.truncation.byRows, false)
+  assert.ok(document.rows.every(row => row.rowId && row.metricId && row.unit !== undefined))
+  assert.equal(readFileSync(target, 'utf8').includes(directory), false, 'no absolute path in the export')
+  // The same target is never overwritten.
+  assert.equal(run(['export', '--input', complete, '--out', target]).status, 5)
+})
+
+test('a row bound reports a partial export instead of a complete one', () => {
+  const directory = workspace()
+  const target = join(directory, 'export-bounded.json')
+  const result = run(['export', '--input', complete, '--out', target, '--max-rows', '2'])
+  assert.equal(result.status, 3, result.stderr)
+  assert.ok(result.stdout.includes('truncated-by-rows'))
+  const document = JSON.parse(readFileSync(target, 'utf8'))
+  assert.equal(document.truncation.byRows, true)
+  assert.equal(document.rows.length, 2)
+})
+
+test('an impossible byte budget is refused without writing a fragment', () => {
+  const directory = workspace()
+  const target = join(directory, 'export-tiny.json')
+  const result = run(['export', '--input', complete, '--out', target, '--max-bytes', '200'])
+  assert.equal(result.status, 5, result.stderr)
+  assert.ok(/exceeds the 200-byte budget/.test(result.stderr), result.stderr)
+  assert.equal(existsSync(target), false)
 })

@@ -42,6 +42,7 @@ Commands
   analyze    Derive a sanitized summary from an input bundle (pure, deterministic).
   report     Write a Markdown/JSON report to a new 0600 file.
   verify     Validate a bundle, report its digest and coverage, and refuse digest mismatches.
+  export     Write a bounded, sanitized JSON export of an analysis (0600, exclusive).
   catalogue  Print the metric catalogue: unit, aggregation and exact measurement definition.
   help       Print this text.
 
@@ -58,6 +59,10 @@ Common options
   --max-works <n>             Analysis bound on attributable works
   --max-pages <n>             Analysis bound on history/attention pages
   --days <7|30>               Use the coordinator's rolling window ending at --to (or the bundle's end)
+
+export options
+  --max-rows <n>              Maximum metric rows in the export (default 200, hard cap 2000)
+  --max-bytes <n>             Maximum serialized bytes (default 1048576)
 
 verify only
   --expect-digest <sha256>    Refuse when the bundle bytes do not match the pinned digest
@@ -112,6 +117,11 @@ const SPECS = {
   verify: {
     input: flag(), 'max-input-bytes': flag(), 'max-records': flag(), 'max-works': flag(), 'max-pages': flag(),
     'expect-digest': flag(),
+  },
+  export: {
+    input: flag(), out: flag(), project: flag('list'), from: flag(), to: flag(), timezone: flag(),
+    days: flag(), baseline: flag(), 'max-input-bytes': flag(), 'max-records': flag(), 'max-works': flag(),
+    'max-pages': flag(), 'max-rows': flag(), 'max-bytes': flag(),
   },
   catalogue: {},
   help: {},
@@ -251,6 +261,30 @@ async function commandReport(options, io) {
   const status = statusOf(analysis)
   io.stdout(`wrote ${basename(written)} (${Buffer.byteLength(text)} bytes) status=${status} coverage=${analysis.summary.coverage.overall} unavailableMetrics=${unavailable(analysis)}\n`)
   return exitFor(status)
+}
+
+async function commandExport(options, io) {
+  const insights = io.insights
+  if (!options.out) throw new UsageError('--out is required for export')
+  const maxBytes = positiveInteger(options['max-input-bytes'], 'max-input-bytes', DEFAULT_MAX_INPUT_BYTES)
+  const bundle = readBundle(requiredString(options.input, 'input'), maxBytes)
+  const formatted = applyOverrides(bundle.value, options, bundle.digest)
+  if (options.baseline) formatted.baseline = readBundle(options.baseline, maxBytes).value
+  const analysis = insights.analyzeUsageInsights(formatted)
+  let built
+  try {
+    built = insights.buildInsightExport(analysis.summary, {
+      maxRows: positiveInteger(options['max-rows'], 'max-rows', insights.EXPORT_DEFAULT_MAX_ROWS),
+      maxBytes: positiveInteger(options['max-bytes'], 'max-bytes', insights.EXPORT_DEFAULT_MAX_BYTES),
+    })
+  } catch (error) {
+    if (error?.name === 'ExportFault') throw new UsageInsightsError('source_unavailable', error.message)
+    throw error
+  }
+  const written = writeExclusive(requiredString(options.out, 'out'), built.text)
+  const status = statusOf(analysis)
+  io.stdout(`wrote ${basename(written)} (${Buffer.byteLength(built.text)} bytes) status=${status} rows=${built.document.truncation.includedRows}/${built.document.truncation.totalRows}${built.document.truncation.byRows ? ' truncated-by-rows' : ''}${built.document.truncation.byBytes ? ' truncated-by-bytes' : ''}\n`)
+  return built.document.truncation.byRows || built.document.truncation.byBytes ? EXIT.partial : exitFor(status)
 }
 
 async function commandVerify(options, io) {
@@ -530,6 +564,7 @@ async function main(argv, io) {
     case 'analyze': return commandAnalyze(options, io)
     case 'report': return commandReport(options, io)
     case 'verify': return commandVerify(options, io)
+    case 'export': return commandExport(options, io)
     case 'catalogue': return commandCatalogue(options, io)
     case 'collect': return commandCollect(options, io)
     default: return EXIT.usage

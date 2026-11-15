@@ -290,6 +290,28 @@ async function main() {
     workEvidence: (workId) => product.read.workEvidence(workId),
   }
   const observation7 = await new ProductUsageObservation(coordinatorReaders).read({ days: 7, timezone: 'UTC' })
+  // The same observation through the real HTTP route the App calls.
+  const coordinatorApp = createLocalHttpApp({
+    application: product.application,
+    principal,
+    apiToken: API_TOKEN,
+    bootstrapToken: 'b2'.repeat(32),
+    allowedOrigins: ['http://127.0.0.1:5173'],
+    mode: 'product',
+    read: {
+      usageObservation: query => new ProductUsageObservation(coordinatorReaders).read(query),
+      workEvidence: workId => product.read.workEvidence(workId),
+    },
+  })
+  const insightsResponse = await coordinatorApp.request('http://127.0.0.1/v1/insights?days=7&timezone=UTC',
+    { headers: { authorization: `Bearer ${API_TOKEN}` } })
+  assert.equal(insightsResponse.status, 200, 'the real /v1/insights route serves the observation')
+  const served = await insightsResponse.json()
+  assert.equal(served.protocol, 'usage-observation/1')
+  assert.deepEqual(served.metrics, observation7.metrics, 'the HTTP route and the direct reader agree')
+  assert.equal(served.sampleCount, observation7.sampleCount)
+  const unauthenticated = await coordinatorApp.request('http://127.0.0.1/v1/insights?days=7')
+  assert.equal(unauthenticated.status, 401)
   const observation30 = await new ProductUsageObservation(coordinatorReaders).read({ days: 30, timezone: 'UTC' })
   const observationRow = (dto, id) => dto.metrics.find(metric => metric.id.startsWith(`${id}@`))
   for (const [label, dto] of [['7d', observation7], ['30d', observation30]]) {
