@@ -213,3 +213,12 @@ test('probe failures map to bounded copy without raw stacks, paths or credential
   assert.doesNotMatch(trialProbeError({ code: 'something_new' }), /\/Users|abc/)
   assert.doesNotMatch(trialProbeError(undefined), /\/Users|abc/)
 })
+
+test('selected observation windows reject stale days and a truncated complete claim', () => {
+  const view = { status: 'ready' as const, days: 7 as const, sampleCount: 1, windowLabel: '近7天', coverage: '完整',
+    coverageState: 'complete' as const, scope: { projectIds: ['one'], aggregation: 'single_project' as const },
+    metrics: [{ id: 'count', label: '记录', value: '1' }], limitations: [] }
+  assert.equal(trialInsightsAdmission(view, 'one', 7).admitted, true)
+  assert.equal(trialInsightsAdmission(view, 'one', 30).admitted, false)
+  assert.equal(trialInsightsAdmission({ ...view, truncated: true }, 'one', 7).admitted, false)
+})

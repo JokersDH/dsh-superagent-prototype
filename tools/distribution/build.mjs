@@ -37,6 +37,8 @@ const PACKAGES = [
   'proposals',
   'knowledge',
   'routing',
+  'usage-insights',
+  'project-recipes',
 ]
 
 const { values } = parseArgs({

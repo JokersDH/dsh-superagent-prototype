@@ -1,0 +1,166 @@
+{
+  "protocol": "wave30-runtime-channel-admission/1",
+  "date": "2026-11-15",
+  "status": "PRIOR_B_ADOPTION_GUARD_STRICT_CLOSED_ORIGINAL_PRODUCT_RECOVERY_STILL_NOT_REACHED",
+  "candidates": {
+    "B": { "root": "/Users/hh/Desktop/joker/superagent-agent-b", "source": "695efad8066433e2e30eff4f776ed74117c61608", "branch": "codex/g1-runtime", "dirtyPreserved": ["reports/releases/wave11-admission/runtime.json", "reports/releases/wave12-admission/runtime.json", "tests/native-acceptance/b16-real-begin.mjs (untracked)"] },
+    "I": { "root": "/Users/hh/Desktop/joker/superagent-agent-i", "source": "861c03edf9e77c5c250fab59a02103ebb93e56c3", "branch": "codex/g5-coordinator-channel", "dirty": [] },
+    "H": { "root": "/Users/hh/Desktop/joker/superagent-agent-h", "source": "f8cf5713c269a3a920231f23baf11aadd90db736", "branch": "codex/g4-trial-operations", "dirty": [] }
+  },
+  "sourceFacts": {
+    "bImplementationCommits": ["3f5a35115f3588a3446f3b02ee8429e59c6bd8e8", "695efad8066433e2e30eff4f776ed74117c61608"],
+    "bAndILatestConcreteModuleBlob": "d1ef81eb9d51b24417645151440eb1e262c20546",
+    "bAndILatestPullAdapterBlob": "321738dae3b87e6ad7d235f52aaa65e6f63ab527",
+    "bUsesRunnerAttachChannel": true,
+    "bOldConnectionsCurrentConnectionAndPollQueueRemoved": true,
+    "iNewResponderInB": false,
+    "iNewResponderNote": "I adds sink-responder.ts/refusals.ts and a typed guard-bound example after the earlier adopted I source. B implements its small service-specific void/throw guard adapter directly. Those additional I example files are not required to claim the prior repair adopted; actual B missing/deny/throw/fresh behavior is independently tested.",
+    "sourceTimeCorrection": "I status's B stale channel-reference compile observation describes an intermediate1930278 tree. Fixed B695efad actual direct consumer now compiles. H status's sink-only bug was true at its earlier observation but is closed in actual current B. Preserve historical scope instead of repeating stale blockers.",
+    "wholeRecoveredSubsystemImplemented": false
+  },
+  "checks": [
+    {
+      "command": "node /tmp/pa-wave29-runtime-channel-audit.mjs",
+      "actualSources": { "B": "695efad8066433e2e30eff4f776ed74117c61608", "I": "861c03edf9e77c5c250fab59a02103ebb93e56c3" },
+      "cwd": "/Users/hh/Desktop/joker/superagent", "exitCode": 1, "passed": 11, "failed": 1,
+      "scope": "Actual current B serveRunner/FileCriticalJournal/authenticated private socket, exact B/I classes and controlled in-process callback driver. No native child/effect/model or signals. The temporary probe was incrementally updated with current source labels and new cases; historical output is not used as current evidence.",
+      "cases": [
+        { "id": "B-actual-2KB-inline-descriptor-161-record-continuity", "status": "PASS", "observed": "161 original records over160 actual wire pages, maximum1821 bytes under2048; original seq remains contiguous. Original135540-byte payload reassembles in5 chunks with byte equality/SHA256." },
+        { "id": "B-explicit-CAS-and-read-only-current-poll-positive", "status": "PASS", "observed": "Initial1, explicitA2, explicitB3, repeated current poll3." },
+        { "id": "B-old-poll-and-foreign-producer-refuse-without-rebind", "status": "PASS", "observed": "Old A uses its original generation2, foreign source uses current3; both refuse without generation change. Supplying current3 for a new explicit bind is not conflated with old-generation polling." },
+        { "id": "I-latest-old-settled-allow-cannot-authorize-same-command-next-intent", "status": "PASS" },
+        { "id": "B-vendored-old-settled-allow-cannot-authorize-same-command-next-intent", "status": "PASS", "observed": "B now emits unique salted frame IDs while preserving original business command.id; prior allowed reply returnsfalse and second intent waits for its own reply." },
+        { "id": "I-latest-pull-queue-namespaces-and-prunes-settled-timeout", "status": "PASS" },
+        { "id": "B-external-deny-native-hook-requires-explicit-fresh-guard", "status": "PASS", "observed": "guard1/effect0/refused." },
+        { "id": "B-sink-only-native-hook-requires-explicit-fresh-guard", "status": "PASS", "observed": "Missing guard: guard0/effect0/refused." },
+        { "id": "B-sink-deny-native-hook-requires-explicit-fresh-guard", "status": "PASS", "observed": "Void/throw denial contract: guard1/effect0/refused." },
+        { "id": "B-sink-throw-native-hook-requires-explicit-fresh-guard", "status": "PASS", "observed": "Guard exception: guard1/effect0/refused." },
+        { "id": "B-sink-allow-native-hook-requires-explicit-fresh-guard", "status": "PASS", "observed": "Same original command, two fresh intent calls: guard2/effect2; no cached approval." },
+        { "id": "B-remote-lease-callback-is-not-also-sent-to-old-stdio", "status": "FAIL", "observed": "After authenticated remote lease takeover, one native-write-intent is both returned to remote poll and written to old stdio with the same fresh frame.id. Remote explicit denial rejects the hook; no native effect occurred." }
+      ]
+    },
+    {
+      "command": "node --test --test-timeout=8000 apps/runner/test/sink-write-admission.test.ts apps/runner/test/attach-adapter.test.ts apps/runner/test/native-write-admission.test.ts",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b", "exitCode": 0, "passed": 8, "failed": 0,
+      "scope": "Actual B selected adapter, sink mandatory fresh guard and original native admission tests; finite module cases, not recovered product/native execution."
+    },
+    {
+      "command": "pnpm exec tsc -p tests/native-acceptance/tsconfig.direct.json",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b", "exitCode": 0,
+      "scope": "Actual runtime and direct transport consumer strict/exactOptional. Prior TS2345/refusal union is closed; root omission is not the evidence."
+    },
+    {
+      "command": "node --test --test-timeout=8000 apps/runner/test/attach-channel/fresh-intent.test.ts apps/runner/test/attach-channel/b-route.test.ts apps/runner/test/attach-channel/guard-responder.test.ts apps/runner/test/attach-channel/refusals.test.ts apps/runner/test/attach-channel/service-consumer.test.ts",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-i", "exitCode": 0, "passed": 34, "failed": 0,
+      "scope": "Risk-relevant latest I callback/guard/typed error/CAS/queue and service-shaped consumer. Does not independently certify actual original A/Broker persistence, live handover or recovery."
+    },
+    { "command": "node_modules/.bin/tsc -p apps/runner/src/attach-channel/tsconfig.json", "cwd": "/Users/hh/Desktop/joker/superagent-agent-i", "exitCode": 0 },
+    {
+      "command": "node --experimental-test-module-mocks /tmp/pa-wave30-signal-mock-audit.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent", "exitCode": 1, "passed": 6, "failed": 4,
+      "scope": "Actual B guard and H guard2 imported unchanged; all OS observations, spawn handles and process.kill wholly mocked, real spawn/signal0. Only precise own temporary birth files written/removed. Initial probe setup retained an earlier unknown flag and failed before H setup; that temporary-harness mistake was corrected and all10 cases rerun before the reported result.",
+      "cases": [
+        { "id": "B-complete-declared-record-matches-fresh-observation-positive", "status": "PASS" },
+        { "id": "B-missing-full-argv-must-still-refuse", "status": "FAIL", "observed": "Deleted argv still results mock TERM senttrue." },
+        { "id": "B-empty-declared-args-cannot-register-arbitrary-pid-ownership", "status": "FAIL", "observed": "born(foreignPid,exactArgs[],expectedChildren[]) snapshots and accepts arbitrary readablePID, then signals it; no independent spawn/handle registry." },
+        { "id": "B-first-signal-resource-plan-cannot-be-omitted-by-default", "status": "FAIL", "observed": "signalOwned default firstfalse sends mock TERM with expectedChildrennull, bypassing the advertised full-resource precheck." },
+        { "id": "B-prefix-exact-arg-refusal-now-passes", "status": "PASS" },
+        { "id": "B-unreadable-observation-remains-UNKNOWN-not-exit", "status": "PASS" },
+        { "id": "H-registered-immutable-birth-intent-positive", "status": "PASS" },
+        { "id": "H-plain-json-record-and-prefix-root-refuse", "status": "PASS" },
+        { "id": "H-unreadable-observation-remains-UNKNOWN-not-gone", "status": "PASS" },
+        { "id": "H-returned-record-mutation-must-not-retarget-registered-handle", "status": "FAIL", "observed": "Changing the returned shared record/birth to foreignPID42345 makes the original registered handle send mock TERM to42345. Immutable handle token does not protect its mutable stored record." }
+      ]
+    },
+    {
+      "command": "H selected/produce2.mjs --out <exact own private new root>, bounded by a short Node wrapper",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-h", "exitCode": 1,
+      "scope": "Actual current committed I861/B695/Hf8 bindings/materialized source, in-process consumers only, no model/native/signals. All source/materialized unchanged checks pass and private output is removed.",
+      "observed": { "iChecks": "12/12", "bChecks": "5/6", "normalFactsPayloadAllowDeny": "PASS", "sinkOnlyAdmitted": false, "sinkOnlyExternalGuardCalls": 0, "sourceUnchanged": true, "materializedUnchanged": true, "findings": [], "failureReason": "H still requires the historical sinkOnlyFinding to exist. Actual B now denies that hook, so report is UNEXPECTED rather than a product regression." }
+    },
+    {
+      "command": "node tests/native-acceptance/b28-delivery.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b", "initialExitCode": 1,
+      "initialError": "Stale local contracts/dist lacked ProjectRecipeFieldsSchema after current main recipe source merge.",
+      "prerequisiteCommand": "pnpm --dir packages/contracts build", "prerequisiteExitCode": 0,
+      "rerunExitCode": 0, "passed": 5, "failed": 0, "notTested": 1,
+      "scope": "Only ignored generated contracts/dist was refreshed, no tracked candidate source changed. Actual ordinary controlled Product/Broker question native_applied→registered check/currentCandidate→explicit accept_candidate→delivered4 artifacts and stale-candidate rejection. This is not original-ID recovered B/I delivery."
+    }
+  ],
+  "closedPriorScopes": [
+    { "id": "B29-VENDORED-I-REPAIR-NOT-ADOPTED", "status": "CLOSED_FOR_ACTUAL_CONCRETE_MODULE_AND_PULL_ADAPTER", "evidence": "B and I module/pull adapter blobs matchd1ef81/321738, B actualRunnerAttachChannel owns pending/queue/prune; old allowed replay refused in actual adopted class. No need to redispatch latest I merge or nonce helper repair." },
+    { "id": "B29-FACT-SINK-IS-NOT-NATIVE-ADMISSION", "status": "CLOSED_FOR_ACTUAL_CALLBACK_GUARD_CONTRACT", "evidence": "Actual sink missing/deny/throw gives zero modeled effect; two successful same-command intents run fresh guard twice. Existing main/Broker callback remains required for product adoption; this test does not grant product execution." },
+    { "id": "B29-DIRECT-ERROR-CODE-CONSUMER-TYPECHECK", "status": "CLOSED_ACTUAL_DIRECT_STRICT", "evidence": "Direct actual consumer now compiles; typed base refused/serverError details preserved." },
+    { "id": "BH29-OBSERVATION-FAILURE-IS-NOT-EXIT", "status": "CLOSED_FOR_MEASURED_EXPLICIT_PS_FAILURES", "evidence": "B confirmExit and Hguard2.waitGone preserve ps permission/status2 asUNKNOWN/notexited. H uses tracked child exit as another positive. Exact absence classifications and full resource ownership remain separate requirements." },
+    { "id": "BH29-INCOMPLETE-BIRTH-AND-PREFIX-OWNERSHIP", "status": "PARTIAL_EXACT_PREFIX_AND_H_REGISTRATION_REPAIRS", "evidence": "B exact argument prefix refusal and H ordinary-record/prefix refusal now pass. Remaining B arbitrary birth/missingargv/optionalresourcecheck and H mutable-registry-origin are independent residuals below." },
+    { "id": "H29-SELECTED-SOURCE-DEFAULTS-ARE-HISTORICAL", "status": "SOURCE_PARAMETERS_AND_CURRENT_CONSUMERS_CLOSED_WITH_STALE_EXPECTATION", "evidence": "No old mainHEAD pin blocks current imports; exact current I/B execute and unchanged checks pass. H's still-required old sink bug assertion now fails correctly after repair and must become a nonregression case." }
+  ],
+  "findings": [
+    {
+      "id": "B30-REMOTE-CALLBACK-FORWARDED-TO-OLD-STDIO",
+      "priority": "P1_NEW_HANDOVER_ADAPTER_ADMISSION",
+      "file": "apps/runner/src/runner-service.ts", "line": 175,
+      "relatedLine": 479,
+      "problem": "pump(connectionId) sends every non-sink connection's request through the original stdout writer. Remote channelNext calls pump(remoteLease), so after takeover its native intent is both returned over authenticated HTTP and written to the stale stdio coordinator. Independent actual service reproduces one duplicate old-stdio frame with exactly the remote fresh correlation.",
+      "scope": "Unadmitted new B handover adapter. Remote denial still rejects the hook, old stdio replies remain structurally refused, no native effect or current public main permission bypass is claimed. The isolation/transport guarantee is nevertheless false and can misroute sensitive callbacks or make fixtures appear to serve the intended lease.",
+      "requiredOutcome": "Only the actual stdio connection may use write(frame); remote leases expose requests solely through their own adapter next/pull path, sink through its own responder. Keep per-connection delivery/correlation and real stale-response refusal; test old stdio frame count0 after remote takeover plus a complete original connection positive."
+    },
+    {
+      "id": "B30-BIRTH-RECORD-IS-NOT-REGISTERED-OWNERSHIP",
+      "priority": "P1_TEST_TOOL_LIVE_ADMISSION",
+      "file": "tests/native-acceptance/signal-guard.mjs", "line": 46,
+      "relatedLine": 113,
+      "problem": "born(pid) still reads arbitrary livePID and constructs a caller-mutable JSON record; no independently spawned handle is registered. exactArgs and argv remain optional in verification. signalOwned defaults firstfalse and can send without expectedChildren, so callers can bypass the full-operation precheck. Independent mock controls send to arbitrary foreignPID, missingargv and absent resourceplan.",
+      "requiredOutcome": "Register independent immutable probe-born handles from original spawn facts, require full exact argv/root/config/op and complete required resource identities before first signal, keep precheck non-bypassable and fresh before every escalation. Child PID-set equality alone is not independent child identity. Preserve exact prefix/UNKNOWN repairs; do not run liveSIGKILL while this fails."
+    },
+    {
+      "id": "H30-MUTABLE-REGISTRY-RETARGETS-OWNED-HANDLE",
+      "priority": "P1_TEST_TOOL_ORIGIN_IDENTITY",
+      "file": "tests/operational-soak/procguard/guard2.mjs", "line": 110,
+      "problem": "REGISTRY stores the same record object returned to the caller. Although the handle token is frozen and plainJSON is refused, the caller can mutate record/birth/pid/argv/root/config/op to a different live process; signalFresh then trusts that mutated registered record. Fully mocked independent test sends the original handle to foreignPID42345.",
+      "requiredOutcome": "Bind opaque handle identity to private immutable cloned/deep-frozen birth facts and original ChildProcess, return only defensive observation copies. Prefer WeakMap keyed by the original handle with no exposed internal record/token reuse. Recheck exact current original target and resource set; returned-object mutation and forged handle must never change the signal target. Keep UNKNOWN/plain-record/prefix repairs."
+    },
+    {
+      "id": "H30-CURRENT-CONSUMER-REQUIRES-A-CLOSED-DEFECT",
+      "priority": "P2_CURRENT_TOOL_EXPECTATION",
+      "file": "tests/operational-soak/selected/produce2.mjs", "line": 121,
+      "problem": "The newly usable current-source producer still requires bSinkFinding and bChecks.sinkOnlyFinding to be true. Current B fixed the bug, so source and12 I/5 B positive checks pass but report exits1 UNEXPECTED with no finding. Current.case likewise expects the old bypass.",
+      "requiredOutcome": "Keep historical bug-detection material, change current consumer to explicit missing/deny/throw/refusal regression checks and fresh allow-positive with actual original callback. A defect no longer present is not product failure; do not weaken source checks or require another bug for a green tool."
+    }
+  ],
+  "actualProductScope": {
+    "sourceIntegrationProgress": "The two B commits primarily close latest module adoption, real sink callback guard/direct typing and a signal helper. They do not add a new original A/Broker recovered Work execution lifecycle or same-run acceptance subsystem.",
+    "originalThreeCallbacksAndSameWorkHandover": "NOT_REACHED as a single actual product consumer with original A persisted ingress, original Broker/native request and current host/profile/policy checks. Module and fixture transport positives are real but separate.",
+    "safeSIGKILLOriginalACKWorkCandidateAccept": "NOT_REACHED. No unsafe live scripts were run; original-ID crash/ACK/unknown plus registered check/currentCandidate/manualaccept must continue one original Work, not combine normal5PASS and JSON-registration experiments.",
+    "slotsAggregateReleasePersistence": "NOT_REACHED for mixed original scheduler2/4 resources/control/unknown/cancel/recovery. Existing ordinary controlled works and intermittent release observations remain scoped.",
+    "ordinaryProduct": "Normal original ProductCompletion/check/artifact/currentCandidate/manualaccept continues to pass5 cases after matching contracts build. No new candidates table/migration/ledger or authorization is required.",
+    "ordinaryMainIndependence": "Main App/recipes/insights/install and exact artifact scopes are unaffected; these unadmitted runtime/test-tool residuals do not revoke those results."
+  },
+  "minimalSourceClosure": {
+    "coreCommunicationAdopted": ["apps/runner/src/attach-channel/coordinator-channel.ts", "apps/runner/src/attach-channel/attach.ts", "apps/runner/src/attach-channel/errors.ts", "apps/runner/src/attach-channel/index.ts", "apps/runner/src/attach-channel/tsconfig.json"],
+    "bActualRuntimeAdapter": ["apps/runner/src/runner-service.ts", "apps/runner/src/runner-link-client.ts", "apps/runner/src/recovery-endpoint.ts", "packages/execution/src/recovery-transport.ts"],
+    "directConsumers": ["apps/runner/test/attach-adapter.test.ts", "apps/runner/test/sink-write-admission.test.ts", "apps/runner/test/native-write-admission.test.ts", "tests/native-acceptance/direct-consumer.ts", "tests/native-acceptance/tsconfig.direct.json"],
+    "iAdditionalOptionalModule": ["apps/runner/src/attach-channel/sink-responder.ts", "apps/runner/src/attach-channel/refusals.ts"],
+    "integrationAdvice": "Current concrete I module/pull adapter and typed callback contract are useful exact source inputs. Do not import test-only signal helpers or default-enable new recovered execution. B runtime adapter must close the remote-to-stdout isolation issue and produce the actual original A/Broker consumer before runtime adoption claims expand. Root/shared contracts and main ProductExecution composition remain main-owned; no new wire/DB/ledger/driver dependency.",
+    "signalTools": "B/H helpers remain test-only and are not live admitted until immutable independent origin/full-resource controls pass. No broad live soak is needed merely to fix those pure controls."
+  },
+  "nextLargeOutcomes": [
+    {
+      "outcome": "Trusted current consumer and owned-process operations",
+      "scope": "Close only remaining guard-tool origin/resource immutability and actual remote transport routing; keep adopted I/fresh guard/direct strict as baseline. H current consumer switches from defect-required to explicit fail-closed checks. Add normal quiescence with external PID/resource observations. Publish one genuinely runnable selected-source normal toolkit before any live crash run."
+    },
+    {
+      "outcome": "Original A/Broker sameRunner dual-client handover",
+      "scope": "Use current public Store/registered producer, original question/native binding and main before-write host/profile/policy guard through all3 callbacks. One Runner/child, distinct real client lifecycles, correct old-connection isolation, actual sink/payload/guard, no synthetic ACK or new coordinator/ledger."
+    },
+    {
+      "outcome": "One recovered development delivery",
+      "scope": "In one safely owned run: original coordinator SIGKILL→new process from original A registration→original question/answer/ACKunknown reconciliation→registered check/artifact/currentCandidate→explicit manualaccept. Reuse original Completion authority; normal5PASS is only the positive, not the recovered result."
+    },
+    {
+      "outcome": "Durable2/4-slot control and colleague-ready operations",
+      "scope": "Original scheduler mixed normal/waiting/handover/unknown/cancel/recovery/delivered, per-slot/aggregate resource closure and true release/queued-work reuse, reopen persistence and exact package/readonly support. I owns communication only, B lifecycle/auth/dispatch, H independent consumer/operations; no extra gate or mechanically longer phase count."
+    }
+  ],
+  "preservation": { "allGivenHeadsUnchanged": true, "bTwoHistoricalReportDiffsAndB16Preserved": true, "iAndHRemainClean": true, "candidateTrackedSourceEdited": false, "onlyIgnoredContractsDistRefreshedForProductTest": true, "eAssertionsEdited": false, "realVendorModelTurns": 0, "nativeTurnStarts": 0, "bespokeLiveSignalScriptsExecuted": false, "signalMockRealSpawns": 0, "signalMockRealSignals": 0, "allTwelveOldServicesAndDataProfilesTarsLedgersPreserved": true, "globalDiscovery": false, "unrelatedCredentialsRead": false, "oldBCap4": "UNKNOWN_NOT_SPENDABLE", "ePilot": "UNCHANGED_BLOCKED", "allOwnExecSessionsCompleted": true }
+}

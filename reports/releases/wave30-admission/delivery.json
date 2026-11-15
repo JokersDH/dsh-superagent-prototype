@@ -1,0 +1,205 @@
+{
+  "protocol": "wave30-delivery-admission/1",
+  "date": "2026-11-15",
+  "scope": "Pinned D/E audit using immutable artifact bytes, source/sourcemap parsing, pure argv and mocked cleanup controls, complete recorded release-gate evaluation. No live installation/stop matrix, global process discovery, long soak or real vendor/model/native request.",
+  "candidates": {
+    "D": "f87034ddc9d62c0f1c6126b4326dea831be28e70",
+    "DDirty": false,
+    "E": "6369eea9a06bd228073281267506db9348c60d03",
+    "ETrackedDirty": false,
+    "EHistoricalUntrackedRuns": "Preserved",
+    "ETestSourceAtFinalRun": "41693dd6335813da363d4be938736ee3ab7ddeb2",
+    "observedMain": "fb3d671d2797367b6365119e6bc627bece16a2ff"
+  },
+  "newDArtifact": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave29-target/wave29-target-1fbaf94.tar.gz",
+    "source": "1fbaf940d426fa34ff6289304e073b9159586ed9",
+    "sourceDirty": false,
+    "buildId": "2d94a7c31ef97b57",
+    "sha256": "daee1a94b43156cec659f7df2a3b08e1ecb89b645fde1ea81c35a81d75b47d7a",
+    "tarBytes": 20458656,
+    "schema": 18,
+    "platform": "darwin",
+    "arch": "arm64",
+    "node": "24.21.0",
+    "abi": "137",
+    "sqlite": "3.53.4",
+    "verifiedEntries": 6849,
+    "verifiedRegularFiles": 6826,
+    "verifiedInternalSymlinks": 23,
+    "verifiedRegularBytes": 68407152,
+    "fileDigestMismatches": [],
+    "verifiedInstall": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-wave30-package-g5fu8f/install",
+    "verificationExitCode": 0,
+    "method": "Expected tar SHA/size, bounded safe member listing, extraction into a fresh private root, every manifest file hash/size and every internal symlink realpath checked",
+    "projectRecipesDistPresent": true,
+    "usageInsightsDistPresent": true,
+    "mainJFormPreviewSourceIsAncestor": true,
+    "main0076WindowSelectorSourceIsAncestor": false,
+    "ancestryCommands": [
+      { "cmd": "git merge-base --is-ancestor a40232ed65a38022b255ce7c07b6dd2ebd0ce35d 1fbaf940d426fa34ff6289304e073b9159586ed9", "exitCode": 0 },
+      { "cmd": "git merge-base --is-ancestor 84b34c2507159526e519e793750f5f7127707bc8 1fbaf940d426fa34ff6289304e073b9159586ed9", "exitCode": 1 }
+    ],
+    "actualSourceMapInspection": {
+      "method": "Parse the packaged console JS sourcemap with JSON; inspect only the exact App.tsx and TrialWorkspace.tsx sourcesContent entries",
+      "AppRecipePreviewAndApply": true,
+      "TrialWorkspaceInsightWindowProp": false,
+      "TrialWorkspaceOnSelectInsightWindow": false,
+      "AppUsageDaysSelection": false
+    },
+    "scope": "Genuine new J/G/template runtime package beyond1ba. It contains the original0073 preview/apply/form path and statistics, but not main0076's new7/30-day window selector. Do not call it the exact latest-window product; this is temporal scope, not a window regression.",
+    "independentEFinalVerdictForTheseBytes": "NOT_REACHED"
+  },
+  "dClosureAndSourceProgress": {
+    "manifest": "/Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/reports/wave29/ordinary-source-closure.json",
+    "source": "1fbaf940",
+    "entriesChecked": 120,
+    "matches": 120,
+    "mismatches": [],
+    "fixtureCompatibility": {
+      "status": "CLOSED_IN_REVIEWED_SOURCE_AND_PURE_MATRIX",
+      "command": "node --input-type=module heredoc importing actual D daemonArgv",
+      "exitCode": 0,
+      "cases": [
+        { "name": "normal_personal", "requested": "personal", "selected": "personal", "assistant": true, "native": false },
+        { "name": "restored_personal_without_review", "requested": "personal", "selected": "personal", "assistant": true, "native": false },
+        { "name": "restored_personal_with_review", "requested": "personal", "selected": "personal", "assistant": true, "native": false },
+        { "name": "normal_fixture", "requested": "fixture", "selected": "fixture", "assistant": true, "native": false },
+        { "name": "restored_fixture", "requested": "fixture", "selected": "fixture", "assistant": false, "native": false },
+        { "name": "normal_native_argv_declaration_only", "requested": "personal", "selected": "personal", "assistant": true, "native": true }
+      ],
+      "note": "Native case evaluates argv only; no CLI/model/native process was started. Requested fixture restoration now stays fixture, normal fixture restores its lazy assistant entry, and personal recovery/general health checks remain.",
+      "submittedActualFixtureReportLimit": "tools/distribution/reports/wave29/fixture-mode.json labels restoredFixture PASS but records mode personal with --assistant --discussion-only, contradicting its requested-restored-fixture description and the corrected source/pure matrix. Treat this as stale/misbound raw evidence and rebind the actual restored-fixture functional case; do not claim that row independently proves fixture compatibility. Normal fixture row is consistent."
+    },
+    "minimalMainRuntimeSlice": [
+      "apps/launcher/lib/daemon.mjs requested-mode-correct recovery propagation plus preserved normal fixture lazy assistant",
+      "apps/launcher/lib/start.mjs general health.mode mismatch refusal before RUNNING record",
+      "tools/distribution/build.mjs build both usage-insights and project-recipes after contracts"
+    ],
+    "unchangedStage": "tools/distribution/stage.mjs matches main; no broad portability or historical report import is needed",
+    "scope": "The new packaging and source compatibility are real progress. Preserve prior personal-mode/root/stop guards; instantiating an explicitly configured lazy assistant is not sending a model turn."
+  },
+  "dInstalledJProgress": {
+    "latestReport": "/Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/reports/wave29/installed-j-ui.json",
+    "latestEvidenceCommit": "f87034ddc9d62c0f1c6126b4326dea831be28e70",
+    "reportedCases": 6,
+    "reportedPassed": 6,
+    "previewPosts": 13,
+    "acceptedWorks": 2,
+    "pageErrors": [],
+    "cases": [
+      "preview/apply only prefill original form with zero business write",
+      "changed facts reject explicit creation until reapplication",
+      "selection/config changes cannot retain hidden old atoms",
+      "error and legacy absence keep manual delegation available",
+      "two explicit template works reach original candidate and manual acceptance",
+      "desktop/mobile controls and text fit"
+    ],
+    "unknownRecordedCreateRetry": "Three create requests retain two unique commandIds; the post-record lost response retries the same original command and does not duplicate Work",
+    "sourceReviewOfExecutedHarness": "verify-installed-project-recipes-ui.mjs imports ProductStore/runtime/J registry/HTTP from its explicit APP install and serves that install's console dist. It uses a private controlled Product/Broker/check/accept runtime, not a product daemon/native/recovery run. The proxy now streams SSE with Readable.fromWeb; this is a harness fix, not a new product runtime.",
+    "intermediateNotReachedStatements": "Earlier installed-j.json/recipe/artifacts limitations still say installed UI was not rerun; they are superseded by latestf8706/6 evidence and should be reconciled in final documentation without relabeling runtime bytes.",
+    "independentEInstalledJVerdict": false,
+    "auditBrowserRerun": false,
+    "interpretation": "Retain this genuine developer same-package UI/API/control-flow evidence. E still needs independent same-target template/window/functional acceptance; do not require a refreeze merely to fix the stale reports."
+  },
+  "eRecordedScope": {
+    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T07-03-05-041Z/report.json",
+    "testSource": "41693dd6335813da363d4be938736ee3ab7ddeb2",
+    "actualSubjectSource": "1ba003239237d3fc7a92bde8cbe897549abcbd5d",
+    "buildId": "67abd96690030eb7",
+    "tarSha256": "504dfdc1ceb191828d3836017cc47d9d0023dc27cc1291e6caf28e08aafcfb9e",
+    "counts": { "PASS": 274, "FAIL": 0, "NOT_TESTED": 20 },
+    "ordinary": { "tier": "installed-alpha", "required": 186, "reported": "PASS", "independentRecordedGate": "PASS" },
+    "functional": { "tier": "installed-functional", "required": 187, "reported": "PASS", "independentRecordedGate": "PASS" },
+    "fullProduct": { "required": 188, "reported": "FAIL", "independentRecordedGate": "FAIL_MISSING_NATIVE_DELIVERY_AND_CONTROL" },
+    "actualFunctionalEvidence": "Normal and restored personal starts report personal/normal or personal/recovery_readonly; package stop returns STOPPED exit0, record removed and proofFallbackUsed=false. This genuinely advances past oldce64's functional failure.",
+    "physicalResourceEvidenceLimit": "The functional case re-reads instance.json only AFTER successful stop has removed it, then derives PIDs from that absent record. The recorded resourcesAlive=[] is therefore empty by construction, not an independent observation that each pre-start/recorded resource is gone. Retain packaged STOPPED/no-fallback observations but do not upgrade this to complete physical quiescence proof.",
+    "currentD1fbaActuallyTestedByE": false,
+    "trialIdentityAndGSummary": "NOT_TESTED_AS_REPORTED",
+    "interpretation": "E has truly moved fromce64 to1ba and correctly retains ordinary/functional/full-product separation. It has not measured the new J package or0076 window selector; do not relabel its1ba report."
+  },
+  "eNoRecordOldFinding": {
+    "status": "CLOSED_FOR_KNOWN_LIVE_BIRTH_DEFAULT_RETAIN",
+    "module": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/lib/packaged-instance.mjs",
+    "independentPureCommand": "node --experimental-test-module-mocks --input-type=module heredoc; import actual module with injected ps/package stop/timers/process.kill and synthetic birth in a fresh private root",
+    "exitCode": 0,
+    "positiveControls": [
+      { "case": "known live birth/no record, packageStop=false without forced proof", "clean": false, "retained": true, "signals": [], "releaseRemoved": false, "reason": "record_missing_known_birth" },
+      { "case": "package STOPPED/no record but known live birth without forced proof", "clean": false, "retained": true, "signals": [], "releaseRemoved": false, "reason": "record_missing_known_birth" }
+    ],
+    "scope": "The old live-birth false-clean default is genuinely fixed. Keep full-record root/config/set precheck and existing per-signal freshness fixes; do not reassign those already closed repairs."
+  },
+  "eNewForcedProofFinding": {
+    "id": "E_NO_RECORD_FORCEPROOF_DISCOVERY_AND_SCOPE_NOT_TRUSTWORTHY",
+    "priority": "P1_TEST_TOOL_ONLY",
+    "file": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/lib/packaged-instance.mjs",
+    "summary": "The new no-record forced cleanup invokes a global ps -ax enumeration despite the no-global-discovery rule. Discovery errors return[] as if no children existed. The new stopKnownBirth branch also omits the complete birth.config/install/root checks already enforced for full records.",
+    "independentPureControls": [
+      { "case": "known exited birth, child discovery throws", "expected": "UNKNOWN_RETAIN", "actual": "CLEAN_RELEASES_ROOT", "globalPsAttemptsCaptured": 1, "realPs": 0, "signals": [] },
+      { "case": "live no-record birth has wrong config, explicit proofSignal=true", "expected": "REFUSE_ZERO_SIGNAL_RETAIN", "actual": "TERM_THEN_CLEAN_RELEASES_ROOT", "globalPsAttemptsCaptured": 1, "realSignals": 0, "capturedSignals": ["TERM101"] }
+    ],
+    "additionalSourceLimit": "Discovered child identity is observed later by parent PID, not independently recorded at birth; fresh TERM/KILL checks in this branch compare install/start/UID but omit the requested state/config/fullargv/operation checked earlier. A vanished parent does not prove an orphan resource set is empty.",
+    "next": "Keep safe default retention. Remove global discovery and reuse the complete independently captured spawn/resource set; unknown discovery is never an empty known set. Apply the same root/config/install/operation/fullargv proof and all-resource preflight to every no-record forceproof path, freshly before each signal. If completeness is not proven, retain material without sending signals.",
+    "noActualUserProcessLeakOrSignalClaimed": true
+  },
+  "findingsOrdered": [
+    {
+      "id": "E_FORCEPROOF_GLOBAL_DISCOVERY_FALSE_EMPTY_AND_CONFIG_GAP",
+      "priority": "P1_TEST_TOOL_SAFETY",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/lib/packaged-instance.mjs",
+      "lines": [99, 227, 358],
+      "scope": "New forced cleanup only; default known-live-birth retention and previously fixed full-record proof remain valid. No dangerous live cleanup was run."
+    },
+    {
+      "id": "E_STOP_RESOURCE_EXIT_OBSERVATION_DERIVED_AFTER_RECORD_REMOVAL",
+      "priority": "P2_ACCEPTANCE_EVIDENCE_COMPLETENESS",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/cases/w21-personal-recovery.mjs",
+      "line": 699,
+      "summary": "Capture the complete independent birth/recorded PID-start resource set BEFORE stop, then observe those exact identities afterward. An empty PID list from a deleted record cannot independently prove resources exited. Preserve the actual package STOPPED/exit0/no-fallback functional observations."
+    },
+    {
+      "id": "D_RESTORED_FIXTURE_RAW_REPORT_MISBOUND",
+      "priority": "P2_EVIDENCE_IDENTITY",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/reports/wave29/fixture-mode.json",
+      "summary": "restoredFixture claims PASS but its actual mode/argv/health are personal, contradicting the corrected source and pure matrix. Rebind this raw case to the real requested fixture entry/flags and exact package; do not reuse the old personal sample as restored-fixture proof."
+    }
+  ],
+  "minimalMainSourceAdvice": {
+    "sources": [
+      "apps/launcher/lib/daemon.mjs requested-mode-correct restored personal/fixture propagation and restored normalfixture lazy assistant",
+      "apps/launcher/lib/start.mjs general health.mode validation before RUNNING record",
+      "tools/distribution/build.mjs include usage-insights and project-recipes in contracts-first package build closure"
+    ],
+    "unchangedStage": "tools/distribution/stage.mjs already matches main",
+    "admission": "These narrow product slices are concrete source progress. Avoid whole historical report/live probe imports. New E forced cleanup is not a main runtime dependency and stays held until complete proof/no-global-discovery is fixed.",
+    "nextRuntimeCandidate": "A necessary later candidate should combine these compatible launcher slices with actual main0073+0076 and the parent's current product-composition source. Existing1fba contains J but no0076 selector; docs/report corrections alone do not require a new tar."
+  },
+  "threeNextWholeSubsystemOutcomes": [
+    {
+      "outcome": "One reproducible current product package and complete mode/resource policy",
+      "scope": "D supplies the exact current main/J/window/F/launcher closure, actual requested personal/fixture normal/restored mode matrix, accurately bound fixture functional observations, deterministic build/freeze and an immutable candidate. Keep ordinary/read-only authorization separate from target activation."
+    },
+    {
+      "outcome": "Independent same-tar installation and restored-readonly lifecycle",
+      "scope": "E first holds/fixes no-record forced proof; then consumes the same D candidate, captures complete resources before stop, validates cold install/upgrade/reopen/backup/restore/two-state and real STOPPED without substituting fallback cleanup. Ordinary/functional/full-product remain distinct."
+    },
+    {
+      "outcome": "A colleague can use and diagnose the complete ordinary product",
+      "scope": "One exact installed candidate supports two-project template preview/apply/revalidation/explicit create/check/candidate/manualaccept, real7/30 selector, context/source UI, known/partial/readonly/error states and a private support bundle, backed by independent user-guide/cold-root evidence. No new gate/tracker/coordinator/ledger or target authorization; current limitations are stated without efficiency/native overclaims."
+    }
+  ],
+  "safety": {
+    "realVendorSends": 0,
+    "realModelTurns": 0,
+    "nativeTurnStarts": 0,
+    "realProcessSignals": 0,
+    "realGlobalPsOrDiscovery": 0,
+    "liveInstallationStopOrBrowserMatricesRun": 0,
+    "longSoakRunsStarted": 0,
+    "userTwelveServicesTouched": false,
+    "oldStateProfilesTarsLedgersDirtyAndERunsPreserved": true,
+    "dEImplementationsAssertionsOrRootEdited": false,
+    "allExecSessionsCompleted": true,
+    "onlyDurableNewWorkspaceArtifact": "reports/releases/wave30-admission/delivery.json"
+  }
+}

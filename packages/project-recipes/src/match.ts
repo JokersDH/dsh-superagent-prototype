@@ -39,7 +39,7 @@ import {
   type RecipeIssueField,
   type RecipeProvenance,
 } from './draft.ts'
-import { PROJECT_FACTS_PROTOCOL, ProjectFactsSchema, type ProjectFacts } from './facts.ts'
+import { PROJECT_FACTS_PROTOCOL, ProjectFactsSchema, factsContentDigest, type ProjectFacts } from './facts.ts'
 import { isProjectAtom } from './scope.ts'
 
 /** Default freshness budget for injected facts: older observations need an explicit refresh. */
@@ -118,6 +118,7 @@ const provenanceFor = (
     ...(sortedUnique(selection.criteriaIds) === undefined ? {} : { criteriaIds: sortedUnique(selection.criteriaIds) }),
   }
   const factsDigest = canonicalDigest(facts as unknown as Json)
+  const contentDigest = factsContentDigest(facts)
   const selectionDigest = canonicalDigest(normalized as unknown as Json)
   return {
     catalog: { id: RECIPE_CATALOG_ID, version: RECIPE_CATALOG_VERSION, digest: catalogDigest() },
@@ -125,13 +126,14 @@ const provenanceFor = (
     facts: {
       protocol: PROJECT_FACTS_PROTOCOL,
       digest: factsDigest,
+      contentDigest,
       observedAt: facts.observedAt,
       provider: facts.provenance.provider,
       source: facts.provenance.source,
     },
     selection: { digest: selectionDigest, ...normalized },
     input: canonicalDigest({
-      facts: factsDigest,
+      facts: contentDigest,
       configuration: configuration.revision,
       kind,
       selection: selectionDigest,
