@@ -79,7 +79,7 @@ export function renderMarkdown(analysis: UsageInsightsAnalysis): string {
   for (const [name, value] of Object.entries(summary.coverage))
     lines.push(`| ${name} | ${coverageLabel(value)} |`)
   lines.push('')
-  lines.push(`Stopped by: ${summary.limits.stoppedBy}. Records seen ${summary.limits.recordsSeen}, accepted ${summary.limits.recordsAccepted}, not parsed ${summary.limits.recordsNotParsed}; works ${summary.limits.worksSeen}, not processed ${summary.limits.worksNotProcessed}; pages ${summary.limits.pagesSeen}, not parsed ${summary.limits.pagesNotParsed}.`)
+  lines.push(`Stopped by: ${summary.limits.stoppedBy}. Record units seen ${summary.limits.recordsSeen}, admitted ${summary.limits.recordsAdmitted}, not parsed ${summary.limits.recordsNotParsed} (unit: ${summary.limits.recordUnit}); metric-bearing outcomes ${summary.limits.recordsAccepted}; works ${summary.limits.worksSeen}, not processed ${summary.limits.worksNotProcessed}; pages ${summary.limits.pagesSeen}, not parsed ${summary.limits.pagesNotParsed}.`)
   lines.push('')
   lines.push('## Source losses')
   lines.push('')

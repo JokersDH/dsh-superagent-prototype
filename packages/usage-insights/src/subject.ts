@@ -183,6 +183,12 @@ function coverageOfEvidence(projection: string): IngestWorkCoverage {
 export interface WorkScopeOptions {
   projectIds: ReadonlySet<string>
   workIndex: ReadonlyMap<string, string>
+  /**
+   * Work identities whose project mapping was contradictory anywhere in this input. The set is
+   * permanent for the whole analysis: no later or reordered index entry can revive a mapping, and the
+   * work's entries and embedded outcomes are excluded from every count.
+   */
+  conflictedWorkIds: ReadonlySet<string>
   window: { from: Timestamp; to: Timestamp }
 }
 
@@ -247,6 +253,12 @@ export function parseWorkRecords(evidenceItems: readonly unknown[], historyItems
       continue
     }
     const record = parsed.data
+    if (options.conflictedWorkIds.has(record.workId)) {
+      // A permanent tombstone from the work index: this work can never be attributed in this input.
+      loss.conflicted++
+      unattributableWorks++
+      continue
+    }
     const coverage = worst(coverageOfEvidence(record.projection), record.truncated ? 'storage_cap' : 'complete')
     for (const entry of record.entries)
       addEntry(record.workId, { workId: record.workId, at: entry.at, kind: entry.kind, sourceRef: entry.sourceRef, detail: entry.detail }, 'work_evidence')
@@ -262,6 +274,10 @@ export function parseWorkRecords(evidenceItems: readonly unknown[], historyItems
       continue
     }
     const record = parsed.data
+    if (options.conflictedWorkIds.has(record.workId)) {
+      loss.conflicted++
+      continue
+    }
     const coverage: IngestWorkCoverage =
       record.window === 'caller_limit' ? 'caller_limit' : record.window === 'storage_cap' ? 'storage_cap' : 'complete'
     for (const entry of record.entries)
