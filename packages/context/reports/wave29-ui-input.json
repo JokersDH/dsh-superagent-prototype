@@ -1,0 +1,19 @@
+{
+  "protocol": "wave29-ui-input/1",
+  "owner": "C provides data only; F/main own UI subtree",
+  "sources": {
+    "scopeReview": { "state": ["complete", "partial", "scope_changed", "unavailable"], "reasonsMax": 7, "reasonKinds": ["outside_selection", "excluded_path", "no_source_root", "invalid_source_root", "withheld_sensitive_name", "expired_source", "unsupported_source_root"], "fields": ["authorization='none'", "withheldSourceCount (null when unobserved)", "scopeDigest", "sourceFingerprint"], "note": "opt-in ?scopeReview=1; absent by default; not a grant" },
+    "partialPdf": { "state": ["complete", "partial", "unavailable"], "fields": ["readable", "unreadable", "scanned"], "note": "counts unknown => null, never fabricated" },
+    "readiness": { "state": ["present", "unavailable"], "fields": ["authorization:'none'", "startupMode:'recovery_readonly'", "development:'readonly'", "dispatchable:0", "admitted:0", "decisions:false", "proposals:false"], "samplePackage": "1ba0032" },
+    "proposalCandidate": { "fields": ["proposalId", "kind", "humanAcceptanceRef", "artifactDigest", "authorization:'none'"], "note": "confirmation stays an ordinary model/approval step" },
+    "completionFacts": { "fields": ["commandId", "verification.id", "acceptance.ref", "canonical", "unclassifiedReviews"], "note": "read-only facts; raw receipts are excluded; ProductCompletion remains authority; not execution or acceptance UI" },
+    "templatePrefill": { "status": ["draft", "needs_input", "unsupported", "unavailable"], "fields": ["kind", "allowedPaths", "profileId", "fields", "authorization:'none'"], "note": "prefill only; creating still uses the original form command" }
+  },
+  "states": ["unavailable", "partial", "ready", "reused", "refused-verified", "not-reached"],
+  "limits": ["no private SQL", "no second confirmation", "no LLM loop", "data proof != startup permission"],
+  "examples": {
+    "readiness": { "authorization": "none", "startupMode": "recovery_readonly", "development": "readonly", "dispatchable": 0, "admitted": 0 },
+    "templateDraft": { "status": "draft", "authorization": "none", "rootLeaked": false },
+    "facts": { "reviewCanonical": true, "rawReceiptBecomesReview": false }
+  }
+}
