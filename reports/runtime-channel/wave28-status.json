@@ -1,0 +1,172 @@
+{
+  "wave": "product-wave-28",
+  "role": "I",
+  "title": "Fresh native intent correlation, unique module and pull adapter handoff",
+  "date": "2026-11-15",
+  "workdir": "/Users/hh/Desktop/joker/superagent-agent-i",
+  "branch": "codex/g5-coordinator-channel",
+  "baseline": "d95df88bb9dfdeaef74fa49629dcc2aba25d4d1b",
+  "implementationCommit": "1a34005dd8678c9ecdfbb6ed780a5bb81a32b550",
+  "mergedOriginMain": "ea82d8f",
+  "status": "P1_CLOSED_AND_SOURCE_HANDED_OFF_B_MERGE_PENDING",
+  "statement": "The audited P1 (settled allowed reply authorising a later same-command intent) is reproduced, fixed and covered by independent negatives. A production pull adapter absorbs the current B route needs. B already imports this module at the wave-27 blob and still needs to merge the wave-28 delta and adopt the adapter; H has not executed the current source in its own tree.",
+  "ownedPaths": [
+    "apps/runner/src/attach-channel/",
+    "apps/runner/test/attach-channel/",
+    "docs/runtime-channel/",
+    "reports/runtime-channel/"
+  ],
+  "p1": {
+    "finding": "I28-SETTLED-ALLOW-REPLAY-IN-SAME-LEASE",
+    "reproduced": true,
+    "redTest": "apps/runner/test/attach-channel/fresh-intent.test.ts (3 failures before the fix: reused frame.id and replay accepted)",
+    "rootCause": "pending native writes were keyed by command.id, so frame.id equalled the business id and a settled reply matched a later pending intent",
+    "fix": [
+      "each beforeNativeWrite allocates intent-<module salt>-<n>; frame.id is that correlation while command id/body/attempt/native binding stay byte-for-byte",
+      "pending writes keyed by the intent correlation; settlement removes the correlation permanently",
+      "concurrent second intent for one business command refused with protocol_error/write_already_pending",
+      "NativeWriteDenied still reports the original business command id",
+      "no new wire version, contracts change or ledger: the local v1 schema already separates frame.id from command"
+    ],
+    "negatives": [
+      "replayed allowed frame for a settled intent returns false and leaves the later intent pending",
+      "replayed denial cannot decide a later intent either",
+      "intent correlation ids are unique across calls and modules",
+      "timed-out and closed intents cannot be revived by a late allowed frame",
+      "intent ids never appear as the business command id"
+    ]
+  },
+  "results": [
+    {
+      "id": "I4",
+      "milestone": "first result",
+      "status": "PASS",
+      "content": "Fresh-intent fix plus the single importable module: constructor, CAS bind, three callbacks, adapter, strict types",
+      "evidence": ["fresh-intent.test.ts (5)", "three-callbacks.test.ts (11)", "tsc -p apps/runner/src/attach-channel/tsconfig.json exit 0"]
+    },
+    {
+      "id": "I8",
+      "milestone": "second result",
+      "status": "PASS",
+      "content": "Same controller from client A to client B through the production pull adapter with durable-ACK sink, immutable payload re-read and fresh guard",
+      "evidence": ["rebind.test.ts (7)"],
+      "scope": "DurableSink remains an idempotency contract double, not A's persisted ingress"
+    },
+    {
+      "id": "I12",
+      "milestone": "third result",
+      "status": "PARTIAL_B_MERGE_PENDING",
+      "content": "B unique-implementation state verified from source and the drop-in adapter delivered",
+      "evidence": [
+        "B tree: 0 old waiter-map references; business-channel.ts/business-dispatch.ts deleted",
+        "B runner-service imports ./attach-channel/index.ts; vendored coordinator-channel.ts blob bf5b25a6e87b6de1f02838cd3b5fe9b5ec394007 equals I ae93f34",
+        "src/attach-channel/attach.ts + b-route.test.ts (9)",
+        "docs/runtime-channel/b-adapter-handoff.zh-CN.md"
+      ],
+      "notReached": ["B merged this wave-28 commit (it still carries the wave-27 P1)", "B replaced its hand-written connections/queue layer with RunnerAttachChannel", "B live runtime executed the wave-28 module"]
+    },
+    {
+      "id": "I16",
+      "milestone": "fourth result",
+      "status": "PASS",
+      "content": "Fault, capacity, late-reply, close, replay and route-refusal matrix with active bounds and single settlement",
+      "evidence": ["faults.test.ts (18)", "b-route.test.ts (9)", "compatibility.test.ts (4)"]
+    },
+    {
+      "id": "I20",
+      "milestone": "fifth result",
+      "status": "PARTIAL_INDEPENDENT_SOURCE_ONLY",
+      "content": "Independent consumer and the B-route consumer execute the same implementation; H guidance updated to the current source",
+      "evidence": ["independent-consumer.test.ts (4)", "b-route.test.ts (9)", "docs/runtime-channel/h-independent-consumer.zh-CN.md"],
+      "notReached": ["H executed the current source in its own tree; H still consumes the old stdio service blob", "real A/Broker persisted ingress and fresh guard"]
+    },
+    {
+      "id": "I24",
+      "milestone": "sixth result",
+      "status": "PASS_SOURCE_HANDOFF",
+      "content": "Unique module, production adapter, full fault/interface coverage, operations docs and this status file",
+      "evidence": ["docs/runtime-channel/README.zh-CN.md", "b-adapter-handoff.zh-CN.md", "wave28-evidence.zh-CN.md", "wave28-status.json"]
+    }
+  ],
+  "stages": [
+    { "id": "I1", "status": "DONE", "evidence": "P1 reproduced red, then fixed with fresh correlation" },
+    { "id": "I2", "status": "DONE", "evidence": "Immutable producer/CAS/lease fencing preserved; intent id space bounded and non-reused" },
+    { "id": "I3", "status": "DONE", "evidence": "B pull/queue/current-connection needs absorbed into src RunnerAttachChannel with settlement pruning and remaining deadline" },
+    { "id": "I4", "status": "DONE", "evidence": "First result published" },
+    { "id": "I5", "status": "DONE", "evidence": "Facts re-send original id/body across rebind for durable ACK; conflicts refused (rebind.test.ts)" },
+    { "id": "I6", "status": "DONE", "evidence": "Payload same-reference re-read and byte bounds; journal chunk route explicitly out of channel scope" },
+    { "id": "I7", "status": "DONE", "evidence": "Allow/deny/unknown per fresh intent; rebind makes pending writes indeterminate" },
+    { "id": "I8", "status": "DONE", "evidence": "Second result published through the pull adapter" },
+    { "id": "I9", "status": "PARTIAL", "evidence": "Adapter/import/migration list delivered; B merge and adapter adoption pending B" },
+    { "id": "I10", "status": "PARTIAL", "evidence": "Explicit CAS, read-only next, per-connection receive and stale/foreign refusal implemented and tested; B route not yet switched" },
+    { "id": "I11", "status": "PARTIAL", "evidence": "B actual callbacks verified at module-import level from source; live B runtime run is B-owned and not executed here" },
+    { "id": "I12", "status": "PARTIAL", "evidence": "Module-level uniqueness achieved by B; wave-28 delta and adapter consolidation pending" },
+    { "id": "I13", "status": "DONE", "evidence": "Timer/reply/close/send races settle once; absolute deadline not refreshed (faults/rebind/b-route)" },
+    { "id": "I14", "status": "DONE", "evidence": "Per-kind/total/payload byte bounds, queue dedupe, capacity recovery; 135540-byte route not misreported" },
+    { "id": "I15", "status": "DONE", "evidence": "lease vs module close, late/expired/replay negatives, secret-free bounded errors" },
+    { "id": "I16", "status": "DONE", "evidence": "Fourth result published" },
+    { "id": "I17", "status": "PARTIAL", "evidence": "Selected-source consumer sample and H guide published; H execution NOT_REACHED" },
+    { "id": "I18", "status": "DONE", "evidence": "Authority split documented and exercised with doubles; module caches no permission and defines no payload content" },
+    { "id": "I19", "status": "PARTIAL", "evidence": "Cross-process/SIGKILL/recovered lane remains B/main; no signals or process starts performed" },
+    { "id": "I20", "status": "PARTIAL", "evidence": "Fifth result: independent and route consumers pass; real B/H runs pending" },
+    { "id": "I21", "status": "DONE", "evidence": "Shared interface untouched; correlation vs business id, optional-field strictness and errors documented and compiled" },
+    { "id": "I22", "status": "DONE", "evidence": "docs/runtime-channel rewritten for constructor/CAS/lease/three methods/deadline/close/unknown" },
+    { "id": "I23", "status": "DONE", "evidence": "Bounded regressions keep the wave-27 scope; delivery list in wave28-evidence" },
+    { "id": "I24", "status": "DONE", "evidence": "Sixth result and this status file" }
+  ],
+  "checks": [
+    { "command": "node_modules/.bin/tsc -p apps/runner/src/attach-channel/tsconfig.json", "exit": 0, "note": "strict + noUncheckedIndexedAccess + exactOptionalPropertyTypes" },
+    { "command": "cd apps/runner && node --test --test-timeout=8000 test/attach-channel/*.test.ts", "exit": 0, "tests": 64, "passed": 64, "failed": 0 },
+    { "command": "node --test packages/contracts/test/coordinator-channel.case.ts", "exit": 0, "tests": 5, "passed": 5, "failed": 0 },
+    { "command": "git merge --no-edit origin/main", "exit": 0, "merged": "ea82d8f", "note": "wave-28 packet and admission merged before implementation" }
+  ],
+  "testCounts": {
+    "three-callbacks.test.ts": 11,
+    "binding.test.ts": 6,
+    "rebind.test.ts": 7,
+    "faults.test.ts": 18,
+    "compatibility.test.ts": 4,
+    "independent-consumer.test.ts": 4,
+    "fresh-intent.test.ts": 5,
+    "b-route.test.ts": 9,
+    "total": 64
+  },
+  "bReconciliation": {
+    "auditedSource": "cb4e97504157e500799284bfd63d51768740c9fc",
+    "observedSource": "423df04e46021f781adf4ee598ffb9b4b7620807",
+    "observedDirtyPreserved": ["packages/execution/src/recovery-transport.ts", "reports/releases/wave11-admission/runtime.json", "reports/releases/wave12-admission/runtime.json", "tests/native-acceptance/b16-real-begin.mjs", "tests/native-acceptance/b28-budget.mjs"],
+    "oldThreeMapsInB": 0,
+    "parallelBusinessChannelFiles": "deleted from B tracked source",
+    "bImportsIModule": true,
+    "bVendoredModuleBlob": "bf5b25a6e87b6de1f02838cd3b5fe9b5ec394007",
+    "equalsIImplementation": "ae93f3436663e1660b5ae45be3fd823f8caf9ad4",
+    "wave28DeltaInB": false,
+    "adapterAdoptedByB": false,
+    "correction": "The wave-27 line about 15 waiter references described my old main baseline, not current B. I no longer report maps as existing in B."
+  },
+  "notReached": [
+    "B merged the wave-28 fresh-intent fix (B still runs the wave-27 module with the P1)",
+    "B replaced its hand-written connections/queue wrapper with RunnerAttachChannel",
+    "B live runtime executed the wave-28 module",
+    "H executed the selected current source in its own tree",
+    "real A durable persisted ingress and real main/Broker guard (doubles only)",
+    "same Runner process dual client, coordinator SIGKILL question->answer recovery, cross-coordinator recovery",
+    "durable exactly-once native execution and physical writer quiescence"
+  ],
+  "boundaries": {
+    "filesOutsideOwnershipModified": [],
+    "contractsRootWireChanged": false,
+    "runnerServiceOrLinkClientChanged": false,
+    "newServerDatabaseLedgerDriverLifecycle": false,
+    "realModelTurns": 0,
+    "nativeTurns": 0,
+    "processSignalsOrUserServiceOperations": 0,
+    "preservedUserServices": [[5180, 8796], [5181, 8797], [5182, 8798], [5183, 8799], [5184, 8800], [5185, 8801], [5186, 8802], [5187, 8803], [5188, 8804], [5189, 8805], [5190, 8806], [5191, 8807]],
+    "studyState": "BLOCKED_CURRENT_RECIPE_UNTOUCHED"
+  },
+  "handoff": {
+    "main": "No shared-interface or contracts change requested; frame.id correlation is a local implementation detail of the existing v1 schema.",
+    "B": "Merge this commit for the P1 fix, then replace connections/queue/currentConnection with RunnerAttachChannel (explicit CAS bind, read-only next, per-connection receive, close via attach.close). Keep auth/routes/dispatch/begin/prepared/process/lifecycle.",
+    "H": "Copy independent-consumer.test.ts, bind the exact selected source and report defects by owner instead of editing I/B."
+  }
+}
