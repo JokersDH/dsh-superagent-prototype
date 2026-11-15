@@ -105,6 +105,10 @@
     "d18": {
       "status": "PASS",
       "summary": "Installed package C driver precise dual-format chain: v1 and v2 both verified-flow with target proof ok/independent, source verified, history1, 21 assertions, verified stop; v1 target-only message drift rejected as target_subject_mismatch before content."
+    },
+    "d19": {
+      "status": "PASS",
+      "summary": "Added read-only release checker and colleague handoff recipe; PASS_WITH_E_PENDING_J_ABSENT."
     }
   },
   "testLayers": {
@@ -145,5 +149,7 @@
     "report": "tools/distribution/reports/wave28/precise-exceptions.json",
     "manual": "FTS/event/artifact mutations blocked",
     "installedDriver": "v1/v2 verified-flow, drift blocked"
-  }
+  },
+  "releaseCheck": "tools/distribution/reports/wave28/release-check.json",
+  "handoff": "tools/distribution/recipes/wave28-handoff.zh-CN.md"
 }

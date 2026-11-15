@@ -1,0 +1,92 @@
+{
+  "protocol": "wave28-release-check/1",
+  "status": "PASS_WITH_E_PENDING_J_ABSENT",
+  "checks": [
+    {
+      "id": "status_protocol",
+      "ok": true
+    },
+    {
+      "id": "source",
+      "ok": true,
+      "detail": {
+        "status": "1ba0032",
+        "artifact": "1ba003239237d3fc7a92bde8cbe897549abcbd5d"
+      }
+    },
+    {
+      "id": "build",
+      "ok": true,
+      "detail": {
+        "status": "67abd96690030eb7",
+        "artifact": "67abd96690030eb7"
+      }
+    },
+    {
+      "id": "tar_exists",
+      "ok": true,
+      "detail": "/Users/hh/Desktop/joker/pa-artifacts/wave28-target/wave28-target-1ba0032.tar.gz"
+    },
+    {
+      "id": "tar_sha256",
+      "ok": true,
+      "detail": {
+        "expected": "504dfdc1ceb191828d3836017cc47d9d0023dc27cc1291e6caf28e08aafcfb9e",
+        "actual": "504dfdc1ceb191828d3836017cc47d9d0023dc27cc1291e6caf28e08aafcfb9e"
+      }
+    },
+    {
+      "id": "tar_bytes",
+      "ok": true,
+      "detail": {
+        "expected": 20333302,
+        "actual": 20333302
+      }
+    },
+    {
+      "id": "entry_count",
+      "ok": true,
+      "detail": 6778
+    },
+    {
+      "id": "closure_count",
+      "ok": true,
+      "detail": 109
+    },
+    {
+      "id": "closure_hashes",
+      "ok": true,
+      "detail": {
+        "mismatched": 0
+      }
+    },
+    {
+      "id": "artifact_present",
+      "ok": true
+    },
+    {
+      "id": "usage_insights_source",
+      "ok": true
+    },
+    {
+      "id": "recipe_tuple",
+      "ok": true
+    },
+    {
+      "id": "j_absent_documented",
+      "ok": true
+    }
+  ],
+  "tuple": {
+    "source": "1ba003239237d3fc7a92bde8cbe897549abcbd5d",
+    "build": "67abd96690030eb7",
+    "tarSha256": "504dfdc1ceb191828d3836017cc47d9d0023dc27cc1291e6caf28e08aafcfb9e",
+    "bytes": 20333302,
+    "closure": 109
+  },
+  "boundaries": [
+    "no build/install/start/signal",
+    "E verdict independent and pending",
+    "J recipes absent from current main"
+  ]
+}
