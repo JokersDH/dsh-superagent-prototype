@@ -2,6 +2,6 @@
   "protocol": "usage-observation/1",
   "runtimeContractSchemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
   "runtimeValidationRequired": true,
-  "schemaHash": "4e1b2996bfb0e3b18b3eb00cabd51251a84859bf595ffdd7e29459d79efa1f72",
-  "sourceHash": "7f78b3d211d1c22e9a87676604b89cb1ddffbab136122b76df8932d24e3770bb"
+  "schemaHash": "263b32cad08748be2667733e0baf385a77bf06bad60fa2d18c12c6341db66279",
+  "sourceHash": "caa8c26787d9e6da7fd732617e51130f134d51324fada90071cbb7d1cab8110b"
 }
