@@ -70,6 +70,8 @@ import {
   ContextHistoryQuerySchema,
   ContextHistorySchema,
   ContextSourcesSchema,
+  UsageObservationQuerySchema,
+  UsageObservationSchema,
 } from '@personal-agent/contracts'
 import type {
   RecoveryTargetPrepareInput,
@@ -127,6 +129,8 @@ import type {
   RecoverySourcePrepare,
   RecoverySourcePrepared,
   RecoverySourceConfirm,
+  UsageObservation,
+  UsageObservationQuery,
 } from '@personal-agent/contracts'
 import { ApplicationFault } from '@personal-agent/application'
 import { QuestionFault } from '@personal-agent/questions'
@@ -194,6 +198,7 @@ export interface LocalHttpOptions {
     assistantContextSend?(input: AssistantContextSend, actor: TrustedActor): Promise<CommandReceipt>
   }
   read?: {
+    usageObservation?(query: UsageObservationQuery): Promise<UsageObservation>
     attention?(query: AttentionQuery): Promise<AttentionPage>
     decisions?(query: DecisionQuery): Promise<DecisionPage>
     recovery?(): Promise<RecoveryInspection>
@@ -435,6 +440,19 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
     const configuration = await readConfiguration(), provider = await options.read?.assistant?.()
     return c.json(projectTrialReadiness(configuration, provider, { mode: options.mode,
       startupMode: options.startupMode ?? 'normal', observedAt: new Date(now()).toISOString() }))
+  })
+  app.get('/v1/insights', async c => {
+    if (!options.read?.usageObservation) throw new ApplicationFault('unsupported_capability', 'Usage observation is not connected')
+    if (Object.values(c.req.queries()).some(values => values.length !== 1))
+      throw new ApplicationFault('invalid_request', 'Observation query parameters must be unique')
+    const raw = c.req.query(), input = { ...raw } as Record<string, unknown>
+    if (raw.days !== undefined) input.days = /^(7|30)$/.test(raw.days) ? Number(raw.days) : NaN
+    const query = UsageObservationQuerySchema.parse(input)
+    const value = UsageObservationSchema.parse(await options.read.usageObservation(query))
+    if ((query.projectId && (value.scope.projectIds.length !== 1 || value.scope.projectIds[0] !== query.projectId)) ||
+      value.days !== (query.days ?? 7) || value.timezone !== (query.timezone ?? 'UTC'))
+      throw new ApplicationFault('storage_unavailable', 'Observation response scope mismatch', 'none')
+    return c.json(value)
   })
   app.post('/v1/context/preview', async (c) => {
     if (!c.req.header('content-type')?.toLowerCase().startsWith('application/json')) throw new ApplicationFault('invalid_request', 'Context preview requires JSON')

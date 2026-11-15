@@ -1,0 +1,1113 @@
+{
+  "schemaVersion": 1,
+  "wave": "product-wave-28",
+  "date": "2026-11-15",
+  "status": "PLANNED_NOT_EXECUTED",
+  "deliveryCadence": "NORMAL_NO_SAME_DAY_DEADLINE",
+  "calendarDeadline": null,
+  "reviewBaseline": "22d0c759c59e6387ee397476f3d15d28425818df",
+  "observedMain": "623cccb254c3324e91e99d1c3afb82b46ef703ab",
+  "productRuntimeSource": "623cccb254c3324e91e99d1c3afb82b46ef703ab",
+  "externalAgentCount": 10,
+  "totalOwnersIncludingMain": 11,
+  "phasesPerOwner": 24,
+  "checkpointsPerOwner": 6,
+  "sharedBoundary": "docs/rfcs/WP-16/0072-wave-28-integrated-delivery-packages.md",
+  "sharedInputBoundary": "docs/rfcs/WP-16/0071-wave-28-architecture-inputs.md",
+  "contracts": [
+    "packages/contracts/src/recovery-state.ts",
+    "packages/contracts/src/recovery-source.ts",
+    "packages/contracts/src/recovery-activation.ts",
+    "packages/contracts/src/recovery-target.ts",
+    "packages/contracts/src/assistant-candidates.ts",
+    "packages/contracts/src/recovery-source-confirmation.ts",
+    "packages/contracts/src/trial-readiness.ts",
+    "packages/contracts/src/coordinator-channel.ts",
+    "packages/contracts/src/usage-observation.ts"
+  ],
+  "newModelAllowance": 0,
+  "nativeModelsStartedByThisDispatch": 0,
+  "newDriverImplementation": false,
+  "studyState": "BLOCKED_CURRENT_RECIPE",
+  "pilotGatesProductAcceptance": false,
+  "normalInstallRequiresRecoveryActivation": false,
+  "continueAfterCheckpoint": true,
+  "independentQueueRequired": true,
+  "unboundedPollingAllowed": false,
+  "preservedUserServices": [
+    [
+      5180,
+      8796
+    ],
+    [
+      5181,
+      8797
+    ],
+    [
+      5182,
+      8798
+    ],
+    [
+      5183,
+      8799
+    ],
+    [
+      5184,
+      8800
+    ],
+    [
+      5185,
+      8801
+    ],
+    [
+      5186,
+      8802
+    ],
+    [
+      5187,
+      8803
+    ],
+    [
+      5188,
+      8804
+    ],
+    [
+      5189,
+      8805
+    ],
+    [
+      5190,
+      8806
+    ],
+    [
+      5191,
+      8807
+    ]
+  ],
+  "roles": {
+    "A": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "branch": "codex/g2-workspaces-verification",
+      "candidate": "aeeced18907a548e0f21263f99ec826d55402aef",
+      "packet": "agent-tasks/product-wave-28/agent-a-data.zh-CN.md",
+      "ownedPaths": [
+        "packages/storage/",
+        "packages/workflows/"
+      ],
+      "evidencePath": "packages/workflows/reports/wave28-status.json",
+      "phases": [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5",
+        "A6",
+        "A7",
+        "A8",
+        "A9",
+        "A10",
+        "A11",
+        "A12",
+        "A13",
+        "A14",
+        "A15",
+        "A16",
+        "A17",
+        "A18",
+        "A19",
+        "A20",
+        "A21",
+        "A22",
+        "A23",
+        "A24"
+      ],
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "milestones": [
+        "A4",
+        "A8",
+        "A12",
+        "A16",
+        "A20",
+        "A24"
+      ]
+    },
+    "B": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "branch": "codex/g1-runtime",
+      "candidate": "cb4e97504157e500799284bfd63d51768740c9fc",
+      "packet": "agent-tasks/product-wave-28/agent-b-runtime.zh-CN.md",
+      "ownedPaths": [
+        "packages/execution/",
+        "packages/catalog/",
+        "packages/policy-preparation/",
+        "packages/driver-kit/",
+        "packages/testing/",
+        "packages/drivers/",
+        "apps/runner/",
+        "tests/native-acceptance/"
+      ],
+      "evidencePath": "tests/native-acceptance/reports/wave28-status.json",
+      "grantId": "wave03-b-native",
+      "historicalLimit": 4,
+      "remaining": "UNKNOWN_NOT_SPENDABLE",
+      "resetLedger": false,
+      "newFeasibilityInvestigations": 0,
+      "phases": [
+        "B1",
+        "B2",
+        "B3",
+        "B4",
+        "B5",
+        "B6",
+        "B7",
+        "B8",
+        "B9",
+        "B10",
+        "B11",
+        "B12",
+        "B13",
+        "B14",
+        "B15",
+        "B16",
+        "B17",
+        "B18",
+        "B19",
+        "B20",
+        "B21",
+        "B22",
+        "B23",
+        "B24"
+      ],
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "milestones": [
+        "B4",
+        "B8",
+        "B12",
+        "B16",
+        "B20",
+        "B24"
+      ],
+      "excludedOwnedPaths": [
+        "apps/runner/src/attach-channel/",
+        "apps/runner/test/attach-channel/"
+      ]
+    },
+    "C": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "branch": "codex/g3-assistant-context",
+      "candidate": "f2c4af69bb0ed495822ae3ed6f8cdda53c21a0bf",
+      "packet": "agent-tasks/product-wave-28/agent-c-context.zh-CN.md",
+      "ownedPaths": [
+        "packages/context/",
+        "packages/proposals/",
+        "packages/knowledge/",
+        "packages/routing/"
+      ],
+      "evidencePath": "packages/context/reports/wave28-status.json",
+      "phases": [
+        "C1",
+        "C2",
+        "C3",
+        "C4",
+        "C5",
+        "C6",
+        "C7",
+        "C8",
+        "C9",
+        "C10",
+        "C11",
+        "C12",
+        "C13",
+        "C14",
+        "C15",
+        "C16",
+        "C17",
+        "C18",
+        "C19",
+        "C20",
+        "C21",
+        "C22",
+        "C23",
+        "C24"
+      ],
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "milestones": [
+        "C4",
+        "C8",
+        "C12",
+        "C16",
+        "C20",
+        "C24"
+      ]
+    },
+    "D": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-d",
+      "branch": "codex/g3-local-distribution",
+      "candidate": "26f8ad6ca5c6c1c0764ce426e4fb5dd073e6a8a1",
+      "packet": "agent-tasks/product-wave-28/agent-d-delivery.zh-CN.md",
+      "ownedPaths": [
+        "apps/launcher/",
+        "tools/distribution/",
+        "packages/portability/"
+      ],
+      "evidencePath": "tools/distribution/reports/wave28-status.json",
+      "phases": [
+        "D1",
+        "D2",
+        "D3",
+        "D4",
+        "D5",
+        "D6",
+        "D7",
+        "D8",
+        "D9",
+        "D10",
+        "D11",
+        "D12",
+        "D13",
+        "D14",
+        "D15",
+        "D16",
+        "D17",
+        "D18",
+        "D19",
+        "D20",
+        "D21",
+        "D22",
+        "D23",
+        "D24"
+      ],
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "milestones": [
+        "D4",
+        "D8",
+        "D12",
+        "D16",
+        "D20",
+        "D24"
+      ]
+    },
+    "E": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-e",
+      "branch": "codex/g3-product-acceptance",
+      "candidate": "03349a6c4567b9b832ad3ff0f9612d2ef18cc74e",
+      "packet": "agent-tasks/product-wave-28/agent-e-acceptance.zh-CN.md",
+      "ownedPaths": [
+        "tests/product-acceptance/"
+      ],
+      "evidencePath": "tests/product-acceptance/reports/wave28-status.json",
+      "grantId": "wave05-independent-review-pilot-01",
+      "maxNativeTurnStarts": 24,
+      "maxAuthorTurnStarts": 8,
+      "maxReviewTurnStarts": 16,
+      "maxBillableTokens": 200000,
+      "maxCostUSD": 5,
+      "maxInFlight": 1,
+      "resetLedger": false,
+      "unknownCostIsZero": false,
+      "cliFallbackAllowed": false,
+      "executionPolicy": "BLOCKED_CURRENT_RECIPE_NO_SEND_THIS_WAVE",
+      "phases": [
+        "E1",
+        "E2",
+        "E3",
+        "E4",
+        "E5",
+        "E6",
+        "E7",
+        "E8",
+        "E9",
+        "E10",
+        "E11",
+        "E12",
+        "E13",
+        "E14",
+        "E15",
+        "E16",
+        "E17",
+        "E18",
+        "E19",
+        "E20",
+        "E21",
+        "E22",
+        "E23",
+        "E24"
+      ],
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "milestones": [
+        "E4",
+        "E8",
+        "E12",
+        "E16",
+        "E20",
+        "E24"
+      ]
+    },
+    "main": {
+      "workdir": "/Users/hh/Desktop/joker/superagent",
+      "branch": "codex/g2-execution-integration",
+      "packet": "agent-tasks/product-wave-28/main.zh-CN.md",
+      "ownedPaths": [
+        "packages/contracts/",
+        "packages/application/",
+        "packages/questions/",
+        "apps/coordinator/",
+        "apps/console/",
+        "agent-tasks/product-wave-26/",
+        "tools/bootstrap/",
+        "docs/rfcs/WP-16/"
+      ],
+      "evidencePath": "reports/releases/wave28-integration/status.json",
+      "phases": [
+        "M1",
+        "M2",
+        "M3",
+        "M4",
+        "M5",
+        "M6",
+        "M7",
+        "M8",
+        "M9",
+        "M10",
+        "M11",
+        "M12",
+        "M13",
+        "M14",
+        "M15",
+        "M16",
+        "M17",
+        "M18",
+        "M19",
+        "M20",
+        "M21",
+        "M22",
+        "M23",
+        "M24"
+      ],
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "milestones": [
+        "M4",
+        "M8",
+        "M12",
+        "M16",
+        "M20",
+        "M24"
+      ],
+      "excludedOwnedPaths": [
+        "apps/console/src/trial/",
+        "apps/console/test/trial/",
+        "apps/console/e2e/trial/"
+      ]
+    },
+    "F": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-f",
+      "branch": "codex/g4-trial-experience",
+      "preparedFrom": "fdb3f160b1d867f7167fb034d96a5c13bd16cdfb",
+      "packet": "agent-tasks/product-wave-28/agent-f-experience.zh-CN.md",
+      "ownedPaths": [
+        "apps/console/src/trial/",
+        "apps/console/test/trial/",
+        "apps/console/e2e/trial/",
+        "docs/user-guide/",
+        "reports/trial-experience/"
+      ],
+      "evidencePath": "reports/trial-experience/wave28-status.json",
+      "phases": [
+        "F1",
+        "F2",
+        "F3",
+        "F4",
+        "F5",
+        "F6",
+        "F7",
+        "F8",
+        "F9",
+        "F10",
+        "F11",
+        "F12",
+        "F13",
+        "F14",
+        "F15",
+        "F16",
+        "F17",
+        "F18",
+        "F19",
+        "F20",
+        "F21",
+        "F22",
+        "F23",
+        "F24"
+      ],
+      "milestones": [
+        "F4",
+        "F8",
+        "F12",
+        "F16",
+        "F20",
+        "F24"
+      ],
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "implementationStatus": "SOURCE_EXISTS_CONTINUE_COMPLETE_CAPABILITY",
+      "candidate": "2a862525894b89cdfe17b4ea84862624447ee609"
+    },
+    "G": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-g",
+      "branch": "codex/g4-usage-insights",
+      "preparedFrom": "fdb3f160b1d867f7167fb034d96a5c13bd16cdfb",
+      "packet": "agent-tasks/product-wave-28/agent-g-insights.zh-CN.md",
+      "ownedPaths": [
+        "packages/usage-insights/",
+        "tools/usage-insights/",
+        "reports/usage-insights/"
+      ],
+      "evidencePath": "reports/usage-insights/wave28-status.json",
+      "phases": [
+        "G1",
+        "G2",
+        "G3",
+        "G4",
+        "G5",
+        "G6",
+        "G7",
+        "G8",
+        "G9",
+        "G10",
+        "G11",
+        "G12",
+        "G13",
+        "G14",
+        "G15",
+        "G16",
+        "G17",
+        "G18",
+        "G19",
+        "G20",
+        "G21",
+        "G22",
+        "G23",
+        "G24"
+      ],
+      "milestones": [
+        "G4",
+        "G8",
+        "G12",
+        "G16",
+        "G20",
+        "G24"
+      ],
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "implementationStatus": "SOURCE_EXISTS_CONTINUE_COMPLETE_CAPABILITY",
+      "candidate": "2b41765a58687fc286af07e53eca5f37c21e6d53"
+    },
+    "H": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-h",
+      "branch": "codex/g4-trial-operations",
+      "preparedFrom": "fdb3f160b1d867f7167fb034d96a5c13bd16cdfb",
+      "packet": "agent-tasks/product-wave-28/agent-h-trial-operations.zh-CN.md",
+      "ownedPaths": [
+        "tools/trial-kit/",
+        "tests/operational-soak/",
+        "docs/internal-trial/",
+        "reports/trial-operations/"
+      ],
+      "evidencePath": "reports/trial-operations/wave28-status.json",
+      "phases": [
+        "H1",
+        "H2",
+        "H3",
+        "H4",
+        "H5",
+        "H6",
+        "H7",
+        "H8",
+        "H9",
+        "H10",
+        "H11",
+        "H12",
+        "H13",
+        "H14",
+        "H15",
+        "H16",
+        "H17",
+        "H18",
+        "H19",
+        "H20",
+        "H21",
+        "H22",
+        "H23",
+        "H24"
+      ],
+      "milestones": [
+        "H4",
+        "H8",
+        "H12",
+        "H16",
+        "H20",
+        "H24"
+      ],
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "implementationStatus": "SOURCE_EXISTS_CONTINUE_COMPLETE_CAPABILITY",
+      "candidate": "0651a50f70e589570aef6a2a91961ee94abbc839"
+    },
+    "I": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-i",
+      "branch": "codex/g5-coordinator-channel",
+      "preparedFrom": "967dc0c677333ec307c215c0ed67e838b5487d92",
+      "packet": "agent-tasks/product-wave-28/agent-i-coordinator-channel.zh-CN.md",
+      "ownedPaths": [
+        "apps/runner/src/attach-channel/",
+        "apps/runner/test/attach-channel/",
+        "docs/runtime-channel/",
+        "reports/runtime-channel/"
+      ],
+      "evidencePath": "reports/runtime-channel/wave28-status.json",
+      "phases": [
+        "I1",
+        "I2",
+        "I3",
+        "I4",
+        "I5",
+        "I6",
+        "I7",
+        "I8",
+        "I9",
+        "I10",
+        "I11",
+        "I12",
+        "I13",
+        "I14",
+        "I15",
+        "I16",
+        "I17",
+        "I18",
+        "I19",
+        "I20",
+        "I21",
+        "I22",
+        "I23",
+        "I24"
+      ],
+      "milestones": [
+        "I4",
+        "I8",
+        "I12",
+        "I16",
+        "I20",
+        "I24"
+      ],
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "implementationStatus": "SOURCE_EXISTS_CONTINUE_COMPLETE_CAPABILITY",
+      "candidate": "d95df88bb9dfdeaef74fa49629dcc2aba25d4d1b"
+    },
+    "J": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-j",
+      "branch": "codex/g5-project-recipes",
+      "preparedFrom": "967dc0c677333ec307c215c0ed67e838b5487d92",
+      "packet": "agent-tasks/product-wave-28/agent-j-project-recipes.zh-CN.md",
+      "ownedPaths": [
+        "packages/project-recipes/",
+        "tools/project-recipes/",
+        "docs/project-recipes/",
+        "reports/project-recipes/"
+      ],
+      "evidencePath": "reports/project-recipes/wave28-status.json",
+      "phases": [
+        "J1",
+        "J2",
+        "J3",
+        "J4",
+        "J5",
+        "J6",
+        "J7",
+        "J8",
+        "J9",
+        "J10",
+        "J11",
+        "J12",
+        "J13",
+        "J14",
+        "J15",
+        "J16",
+        "J17",
+        "J18",
+        "J19",
+        "J20",
+        "J21",
+        "J22",
+        "J23",
+        "J24"
+      ],
+      "milestones": [
+        "J4",
+        "J8",
+        "J12",
+        "J16",
+        "J20",
+        "J24"
+      ],
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "implementationStatus": "SOURCE_EXISTS_CONTINUE_COMPLETE_CAPABILITY",
+      "candidate": "46020ff2e2d748961835a64cc8bf1a39cb91d378"
+    }
+  },
+  "admissionReports": {
+    "data": "reports/releases/wave28-admission/data.json",
+    "runtime": "reports/releases/wave28-admission/runtime-channel.json",
+    "deliveryInsights": "reports/releases/wave28-admission/delivery-insights.json",
+    "experienceRecipes": "reports/releases/wave28-admission/experience-recipes.json",
+    "inventory": "reports/releases/wave28-admission/workspaces.json"
+  },
+  "providedInputs": {
+    "aCPreviousThreeFindingsClosed": true,
+    "aCExactCe64SingleManifestDualPassed": true,
+    "bOldThreeMapsDeleted": true,
+    "bActualFull161AndFiveChunkPassed": true,
+    "bOriginalCompletionNormalConsumerPassed": true,
+    "bEffective2KiBPageBoundPassed": false,
+    "bExplicitSourceBoundLeasePassed": false,
+    "bIUnifiedImplementation": false,
+    "bActualProductRecoveryDelivered": false,
+    "iConcreteModuleExists": true,
+    "iFreshIntentReplayAdmitted": false,
+    "hCurrentBISameImplementationAdmitted": false,
+    "jConcreteLibraryAndCliPassed": true,
+    "jActualSameConfigurationScopeConsumerAdmitted": false,
+    "fPureRecipeStatePassed": true,
+    "fUnqualifiedRecipeApplicabilityAdmitted": false,
+    "gOldNestedAndTombstoneClosed": true,
+    "gMainScopeConsumerIntegrated": true,
+    "gMainRuntimeSource": "623cccb254c3324e91e99d1c3afb82b46ef703ab",
+    "dArtifact": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave27-target/wave27-target-1cdab25.tar.gz",
+      "source": "1cdab25a76748edad5054ce1a5150a69d5ad9361",
+      "sourceDirty": false,
+      "buildId": "ecffaa6d3f784426",
+      "sha256": "dcfda014ce0ac04ff4a78ebcf27cea9c3659e12bc3156583c985b869401fa86e",
+      "tarBytes": 20283738,
+      "schema": 18,
+      "platform": "darwin",
+      "arch": "arm64",
+      "node": "24.21.0",
+      "abi": "137",
+      "sqlite": "3.53.4",
+      "verifiedEntries": 6759,
+      "verifiedRegularFiles": 6738,
+      "verifiedInternalSymlinks": 21,
+      "verifiedRegularBytes": 67721476,
+      "fileDigestMismatches": [],
+      "verifiedInstall": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-wave28-package-lI8Tt0/install",
+      "byteVerificationExitCode": 0,
+      "contains": [
+        "main967 F enabled/identity/readiness hardening successor",
+        "existing ordinary F trial workbench and source-review surfaces"
+      ],
+      "containsUsageInsightsPackage": false,
+      "containsUsageObservationEntry": false,
+      "containsMain18fStatistics": false,
+      "currentSourceClaim": "Do not call this current-main18f or a metrics-capable installed product. Missing later statistics is temporal scope; normal startup should remain independently usable.",
+      "eIndependentVerdictForThisArtifact": "NOT_REACHED",
+      "oldCe64": "Preserve immutable ce64/164-required normal ordinary scope; no test/docs-only refreeze"
+    },
+    "eMeasured": {
+      "path": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-55-21-036Z/report.json",
+      "testSource": "373c195ecbb8709f74763ee437d427dca904a791",
+      "subject": "ce64fc1fd986bde9a6eba5ace1a4658beadcda21",
+      "buildId": "d4b1780d999a4b74",
+      "tarSha256": "8c36aaeb472263bbb7c6ab5e4dafb3e9394306c83b3b6e1ab257d8770480c33a",
+      "counts": {
+        "PASS": 260,
+        "FAIL": 0,
+        "NOT_TESTED": 19
+      },
+      "requiredCases": 178,
+      "reportedInstalledAlpha": "PASS",
+      "independentFullRecordedGateReevaluation": {
+        "exitCode": 0,
+        "ok": true,
+        "failures": []
+      },
+      "scope": "Still exactce64, not new1cd and not current18f metrics. Preserve actual original164-required normal ordinary/UI/readiness/install observations. The expanded178 gate includes a detected BLOCKED product stop as PASS; that is not evidence of functional restored startup/stop.",
+      "packagedStopCase": {
+        "id": "E8-PACKAGED-STOP-CONSISTENCY",
+        "caseStatus": "PASS",
+        "startStatus": "RUNNING",
+        "recordMode": "personal",
+        "actualHealthMode": "fixture",
+        "actualStartupMode": "recovery_readonly",
+        "stopStatus": "BLOCKED",
+        "stopCode": "instance_identity_mismatch",
+        "failures": [
+          "runtime_mode"
+        ],
+        "cleanup": "Acceptance-tool equivalent proof, not a successful packaged stop",
+        "interpretation": "Detection of a truthful product refusal can pass a detection test, but cannot satisfy a functional requirement that the package can stop the process it just started. Separate these layers before claiming restoration/start-stop admission."
+      },
+      "historicalWrongStateDocument": "tests/product-acceptance/reports/defects/stop-claims-other-state.zh-CN.md describes old schema15/16 artifacts. It is not the new finding; current requested-root checks and same-install/two-state refusal remain intact."
+    },
+    "dRestoredDiscussionModeStopPassed": false,
+    "eFullResourcePrecheckPassed": false,
+    "oldCe64NormalOrdinaryScopePreserved": true,
+    "currentDIndependentInstalledAdmission": false,
+    "currentMetricsInstalledAdmission": false,
+    "privatePermissionImplemented": false,
+    "targetActivationImplemented": false,
+    "unsafeLiveRecoveryHarnessesRerun": false
+  },
+  "checkpoints": {
+    "M-current-product": {
+      "owner": "main",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "M-original-completion-proof": {
+      "owner": "main",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "M-original-scope-atoms": {
+      "owner": "main",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "M-channel-contract": {
+      "owner": "main",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "M-scoped-observation-refreshed": {
+      "owner": "main",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "A-complete-v2-proof-source": {
+      "owner": "A",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "C-ce64-dual-manifest": {
+      "owner": "C",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "B-maps-deleted": {
+      "owner": "B",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "B-full-journal-chunks": {
+      "owner": "B",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "D-1cd-frozen": {
+      "owner": "D",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "E-ce64-normal-scope": {
+      "owner": "E",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "F-current-experience-source": {
+      "owner": "F",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "G-nested-tombstone-closed": {
+      "owner": "G",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "H-support-source": {
+      "owner": "H",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "I-module-source": {
+      "owner": "I",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "J-library-cli-source": {
+      "owner": "J",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "A-main-consumer-compatibility": {
+      "owner": "A",
+      "dependsOn": [
+        "A-complete-v2-proof-source"
+      ]
+    },
+    "C-current-proof-consumer": {
+      "owner": "C",
+      "dependsOn": [
+        "A-main-consumer-compatibility",
+        "C-ce64-dual-manifest"
+      ]
+    },
+    "I-fresh-intent-correlation": {
+      "owner": "I",
+      "dependsOn": [
+        "I-module-source",
+        "M-channel-contract"
+      ]
+    },
+    "H-safe-owned-tools": {
+      "owner": "H",
+      "dependsOn": [
+        "H-support-source"
+      ]
+    },
+    "B-effective-page-budget": {
+      "owner": "B",
+      "dependsOn": [
+        "B-full-journal-chunks"
+      ]
+    },
+    "B-safe-fault-tools": {
+      "owner": "B",
+      "dependsOn": [
+        "H-safe-owned-tools"
+      ]
+    },
+    "B-I-single-implementation": {
+      "owner": "B",
+      "dependsOn": [
+        "I-fresh-intent-correlation",
+        "B-effective-page-budget"
+      ]
+    },
+    "I-B-actual-adoption": {
+      "owner": "I",
+      "dependsOn": [
+        "B-I-single-implementation"
+      ]
+    },
+    "B-explicit-fenced-lease": {
+      "owner": "B",
+      "dependsOn": [
+        "B-I-single-implementation"
+      ]
+    },
+    "H-actual-callback-consumer": {
+      "owner": "H",
+      "dependsOn": [
+        "B-I-single-implementation",
+        "I-fresh-intent-correlation"
+      ]
+    },
+    "B-actual-original-dual-client": {
+      "owner": "B",
+      "dependsOn": [
+        "B-explicit-fenced-lease",
+        "B-safe-fault-tools"
+      ]
+    },
+    "M-business-consumer": {
+      "owner": "main",
+      "dependsOn": [
+        "B-I-single-implementation",
+        "M-original-completion-proof"
+      ]
+    },
+    "B-original-product-recovery": {
+      "owner": "B",
+      "dependsOn": [
+        "B-actual-original-dual-client",
+        "M-business-consumer"
+      ]
+    },
+    "B-recovered-delivery-slots": {
+      "owner": "B",
+      "dependsOn": [
+        "B-original-product-recovery",
+        "M-original-completion-proof"
+      ]
+    },
+    "A-recovered-original-results": {
+      "owner": "A",
+      "dependsOn": [
+        "B-original-product-recovery",
+        "A-complete-v2-proof-source"
+      ]
+    },
+    "C-recovered-data-consumer": {
+      "owner": "C",
+      "dependsOn": [
+        "A-recovered-original-results"
+      ]
+    },
+    "H-recovered-observations": {
+      "owner": "H",
+      "dependsOn": [
+        "B-original-product-recovery",
+        "H-safe-owned-tools"
+      ]
+    },
+    "F-project-applicability": {
+      "owner": "F",
+      "dependsOn": [
+        "F-current-experience-source"
+      ]
+    },
+    "J-original-scope-compatibility": {
+      "owner": "J",
+      "dependsOn": [
+        "J-library-cli-source",
+        "M-original-scope-atoms"
+      ]
+    },
+    "J-runtime-facts": {
+      "owner": "J",
+      "dependsOn": [
+        "J-original-scope-compatibility"
+      ]
+    },
+    "M-recipe-input-port": {
+      "owner": "main",
+      "dependsOn": [
+        "J-library-cli-source",
+        "M-original-scope-atoms"
+      ]
+    },
+    "M-recipe-backend": {
+      "owner": "main",
+      "dependsOn": [
+        "J-runtime-facts",
+        "M-recipe-input-port"
+      ]
+    },
+    "F-recipe-consumer": {
+      "owner": "F",
+      "dependsOn": [
+        "J-original-scope-compatibility",
+        "F-project-applicability",
+        "M-recipe-input-port"
+      ]
+    },
+    "M-recipe-form-flow": {
+      "owner": "main",
+      "dependsOn": [
+        "M-recipe-backend",
+        "F-recipe-consumer"
+      ]
+    },
+    "F-actual-recipe-journey": {
+      "owner": "F",
+      "dependsOn": [
+        "M-recipe-form-flow"
+      ]
+    },
+    "G-current-main-consumer": {
+      "owner": "G",
+      "dependsOn": [
+        "G-nested-tombstone-closed",
+        "M-scoped-observation-refreshed"
+      ]
+    },
+    "G-window-layer-tools": {
+      "owner": "G",
+      "dependsOn": [
+        "G-current-main-consumer"
+      ]
+    },
+    "F-window-observation-journey": {
+      "owner": "F",
+      "dependsOn": [
+        "G-window-layer-tools",
+        "F-current-experience-source"
+      ]
+    },
+    "D-mode-start-health-stop": {
+      "owner": "D",
+      "dependsOn": []
+    },
+    "E-full-birth-root-precheck": {
+      "owner": "E",
+      "dependsOn": []
+    },
+    "E-detection-functional-gates": {
+      "owner": "E",
+      "dependsOn": [
+        "E-full-birth-root-precheck"
+      ]
+    },
+    "D-observation-successor": {
+      "owner": "D",
+      "dependsOn": [
+        "D-mode-start-health-stop",
+        "M-scoped-observation-refreshed"
+      ]
+    },
+    "D-current-data-dual": {
+      "owner": "D",
+      "dependsOn": [
+        "D-observation-successor",
+        "C-current-proof-consumer"
+      ]
+    },
+    "D-template-successor": {
+      "owner": "D",
+      "dependsOn": [
+        "D-observation-successor",
+        "M-recipe-form-flow"
+      ]
+    },
+    "E-ordinary-observation-verdict": {
+      "owner": "E",
+      "dependsOn": [
+        "D-observation-successor",
+        "E-detection-functional-gates"
+      ]
+    },
+    "E-current-data-verdict": {
+      "owner": "E",
+      "dependsOn": [
+        "D-current-data-dual",
+        "E-full-birth-root-precheck"
+      ]
+    },
+    "E-recipe-verdict": {
+      "owner": "E",
+      "dependsOn": [
+        "D-template-successor",
+        "F-actual-recipe-journey",
+        "E-full-birth-root-precheck"
+      ]
+    },
+    "H-readonly-support": {
+      "owner": "H",
+      "dependsOn": [
+        "D-observation-successor",
+        "H-safe-owned-tools"
+      ]
+    },
+    "M-private-permission": {
+      "owner": "main",
+      "dependsOn": [
+        "M-business-consumer",
+        "B-explicit-fenced-lease"
+      ]
+    },
+    "M-target-activation": {
+      "owner": "main",
+      "dependsOn": [
+        "M-private-permission",
+        "B-original-product-recovery"
+      ]
+    },
+    "E-target-verdict": {
+      "owner": "E",
+      "dependsOn": [
+        "M-target-activation",
+        "E-full-birth-root-precheck"
+      ]
+    }
+  },
+  "completionEstimateRef": "reports/releases/wave13-admission/progress.json",
+  "releaseApproved": false,
+  "goalCoversWholePackage": true,
+  "goalsChangeExecutionBudgets": false
+}
