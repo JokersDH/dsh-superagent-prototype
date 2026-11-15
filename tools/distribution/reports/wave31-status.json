@@ -1,0 +1,214 @@
+{
+  "protocol": "wave31-status/1",
+  "owner": "agent-d",
+  "branch": "codex/g3-local-distribution",
+  "source": "c0a1f8975232b6397dfaf92d31ac5682df2dab36",
+  "dirty": false,
+  "runtimeSource": "303b2c6a",
+  "R1": {
+    "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+    "build": "8296720d8a25f38c",
+    "tar": "pa-artifacts/wave30-target/wave30-target-8296720.tar.gz",
+    "sha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+    "bytes": 20481470,
+    "files": 6849,
+    "tarEntries": 7405,
+    "closure": "197/197",
+    "immutable": true
+  },
+  "R2": {
+    "runtimeSource": "303b2c6a",
+    "buildCheckout": "c0a1f897",
+    "build": "4dcd28f758bbb265",
+    "tar": "pa-artifacts/wave31-target/wave31-target-4dcd28f.tar.gz",
+    "sha256": "405ecd02fcbf288bac0855e17911ec4035521b54fe27d81fa0b28feaf5addcc6",
+    "bytes": 20540568,
+    "files": 6864,
+    "tarEntries": 7421,
+    "closure": "209/209",
+    "environment": {
+      "node": "24.21.0",
+      "abi": "137",
+      "platform": "darwin",
+      "arch": "arm64",
+      "sqlite": "3.53.4",
+      "productSchema": 18
+    }
+  },
+  "diff": {
+    "files": 35,
+    "groups": {
+      "apps/console/src": 5,
+      "apps/console/test": 1,
+      "apps/coordinator/http": 1,
+      "apps/coordinator/product": 2,
+      "apps/runner/src": 7,
+      "apps/runner/test": 3,
+      "packages/contracts/generated": 2,
+      "packages/contracts/src": 1,
+      "packages/contracts/tools": 1,
+      "packages/execution/src": 1,
+      "packages/project-recipes/src": 5,
+      "packages/usage-insights/src": 6
+    }
+  },
+  "deliverables": {
+    "D1": {
+      "status": "PASS",
+      "consumer": "frozen manifest checker + tar extraction",
+      "positive": "R1 manifest PASS (sha/bytes/entries)",
+      "negative": "tampered SHA REFUSED",
+      "evidence": [
+        "reports/wave31/R1-manifest.json",
+        "reports/wave31/R1-check.json",
+        "reports/wave31/R1-negative.json"
+      ],
+      "commands": [
+        "node tools/distribution/verify-frozen-manifest.mjs --manifest ...R1... --tar ... ; exit0"
+      ],
+      "actual": "R1 8296720 tuple re-read from original tar"
+    },
+    "D2": {
+      "status": "PASS",
+      "consumer": "package daemonArgv/start/health/record/stop + installed J/window",
+      "positive": "R1 actual modes 5/5 and v1/v2 verified-flow",
+      "negative": "fixture+review/stale review refused",
+      "evidence": [
+        "reports/wave30/actual-modes.json",
+        "reports/wave30/precise-v1.json",
+        "reports/wave30/precise-v2.json",
+        "reports/wave30/negatives.json"
+      ],
+      "actual": "R1 package processes and format consumers"
+    },
+    "D3": {
+      "status": "PASS",
+      "consumer": "R1 pa first-run/start/stop/backup/restore/upgrade",
+      "positive": "cold4/personal7/same4/upgrade7/backup6/noexec4/portable5",
+      "negative": "wrong mode/review; corrupt manifest",
+      "evidence": [
+        "reports/wave30/cold-install.json",
+        "reports/wave30/personal-lifecycle.json",
+        "reports/wave30/same-store.json",
+        "reports/wave30/upgrade-artifact.json",
+        "reports/wave30/backup.json"
+      ],
+      "actual": "R1 tar lifecycle"
+    },
+    "D4": {
+      "status": "PASS",
+      "consumer": "colleague guide + support-bundle 0600",
+      "positive": "support PASS 0700/0600, overwrite REFUSED",
+      "negative": "output_exists",
+      "evidence": [
+        "recipes/wave30-install-guide.zh-CN.md",
+        "reports/wave30/support-positive.json",
+        "reports/wave30/support-negative.json"
+      ],
+      "actual": "independent root recipe"
+    },
+    "D5": {
+      "status": "PASS",
+      "consumer": "main 0080 source slices",
+      "positive": "R1→R2 runtime diff table and public entry listing",
+      "negative": "unpublished/dirty source excluded by build source.dirty=false",
+      "evidence": [
+        "reports/wave31/R2-diff.json"
+      ],
+      "actual": "R2 source c0a1/303b"
+    },
+    "D6": {
+      "status": "PASS",
+      "consumer": "build/stage/freeze/manifest checker",
+      "positive": "clean build, closure209, R2 manifest PASS",
+      "negative": "bad SHA REFUSED, wrong source excluded",
+      "evidence": [
+        "reports/wave31/R2-manifest.json",
+        "reports/wave31/R2-check.json",
+        "reports/wave31/ordinary-source-closure.json",
+        "reports/wave31/artifacts.json"
+      ],
+      "actual": "R2 tar 4dcd28f"
+    },
+    "D7": {
+      "status": "PASS",
+      "consumer": "R1→R2 managed upgrade/personal lifecycle",
+      "positive": "upgrade7, personal7, noexec4, portable5",
+      "negative": "not claimed rollback; mode/review refusals from R1 apply",
+      "evidence": [
+        "reports/wave31/R2-upgrade-from-R1.json",
+        "reports/wave31/R2-personal-lifecycle.json",
+        "reports/wave31/R2-noexec.json",
+        "reports/wave31/R2-portable.json"
+      ],
+      "actual": "R2 tar upgrade from R1"
+    },
+    "D8": {
+      "status": "PASS",
+      "consumer": "R2 installed 0080 export/window/J/F",
+      "positive": "window+export13/13 (downloads2/exportReads6/POST0), J6/6, F8/8",
+      "negative": "bad digest/scope change/legacy absence cases PASS; docs/tools only after freeze",
+      "evidence": [
+        "reports/wave31/R2-window-export.json",
+        "reports/wave31/R2-installed-j.json",
+        "reports/wave31/R2-installed-f.json"
+      ],
+      "actual": "R2 frozen static/runtime"
+    },
+    "D9": {
+      "status": "PASS_SCOPE_LIMITED",
+      "consumer": "install relocation/new private root",
+      "positive": "personal relocated install PASS",
+      "negative": "wrong root/config refused by same-store/lifecycle tests",
+      "evidence": [
+        "reports/wave31/R2-personal-lifecycle.json"
+      ],
+      "actual": "same-machine independent directory only"
+    },
+    "D10": {
+      "status": "PASS_SCOPE_LIMITED",
+      "consumer": "R2 backup/restore/readonly",
+      "positive": "backup6, restore fresh root readonly, personal7",
+      "negative": "nonempty data protection via baseline tests; no empty-DB success",
+      "evidence": [
+        "reports/wave31/R2-backup.json",
+        "reports/wave31/R2-personal-lifecycle.json"
+      ],
+      "actual": "R2 nonempty package state"
+    },
+    "D11": {
+      "status": "PARTIAL",
+      "consumer": "pure cleanup controls + manifest negative",
+      "positive": "cleanup controls PASS; complete own identity",
+      "negative": "wrong/foreign/unknown retained, no live forceproof",
+      "evidence": [
+        "reports/wave31/cleanup-pure.json",
+        "reports/wave31/R1-negative.json"
+      ],
+      "actual": "no high-risk live injection this round; NOT_REACHED"
+    },
+    "D12": {
+      "status": "PASS",
+      "consumer": "build/stage/freeze/package help/support",
+      "positive": "R1/R2 reproducible manifests and commands",
+      "negative": "cross-source/bad SHA/overwrite refused",
+      "evidence": [
+        "recipes/wave31-r1-r2-guide.zh-CN.md",
+        "reports/wave31/artifacts.json",
+        "reports/wave30-status.json"
+      ],
+      "actual": "R1/R2 individual tuples; no R3"
+    }
+  },
+  "remaining": [
+    "E independent verdict for R1 (1fba subject) and R2 (4dcd28f)",
+    "D11 high-risk live fault injection NOT_REACHED",
+    "R9 migration native/private/target/cross-machine",
+    "real vendor/model/native 0"
+  ],
+  "limits": [
+    "D selftests are not release admission",
+    "R2 runtime source 303b2c6a; build checkout c0a1f897 includes D tools/reports only",
+    "historical tars/states/ledgers/services preserved"
+  ]
+}

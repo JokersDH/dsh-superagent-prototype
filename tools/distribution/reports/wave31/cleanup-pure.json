@@ -1,0 +1,816 @@
+{
+  "protocol": "wave24-cleanup-controls/1",
+  "status": "PASS",
+  "steps": [
+    {
+      "id": "positive-complete-own",
+      "status": "PASS",
+      "detail": {
+        "proof": {
+          "owned": true,
+          "checks": [
+            {
+              "owned": true,
+              "reason": "exact_identity",
+              "evidence": {
+                "pid": 83949,
+                "role": "launcher",
+                "startOk": true,
+                "uidOk": true,
+                "roleOk": true,
+                "operationOk": true,
+                "tokenInstall": true,
+                "tokenData": true,
+                "tokenConfig": true,
+                "argvExact": true,
+                "operationCurrent": true,
+                "entryOk": true,
+                "argvOk": true,
+                "actual": {
+                  "pid": 83949,
+                  "ppid": 83948,
+                  "stat": "S",
+                  "live": true,
+                  "startText": "Sun Nov 15 23:06:01 2026",
+                  "startMs": 1794755161000,
+                  "uid": 501,
+                  "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node -e const {spawn}=require('child_process');const c=spawn(process.execPath,['-e',\"setTimeout(() => {}, 60000)\",'demo.ts','--state',\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state\",'--console-origin','http://127.0.0.1:1','--startup-mode','normal',\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install\",\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config\"],{stdio:'ignore'});console.log(c.pid);setTimeout(()=>{},60000) start /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state",
+                  "tokens": [
+                    "/Users/hh/.nvm/versions/node/v24.21.0/bin/node",
+                    "-e",
+                    "const",
+                    "{spawn}=require('child_process');const",
+                    "c=spawn(process.execPath,['-e',\"setTimeout(() => {}, 60000)\",'demo.ts','--state',\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state\",'--console-origin','http://127.0.0.1:1','--startup-mode','normal',\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install\",\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config\"],{stdio:'ignore'});console.log(c.pid);setTimeout(()=>{},60000)",
+                    "start",
+                    "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install",
+                    "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config",
+                    "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state"
+                  ]
+                }
+              }
+            },
+            {
+              "owned": true,
+              "reason": "exact_identity",
+              "evidence": {
+                "pid": 83950,
+                "role": "api",
+                "startOk": true,
+                "uidOk": true,
+                "roleOk": true,
+                "operationOk": true,
+                "tokenInstall": true,
+                "tokenData": true,
+                "tokenConfig": true,
+                "argvExact": true,
+                "operationCurrent": true,
+                "entryOk": true,
+                "argvOk": true,
+                "actual": {
+                  "pid": 83950,
+                  "ppid": 83949,
+                  "stat": "R",
+                  "live": true,
+                  "startText": "Sun Nov 15 23:06:01 2026",
+                  "startMs": 1794755161000,
+                  "uid": 501,
+                  "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node -e setTimeout(() => {}, 60000) demo.ts --state /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state --console-origin http://127.0.0.1:1 --startup-mode normal /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config",
+                  "tokens": [
+                    "/Users/hh/.nvm/versions/node/v24.21.0/bin/node",
+                    "-e",
+                    "setTimeout(()",
+                    "=>",
+                    "{},",
+                    "60000)",
+                    "demo.ts",
+                    "--state",
+                    "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state",
+                    "--console-origin",
+                    "http://127.0.0.1:1",
+                    "--startup-mode",
+                    "normal",
+                    "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install",
+                    "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config"
+                  ]
+                }
+              }
+            }
+          ],
+          "pids": [
+            83949,
+            83950
+          ]
+        }
+      }
+    },
+    {
+      "id": "child-start-mismatch-refused",
+      "status": "PASS",
+      "detail": {
+        "proof": {
+          "owned": false,
+          "reason": "exact_identity",
+          "evidence": {
+            "pid": 83950,
+            "role": "api",
+            "startOk": false,
+            "uidOk": true,
+            "roleOk": true,
+            "operationOk": true,
+            "tokenInstall": true,
+            "tokenData": true,
+            "tokenConfig": true,
+            "argvExact": true,
+            "operationCurrent": true,
+            "entryOk": true,
+            "argvOk": true,
+            "actual": {
+              "pid": 83950,
+              "ppid": 83949,
+              "stat": "R",
+              "live": true,
+              "startText": "Sun Nov 15 23:06:01 2026",
+              "startMs": 1794755161000,
+              "uid": 501,
+              "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node -e setTimeout(() => {}, 60000) demo.ts --state /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state --console-origin http://127.0.0.1:1 --startup-mode normal /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config",
+              "tokens": [
+                "/Users/hh/.nvm/versions/node/v24.21.0/bin/node",
+                "-e",
+                "setTimeout(()",
+                "=>",
+                "{},",
+                "60000)",
+                "demo.ts",
+                "--state",
+                "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state",
+                "--console-origin",
+                "http://127.0.0.1:1",
+                "--startup-mode",
+                "normal",
+                "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install",
+                "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "sibling-root-refused",
+      "status": "PASS",
+      "detail": {
+        "proof": {
+          "owned": false,
+          "reason": "root_mismatch",
+          "recorded": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state-sibling",
+          "requested": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state"
+        }
+      }
+    },
+    {
+      "id": "wrong-operation-refused",
+      "status": "PASS",
+      "detail": {
+        "proof": {
+          "owned": false,
+          "reason": "exact_identity",
+          "evidence": {
+            "pid": 83949,
+            "role": "launcher",
+            "startOk": true,
+            "uidOk": true,
+            "roleOk": true,
+            "operationOk": false,
+            "tokenInstall": true,
+            "tokenData": true,
+            "tokenConfig": true,
+            "argvExact": true,
+            "operationCurrent": true,
+            "entryOk": true,
+            "argvOk": true,
+            "actual": {
+              "pid": 83949,
+              "ppid": 83948,
+              "stat": "S",
+              "live": true,
+              "startText": "Sun Nov 15 23:06:01 2026",
+              "startMs": 1794755161000,
+              "uid": 501,
+              "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node -e const {spawn}=require('child_process');const c=spawn(process.execPath,['-e',\"setTimeout(() => {}, 60000)\",'demo.ts','--state',\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state\",'--console-origin','http://127.0.0.1:1','--startup-mode','normal',\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install\",\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config\"],{stdio:'ignore'});console.log(c.pid);setTimeout(()=>{},60000) start /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state",
+              "tokens": [
+                "/Users/hh/.nvm/versions/node/v24.21.0/bin/node",
+                "-e",
+                "const",
+                "{spawn}=require('child_process');const",
+                "c=spawn(process.execPath,['-e',\"setTimeout(() => {}, 60000)\",'demo.ts','--state',\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state\",'--console-origin','http://127.0.0.1:1','--startup-mode','normal',\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install\",\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config\"],{stdio:'ignore'});console.log(c.pid);setTimeout(()=>{},60000)",
+                "start",
+                "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install",
+                "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config",
+                "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "pid-reuse-start-refused",
+      "status": "PASS",
+      "detail": {
+        "proof": {
+          "owned": false,
+          "reason": "exact_identity",
+          "evidence": {
+            "pid": 83949,
+            "role": "launcher",
+            "startOk": false,
+            "uidOk": true,
+            "roleOk": true,
+            "operationOk": true,
+            "tokenInstall": true,
+            "tokenData": true,
+            "tokenConfig": true,
+            "argvExact": true,
+            "operationCurrent": true,
+            "entryOk": true,
+            "argvOk": true,
+            "actual": {
+              "pid": 83949,
+              "ppid": 83948,
+              "stat": "S",
+              "live": true,
+              "startText": "Sun Nov 15 23:06:01 2026",
+              "startMs": 1794755161000,
+              "uid": 501,
+              "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node -e const {spawn}=require('child_process');const c=spawn(process.execPath,['-e',\"setTimeout(() => {}, 60000)\",'demo.ts','--state',\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state\",'--console-origin','http://127.0.0.1:1','--startup-mode','normal',\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install\",\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config\"],{stdio:'ignore'});console.log(c.pid);setTimeout(()=>{},60000) start /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state",
+              "tokens": [
+                "/Users/hh/.nvm/versions/node/v24.21.0/bin/node",
+                "-e",
+                "const",
+                "{spawn}=require('child_process');const",
+                "c=spawn(process.execPath,['-e',\"setTimeout(() => {}, 60000)\",'demo.ts','--state',\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state\",'--console-origin','http://127.0.0.1:1','--startup-mode','normal',\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install\",\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config\"],{stdio:'ignore'});console.log(c.pid);setTimeout(()=>{},60000)",
+                "start",
+                "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install",
+                "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config",
+                "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "child-config-refused",
+      "status": "PASS",
+      "detail": {
+        "proof": {
+          "owned": false,
+          "reason": "exact_identity",
+          "evidence": {
+            "pid": 83950,
+            "role": "api",
+            "startOk": true,
+            "uidOk": true,
+            "roleOk": true,
+            "operationOk": true,
+            "tokenInstall": true,
+            "tokenData": true,
+            "tokenConfig": false,
+            "argvExact": true,
+            "operationCurrent": true,
+            "entryOk": true,
+            "argvOk": false,
+            "actual": {
+              "pid": 83950,
+              "ppid": 83949,
+              "stat": "R",
+              "live": true,
+              "startText": "Sun Nov 15 23:06:01 2026",
+              "startMs": 1794755161000,
+              "uid": 501,
+              "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node -e setTimeout(() => {}, 60000) demo.ts --state /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state --console-origin http://127.0.0.1:1 --startup-mode normal /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config",
+              "tokens": [
+                "/Users/hh/.nvm/versions/node/v24.21.0/bin/node",
+                "-e",
+                "setTimeout(()",
+                "=>",
+                "{},",
+                "60000)",
+                "demo.ts",
+                "--state",
+                "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state",
+                "--console-origin",
+                "http://127.0.0.1:1",
+                "--startup-mode",
+                "normal",
+                "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install",
+                "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "child-entry-refused",
+      "status": "PASS",
+      "detail": {
+        "proof": {
+          "owned": false,
+          "reason": "exact_identity",
+          "evidence": {
+            "pid": 83950,
+            "role": "api",
+            "startOk": true,
+            "uidOk": true,
+            "roleOk": true,
+            "operationOk": true,
+            "tokenInstall": true,
+            "tokenData": true,
+            "tokenConfig": true,
+            "argvExact": true,
+            "operationCurrent": true,
+            "entryOk": false,
+            "argvOk": false,
+            "actual": {
+              "pid": 83950,
+              "ppid": 83949,
+              "stat": "S",
+              "live": true,
+              "startText": "Sun Nov 15 23:06:01 2026",
+              "startMs": 1794755161000,
+              "uid": 501,
+              "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node -e setTimeout(() => {}, 60000) demo.ts --state /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state --console-origin http://127.0.0.1:1 --startup-mode normal /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config",
+              "tokens": [
+                "/Users/hh/.nvm/versions/node/v24.21.0/bin/node",
+                "-e",
+                "setTimeout(()",
+                "=>",
+                "{},",
+                "60000)",
+                "demo.ts",
+                "--state",
+                "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state",
+                "--console-origin",
+                "http://127.0.0.1:1",
+                "--startup-mode",
+                "normal",
+                "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install",
+                "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "missing-record-refused",
+      "status": "PASS",
+      "detail": {
+        "proof": {
+          "owned": false,
+          "reason": "record_missing"
+        }
+      }
+    },
+    {
+      "id": "cleanup-failure-retains-material",
+      "status": "PASS",
+      "detail": {
+        "first": {
+          "status": "UNKNOWN",
+          "stopped": [],
+          "unknown": [
+            {
+              "pid": 83949,
+              "reason": "stop_unconfirmed",
+              "stdout": "",
+              "proof": {
+                "owned": true,
+                "checks": [
+                  {
+                    "owned": true,
+                    "reason": "exact_identity",
+                    "evidence": {
+                      "pid": 83949,
+                      "role": "launcher",
+                      "startOk": true,
+                      "uidOk": true,
+                      "roleOk": true,
+                      "operationOk": true,
+                      "tokenInstall": true,
+                      "tokenData": true,
+                      "tokenConfig": true,
+                      "argvExact": true,
+                      "operationCurrent": true,
+                      "entryOk": true,
+                      "argvOk": true,
+                      "actual": {
+                        "pid": 83949,
+                        "ppid": 83948,
+                        "stat": "S",
+                        "live": true,
+                        "startText": "Sun Nov 15 23:06:01 2026",
+                        "startMs": 1794755161000,
+                        "uid": 501,
+                        "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node -e const {spawn}=require('child_process');const c=spawn(process.execPath,['-e',\"setTimeout(() => {}, 60000)\",'demo.ts','--state',\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state\",'--console-origin','http://127.0.0.1:1','--startup-mode','normal',\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install\",\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config\"],{stdio:'ignore'});console.log(c.pid);setTimeout(()=>{},60000) start /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state",
+                        "tokens": [
+                          "/Users/hh/.nvm/versions/node/v24.21.0/bin/node",
+                          "-e",
+                          "const",
+                          "{spawn}=require('child_process');const",
+                          "c=spawn(process.execPath,['-e',\"setTimeout(() => {}, 60000)\",'demo.ts','--state',\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state\",'--console-origin','http://127.0.0.1:1','--startup-mode','normal',\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install\",\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config\"],{stdio:'ignore'});console.log(c.pid);setTimeout(()=>{},60000)",
+                          "start",
+                          "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install",
+                          "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config",
+                          "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state"
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "owned": true,
+                    "reason": "exact_identity",
+                    "evidence": {
+                      "pid": 83950,
+                      "role": "api",
+                      "startOk": true,
+                      "uidOk": true,
+                      "roleOk": true,
+                      "operationOk": true,
+                      "tokenInstall": true,
+                      "tokenData": true,
+                      "tokenConfig": true,
+                      "argvExact": true,
+                      "operationCurrent": true,
+                      "entryOk": true,
+                      "argvOk": true,
+                      "actual": {
+                        "pid": 83950,
+                        "ppid": 83949,
+                        "stat": "S",
+                        "live": true,
+                        "startText": "Sun Nov 15 23:06:01 2026",
+                        "startMs": 1794755161000,
+                        "uid": 501,
+                        "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node -e setTimeout(() => {}, 60000) demo.ts --state /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state --console-origin http://127.0.0.1:1 --startup-mode normal /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config",
+                        "tokens": [
+                          "/Users/hh/.nvm/versions/node/v24.21.0/bin/node",
+                          "-e",
+                          "setTimeout(()",
+                          "=>",
+                          "{},",
+                          "60000)",
+                          "demo.ts",
+                          "--state",
+                          "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state",
+                          "--console-origin",
+                          "http://127.0.0.1:1",
+                          "--startup-mode",
+                          "normal",
+                          "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install",
+                          "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config"
+                        ]
+                      }
+                    }
+                  }
+                ],
+                "pids": [
+                  83949,
+                  83950
+                ]
+              }
+            }
+          ],
+          "retained": true,
+          "signals": []
+        }
+      }
+    },
+    {
+      "id": "repeated-finally-still-unknown",
+      "status": "PASS",
+      "detail": {
+        "second": {
+          "status": "UNKNOWN",
+          "stopped": [],
+          "unknown": [
+            {
+              "pid": 83949,
+              "reason": "stop_unconfirmed",
+              "stdout": "",
+              "proof": {
+                "owned": true,
+                "checks": [
+                  {
+                    "owned": true,
+                    "reason": "exact_identity",
+                    "evidence": {
+                      "pid": 83949,
+                      "role": "launcher",
+                      "startOk": true,
+                      "uidOk": true,
+                      "roleOk": true,
+                      "operationOk": true,
+                      "tokenInstall": true,
+                      "tokenData": true,
+                      "tokenConfig": true,
+                      "argvExact": true,
+                      "operationCurrent": true,
+                      "entryOk": true,
+                      "argvOk": true,
+                      "actual": {
+                        "pid": 83949,
+                        "ppid": 83948,
+                        "stat": "S",
+                        "live": true,
+                        "startText": "Sun Nov 15 23:06:01 2026",
+                        "startMs": 1794755161000,
+                        "uid": 501,
+                        "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node -e const {spawn}=require('child_process');const c=spawn(process.execPath,['-e',\"setTimeout(() => {}, 60000)\",'demo.ts','--state',\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state\",'--console-origin','http://127.0.0.1:1','--startup-mode','normal',\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install\",\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config\"],{stdio:'ignore'});console.log(c.pid);setTimeout(()=>{},60000) start /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state",
+                        "tokens": [
+                          "/Users/hh/.nvm/versions/node/v24.21.0/bin/node",
+                          "-e",
+                          "const",
+                          "{spawn}=require('child_process');const",
+                          "c=spawn(process.execPath,['-e',\"setTimeout(() => {}, 60000)\",'demo.ts','--state',\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state\",'--console-origin','http://127.0.0.1:1','--startup-mode','normal',\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install\",\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config\"],{stdio:'ignore'});console.log(c.pid);setTimeout(()=>{},60000)",
+                          "start",
+                          "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install",
+                          "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config",
+                          "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state"
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "owned": true,
+                    "reason": "exact_identity",
+                    "evidence": {
+                      "pid": 83950,
+                      "role": "api",
+                      "startOk": true,
+                      "uidOk": true,
+                      "roleOk": true,
+                      "operationOk": true,
+                      "tokenInstall": true,
+                      "tokenData": true,
+                      "tokenConfig": true,
+                      "argvExact": true,
+                      "operationCurrent": true,
+                      "entryOk": true,
+                      "argvOk": true,
+                      "actual": {
+                        "pid": 83950,
+                        "ppid": 83949,
+                        "stat": "S",
+                        "live": true,
+                        "startText": "Sun Nov 15 23:06:01 2026",
+                        "startMs": 1794755161000,
+                        "uid": 501,
+                        "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node -e setTimeout(() => {}, 60000) demo.ts --state /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state --console-origin http://127.0.0.1:1 --startup-mode normal /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config",
+                        "tokens": [
+                          "/Users/hh/.nvm/versions/node/v24.21.0/bin/node",
+                          "-e",
+                          "setTimeout(()",
+                          "=>",
+                          "{},",
+                          "60000)",
+                          "demo.ts",
+                          "--state",
+                          "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state",
+                          "--console-origin",
+                          "http://127.0.0.1:1",
+                          "--startup-mode",
+                          "normal",
+                          "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install",
+                          "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config"
+                        ]
+                      }
+                    }
+                  }
+                ],
+                "pids": [
+                  83949,
+                  83950
+                ]
+              }
+            }
+          ],
+          "retained": true,
+          "signals": []
+        }
+      }
+    },
+    {
+      "id": "stop-timeout-clean-through-fresh-proof",
+      "status": "PASS",
+      "detail": {
+        "timeoutClean": {
+          "status": "CLEAN",
+          "stopped": [
+            {
+              "pid": 92004,
+              "pids": [
+                92004
+              ],
+              "operation": "start",
+              "method": "proven-direct-signal"
+            }
+          ],
+          "unknown": [],
+          "retained": false,
+          "signals": [
+            {
+              "pid": 92004,
+              "signal": "SIGTERM",
+              "ok": true,
+              "fresh": {
+                "owned": true,
+                "checks": [
+                  {
+                    "owned": true,
+                    "reason": "exact_identity",
+                    "evidence": {
+                      "pid": 92004,
+                      "role": "launcher",
+                      "startOk": true,
+                      "uidOk": true,
+                      "roleOk": true,
+                      "operationOk": true,
+                      "tokenInstall": true,
+                      "tokenData": true,
+                      "tokenConfig": true,
+                      "argvExact": true,
+                      "operationCurrent": true,
+                      "entryOk": true,
+                      "argvOk": true,
+                      "actual": {
+                        "pid": 92004,
+                        "ppid": 83948,
+                        "stat": "S",
+                        "live": true,
+                        "startText": "Sun Nov 15 23:06:17 2026",
+                        "startMs": 1794755177000,
+                        "uid": 501,
+                        "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node -e setTimeout(() => {}, 60000) start /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state",
+                        "tokens": [
+                          "/Users/hh/.nvm/versions/node/v24.21.0/bin/node",
+                          "-e",
+                          "setTimeout(()",
+                          "=>",
+                          "{},",
+                          "60000)",
+                          "start",
+                          "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install",
+                          "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config",
+                          "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state"
+                        ]
+                      }
+                    }
+                  }
+                ],
+                "pids": [
+                  92004
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "mixed-valid-null-keeps-unknown",
+      "status": "PASS",
+      "detail": {
+        "mixed": {
+          "status": "UNKNOWN",
+          "stopped": [],
+          "unknown": [
+            {
+              "pid": 83949,
+              "reason": "stop_unconfirmed",
+              "stdout": "",
+              "proof": {
+                "owned": true,
+                "checks": [
+                  {
+                    "owned": true,
+                    "reason": "exact_identity",
+                    "evidence": {
+                      "pid": 83949,
+                      "role": "launcher",
+                      "startOk": true,
+                      "uidOk": true,
+                      "roleOk": true,
+                      "operationOk": true,
+                      "tokenInstall": true,
+                      "tokenData": true,
+                      "tokenConfig": true,
+                      "argvExact": true,
+                      "operationCurrent": true,
+                      "entryOk": true,
+                      "argvOk": true,
+                      "actual": {
+                        "pid": 83949,
+                        "ppid": 83948,
+                        "stat": "S",
+                        "live": true,
+                        "startText": "Sun Nov 15 23:06:01 2026",
+                        "startMs": 1794755161000,
+                        "uid": 501,
+                        "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node -e const {spawn}=require('child_process');const c=spawn(process.execPath,['-e',\"setTimeout(() => {}, 60000)\",'demo.ts','--state',\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state\",'--console-origin','http://127.0.0.1:1','--startup-mode','normal',\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install\",\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config\"],{stdio:'ignore'});console.log(c.pid);setTimeout(()=>{},60000) start /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state",
+                        "tokens": [
+                          "/Users/hh/.nvm/versions/node/v24.21.0/bin/node",
+                          "-e",
+                          "const",
+                          "{spawn}=require('child_process');const",
+                          "c=spawn(process.execPath,['-e',\"setTimeout(() => {}, 60000)\",'demo.ts','--state',\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state\",'--console-origin','http://127.0.0.1:1','--startup-mode','normal',\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install\",\"/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config\"],{stdio:'ignore'});console.log(c.pid);setTimeout(()=>{},60000)",
+                          "start",
+                          "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install",
+                          "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config",
+                          "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state"
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "owned": true,
+                    "reason": "exact_identity",
+                    "evidence": {
+                      "pid": 83950,
+                      "role": "api",
+                      "startOk": true,
+                      "uidOk": true,
+                      "roleOk": true,
+                      "operationOk": true,
+                      "tokenInstall": true,
+                      "tokenData": true,
+                      "tokenConfig": true,
+                      "argvExact": true,
+                      "operationCurrent": true,
+                      "entryOk": true,
+                      "argvOk": true,
+                      "actual": {
+                        "pid": 83950,
+                        "ppid": 83949,
+                        "stat": "S",
+                        "live": true,
+                        "startText": "Sun Nov 15 23:06:01 2026",
+                        "startMs": 1794755161000,
+                        "uid": 501,
+                        "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node -e setTimeout(() => {}, 60000) demo.ts --state /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state --console-origin http://127.0.0.1:1 --startup-mode normal /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install /var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config",
+                        "tokens": [
+                          "/Users/hh/.nvm/versions/node/v24.21.0/bin/node",
+                          "-e",
+                          "setTimeout(()",
+                          "=>",
+                          "{},",
+                          "60000)",
+                          "demo.ts",
+                          "--state",
+                          "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/state",
+                          "--console-origin",
+                          "http://127.0.0.1:1",
+                          "--startup-mode",
+                          "normal",
+                          "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/install",
+                          "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-cleanup-controls-HOc1ps/config"
+                        ]
+                      }
+                    }
+                  }
+                ],
+                "pids": [
+                  83949,
+                  83950
+                ]
+              }
+            },
+            {
+              "reason": "record_missing_in_mixed_set"
+            }
+          ],
+          "retained": true,
+          "signals": []
+        }
+      }
+    },
+    {
+      "id": "empty-record-is-unknown",
+      "status": "PASS",
+      "detail": {
+        "empty": {
+          "status": "UNKNOWN",
+          "stopped": [],
+          "unknown": [
+            {
+              "reason": "no_probe_record"
+            }
+          ],
+          "retained": true,
+          "signals": []
+        }
+      }
+    }
+  ]
+}

@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict'
+import { createHash } from 'node:crypto'
 import { execFileSync } from 'node:child_process'
 import { once } from 'node:events'
 import { createServer as createStaticServer } from 'node:http'
 import { createServer as createPortProbe } from 'node:net'
-import { createReadStream, existsSync, mkdirSync, mkdtempSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { createReadStream, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { Readable } from 'node:stream'
 import { join, resolve } from 'node:path'
@@ -48,7 +49,7 @@ const staticServer = createStaticServer(async (req, res) => {
   res.writeHead(200, { 'content-type': file.endsWith('.html') ? 'text/html; charset=utf-8' : file.endsWith('.js') ? 'text/javascript' : file.endsWith('.css') ? 'text/css' : 'application/octet-stream' })
   createReadStream(file).pipe(res)
 })
-let browser, before, posts = 0, previewPosts = 0, insightReads = 0
+let browser, before, posts = 0, previewPosts = 0, insightReads = 0, exportReads = 0, downloads = 0
 const requestedWindows = []
 const cases = [], errors = []
 const check = async (id, action) => { await action(); cases.push({ id, status: 'PASS' }) }
@@ -68,7 +69,9 @@ try {
   before = store.events.cursor(); await new Promise((resolveListen, rejectListen) => { staticServer.once('error', rejectListen); staticServer.listen(port, '127.0.0.1', resolveListen) }); browser = await chromium.launch()
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, locale: 'zh-CN', timezoneId: 'Asia/Shanghai' })
   page.setDefaultTimeout(10000); page.on('pageerror', error => errors.push(error.message))
+  page.on('download', () => { downloads++ })
   page.on('request', request => {
+    if (new URL(request.url()).pathname === '/v1/insights/export') exportReads++
     if (new URL(request.url()).pathname === '/v1/insights') {
       insightReads++; requestedWindows.push(Number(new URL(request.url()).searchParams.get('days')))
     }
@@ -157,6 +160,66 @@ try {
     await page.waitForTimeout(300); assert.doesNotMatch(await trial.textContent(), /999/)
     await page.unroute('**/v1/insights?**')
   })
+  const exportButton = trial.getByRole('button', { name: '导出当前范围观察', exact: true })
+  await check('REAL-DOWNLOAD-PRESERVES-CURRENT-PROJECT-WINDOW-AND-DISPLAY-VALUES', async () => {
+    for (const days of [7, 30]) {
+      await selectWindow(days); await questionValue.waitFor(); await exportButton.waitFor()
+      const response = page.waitForResponse(item => new URL(item.url()).pathname === '/v1/insights/export')
+      const downloaded = page.waitForEvent('download')
+      await exportButton.click()
+      const envelope = await (await response).json(), file = await downloaded
+      const text = readFileSync(await file.path(), 'utf8'), data = JSON.parse(text)
+      assert.equal(text, envelope.text); assert.equal(file.suggestedFilename(), envelope.fileName)
+      assert.equal(createHash('sha256').update(text).digest('hex'), envelope.sha256)
+      assert.equal(data.protocol, 'usage-insights-display-export/1'); assert.equal(data.authorization, 'none')
+      assert.equal(data.exportedFrom.days, days); assert.deepEqual(data.scope.projectIds, ['two'])
+      assert.equal(data.snapshot.snapshotId, envelope.observation.summaryId)
+      assert.equal(data.sourceIdentity.numericValues, false)
+      assert.ok(data.rows.length > 0)
+      for (const [index, row] of data.rows.entries()) {
+        assert.equal(row.formatted, envelope.observation.metrics[index].value)
+        assert.equal('value' in row, false)
+      }
+      assert.equal(text.includes(projectRoot), false); assert.equal(text.includes(stateRoot), false)
+      assert.equal(text.includes('Bounded question fixture'), false)
+    }
+  })
+  await check('BAD-DOWNLOAD-DIGEST-REFUSES-FILE-WITH-SANITIZED-ERROR', async () => {
+    const count = downloads
+    await page.route('**/v1/insights/export?**', async route => {
+      const response = await route.fetch(), body = await response.json(); body.sha256 = '0'.repeat(64)
+      await route.fulfill({ response, json: body })
+    })
+    await exportButton.click(); await trial.getByText('观察导出失败，请重新读取后重试。', { exact: true }).waitFor()
+    assert.equal(downloads, count)
+    await page.unroute('**/v1/insights/export?**')
+  })
+  await check('SCOPE-AND-WINDOW-CHANGES-CANCEL-PENDING-DOWNLOADS', async () => {
+    for (const change of [() => choose('甲项目'), () => selectWindow(7)]) {
+      let capturedResolve, release
+      const captured = new Promise(resolve => { capturedResolve = resolve }), gate = new Promise(resolve => { release = resolve })
+      await page.route('**/v1/insights/export?**', async route => {
+        const response = await route.fetch(); capturedResolve(); await gate
+        try { await route.fulfill({ response }) } catch { /* Superseded requests are aborted. */ }
+      })
+      const count = downloads
+      let timer
+      try {
+        await exportButton.click()
+        await Promise.race([captured, new Promise((_, reject) => { timer = setTimeout(() => reject(new Error('Export not captured')), 10000) })])
+        await change(); await questionValue.waitFor(); release(); await page.waitForTimeout(200)
+        assert.equal(downloads, count)
+      } finally { clearTimeout(timer); release(); await page.unroute('**/v1/insights/export?**') }
+    }
+  })
+  await check('LEGACY-DOWNLOAD-ABSENCE-KEEPS-OBSERVATION-AND-ORIGINAL-ACTIONS', async () => {
+    const count = downloads
+    await page.route('**/v1/insights/export?**', route => route.fulfill({ status: 404, json: { error: { code: 'invalid_request' } } }))
+    await exportButton.click(); await trial.getByText('当前服务未提供观察导出。', { exact: true }).waitFor()
+    assert.equal(downloads, count); assert.ok(await trial.locator('.trial-insight-row').count() > 0)
+    assert.equal(await trial.getByRole('button', { name: '检查执行器', exact: true }).count(), 1)
+    await page.unroute('**/v1/insights/export?**')
+  })
   await check('INVALID-OR-FAILED-READ-KEEPS-DATED-OBSERVATION-WITH-SANITIZED-ERROR', async () => {
     await page.route('**/v1/insights?**', route => route.fulfill({ status: 503, json: { error: { code: 'storage_unavailable', message: '/private/key-secret' } } }))
     await reload(); await trial.getByText('使用观察暂时无法读取，请重新读取。', { exact: true }).waitFor()
@@ -188,10 +251,10 @@ try {
   await browser?.close(); staticServer.close(); api.closeAllConnections(); await new Promise(resolve => api.close(resolve))
   const eventDelta = before === undefined ? null : store.events.cursor() - before
   await product.close(); store.close(); rmSync(root, { recursive: true, force: true })
-  const report = { status: cases.length === 9 ? 'PASS_ACTUAL_SCOPED_INSIGHTS_APP' : 'FAIL',
+  const report = { status: cases.length === 13 ? 'PASS_ACTUAL_SCOPED_INSIGHTS_APP' : 'FAIL',
     sourceCommit: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
     sourceWorktreeClean: execFileSync('git', ['status', '--porcelain', '--', 'apps', 'packages', 'tests/integration/usage-observation*'], { encoding: 'utf8' }).trim() === '',
-    cases, errors, insightReads, requestedWindows, postRequests: posts, readonlyRecipePreviewPosts: previewPosts,
+    cases, errors, insightReads, exportReads, downloads, requestedWindows, postRequests: posts, readonlyRecipePreviewPosts: previewPosts,
     eventDelta, realModelTurns: 0, nativeTurnStarts: 0,
     scope: 'Installed static console + installed runtime/Product/Broker/SQLite/HTTP/G Node analyzer, private controlled question fixtures; no daemon/native/recovery/benefit admission' }
   writeFileSync(join(output, 'browser-report.json'), JSON.stringify(report, null, 2) + '\n'); console.log(JSON.stringify(report, null, 2))

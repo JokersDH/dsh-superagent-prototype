@@ -1,0 +1,20 @@
+{
+  "protocol": "wave31-frozen-manifest/1",
+  "release": true,
+  "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+  "buildId": "8296720d8a25f38c",
+  "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+  "tarBytes": 20481470,
+  "entries": 6849,
+  "closure": "197/197",
+  "productSchema": 18,
+  "environment": {
+    "node": "24.21.0",
+    "abi": "137",
+    "platform": "darwin",
+    "arch": "arm64",
+    "sqlite": "3.53.4"
+  },
+  "tarPath": "pa-artifacts/wave30-target/wave30-target-8296720.tar.gz",
+  "tarEntries": 7405
+}
