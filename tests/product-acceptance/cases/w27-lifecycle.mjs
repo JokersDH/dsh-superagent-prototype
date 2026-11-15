@@ -323,7 +323,7 @@ export async function runLifecycle() {
         const resources = [{ pid: birth.pid, start: birth.start, parentPid: null }]
         stopped = await stopOwned(root, { packageStop: false, proofSignal: true, birth, resources })
         evidence.lifecycleNoRecordExit = { clean: stopped.clean, reason: stopped.reason ?? null, legitimateExit: stopped.legitimateExit ?? null,
-          signals: stopped.signals, observedChildren: stopped.observedChildren ?? null }
+          signals: stopped.signals, resources: stopped.resources ?? null }
       } finally { rmSync(root.own, { recursive: true, force: true }) }
       assert('NOEXIT_CLEAN', stopped?.clean === true && stopped.legitimateExit === true, JSON.stringify(stopped))
       assert('NOEXIT_NO_SIGNAL', (stopped?.signals ?? []).length === 0, JSON.stringify(stopped?.signals))

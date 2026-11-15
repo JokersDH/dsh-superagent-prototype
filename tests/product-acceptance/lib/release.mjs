@@ -567,7 +567,7 @@ export function lifecycleNoRecordIssues(value) {
   if (value.refused?.clean === true || value.refused?.retained !== true || value.refused?.reason !== 'record_missing_known_birth') issues.push('refused')
   if (value.released !== false) issues.push('released')
   if (value.aliveAfterRefusal !== true) issues.push('killed_without_proof')
-  if (value.stopped?.clean !== true || value.stopped?.source !== 'birth') issues.push('proof')
+  if (value.stopped?.clean !== true || value.stopped?.source !== 'known_set') issues.push('proof')
   if (!Array.isArray(value.stopped?.signals) || value.stopped.signals.length === 0 || value.stopped.signals.some(item => item.signalled !== 'SIGTERM')) issues.push('signals')
   return issues
 }
@@ -576,7 +576,8 @@ export function lifecycleNoRecordExitIssues(value) {
   const issues = []
   if (value.clean !== true || value.legitimateExit !== true) issues.push('not_legitimate')
   if (!Array.isArray(value.signals) || value.signals.length !== 0) issues.push('signalled')
-  if (value.observedChildren !== 0) issues.push('children')
+  if (!Array.isArray(value.resources) || value.resources.length !== 1) issues.push('set')
+  if (value.observedChildren !== null && value.observedChildren !== 0) issues.push('children')
   return issues
 }
 export function lifecycleNoRecordReuseIssues(value) {
@@ -591,7 +592,7 @@ export function lifecycleNoRecordReuseIssues(value) {
 export function lifecycleStopNoRecordIssues(value) {
   if (!value || typeof value !== 'object') return ['missing']
   const issues = []
-  if (value.sawNoRecord !== true || value.source !== 'birth') issues.push('accepted_package_clean')
+  if (value.sawNoRecord !== true || value.source !== 'known_set') issues.push('accepted_package_clean')
   if (value.clean !== true) issues.push('not_cleaned')
   if (!Array.isArray(value.signals) || value.signals.length === 0) issues.push('no_signal')
   if (value.alive !== false) issues.push('still_alive')

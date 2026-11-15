@@ -1,25 +1,25 @@
 {
   "control": "wrongstart",
   "reason": "unknown_live_resource",
-  "at": "2026-11-15T08:05:40.548Z",
-  "root": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-mbd12L",
+  "at": "2026-11-15T08:17:46.828Z",
+  "root": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-ITPBXH",
   "scope": {
-    "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-mbd12L/install",
-    "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-mbd12L/state",
-    "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-mbd12L/config"
+    "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-ITPBXH/install",
+    "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-ITPBXH/state",
+    "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-ITPBXH/config"
   },
   "record": {
-    "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-mbd12L/config/instance.json",
-    "sha256": "73b84163a93867d3fcb0eb5f0548ed38ccd9c62369efec8dd1b6af7ea7e20ad2",
-    "bytes": 543,
+    "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-ITPBXH/config/instance.json",
+    "sha256": "a6fddcbf0b7448c3f54e101fe1dff91064ce6ba3b59393d0b5058a51a51bed93",
+    "bytes": 541,
     "value": {
       "protocol": "pa-instance/1",
-      "pid": 14363,
+      "pid": 9948,
       "processStart": "Wed Jan  1 00:00:00 2020",
-      "apiPid": 14363,
+      "apiPid": 9948,
       "apiProcessStart": "Wed Jan  1 00:00:00 2020",
-      "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-mbd12L/state",
-      "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-mbd12L/install",
+      "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-ITPBXH/state",
+      "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-ITPBXH/install",
       "apiURL": "http://127.0.0.1:1",
       "consoleURL": "http://127.0.0.1:2",
       "buildId": "probe",
@@ -30,18 +30,18 @@
   },
   "material": {
     "reason": "unknown_live_resource",
-    "root": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-mbd12L",
-    "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-mbd12L/install",
-    "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-mbd12L/config",
-    "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-mbd12L/state",
+    "root": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-ITPBXH",
+    "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-ITPBXH/install",
+    "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-ITPBXH/config",
+    "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-ITPBXH/state",
     "record": {
-      "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-mbd12L/config/instance.json",
-      "sha256": "73b84163a93867d3fcb0eb5f0548ed38ccd9c62369efec8dd1b6af7ea7e20ad2",
-      "bytes": 543,
+      "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-ITPBXH/config/instance.json",
+      "sha256": "a6fddcbf0b7448c3f54e101fe1dff91064ce6ba3b59393d0b5058a51a51bed93",
+      "bytes": 541,
       "error": null
     },
     "files": [],
-    "retainedAt": "2026-11-15T08:05:40.548Z",
+    "retainedAt": "2026-11-15T08:17:46.828Z",
     "deleted": false
   },
   "extra": {}

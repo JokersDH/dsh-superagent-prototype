@@ -591,14 +591,14 @@ const evidenceFor = (key) => {
       return { reason: 'birth_set_mismatch', signals: [], alive: true, birthConfig: '/tmp/a/config', requestedConfig: '/tmp/b/config' }
     case 'lifecycleNoRecord':
       return { refused: { clean: false, retained: true, reason: 'record_missing_known_birth' }, released: false, aliveAfterRefusal: true,
-        stopped: { clean: true, source: 'birth', signals: [{ label: 'launcher', signalled: 'SIGTERM' }], aliveAfter: [] } }
+        stopped: { clean: true, source: 'known_set', signals: [{ label: 'resource', signalled: 'SIGTERM' }], aliveAfter: [] } }
     case 'lifecycleNoRecordExit':
-      return { clean: true, reason: null, legitimateExit: true, signals: [], observedChildren: 0 }
+      return { clean: true, reason: null, legitimateExit: true, signals: [], resources: [{ pid: 1, start: 's', parentPid: null }] }
     case 'lifecycleNoRecordReuse':
       return { clean: false, reason: 'birth_identity_mismatch', signals: [], alive: true,
         birthAlive: { pid: 10, expectedStart: 'b', observedStart: 'c' } }
     case 'lifecycleStopNoRecord':
-      return { clean: true, reason: null, sawNoRecord: true, signals: [{ label: 'launcher', signalled: 'SIGTERM' }], source: 'birth', alive: false }
+      return { clean: true, reason: null, sawNoRecord: true, signals: [{ label: 'resource', signalled: 'SIGTERM' }], source: 'known_set', alive: false }
     case 'lifecycleBirthRoot':
       return { reason: 'resource_scope_mismatch', blocked: { label: 'launcher', birthBound: true, birthOk: false, stateOk: false },
         signals: [], alive: true, recordPresent: true, birthState: '/tmp/a/state', requestedState: '/tmp/b/state' }
