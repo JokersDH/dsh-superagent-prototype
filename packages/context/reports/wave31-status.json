@@ -1,0 +1,65 @@
+{
+  "protocol": "wave31-status/1",
+  "agent": "C",
+  "branch": "codex/g3-assistant-context",
+  "base": { "mergeCommit": "50f8d5d2", "originMain": "8deda18d", "rfcs": ["WP-16/0080", "WP-16/0081", "WP-16/0082"] },
+  "wave": 31,
+  "packages": ["reliable-history-and-source-audit", "current-two-project-daily-flow", "immutable-rc-and-r2-recovery"],
+  "sources": {
+    "aHead": "02dc4aa889bdf3e5832808133916ff43b22e49f3",
+    "aWorkflowsDirty": { "path": "packages/storage/src/workflows.ts", "sha256": "074d75ad1ef57235aa96410167779aae406279189d7b05cb2de5e8277576cce4", "onOriginMain": false, "note": "per-ticket completion coverage/limits + historical binding" },
+    "historyTool": "packages/context/tools/wave31-completion-history.mjs",
+    "historyProtocol": "wave31-completion-history/1",
+    "R1": { "tar": "wave30-target-8296720.tar.gz", "sha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543", "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2", "build": "8296720d8a25f38c", "schema": 18, "immutable": true },
+    "R2": { "tar": "wave31-target-4dcd28f.tar.gz", "sha256": "405ecd02fcbf288bac0855e17911ec4035521b54fe27d81fa0b28feaf5addcc6", "source": "c0a1f8975232b6397dfaf92d31ac5682df2dab36", "build": "4dcd28f758bbb265", "schema": 18, "lineage": "303b2c6a ancestor of merge c0a1f897", "contains": ["project-recipes", "usage-observation", "usage-insights", "console /v1/insights"] },
+    "eStatus": "independent verdict still ce64; R1/R2 not relabelled"
+  },
+  "checkpoints": [
+    "02235375", "c42f8a5f", "7080c9c1", "75c7d4bc", "f54f2858", "bbf65b6a", "615184f7", "76947162", "b098222e", "ea2d6963", "55e554f5"
+  ],
+  "outcomes": {
+    "C1": { "package": 1, "status": "complete", "source": "packages/context/tools/wave31-completion-history.mjs", "consumer": "A completion coverage/limits through source Store", "command": "pnpm --filter @personal-agent/knowledge test (main-personal-history-coverage)", "exit": 0, "objects": ["A head 02dc4aa8", "workflows.ts sha 074d75ad"], "evidence": "packages/context/reports/wave31-history-coverage.tap", "scope": ["51-verification source cap -> truncated_source", "local limit/offset composition", "availableKnown null on truncation"] },
+    "C2": { "package": 1, "status": "complete", "source": "main-personal-history-paging.case.ts", "consumer": "wave31 history tool + /v1/works/:id/evidence + /v1/messages/:id/context(/sources)", "command": "pnpm --filter @personal-agent/knowledge test", "exit": 0, "objects": ["multi-attempt reviews via public bindings/evidence/commands", "frozen digest chain"], "evidence": "packages/context/reports/wave31-history-paging.tap", "scope": ["page split without loss/dup", "foreign project missing exit 1", "source audit readable"] },
+    "C3": { "package": 1, "status": "complete", "source": "main-personal-decision-support-flow.case.ts", "consumer": "real decision HTTP + frozen context", "command": "pnpm --filter @personal-agent/knowledge test", "exit": 0, "objects": ["record/supersede/revoke", "frozen bundle"], "evidence": "packages/context/reports/wave31-decision-source.tap", "scope": ["revocation preserves frozen bytes", "replay does not resurrect", "unknown send not resent"] },
+    "C4": { "package": 1, "status": "complete", "source": "main-personal-history-browse-flow.case.ts + wave31-history-consumer.json", "consumer": "one Work: history+evidence+evidence-history+frozen+sources+revoke", "command": "pnpm --filter @personal-agent/knowledge test", "exit": 0, "objects": ["2 attempts", "1 revoke"], "evidence": "packages/context/reports/wave31-history-browse.tap", "scope": ["ids consistent across surfaces", "history unchanged by revoke"] },
+    "C5": { "package": 2, "status": "complete", "source": "main-personal-template-lifecycle.case.ts", "consumer": "J preview + original create_work/accept", "command": "pnpm --filter @personal-agent/knowledge test", "exit": 0, "objects": ["2 registered projects", "config revision bump"], "evidence": "packages/context/reports/wave31-template-lifecycle.tap", "scope": ["preview zero-write", "edited goal", "stale preview is data", "cross project 400"] },
+    "C6": { "package": 2, "status": "complete", "source": "main-personal-check-retry.case.ts", "consumer": "questions/deliveries, verification, explicit acceptance", "command": "pnpm --filter @personal-agent/knowledge test", "exit": 0, "objects": ["question profile Work", "fail profile Work", "corrected Work"], "evidence": "packages/context/reports/wave31-check-retry.tap", "scope": ["native_applied", "failed check accept rejected", "new Work own acceptance"] },
+    "C7": { "package": 2, "status": "complete", "source": "main-personal-audit-observation.case.ts", "consumer": "/v1/insights + /v1/insights/export + source/evidence audit + expired scope", "command": "pnpm --filter @personal-agent/knowledge test", "exit": 0, "objects": ["7/30 windows", "display export sha256"], "evidence": "packages/context/reports/wave31-audit-observation.tap", "scope": ["numericValues:false", "foreign project 403", "expired scope refused"] },
+    "C8": { "package": 2, "status": "complete", "source": "main-personal-two-project-reopen.case.ts", "consumer": "reopened runtime over same Store", "command": "pnpm --filter @personal-agent/knowledge test", "exit": 0, "objects": ["2 works/conversations", "changed-body conflict"], "evidence": "packages/context/reports/wave31-two-project-reopen.tap", "scope": ["works/conversations/facts survive", "preview read-only", "command identity"] },
+    "C9": { "package": 3, "status": "complete", "source": "main-personal-package-r1-r2.case.ts", "consumer": "tar/install.json closure", "command": "pnpm --filter @personal-agent/knowledge test", "exit": 0, "objects": ["R1 8296720d8a25f38c", "R2 4dcd28f758bbb265"], "evidence": "packages/context/reports/wave31-package-r1-r2.tap", "scope": ["distinct identity", "J/export closure", "no private entrypoints"] },
+    "C10": { "package": 3, "status": "complete", "source": "main-personal-package-r2-dual.case.ts", "consumer": "driver package dialect + A restore/proof + package HTTP", "command": "pnpm --filter @personal-agent/knowledge test", "exit": 0, "objects": ["R2 tar 405ecd02", "v1/v2 restore", "target-only drift"], "evidence": "packages/context/reports/wave31-package-r2-dual.tap", "scope": ["readiness readonly", "STOPPED", "target_subject_mismatch"] },
+    "C11": { "package": 3, "status": "complete", "source": "main-personal-package-faults.case.ts", "consumer": "driver wrong-target-proof bounded failure", "command": "pnpm --filter @personal-agent/knowledge test", "exit": 0, "objects": ["wrong digest", "fresh restore"], "evidence": "packages/context/reports/wave31-package-faults.tap", "scope": ["failed exit 1", "STOPPED", "manifest/log retained", "no model call"] },
+    "C12": { "package": 3, "status": "complete", "source": ["packages/context/docs/WAVE31-RECIPE.md", "packages/context/docs/WAVE31-COLLEAGUE-GUIDE.md", "packages/context/reports/wave31-consumers.json", "packages/context/reports/wave31-ui-input.json"], "consumer": "main/A/D/E colleague handoff", "command": "docs + suites", "exit": 0, "objects": ["3-package guide", "typed consumer contract"], "scope": ["public/readonly/dual/history/export/unknown support documented"] }
+  },
+  "suites": {
+    "context": { "tests": 129, "pass": 129, "fail": 0, "tap": "packages/context/reports/wave31-final-context.tap" },
+    "proposals": { "tests": 41, "pass": 41, "fail": 0, "tap": "packages/context/reports/wave31-final-proposals.tap" },
+    "knowledge": { "tests": 133, "pass": 133, "fail": 0, "tap": "packages/context/reports/wave31-final-knowledge.tap", "note": "serialized --test-concurrency=1" },
+    "routing": { "tests": 44, "pass": 44, "fail": 0, "tap": "packages/context/reports/wave31-final-routing.tap" },
+    "total": { "tests": 347, "pass": 347, "fail": 0 },
+    "typecheck": "pass (context/proposals/knowledge/routing)",
+    "build": "pnpm -r --workspace-concurrency=4 run build exit 0"
+  },
+  "layers": {
+    "source": "C four packages + A history coverage (dirty worktree)",
+    "package": "R1 829RC immutable; R2 4dcd28f successor",
+    "installed": "not independently verified by C (E owns; verdict ce64)",
+    "normal": "two controlled projects template/question/check/accept/observe/reopen",
+    "recovered": "readonly v1/v2 restored data + history facts on R2",
+    "native": "0; private activation/target not attempted"
+  },
+  "notReached": [
+    "live B/I callback and private activation/target/native",
+    "E independent R2 release verdict (still ce64)",
+    "F UI window selector and full workbench",
+    "long-term revocation, concurrent writers, soak",
+    "packaged A strict history consumer (A dirty worktree only)"
+  ],
+  "remaining": [
+    "D/E must independently bind R2 tar and run their own required/installed matrices",
+    "main/A to consume history coverage contract through public ports if they expose it",
+    "operational soak and multi-user concurrency outside C"
+  ],
+  "preserved": ["pnpm-lock.yaml diff uncommitted", "twelve services 5180-5191/8796-8807", "state/profile/tar/ledger/historical reports", "no control of user instances"],
+  "budgets": { "realVendorModelTurns": 0, "realNativeTurns": 0, "bCap4": "UNKNOWN unspendable", "ePilot": "BLOCKED, not reset/top-up/refund/replaced" }
+}

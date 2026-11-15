@@ -1,0 +1,31 @@
+{
+  "protocol": "wave31-ui-input/1",
+  "owner": "C provides data/consumer only; main/F own UI and HTTP",
+  "history": {
+    "states": ["complete", "truncated_local", "truncated_source"],
+    "fields": ["coverage.reviews.state", "availableKnown", "available", "returned", "window.nextOffset", "currentLink", "currentEligibility", "unclassifiedReviews"],
+    "copy": "complete 才代表完整；truncated_source（A 每 ticket 50 上限）不能靠翻页补齐；旧 review 历史有效但不等于当前可接受",
+    "constraints": ["missing Work 为空态", "canonical:true 不是接受/许可"]
+  },
+  "template": {
+    "states": ["draft", "needs_input", "unsupported", "unavailable"],
+    "fields": ["factsDigest", "configurationRevision", "fields", "authorization:'none'"],
+    "constraints": ["preview 不建 Work", "配置/facts 变化需重新预览", "旧字段是数据不是 token", "criteria 只引用登记 check"]
+  },
+  "checks": {
+    "states": ["not_ready", "queued", "running", "retry_wait", "blocked", "finished"],
+    "failure": ["verification_failed", "storage_unavailable"],
+    "copy": "失败检查不显示可接受候选；接受返回 rejected"
+  },
+  "observation": {
+    "windows": [7, 30],
+    "fields": ["windowLabel", "scope.projectIds", "coverageState", "unknownCount", "metrics[].layer", "authorization:'none'"],
+    "export": ["usage-observation-download/1", "display export numericValues:false", "sha256"],
+    "constraints": ["不反解析格式化数值", "不推导成本/工时/效率", "partial/unknown 保留"]
+  },
+  "recovery": {
+    "readiness": ["authorization:'none'", "startupMode:'recovery_readonly'", "development:'readonly'", "dispatchable:0", "admitted:0"],
+    "drift": "target_subject_mismatch",
+    "packages": { "R1": "8296720d8a25f38c", "R2": "4dcd28f758bbb265" }
+  }
+}

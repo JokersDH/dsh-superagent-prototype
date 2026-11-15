@@ -1,0 +1,24 @@
+{
+  "protocol": "wave31-consumers/1",
+  "history": {
+    "tool": "packages/context/tools/wave31-completion-history.mjs",
+    "inputs": ["--a-worktree", "--db", "--work", "--project", "--limit", "--offset"],
+    "coverage": ["sourceState", "state(complete|truncated_local|truncated_source)", "availableKnown", "available", "returned", "truncated", "nextOffset"],
+    "sources": ["A completion.coverage", "A completion.limits.perTicket=50"],
+    "authority": "ProductCompletion metadata/current/preflight/accept"
+  },
+  "packageTwo": {
+    "surfaces": ["POST /v1/projects/:id/recipes/preview", "POST /v1/commands (create_work/answer_question/accept_candidate)", "GET /v1/works/:id(/evidence|/evidence/history|/verification)", "GET /v1/messages/:id/context(/sources)", "GET /v1/insights", "GET /v1/insights/export"],
+    "acceptance": "explicit accept_candidate only; verification_failed returns rejected receipt without acceptance",
+    "observation": "usage-observation/1; export usage-observation-download/1 display-only (numericValues:false) with sha256"
+  },
+  "packages": {
+    "R1": { "tar": "wave30-target-8296720.tar.gz", "sha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543", "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2", "build": "8296720d8a25f38c", "role": "immutable RC" },
+    "R2": { "tar": "wave31-target-4dcd28f.tar.gz", "sha256": "405ecd02fcbf288bac0855e17911ec4035521b54fe27d81fa0b28feaf5addcc6", "source": "c0a1f8975232b6397dfaf92d31ac5682df2dab36", "build": "4dcd28f758bbb265", "contains": ["project-recipes", "usage-observation", "usage-insights", "console /v1/insights"], "role": "successor bound to 303b2c6a lineage" }
+  },
+  "faults": {
+    "wrongTargetProof": "failed exit 1, package STOPPED, manifest/log retained",
+    "targetOnlyDrift": "target_subject_mismatch on a fresh restore with one legal extra message"
+  },
+  "notReached": ["live B/I recovery", "private activation/target/native", "E release verdict", "F UI"]
+}
