@@ -67,7 +67,9 @@
     "runner_tests": "node --test --test-force-exit apps/runner/test/*.test.ts -> exit 0, 137 pass / 0 fail",
     "b30_transport_owner": "2 PASS / 0 FAIL / 1 NT (remote takeover: old stdio 0)",
     "b28_cas": "7 PASS / 0 FAIL / 1 NT",
-    "b28_budget": "4 PASS / 0 FAIL / 1 NT (2KiB / 161 facts / 135540-byte five chunks retained)"
+    "b28_budget": "4 PASS / 0 FAIL / 1 NT (2KiB / 161 facts / 135540-byte five chunks retained)",
+    "b31_attached_consumer": "node tests/native-acceptance/b31-attached-consumer.mjs -> exit 0, 3 PASS / 0 FAIL / 1 NOT_TESTED",
+    "attached_strict": "npx tsc -p tests/native-acceptance/tsconfig.attached.json -> exit 0"
   },
   "scope": {
     "modelTurns": 0,
@@ -76,9 +78,9 @@
     "noNew": "no candidate table, ledger, second coordinator/lifecycle, migration, shared schema or main-owned file change",
     "twelveOutcomes": {
       "B1": "IMPLEMENTED",
-      "B2": "NOT_REACHED",
-      "B3": "PARTIAL",
-      "B4": "NOT_REACHED",
+      "B2": "PARTIAL (B-owned caller + fixture dual-client; original Store/Broker wiring main-owned NOT_REACHED)",
+      "B3": "PARTIAL (three callback kinds implemented, fact path proven; payload/native not raised; original authority main-owned)",
+      "B4": "PARTIAL (fixture lane A->B takeover on same Runner/attempt; original Work handover needs main wiring)",
       "B5": "NOT_REACHED",
       "B6": "NOT_REACHED",
       "B7": "NOT_REACHED",
