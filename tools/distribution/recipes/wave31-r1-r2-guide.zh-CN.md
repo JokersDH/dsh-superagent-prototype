@@ -15,3 +15,18 @@ node tools/distribution/verify-frozen-manifest.mjs --manifest tools/distribution
 R1→R2：`verify-upgrade-artifact.mjs` 7/7；R2 personal7（backup→readonly）、backup6、noexec4、portable5。R1/R2 数据不互认，旧用户 state/profile/tar 保留。
 
 未达：E 新 R1/R2 独立 required；真实 native/vendor、private/target/value、跨机、48h、rollback 未测。工具自测不是 release admission。
+
+## R2 实际安装与结果索引
+R2 tar 解包：
+```bash
+mkdir -p /tmp/pa-r2 && tar -xzf pa-artifacts/wave31-target/wave31-target-4dcd28f.tar.gz -C /tmp/pa-r2
+APP=/tmp/pa-r2/install/app; R=$HOME/.personal-agent-r2
+mkdir -p "$R"/{config,state,cache,logs,ws}; chmod 700 "$R" "$R"/*
+node "$APP/apps/launcher/bin/pa.mjs" first-run --json --install "$APP" --config-root "$R/config" --data-root "$R/state" --cache-root "$R/cache" --logs-root "$R/logs" --workspace-root "$R/ws"
+node "$APP/apps/launcher/bin/pa.mjs" doctor --json --install "$APP" --config-root "$R/config" --data-root "$R/state" --cache-root "$R/cache" --logs-root "$R/logs" --workspace-root "$R/ws"
+```
+R2 frozen 实测：window+export13/13、J6/6、F8/8；R1→R2 upgrade7、personal7、backup6、noexec4、portable5。
+R1/R2 是独立候选；不要用 R2 结果替代 R1，也不要跨 tar 混数据。
+
+## 高风险失败/D11 状态
+本轮只完成 pure cleanup identity/mixed-unknown/retention 13项和 R1 manifest 负例；**没有执行产品级中断、parent-exit-child-live、部分写/unknown live 注入**，因此 D11 记 PARTIAL/NOT_REACHED，不以工具收尾补成产品通过。
