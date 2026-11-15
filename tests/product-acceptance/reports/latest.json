@@ -1,12 +1,12 @@
 {
-  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T06-51-12-844Z",
+  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T07-03-05-041Z",
   "tier": "controlled-product-workflow",
   "status": "PASS",
   "source": {
-    "commit": "9027d03dcf9981c3161acce81482fa4872f06e29",
+    "commit": "41693dd6335813da363d4be938736ee3ab7ddeb2",
     "dirty": false
   },
-  "checkedAt": "2026-11-15T06:56:55.299Z",
+  "checkedAt": "2026-11-15T07:08:46.999Z",
   "counts": {
     "PASS": 274,
     "FAIL": 0,

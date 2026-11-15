@@ -2,7 +2,7 @@
   "schema": "product-acceptance-matrix/1",
   "agent": "E",
   "source": {
-    "commit": "9027d03dcf9981c3161acce81482fa4872f06e29",
+    "commit": "41693dd6335813da363d4be938736ee3ab7ddeb2",
     "dirty": false
   },
   "environment": {
@@ -11,7 +11,7 @@
     "architecture": "arm64",
     "os": "Darwin 25.6.0"
   },
-  "checkedAt": "2026-11-15T06:56:55.299Z",
+  "checkedAt": "2026-11-15T07:08:46.999Z",
   "release": {
     "tier": "controlled-product-workflow",
     "status": "PASS",
