@@ -1,0 +1,158 @@
+{
+  "protocol": "wave29-data-admission/1",
+  "date": "2026-11-15",
+  "status": "PARTIAL_CURRENT_PACKAGE_DUAL_FLOW_PASSED_NEW_COMPLETION_REVIEW_CLASSIFICATION_NEEDS_BINDING",
+  "observedMain": "ea82d8f2a923f623899eed043c1402708074e3b3",
+  "fixedSources": {
+    "A": "1f080068bf79ed8c1ca144c3bfadc1ec3cc62efa",
+    "C": "039fffb776d97db4310cba33db105800f17e83e7"
+  },
+  "dirtyBeforeAndAfter": { "A": [], "C": ["pnpm-lock.yaml"] },
+  "executed": [
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "command": "node --test packages/workflows/test/acceptance.case.ts",
+      "exitCode": 0,
+      "passed": 4,
+      "scope": "Existing acceptance projection/idempotence/UoW cases plus new completion raw-fact arrays and reopen readback. The fixture directly seeds verification/acceptance rows and a review-shaped command receipt; it is data projection evidence, not a new native or acceptance-authority proof."
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "command": "pnpm --filter @personal-agent/storage --filter @personal-agent/workflows typecheck",
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "command": "node --test packages/knowledge/test/main-personal-completion-consumer.case.ts",
+      "exitCode": 0,
+      "passed": 1,
+      "scope": "Real controlled Product/Broker/check/manualaccept plus SDK/context same-Store producer; actual A restore; existing ProductCompletion metadata/current and restored Work delivered still reference original verification/artifact/readyAt/eventCursor. No candidate table or new accept authority."
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "command": "pnpm --filter @personal-agent/context --filter @personal-agent/knowledge typecheck",
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "command": "node --experimental-strip-types /tmp/pa-wave29-data-audit-NLNJSA/probe-completion-reader.ts",
+      "exitCode": 0,
+      "positiveControls": 1,
+      "acceptedNegativeRecords": 1,
+      "report": "/tmp/pa-wave29-data-audit-NLNJSA/completion-reader/result.json",
+      "scope": "Real private controlled Work/current ProductCompletion positive. A new non-product-review command receipt retaining the original ticket but carrying proposal.contract.workId foreign-work is still classified as CompletionReviewFact for the original scoped work; malformed artifactIds element is silently dropped. Existing authoritative ProductCompletion.current remains unchanged; projection reads append no event."
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "command": "node --experimental-strip-types /tmp/pa-wave29-data-audit-NLNJSA/probe-1cd-package.ts",
+      "exitCode": 0,
+      "positiveFlows": 2,
+      "report": "/tmp/pa-wave29-data-audit-NLNJSA/1cd/result.json",
+      "scope": "Immutable exact1cdab25 tar hash/source/build verified. Two genuine A workflow restores, current C single driver invokes original A manifest and independent content/artifact proof, actual package original Work/Q&A/native_applied/context/readiness reads and verified stop. Both statusesAfter STOPPED, provider2->2; source completion-reader and original application authority remain distinct from installed byte admission."
+    }
+  ],
+  "retainedClosures": {
+    "independentArtifactInventoryShrink": "Preserved. A content-proof/restore implementation is unchanged from admitted aeeced18; no repeated empty probe was substituted for its prior independent positive and shrink negative.",
+    "ordinaryConversationSearchPrefixTable": "Preserved. Current workflow-content/2 structured schema policy remains; legacy content/1 is separate reproducibility.",
+    "broadEventLogExemption": "Preserved. C still delegates to A independent content proof with allowed subject.dataRoot only; no new broad event exception.",
+    "sameManifestActualPackageDualRestore": "Advanced from exactce64 to independently rerun exact1cdab25 with the current pinned sources and actual two target roots."
+  },
+  "exactPackageCheckpoint": {
+    "tar": "/Users/hh/Desktop/joker/pa-artifacts/wave27-target/wave27-target-1cdab25.tar.gz",
+    "sha256": "dcfda014ce0ac04ff4a78ebcf27cea9c3659e12bc3156583c985b869401fa86e",
+    "source": "1cdab25a76748edad5054ce1a5150a69d5ad9361",
+    "buildId": "ecffaa6d3f784426",
+    "schema": 18,
+    "runtime": "Node24.21.0/darwin-arm64/ABI137",
+    "formats": [
+      { "workflowSnapshot": 1, "driverExit": 0, "driverStatus": "verified-flow", "targetProof": "ok", "basis": "independent", "artifactCoverage": "independent", "work": "delivered", "delivery": ["native_applied"], "statusAfter": "STOPPED" },
+      { "workflowSnapshot": 2, "driverExit": 0, "driverStatus": "verified-flow", "targetProof": "ok", "basis": "independent", "artifactCoverage": "independent", "work": "delivered", "delivery": ["native_applied"], "statusAfter": "STOPPED" }
+    ],
+    "providerCallsBefore": 2,
+    "providerCallsAfter": 2,
+    "notClaimed": ["new A completion projection included in this artifact", "F browser/complete UI acceptance", "later current-main package bytes", "E independent installed/release verdict", "B/I live attach or recovered native delivery", "private target activation or writer quiescence", "vendor native compatibility", "long soak"]
+  },
+  "newFindings": [
+    {
+      "id": "A29-REVIEW-FACT-CLASSIFICATION-ONLY-BINDS-TICKET",
+      "priority": "P2_DATA_PROJECTION_IDENTITY",
+      "file": "packages/storage/src/workflows.ts",
+      "line": 787,
+      "relatedLine": 800,
+      "problem": "The new review projection selects any command_receipts JSON result with proposal.ticketId matching a linked ticket, then checks only truthy proposal/verification, artifactIds array and attemptId string. It does not bind proposal.contract.workId/full candidate tuple or actual ProductCompletion review identity/schema. A private real-chain positive followed by a recorded non-review receipt for the same ticket but foreign-work contract is returned in the original work's completion.reviews. Non-string artifact IDs are silently removed, making malformed data look like a valid CompletionReviewFact.",
+      "evidence": "/tmp/pa-wave29-data-audit-NLNJSA/completion-reader/result.json",
+      "scopeLimit": "New A source-only raw-fact classifier, not an application permission bypass. The existing ProductCompletion.current uses its original canonical review key and validation; the probe proves the original verification stays current. No candidate, verification or acceptance authority was created by reading this projection.",
+      "requiredOutcome": "Validate the original review data shape and full work/contract/candidate/attempt relation, using a shared public record/schema or the existing trusted completion-reader contract. Require the intended original review identity/provenance, or return such records as explicitly unclassified raw data. Reject malformed artifact IDs rather than silently normalizing them. Preserve main's original current/preflight/accept authority."
+    }
+  ],
+  "readerBoundaryAssessment": {
+    "noNewCandidateTable": true,
+    "originalCurrentAndAcceptRemainApplicationOwned": true,
+    "newProjectionHasNoWritePath": true,
+    "actualProjectionReadEventDelta": 0,
+    "CActualCompletionConsumerUsesOriginalAuthority": true,
+    "newAProjectionIsNotYetAuthenticCurrentCandidateProof": true,
+    "historyCoverageGap": "Each ticket query uses LIMIT50 but CompletionFacts has no hasMore/truncated/coverage indicator or contract field on verification/acceptance rows. This can be a bounded history view, but consumers must not infer a complete history or current relation from the returned arrays. Current/accept must remain the original ProductCompletion/application path.",
+    "performanceGap": "Receipt extraction performs json_extract result filtering per linked ticket and runs as part of WorkflowIndex.work. Large-history cost/query-plan behavior was not measured in this finite review; a real consumer should avoid turning raw metadata scans into an unbounded hot path."
+  },
+  "admittedScopes": {
+    "AExistingAcceptanceProjectionAndReopen": true,
+    "ASourceAndWorkflowStrict": true,
+    "COriginalProductCompletionRestoredMetadataCurrent": true,
+    "CExact1cdab25SameManifestDualFormat": true,
+    "AUnclassifiedReceiptAsOriginalReviewFact": false,
+    "currentMainPackagedProofDependencyClosure": false,
+    "newAProjectionInstalledAdmission": false,
+    "liveBIRecovery": false,
+    "releaseOrNativeAdmission": false
+  },
+  "minimalIntegrationSlice": {
+    "previousApprovedDataProof": "Content v2, independent artifact inventory/restore and existing data-manifest source from the prior approved slice remain usable after exact main consumer compilation; this wave does not regress them.",
+    "holdNewAReviewClassifier": "Do not use the new completion.reviews list as original review/current/accept evidence until subject/schema/provenance classification is fixed. Main may keep using existing ProductCompletion metadata/current and verification/acceptance readers. No new candidate table or parallel authority is needed.",
+    "AChangedSource": ["packages/storage/src/workflows.ts typed completion facts and work projection", "packages/storage/src/index.ts selected type exports", "packages/workflows/src/ports.ts type re-exports"],
+    "CProductionSourceNeededNow": [],
+    "CActualInputs": "C added real ProductCompletion restore consumption and exact1cdab25 package tests/docs rather than a new product algorithm; its existing single driver/proof remains admitted in the measured scopes. Public packaged proof integration still explicitly requires work rather than a default other-checkout path."
+  },
+  "nextCompleteResultThemes": [
+    {
+      "result": 1,
+      "outcome": "Authentic bounded completion-fact reader",
+      "scope": "Original valid review/verification/acceptance data with complete subject/contract/provenance and explicit history coverage; foreign or malformed receipt is rejected/unclassified. Existing main current/preflight/accept remains the sole authority, no new tables or SQL writer."
+    },
+    {
+      "result": 2,
+      "outcome": "Current-main public proof dependency closure",
+      "scope": "Stable typed A data/proof APIs compiled and consumed by current main/C without requiring another agent's source checkout. Preserve the already closed inventory/prefix/event controls and caller-supplied independent expectations."
+    },
+    {
+      "result": 3,
+      "outcome": "Accurate current package with data and completion consumers",
+      "scope": "A correctly frozen successor runs same-manifest two-format restore/content/readiness and original application completion metadata through real package public ports. New A source-only projection is not retroactively claimed in1cd. E separately owns installed/browser/release; D/E mode defects remain exact-scope, not blanket package rejection."
+    },
+    {
+      "result": 4,
+      "outcome": "Qualified original-result persistence and actual consumer",
+      "scope": "After B/I/main callback admission, original facts/receipts/answers/results and ProductCompletion references remain on original IDs, idempotently persist real observed results and preserve unknown. Data-only facts or receipt presence cannot replace live recovery or native-write authorization."
+    },
+    {
+      "result": 5,
+      "outcome": "Portable history/failure tooling and independent handoff",
+      "scope": "Bounded history/cursor/coverage, identity-changing and missing-data failures, exact package/source evidence and public examples are usable by main/C/H/E. Add relevant fault/scale checks only for changed consumers; no repeated old negative gates, long blind soak or fresh model allowance."
+    }
+  ],
+  "preservation": {
+    "realVendorModelCalls": 0,
+    "nativeTurnStarts": 0,
+    "userServiceActions": 0,
+    "globalSocketDiscovery": false,
+    "foreignCredentialsRead": false,
+    "candidateImplementationsEdited": false,
+    "eAssertionsOrRootConfigEdited": false,
+    "manualRawProcessSignalsByAudit": false,
+    "allPrivateExecSessionsCompleted": true,
+    "exactPrivatePackageStatusesAfter": ["STOPPED", "STOPPED"],
+    "privateEvidenceRoot": "/tmp/pa-wave29-data-audit-NLNJSA",
+    "budgetsAndLedgersUnchanged": true,
+    "releaseApproved": false
+  }
+}

@@ -52,10 +52,14 @@ import {
   TrialReadinessSchema,
   UsageObservationQuerySchema,
   UsageObservationSchema,
+  ProjectRecipePreviewInputSchema,
+  ProjectRecipePreviewSchema,
 } from '@personal-agent/contracts'
 import type {
   UsageObservationQuery,
   UsageObservation,
+  ProjectRecipePreviewInput,
+  ProjectRecipePreview,
   AgentProfile,
   ApplicationConfiguration,
   AssistantProviderStatus,
@@ -172,6 +176,7 @@ export interface ConsoleTransport {
   contextHistory?(query: ContextHistoryQuery): Promise<ContextHistory>
   contextSources?(messageId: string, options?: { scopeReview: true }): Promise<ContextSources | undefined>
   readiness?(): Promise<TrialReadiness | undefined>
+  previewProjectRecipe?(input: ProjectRecipePreviewInput, signal?: AbortSignal): Promise<ProjectRecipePreview | undefined>
   usageObservation?(query: UsageObservationQuery, signal?: AbortSignal): Promise<UsageObservation | undefined>
   /** Authenticated local session check/bootstrap (HTTP lane); the fixture lane is always authenticated. */
   session?(): Promise<boolean>
@@ -527,6 +532,22 @@ export class HttpTransport implements ConsoleTransport {
       const value = ContextSourcesSchema.parse(body)
       if (value.binding.messageId !== messageId) throw new TransportError('schema_mismatch', '来源正文属于另一条消息')
       return value
+    } catch (error) {
+      if (error instanceof TransportError && error.code === 'unsupported_capability') return undefined
+      throw error
+    }
+  }
+  async previewProjectRecipe(raw: ProjectRecipePreviewInput, signal?: AbortSignal): Promise<ProjectRecipePreview | undefined> {
+    const input = ProjectRecipePreviewInputSchema.parse(raw)
+    try {
+      const value = await this.request(`/v1/projects/${encodeURIComponent(input.projectId)}/recipes/preview`, {
+        method: 'POST', body: JSON.stringify(input),
+        signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(10000)]) : AbortSignal.timeout(10000),
+      }, 'json404')
+      if (value === missingOptionalResource) return undefined
+      const result = ProjectRecipePreviewSchema.parse(value)
+      if (JSON.stringify(result.input) !== JSON.stringify(input)) throw new TransportError('schema_mismatch', '项目模板不属于当前选择')
+      return result
     } catch (error) {
       if (error instanceof TransportError && error.code === 'unsupported_capability') return undefined
       throw error
