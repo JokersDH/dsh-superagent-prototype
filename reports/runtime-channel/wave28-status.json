@@ -69,15 +69,15 @@
       "id": "I16",
       "milestone": "fourth result",
       "status": "PASS",
-      "content": "Fault, capacity, late-reply, close, replay and route-refusal matrix with active bounds and single settlement",
-      "evidence": ["faults.test.ts (18)", "b-route.test.ts (9)", "compatibility.test.ts (4)"]
+      "content": "Fault, capacity, late-reply, close, replay and route-refusal matrix with active bounds, single settlement and kind-namespaced queue keys",
+      "evidence": ["faults.test.ts (18)", "b-route.test.ts (10)", "compatibility.test.ts (4)"]
     },
     {
       "id": "I20",
       "milestone": "fifth result",
       "status": "PARTIAL_INDEPENDENT_SOURCE_ONLY",
       "content": "Independent consumer and the B-route consumer execute the same implementation; H guidance updated to the current source",
-      "evidence": ["independent-consumer.test.ts (4)", "b-route.test.ts (9)", "docs/runtime-channel/h-independent-consumer.zh-CN.md"],
+      "evidence": ["independent-consumer.test.ts (4)", "b-route.test.ts (10)", "docs/runtime-channel/h-independent-consumer.zh-CN.md"],
       "notReached": ["H executed the current source in its own tree; H still consumes the old stdio service blob", "real A/Broker persisted ingress and fresh guard"]
     },
     {
@@ -116,7 +116,7 @@
   ],
   "checks": [
     { "command": "node_modules/.bin/tsc -p apps/runner/src/attach-channel/tsconfig.json", "exit": 0, "note": "strict + noUncheckedIndexedAccess + exactOptionalPropertyTypes" },
-    { "command": "cd apps/runner && node --test --test-timeout=8000 test/attach-channel/*.test.ts", "exit": 0, "tests": 64, "passed": 64, "failed": 0 },
+    { "command": "cd apps/runner && node --test --test-timeout=8000 test/attach-channel/*.test.ts", "exit": 0, "tests": 65, "passed": 65, "failed": 0 },
     { "command": "node --test packages/contracts/test/coordinator-channel.case.ts", "exit": 0, "tests": 5, "passed": 5, "failed": 0 },
     { "command": "git merge --no-edit origin/main", "exit": 0, "merged": "ea82d8f", "note": "wave-28 packet and admission merged before implementation" }
   ],
@@ -128,8 +128,8 @@
     "compatibility.test.ts": 4,
     "independent-consumer.test.ts": 4,
     "fresh-intent.test.ts": 5,
-    "b-route.test.ts": 9,
-    "total": 64
+    "b-route.test.ts": 10,
+    "total": 65
   },
   "bReconciliation": {
     "auditedSource": "cb4e97504157e500799284bfd63d51768740c9fc",

@@ -351,9 +351,9 @@ export class CoordinatorChannelModule implements CoordinatorChannel {
    * A pull-based route uses this to tell the answering client how much of the original window is
    * left; it never refreshes a deadline and never grants anything.
    */
-  deadline(correlationId: string): number | undefined {
-    const pending = this.#facts.get(correlationId) ?? this.#payloads.get(correlationId) ?? this.#writes.get(correlationId)
-    return pending ? pending.expiresAt : undefined
+  deadline(kind: CoordinatorChannelSettlement['kind'], correlationId: string): number | undefined {
+    const map = kind === 'fact' ? this.#facts : kind === 'payload' ? this.#payloads : this.#writes
+    return map.get(correlationId)?.expiresAt
   }
 
   inspect(): {

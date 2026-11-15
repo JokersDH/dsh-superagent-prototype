@@ -57,9 +57,30 @@ export type AttachReply = {
 
 type Queued = { readonly generation: number; readonly key: string; readonly request: CoordinatorChannelRequest }
 
-/** Correlation key of an outbound request: the fact id, payload request id or fresh intent id. */
+/**
+ * Correlation key of an outbound request, namespaced by kind so a fact id can never collide with a
+ * payload request id or a native intent id in the transport queue (the module keeps them apart too).
+ */
 function correlationKey(request: CoordinatorChannelRequest): string {
-  return request.type === 'payload-read' ? request.requestId : request.id
+  return request.type === 'fact' ? `fact:${request.id}` : request.type === 'payload-read' ? `payload:${request.requestId}` : `write:${request.id}`
+}
+
+/** The same namespacing, derived from a reply that settled one of the three kinds. */
+function correlationKeyOfReply(frame: unknown): string | undefined {
+  if (frame === null || typeof frame !== 'object') return undefined
+  const reply = frame as { readonly id?: unknown; readonly type?: unknown }
+  if (typeof reply.id !== 'string' || reply.id.length === 0) return undefined
+  switch (reply.type) {
+    case 'receipt':
+    case 'ack-failed':
+      return `fact:${reply.id}`
+    case 'payload':
+      return `payload:${reply.id}`
+    case 'write-admission':
+      return `write:${reply.id}`
+    default:
+      return undefined
+  }
 }
 
 export class RunnerAttachChannel {
@@ -75,7 +96,7 @@ export class RunnerAttachChannel {
     this.#now = options.now ?? Date.now
     this.#channel = new CoordinatorChannelModule({
       ...options,
-      onPendingSettled: settled => this.#dequeue(settled.id),
+      onPendingSettled: settled => this.#dequeue(`${settled.kind}:${settled.id}`),
     })
     this.#hooks = {
       factSink: { record: fact => this.#channel.recordFact(fact) },
@@ -121,7 +142,10 @@ export class RunnerAttachChannel {
     this.#pruneStale(generation)
     const head = this.#queue[0]
     if (!head) return { ok: true, generation, request: null, expiresAt: null, remainingMs: null }
-    const expiresAt = this.#channel.deadline(head.key) ?? null
+    const separator = head.key.indexOf(':')
+    const kind = head.key.slice(0, separator) as 'fact' | 'payload' | 'write'
+    const id = head.key.slice(separator + 1)
+    const expiresAt = this.#channel.deadline(kind, id) ?? null
     return {
       ok: true,
       generation,
@@ -191,14 +215,6 @@ export class RunnerAttachChannel {
   #pruneStale(generation: number): void {
     this.#queue = this.#queue.filter(entry => entry.generation === generation)
   }
-}
-
-function correlationKeyOfReply(frame: unknown): string | undefined {
-  if (frame === null || typeof frame !== 'object') return undefined
-  const reply = frame as { readonly id?: unknown; readonly type?: unknown }
-  if (typeof reply.id !== 'string' || reply.id.length === 0) return undefined
-  if (reply.type === 'receipt' || reply.type === 'ack-failed' || reply.type === 'payload' || reply.type === 'write-admission') return reply.id
-  return undefined
 }
 
 export { CoordinatorChannelError, NativeWriteDenied }

@@ -131,7 +131,8 @@ attach.drop(leaseRef, 'socket closed')
 ```
 
 - `next`/`receive` 的 refusal 只有 `stale_connection` / `identity_mismatch` / `closed`，且**不产生副作用**；stale/foreign 调用者无法通过 poll 重新占位。
-- 出站队列按 correlation 去重（每个 pending 至多一条），重绑只重建当前 generation 的条目，结算即出队；长度不超过构造函数的三类 pending 上限。
+- 出站队列按 `kind:correlation` 去重（每类每个 pending 至多一条，fact id 与 `payload-<n>` 不会互相吞掉），重绑只重建当前 generation 的条目，结算即出队；长度不超过构造函数的三类 pending 上限。
+- `next` 是幂等的：在 head 被答复（或超时/关闭）之前，重复轮询返回同一条请求；这使客户端重试不会丢请求，也让一次连接同时只有一个在途请求。
 - 独立复现：`apps/runner/test/attach-channel/independent-consumer.test.ts`（只 import 公开入口），B 路由形状：`b-route.test.ts`。
 
 ## 8. 验证
@@ -140,10 +141,10 @@ attach.drop(leaseRef, 'socket closed')
 # 严格类型（strict + noUncheckedIndexedAccess + exactOptionalPropertyTypes）
 node_modules/.bin/tsc -p apps/runner/src/attach-channel/tsconfig.json
 # 行为矩阵（注入时钟，无 sleep、无真实网络/模型）
-cd apps/runner && node --test --test-timeout=8000 test/attach-channel/*.test.ts   # 63/63
+cd apps/runner && node --test --test-timeout=8000 test/attach-channel/*.test.ts   # 65/65
 ```
 
-覆盖：CAS/generation/fencing、三回调、跨客户端重绑、fresh intent 与旧 allowed 重放、timeout/capacity/late/close、共享契约与 freeze 守卫、B 路由形状、独立 consumer。wave-27 的 44 个历史用例保留在原 scope 内。
+覆盖：CAS/generation/fencing、三回调、跨客户端重绑、fresh intent 与旧 allowed 重放、timeout/capacity/late/close、共享契约与 freeze 守卫、B 路由形状、kind 命名空间与 id 碰撞、独立 consumer。wave-27 的 44 个历史用例保留在原 scope 内。
 
 ## 9. 本文明确不证明的事
 

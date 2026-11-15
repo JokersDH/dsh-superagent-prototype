@@ -41,7 +41,7 @@ attach.drop(leaseId, 'socket closed')
 
 与 B 当前手写层的差异（这正是需要吸收的部分）：
 
-- B 的 `queue.shift()` 在取走请求后即从队列删除；若客户端拿到后不回，队列里没有记录（只能靠模块超时，且无法再报告 remaining）。adapter 保留条目直到**结算**才出队，并按 correlation 去重，重绑只重建当前 generation。
+- B 的 `queue.shift()` 在取走请求后即从队列删除；若客户端拿到后不回，队列里没有记录（只能靠模块超时）。adapter 保留条目直到**结算**才出队，`next` 幂等返回 head，按 `kind:correlation` 去重（fact id 与 payload 请求 id 不互相吞掉），重绑只重建当前 generation。
 - B 的 `connections` map 允许保留多个 lease 对象；模块本身只承认一个 active lease，adapter 用一个 `#connectionId` 表达当前连接，stale 连接显式 `refused`。
 - adapter 的 `next.receive` 对 stale/foreign 调用**不产生任何副作用**（generation 不变、pending 不动、queue 不动），等价于把 B 的 `assertChannelProducer`/`currentConnection` 检查收进同一处。
 

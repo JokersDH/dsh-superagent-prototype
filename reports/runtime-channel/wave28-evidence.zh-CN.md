@@ -41,11 +41,16 @@
 
 因此本轮**不再重复"B 仍有旧 maps"的过时结论**（那只适用于 I 分支的旧 main baseline `d95df88`）。第三成果的准确表述是：B 已在 module 层完成唯一实现切换；wave-28 的 P1 修正与 adapter 合并仍待 B 执行（其 owner 范围），交接点见 `docs/runtime-channel/b-adapter-handoff.zh-CN.md`。
 
-## 4. 第四成果：故障/容量/late/close 矩阵（64 例）
+## 4. 第四成果：故障/容量/late/close 矩阵（65 例）
 
 - `faults.test.ts` 18 例：timeout/reply、close/reply、同步 send/reply、异步 send 拒绝（数据 `stale_connection`、native `indeterminate`）、容量饱和与回收、per-kind/总 bytes、重复 correlation、非法 limits、错误不含秘密、timed-out intent 重放、close 后重放、write 容量恢复、payload 边界正负。
-- `b-route.test.ts` 8 例：未 bind 的 poll 被拒、poll 不 rebind、foreign producer 不读/不答、被替换客户端不能 reclaim、显式 CAS 拒绝 stale/future、跨多次 rebind 队列不累积、native 意图经路由保持业务 id、结算清空队列、remaining deadline 绝对不刷新。
+- `b-route.test.ts` 10 例：未 bind 的 poll 被拒、poll 不 rebind、foreign producer 不读/不答、被替换客户端不能 reclaim、显式 CAS 拒绝 stale/future、跨多次 rebind 队列不累积、native 意图经路由保持业务 id、结算清空队列、remaining deadline 绝对不刷新、fact id 与 payload request id 碰撞时互不吞掉。
 - `compatibility.test.ts` 4 例 + `packages/contracts/test/coordinator-channel.case.ts` 5 例：共享 schema/冻结 hash/v1 协议不变。
+
+## 4.1 交付前的两个实现缺陷（由新用例捕获）
+
+- 出站队列原先用裸 correlation 作 key：fact id 若恰好等于 `payload-<n>` 会与 payload 请求互吞队列条目。改为 `kind:correlation` 命名空间后，两类 pending 互不影响（`b-route.test.ts` 新增正例）。
+- 结算清理原先传入未命名空间的 id，导致超时结算后队列残留一条死条目；改为按 `kind:id` 出队后，`outboundCount` 在 timeout/close 后归零。
 
 ## 5. 第五成果：独立 consumer 与真实消费者兼容
 
@@ -63,11 +68,11 @@
 
 ```bash
 node_modules/.bin/tsc -p apps/runner/src/attach-channel/tsconfig.json                 # exit 0
-cd apps/runner && node --test --test-timeout=8000 test/attach-channel/*.test.ts      # exit 0, 64/64
+cd apps/runner && node --test --test-timeout=8000 test/attach-channel/*.test.ts      # exit 0, 65/65
 node --test packages/contracts/test/coordinator-channel.case.ts                      # exit 0, 5/5
 ```
 
-分层计数：three-callbacks 11、binding 6、rebind 7、faults 18、compatibility 4、independent-consumer 4、fresh-intent 5、b-route 9（含 remaining deadline）＝ 64（wave-27 历史 44 例全部保留在原 scope 内，仅按 fresh correlation 更新断言）。
+分层计数：three-callbacks 11、binding 6、rebind 7、faults 18、compatibility 4、independent-consumer 4、fresh-intent 5、b-route 10（含 remaining deadline 与 id 碰撞）＝ 65（wave-27 历史 44 例全部保留在原 scope 内，仅按 fresh correlation 更新断言）。
 
 ## 8. 边界与保留资源
 

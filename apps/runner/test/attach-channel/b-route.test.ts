@@ -12,6 +12,7 @@ import { makeCommand } from '../../../../packages/testing/src/index.ts'
 import type { CoordinatorChannelProducer, CoordinatorChannelReply } from '../../../../packages/contracts/src/coordinator-channel.ts'
 import { RunnerAttachChannel } from '../../src/attach-channel/attach.ts'
 import { CoordinatorChannelError } from '../../src/attach-channel/errors.ts'
+import { CoordinatorDouble } from './coordinator.ts'
 import { factOf, LIMITS, ManualClock, PRODUCER } from './fixtures.ts'
 
 /** Mirrors the current runner-service handler signatures exactly. */
@@ -34,8 +35,9 @@ function routeFor(attach: RunnerAttachChannel) {
 
 function setup() {
   const clock = new ManualClock()
+  const coordinator = new CoordinatorDouble()
   const attach = new RunnerAttachChannel({ producer: PRODUCER, limits: LIMITS, now: clock.now, schedule: clock.schedule })
-  return { clock, attach, route: routeFor(attach) }
+  return { clock, coordinator, attach, route: routeFor(attach) }
 }
 
 const lease = (connectionId: string) => connectionId
@@ -207,4 +209,43 @@ test('the pull route reports the remaining window and never refreshes it', () =>
 
   const none = s.attach.next('conn-b')
   assert.equal(none.ok, false)
+})
+
+test('a fact id that looks like a payload request id cannot consume the other request', async () => {
+  const s = setup()
+  s.coordinator.payloads.put('payload-same-id', { value: 'payload-value' })
+  s.attach.bind({ producer: PRODUCER, connectionId: lease('conn-a'), expectedGeneration: 0 })
+
+  // The first payload read is correlated as `payload-1`; the fact below deliberately reuses it.
+  const fact = s.attach.hooks.factSink.record(factOf({ factId: 'payload-1' }))
+  const payload = s.attach.hooks.payloads.read('payload-same-id')
+  assert.equal(s.attach.outboundCount, 2, 'both pendings keep their own transport entry')
+
+  // `next` is idempotent: it returns the head until that request is answered.
+  const first = s.attach.next('conn-a')
+  assert.ok(first.ok && first.request && first.request.type === 'fact')
+  assert.equal(first.request.id, 'payload-1')
+  const sameHead = s.attach.next('conn-a')
+  assert.ok(sameHead.ok && sameHead.request)
+  assert.deepEqual(sameHead.request, first.request)
+
+  const factReply = await s.coordinator.handle(first.request)
+  assert.ok(factReply)
+  assert.equal(s.attach.receive('conn-a', factReply).accepted, true)
+  assert.deepEqual(await fact, { factId: 'payload-1', persisted: true, seq: 1 })
+  // The same-looking fact id left the payload request untouched and queued.
+  assert.equal(s.attach.inspect().pendingPayloads, 1)
+  assert.equal(s.attach.outboundCount, 1)
+
+  const second = s.attach.next('conn-a')
+  assert.ok(second.ok && second.request && second.request.type === 'payload-read')
+  assert.equal(second.request.requestId, 'payload-1')
+  const payloadReply = await s.coordinator.handle(second.request)
+  assert.ok(payloadReply)
+  assert.equal(s.attach.receive('conn-a', payloadReply).accepted, true)
+  assert.deepEqual(await payload, { value: 'payload-value' })
+  assert.equal(s.attach.outboundCount, 0)
+  assert.deepEqual(s.attach.inspect(), {
+    state: 'bound', generation: 1, pendingFacts: 0, pendingPayloads: 0, pendingWrites: 0, pendingBytes: 0,
+  })
 })
