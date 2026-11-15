@@ -182,10 +182,10 @@ attach.drop(leaseRef, 'socket closed')
 # 严格类型（strict + noUncheckedIndexedAccess + exactOptionalPropertyTypes）
 node_modules/.bin/tsc -p apps/runner/src/attach-channel/tsconfig.json
 # 行为矩阵（注入时钟，无 sleep、无真实网络/模型）
-cd apps/runner && node --test --test-timeout=8000 test/attach-channel/*.test.ts   # 100/100
+cd apps/runner && node --test --test-timeout=8000 test/attach-channel/*.test.ts   # 132/132
 ```
 
-覆盖：CAS/generation/fencing、三回调、跨客户端重绑、fresh intent 与旧 allowed 重放、timeout/capacity/late/close、共享契约与 freeze 守卫、B 路由形状、kind 命名空间与 id 碰撞、单 transport owner（remote/stdio/sink 车道）、handover（协调器离开→继任）、并发/饱和/恢复、in-process guard responder（缺失/拒绝/抛错）、typed refusal 映射。wave-27 的 44 个历史用例保留在原 scope 内。
+覆盖：模块既有 scope 之外，wave-31 增加了真实消费者：真实 `serveRunner`（原 fact id/fresh intent/重放拒绝）、真实 `ProductStore` ingress（receipt 回读）、真实 Broker 等价 guard、真实 endpoint 双 client 与继任、ACK 窗口、64 上限背压、4 槽隔离、shutdown/malformed、公开接口兼容。完整清单与调用图见 `adoption-manual.zh-CN.md`。wave-27 的 44 个历史用例保留在原 scope 内。
 
 ## 9. 本文明确不证明的事
 
