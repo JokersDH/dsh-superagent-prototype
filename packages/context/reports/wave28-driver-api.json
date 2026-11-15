@@ -1,0 +1,24 @@
+{
+  "protocol": "personal-review-driver-api/2-wave28",
+  "supersedes": "wave27/personal-review-driver-api/2",
+  "entry": "packages/context/tools/personal-review-driver.mjs",
+  "targetProof": {
+    "requires": ["--target-protocol", "--target-snapshot-digest", "--target-content-digest"],
+    "optional": ["--target-artifacts", "--target-source-root"],
+    "verification": "A restoreWorkflowSnapshot/verifyRestoredSnapshot basis=independent, artifactCoverage=independent, workflow-content/2",
+    "allowed": ["subject.dataRoot"]
+  },
+  "publicIntegration": {
+    "status": "NOT_REACHED",
+    "reason": "current main/A workspace has not exported the restore/content proof as a product package; callers must supply --a-worktree/--a-module or a packaged equivalent",
+    "noDefaults": "driver has no built-in A/C checkout path and no vendored SQL/manifest/FTS/event allow-list"
+  },
+  "completionConsumer": {
+    "source": "ProductCompletion metadata/current on a restored root",
+    "tablePolicy": "no candidates table, no parallel ledger, no hand-written acceptance",
+    "liveBI": "NOT_REACHED"
+  },
+  "status": ["verified-flow", "reused", "refused-verified", "observed", "NOT_REACHED", "failed", "usage"],
+  "exits": { "verified-flow": 0, "reused": 0, "refused-verified": 0, "observed": 0, "NOT_REACHED": 4, "failed": 1, "usage": 2 },
+  "noAuthority": ["content proof", "readiness authorization none", "verified-flow"]
+}
