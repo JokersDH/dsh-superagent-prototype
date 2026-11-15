@@ -24,6 +24,13 @@ function facts(database: string, workId: string, projectId: string): Record<stri
   return JSON.parse(stdout.trim().split('\n').at(-1)!) as Record<string, any>
 }
 
+async function closeBounded(product: { close(): Promise<void> }, label: string) {
+  await Promise.race([
+    product.close().catch(() => undefined),
+    new Promise((_, reject) => setTimeout(() => reject(new Error(`${label} close exceeded 30s`)), 30000)),
+  ])
+}
+
 async function until<T>(read: () => Promise<T> | T, predicate: (value: T) => boolean, timeout = 30000): Promise<T> {
   const deadline = Date.now() + timeout
   let latest: T
@@ -74,14 +81,14 @@ test('two projects reopen from the same store with their works, conversations an
         assert.equal((await product.application.inspect({ workId: first.workId })).works[0]?.phase, 'delivered')
         createdIds.push(first.workId)
       }
-    } finally { await product.close().catch(() => undefined); store.close() }
+    } finally { await closeBounded(product, 'first runtime'); store.close() }
   }
 
   // Reopen the same store in a fresh runtime: works, conversations and per-project facts survive.
   const store = new ProductStore({ path: database })
   const product = createProductRuntime({ store, stateRoot, scratchProject: paths[0]!, projectRegistry: registry,
     projects, principal, actionSecret: Buffer.alloc(32, 15) })
-  t.after(async () => { await product.close().catch(() => undefined); store.close(); rmSync(root, { recursive: true, force: true }) })
+  t.after(async () => { await closeBounded(product, 'reopened runtime').catch(() => undefined); store.close(); rmSync(root, { recursive: true, force: true }) })
   const app = createLocalHttpApp({ application: product.application, principal, apiToken, bootstrapToken: 'b'.repeat(64),
     allowedOrigins: ['http://127.0.0.1:4400'], mode: 'fixture', read: product.read, operations: product.operations })
   product.start()

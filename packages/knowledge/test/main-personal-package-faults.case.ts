@@ -69,7 +69,6 @@ test('a wrong target proof fails bounded before start and leaves only owned diag
   assert.equal(wrongDigest.exitCode, 1, JSON.stringify(wrongDigest.output))
   assert.equal(wrongDigest.output.status, 'failed')
   assert.equal(typeof wrongDigest.output.failure?.code, 'string')
-  assert.equal(wrongDigest.output.status !== 'verified-flow', true)
 
   // No package instance is left running for the wrong-proof attempt; only owned diagnostics remain.
   let statusText = ''

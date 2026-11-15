@@ -42,7 +42,7 @@ test('a half JSON body is an invalid response, not an empty success', async () =
 
 test('readiness fails immediately on an entry that already exited and on deadline', async () => {
   const child = spawn(process.execPath, ['-e', 'process.exit(3)'], { stdio: 'ignore' })
-  await sleep(100)
+  for (let index = 0; index < 200 && child.exitCode === null; index += 1) await sleep(25)
   const logs = logSink(64)
   await assert.rejects(waitUntil(() => true, { deadlineAt: Date.now() + 5000, child, logs }),
     (error: { code?: string; detail?: { exitCode?: number } }) => error.code === 'entry_exited' && error.detail?.exitCode === 3)
