@@ -323,6 +323,35 @@ const command = toCreateWorkCommand(draft, { commandId, conversationId })
 
 ---
 
+## 7.5 迁移/重绑项目（R3）
+
+同事把项目搬到新目录、或在原产品里重新登记后，需要判断「旧建议是否还适用」。`src/rebind.ts` 提供只读对比，不做迁移判定、不写 registry、不携带旧凭据：
+
+```ts
+const { facts, report } = rebindRegisteredProject({
+  previous,                       // 上一次 project-facts/1（存在任何地方都行）
+  observedAt: new Date().toISOString(),
+  roots: { rootFor: (id) => registeredRoots.get(id) },  // main 自己的已登记映射
+})
+// report.status: 'current' | 'changed' | 'unbound' | 'foreign'
+// report.changes: ['stack'|'manager'|'packageJson'|'lockfile'|'workspace'|'scripts'|'languages'|'observation']
+```
+
+- `unbound`：当前没有该项目的已登记 root → 只能先走原项目设置/登记流程，**不猜路径**。
+- `foreign`：`previous` 属于另一个项目 → 旧观察不能复用为当前项目建议。
+- `current`：内容摘要相同（观察时间可以不同）→ 可沿用已生成建议，仍以原确认流程为准。
+- `changed`：列出字段级变化（manager/lock/workspace/scripts…），旧草稿由 `previewInputs` 判定为 `stale_inputs`，需用当前配置重新生成。
+- 报告只含 digest/时间/字段名/脱敏 note，没有绝对 root、metadata 正文、凭据或授权；`authorization` 恒 `none`。
+
+CLI 迁移对比模式（只读，需显式授权根）：
+
+```sh
+node tools/project-recipes/cli.ts --previous-facts /tmp/old-facts.json \
+  --root /path/to/new/project --project project-alpha --now 2026-11-15T00:00:00.000Z
+```
+
+退出码：`current`/`changed` → 0；`unbound`（未登记/根不存在）→ 3；`foreign` 或输入被拒绝 → 5；参数冲突 → 2。该模式不接受 `--facts/--kind/--paths/--output`，避免把迁移对比混成生成或写入。
+
 ## 8. 兼容、版本与分发
 
 - 支持：`application-configuration/1`、`project-facts/1`、`project-facts-observer/1`、catalog `project-recipes@1`、与 main 的 `project-recipe-preview/1` 字段对齐。
@@ -342,6 +371,14 @@ const command = toCreateWorkCommand(draft, { commandId, conversationId })
 - `dist` 由 `tsc -p tsconfig.build.json` 生成，不提交。
 
 ---
+
+## 8.5 三条发行线（R1 / R2 / R3）
+
+| 线 | 含义 | 本包的准确状态 |
+| --- | --- | --- |
+| R1 | 固定安装包 `8296720d8a25f38c`（source `82ee5b8f…`，tar `04926739…`，20481470 B / 6849 项，schema18/Node24.21.0/ABI137/darwin-arm64） | **不修改、不重冻**。R1 源码含 wave-29 模板层（`factsContentDigest`、goal 编辑、atom scope），但缺 wave-30 的 future/clock/expiry/omissions/limits 边界；由 `tools/project-recipes/test/r1-baseline.case.ts` 直接从 git 对象核对，报告不冒充 R1 有新能力 |
+| R2 | 当前 source 与后继安装包 | 当前分支 source（本报告对应提交）+ `dist` 构建 + `npm pack` 列表；tar 由 D 在确定运行字节后冻结，E 绑定同一 tar |
+| R3 | 反复使用与同事支持 | 迁移对比（`rebindRegisteredProject` / CLI 模式）、重复观察稳定性、失败边界与重开回原手动流程 |
 
 ## 9. 不做 / 未达
 
@@ -367,12 +404,12 @@ pnpm --dir packages/contracts build
 
 # 纯库
 ./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.json
-node --test packages/project-recipes/test/*.case.ts     # 75 tests
+node --test packages/project-recipes/test/*.case.ts     # 82 tests
 ./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.build.json
 
 # CLI 与真实 Application 消费者（后者需要产品包构建）
 ./node_modules/.bin/tsc -p tools/project-recipes/tsconfig.json
-node --test tools/project-recipes/test/*.case.ts        # 26 tests
+node --test tools/project-recipes/test/*.case.ts        # 32 tests
 
 # 真实 Application 消费者与 main 集成测试的构建闭包（一次性）
 pnpm -r --workspace-concurrency=2 run build
@@ -385,6 +422,10 @@ node tools/project-recipes/cli.ts --config tools/project-recipes/fixtures/config
   --facts tools/project-recipes/fixtures/facts-alpha.json --now 2026-11-14T12:00:00.000Z --paths src/
 node tools/project-recipes/cli.ts --config tools/project-recipes/fixtures/configuration.json \
   --facts tools/project-recipes/fixtures/facts-alpha.json --now 2026-11-14T12:00:00.000Z --kind scoped_change
+
+# 迁移对比（只读，显式授权根；用 fixture 中的 facts 作为“上一次观察”）
+node tools/project-recipes/cli.ts --previous-facts tools/project-recipes/fixtures/facts-alpha.json \
+  --root tools/project-recipes/fixtures/example-project --now 2026-11-15T00:00:00.000Z
 
 # 消费者样例（内存内自检，不写文件）
 node packages/project-recipes/examples/preview-consumer.ts

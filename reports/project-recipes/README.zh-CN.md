@@ -2,14 +2,83 @@
 
 工作树 `/Users/hh/Desktop/joker/superagent-agent-j`，分支 `codex/g5-project-recipes`。
 
-- 当前（wave-30）机读状态：[wave30-status.json](wave30-status.json)
+- 当前（wave-31）机读状态：[wave31-status.json](wave31-status.json)
+- 历史（wave-30）：[wave30-status.json](wave30-status.json)
 - 历史（wave-29）：[wave29-status.json](wave29-status.json)
 - 历史（wave-28）：[wave28-status.json](wave28-status.json)
 - 历史（wave-27）：[wave27-status.json](wave27-status.json)
 
 ---
 
-# wave-30（2026-11-15）
+# wave-31（2026-11-15）
+
+起点 `e6400429`，合并 `origin/main`（wave-31 派工 `8deda18d`，含 `303b2c6a` 观察导出/运行时检查点）后按 `agent-tasks/product-wave-31/agent-j-project-recipes.zh-CN.md` 执行三个连续交付包、每包四个完整成果（共 12 项）。
+
+## 1. 三条发行线的准确状态
+
+| 线 | 状态 |
+| --- | --- |
+| R1（829 固定包） | **只读核对、未修改**。source `82ee5b8f`、build `8296720d8a25f38c`、tar `04926739…`（20481470 B / 6849 项）；R1 源码含 0073/0077 预览链与 wave-29 模板层，缺 wave-30/31 的 future/clock/expiry/omissions/limits 与迁移对比。`r1-baseline.case.ts` 直接从 git 对象核对，不装、不冻、不改 R1 |
+| R2（当前 source 与后继包） | 运行时 source `ecc81446`；`dist` 构建 0；`npm pack --dry-run` 38 文件 / 47,157 B；**tar 未创建**，由 D 在确定运行字节后冻结，E 绑定同一 tar |
+| R3（迁移/长用/支持） | 新增只读迁移对比：`rebindRegisteredProject` / `reobserveProjectFacts` / CLI `--previous-facts`，输出 `current/changed/unbound/foreign` 与字段级变化 |
+
+## 2. 包一：当前 facts/config/声明基线
+
+- **J1** R1 事实来源：`r1-baseline.case.ts`（3 项）从 R1 source 断言 8 个 src、0073/0077 消费链与 endpoint 存在，并断言 R1 **没有** `observedMs > nowMs`、`omissions`、`validateMetadataLimits`、`project_scope_expired`。
+- **J2** freshness/content/config：时间总是被核（不传 `now` 用真实时钟）；future/stale/invalid clock、未知/损坏配置、过期 scope、旧 draft 全部拒绝；同内容重观察可复用（82 库测试覆盖）。
+- **J3** 三 kind 与原 scope/check/profile：只用已声明 atom、已启用 profile、已登记 check；blocked/readonly/unknown、缺 check、过期 scope、错项目/foreign atom 不被静默丢弃；脚本只是名字数据。
+- **J4** 真实预览/确认：main 的 5 项集成测试 5/5；main 的 8 项工作台浏览器流程在 clean source `ecc81446` 上 8/8、两个 controlled work 被明确接受。**R1 已安装包的预览/确认仍是 E-owned、J 未安装 → NOT_REACHED**。
+
+## 3. 包二：当前 source 的三 kind 实际项目
+
+- **J5** observer：NOFOLLOW、lstat/open 的 inode+size、读后 size/mtime、根变更、普通文件/白名单、预算与 limits 校验（22 项）。
+- **J6** 配置重用/失效：配置 schema/revision/project/profile/check/expiry 与 facts/catalog/字段身份全部参与；goal 编辑只改 goal；hash 不是授权。
+- **J7** 两项目三 kind：同一真实 Application 内 3×2 全部 `dispatch recorded`；main 集成测试到达两个原候选与人工接受；preview/取消零业务写。
+- **J8** 可打包模块：build 0、pack 38 文件 / 47,157 B、dist 导入闭包只允许内建/contracts/zod/兄弟模块；root deps/lock/importer 未改。
+
+## 4. 包三：迁移项目与同事支持
+
+- **J9** 迁移重绑：`rebindRegisteredProject({ previous, observedAt, roots })` → `unbound`（无登记 root，不猜路径）/`foreign`（旧观察属于别的项目）/`current`（内容未变）/`changed`（列出 manager/lockfile/workspace/scripts…）；报告只有 digest/时间/字段名，无绝对 root、凭据或授权。
+- **J10** 迁移后的模板/检查适配：manager、lock、workspace 变化后旧草稿 `stale_inputs`，新树生成新建议；旧 grant/check revision 不复用；未知语言/布局/版本保持 needs_input/unsupported。
+- **J11** 长用 CLI：`--previous-facts` 只读对比模式（0 current/changed、3 unbound、5 foreign/拒绝、2 参数冲突），拒绝与 `--facts/--kind/--paths/--output` 混用；错误脱敏、原项目不变。
+- **J12** 三包交接：本状态与文档。
+
+## 5. 实际验证
+
+| 命令 | exit | 结果 |
+| --- | --- | --- |
+| `./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.json` | 0 | strict |
+| `node --test packages/project-recipes/test/*.case.ts` | 0 | 82 tests / 82 pass |
+| `./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.build.json` | 0 | dist |
+| `./node_modules/.bin/tsc -p tools/project-recipes/tsconfig.json` | 0 | strict |
+| `node --test tools/project-recipes/test/*.case.ts` | 0 | 33 tests / 33 pass |
+| `node packages/project-recipes/examples/preview-consumer.ts` | 0 | 三态自检 |
+| `node --test tests/integration/project-recipes.case.mjs` | 0 | 5/5 |
+| `node tests/integration/project-recipes-browser.mjs reports/project-recipes/wave31-browser` | 0 | 8/8，clean source `ecc81446`，2 个人工接受 |
+| `node agent-tasks/product-wave-31/verify.mjs --workspaces` | 0 | 静态派工校验 |
+| `npm pack --dry-run` | 0 | 38 files / 47,157 B |
+
+合并 main 后必须重建 workspace（`pnpm -r --workspace-concurrency=2 run build`，exit 0），否则旧 contracts dist 缺 `UsageObservationDownloadSchema`，main 集成测试会在导入期失败——这是构建产物过期，不是模板模块回归，已按此记录。
+
+## 6. 分层与未达
+
+| 层 | 状态 |
+| --- | --- |
+| source | PASS（82 库 / 33 工具 / strict / build / example / 派工校验） |
+| controlled | PASS（真实 Application 3×2；main 5 集成；main 8 浏览器 clean source） |
+| installed | NOT_REACHED（未装 R1 tar、未产出 R2 tar；E 独立验收） |
+| native | NOT_APPLICABLE（真实 vendor/model/native = 0） |
+| value | NOT_CLAIMED |
+| activation | PASS_PRODUCT_PATH_CONTROLLED |
+| recovered | NOT_REACHED（B/I 原恢复/native 不在本包，未用普通工作冒充） |
+
+## 7. 交接
+
+新增公开：`rebindRegisteredProject`、`reobserveProjectFacts`、`compareProjectFacts`、`changedFields`、`RebindReportSchema`、`REBIND_FIELDS`、`RebindError`；契约 `project-facts-rebind/1`。重导入改动文件：`src/rebind.ts`、`src/index.ts`。main 仍持有 root/锁/HTTP/App/表单，D 冻结 R2 tar，E 绑定同一 tar。
+
+---
+
+# 历史：wave-30（2026-11-15）
 
 起点 `bd027a44`，合并 `origin/main`（wave-30 派工 `6f385a54`，含 0076/0077 工作台组合）后按 `agent-tasks/product-wave-30/agent-j-project-recipes.zh-CN.md` 执行四个完整子系统成果。main 本轮按 `bd027a44` 原字节更新了我 5 个 src，并在预览里使用 `factsContentDigest` 与服务端时间；本轮只改 J-owned 缺陷，不重造 HTTP/matcher。
 

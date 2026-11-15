@@ -47,6 +47,23 @@ test('R1 source contains the wave-29 template layer and predates the wave-30 fre
   assert.doesNotMatch(match, /project_scope_expired/)
 })
 
+test('R1 source already contains the 0073/0077 preview chain, so package one is not "missing an entry"', (t) => {
+  if (!hasCommit()) {
+    t.skip('R1 source commit is not available in this clone')
+    return
+  }
+  for (const file of [
+    'apps/coordinator/product/project-recipes.ts',
+    'apps/console/src/useProjectRecipe.ts',
+    'packages/contracts/src/project-recipe-preview.ts',
+    'tests/integration/project-recipes.case.mjs',
+    'tests/integration/project-recipes-browser.mjs',
+  ]) assert.ok(read(file).length > 0, file)
+  assert.match(read('apps/coordinator/http/app.ts'), /recipes\/preview/)
+  // R1 ships the template entry but only the wave-29 freshness policy.
+  assert.match(read('apps/coordinator/product/project-recipes.ts'), /createProjectFactsObserver/)
+})
+
 test('the pinned R1 tuple is recorded verbatim so D/E can bind it', () => {
   const record = {
     source: '82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2',

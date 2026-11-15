@@ -1,0 +1,280 @@
+{
+  "protocol": "project-recipes-wave31-status/1",
+  "owner": "J",
+  "date": "2026-11-15",
+  "branch": "codex/g5-project-recipes",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-j",
+  "baseline": "e640042948c04dd0eb33b310a09c75dba211b5f7",
+  "mergedOriginMain": "8deda18d (wave-31 dispatch); includes 303b2c6a (0080 observation export + runtime checkpoint)",
+  "packet": "agent-tasks/product-wave-31/agent-j-project-recipes.zh-CN.md",
+  "releaseLines": {
+    "R1": {
+      "status": "PINNED_UNMODIFIED",
+      "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "build": "8296720d8a25f38c",
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "bytes": 20481470,
+      "entries": 6849,
+      "schema": 18,
+      "node": "24.21.0",
+      "abi": 137,
+      "platform": "darwin-arm64",
+      "jCapability": "R1 ships the 0073/0077 preview chain and the wave-29 template layer (factsContentDigest, atom scope, edited goal, changed_during_read). It predates wave-30/31: no future-observation refusal, no omissions, no MetadataLimits validation, no project_scope_expired, no stale_draft_version, no migration comparison.",
+      "installedPreviewByJ": "NOT_REACHED (no R1 tar is installed in this worktree; E owns the independent installed verdict)",
+      "modifiedByJ": false
+    },
+    "R2": {
+      "status": "SOURCE_AND_PACK_READY_TAR_NOT_CREATED",
+      "runtimeSource": "ecc81446 (later commits in this wave are tests/docs only)",
+      "package": "packages/project-recipes",
+      "buildCommand": "./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.build.json",
+      "pack": { "files": 38, "bytes": 47157, "contains": ["dist/", "README.md"] },
+      "tar": "not created (D freezes the successor after runtime bytes are determined; E binds one exact tar)",
+      "note": "main 303b2c6a imported J e6400429's five sources exact; this wave's additions (rebind) are not in main or R1 until main re-imports."
+    },
+    "R3": {
+      "status": "IMPLEMENTED",
+      "capability": "Migration/re-bind comparison (`rebindRegisteredProject`, `reobserveProjectFacts`, CLI `--previous-facts`), repeated observation stability, bounded failure handling, colleague guide.",
+      "dependsOn": "R1 and R2 as packages; R3 itself adds no runtime bytes to a shipped tar."
+    }
+  },
+  "packages": [
+    {
+      "id": "package-1",
+      "title": "current facts and template baseline on the exact R1 package",
+      "status": "PASS_WITH_INSTALLED_GAP",
+      "outcomes": [
+        {
+          "id": "J1",
+          "title": "R1 and current project fact sources",
+          "status": "PASS",
+          "source": ["tools/project-recipes/test/r1-baseline.case.ts", "packages/project-recipes/src/observe.ts"],
+          "actualConsumer": "main's registered-root lookup + createProjectFactsObserver; CLI",
+          "checks": [
+            { "command": "node --test tools/project-recipes/test/r1-baseline.case.ts", "exit": 0, "tests": 3, "pass": 3 },
+            { "command": "git cat-file -e 82ee5b8f^{commit}", "exit": 0 }
+          ],
+          "actualObject": "R1 source at 82ee5b8f inspected read-only: 0073/0077 preview chain present, wave-29 template layer present, wave-30/31 freshness work absent.",
+          "remaining": "R1 installed behaviour is E-owned; J does not install, re-freeze or modify the 829 package."
+        },
+        {
+          "id": "J2",
+          "title": "freshness, content digest and configuration boundary",
+          "status": "PASS",
+          "source": ["packages/project-recipes/src/preview.ts", "packages/project-recipes/test/freshness.case.ts", "packages/project-recipes/test/observed-at.case.ts"],
+          "actualConsumer": "main's previewInputs/assertDraftCurrent calls with server now; same policy in the CLI",
+          "checks": [
+            { "command": "node --test packages/project-recipes/test/*.case.ts", "exit": 0, "tests": 82, "pass": 82 }
+          ],
+          "actualObject": "Time is always checked (real clock when now is omitted); future/stale observations, invalid clocks, unsupported/malformed configuration, expired scope and pre-contentDigest drafts are refused; identical content re-observed is reusable.",
+          "remaining": "None for the data layer; main still owns the runtime guard."
+        },
+        {
+          "id": "J3",
+          "title": "three-kind templates matched to original scope/check/profile",
+          "status": "PASS",
+          "source": ["packages/project-recipes/src/match.ts", "packages/project-recipes/src/scope.ts", "packages/project-recipes/test/catalog.case.ts", "packages/project-recipes/test/negative.case.ts"],
+          "actualConsumer": "main preview returns field data; F displays the same server fields; original WorkDraft/UserCommand confirmation stays with main",
+          "checks": [
+            { "command": "node --test packages/project-recipes/test/*.case.ts", "exit": 0, "tests": 82, "pass": 82 },
+            { "command": "node --test tools/project-recipes/test/main-contract.case.ts", "exit": 0, "tests": 4, "pass": 4 }
+          ],
+          "actualObject": "Three kinds reuse only configured atoms, profile, criteria and registered checks; blocked/discussion/unknown profile, missing check, expired scope, wrong project, foreign atom and unexpressible extras are refused, never silently dropped; scripts stay names-only data.",
+          "remaining": "None; no model proposal or second runner is created."
+        },
+        {
+          "id": "J4",
+          "title": "R1 real preview/user confirmation handoff",
+          "status": "PASS_SOURCE_LEVEL_INSTALLED_NOT_REACHED",
+          "source": ["tools/project-recipes/test/r1-baseline.case.ts", "tests/integration/project-recipes.case.mjs"],
+          "actualConsumer": "main 0073/0077 preview + original form; two controlled works accepted",
+          "checks": [
+            { "command": "node --test tests/integration/project-recipes.case.mjs", "exit": 0, "tests": 5, "pass": 5 },
+            { "command": "node tests/integration/project-recipes-browser.mjs reports/project-recipes/wave31-browser", "exit": 0, "observed": "8/8 PASS at clean source ecc81446, two accepted works" }
+          ],
+          "actualObject": "R1 source contains the endpoint (`apps/coordinator/http/app.ts`), coordinator consumer, console hook and both integration tests; the executed evidence is on current source (R2), not on an installed R1 tar.",
+          "remaining": "R1 installed preview/confirm is NOT_REACHED for J; E must verify the exact 829 tar."
+        }
+      ]
+    },
+    {
+      "id": "package-2",
+      "title": "current-source three-kind projects and complete original work results",
+      "status": "PASS",
+      "outcomes": [
+        {
+          "id": "J5",
+          "title": "safe metadata observer on the current source",
+          "status": "PASS",
+          "source": ["packages/project-recipes/src/observe.ts", "packages/project-recipes/test/observe.case.ts"],
+          "actualConsumer": "main's registered-root runtime observer and the read-only CLI share this implementation",
+          "checks": [
+            { "command": "node --test packages/project-recipes/test/observe.case.ts", "exit": 0, "tests": 22, "pass": 22 }
+          ],
+          "actualObject": "NOFOLLOW, lstat/open inode+size and post-read size/mtime checks, root-change refusal, regular-file/whitelist, per-file/count/total budgets and validated limits; metadata errors are relative-target, path-free and never become empty 'no dependency' facts.",
+          "remaining": "No home/env/hook/script-body read was added; unknown stays unknown."
+        },
+        {
+          "id": "J6",
+          "title": "current configuration reuse and preview invalidation",
+          "status": "PASS",
+          "source": ["packages/project-recipes/src/preview.ts", "packages/project-recipes/test/preview.case.ts", "packages/project-recipes/test/freshness.case.ts"],
+          "actualConsumer": "main POST preview + original form pre-creation revalidation is the only runtime consumer",
+          "checks": [
+            { "command": "node --test packages/project-recipes/test/preview.case.ts", "exit": 0, "tests": 6, "pass": 6 },
+            { "command": "node --test packages/project-recipes/test/freshness.case.ts", "exit": 0, "tests": 5, "pass": 5 }
+          ],
+          "actualObject": "configuration schema/revision/project/profile/check/expiry and facts/catalog/field identities all participate; a goal edit changes only the goal; selection changes invalidate the applied draft; a hash is never an authorization.",
+          "remaining": "None."
+        },
+        {
+          "id": "J7",
+          "title": "three kinds on two projects through the original product",
+          "status": "PASS",
+          "source": ["tools/project-recipes/test/actual-application.case.ts", "tests/integration/project-recipes.case.mjs"],
+          "actualConsumer": "original Application/Work/check/currentCandidate/manualaccept; preview and cancel create no business work",
+          "checks": [
+            { "command": "node --test tools/project-recipes/test/actual-application.case.ts", "exit": 0, "tests": 8, "pass": 8 },
+            { "command": "node --test tests/integration/project-recipes.case.mjs", "exit": 0, "tests": 5, "pass": 5 }
+          ],
+          "actualObject": "Three kinds x two projects dispatch recorded in one Application; same-name/different-ID, differing check/scope/profile, cross-project atom refusal; main's integration test reaches two original candidates and explicit manual acceptance, with the lost-response same-commandId retry retained by main.",
+          "remaining": "Recovered/B/I native paths are separate and NOT_REACHED; no recovered result is filled with a new normal work."
+        },
+        {
+          "id": "J8",
+          "title": "packable module and package-2 delivery",
+          "status": "PASS",
+          "source": ["packages/project-recipes/package.json", "packages/project-recipes/test/distribution.case.ts"],
+          "actualConsumer": "main/D/E/F via the public API; Node observer never enters the browser",
+          "checks": [
+            { "command": "./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.build.json", "exit": 0 },
+            { "command": "npm pack --dry-run", "exit": 0, "observed": "38 files / 47,157 bytes, only dist/ + README.md" },
+            { "command": "node --test packages/project-recipes/test/distribution.case.ts", "exit": 0, "tests": 2, "pass": 2 }
+          ],
+          "actualObject": "R2 successor runtime source ecc81446 with dist/pack listing; R1 829 left unchanged; root deps/lock/importer untouched by J.",
+          "remaining": "No tar is created by J; D freezes the successor and E binds one exact tar."
+        }
+      ]
+    },
+    {
+      "id": "package-3",
+      "title": "migration projects, repeated use and colleague support",
+      "status": "PASS",
+      "outcomes": [
+        {
+          "id": "J9",
+          "title": "current facts rebuild for a migrated/re-bound project",
+          "status": "PASS",
+          "source": ["packages/project-recipes/src/rebind.ts", "packages/project-recipes/test/rebind.case.ts"],
+          "actualConsumer": "main's own registration mapping via `roots.rootFor`; J never writes a registry, SQL or root mapping",
+          "checks": [
+            { "command": "node --test packages/project-recipes/test/rebind.case.ts", "exit": 0, "tests": 7, "pass": 7 }
+          ],
+          "actualObject": "`rebindRegisteredProject` reports current/changed/unbound/foreign with field-level changes; no registered root yields `unbound` instead of a guessed path; a previous observation of another project is `foreign`; the report carries no absolute root, credential or grant.",
+          "remaining": "Actual material movement (backup/restore) is D/A-owned; J only re-observes the root main supplies."
+        },
+        {
+          "id": "J10",
+          "title": "template and registered-check adaptation after migration",
+          "status": "PASS",
+          "source": ["packages/project-recipes/test/rebind.case.ts", "packages/project-recipes/src/match.ts"],
+          "actualConsumer": "original NewWorkForm/ProjectSettings and verifier policy remain the only authority",
+          "checks": [
+            { "command": "node --test packages/project-recipes/test/rebind.case.ts", "exit": 0, "tests": 7, "pass": 7 },
+            { "command": "node --test packages/project-recipes/test/negative.case.ts", "exit": 0, "tests": 16, "pass": 16 }
+          ],
+          "actualObject": "After a manager/lock/workspace change the previous draft is `stale_inputs` and the new tree produces a new suggestion against current atoms; old grant/old check revision is never reused; unknown language/workspace/version stays needs_input/unsupported; scripts are names only and never become an executable.",
+          "remaining": "New checks still require the trusted registration flow; J cannot register anything."
+        },
+        {
+          "id": "J11",
+          "title": "long-use CLI, error recovery and developer guide",
+          "status": "PASS",
+          "source": ["tools/project-recipes/cli.ts", "tools/project-recipes/test/rebind-cli.case.ts", "docs/project-recipes"],
+          "actualConsumer": "colleague runbook plus main/F typed preview; H/E can replay source and inputs",
+          "checks": [
+            { "command": "node --test tools/project-recipes/test/*.case.ts", "exit": 0, "tests": 33, "pass": 33 },
+            { "command": "node tools/project-recipes/cli.ts --previous-facts tools/project-recipes/fixtures/facts-alpha.json --root tools/project-recipes/fixtures/example-project --now 2026-11-15T00:00:00.000Z", "exit": 0, "observed": "rebind report (status depends on content)" }
+          ],
+          "actualObject": "Read-only CLI with draft/needs_input/unsupported and migration modes; owner-only new output file; bounded failure for bad JSON, symlink, permissions, oversize, invalid limits; existing project files unchanged; guide covers freshness/content/config, needs_input and the original confirmation.",
+          "remaining": "No version command, project hook or model task is executed to fill unknown information."
+        },
+        {
+          "id": "J12",
+          "title": "repeatable module and three-package final handoff",
+          "status": "PASS",
+          "source": ["reports/project-recipes/wave31-status.json", "docs/project-recipes"],
+          "actualConsumer": "main/F/D/E/A/C consume the same public inputs/ports; root/deps/HTTP/UI stay with main",
+          "checks": [
+            { "command": "node agent-tasks/product-wave-31/verify.mjs --workspaces", "exit": 0 },
+            { "command": "node --test tests/integration/project-recipes.case.mjs", "exit": 0, "tests": 5, "pass": 5 }
+          ],
+          "actualObject": "This status lists all 12 outcomes with source, consumer, commands/exits, actual objects and remaining gaps, and separates R1/R2/R3 and source/controlled/installed/native/value/activation.",
+          "remaining": "Ordinary templates are not B/I recovery, native or private-target work."
+        }
+      ]
+    }
+  ],
+  "layers": {
+    "source": { "status": "PASS", "note": "82 package tests, 33 tools tests, strict typecheck, build, example 0, wave-31 dispatch verifier 0." },
+    "controlled": {
+      "status": "PASS_CONTROLLED_CONFIG",
+      "note": "Real ProductStore/Application (three kinds x two projects), main's 5 integration cases, main's 8 browser cases at clean source ecc81446 with two accepted works. Fixture mode; zero real model/native turns."
+    },
+    "installed": { "status": "NOT_REACHED", "note": "No R1 tar installed in this worktree and no R2 tar created; npm pack --dry-run lists contents only. E owns the installed verdict." },
+    "native": { "status": "NOT_APPLICABLE", "note": "Real vendor/model/native turns: 0." },
+    "value": { "status": "NOT_CLAIMED", "note": "No benefit or time-saving claim." },
+    "activation": { "status": "PASS_PRODUCT_PATH_CONTROLLED", "note": "main's actual HTTP/workbench/form and original manual accept exercised in controlled mode only." },
+    "recovered": { "status": "NOT_REACHED", "note": "B/I recovered business and native paths are out of scope and were not substituted with new normal work." }
+  },
+  "evidence": {
+    "package": { "typecheckExit": 0, "tests": 82, "pass": 82, "fail": 0, "buildExit": 0 },
+    "tools": { "typecheckExit": 0, "tests": 33, "pass": 33, "fail": 0 },
+    "exampleExit": 0,
+    "wave31VerifierExit": 0,
+    "mainIntegration": { "command": "node --test tests/integration/project-recipes.case.mjs", "exit": 0, "tests": 5, "pass": 5 },
+    "mainBrowser": { "command": "node tests/integration/project-recipes-browser.mjs reports/project-recipes/wave31-browser", "exit": 0, "cases": 8, "pass": 8, "sourceCommit": "ecc81446", "sourceWorktreeClean": true, "acceptedWorks": 2 },
+    "packDryRun": { "files": 38, "bytes": 47157 },
+    "workspaceRebuildRequired": "after merging main, contracts dist must be rebuilt or main imports fail with a missing export; `pnpm -r --workspace-concurrency=2 run build` exit 0"
+  },
+  "handoff": {
+    "newPublicExports": ["rebindRegisteredProject", "reobserveProjectFacts", "compareProjectFacts", "changedFields", "RebindReportSchema", "REBIND_FIELDS", "RebindError"],
+    "newContracts": ["project-facts-rebind/1 report"],
+    "changedPackageFilesForReimport": ["packages/project-recipes/src/rebind.ts", "packages/project-recipes/src/index.ts"],
+    "mainMustKeep": ["root workspace importer/lock", "registered-root lookup", "HTTP/workbench/form authority", "server-generated observation time"],
+    "dConsumes": ["R2 runtime source ecc81446", "build order contracts -> project-recipes", "pack listing 38 files / 47,157 bytes"],
+    "eConsumes": ["exact R1 829 tar for R1 verdict", "one exact R2 tar after D freezes"],
+    "reproduce": [
+      "./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.json && node --test packages/project-recipes/test/*.case.ts",
+      "./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.build.json",
+      "./node_modules/.bin/tsc -p tools/project-recipes/tsconfig.json && node --test tools/project-recipes/test/*.case.ts",
+      "pnpm -r --workspace-concurrency=2 run build && node --test tests/integration/project-recipes.case.mjs",
+      "node tests/integration/project-recipes-browser.mjs reports/project-recipes/wave31-browser",
+      "node packages/project-recipes/examples/preview-consumer.ts"
+    ]
+  },
+  "notReached": [
+    "R1 installed preview/confirmation and installed verdict (E-owned, no tar installed here)",
+    "R2 tar creation and installed verdict (D freezes, E verifies)",
+    "real model/native/runtime admission",
+    "B/I recovered business and native paths",
+    "F-owned presentation verification and E independent assertions",
+    "value/efficiency claims"
+  ],
+  "limits": {
+    "realModelTurns": 0,
+    "nativeTurns": 0,
+    "vendorCalls": 0,
+    "dependencyInstalls": 0,
+    "executedProjectCommands": 0,
+    "checkRegistrations": 0,
+    "sqlWrites": 0,
+    "executionLifecycles": 0,
+    "userServicesTouched": 0,
+    "newWorktreesCreated": 0
+  },
+  "ownership": {
+    "owned": ["packages/project-recipes/", "tools/project-recipes/", "docs/project-recipes/", "reports/project-recipes/"],
+    "untouchedByDesign": ["pnpm-lock.yaml", "root package.json", "packages/contracts/", "apps/", "A/B/C/D/E/F/G/H/I paths"]
+  }
+}
