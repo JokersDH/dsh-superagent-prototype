@@ -65,8 +65,8 @@
       "summary": "Functional mode closure with old personal scope preserved."
     },
     "d9": {
-      "status": "PARTIAL_REGISTERED_NEEDS_INPUT",
-      "summary": "Source J browser 6/6; package J dist/API present. Installed fixture without root returns unavailable; installed personal registered project returns needs_input because discussion project has no dispatch profile, authorization none, event_log0/command_receipts0. Installed draft/apply remains NOT_REACHED."
+      "status": "PASS_API_DRAFT",
+      "summary": "Installed package J API with controlled fixture + registered roots returns draft, input exact, authorization none, events0. Installed CLI fixture cannot provide that combo; UI apply/create source test 6/6 remains separate."
     },
     "d10": {
       "status": "PASS",
@@ -118,7 +118,7 @@
   "notDone": [
     "E successor independent verdict",
     "B/private/target",
-    "installed J draft/apply with controlled fixture profile"
+    "installed J UI apply/create static rerun"
   ],
   "limits": [
     "zero real vendor/model/native turns",
