@@ -1,0 +1,295 @@
+{
+  "protocol": "project-recipes-wave28-status/1",
+  "owner": "J",
+  "date": "2026-11-15",
+  "branch": "codex/g5-project-recipes",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-j",
+  "baseline": "46020ff2e2d748961835a64cc8bf1a39cb91d378",
+  "mergedOriginMain": "ea82d8f (wave-28 dispatch) merged as edf9a54",
+  "packet": "agent-tasks/product-wave-28/agent-j-project-recipes.zh-CN.md",
+  "admissionAddressed": {
+    "id": "J28-ORIGINAL-SCOPE-CONSUMER-COMPATIBILITY",
+    "record": "reports/releases/wave28-admission/experience-recipes.json",
+    "before": "grant ['src'] + selection ['src/file.ts'] produced a schema-valid draft that the same-config createProductApplication rejected as forbidden; trailing-slash and '.' grant atoms were wrongly refused.",
+    "after": "Declared-atom containment (exact string membership) mirrored in packages/project-recipes/src/scope.ts; '.' and 'src/' preserved verbatim; child paths and differently-spelled atoms return needs_input; the same configuration now dispatches recorded."
+  },
+  "layers": {
+    "source": {
+      "status": "PASS",
+      "evidence": ["packages/project-recipes", "tools/project-recipes"],
+      "note": "Strict typecheck, build, 61 package tests, 20 tools tests, example exit 0."
+    },
+    "controlled": {
+      "status": "PASS_CONTROLLED_CONFIG",
+      "evidence": ["tools/project-recipes/test/actual-application.case.ts"],
+      "note": "Real createProductApplication + real ProductStore in a temp directory, controlled project configuration, no real model/native turn. Dispatch is the only product action; it records work in the temp store."
+    },
+    "installed": {
+      "status": "NOT_REACHED",
+      "note": "No packaged installation was produced or admitted. npm pack --dry-run only lists contents (34 files, 36,643 bytes)."
+    },
+    "native": {
+      "status": "NOT_APPLICABLE",
+      "note": "Real vendor/model/native turns: 0. The module executes nothing."
+    },
+    "value": {
+      "status": "NOT_CLAIMED",
+      "note": "No time saving, efficiency or quality benefit is asserted; J22 is a field-level observation only."
+    },
+    "activation": {
+      "status": "NOT_REACHED",
+      "note": "No main HTTP/App route and no F form pass recipe fields; main wave-28 status reports unadmittedJRecipesDefaultEnabled=false."
+    }
+  },
+  "evidence": {
+    "package": { "typecheckExit": 0, "tests": 61, "pass": 61, "fail": 0, "buildExit": 0 },
+    "tools": { "typecheckExit": 0, "tests": 20, "pass": 20, "fail": 0 },
+    "exampleExit": 0,
+    "wave28VerifierExit": 0,
+    "packDryRun": { "files": 34, "bytes": 36643, "contains": ["dist/", "README.md"] },
+    "cli": [
+      { "args": "--paths src/", "exit": 0, "observed": "draft" },
+      { "args": "--paths src/file.ts", "exit": 3, "observed": "needs_input scope_path_outside_allowed" },
+      { "args": "--paths src (config declares src/)", "exit": 3, "observed": "needs_input scope_path_outside_allowed" },
+      { "args": "--kind scoped_change (no paths)", "exit": 3, "observed": "needs_input scope_paths_required" },
+      { "args": "--config only", "exit": 2, "observed": "usage" },
+      { "args": "--facts /tmp/nope.json", "exit": 5, "observed": "refused [unreadable]" }
+    ],
+    "actualApplication": [
+      { "case": "draft with declared atom dispatched", "result": "recorded" },
+      { "case": "forced child atom dispatched", "result": "rejected forbidden (Scope exceeds the configured project grant)" },
+      { "case": "grant ['src'] + selection ['src/file.ts']", "result": "needs_input scope_path_outside_allowed" },
+      { "case": "grant ['src'] + selection ['src']", "result": "recorded" }
+    ]
+  },
+  "stages": [
+    {
+      "id": "J1",
+      "title": "align with original Scope semantics",
+      "status": "PASS",
+      "source": ["packages/project-recipes/src/scope.ts", "packages/project-recipes/src/match.ts"],
+      "capability": "Exact declared-atom containment mirroring packages/questions/src/validation.ts and packages/context/src/paths.ts: allowed atoms must be literally present, grant exclusions must survive, externalActions subset, expiry respected. Trailing-slash and '.' atoms are legal and preserved."
+    },
+    {
+      "id": "J2",
+      "title": "only usable scope selections",
+      "status": "PASS",
+      "source": ["packages/project-recipes/src/match.ts", "packages/project-recipes/test/negative.case.ts"],
+      "capability": "Selections must be existing declared atoms or produce needs_input; child paths are never promoted to new atoms; '.', 'src/', 'src', similar prefixes, empty/parent/absolute/backslash are covered; original representations are preserved."
+    },
+    {
+      "id": "J3",
+      "title": "actual application consumer",
+      "status": "PASS",
+      "source": ["tools/project-recipes/test/actual-application.case.ts"],
+      "capability": "Real createProductApplication + ProductStore under the same configuration; a matcher draft dispatches recorded, and a forced child atom is rejected forbidden. No candidates table, SQL, execution lifecycle or change to core authorization."
+    },
+    {
+      "id": "J4",
+      "title": "first result: actual usable draft",
+      "status": "PASS",
+      "source": ["packages/project-recipes", "tools/project-recipes"],
+      "capability": "Positive drafts and refusals for the original controlled grant atoms, with an actual Application consumer; wave-27 suites still pass (now 61 package / 20 tools)."
+    },
+    {
+      "id": "J5",
+      "title": "packaged read-only facts module",
+      "status": "PASS",
+      "source": ["packages/project-recipes/src/observe.ts"],
+      "capability": "The bounded observation moved from tools into the package runtime export; one implementation serves CLI and main. createProjectFactsObserver takes a registered-root resolver and its observe() has no path parameter."
+    },
+    {
+      "id": "J6",
+      "title": "complete read budget and identity",
+      "status": "PASS",
+      "source": ["packages/project-recipes/src/observe.ts", "packages/project-recipes/test/observe.case.ts"],
+      "capability": "NOFOLLOW/fstat, regular-file only, per-file/file-count/total-byte budgets, root swap and missing files refused; JSON only for package.json; script bodies never read or emitted; no version or script execution."
+    },
+    {
+      "id": "J7",
+      "title": "current facts and versions",
+      "status": "PASS",
+      "source": ["packages/project-recipes/src/facts.ts", "packages/project-recipes/src/draft.ts"],
+      "capability": "Facts/config/catalog/selection all carry version or digest and observation time; changed inputs require regeneration (staleInputs names the changed prerequisite); path names and lock names never imply native readiness or execution authority."
+    },
+    {
+      "id": "J8",
+      "title": "second result: real Node facts consumer",
+      "status": "PASS",
+      "source": ["packages/project-recipes/src/observe.ts", "tools/project-recipes/cli.ts", "packages/project-recipes/src/index.ts"],
+      "capability": "Main-consumable runtime observer port plus the read-only CLI over one implementation; unregistered project refuses with root_not_registered; no root-lock, registry or HTTP change."
+    },
+    {
+      "id": "J9",
+      "title": "formal preview field hand-off",
+      "status": "PASS",
+      "source": ["packages/project-recipes/src/preview.ts"],
+      "capability": "Existing Scope/RequiredCriteria/profile and create_work fields reused; main keeps session/command/authority and explicit confirmation; no fabricated model source or second confirmation authority."
+    },
+    {
+      "id": "J10",
+      "title": "complete states and errors",
+      "status": "PASS",
+      "source": ["packages/project-recipes/src/draft.ts", "packages/project-recipes/test/negative.case.ts"],
+      "capability": "Closed issue codes and fields for all three statuses; bounded, path-free messages; no script, credential or private absolute root echoed; unknown protocol/oversize/malformed inputs refused at the boundary."
+    },
+    {
+      "id": "J11",
+      "title": "old inputs and user edits",
+      "status": "PASS",
+      "source": ["packages/project-recipes/src/preview.ts", "packages/project-recipes/test/preview.case.ts"],
+      "capability": "previewInputs revalidates current configuration/facts and the original selection; PreviewError carries staleInputs=['configuration'|'facts']; a self-computed digest is never treated as approval; edits remain the original form's job."
+    },
+    {
+      "id": "J12",
+      "title": "third result: draft to original confirmation input",
+      "status": "PASS",
+      "source": ["tools/project-recipes/test/actual-application.case.ts"],
+      "capability": "One chain proven end to end: authorized root → observer facts → same-config draft → preview fields → create_work command → real Application recorded. main/F UI/HTTP remains NOT_REACHED."
+    },
+    {
+      "id": "J13",
+      "title": "multi-project and same-name isolation",
+      "status": "PASS",
+      "source": ["tools/project-recipes/test/multi-project.case.ts", "packages/project-recipes/test/compatibility.case.ts"],
+      "capability": "Two real independent roots with different manager/profile/check/atoms; same display name but different IDs never share provenance, criteria or revision; repeated observation is side-effect free."
+    },
+    {
+      "id": "J14",
+      "title": "monorepo exact scope",
+      "status": "PASS",
+      "source": ["tools/project-recipes/test/multi-project.case.ts", "packages/project-recipes/src/match.ts"],
+      "capability": "Workspace root requires explicit declared atoms; an undeclared sibling member is needs_input; no member guessing, no parent/sibling reads, no silent widening."
+    },
+    {
+      "id": "J15",
+      "title": "three templates and checks",
+      "status": "PASS",
+      "source": ["packages/project-recipes/src/catalog.ts", "packages/project-recipes/test/catalog.case.ts"],
+      "capability": "Regression fix, scoped change and verification follow-up reuse registered checks and the project profile; unknown stack/manager, no required machine check and disabled profile are explained without switching to fixture or another agent."
+    },
+    {
+      "id": "J16",
+      "title": "fourth result: multi-project template library",
+      "status": "PASS",
+      "source": ["packages/project-recipes", "tools/project-recipes"],
+      "capability": "Complete suggestions and refusals across two projects, monorepo atoms and missing capabilities; positives and independent negatives; no claim of main consumption beyond the controlled Application dispatch."
+    },
+    {
+      "id": "J17",
+      "title": "resources and failure recovery",
+      "status": "PASS",
+      "source": ["packages/project-recipes/src/observe.ts", "packages/project-recipes/test/observe.case.ts"],
+      "capability": "Reads/parse/total work bounded; refusals leave project files unchanged (mtime/size/mode asserted); output only creates a new file; repeated observation reproduces identical facts; failures carry bounded ids/status/digest only."
+    },
+    {
+      "id": "J18",
+      "title": "distribution and consumer compatibility",
+      "status": "PASS",
+      "source": ["packages/project-recipes/package.json", "packages/project-recipes/tsconfig.build.json"],
+      "capability": "Node library and CLI share one source; exports point at dist; npm pack --dry-run lists only dist+README (34 files); runtime deps are contracts+zod; root lock remains main-owned and unchanged."
+    },
+    {
+      "id": "J19",
+      "title": "privacy and observable data",
+      "status": "PASS",
+      "source": ["packages/project-recipes/src/observe.ts", "packages/project-recipes/test/observe.case.ts"],
+      "capability": "Output only public facts names/counts/digests/missing; refusals never echo metadata bodies or secrets; configuration presence never proves a tool is installed or native-tested; no executable/install/network action."
+    },
+    {
+      "id": "J20",
+      "title": "fifth result: complete tool and support",
+      "status": "PASS",
+      "source": ["tools/project-recipes", "docs/project-recipes/README.zh-CN.md"],
+      "capability": "Real Node/CLI entry, failure/limit/new-file behavior, documentation and reproducible consumers usable by a colleague within the legal scope; zero model, native, install, SQL or check registration."
+    },
+    {
+      "id": "J21",
+      "title": "main actual integration review",
+      "status": "NOT_REACHED",
+      "source": ["reports/releases/wave28-integration/status.json", "reports/releases/wave28-admission/experience-recipes.json"],
+      "capability": "J-owned part is done: same project/config/facts/revision fields and the original confirm produce a recorded Application command. main has not published or enabled a recipe HTTP/form consumer (unadmittedJRecipesDefaultEnabled=false, newSharedContracts=false); no J defect blocks it.",
+      "notReached": ["main HTTP/App route", "F form pass-through", "F presentation applicability (F-owned finding)"]
+    },
+    {
+      "id": "J22",
+      "title": "useful daily flow observation",
+      "status": "PASS_OBSERVATION_ONLY",
+      "source": ["reports/project-recipes/wave28-report.zh-CN.md"],
+      "capability": "One real authorized monorepo root observed with the shipped CLI produced a draft carrying goal text, the declared atom, configured criteria and profile; a manual baseline would type those four field groups by hand. No user study, no efficiency claim, no BLOCKED pilot executed."
+    },
+    {
+      "id": "J23",
+      "title": "public development handoff",
+      "status": "PASS",
+      "source": ["docs/project-recipes/README.zh-CN.md", "docs/project-recipes/main-integration.zh-CN.md", "packages/project-recipes/README.md"],
+      "capability": "Support range, scope atom invariants, errors, budgets, three template examples and fresh run commands updated; wave-27 numbers are labelled historical; untested platforms stated."
+    },
+    {
+      "id": "J24",
+      "title": "sixth result and final delivery",
+      "status": "PASS",
+      "source": ["reports/project-recipes/wave28-status.json"],
+      "capability": "This status lists J1–J24, six results, main/F consumer state, exact source/commands/exits and layered source/controlled/installed/native/value/activation accounting."
+    }
+  ],
+  "results": [
+    { "checkpoint": 4, "name": "actual usable draft", "stages": ["J1", "J2", "J3", "J4"], "status": "PASS" },
+    { "checkpoint": 8, "name": "runtime read-only facts", "stages": ["J5", "J6", "J7", "J8"], "status": "PASS" },
+    { "checkpoint": 12, "name": "draft to original confirmation input", "stages": ["J9", "J10", "J11", "J12"], "status": "PASS" },
+    { "checkpoint": 16, "name": "multi-project template library", "stages": ["J13", "J14", "J15", "J16"], "status": "PASS" },
+    { "checkpoint": 20, "name": "complete tool and support", "stages": ["J17", "J18", "J19", "J20"], "status": "PASS" },
+    { "checkpoint": 24, "name": "handoff and final status", "stages": ["J21", "J22", "J23", "J24"], "status": "PASS_WITH_NOT_REACHED_CONSUMER" }
+  ],
+  "consumerState": {
+    "main": {
+      "recipeHttpOrForm": "NOT_REACHED",
+      "evidence": "reports/releases/wave28-integration/status.json: unadmittedJRecipesDefaultEnabled=false, newSharedContracts=false, knownRemainingCandidateIssues includes the J scope mismatch now fixed"
+    },
+    "f": {
+      "recipeFieldPassThrough": "NOT_REACHED",
+      "note": "F's own presentation applicability finding (F28-UNQUALIFIED-RECIPE-DISPLAY-ADMISSION) is F-owned; main currently passes no suggestions"
+    },
+    "e": {
+      "independentAcceptance": "NOT_SUPPLIED",
+      "note": "J did not create or modify product-acceptance assertions; fixtures and documented failure matrix are available"
+    }
+  },
+  "handoff": {
+    "mainMustAddLockImporter": "packages/project-recipes (see docs/project-recipes/main-integration.zh-CN.md section 1)",
+    "mainConsumes": ["matchRecipe", "parseProjectRecipeDraft", "previewInputs", "toCreateWorkCommand", "createProjectFactsObserver"],
+    "fConsumes": ["CreateWorkFields"],
+    "reproduce": [
+      "./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.json && node --test packages/project-recipes/test/*.case.ts",
+      "./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.build.json",
+      "./node_modules/.bin/tsc -p tools/project-recipes/tsconfig.json && node --test tools/project-recipes/test/*.case.ts",
+      "for p in effects orchestrator-core storage questions application; do ./node_modules/.bin/tsc -p packages/$p/tsconfig.build.json; done",
+      "node packages/project-recipes/examples/preview-consumer.ts"
+    ]
+  },
+  "notReached": [
+    "main HTTP/App composition of recipe drafts",
+    "F form rendering / keyboard and mobile checks for recipe fields",
+    "E independent product-acceptance assertions",
+    "packaged installation and installed verdict",
+    "any native/runtime admission: zero model/native turns",
+    "monorepo member enumeration (pnpm-workspace.yaml content never parsed)",
+    "package-manager version probing (no --version execution)"
+  ],
+  "limits": {
+    "realModelTurns": 0,
+    "nativeTurns": 0,
+    "vendorCalls": 0,
+    "dependencyInstalls": 0,
+    "executedProjectCommands": 0,
+    "checkRegistrations": 0,
+    "sqlWrites": 0,
+    "executionLifecycles": 0,
+    "userServicesTouched": 0,
+    "newWorktreesCreated": 0
+  },
+  "ownership": {
+    "owned": ["packages/project-recipes/", "tools/project-recipes/", "docs/project-recipes/", "reports/project-recipes/"],
+    "untouchedByDesign": ["pnpm-lock.yaml", "root package.json", "packages/contracts/", "apps/", "global CSS", "A/B/C/D/E/F/G/H/I paths"]
+  }
+}

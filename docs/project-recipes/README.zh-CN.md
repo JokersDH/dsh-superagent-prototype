@@ -1,12 +1,12 @@
 # 项目任务/检查声明配方（project-recipes）
 
-日期：2026-11-14。范围：`packages/project-recipes/`、`tools/project-recipes/`、`docs/project-recipes/`、`reports/project-recipes/`。
+日期：2026-11-15（wave-28）。范围：`packages/project-recipes/`、`tools/project-recipes/`、`docs/project-recipes/`、`reports/project-recipes/`。
 
-这是**选择与声明**层，不是执行层。它把「明确观察到的项目事实 + 当前公开 `ApplicationConfiguration` + 任务类型 + 用户显式选择」变成三种结果之一：完整草稿 `draft`、待补输入 `needs_input`、不支持 `unsupported`。草稿只是数据，必须走应用原有的预览与明确确认；本模块不安装、不运行、不注册任何检查或脚本，不调用模型/agent，不写数据库或账本，也不创建第二套执行生命周期。
+这是**选择与声明**层，不是执行层。它把「明确观察到/已授权的项目事实 + 当前公开 `ApplicationConfiguration` + 任务类型 + 用户显式选择」变成三种结果之一：完整草稿 `draft`、待补输入 `needs_input`、不支持 `unsupported`。草稿只是数据，必须走应用原有的预览与明确确认；本模块不安装、不运行、不注册任何检查或脚本，不调用模型/agent，不写数据库或账本，也不创建第二套执行生命周期。
 
 ---
 
-## 1. 支持范围
+## 1. 支持范围与 scope 语义（本轮修正）
 
 | 维度 | 支持 | 明确不支持 |
 | --- | --- | --- |
@@ -15,8 +15,30 @@
 | 任务类型 | `regression_fix`、`scoped_change`、`verification_followup` | 其他 kind（调用方用法错误，CLI exit 2） |
 | 配置协议 | `application-configuration/1` | 其他版本（`configuration_unsupported_version`） |
 | 事实协议 | `project-facts/1` | 其他版本（`invalid_facts`，CLI exit 5） |
-| 布局 | 单包；monorepo/workspace 根需显式成员路径 | 自动成员枚举（不解析 `pnpm-workspace.yaml` 内容） |
+| 布局 | 单包；monorepo/workspace 根需显式成员原子 | 自动成员枚举（不解析 `pnpm-workspace.yaml` 内容） |
 | 检查 | 只引用配置里已登记的 `checkDefinitionRef` | 从 `package.json` scripts 反推命令、注册新检查 |
+
+### 1.1 Scope 是「声明原子」，不是前缀
+
+原应用（`packages/questions/src/validation.ts`、`packages/context/src/paths.ts`）的 `scopeWithin` 规则：
+
+- `scope.allowedPaths` 的每一项必须**逐字出现在** grant 的 `allowedPaths` 中（`includes`，精确字符串比较）；
+- grant 的**每一个** `excludedPaths` 必须仍存在于子 scope 中（排除只能增加）；
+- `externalActions` 只能是子集；
+- 若 grant 有 `expiresAt`，子 scope 必须有不晚于它的 `expiresAt`。
+
+因此：
+
+| 配置声明 | 选择 | 结果 |
+| --- | --- | --- |
+| `src/` | `src/` | ✅ 同一原子，原样保留 |
+| `src/` | `src` | ❌ 不同原子（尾斜杠属于字符串） |
+| `src/` | `src/file.ts` | ❌ 子路径**不是**更小的原子；原 Application 会 `forbidden` |
+| `.` | `.` | ✅ 原样保留 |
+| `packages/core/src/` | `packages/core/src/` | ✅ |
+| 任意 | `/etc/passwd`、`../x`、`a\b`、空串 | ❌ `scope_path_invalid` |
+
+要更小的范围（例如把 `src/` 缩到 `src/file.ts`），必须走**原配置授权流程**（main 的 ProjectSettings/registration），配方不会替你新增授权原子。判定代码在 `packages/project-recipes/src/scope.ts`（`isProjectAtom`、`scopeAtomWithin`），并由 `tools/project-recipes/test/actual-application.case.ts` 在**真实 `createProductApplication`** 上双向验证：matcher 产出的原子被应用接受，被 matcher 拒绝的子路径强行送入应用也会被 `forbidden` 拒绝。
 
 fixture 与 native 的区分由配置决定，本模块不参与判定，但保证不混淆：草稿只记录 `profileId`，不写 readiness、driver 或执行类型；fixture 配置产出 fixture profile 的草稿，native 配置不会继承 `fixture_ready` 字样，显式选择的 profile 也不会被默认值替换（`profile_not_enabled` 直接拒绝）。测试见 `packages/project-recipes/test/compatibility.case.ts`。
 
@@ -24,9 +46,9 @@ fixture 与 native 的区分由配置决定，本模块不参与判定，但保�
 
 | kind | 建议的重点 | scope | criteria |
 | --- | --- | --- | --- |
-| `regression_fix` | 最小修复 + 回归证据，让已登记检查重新通过 | 必须显式给出更窄路径 | 项目默认 criteria 全集 |
-| `scoped_change` | 只在列出路径内做有限变更 | 必须显式给出路径 | 项目默认 criteria 全集 |
-| `verification_followup` | 只跟进已有检查结果，不新增能力 | 可用项目 scope | 只取已登记的机器检查 |
+| `regression_fix` | 最小修复 + 回归证据，让已登记检查重新通过 | 必须显式给出更窄的**已声明原子** | 项目默认 criteria 全集 |
+| `scoped_change` | 只在列出的原子内做有限变更 | 必须显式给出已声明原子 | 项目默认 criteria 全集 |
+| `verification_followup` | 只跟进已有检查结果，不新增能力 | 可用项目全部已声明原子 | 只取已登记的机器检查 |
 
 ---
 
@@ -34,8 +56,8 @@ fixture 与 native 的区分由配置决定，本模块不参与判定，但保�
 
 只接受两种来源，二者都写进 `provenance`：
 
-1. **注入**（`source: "injected"`）：main 或已有 inspection 已经观察好，直接传入。优先这种方式，避免重复扫描环境。
-2. **授权只读读取**（`source: "authorized_metadata"`）：由 `tools/project-recipes` 的读取器在**显式给出的绝对根目录**下观察。
+1. **注入**（`source: "injected"`）：main 或已有 inspection 已经观察好，直接传入。优先这种方式。
+2. **授权只读读取**（`source: "authorized_metadata"`）：`packages/project-recipes/src/observe.ts` 在明确给出的绝对根目录下观察；CLI 与 main 的 runtime port 共用**同一份实现**。
 
 `project-facts/1` 只包含名字、摘要、计数和封闭枚举：
 
@@ -64,11 +86,28 @@ fixture 与 native 的区分由配置决定，本模块不参与判定，但保�
 - `provenance.authority` 恒为 `none`：事实是数据，不含执行许可。
 - `observedAt` 由调用方给出；`matchRecipe` 用调用方传入的 `now` 判断是否过期（默认 60 分钟），因此结果可复现。
 
-### 读取边界（`tools/project-recipes/metadata.ts`）
+### 2.1 main 应使用的 runtime port（无任意 root）
 
-- 根目录必须**绝对路径**、已存在、是目录；拒绝 `/` 与用户 home。
+```ts
+import { createProjectFactsObserver } from '@personal-agent/project-recipes'
+
+const observer = createProjectFactsObserver({
+  // main 已登记项目 → 根的映射；由 main 自己的 registry/配置提供
+  rootFor: (projectId) => registeredRoots.get(projectId),
+})
+const { facts, notes } = observer.observe({ projectId, observedAt: new Date().toISOString() })
+```
+
+- `observe` 的入参只有 `projectId` 与 `observedAt`，**没有 path**：公开请求无法指定任意根。
+- 未登记项目 → `MetadataRefused`，`code: "root_not_registered"`。
+- 端口协议字符串 `project-facts-observer/1`，可放进 main 的状态输出做版本核对。
+- 需要更底层的显式根时用 `observeProjectMetadata({ root, projectId, observedAt })`（CLI 的 `--root` 走这条），仍受同样边界约束。
+
+### 2.2 读取边界
+
+- 根目录必须**绝对路径**、已存在、是目录；拒绝 `/`、用户 home、未登记项目。根被替换时读取会拒绝（读完再核对父目录 realpath）。
 - 只打开根目录下白名单名字：`package.json`、`tsconfig.json`、`pnpm-workspace.yaml`、`package-lock.json`、`pnpm-lock.yaml`、`npm-shrinkwrap.json`、`yarn.lock`、`bun.lockb`、`pyproject.toml`、`go.mod`、`Cargo.toml`、`pom.xml`、`build.gradle`。不递归、不进子目录。
-- 每次都 `O_NOFOLLOW` + `fstat`：符号链接、非普通文件一律拒绝；读完后再次确认父目录仍是原根（防路径替换）。
+- 每次都 `O_NOFOLLOW` + `fstat`：符号链接、非普通文件一律拒绝。
 - 默认上限：`package.json` 256 KiB，锁文件 4 MiB，最多读 12 个文件，整次观察 8 MiB；超出即拒绝。
 - 只解析 `package.json` 的 JSON；YAML/锁文件只做存在性判断或有界哈希。
 - 不读 home、环境变量、`.npmrc`、凭据；不执行 `--version` 或任何项目脚本。
@@ -78,7 +117,7 @@ fixture 与 native 的区分由配置决定，本模块不参与判定，但保�
 ## 3. CLI
 
 ```sh
-# 最小前置（workspace 依赖）：只构建 contracts，不安装任何项目依赖
+# 最小前置（workspace 依赖）：只构建 contracts
 pnpm --dir packages/contracts build
 
 # 1) 直接使用已观察事实
@@ -86,13 +125,13 @@ node tools/project-recipes/cli.ts \
   --config tools/project-recipes/fixtures/configuration.json \
   --facts  tools/project-recipes/fixtures/facts-alpha.json \
   --now 2026-11-14T12:00:00.000Z \
-  --kind regression_fix --paths src/parser.ts
+  --kind regression_fix --paths src/
 
 # 2) 显式授权根目录，按白名单只读观察
 node tools/project-recipes/cli.ts \
   --config tools/project-recipes/fixtures/configuration.json \
   --root tools/project-recipes/fixtures/example-project \
-  --project project-alpha --paths src --now 2026-11-14T12:00:00.000Z
+  --project project-alpha --paths src/ --now 2026-11-14T12:00:00.000Z
 
 # 3) 写到新文件（已存在则拒绝，绝不覆盖）
 node tools/project-recipes/cli.ts … --output /tmp/recipe-draft.json
@@ -107,8 +146,8 @@ node tools/project-recipes/cli.ts … --output /tmp/recipe-draft.json
 | `--root <dir>` | 与 `--facts` 二选一。明确授权的绝对项目根。 |
 | `--project <id>` | 省略时取 `--facts` 的 `projectId`；若用 `--root` 则要求配置里只有唯一项目。两者不一致直接拒绝（exit 2）。 |
 | `--kind <kind>` | 默认 `regression_fix`。 |
-| `--paths a,b` / `--exclude c` / `--criteria x,y` / `--profile <id>` | 显式选择；只可在配置允许集合内收窄。给空值（如 `--paths ""`）是用法错误（exit 2）。 |
-| 省略 `--paths` | 表示「没有额外收窄」：`verification_followup` 用项目 scope；两个需要边界的配方则返回 `needs_input: scope_paths_required`。 |
+| `--paths a,b` / `--exclude c` / `--criteria x,y` / `--profile <id>` | 显式选择；`--paths` 必须是配置**已声明的原子**。给空值是用法错误（exit 2）。 |
+| 省略 `--paths` | 表示「没有额外收窄」：`verification_followup` 用项目全部已声明原子；两个需要边界的配方则返回 `needs_input: scope_paths_required`。 |
 | `--now <ISO>` | 决定 facts 新鲜度；省略用当前时间（测试与复跑请显式给出）。 |
 | `--max-facts-age-ms <n>` | 覆盖默认 60 分钟上限。 |
 | `--output <新文件>` | 仅在文件不存在时写入（`O_EXCL`），同时仍把 JSON 打到 stdout。 |
@@ -122,11 +161,9 @@ node tools/project-recipes/cli.ts … --output /tmp/recipe-draft.json
 | `2` | 用法错误（缺参、未知 flag、未知 kind、`--project` 与 facts 不一致） |
 | `3` | `needs_input`（可纠正的缺失输入） |
 | `4` | `unsupported`（该输入类别不支持） |
-| `5` | 输入被拒绝（坏 JSON、缺失文件、符号链接、超限、输出文件已存在、facts 不合法） |
+| `5` | 输入被拒绝（坏 JSON、缺失文件、符号链接、超限、输出文件已存在、facts 不合法、依赖未构建） |
 
 `--root` 观察到的 `note:` 走 stderr；stdout 只有一个 JSON 结果。stdout 不含绝对路径、脚本正文或环境材料。
-
-若 workspace 依赖尚未构建，CLI 在加载失败时给一条可执行的拒绝（`refused [unreadable] packages/contracts/dist: …请先运行 pnpm --dir packages/contracts build`，exit 5），不会抛出模块栈。
 
 ---
 
@@ -143,13 +180,13 @@ node tools/project-recipes/cli.ts … --output /tmp/recipe-draft.json
     "catalog":       { "id": "project-recipes", "version": 1, "digest": "…" },
     "configuration": { "protocol": "application-configuration/1", "revision": "…", "projectId": "project-alpha" },
     "facts":         { "protocol": "project-facts/1", "digest": "…", "observedAt": "…", "provider": "…", "source": "injected" },
-    "selection":     { "digest": "…", "paths": ["src/parser.ts"] },
+    "selection":     { "digest": "…", "paths": ["src/"] },
     "input": "…"                       // (facts, config revision, kind, selection) 的摘要
   },
   "authorization": "none",
   "notes": ["…"],
   "status": "draft",
-  "goal": "…", "scope": { "…": "现有 Scope 形状" }, "criteria": [ … ], "profileId": "profile-native",
+  "goal": "…", "scope": { "…": "现有 Scope 形状，原子逐字保留" }, "criteria": [ … ], "profileId": "profile-native",
   "revision": "…"                      // 去掉 revision 后内容的 sha256
 }
 ```
@@ -159,7 +196,7 @@ node tools/project-recipes/cli.ts … --output /tmp/recipe-draft.json
 - `provenance.configuration.revision` 为 `null` 只出现在「配置无法解析/版本不支持」，绝不伪造摘要。
 - `needs_input` 与 `unsupported` 用封闭 code 列表表达原因，调用方不必解析自由文本。
 
-### 结果码表
+### 4.1 结果码表
 
 | code | 状态 | 触发条件 |
 | --- | --- | --- |
@@ -171,33 +208,35 @@ node tools/project-recipes/cli.ts … --output /tmp/recipe-draft.json
 | `manager_unknown` | needs_input | 无法确定包管理器 |
 | `locks_ambiguous` | needs_input | pnpm 与 npm 锁文件并存，或声明与锁文件不一致 |
 | `workspace_unknown` | needs_input | 布局未观察 |
-| `workspace_member_required` | needs_input | monorepo 根 + 有限范围配方未给路径 |
+| `workspace_member_required` | needs_input | monorepo 根 + 有限范围配方未给原子 |
 | `project_discussion_only` / `project_dispatch_blocked` | needs_input | 只读讨论 / 项目不可派工 |
 | `execution_unavailable` | needs_input | 配置声明执行不可用 |
 | `profile_required` / `profile_not_enabled` | needs_input | 无默认 profile / 指定 profile 未启用 |
 | `criteria_machine_required` | needs_input | 所选 criteria 没有必需的已登记机器检查 |
 | `criteria_check_unregistered` | unsupported | criteria 引用了未登记检查（防御性） |
 | `criteria_selection_unknown` | needs_input | 指定的 criteria id 不在默认集合 |
-| `scope_paths_required` | needs_input | 有限范围配方未给路径 |
-| `scope_path_outside_allowed` | needs_input | 路径越界、绝对路径、含 `..` |
+| `scope_paths_required` | needs_input | 有限范围配方未给原子 |
+| `scope_path_outside_allowed` | needs_input | 合法但**没被当前配置声明**的原子（含子路径） |
+| `scope_path_invalid` | needs_input | 绝对路径/盘符/反斜杠/`..`/空串等非法原子 |
 
 ---
 
 ## 5. 接到原确认流程（main/F）
 
-本模块**不做 UI/API**。`packages/project-recipes/src/preview.ts` 提供两件事：
+本模块**不做 UI/API**。`packages/project-recipes/src/preview.ts` 提供：
 
 ```ts
 // 1) 只把 draft 的字段整理成现有 create_work 命令的数据部分
-const fields = previewInputs(draft, { configuration, facts })   // 输入已过期会抛 stale_inputs
+const fields = previewInputs(draft, { configuration, facts })
 
 // 2) 生成一个仍然要过原有校验与确认的命令候选
-const command = toCreateWorkCommand(draft, { commandId, conversationId })  // 由应用会话提供 ID
+const command = toCreateWorkCommand(draft, { commandId, conversationId })
 ```
 
 - `commandId` / `conversationId` / trusted actor / 预览 token 全部由应用提供，本模块不生成。
-- `assertDraftCurrent` 会比较 `configuration.revision` 与 facts 摘要：配置或观察变化后必须重新生成，旧草稿不能拿去提交新作用域。
-- 模型撰写的 `ProposalPrepare` 路径仍只属于原模型提案（需要 `sourceMessageId`）；项目配方走 `create_work` 草稿路径，不要伪造来源消息。
+- `previewInputs` 会比较 `configuration.revision` 与 facts 摘要；不匹配时抛 `PreviewError`，`code: "stale_inputs"`，并在 `staleInputs: ("configuration" | "facts")[]` 里指出**哪一项需要重生成**。
+- 模型撰写的 `ProposalPrepare` 路径仍只属于原模型提案（需要 `sourceMessageId`）；项目配方走 `create_work` 草稿路径，不伪造来源消息。
+- 已用真实 `createProductApplication` 验证：同配置下 `draft → create_work → dispatch` 返回 `recorded`；强行送入子路径原子会被 `forbidden` 拒绝。
 - 具体接线示例见 [main-integration.zh-CN.md](main-integration.zh-CN.md)。
 
 ---
@@ -206,7 +245,7 @@ const command = toCreateWorkCommand(draft, { commandId, conversationId })  // �
 
 | 限制 | 默认值 | 说明 |
 | --- | --- | --- |
-| 单个 JSON 元数据 | 256 KiB | `package.json` |
+| 单个 JSON 元数据 | 256 KiB | `package.json`（含边界值，超一字节即拒绝） |
 | 单个锁文件 | 4 MiB | 超出则不算摘要并记 `missing.lockfile` |
 | 读取文件数 | 12 | 每次观察 |
 | 观察总字节 | 8 MiB | 每次观察 |
@@ -214,13 +253,13 @@ const command = toCreateWorkCommand(draft, { commandId, conversationId })  // �
 | 脚本名条数 | 512 | 超出截断并记 note |
 | 输出集合 | scope ≤256、criteria ≤128、locks ≤5 | 与公开 schema 一致 |
 
-隐私：输出只有项目相对路径、脚本名、摘要与计数；没有 home、环境变量、凭据、锁文件内容或脚本正文。CLI 只在 stderr 打印用户自己给出的绝对路径（`wrote:`）。
+隐私：输出只有项目相对原子、脚本名、摘要与计数；没有 home、环境变量、凭据、锁文件内容或脚本正文。拒绝信息不回显 metadata 正文或 secret。CLI 只在 stderr 打印用户自己给出的绝对路径（`wrote:` / refused target 名）。
 
 ---
 
 ## 7. 故障矩阵（单变量）
 
-每个负例都从合法基线出发只改一个原因；测试在 `packages/project-recipes/test/negative.case.ts` 与 `tools/project-recipes/test/*.case.ts`。
+每个负例都从合法基线出发只改一个原因；测试在 `packages/project-recipes/test/*.case.ts` 与 `tools/project-recipes/test/*.case.ts`。
 
 | 改动 | 结果 |
 | --- | --- |
@@ -228,37 +267,44 @@ const command = toCreateWorkCommand(draft, { commandId, conversationId })  // �
 | 有 `pyproject.toml` 无 `package.json` | `unsupported: stack_not_node` |
 | `stack.kind = unknown` | `unsupported: stack_unknown` |
 | `packageManager: bun@…` | `unsupported: manager_unsupported` |
-| 无声明无锁 | `needs_input: manager_unknown`（观测器会给出 `none`，则直接给建议并附 note） |
+| 无声明无锁 | `needs_input: manager_unknown`（观测器给出 `none` 时直接建议并附 note） |
 | pnpm + npm 锁并存 | `needs_input: locks_ambiguous` |
-| facts 超过 60 分钟 / 时间在将来 | `needs_input: facts_stale` |
+| facts 超过 60 分钟 / 时间在将来 | `needs_input: facts_stale`（CLI exit 3） |
 | 项目 discussion-only | `needs_input: project_discussion_only` + `execution_unavailable` |
 | 指定未启用 profile | `needs_input: profile_not_enabled` |
 | 指定不存在的 criteria | `needs_input: criteria_selection_unknown` |
-| 路径 `docs`（不在 scope）/ `/etc/passwd` / `src/../etc` | `needs_input: scope_path_outside_allowed` |
-| monorepo 根且未给路径 | `needs_input: workspace_member_required` |
+| 选择 `docs`（未声明） | `needs_input: scope_path_outside_allowed` |
+| 选择 `src/file.ts`（子路径，非声明原子） | `needs_input: scope_path_outside_allowed`；强行送 Application → `forbidden` |
+| 选择 `/etc/passwd` / `../x` / `a\b` / 空串 | `needs_input: scope_path_invalid` |
+| monorepo 根未给原子 | `needs_input: workspace_member_required` |
+| monorepo 根给了未声明的兄弟成员 | `needs_input: scope_path_outside_allowed` |
 | 配置 `protocol` 改为 v2 | `unsupported: configuration_unsupported_version`，`revision: null` |
 | 配置 `revision` 非法 | `unsupported: configuration_invalid` |
 | 未知 kind | `RecipeInputError: unknown_kind`（CLI exit 2） |
 | facts 多余字段/错误协议 | `RecipeInputError: invalid_facts`（CLI exit 5） |
-| `package.json` 是符号链接 | 读取器 `symlink` 拒绝（CLI exit 5） |
-| `package.json` 超过上限 / 坏 JSON / 不是对象 | `too_large` / `invalid_json` / `not_object`（exit 5） |
-| 根是 `/` 或 home / 相对路径 / 不存在 | `root_forbidden` / `root_not_absolute` / `root_missing`（exit 5） |
+| `package.json` 是符号链接/目录/超限/坏 JSON | `symlink` / `not_regular_file` / `too_large` / `invalid_json`（exit 5） |
+| 根是 `/`、home、相对路径、不存在、未登记 | `root_forbidden` / `root_not_absolute` / `root_missing` / `root_not_registered`（exit 5） |
 | `--output` 指向已存在文件 | exit 5，原文件字节不变 |
 
 未知永远是未知：读取失败不会被当成「项目没有依赖」，缺失字段不会被当成「通过」。
 
 ---
 
-## 8. 兼容与版本
+## 8. 兼容、版本与分发
 
-- 支持：`application-configuration/1`、`project-facts/1`、catalog `project-recipes@1`。
+- 支持：`application-configuration/1`、`project-facts/1`、`project-facts-observer/1`、catalog `project-recipes@1`。
 - 未知配置版本 → `unsupported`，并如实记录观察到的协议字符串。
 - 未知 facts 版本/多余字段 → 拒绝（`invalid_facts`），因为无法解释其语义。
-- 配方目录内容变化必须提升 `RECIPE_CATALOG_VERSION`；每份草稿记录 catalog 版本与摘要，旧草稿不会被误认为新配方。
-- 后端缺少可选 facts 字段时给 `needs_input`，不会降级到另一个执行器。
-- 建议是数据：不是环境已准备、检查已通过、任务已执行或可计费的证明。
-- criteria 只引用已登记的**检查 ID**；检查的具体 revision 由原 verifier 在执行时记录。本模块不固定 revision，也不判断检查是否通过。
+- 配方目录内容变化必须提升 `RECIPE_CATALOG_VERSION`；每份草稿记录 catalog 版本与摘要。
+- criteria 只引用已登记的**检查 ID**；检查的具体 revision 由原 verifier 在执行时记录，本模块不固定 revision，也不判断检查是否通过。
 - 同名不同 ID 的项目不会混用：provenance、projectId、criteria 与 revision 都按真实 ID 区分。
+
+分发 closure（J-owned）：
+
+- 入口：`package.json` `exports["."]` → `dist/index.js` / `dist/index.d.ts`；`files: ["dist","README.md"]`。
+- 运行时依赖：`@personal-agent/contracts`（workspace）、`zod`；其余只用 Node 内建模块。
+- `npm pack --dry-run` 实测 34 个文件 / 36,643 字节，只含 `dist/*` 与 `README.md`（无 src/tools/tests）。
+- `dist` 由 `tsc -p tsconfig.build.json` 生成，不提交。
 
 ---
 
@@ -268,8 +314,8 @@ const command = toCreateWorkCommand(draft, { commandId, conversationId })  // �
 
 未达（如实记录）：
 
-- 未接 App/HTTP/UI：main/F 尚未把草稿放进实际委托表单；本包只提供可编译的类型与数据。
-- 不枚举 monorepo 成员（不解析 `pnpm-workspace.yaml` 内容）；只接受显式路径。
+- main 的 HTTP/App 组合与 F 的表单呈现尚未合入（main wave-28 状态写明 `unadmittedJRecipesDefaultEnabled: false`）；本包只提供可编译类型、runtime port 与数据。
+- 不枚举 monorepo 成员（不解析 `pnpm-workspace.yaml` 内容）；只接受显式声明原子。
 - 不探测包管理器实际版本（不执行 `--version`）；只记录声明值。
 - 不判断测试是否通过、不估算节省的时间。
 
@@ -285,21 +331,21 @@ pnpm --dir packages/contracts build
 
 # 纯库
 ./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.json
-node --test packages/project-recipes/test/*.case.ts     # 42 tests
+node --test packages/project-recipes/test/*.case.ts     # 61 tests (含 observe)
 ./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.build.json
 
-# 等价的 pnpm 形式（main 合入 importer 后使用）
-pnpm --dir packages/project-recipes typecheck
-pnpm --dir packages/project-recipes test
-pnpm --dir packages/project-recipes build
-
-# CLI 与读取器
+# CLI 与真实 Application 消费者（后者需要产品包构建）
 ./node_modules/.bin/tsc -p tools/project-recipes/tsconfig.json
-node --test tools/project-recipes/test/*.case.ts  # 30 tests
+node --test tools/project-recipes/test/*.case.ts        # 19 tests
+
+# 真实 Application 消费者的构建闭包（一次性）
+for p in effects orchestrator-core storage questions application; do
+  ./node_modules/.bin/tsc -p packages/$p/tsconfig.build.json
+done
 
 # 端到端样例（draft / needs_input / unsupported）
 node tools/project-recipes/cli.ts --config tools/project-recipes/fixtures/configuration.json \
-  --facts tools/project-recipes/fixtures/facts-alpha.json --now 2026-11-14T12:00:00.000Z --paths src
+  --facts tools/project-recipes/fixtures/facts-alpha.json --now 2026-11-14T12:00:00.000Z --paths src/
 node tools/project-recipes/cli.ts --config tools/project-recipes/fixtures/configuration.json \
   --facts tools/project-recipes/fixtures/facts-alpha.json --now 2026-11-14T12:00:00.000Z --kind scoped_change
 
@@ -311,4 +357,5 @@ node packages/project-recipes/examples/preview-consumer.ts
 
 - 新增配方：在 `catalog.ts` 的 `RECIPE_CATALOG` 增加条目并提升 `RECIPE_CATALOG_VERSION`，补一条正例与一条缺能力负例；`catalogDigest()` 会自动变化。
 - 新增结果码：先加到 `RECIPE_ISSUE_CODES` 与 `RECIPE_ISSUE_FIELDS`，再在 `match.ts` 用固定顺序产生；测试断言封闭 code，不要断言自由文本。
-- 读取器新增文件名：先加到 `METADATA_NAMES`，确认是 JSON 或只需存在性/哈希，再补隐私与上限测试。
+- scope 语义只能跟随原应用：改动 `scope.ts` 前先看 `packages/questions/src/validation.ts` 与 `packages/context/src/paths.ts`，并跑 `actual-application.case.ts`。
+- 读取器新增文件名：先加到 `observe.ts` 的 `METADATA_NAMES`，确认是 JSON 或只需存在性/哈希，再补隐私与上限测试。
