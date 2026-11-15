@@ -583,6 +583,15 @@ const evidenceFor = (key) => {
       return { desktop: { horizontalOverflow: false } }
     case 'catalog':
       return { conversations: 3, archived: 1 }
+    case 'lifecycleStoppedChild':
+      return { packageStatus: 'STOPPED', reason: 'known_resource_alive_after_package_stop', retained: true,
+        aliveAfter: [{ pid: 2, expectedStart: 's', alive: true, sameIdentity: true }], childAlive: true, released: false,
+        proven: { clean: true, signals: [{ pid: 2, signalled: 'SIGTERM' }] } }
+    case 'lifecycleStoppedNoRecordChild':
+      return { reason: 'known_resource_alive_after_package_stop', retained: true, clean: false,
+        aliveAfter: [{ pid: 2, expectedStart: 's', alive: true, sameIdentity: true }], childAlive: true, released: false }
+    case 'lifecycleParentGone':
+      return { clean: true, signals: [{ pid: 2, signalled: 'SIGTERM' }], preflight: [{ pid: 2, parentGone: true, parentOk: true }] }
     case 'lifecycleNoRecordUnverified':
       return { clean: false, reason: 'resources_unverified', retained: true, signals: [], released: false, alive: true }
     case 'lifecycleSetMismatch':
@@ -1641,6 +1650,25 @@ const CASES = [
         findCase(report, 'E1-LIFECYCLE-NO-RECORD-EXIT').evidence.lifecycleNoRecordExit.signals = [{ pid: 1, signalled: 'SIGTERM' }]
         return report
       }, 'lifecycleNoRecordExit_invalid'),
+  },
+  {
+    id: 'E31-MUTATE-AFTER-EMPTY-OBJECT',
+    title: 'Empty post-stop objects are not an observation of the fixed resource set',
+    check: ({ assert }) =>
+      rejectWithTier(assert, 'AFTER_EMPTY', tier('installed-functional'), (report) => {
+        findCase(report, 'E5-STOP-FUNCTIONAL').evidence.stopFunctional.normal.after = [{}, {}]
+        return report
+      }, 'stopFunctional_invalid'),
+  },
+  {
+    id: 'E31-MUTATE-AFTER-WRONG-PID',
+    title: 'A post-stop row for a different pid is rejected',
+    check: ({ assert }) =>
+      rejectWithTier(assert, 'AFTER_PID', tier('installed-functional'), (report) => {
+        const value = findCase(report, 'E5-STOP-FUNCTIONAL').evidence.stopFunctional.normal
+        value.after[0].pid = 999
+        return report
+      }, 'stopFunctional_invalid'),
   },
   {
     id: 'E28-MUTATE-FUNCTIONAL-STOP-DETECTOR',

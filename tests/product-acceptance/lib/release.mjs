@@ -491,7 +491,16 @@ export function stopFunctionalIssues(value) {
     else {
       if (before.some(resource => !Number.isSafeInteger(resource.pid) || !isSubstantive(resource.start))) issues.push(`${key}_prestop_identity`)
       if (!Array.isArray(item.after) || item.after.length !== before.length) issues.push(`${key}_after_set`)
-      else if (item.after.some(resource => resource.alive === true && resource.sameIdentity === true)) issues.push(`${key}_resources_alive`)
+      else {
+        // Each post-stop row must be an observation of the same exact pid and start, with explicit
+        // booleans. An empty object, a missing field or a different identity is not quiescence.
+        const strict = item.after.every((resource, index) => resource && typeof resource === 'object' &&
+          Number.isSafeInteger(resource.pid) && resource.pid === before[index]?.pid &&
+          resource.expectedStart === before[index]?.start &&
+          typeof resource.alive === 'boolean' && typeof resource.sameIdentity === 'boolean')
+        if (!strict) issues.push(`${key}_after_unobserved`)
+        if (item.after.some(resource => resource?.alive === true && resource?.sameIdentity === true)) issues.push(`${key}_resources_alive`)
+      }
     }
   }
   return issues
@@ -549,6 +558,39 @@ export function packagedStopIssues(value) {
 /** A record may not lend another state's birth to the launcher. */
 /** A known birth without a record is UNKNOWN until a verified proof stops it. */
 /** A forced no-record proof without the spawn's complete immutable set is retained. */
+/** A packaged STOPPED that leaves a known live child is not quiescence. */
+export function lifecycleStoppedChildIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (value.packageStatus !== 'STOPPED') issues.push('package_status')
+  if (value.reason !== 'known_resource_alive_after_package_stop' || value.retained !== true) issues.push('reason')
+  if (!Array.isArray(value.aliveAfter) || value.aliveAfter.length !== 1) issues.push('alive_after')
+  if (value.childAlive !== true) issues.push('child_state')
+  if (value.released !== false) issues.push('released')
+  if (value.proven?.clean !== true) issues.push('proof')
+  if (!Array.isArray(value.proven?.signals) || !value.proven.signals.some(item => item.signalled === 'SIGTERM')) issues.push('proof_signal')
+  return issues
+}
+/** A STOPPED with no record and an exited parent still cannot ignore a known live child. */
+export function lifecycleStoppedNoRecordChildIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (value.reason !== 'known_resource_alive_after_package_stop' || value.retained !== true || value.clean !== false) issues.push('reason')
+  if (!Array.isArray(value.aliveAfter) || value.aliveAfter.length !== 1) issues.push('alive_after')
+  if (value.childAlive !== true) issues.push('child_state')
+  if (value.released !== false) issues.push('released')
+  return issues
+}
+/** A re-parented child of an exited launcher is still a legitimate known resource. */
+export function lifecycleParentGoneIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (value.clean !== true) issues.push('clean')
+  if (!Array.isArray(value.signals) || !value.signals.some(item => item.signalled === 'SIGTERM')) issues.push('signals')
+  const flagged = (value.preflight ?? []).find(item => item.parentGone === true)
+  if (!flagged || flagged.parentOk !== true) issues.push('parent_gone')
+  return issues
+}
 export function lifecycleNoRecordUnverifiedIssues(value) {
   if (!value || typeof value !== 'object') return ['missing']
   const issues = []
@@ -1500,7 +1542,8 @@ export function evaluateRelease({
           failures.push(fail('evidence_history_invalid', `Evidence history ${issue}`, entry.id))
       }
       for (const [key, fn] of [['contextUse', contextUseIssues], ['sse', contextSseIssues], ['guards', contextGuardIssues], ['sourceConfirm', sourceConfirmIssues], ['sourceConfirmRefusal', sourceConfirmRefusalIssues], ['candidateFlow', candidateFlowIssues], ['history', contextHistoryIssues], ['sources', contextSourcesIssues], ['contextUi', contextUiIssues], ['concurrency', concurrencyIssues], ['schemaMigration', schemaMigrationIssues], ['legacyMigration', legacyMigrationIssues], ['frozenScope', frozenScopeIssues], ['ownershipCopy', ownershipCopyIssues], ['ownershipMocks', ownershipMocksIssues], ['installedCandidates', installedCandidatesIssues], ['secondRoot', secondRootIssues], ['workflowFormats', workflowFormatsIssues], ['personalReview', personalReviewIssues], ['restoredReviewRefusals', restoredReviewRefusalsIssues], ['reviewReuse', reviewReuseIssues], ['scopeDiagnostics', scopeDiagnosticsIssues], ['readiness', readinessIssues], ['trialUi', trialUiIssues],
-      ['recipePreview', recipePreviewIssues], ['packagedStop', packagedStopIssues], ['stopFunctional', stopFunctionalIssues], ['lifecycleOwn', lifecycleOwnIssues], ['lifecycleNoRecordUnverified', lifecycleNoRecordUnverifiedIssues], ['lifecycleSetMismatch', lifecycleSetMismatchIssues],
+      ['recipePreview', recipePreviewIssues], ['packagedStop', packagedStopIssues], ['stopFunctional', stopFunctionalIssues], ['lifecycleOwn', lifecycleOwnIssues], ['lifecycleStoppedChild', lifecycleStoppedChildIssues], ['lifecycleStoppedNoRecordChild', lifecycleStoppedNoRecordChildIssues],
+      ['lifecycleParentGone', lifecycleParentGoneIssues], ['lifecycleNoRecordUnverified', lifecycleNoRecordUnverifiedIssues], ['lifecycleSetMismatch', lifecycleSetMismatchIssues],
       ['lifecycleBirthConfig', lifecycleBirthConfigIssues], ['lifecycleNoRecord', lifecycleNoRecordIssues], ['lifecycleNoRecordExit', lifecycleNoRecordExitIssues],
       ['lifecycleNoRecordReuse', lifecycleNoRecordReuseIssues], ['lifecycleStopNoRecord', lifecycleStopNoRecordIssues], ['lifecycleBirthRoot', lifecycleBirthRootIssues], ['lifecycleChildScope', lifecycleChildScopeIssues], ['lifecycleWrongStart', lifecycleWrongStartIssues], ['lifecycleSibling', lifecycleSiblingIssues],
       ['lifecycleForeignChild', lifecycleForeignChildIssues], ['lifecycleMixedUnknown', lifecycleMixedUnknownIssues],

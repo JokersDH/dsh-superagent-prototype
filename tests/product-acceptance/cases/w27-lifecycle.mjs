@@ -428,5 +428,92 @@ export async function runLifecycle() {
       assert('BIRTHCFG_ALIVE', evidence.lifecycleBirthConfig.alive === true, JSON.stringify(evidence.lifecycleBirthConfig))
     }))
 
+  /** Spawns a sleeper, kills it and returns its now-dead pid/start (a legitimate "already exited" id). */
+  const deadPid = async root => {
+    const sleeper = spawnSleeper(root, { name: `dead-${Date.now()}` })
+    const identity = liveIdentity(sleeper.pid)
+    sleeper.child.kill('SIGKILL')
+    for (let attempt = 0; attempt < 60 && liveIdentity(sleeper.pid).alive; attempt += 1) await new Promise(r => setTimeout(r, 50))
+    return { pid: sleeper.pid, start: identity.start }
+  }
+
+  cases.push(await runCase({ ...define('E1-LIFECYCLE-STOPPED-KNOWN-CHILD', 'A packaged STOPPED that leaves a known live child is not clean until that child is verified and stopped'), evidence: {} },
+    async ({ assert, evidence }) => {
+      const root = privateRoot('pa-e-life-stoppedchild-')
+      const child = spawnSleeper(root, { name: 'api' })
+      let refused, released, proven
+      try {
+        const dead = await deadPid(root)
+        const childIdentity = liveIdentity(child.pid)
+        // The record names a dead launcher and a live api child, so the pre-stop set has one survivor.
+        writeSyntheticRecord(root, recordFor(root, { pid: dead.pid, start: dead.start, apiPid: child.pid, apiStart: childIdentity.start }))
+        mkdirSync(join(root.install, 'bin'), { recursive: true })
+        writeFileSync(join(root.install, 'bin/pa'), '#!/bin/sh\nprintf \'%s\\n\' \'{"status":"STOPPED"}\'\nexit 0\n', { mode: 0o755 })
+        refused = await stopOwned(root, { packageStop: true, equivalentProof: false })
+        released = releaseRoot(root, refused)
+        const childAlive = liveIdentity(child.pid).alive
+        proven = await stopOwned(root, { packageStop: false, proofSignal: true,
+          birth: { pid: dead.pid, start: dead.start, uid: childIdentity.uid, state: root.state, config: root.config, install: root.install },
+          resources: [{ pid: dead.pid, start: dead.start, parentPid: null },
+            { pid: child.pid, start: childIdentity.start, parentPid: dead.pid }] })
+        evidence.lifecycleStoppedChild = { packageStatus: refused.packageStop?.json?.status ?? null, reason: refused.reason,
+          retained: refused.retained, aliveAfter: refused.aliveAfter ?? [], released: released.removed, childAlive,
+          proven: { clean: proven.clean, signals: proven.signals, parentGone: proven.preflight?.find(item => item.pid === child.pid)?.parentGone ?? null } }
+      } finally { try { child.child.kill('SIGKILL') } catch { /* gone */ } rmSync(root.own, { recursive: true, force: true }) }
+      assert('STOPPED_CHILD_NOT_CLEAN', refused?.clean === false && refused?.retained === true && refused.reason === 'known_resource_alive_after_package_stop',
+        JSON.stringify({ reason: refused?.reason, alive: refused?.aliveAfter }))
+      assert('STOPPED_CHILD_ALIVE_OBSERVED', evidence.lifecycleStoppedChild.childAlive === true && evidence.lifecycleStoppedChild.aliveAfter.length === 1,
+        JSON.stringify(evidence.lifecycleStoppedChild.aliveAfter))
+      assert('STOPPED_CHILD_NOT_RELEASED', released?.removed === false, JSON.stringify(released))
+      assert('STOPPED_CHILD_PROVEN_STOP', proven?.clean === true && (proven.signals ?? []).some(item => item.pid === child.pid && item.signalled === 'SIGTERM'),
+        JSON.stringify(proven?.signals))
+    }))
+
+  cases.push(await runCase({ ...define('E1-LIFECYCLE-STOPPED-NO-RECORD-CHILD', 'A STOPPED with no record and an exited parent still cannot ignore a known live child'), evidence: {} },
+    async ({ assert, evidence }) => {
+      const root = privateRoot('pa-e-life-stoppednorec-')
+      const child = spawnSleeper(root, { name: 'api' })
+      let stopped, released
+      try {
+        const dead = await deadPid(root)
+        const childIdentity = liveIdentity(child.pid)
+        mkdirSync(join(root.install, 'bin'), { recursive: true })
+        writeFileSync(join(root.install, 'bin/pa'), '#!/bin/sh\nprintf \'%s\\n\' \'{"status":"STOPPED"}\'\nexit 0\n', { mode: 0o755 })
+        stopped = await stopOwned(root, { packageStop: true, equivalentProof: false,
+          birth: { pid: dead.pid, start: dead.start, uid: childIdentity.uid, state: root.state, config: root.config, install: root.install },
+          resources: [{ pid: dead.pid, start: dead.start, parentPid: null },
+            { pid: child.pid, start: childIdentity.start, parentPid: dead.pid }] })
+        released = releaseRoot(root, stopped)
+        evidence.lifecycleStoppedNoRecordChild = { reason: stopped.reason, retained: stopped.retained, clean: stopped.clean,
+          aliveAfter: stopped.aliveAfter ?? [], released: released.removed, childAlive: liveIdentity(child.pid).alive }
+      } finally { try { child.child.kill('SIGKILL') } catch { /* gone */ } rmSync(root.own, { recursive: true, force: true }) }
+      assert('STOPPED_NOREC_CHILD_REFUSED', stopped?.clean === false && stopped?.retained === true && stopped.reason === 'known_resource_alive_after_package_stop',
+        JSON.stringify({ reason: stopped?.reason, alive: stopped?.aliveAfter }))
+      assert('STOPPED_NOREC_CHILD_ALIVE', evidence.lifecycleStoppedNoRecordChild.childAlive === true, JSON.stringify(evidence.lifecycleStoppedNoRecordChild))
+      assert('STOPPED_NOREC_CHILD_NOT_RELEASED', released?.removed === false, JSON.stringify(released))
+    }))
+
+  cases.push(await runCase({ ...define('E1-LIFECYCLE-PARENT-GONE', 'A live child whose recorded parent already exited is still a legitimate known resource'), evidence: {} },
+    async ({ assert, evidence }) => {
+      const root = privateRoot('pa-e-life-parentgone-')
+      const child = spawnSleeper(root, { name: 'api' })
+      let stopped
+      try {
+        const dead = await deadPid(root)
+        const childIdentity = liveIdentity(child.pid)
+        stopped = await stopOwned(root, { packageStop: false, proofSignal: true,
+          birth: { pid: dead.pid, start: dead.start, uid: childIdentity.uid, state: root.state, config: root.config, install: root.install },
+          resources: [{ pid: dead.pid, start: dead.start, parentPid: null },
+            { pid: child.pid, start: childIdentity.start, parentPid: dead.pid }] })
+        evidence.lifecycleParentGone = { clean: stopped.clean, reason: stopped.reason ?? null,
+          preflight: stopped.preflight ?? [], signals: stopped.signals, aliveAfter: stopped.aliveAfter ?? [] }
+      } finally { try { child.child.kill('SIGKILL') } catch { /* gone */ } rmSync(root.own, { recursive: true, force: true }) }
+      const childPreflight = evidence.lifecycleParentGone.preflight.find(item => item.pid === evidence.lifecycleParentGone.signals?.[0]?.pid)
+      assert('PARENTGONE_ACCEPTED', stopped?.clean === true && (stopped.signals ?? []).some(item => item.signalled === 'SIGTERM'),
+        JSON.stringify({ reason: stopped?.reason, signals: stopped?.signals }))
+      assert('PARENTGONE_FLAG', childPreflight?.parentGone === true && childPreflight?.parentOk === true,
+        JSON.stringify(childPreflight))
+    }))
+
   return { cases, artifacts: {} }
 }

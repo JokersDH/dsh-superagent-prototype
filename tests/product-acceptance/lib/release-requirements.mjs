@@ -86,6 +86,9 @@ export const SAFETY_CASES = [
  * window, a refused packaged stop, and idempotent repeat.
  */
 SAFETY_CASES.push(
+  case_('E1-LIFECYCLE-STOPPED-KNOWN-CHILD', { layers: [LAYERS.READONLY], evidence: ['lifecycleStoppedChild'] }),
+  case_('E1-LIFECYCLE-STOPPED-NO-RECORD-CHILD', { layers: [LAYERS.READONLY], evidence: ['lifecycleStoppedNoRecordChild'] }),
+  case_('E1-LIFECYCLE-PARENT-GONE', { layers: [LAYERS.READONLY], evidence: ['lifecycleParentGone'] }),
   case_('E1-LIFECYCLE-NO-RECORD-UNVERIFIED', { layers: [LAYERS.READONLY], evidence: ['lifecycleNoRecordUnverified'] }),
   case_('E1-LIFECYCLE-SET-MISMATCH', { layers: [LAYERS.READONLY], evidence: ['lifecycleSetMismatch'] }),
   case_('E1-LIFECYCLE-BIRTH-CONFIG', { layers: [LAYERS.READONLY], evidence: ['lifecycleBirthConfig'] }),

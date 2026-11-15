@@ -75,8 +75,9 @@ export function liveIdentity(pidValue) {
   try { process.kill(pid, 0); alive = true } catch (error) { alive = error.code === 'EPERM' }
   const stat = ps(pid, 'stat')
   if (alive && stat && stat.toUpperCase().startsWith('Z')) alive = false
-  if (!alive) return { pid, alive: false, start: null, uid: null, command: null }
-  return { pid, alive: true, start: ps(pid, 'lstart'), uid: Number(ps(pid, 'uid')), command: ps(pid, 'args') }
+  if (!alive) return { pid, alive: false, start: null, uid: null, ppid: null, command: null }
+  const ppid = Number(ps(pid, 'ppid'))
+  return { pid, alive: true, start: ps(pid, 'lstart'), uid: Number(ps(pid, 'uid')), ppid: Number.isSafeInteger(ppid) ? ppid : null, command: ps(pid, 'args') }
 }
 
 /** Path-prefix match at a `/` boundary: `<dir>/x` matches, `<dir>-sibling` never does. */
@@ -91,6 +92,36 @@ export function argvHasExactPath(command, path) {
   if (typeof command !== 'string' || command.length === 0) return false
   const escaped = path.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&')
   return new RegExp(`(?:^|\\s)${escaped}(?:$|\\s)`, 'u').test(command)
+}
+
+/**
+ * The pre-stop known set: caller-supplied resources plus every pid the record names at this moment,
+ * each with its independent live start. Captured before any package stop so a deleted record can
+ * never be read as "nothing was running".
+ */
+function captureKnownSet(config, { resources = null } = {}) {
+  const record = readRecord(config)
+  const value = record.value ?? null
+  const set = new Map()
+  for (const item of Array.isArray(resources) ? resources : []) {
+    if (Number.isSafeInteger(item.pid)) set.set(item.pid, { pid: item.pid, start: item.start ?? null, parentPid: item.parentPid ?? null, source: 'caller' })
+  }
+  const recorded = value ? [value.pid, value.apiPid, value.consolePid].filter(Number.isSafeInteger) : []
+  for (const pid of recorded) {
+    if (set.has(pid)) continue
+    const live = liveIdentity(pid)
+    set.set(pid, { pid, start: live.alive ? live.start : null, parentPid: pid === value.pid ? null : value.pid, source: 'record' })
+  }
+  return { present: record.present, hadRecord: record.present, set: [...set.values()] }
+}
+
+/** Independent observation of a fixed set: each pid is re-read by pid and start, never discovered. */
+function observeFixedSet(set) {
+  return set.map(item => {
+    const live = liveIdentity(item.pid)
+    return { pid: item.pid, expectedStart: item.start, alive: live.alive, start: live.start ?? null,
+      uid: live.uid ?? null, sameIdentity: live.alive && live.start === item.start, source: item.source }
+  })
 }
 
 function recordPath(config) { return join(config, 'instance.json') }
@@ -162,6 +193,9 @@ export async function stopOwned(root, { mockFile, birth = null, resources = null
   const finish = value => { trace(`stop ${root.state} -> clean=${value.clean} reason=${value.reason ?? null} blocked=${JSON.stringify(value.blocked ?? null).slice(0, 160)} pkg=${value.packageStop?.json?.status ?? null}`); return value }
   const { install, config, state } = root
   const result = { install, state, config, attempts: [], signals: [], packageStop: null, record: null, clean: false, retained: false }
+  // The set is fixed before any signal, so a deleted record cannot later masquerade as an empty set.
+  const preStop = captureKnownSet(config, { resources })
+  result.preStopSet = preStop.set
   if (packageStop) {
     const stopped = launcher(install, ['stop', '--json'], {
       timeoutMs,
@@ -171,18 +205,28 @@ export async function stopOwned(root, { mockFile, birth = null, resources = null
     const status = stopped.json?.status ?? null
     if (stopped.status === 0 && (status === 'STOPPED' || status === 'STOPPED_ORPHAN')) {
       result.record = readRecord(config)
-      // "No managed instance" is not evidence that a process this probe spawned has stopped. A known
-      // live birth without a record keeps the result UNKNOWN and moves to birth-based proof.
-      const lived = birth ? liveIdentity(birth.pid) : null
-      if (!result.record.present && lived?.alive) {
-        result.packageStopSawNoRecord = true
-        result.birthAlive = { pid: lived.pid, start: lived.start, uid: lived.uid }
-        if (!proofSignal && !equivalentProof) { result.retained = true; result.reason = 'record_missing_known_birth'; return finish(result) }
-        return finish(await stopKnownSet(root, { birth, resources, result }))
-      } else {
-        result.clean = true
+      // A packaged STOPPED is the product's claim, not an observation of this probe's resources. The
+      // pre-stop set (recorded pids + caller set, captured before the call) must be re-observed.
+      const observed = observeFixedSet(preStop.set)
+      result.observedBeforePackage = observed
+      const survivors = observed.filter(item => item.alive && item.sameIdentity === true)
+      const unknown = observed.filter(item => item.alive && item.sameIdentity !== true)
+      if (survivors.length > 0 || unknown.length > 0) {
+        result.packageStopSawNoRecord = !result.record.present
+        result.retained = true
+        result.clean = false
+        result.reason = unknown.length > 0 ? 'known_resource_identity_unknown' : 'known_resource_alive_after_package_stop'
+        result.aliveAfter = survivors
+        result.unknownResources = unknown
+        // A live known resource may still be stopped, but only through the explicit immutable-set proof
+        // and only when the caller asked for it; the packaged success never authorizes cleaning the root.
+        if ((proofSignal || equivalentProof) && resources !== null) return finish(await stopKnownSet(root, { birth, resources, result }))
         return finish(result)
       }
+      if (!result.record.present) result.packageStopSawNoRecord = true
+      result.clean = true
+      result.legitimateExit = observed.length > 0 ? true : undefined
+      return finish(result)
     } else {
     trace(`package stop refused: ${JSON.stringify(result.packageStop).slice(0, 300)}`)
     // A refused packaged stop is first recorded as a product finding. Without an explicit
@@ -271,7 +315,9 @@ export async function stopOwned(root, { mockFile, birth = null, resources = null
     const argvInstall = argvHasPathPrefix(fresh.command ?? '', payloadInstall)
     const argvState = argvHasExactPath(fresh.command ?? '', state)
     const ppid = fresh.pid ? Number(ps(fresh.pid, 'ppid')) : null
-    const parentOk = entry.parent === null ? true : ppid === entry.parent
+    // A child whose recorded launcher already exited is re-parented; that is still this record's child,
+    // proven by its own start/uid/argv. A live parent must match exactly.
+    const parentOk = entry.parent === null ? true : ppid === entry.parent || !liveIdentity(entry.parent).alive
     // The launcher carries the roots in its environment, not its argv. Its state/root proof must come
     // from the birth record captured at spawn: identical pid/start and the same state/config/install
     // this request names. A record that self-claims another root cannot substitute for that.
@@ -349,7 +395,10 @@ async function stopKnownSet(root, { birth, resources, result }) {
       startOk: live.start === item.start, uidOk: live.uid === process.getuid?.(),
       argvInstall: argvHasPathPrefix(live.command ?? '', payloadInstall),
       argvState: argvHasExactPath(live.command ?? '', state),
-      parentOk: item.parentPid === undefined || item.parentPid === null ? true : live.ppid === item.parentPid }
+      parentOk: item.parentPid === undefined || item.parentPid === null
+        ? true
+        : live.ppid === item.parentPid || !liveIdentity(item.parentPid).alive,
+      parentGone: item.parentPid !== undefined && item.parentPid !== null && !liveIdentity(item.parentPid).alive }
   })
   if (!birthMatches) { result.retained = true; result.reason = 'birth_set_mismatch'; return result }
   const bad = result.preflight.find(item => item.alive && (!item.startOk || !item.uidOk || !item.argvInstall || !item.argvState || !item.parentOk))
