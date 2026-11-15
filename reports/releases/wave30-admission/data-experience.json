@@ -1,0 +1,175 @@
+{
+  "protocol": "wave30-data-experience-admission/1",
+  "date": "2026-11-15",
+  "status": "PARTIAL_PRIOR_CLASSIFIER_AND_RECIPE_GAPS_CLOSED_HISTORY_AND_SELECTION_COHERENCE_REMAIN",
+  "observedMain": "fb3d671d2797367b6365119e6bc627bece16a2ff",
+  "fixedSources": {
+    "A": "c80ec34ccbd2c8398258d318eac7c53c232da9aa",
+    "C": "e1a486ec0007a8db5596682e4acce8b32630992b",
+    "F": "901090ac6a3e818e28e4bf348a59e6a4cc38293f"
+  },
+  "dirtyBeforeAndAfter": { "A": [], "C": ["pnpm-lock.yaml"], "F": [] },
+  "executed": [
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "command": "node --test packages/workflows/test/acceptance.case.ts",
+      "exitCode": 0,
+      "passed": 6,
+      "scope": "Acceptance/outcome/UoW history plus new canonical review key, strict shape/full Work-binding relations, invalid artifact handling and explicit per-ticket truncation. Data fixtures do not independently grant current/accept authority."
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "command": "pnpm --filter @personal-agent/storage --filter @personal-agent/workflows typecheck",
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "command": "node --test packages/knowledge/test/main-personal-completion-facts.case.ts packages/knowledge/test/main-personal-completion-consumer.case.ts packages/knowledge/test/main-personal-template-completion.case.ts",
+      "exitCode": 0,
+      "passed": 3,
+      "scope": "Real controlled Product/Broker/check/explicit acceptance + SDK/context; actual original ProductCompletion metadata/current and A strict facts after restore; registered project recipe readonly preview enters the original Application create/check/accept and A facts. Source/controlled data only, no native or newly frozen package claim."
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "command": "pnpm --filter @personal-agent/context --filter @personal-agent/knowledge typecheck",
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-f",
+      "command": "node --test apps/console/test/trial/recipes.case.ts",
+      "exitCode": 0,
+      "passed": 8,
+      "scope": "Restricted current-project selection positive, blocked/discussion/expired refusal, correct original exclusion direction, project atoms/profile/check/source/goal validation. No actual F App recipe callback wiring or installed/native admission."
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-f",
+      "command": "pnpm --filter @personal-agent/console typecheck",
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "command": "node --experimental-strip-types /tmp/pa-wave30-data-experience-YUtUTX/probe-classifier-and-selection.ts",
+      "exitCode": 0,
+      "report": "/tmp/pa-wave30-data-experience-YUtUTX/controls/result.json",
+      "scope": "Actual private completed controlled Work/receipt/binding Stores and exact current F pure mapping. The prior foreign noncanonical receipt stays excluded. A valid historical canonical review becomes unclassified after a legitimate newer current binding is registered. F correct declaration positive passes but uniquely changing preview atoms from declared src/ to other project-valid test/ still emits applicable selection with no reason. No wrong-scope Work or new accept command is created."
+    }
+  ],
+  "priorFindingsClosed": [
+    {
+      "id": "A29-REVIEW-FACT-CLASSIFICATION-ONLY-BINDS-TICKET",
+      "status": "CLOSED_FOR_PREVIOUS_FOREIGN_NONCANONICAL_AND_MALFORMED_CONTROLS",
+      "implementation": "The classifier now derives exact canonical product-review keys from bounded existing verification candidates, validates strict CompletionProposal/Verification plus unique valid artifact IDs, full Work/binding/candidate relationships, and returns unclassified reasons for canonical-looking invalid data. It no longer scans all receipt JSON by ticketId or silently filters malformed artifact IDs.",
+      "independentEvidence": "Real original canonical review count1 remains1 after the exact prior noncanonical foreign-work receipt is recorded; the foreign receipt is not included. Existing original ProductCompletion authority is unchanged."
+    },
+    {
+      "id": "F-BLOCKED-PROJECT-STILL-APPLICABLE",
+      "status": "CLOSED_FOR_CURRENT_CONFIG_OBSERVATION",
+      "implementation": "F explicitly checks selected configured project existence, dispatchAllowed, discussionOnly and expiresAt in addition to admitted project-bound profile. Complete future/blocked/expired/discussion controls pass."
+    },
+    {
+      "id": "F-DROPPED-ORIGINAL-EXCLUSION-ACCEPTED",
+      "status": "CLOSED_FOR_ORIGINAL_PROJECT_EXCLUSION_DIRECTION",
+      "implementation": "Every original project excluded atom must now be retained in a non-null suggestion scope; missing exclusion refuses, additional exclusions are treated as narrowing in display validation. Actual creation fields are deliberately delegated to main's current server preview, not reconstructed by F."
+    }
+  ],
+  "newFindings": [
+    {
+      "id": "A30-HISTORICAL-REVIEW-VALIDITY-DEPENDS-ON-LATEST-BINDING",
+      "priority": "P2_HISTORICAL_DATA_CORRECTNESS",
+      "file": "packages/storage/src/workflows.ts",
+      "line": 803,
+      "relatedLine": 833,
+      "problem": "One runtime_current/latest binding is selected per ticket and used to validate every historical verification/review. In a private real completed Work positive the original canonical review is readable. Recording a legitimate newer binding for the same ticket with epoch+1 and making it current changes the original history result from reviews1 to0 and classifies the unchanged original review as foreign_work_or_binding, while reviews coverage remains complete. Historical authenticity is being conflated with current execution binding.",
+      "evidence": "/tmp/pa-wave30-data-experience-YUtUTX/controls/result.json#aHistorical",
+      "scopeLimit": "New A history/data reader only. The new current binding correctly belongs to another attempt; no execution or acceptance permission is obtained or bypassed. Main's current/preflight/accept checks remain unchanged.",
+      "requiredOutcome": "Resolve each original review's own parsed attemptId in the historical runtime binding store and validate its immutable full subject. Keep historical validity separately labelled from current eligibility; do not make old reviews current or move the execution pointer. Add actual original-review/newer-binding positive with original history retained and foreign historical binding negative."
+    },
+    {
+      "id": "F30-DECLARED-SCOPE-AND-PREVIEW-SELECTION-CAN-DISAGREE",
+      "priority": "P2_PREVIEW_SELECTION_SEMANTICS",
+      "file": "apps/console/src/trial/recipes.ts",
+      "line": 220,
+      "relatedLine": 253,
+      "problem": "Suggestion scope and preview selection are validated independently against the project but not against each other. With a project allowing src/ and test/, a suggestion declared scope/goal 'src only' remains applicable with no reason when only preview.allowedPaths is changed to test/; its callback emits test/. Thus the opened main form can carry a different project-valid scope than the displayed declaration. Extra suggestion exclusions/external restrictions likewise cannot be conveyed by the restricted callback and must not be advertised as applied creation fields.",
+      "evidence": "/tmp/pa-wave30-data-experience-YUtUTX/controls/result.json#f.mismatch",
+      "scopeLimit": "Optional F display/navigation input only, currently not wired into main's TrialWorkspace recipes. Main0073 re-reads current project/config/facts and explicitly previews/applies/confirms complete fields, so this is not a server permission bypass or an actual wrong-scope Work creation.",
+      "requiredOutcome": "Make the actual restricted selection coherent with the displayed declaration, or explicitly mark the declaration non-previewable when its meaning cannot be represented by ProjectRecipePreviewInput. Do not restore local creation-field reconstruction or add a second authorization gate. Main must remain the sole producer of complete scope/criteria/profile fields and original confirmation."
+    }
+  ],
+  "completionAuthorityAssessment": {
+    "canonicalReviewClassificationImplemented": true,
+    "strictReviewShapesAndArtifactIdsImplemented": true,
+    "explicitHistoryTruncationImplemented": true,
+    "existingProductCompletionCurrentMetadataActualConsumerPassed": true,
+    "newCandidateOrAcceptanceAuthorityCreated": false,
+    "newCandidateTableOrLedgerCreated": false,
+    "historyBindingFixRequiredBeforeHistoricalConsumerAdmission": true,
+    "currentMainApplicationAuthorityUnaffected": true
+  },
+  "FCompatibilityAssessment": {
+    "onlyRestrictedSelectionCallback": true,
+    "callbackFields": ["suggestionId", "projectId", "kind", "allowedPaths", "profileId"],
+    "noLocalGoalScopeCriteriaCreationFieldReconstruction": true,
+    "main0073PreviewAndOriginalFormRemainAuthoritative": true,
+    "existingFourNavigationCallbacksPreserved": true,
+    "expiredAtObservationTimeRejected": true,
+    "expiryLimit": "Pure applicability checks the supplied/current render timestamp. This audit did not claim timed in-place revocation or click-time rerender; the callback only opens the original form and main's fresh preview/create guard must still recheck expiry.",
+    "main7And30AlreadyImplemented": true,
+    "staleReportNotes": "F's wave29 status/main-integration doc still describes main as7-day only and30-day wiring pending; C status has an older 'J/statistics absent' phrase for1ba. Current mainfb3 has actual7/30 and D1ba carries statistics while J wiring is not in that historical package. These outdated statements are not runtime missing features or reasons to redispatch completed work."
+  },
+  "retainedProofAndPackageScopes": {
+    "oldArtifactPrefixEventCounterexamplesRemainClosed": true,
+    "proofProductionAlgorithmsChangedThisWave": false,
+    "priorExact1cdDualFormatPositivePreserved": true,
+    "currentCReported1baDualFlow": "Candidate supplied exact1ba source/build/hash evidence remains distinct. This finite audit did not rerun the long package/dual/browser matrix; no new package verdict is inferred from source tests.",
+    "installedNativeLiveRecoveryNotAdmittedByTheseTests": true
+  },
+  "minimalIntegrationSlices": {
+    "A": {
+      "source": ["packages/storage/src/workflows.ts strict completion classifier/types/coverage", "packages/storage/src/index.ts selected exports", "packages/workflows/src/ports.ts type re-exports"],
+      "focusedTests": ["packages/workflows/test/acceptance.case.ts strict classification and history coverage"],
+      "conditions": "Prior broad receipt false classification is fixed and the slice strictly compiles. Repair per-review historical binding resolution before using this as a complete historical facts consumer; main may continue existing ProductCompletion current/metadata immediately. No migration or root dependency change is needed."
+    },
+    "F": {
+      "source": ["apps/console/src/trial/recipes.ts", "apps/console/src/trial/index.ts restricted selection export changes", "apps/console/src/trial/TrialWorkspace.tsx optional recipes/onOpenRecipe callback presentation"],
+      "focusedTests": ["apps/console/test/trial/recipes.case.ts"],
+      "conditions": "Blocked/exclusion/observed-expiry and deletion of local creation-field reconstruction are useful. Before default recipe suggestion wiring, fix declaration-to-selection coherence and explicitly define unrepresentable narrower fields. Main then only maps the restricted selection into its existing NewWorkForm initial choices and original0073 preview/apply/revalidate/confirm; no new transport/API/grant or parallel form. Current7/30 code/CSS need no rollback or reimplementation."
+    },
+    "C": {
+      "source": ["packages/context/tools/wave29-completion-facts.mjs as development data tooling if needed"],
+      "conditions": "C primarily added actual source consumers and documentation. There is no required new production algorithm slice for current App. When adopting the wrapper, propagate A history coverage/limits instead of presenting a truncated array as complete; do not promote its canonical flag to current/accept authority."
+    }
+  },
+  "nextThreeCompleteSubsystemResults": [
+    {
+      "result": 1,
+      "outcome": "Authentic complete-history reader consumed by the current product",
+      "acceptance": "Fix historical binding without weakening canonical/full-subject validation; stable bounded Completion Facts with coverage and real ProductCompletion consumers are integrated/strictly compiled on main. Original current/preflight/accept remains the only authority, and source/package history identities are distinct."
+    },
+    {
+      "result": 2,
+      "outcome": "One actual template suggestion-to-original-form experience",
+      "acceptance": "F's display and restricted selection describe the same meaning, blocked/expired/readonly states explain accurately, main passes selection to the existing0073 NewWorkForm and users preview/apply/edit/confirm through the original create path. Two-project/source/cancel/unknown-response behavior and actual7/30 observations use the current App, with no local field reconstruction or automatic execution."
+    },
+    {
+      "result": 3,
+      "outcome": "Exact package data/user-flow and qualified recovery handoff",
+      "acceptance": "D freezes one correct mode/current-source artifact; C/A consume public proof/completion ports through both genuine restores and ordinary template flow, F supplies actual user inputs, E independently verifies that same package. B/I live original-result landing stays a separately admitted dependency; no source-only, oldce64 or data reader success is relabelled native/release. Accurate errors, coverage, support materials and bounded cleanup complete the subsystem."
+    }
+  ],
+  "preservation": {
+    "realVendorModelCalls": 0,
+    "nativeTurnStarts": 0,
+    "userServiceActions": 0,
+    "globalDiscovery": false,
+    "foreignCredentialsRead": false,
+    "candidateImplementationsEdited": false,
+    "eAssertionsOrRootConfigEdited": false,
+    "packageOrBrowserLongMatrixStarted": false,
+    "manualProcessSignalsByAudit": false,
+    "allPrivateExecSessionsCompleted": true,
+    "privateEvidenceRoot": "/tmp/pa-wave30-data-experience-YUtUTX",
+    "budgetsLedgersAndHistoricalStateUnchanged": true,
+    "releaseApproved": false
+  }
+}
