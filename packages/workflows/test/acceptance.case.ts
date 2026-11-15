@@ -45,6 +45,8 @@ function fixture(): { store: ProductStore; seq: number; reopen(): ProductStore; 
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`)
       .run('acceptance-1', 'author-ticket', 'author-assignment', 1, JSON.stringify(contract), 'd'.repeat(64),
         '["unit"]', 'actor-1', at)
+    store.commands.record('wave28-review-1', 'r'.repeat(64), () => ({ proposal: candidate, verification: { id: 'verification-1' },
+      artifactIds: ['artifact-1'], attemptId: 'author-attempt' }))
     seq = store.events.append({ topic: 'application.candidate.accepted', entityRef: 'work-author',
       payload: { candidate, actorRef: 'actor-1', reviewTiming: timed } })
   })
@@ -76,6 +78,13 @@ test('accepted event projects one exact outcome and preserves unknown timing as 
     assert.equal(ports.acceptance.consume({ eventSeq: seq, projectId: 'project-1', profileRef, layer: 'controlled' }).status, 'replayed')
     assert.equal(store.events.after(0, 100).filter(event => event.topic === 'application.candidate.accepted').length, 1, 'never append a second accepted event')
     assert.equal(ports.routingEvidence.outcomes.get(result.outcome.id)!.acceptance, 'accepted')
+    const completionWork = ports.index.work('work-author', ['project-1'])!
+    assert.equal(completionWork.completion.reviews.length, 1)
+    assert.equal(completionWork.completion.reviews[0]!.proposal.ticketId, 'author-ticket')
+    assert.equal(completionWork.completion.verifications[0]!.id, 'verification-1')
+    assert.equal(completionWork.completion.acceptances[0]!.id, 'acceptance-1')
+    console.log('WAVE28_COMPLETION_FACTS', JSON.stringify({ reviews: completionWork.completion.reviews.length,
+      verifications: completionWork.completion.verifications.length, acceptances: completionWork.completion.acceptances.length }))
 
     const timeline = ports.index.timeline({ workId: 'work-author', projectIds: ['project-1'] })!
     assert.equal(timeline.entries.some(entry => entry.kind === 'execution.outcome'), true)
@@ -86,6 +95,10 @@ test('accepted event projects one exact outcome and preserves unknown timing as 
     const replayed = reopenedPorts.acceptance.consume({ eventSeq: seq, projectId: 'project-1', profileRef, layer: 'controlled' })
     assert.equal(replayed.status, 'replayed')
     assert.equal(reopenedPorts.routingEvidence.outcomes.list({ projectId: 'project-1' }).records.length, 1, 'reopen does not double-count')
+    const reopenedCompletion = reopenedPorts.index.work('work-author', ['project-1'])!
+    assert.equal(reopenedCompletion.completion.reviews.length, 1)
+    assert.equal(reopenedCompletion.completion.verifications[0]!.id, 'verification-1')
+    assert.equal(reopenedCompletion.completion.acceptances[0]!.id, 'acceptance-1')
     assert.equal(reopened.events.after(0, 100).filter(event => event.topic === 'application.candidate.accepted').length, 1)
   } finally {
     store.close()
@@ -126,7 +139,9 @@ test('acceptance.consume joins the accepting transaction and a later failure rol
     const ports = createWorkflowPorts(store)
     let seq = 0
     assert.throws(() => store.uow.atomic(() => {
-      seq = store.events.append({ topic: 'application.candidate.accepted', entityRef: 'work-author',
+      store.commands.record('wave28-review-1', 'r'.repeat(64), () => ({ proposal: candidate, verification: { id: 'verification-1' },
+      artifactIds: ['artifact-1'], attemptId: 'author-attempt' }))
+    seq = store.events.append({ topic: 'application.candidate.accepted', entityRef: 'work-author',
         payload: { candidate, actorRef: 'actor-1', reviewTiming: timed } })
       const result = ports.acceptance.consume({ eventSeq: seq, projectId: 'project-1', profileRef, layer: 'controlled' })
       assert.equal(result.status, 'recorded')

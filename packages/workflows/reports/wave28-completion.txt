@@ -1,0 +1,13 @@
+WAVE28_COMPLETION_FACTS {"reviews":1,"verifications":1,"acceptances":1}
+✔ accepted event projects one exact outcome and preserves unknown timing as null (23.105125ms)
+✔ missing attempt/verification/acceptance or wrong project yields an auditable gap and writes no outcome (9.180917ms)
+✔ acceptance.consume joins the accepting transaction and a later failure rolls the outcome back (9.517458ms)
+✔ a new candidate on the same work gets its own outcome; the older accepted outcome stays readable (8.593791ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 171.1305

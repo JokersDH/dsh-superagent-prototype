@@ -615,6 +615,26 @@ export interface WorkflowStateFacts {
   observedAt: string
 }
 
+export interface CompletionReviewFact {
+  commandId: string; payloadDigest: string; seq: number; recordedAt: string
+  proposal: Record<string, unknown>; verification: Record<string, unknown>
+  artifactIds: readonly string[]; attemptId: string
+}
+export interface CompletionVerificationFact {
+  id: string; ticketId: string; assignmentId: string; candidateGeneration: number
+  artifactDigest: string; criteriaDigest: string; environmentRef: string; verifierIdentityRef: string
+  results: unknown; createdAt: string
+}
+export interface CompletionAcceptanceFact {
+  id: string; ticketId: string; assignmentId: string; candidateGeneration: number
+  artifactDigest: string; criterionIds: readonly string[]; actorRef: string; acceptedAt: string
+}
+export interface CompletionFacts {
+  /** Original review receipts (`product-review-*`) found by their stored result, not a new candidate table. */
+  reviews: readonly CompletionReviewFact[]
+  verifications: readonly CompletionVerificationFact[]
+  acceptances: readonly CompletionAcceptanceFact[]
+}
 export interface WorkIndexEntry {
   work: WorkRecord
   authority: ContractRef | undefined
@@ -627,6 +647,8 @@ export interface WorkIndexEntry {
   verificationIds: readonly string[]
   acceptanceIds: readonly string[]
   deliverables: readonly { verificationId: string; artifactDigest: string; criteriaDigest: string; accepted: boolean }[]
+  /** Existing ProductCompletion/verification/acceptance facts; data only, never current/accept authority. */
+  completion: CompletionFacts
   project: { id: string; settings: ProjectCurrent | undefined; state: 'current' | 'missing' | 'archived' }
   provenance: readonly string[]
 }
@@ -731,10 +753,15 @@ export class WorkflowIndex {
     const verificationIds: string[] = []
     const acceptanceIds: string[] = []
     const deliverables: { verificationId: string; artifactDigest: string; criteriaDigest: string; accepted: boolean }[] = []
+    const reviews: CompletionReviewFact[] = []
+    const completionVerifications: CompletionVerificationFact[] = []
+    const completionAcceptances: CompletionAcceptanceFact[] = []
     for (const ticketId of ticketIds) {
-      const verifications = this.db.prepare(`SELECT id, artifact_digest, criteria_digest FROM completion_verifications
+      const verifications = this.db.prepare(`SELECT id, ticket_id, assignment_id, candidate_generation, artifact_digest,
+        criteria_digest, environment_ref, verifier_identity_ref, results, created_at FROM completion_verifications
         WHERE ticket_id = ? ORDER BY created_at DESC LIMIT 50`).all(ticketId) as Row[]
-      const acceptances = this.db.prepare(`SELECT id, artifact_digest FROM completion_acceptances
+      const acceptances = this.db.prepare(`SELECT id, ticket_id, assignment_id, candidate_generation, artifact_digest,
+        criterion_ids, actor_ref, accepted_at FROM completion_acceptances
         WHERE ticket_id = ? ORDER BY accepted_at DESC LIMIT 50`).all(ticketId) as Row[]
       verificationIds.push(...verifications.map(item => text(item.id)))
       acceptanceIds.push(...acceptances.map(item => text(item.id)))
@@ -744,6 +771,34 @@ export class WorkflowIndex {
           artifactDigest: text(verification.artifact_digest),
           criteriaDigest: text(verification.criteria_digest),
           accepted: acceptances.some(item => text(item.artifact_digest) === text(verification.artifact_digest)),
+        })
+        completionVerifications.push({
+          id: text(verification.id), ticketId: text(verification.ticket_id), assignmentId: text(verification.assignment_id),
+          candidateGeneration: Number(verification.candidate_generation), artifactDigest: text(verification.artifact_digest),
+          criteriaDigest: text(verification.criteria_digest), environmentRef: text(verification.environment_ref),
+          verifierIdentityRef: text(verification.verifier_identity_ref), results: json<unknown>(verification.results), createdAt: text(verification.created_at),
+        })
+      }
+      for (const acceptance of acceptances) completionAcceptances.push({
+        id: text(acceptance.id), ticketId: text(acceptance.ticket_id), assignmentId: text(acceptance.assignment_id),
+        candidateGeneration: Number(acceptance.candidate_generation), artifactDigest: text(acceptance.artifact_digest),
+        criterionIds: json<string[]>(acceptance.criterion_ids), actorRef: text(acceptance.actor_ref), acceptedAt: text(acceptance.accepted_at),
+      })
+      const receiptRows = this.db.prepare(`SELECT command_id, payload_digest, seq, recorded_at, result FROM command_receipts
+        WHERE result IS NOT NULL AND json_valid(result) AND json_extract(result, '$.proposal.ticketId') = ?
+        ORDER BY seq DESC LIMIT 50`).all(ticketId) as Row[]
+      for (const receipt of receiptRows) {
+        let parsed: Record<string, unknown>
+        try { parsed = json<Record<string, unknown>>(receipt.result) } catch { continue }
+        const proposal = parsed.proposal as Record<string, unknown> | undefined
+        const verification = parsed.verification as Record<string, unknown> | undefined
+        if (!proposal || typeof proposal.ticketId !== 'string' || proposal.ticketId !== ticketId ||
+          !verification || !Array.isArray(parsed.artifactIds) || typeof parsed.attemptId !== 'string') continue
+        reviews.push({
+          commandId: text(receipt.command_id), payloadDigest: text(receipt.payload_digest), seq: Number(receipt.seq),
+          recordedAt: text(receipt.recorded_at), proposal, verification,
+          artifactIds: parsed.artifactIds.filter((value): value is string => typeof value === 'string'),
+          attemptId: parsed.attemptId,
         })
       }
     }
@@ -759,6 +814,7 @@ export class WorkflowIndex {
       verificationIds,
       acceptanceIds,
       deliverables,
+      completion: { reviews, verifications: completionVerifications, acceptances: completionAcceptances },
       project: { id: work.projectId, settings: project.current, state: project.state },
       provenance: [
         ...(project.current ? [project.current.settings.sourceRef] : []),
