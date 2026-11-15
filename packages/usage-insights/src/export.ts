@@ -18,11 +18,93 @@ import {
 } from './protocol.ts'
 import { consumerScope, formatMetricValue, metricRowKey, metricUnitLabel } from './facing.ts'
 
-export const EXPORT_PROTOCOL = 'usage-insights-export/1' as const
+export const EXPORT_PROTOCOL = 'usage-insights-export/2' as const
 export const EXPORT_DEFAULT_MAX_ROWS = 200
 export const EXPORT_DEFAULT_MAX_BYTES = 1_048_576
 
 const count = z.number().int().min(0).max(1_000_000).safe()
+
+/**
+ * An export belongs to exactly one observation. The identity is the analysis summary id: the same id
+ * means the same observation, and a re-read of the source produces a different id. A previous export
+ * can be declared so the document says whether it continues that observation or replaces it; the
+ * values are always recomputed, never copied from the earlier file.
+ */
+export const SNAPSHOT_PROTOCOL = 'usage-insights-snapshot/1' as const
+export const SNAPSHOT_CONTINUITY = ['first_observation', 'same_snapshot', 'new_snapshot'] as const
+export type SnapshotContinuity = (typeof SNAPSHOT_CONTINUITY)[number]
+
+export const SnapshotBlockSchema = z.strictObject({
+  snapshotId: z.string().regex(/^[a-f0-9]{64}$/).nullable(),
+  capturedAt: z.string().min(1).max(64),
+  continuity: z.enum(SNAPSHOT_CONTINUITY),
+  /** The export this document was compared with, when the caller declared one. */
+  previous: z.strictObject({
+    snapshotId: z.string().regex(/^[a-f0-9]{64}$/).nullable(),
+    capturedAt: z.string().min(1).max(64),
+  }).nullable(),
+  /** Present only for `new_snapshot`: the values are a fresh read, not the earlier displayed ones. */
+  note: z.string().min(1).max(512).nullable(),
+}).superRefine((value, ctx) => {
+  if (value.continuity === 'first_observation' && value.previous !== null)
+    ctx.addIssue({ code: 'custom', message: 'A first observation cannot declare a previous export' })
+  if (value.continuity !== 'first_observation' && value.previous === null)
+    ctx.addIssue({ code: 'custom', message: 'A continued or replaced observation must declare the previous export' })
+  if ((value.continuity === 'new_snapshot') !== (value.note !== null))
+    ctx.addIssue({ code: 'custom', message: 'Only a replaced observation carries a discontinuity note' })
+  if (value.continuity === 'same_snapshot' && value.snapshotId === null)
+    ctx.addIssue({ code: 'custom', message: 'An observation without an identity cannot continue another one' })
+})
+export type SnapshotBlock = z.infer<typeof SnapshotBlockSchema>
+
+export interface PreviousSnapshot {
+  readonly snapshotId: string | null
+  readonly capturedAt: string
+}
+
+const NEW_SNAPSHOT_NOTE =
+  'This export re-read the observation, so its snapshot differs from the previously exported one; the earlier displayed values are not reused or extended.'
+
+export const snapshotBlock = (snapshotId: string | null, capturedAt: string, previous: PreviousSnapshot | null): SnapshotBlock => {
+  if (previous === null) return { snapshotId, capturedAt, continuity: 'first_observation', previous: null, note: null }
+  const same = snapshotId !== null && previous.snapshotId === snapshotId
+  return {
+    snapshotId,
+    capturedAt,
+    continuity: same ? 'same_snapshot' : 'new_snapshot',
+    previous: { snapshotId: previous.snapshotId, capturedAt: previous.capturedAt },
+    note: same ? null : NEW_SNAPSHOT_NOTE,
+  }
+}
+
+/**
+ * Read the snapshot identity out of an export document, so the CLI can declare what the next export
+ * replaces. Documents written before the snapshot block existed carry the summary id instead; a
+ * document without either identity yields a `null` id, which is reported as a replaced observation
+ * rather than silently treated as continuous.
+ */
+export function previousSnapshotOf(value: unknown): PreviousSnapshot | null {
+  if (value === null || typeof value !== 'object') return null
+  const record = value as Record<string, unknown>
+  const snapshot = record.snapshot
+  if (snapshot !== null && typeof snapshot === 'object') {
+    const block = snapshot as Record<string, unknown>
+    if (typeof block.capturedAt === 'string') {
+      const id = block.snapshotId
+      return { snapshotId: typeof id === 'string' ? id : null, capturedAt: block.capturedAt }
+    }
+  }
+  const from = record.exportedFrom
+  if (from !== null && typeof from === 'object') {
+    const block = from as Record<string, unknown>
+    const capturedAt = block.capturedAt
+    if (typeof capturedAt === 'string') {
+      const id = block.summaryId
+      return { snapshotId: typeof id === 'string' ? id : null, capturedAt }
+    }
+  }
+  return null
+}
 
 export const ExportRowSchema = z.strictObject({
   /** Stable identity: metric, layer and currency. The same row always has the same id. */
@@ -51,6 +133,7 @@ export const ExportDocumentSchema = z.strictObject({
     sourceDescriptor: z.string().min(1).max(256),
     capturedAt: z.string().min(1).max(64),
   }),
+  snapshot: SnapshotBlockSchema,
   window: z.strictObject({ from: z.string().min(1).max(64), to: z.string().min(1).max(64) }),
   timezone: z.string().min(1).max(64),
   scope: z.strictObject({
@@ -87,7 +170,7 @@ export const ExportDocumentSchema = z.strictObject({
 export type ExportDocument = z.infer<typeof ExportDocumentSchema>
 
 export class ExportFault extends Error {
-  readonly code: 'export_too_large' | 'invalid_summary'
+  readonly code: 'export_too_large' | 'invalid_summary' | 'invalid_previous'
   constructor(code: ExportFault['code'], message: string) {
     super(message)
     this.name = 'ExportFault'
@@ -98,6 +181,8 @@ export class ExportFault extends Error {
 export interface ExportOptions {
   maxRows?: number
   maxBytes?: number
+  /** The export this one is compared with; it never contributes a value, only the continuity note. */
+  previous?: PreviousSnapshot | null
 }
 
 const toExportRow = (row: MetricRow): ExportRow => ({
@@ -115,11 +200,73 @@ const toExportRow = (row: MetricRow): ExportRow => ({
   nullReason: row.nullReason,
 })
 
+export interface TruncationBlock {
+  byRows: boolean
+  byBytes: boolean
+  totalRows: number
+  includedRows: number
+  maxRows: number
+  maxBytes: number
+  bytes: number
+}
+
+/**
+ * Serialize a document whose rows are added in their stable order until `maxRows` or `maxBytes` is
+ * reached. The truncation block reports exactly which bound stopped it and how many rows were left
+ * out. The recorded `bytes` is part of the document it describes, so the length is resolved to a
+ * fixed point instead of being guessed, and the caller decides how an envelope that cannot fit at all
+ * is refused.
+ */
+export function serializeBounded<Row>(
+  envelope: Record<string, unknown>,
+  all: readonly Row[],
+  limits: { maxRows: number; maxBytes: number },
+  onEnvelopeTooLarge: () => never,
+): { text: string; rows: Row[]; truncation: TruncationBlock } {
+  const { maxRows, maxBytes } = limits
+  const finalize = (rows: readonly Row[], truncation: TruncationBlock): { text: string; size: number } => {
+    let guess = truncation.bytes
+    for (let attempt = 0; attempt < 4; attempt++) {
+      const text = `${JSON.stringify({ ...envelope, rows, truncation: { ...truncation, bytes: guess } }, null, 2)}\n`
+      const size = Buffer.byteLength(text)
+      if (size === guess) return { text, size }
+      guess = size
+    }
+    const text = `${JSON.stringify({ ...envelope, rows, truncation: { ...truncation, bytes: guess } }, null, 2)}\n`
+    return { text, size: Buffer.byteLength(text) }
+  }
+  const sizeOf = (rows: readonly Row[]): number =>
+    finalize(rows, { byRows: false, byBytes: false, totalRows: all.length, includedRows: rows.length, maxRows, maxBytes, bytes: 0 }).size
+  if (sizeOf([]) > maxBytes) return onEnvelopeTooLarge()
+
+  const rows: Row[] = []
+  let truncatedRows = false
+  let truncatedBytes = false
+  for (const row of all) {
+    if (rows.length >= maxRows) { truncatedRows = true; break }
+    const candidate = [...rows, row]
+    if (sizeOf(candidate) > maxBytes) { truncatedBytes = true; break }
+    rows.push(row)
+  }
+  const final = finalize(rows, {
+    byRows: truncatedRows, byBytes: truncatedBytes, totalRows: all.length, includedRows: rows.length,
+    maxRows, maxBytes, bytes: 0,
+  })
+  return {
+    text: final.text,
+    rows,
+    truncation: {
+      byRows: truncatedRows, byBytes: truncatedBytes, totalRows: all.length, includedRows: rows.length,
+      maxRows, maxBytes, bytes: final.size,
+    },
+  }
+}
+
 /**
  * Build the export document and its serialized text.
  *
- * Rows are added in their stable order until `maxRows` or `maxBytes` is reached; the truncation block
- * reports exactly which bound stopped it and how many rows were left out. If even the empty envelope
+ * The rows are the same numbers the report and the display projection show; the document records the
+ * snapshot it belongs to, the bounds it obeyed and what was left out. If even the empty envelope
  * cannot fit `maxBytes`, the export refuses instead of emitting a misleading fragment.
  */
 export function buildInsightExport(summary: UsageInsightsSummary, options: ExportOptions = {}): {
@@ -134,6 +281,8 @@ export function buildInsightExport(summary: UsageInsightsSummary, options: Expor
   if (!Number.isSafeInteger(maxBytes) || maxBytes < 1) throw new ExportFault('invalid_summary', 'maxBytes must be a positive integer')
 
   const all = summary.metrics.map(toExportRow)
+  const snapshot = snapshotBlock(summary.summaryId, summary.capturedAt, options.previous ?? null)
+  const limitations = snapshot.note === null ? [...summary.limitations] : [snapshot.note, ...summary.limitations].slice(0, 32)
   const envelope = {
     protocol: EXPORT_PROTOCOL,
     exportedFrom: {
@@ -144,6 +293,7 @@ export function buildInsightExport(summary: UsageInsightsSummary, options: Expor
       sourceDescriptor: summary.sourceDescriptor,
       capturedAt: summary.capturedAt,
     },
+    snapshot,
     window: summary.window,
     timezone: summary.timezone,
     scope: consumerScope(summary),
@@ -154,64 +304,18 @@ export function buildInsightExport(summary: UsageInsightsSummary, options: Expor
       coverage: summary.attention.coverage,
       stale: summary.attention.stale,
     },
-    rows: [] as ExportRow[],
-    truncation: {
-      byRows: false, byBytes: false, totalRows: all.length, includedRows: 0,
-      maxRows, maxBytes, bytes: 0,
-    },
-    limitations: summary.limitations,
+    limitations,
     authorization: 'none' as const,
   }
-  // The byte budget describes the document that is actually written (pretty-printed), and the recorded
-  // `bytes` is part of that document, so its length is resolved to a fixed point rather than guessed.
-  const finalize = (rows: readonly ExportRow[], truncation: {
-    byRows: boolean
-    byBytes: boolean
-    totalRows: number
-    includedRows: number
-    maxRows: number
-    maxBytes: number
-    bytes: number
-  }): { text: string; size: number } => {
-    let guess = truncation.bytes
-    for (let attempt = 0; attempt < 4; attempt++) {
-      const text = `${JSON.stringify({ ...envelope, rows, truncation: { ...truncation, bytes: guess } }, null, 2)}\n`
-      const size = Buffer.byteLength(text)
-      if (size === guess) return { text, size }
-      guess = size
-    }
-    const text = `${JSON.stringify({ ...envelope, rows, truncation: { ...truncation, bytes: guess } }, null, 2)}\n`
-    return { text, size: Buffer.byteLength(text) }
-  }
-  const draft = (rows: readonly ExportRow[]) => finalize(rows, {
-    byRows: false, byBytes: false, totalRows: all.length, includedRows: rows.length, maxRows, maxBytes, bytes: 0,
-  }).size
-  const sizeOf = (rows: readonly ExportRow[]): number => draft(rows)
-  if (sizeOf([]) > maxBytes)
+  const built = serializeBounded(envelope, all, { maxRows, maxBytes }, () => {
     throw new ExportFault('export_too_large', `The export envelope alone exceeds the ${maxBytes}-byte budget`)
-
-  const rows: ExportRow[] = []
-  let truncatedRows = false
-  let truncatedBytes = false
-  for (const row of all) {
-    if (rows.length >= maxRows) { truncatedRows = true; break }
-    const candidate = [...rows, row]
-    if (sizeOf(candidate) > maxBytes) { truncatedBytes = true; break }
-    rows.push(row)
-  }
-  const final = finalize(rows, {
-    byRows: truncatedRows, byBytes: truncatedBytes, totalRows: all.length, includedRows: rows.length,
-    maxRows, maxBytes, bytes: 0,
   })
   const document: ExportDocument = ExportDocumentSchema.parse({
     ...envelope,
-    rows,
-    truncation: {
-      byRows: truncatedRows, byBytes: truncatedBytes, totalRows: all.length, includedRows: rows.length,
-      maxRows, maxBytes, bytes: final.size,
-    },
+    rows: built.rows,
+    truncation: built.truncation,
   })
-  return { document, text: final.text }
+  return { document, text: built.text }
 }
 
 /** Deterministic identity of an export document, for pinning it like a bundle. */

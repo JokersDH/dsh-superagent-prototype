@@ -87,9 +87,21 @@ export { outcomeSubject, parseAttentionPages, parseOutcomes, parseWorkRecords } 
 export { renderMarkdown, renderTerminal, safeText } from './report.ts'
 export {
   EXPORT_DEFAULT_MAX_BYTES, EXPORT_DEFAULT_MAX_ROWS, EXPORT_PROTOCOL, ExportDocumentSchema, ExportFault, ExportRowSchema,
-  buildInsightExport, exportDigest,
+  SNAPSHOT_CONTINUITY, SNAPSHOT_PROTOCOL, SnapshotBlockSchema, buildInsightExport, exportDigest, previousSnapshotOf,
+  serializeBounded, snapshotBlock,
 } from './export.ts'
-export type { ExportDocument, ExportOptions, ExportRow } from './export.ts'
+export type {
+  ExportDocument, ExportOptions, ExportRow, PreviousSnapshot, SnapshotBlock, SnapshotContinuity, TruncationBlock,
+} from './export.ts'
+export {
+  DISPLAY_EXPORT_PROTOCOL, DisplayExportDocumentSchema, DisplayExportFault, DisplayExportRowSchema,
+  buildDisplayExport, displayExportDigest,
+} from './display-export.ts'
+export type { DisplayExportDocument, DisplayExportOptions, DisplayExportRow } from './display-export.ts'
+export {
+  CROSS_CHECK_ABSOLUTE_TOLERANCE, CROSS_CHECK_PROTOCOL, CrossCheckFault, crossCheckAnalysisWithDisplay, expectedDisplayId,
+} from './crosscheck.ts'
+export type { CrossCheckDisagreement, CrossCheckDisagreementKind, CrossCheckResult } from './crosscheck.ts'
 export {
   consumerAdmission, consumerLayer, consumerScope, formatMetricValue, metricRowKey, metricUnitLabel,
   observedOutcomeCount, toInsightConsumerView,
