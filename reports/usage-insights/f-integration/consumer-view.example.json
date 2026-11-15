@@ -8,8 +8,8 @@
       "project-arcade",
       "project-beacon"
     ],
-    "aggregation": "cross_project",
-    "label": "跨项目（2 个项目）"
+    "aggregation": "declared_multi_project",
+    "label": "本次 2 个项目"
   },
   "sampleCount": 2,
   "unknownCount": null,
@@ -127,7 +127,7 @@
     "Read-only observation of recorded facts. It is not acceptance, routing, budget, publication or execution authority.",
     "review.activeMs is an observed UI-visibility proxy. It is not human working time, attention quality or a productivity score.",
     "Queue waiting requires explicit queued-at and dispatched-at endpoints bound to the same attempt; the collected product surface did not provide them.",
-    "These numbers aggregate 2 projects and are not any single project's total."
+    "These numbers aggregate the 2 declared projects and are not any single project's total."
   ],
   "partial": false
 }
