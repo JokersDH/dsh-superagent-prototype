@@ -191,7 +191,14 @@ export class RunnerLink {
       spec,
       payloadRoot: join(stateRoot, 'payloads'),
       journalPath,
-      producer: this.#options.producer ?? { source: 'runner-link', runnerIdentityRef: `runner-${spec.attemptId}` },
+      // The registered producer source must describe the driver that actually emits the facts: the
+      // fixture scenarios emit `fake-driver`, the Codex fake-server scenarios emit `codex-native`.
+      // A mismatched claim is refused by the channel, so a neutral default would break every genuine
+      // fixture run rather than express a real foreign producer.
+      producer: this.#options.producer ?? {
+        source: (this.#options.args ?? []).some(arg => String(arg).startsWith('codex')) ? 'codex-native' : 'fake-driver',
+        runnerIdentityRef: `runner-${spec.attemptId}`,
+      },
     })
     await new Promise<void>((resolve, reject) => {
       let settled = false
@@ -199,6 +206,7 @@ export class RunnerLink {
         if (settled) return
         settled = true
         clearInterval(timer)
+        clearTimeout(timeout)
         if (error) reject(error)
         else resolve()
       }
@@ -209,6 +217,12 @@ export class RunnerLink {
       }, 10)
       const timeout = setTimeout(() => settle(new Error(`runner did not become ready within 10s: ${stderr}`)), 10_000)
       if (typeof (timeout as { unref?: () => void }).unref === 'function') (timeout as { unref: () => void }).unref()
+    }).catch(error => {
+      // Bootstrap refusal must also close the original bridge; no attempt handle is returned.
+      try { write({ v: 1, type: 'shutdown', id: 'bootstrap-refused' }) } catch { /* EOF still closes a refused bridge. */ }
+      closing = true
+      try { child.stdin.end() } catch { /* Preserve the original bootstrap failure. */ }
+      throw error
     })
 
     return {
@@ -223,7 +237,7 @@ export class RunnerLink {
       waitExit: () => exitPromise,
       close: async () => {
         try {
-          write({ type: 'shutdown' })
+          write({ v: 1, type: 'shutdown', id: 'shutdown' })
           closing = true
           child.stdin.end()
         } catch {

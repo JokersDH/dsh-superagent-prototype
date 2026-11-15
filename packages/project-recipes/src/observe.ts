@@ -42,6 +42,29 @@ export const DEFAULT_METADATA_LIMITS: MetadataLimits = Object.freeze({
   maxTotalBytes: 8 * 1024 * 1024,
 })
 
+/** Upper bounds so a caller cannot lift a budget into an effectively unlimited read. */
+export const MAX_METADATA_LIMITS: MetadataLimits = Object.freeze({
+  maxJsonBytes: 16 * 1024 * 1024,
+  maxLockfileBytes: 64 * 1024 * 1024,
+  maxFiles: 64,
+  maxTotalBytes: 128 * 1024 * 1024,
+})
+
+/**
+ * Validate a caller-supplied budget. `NaN`, `Infinity`, negative, zero, fractional or absurd values
+ * are refused instead of silently disabling a bound.
+ */
+export function validateMetadataLimits(overrides: Partial<MetadataLimits> = {}): MetadataLimits {
+  const merged: MetadataLimits = { ...DEFAULT_METADATA_LIMITS, ...overrides }
+  for (const key of Object.keys(MAX_METADATA_LIMITS) as (keyof MetadataLimits)[]) {
+    const value = merged[key]
+    const ceiling = MAX_METADATA_LIMITS[key]
+    if (!Number.isSafeInteger(value) || value < 1 || value > ceiling)
+      throw new MetadataRefused('invalid_limits', key, `${key} must be an integer between 1 and ${ceiling}`)
+  }
+  return merged
+}
+
 export type MetadataRefusalCode =
   | 'root_not_absolute'
   | 'root_missing'
@@ -54,6 +77,7 @@ export type MetadataRefusalCode =
   | 'budget_exceeded'
   | 'replaced'
   | 'changed_during_read'
+  | 'invalid_limits'
   | 'unreadable'
   | 'invalid_json'
   | 'not_object'
@@ -162,6 +186,8 @@ function readBounded(root: string, name: MetadataName, maxBytes: number, budget:
 
 /** Read one explicit JSON file (config snapshot, injected facts). Same NOFOLLOW/byte rules. */
 export function readJsonFile(path: string, maxBytes = 2 * 1024 * 1024): unknown {
+  if (!Number.isSafeInteger(maxBytes) || maxBytes < 1 || maxBytes > MAX_METADATA_LIMITS.maxTotalBytes)
+    throw new MetadataRefused('invalid_limits', 'maxBytes', `maxBytes must be an integer between 1 and ${MAX_METADATA_LIMITS.maxTotalBytes}`)
   const absolute = isAbsolute(path) ? path : join(process.cwd(), path)
   let stats
   try {
@@ -221,10 +247,14 @@ export function observeProjectMetadata(input: {
   readonly limits?: Partial<MetadataLimits>
 }): Observation {
   const root = authorizeRoot(input.root)
-  const limits: MetadataLimits = { ...DEFAULT_METADATA_LIMITS, ...(input.limits ?? {}) }
+  const limits: MetadataLimits = validateMetadataLimits(input.limits ?? {})
   const budget: Budget = { files: 0, bytes: 0 }
   const notes: string[] = []
   const missing = new Set<ProjectFacts['missing'][number]>()
+  const omissions: { field: ProjectFacts['omissions'][number]['field']; reason: ProjectFacts['omissions'][number]['reason'] }[] = []
+  const omit = (field: ProjectFacts['omissions'][number]['field'], reason: ProjectFacts['omissions'][number]['reason']) => {
+    if (!omissions.some((entry) => entry.field === field && entry.reason === reason)) omissions.push({ field, reason })
+  }
   const inputs: string[] = []
 
   const has = (name: MetadataName): boolean => probe(root, name) === 'file'
@@ -236,6 +266,7 @@ export function observeProjectMetadata(input: {
     if (stats.size > limits.maxLockfileBytes) {
       notes.push(`${name} 超过 ${limits.maxLockfileBytes} 字节，未计算摘要。`)
       missing.add('lockfile')
+      omit('lockfile', 'too_large')
       locks.push({ name })
       continue
     }
@@ -281,8 +312,8 @@ export function observeProjectMetadata(input: {
       const names = Object.keys(parsed.scripts)
       const kept = names.filter((name) => SCRIPT_NAME.test(name)).sort()
       scripts = kept.slice(0, 512)
-      if (kept.length !== names.length) notes.push('部分脚本名包含非安全字符，已省略（脚本正文从未读取）。')
-      if (kept.length > scripts.length) notes.push('脚本名超过 512 条，已截断。')
+      if (kept.length !== names.length) { notes.push('部分脚本名包含非安全字符，已省略（脚本正文从未读取）。'); omit('scripts', 'unsupported') }
+      if (kept.length > scripts.length) { notes.push('脚本名超过 512 条，已截断。'); omit('scripts', 'truncated') }
     } else {
       missing.add('scripts')
     }
@@ -306,11 +337,14 @@ export function observeProjectMetadata(input: {
     if (manager.kind === 'unknown') missing.add('manager')
   } else {
     missing.add('packageJson')
+    omit('packageJson', 'not_observed')
     stack = foreignMarkers.length > 0
       ? { kind: 'not_node', markers: foreignMarkers }
       : { kind: 'unknown', reason: 'unobserved' }
     if (foreignMarkers.length === 0) missing.add('manager')
   }
+
+  if (workspaceDeclaration === 'pnpm_workspace_yaml') omit('workspace', 'unsupported')
 
   const facts: ProjectFacts = {
     protocol: 'project-facts/1',
@@ -330,6 +364,7 @@ export function observeProjectMetadata(input: {
     scripts,
     languages: hasPackageJson ? (hasTsconfig ? ['node', 'typescript'] : ['node']) : [],
     missing: [...missing],
+    omissions: omissions.slice(0, 16),
   }
   if (hasTsconfig) notes.push('观察到 tsconfig.json 标记（只探测存在性，未读取内容）。')
   return { facts, notes }
