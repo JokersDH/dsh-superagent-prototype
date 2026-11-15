@@ -1,0 +1,39 @@
+{
+  "protocol": "wave29-installed-j-ui/1",
+  "status": "PARTIAL_4_OF_6",
+  "ui": {
+    "status": "FAIL",
+    "cases": [
+      {
+        "id": "PREVIEW-AND-APPLY-ONLY-PREFILL-ORIGINAL-FORM",
+        "status": "PASS"
+      },
+      {
+        "id": "CHANGED-FACTS-REFUSE-EXPLICIT-CREATION-UNTIL-REAPPLIED",
+        "status": "PASS"
+      },
+      {
+        "id": "SELECTION-AND-CONFIG-CHANGES-CANNOT-KEEP-HIDDEN-OLD-ATOMS",
+        "status": "PASS"
+      },
+      {
+        "id": "ERROR-AND-LEGACY-ABSENCE-KEEP-MANUAL-DELEGATION-AVAILABLE",
+        "status": "PASS"
+      }
+    ],
+    "previewPosts": 10,
+    "acceptedWorks": 0,
+    "errors": []
+  },
+  "apiDraft": {
+    "status": "draft",
+    "responseStatus": 200,
+    "title": "有限范围变更",
+    "inputMatches": true,
+    "authorization": "none",
+    "fields": true,
+    "issues": [],
+    "events": 0
+  },
+  "limitation": "Installed package static UI passed preview/apply, changed-facts refusal, hidden atom and legacy fallback (4/6). Two-explicit-works candidate/manualaccept and desktop/mobile cases did not complete in static harness; acceptedWorks0. This is not a full installed J workflow pass."
+}

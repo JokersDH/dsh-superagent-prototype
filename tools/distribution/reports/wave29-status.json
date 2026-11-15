@@ -65,8 +65,8 @@
       "summary": "Functional mode closure with old personal scope preserved."
     },
     "d9": {
-      "status": "PASS_API_DRAFT",
-      "summary": "Installed package J API with controlled fixture + registered roots returns draft, input exact, authorization none, events0. Installed CLI fixture cannot provide that combo; UI apply/create source test 6/6 remains separate."
+      "status": "PARTIAL_INSTALLED_UI",
+      "summary": "Installed package API draft passes with controlled fixture+registered roots. Installed static UI 4/6: preview/apply, changed-facts refusal, hidden atom, legacy fallback pass; two-works accept and desktop/mobile do not complete (acceptedWorks0). Source actualApp remains 6/6."
     },
     "d10": {
       "status": "PASS",
@@ -118,7 +118,7 @@
   "notDone": [
     "E successor independent verdict",
     "B/private/target",
-    "installed J UI apply/create static rerun"
+    "installed J UI two-work candidate/manualaccept + desktop/mobile"
   ],
   "limits": [
     "zero real vendor/model/native turns",
