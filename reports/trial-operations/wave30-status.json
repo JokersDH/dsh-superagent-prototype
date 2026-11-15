@@ -5,8 +5,8 @@
   "branch": "codex/g4-trial-operations",
   "base": "f8cf5713c269a3a920231f23baf11aadd90db736",
   "mergedMain": "6f385a54",
-  "currentH": "d04e3ed1",
-  "updatedAt": "2026-11-15T08:42:34.179Z",
+  "currentH": "e588092a",
+  "updatedAt": "2026-11-15T08:45:09.162Z",
   "goal": {
     "established": true,
     "tokenBudget": null,
@@ -713,5 +713,6 @@
     "reports/trial-operations/wave30/windows/windows.json": "637afac546291de2aca8b533ccdbc00fd5d102969fff24fe90ffb95917f4acab",
     "reports/trial-operations/wave30/package-preflight/preflight-report.json": "c2f6034d4a76cfe5704c16a039b432d330f96bac9943138f1bdb291b755b9b6b",
     "reports/trial-operations/wave30/package-machinecheck-bound/machinecheck-report.json": "9e8d597c083f78e4968cb5da6503454f76e50e89533f462dcdd4f1e10621871a"
-  }
+  },
+  "evidenceCommit": "e588092a"
 }
