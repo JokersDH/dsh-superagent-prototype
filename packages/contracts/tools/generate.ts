@@ -27,6 +27,7 @@ import { RecoverySourceCheckpointQuerySchema, RecoverySourceCheckpointSchema } f
 import { RecoverySourcePrepareSchema, RecoverySourcePreparedSchema, RecoverySourceConfirmSchema } from '../src/recovery-source-confirmation.ts';
 import { ContextHistoryQuerySchema, ContextHistoryEntrySchema, ContextHistorySchema, ContextSourcesSchema } from '../src/context-records.ts';
 import { TrialReadinessSchema } from '../src/trial-readiness.ts';
+import { UsageObservationQuerySchema, UsageObservationSchema } from '../src/usage-observation.ts';
 import { CoordinatorChannelProducerSchema, CoordinatorChannelRequestSchema, CoordinatorChannelReplySchema, CoordinatorChannelLimitsSchema } from '../src/coordinator-channel.ts';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -113,6 +114,7 @@ outputs.set('generated/assistant-context-commands.schema.json', assistantContext
 outputs.set('generated/assistant-context-commands.manifest.json', canonical({ protocol: 'assistant-context-command/1', schemaHash: digest(assistantContextCommandsText), sourceHash: digest(readFileSync(resolve(root, 'src/assistant-context.ts'), 'utf8')), runtimeContractSchemaHash: schemaHash, runtimeValidationRequired: true }));
 for (const [name, protocol, source, schemas] of [
   ['trial-readiness', 'trial-readiness/1', 'trial-readiness.ts', { TrialReadiness: TrialReadinessSchema }],
+  ['usage-observation', 'usage-observation/1', 'usage-observation.ts', { UsageObservationQuery: UsageObservationQuerySchema, UsageObservation: UsageObservationSchema }],
   ['coordinator-channel', 'coordinator-channel-local/1', 'coordinator-channel.ts', { CoordinatorChannelProducer: CoordinatorChannelProducerSchema, CoordinatorChannelRequest: CoordinatorChannelRequestSchema, CoordinatorChannelReply: CoordinatorChannelReplySchema, CoordinatorChannelLimits: CoordinatorChannelLimitsSchema }],
   ['assistant-candidates', 'assistant-candidates/1', 'assistant-candidates.ts', { AssistantCandidatePrepare: AssistantCandidatePrepareSchema, AssistantCandidates: AssistantCandidatesSchema }],
   ['assistant-records', 'assistant-records/1', 'assistant-records.ts', { AssistantInferenceRecord: AssistantInferenceRecordSchema, AssistantReplyBody: AssistantReplyBodySchema, AssistantReplyResult: AssistantReplyResultSchema, AssistantContextHistoryQuery: AssistantContextHistoryQuerySchema, AssistantContextHistoryPage: AssistantContextHistoryPageSchema }],

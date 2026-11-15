@@ -1,0 +1,23 @@
+{
+  "status": "PASS_TEN_AGENT_DISPATCH_STATIC_ONLY",
+  "externalAgents": 10,
+  "ownersIncludingMain": 11,
+  "phases": 264,
+  "milestonesPerOwner": 6,
+  "checkpoints": 57,
+  "localLinks": 214,
+  "localWorkspacesChecked": 11,
+  "normalCadenceNoSameDayDeadline": true,
+  "acyclic": true,
+  "ownershipNonoverlap": true,
+  "originalDirectoriesAndBranches": true,
+  "originalCompletionNoNewCandidatesTable": true,
+  "uniqueIImplementationRequired": true,
+  "sourceAndArtifactScopesSeparated": true,
+  "bugDetectionNotFunctionalPass": true,
+  "budgetUnchanged": true,
+  "preservedServicePairs": 12,
+  "runtimeTests": 0,
+  "nativeTurnStarts": 0,
+  "releaseApproved": false
+}
