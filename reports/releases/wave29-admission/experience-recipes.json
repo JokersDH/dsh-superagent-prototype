@@ -1,0 +1,200 @@
+{
+  "protocol": "wave29-experience-recipes-admission/1",
+  "date": "2026-11-15",
+  "baselineMain": "ea82d8f2a923f623899eed043c1402708074e3b3",
+  "candidates": {
+    "F": {
+      "id": "F",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-f",
+      "branch": "codex/g4-trial-experience",
+      "head": "f7d80b9a3c31c47ef97cbb1c8031d64f27a2135f",
+      "dirty": "",
+      "log": "f7d80b9 docs(trial): record wave28 final source commit (docs only)\ncf0bbd5 feat(trial): enforce project-local recipes and consume real scoped observations",
+      "evidencePath": "reports/trial-experience/wave28-status.json",
+      "status": {
+        "keys": [
+          "schemaVersion",
+          "owner",
+          "wave",
+          "goal",
+          "worktree",
+          "branch",
+          "baseMain",
+          "mergedMain",
+          "mergeCommit",
+          "fixedStart",
+          "mainAppSource",
+          "mainObservationSource",
+          "finalSourceCommit",
+          "state",
+          "layers",
+          "sixResults",
+          "phases",
+          "recipes",
+          "insights",
+          "evidence",
+          "handoff",
+          "modelNativeTurns",
+          "preserved",
+          "notTested",
+          "dependencies",
+          "notes"
+        ],
+        "status": "DELIVERED_WITH_DECLARED_DEPENDENCIES"
+      }
+    },
+    "G": {
+      "id": "G",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-g",
+      "branch": "codex/g4-usage-insights",
+      "head": "c5e428a249a44cfa4c60854bdfb1827f0aeeb900",
+      "dirty": "",
+      "log": "c5e428a docs(usage-insights): regenerate the F sample with the coordinator scope vocabulary\nf43e0b4 feat(usage-insights): coordinator-scale bounds, baseline boundary and wave-28 handoff",
+      "evidencePath": "reports/usage-insights/wave28-status.json",
+      "status": {
+        "keys": [
+          "protocol",
+          "agent",
+          "branch",
+          "worktree",
+          "origin",
+          "fixedStart",
+          "syncedMain",
+          "generatedAt",
+          "goal",
+          "ownedPaths",
+          "checkpointCommits",
+          "finalCommit",
+          "mainIntegrationAsObserved",
+          "phases",
+          "results",
+          "measured",
+          "notReached",
+          "limitations",
+          "boundaries",
+          "verification"
+        ]
+      }
+    },
+    "J": {
+      "id": "J",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-j",
+      "branch": "codex/g5-project-recipes",
+      "head": "448a414ed116e4db33b4e23d0ff1a2283cfe4b23",
+      "dirty": "",
+      "log": "448a414 docs(project-recipes): publish atom scope, observer port and wave28 status\n6e5fa90 fix(project-recipes): mirror application scope atoms and add real consumer",
+      "evidencePath": "reports/project-recipes/wave28-status.json",
+      "status": {
+        "keys": [
+          "protocol",
+          "owner",
+          "date",
+          "branch",
+          "worktree",
+          "baseline",
+          "mergedOriginMain",
+          "packet",
+          "admissionAddressed",
+          "layers",
+          "evidence",
+          "stages",
+          "results",
+          "consumerState",
+          "handoff",
+          "notReached",
+          "limits",
+          "ownership"
+        ]
+      }
+    }
+  },
+  "checks": [
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-j",
+      "command": "node --test packages/project-recipes/test/*.case.ts",
+      "exitCode": 0,
+      "passed": 61
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-j",
+      "command": "node --test tools/project-recipes/test/*.case.ts",
+      "exitCode": 0,
+      "passed": 20,
+      "actualApplicationIncluded": true
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-j",
+      "command": "pnpm --dir packages/project-recipes typecheck",
+      "exitCode": 0,
+      "note": "pnpm auto-updated only the missing workspace importer; that generated lock change was individually restored to the initially clean candidate. No downloads/source/profile changes."
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-f",
+      "command": "node --test apps/console/test/trial/*.case.ts",
+      "exitCode": 0,
+      "passed": 18
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-f",
+      "command": "pnpm --dir apps/console run typecheck",
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-g",
+      "command": "node --test packages/usage-insights/test/consumer.case.ts packages/usage-insights/test/coordinator.case.ts",
+      "exitCode": 0,
+      "passed": 18
+    }
+  ],
+  "closedPriorFindings": {
+    "J": "Original declared-atom scope compatibility is now demonstrated by real same-configuration Application dispatch, including '.', trailing slash, forced child rejection and retained original fields. Runtime registered-root observer is a real Node export.",
+    "F": "Unknown source, foreign/undeclared current project, project-local check/profile references and declared contradiction old cases are fixed at examined scope;18 pure cases and strict pass."
+  },
+  "findings": [
+    {
+      "id": "F29-BLOCKED-PROJECT-LOOKS-APPLICABLE",
+      "priority": "P2_PRESENTATION_ONLY",
+      "file": "apps/console/src/trial/recipes.ts",
+      "problem": "With a schema-valid current project dispatchAllowed=false/blockedReason=unsupported_capability and otherwise admitted project-bound profile/check, trialRecipeOutcome still returns applicable=true/reasons=[].",
+      "positive": "Same configured enabled project returns applicable=true with its exact declared scope.",
+      "boundary": "Main does not use F's recipe reconstruction for commands. New main preview checks project/profile/dispatch/expiry before metadata; original create still reauthorizes.",
+      "requiredOutcome": "Use project dispatch/discussion/expiry/current readiness conditions explicitly in display applicability, and keep main revalidation as authority."
+    },
+    {
+      "id": "F29-RECIPE-DROPS-REQUIRED-EXCLUSIONS",
+      "priority": "P2_PRESENTATION_PREFILL",
+      "file": "apps/console/src/trial/recipes.ts",
+      "problem": "A valid current grant ['src/','test/'] excluding ['src/private/'] accepts a suggestion declaring allowed ['src/'] but excluded[], producing applicable draft with missing grant exclusions. The excluded containment direction is reversed.",
+      "requiredOutcome": "Preserve every original grant exclusion/expiry; allow only genuinely narrower exclusions and exact allowed atoms. Prefer actual main fields instead of reconstructing criteria/scope from check references.",
+      "boundary": "Actual main0073 flow uses J/current-server full fields, not this F object; actual Application would reject a scope omitting a required exclusion."
+    },
+    {
+      "id": "G29-ENDPOINT-DOCUMENTATION-DRIFT",
+      "priority": "P2_DOC_SCOPE_ONLY",
+      "problem": "Candidate status labels the coordinator route GET /v1/usage-observation; the actual existing and admitted route is GET /v1/insights. Main does not install a guessed alias.",
+      "requiredOutcome": "Bind reports/reproduction commands to actual HTTP/transport entry; keep source and row coverage semantics explicit rather than change source scope based only on report labels."
+    }
+  ],
+  "mainActualIntegration": {
+    "runtimeSource": "a40232ed65a38022b255ce7c07b6dd2ebd0ce35d",
+    "jSource": "448a414ed116e4db33b4e23d0ff1a2283cfe4b23",
+    "jFilesImported": 12,
+    "sourceByteExact": true,
+    "endpoint": "POST /v1/projects/:id/recipes/preview",
+    "publicRequestHasPrivateRoot": false,
+    "fullScopeCriteriaProfilePreserved": true,
+    "explicitCreationRepreviewsStableInputs": true,
+    "fieldsAreAuthority": false,
+    "fRecipeReconstructionUsed": false,
+    "modelOrNativeTurns": 0,
+    "sourceNotInstalled": true
+  },
+  "preservation": {
+    "candidateSourceEdits": false,
+    "transientGeneratedJLockChangeRestored": true,
+    "oldBReportsB16CLockERunsAndUserLogsPreserved": true,
+    "oldTwelveServicesTouched": false,
+    "newModelAllowance": 0,
+    "allExecSessionsClosed": true
+  }
+}
