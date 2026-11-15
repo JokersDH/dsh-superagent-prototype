@@ -75,10 +75,11 @@
     "root typecheck": "exit 0"
   },
   "nextSteps": [
-    "B5: replace bespoke PID-only SIGKILL/cleanup tooling with independently-born identity/fresh-recheck tooling before running any further live kill matrix (the existing unsafeb27-chain/b27-sigkill kill paths must not be the sole evidence)",
-    "B6: prove the three callbacks against original A ingress/Store/main Guard through the selected module",
-    "B9-B16: original-A recovery, bounded SIGKILL, product-lane candidate/manual accept via ProductCompletion",
-    "B17-B20: 2/4 slot matrix with control re-entry and complete resources"
+    "B6-B8: same-runner three callbacks and the original-authority Broker path (b27-chain proves serve->SIGKILL->successor on the fixture lane; the product-lane Broker variant is not yet one run)",
+    "B9-B12: a NEW coordinator process reconnecting to the original A registration/current binding and continuing the original question/answer with bounded ACK windows",
+    "B15: current epoch >=2 and an old epoch >=1 acceptance on the same chain (the stale-generation rejection here is not yet an old-epoch proof)",
+    "B17-B20: mixed 2/4 slot matrix with control re-entry and complete resource accounting",
+    "B21-B24: consumer compatibility, faults/capacity/close on the selected module, accurate normal/recovered/native docs"
   ],
   "b5_signalTool": {
     "status": "TOOL IN PLACE AND PURE CONTROLS PASS; live kills now route through it",
@@ -86,5 +87,19 @@
     "controls": "tests/native-acceptance/b28-signal.mjs 7 PASS / 0 FAIL: own positive; foreign root/config markers refused with zero signals; recycled start refused; null/no-start record refused; already-exited pid stays unknown; TERM-ignoring child escalated only after a fresh check; a record naming another pid refused (no discovery beyond the record)",
     "liveUse": "b27-sigkill and b27-chain now capture the child birth identity and signal through signalOwned; the runner-liveness checks use observe() instead of kill-0",
     "stillOpen": "the fixtures are our own children; a real product process is not signalled this round, and unknown material is retained rather than cleaned up"
+  },
+  "b13_b16_delivery": {
+    "status": "OBSERVED ON THE ORIGINAL COMPLETION PATH",
+    "harness": "tests/native-acceptance/b28-delivery.mjs",
+    "result": "5 PASS / 0 FAIL / 1 NOT_TESTED",
+    "path": "create_work -> real Broker question -> answer -> registered FIXTURE check/verification -> WorkView.actions.currentVerificationId/currentCandidate -> application command accept_candidate -> delivered",
+    "evidence": [
+      "one Work ran verification verification:7e80... with 4 artifacts, quiescent resources, delivery native_applied and a complete current candidate",
+      "the full CandidateRef from WorkView.actions.currentCandidate was accepted by the real command (status recorded) and the work became delivered with the same 4 artifact ids",
+      "a candidate with generation +99 was rejected and the work stayed delivered",
+      "the delivered workspace location and all four artifacts stay readable by their published ids",
+      "no candidates table exists (sqlite_master LIKE '%candidate%' is empty) and the harness wrote no accepted field"
+    ],
+    "correction": "the earlier claim that B13/B14 were structurally unavailable was wrong: the path is ProductCompletion/Verifier/commands, not a candidates table; no migration and no second ledger were needed"
   }
 }
