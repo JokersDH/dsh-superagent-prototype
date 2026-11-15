@@ -149,7 +149,7 @@ main 已实现并保留以下真实路径，G 不另建 collector：
 | 上限 | main | 50 works / 10000 nested records / 2 MiB 编码字节 / 单次 2 秒 deadline |
 | 窗口 | main | `days=7|30`，`window.to = observedAt`，`from = to - days*86400000`，半开区间；CLI 的 `--days 7|30` 复现同一形状 |
 | DTO | main | `usage-observation/1`，header `sampleCount` = 枚举 work 数，行保留自身 sample/layer/unit |
-| HTTP/App | main | `GET /v1/usage-observation`（Bearer，项目范围）与试用视图按需读取 |
+| HTTP/App | main | `GET /v1/insights`（Bearer，项目范围，`days=7|30`）与试用视图按需读取 |
 | 分析/语义 | G | 记录级 scope/去重/quarantine/limits/层/币种/unknown 与 summary |
 | 工具 | G | `collect/analyze/report/verify`（HTTP/文件 reader）、报告与脱敏 |
 

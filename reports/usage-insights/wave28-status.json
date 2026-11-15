@@ -25,7 +25,7 @@
     "limits": { "works": 50, "nestedRecords": 10000, "encodedBytes": 2097152, "deadlineMs": 2000, "pages": 1 },
     "window": "days=7|30, window.to=observedAt, from=to-days*86400000, half-open [from,to)",
     "dto": "usage-observation/1 with header sampleCount = enumerated works and per-row sampleCount/layer/unit",
-    "http": "GET /v1/usage-observation (Bearer, project scope, days 7|30)",
+    "http": "GET /v1/insights (Bearer, project scope, days 7|30)",
     "app": "useUsageObservation reads only inside the trial view when authenticated; TrialWorkspace renders the DTO as TrialInsightsView",
     "quarantine": "any analysis quarantine returns status unavailable instead of numbers",
     "sourceBytes": "main imports G's package sources unchanged; G does not create another collector"

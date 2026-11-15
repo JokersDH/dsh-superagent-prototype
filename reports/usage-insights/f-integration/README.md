@@ -5,7 +5,7 @@ unknown/coverage/限制。
 
 **当前生产路径（wave-27 起已由 main 实现）**：main 的 `apps/coordinator/product/usage-observation.ts`
 用已授权的 work/evidence readers 调用本包的分析，投影成 `usage-observation/1` DTO，经
-`GET /v1/usage-observation`（Bearer 鉴权、项目范围、`days=7|30`）返回；App 的
+`GET /v1/insights`（Bearer 鉴权、项目范围、`days=7|30`）返回；App 的
 `useUsageObservation` 只在进入试用视图且认证就绪时读取，`TrialWorkspace` 直接用该 DTO 作为
 `TrialInsightsView` 渲染。也就是说：
 

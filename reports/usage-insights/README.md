@@ -22,7 +22,7 @@ main 已把本包源码接回产品并实现真实路径：
 | 独立上限 | main | 50 works / 10000 nested records / 2 MiB / 单次 2 秒 |
 | 窗口 | main | `days=7|30`，半开区间，`to = observedAt` |
 | DTO | main | `usage-observation/1`，header sample = 枚举 work 数，行保留 sample/layer/unit |
-| HTTP/App | main | `GET /v1/usage-observation`；`useUsageObservation` 按需读取，`TrialWorkspace` 直接渲染 |
+| HTTP/App | main | `GET /v1/insights`；`useUsageObservation` 按需读取，`TrialWorkspace` 直接渲染 |
 | 分析语义/工具/报告 | G | scope/去重/quarantine/limits/层/币种/unknown、CLI、报告 |
 
 `reports/usage-insights/probe/` 里的 bundle/report 仍来自 G 自己的只读采集（HTTP/file），用于 CLI 与
