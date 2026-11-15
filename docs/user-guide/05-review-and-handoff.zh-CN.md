@@ -27,7 +27,7 @@
 交接的是**范围与证据**，不是账号或数据：
 
 - 仓库与分支：`codex/g4-trial-experience`（F 自有路径）。
-- 状态记录：`reports/trial-experience/wave28-status.json`（source、endpoints、视口、命令、未测范围、source/controlled/installed 分层）。
+- 状态记录：`reports/trial-experience/wave29-status.json`（source、endpoints、视口、命令、未测范围、source/controlled/installed 分层）。
 - 集成说明：`reports/trial-experience/main-integration.zh-CN.md`（main 接线与 props 语义）。
 - 证据：`apps/console/e2e/trial/report-*.json` 与 `screenshots/`；真实两项目日常委托/问答/证据/接受/重开见 `report-daily-flow.json`；真实 7 天观察由 main 的 `tests/integration/usage-observation-browser.mjs` 独立覆盖。
 - 用户文档：本目录。

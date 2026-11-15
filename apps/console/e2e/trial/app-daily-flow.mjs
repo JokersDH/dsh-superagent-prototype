@@ -213,6 +213,7 @@ try {
     await page.reload({ waitUntil: 'networkidle' })
     await page.locator('.conversation-surface').waitFor()
     await selectConversation('Alpha 日常会话', 'conv-alpha-daily')
+    await page.locator('.work-card').filter({ hasText: 'Alpha：固定流程问答与交付' }).waitFor()
     check(await page.locator('.work-card').filter({ hasText: 'Alpha：固定流程问答与交付' }).count() === 1, 'the Alpha work survives reload exactly once')
     await page.locator('.work-card').filter({ hasText: 'Alpha：固定流程问答与交付' }).click()
     await page.locator('.detail .phase').filter({ hasText: '已交付' }).waitFor()

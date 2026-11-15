@@ -30,7 +30,7 @@ declare global {
     __TRIAL_DISABLED_READS__?: number
     __TRIAL_AUTH_READS__?: number
     __TRIAL_RECIPES__?: string[]
-    __TRIAL_RECIPE_DRAFT__?: unknown
+    __TRIAL_RECIPE_SELECTION__?: unknown
     __TRIAL_WINDOWS__?: number[]
     __TRIAL_SAME_READS__?: number
   }
@@ -95,10 +95,10 @@ function PropsHarness({ state }: { readonly state: TrialHarnessState }) {
         insightsLoading={props.insightsLoading}
         insightsError={props.insightsError}
         onSelectInsightWindow={props.insightWindow === undefined ? undefined : days => { window.__TRIAL_WINDOWS__?.push(days) }}
-        onPrepareRecipe={draft => {
-          window.__TRIAL_RECIPES__?.push(draft.suggestionId)
-          window.__TRIAL_RECIPE_DRAFT__ = draft
-          writeLog(`recipe: ${draft.suggestionId}`)
+        onOpenRecipe={selection => {
+          window.__TRIAL_RECIPES__?.push(selection.suggestionId)
+          window.__TRIAL_RECIPE_SELECTION__ = selection
+          writeLog(`recipe: ${selection.suggestionId}`)
         }}
         onAction={record}
         onReload={() => {

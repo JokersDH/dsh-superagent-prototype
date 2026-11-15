@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 5,
+  "owner": "F",
+  "wave": "product-wave-29",
+  "goal": "current-state-safe recipe entry, restricted selection to main 0073 original form, real two-project delivery, real 7/30 observation, precision UI and handoff",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-f",
+  "branch": "codex/g4-trial-experience",
+  "baseMain": "79525b6",
+  "mergedMain": "79525b6",
+  "mergeCommit": "febcd37c",
+  "fixedStart": "f7d80b9a3c31c47ef97cbb1c8031d64f27a2135f",
+  "mainAppSource": "a40232e",
+  "mainCreationRetrySource": "0a0d5a0",
+  "finalSourceCommit": null,
+  "state": "DELIVERED_WITH_DECLARED_DEPENDENCIES",
+  "layers": {
+    "source": "DELIVERED (component/tests/docs/status)",
+    "controlled": "DELIVERED for two-project fixture daily flow, controlled observation fixtures and 0073 template flow (main-owned)",
+    "installed": "NOT_TESTED (D 1ba has statistics but not J/template; E independent)",
+    "native": "0 turns",
+    "value": "no efficiency/cost claim",
+    "activation": "not applicable"
+  },
+  "sixResults": {
+    "R1_F4": "blocked/expired/discussion project and dropped-exclusion refusals; current-state-safe display entry",
+    "R2_F8": "two-project real App conversation/delegation/question/verification/evidence/human acceptance + reload history",
+    "R3_F12": "restricted selection callback for main 0073 original NewWorkForm preview/apply/confirm; no local fields",
+    "R4_F16": "main real GET /v1/insights 7-day consumer with 7/30 control contract and scope/partial/unknown display",
+    "R5_F20": "precision workbench, mobile/keyboard/error and local token consistency",
+    "R6_F24": "current guide, source/installed separated package handoff, wave29 status/report"
+  },
+  "phases": {
+    "F1": "DELIVERED blocked/discussion/expired projects explain only",
+    "F2": "DELIVERED exclusions preserved, allowed/external narrowed, expiry respected",
+    "F3": "DELIVERED consumes main 0073 preview contract through restricted selection only",
+    "F4": "DELIVERED first result",
+    "F5": "DELIVERED two-project controlled daily delivery",
+    "F6": "DELIVERED identity/reload/history honesty",
+    "F7": "DELIVERED readonly/legacy/error preserved",
+    "F8": "DELIVERED second result",
+    "F9": "DELIVERED trial suggestion -> main original template entry callback",
+    "F10": "DELIVERED only restricted selection; main preview/apply/edit/confirm owns fields/retry",
+    "F11": "DELIVERED missing inputs and unavailable states",
+    "F12": "DELIVERED third result",
+    "F13": "DELIVERED 7/30 window props/callback; stale window hidden",
+    "F14": "DELIVERED partial/unknown/sample/layer/currency",
+    "F15": "DELIVERED observation stays within trial; no fake drill-down",
+    "F16": "DELIVERED fourth result",
+    "F17": "DELIVERED local trial tokens/compact controls/wrapping",
+    "F18": "DELIVERED desktop/mobile/keyboard/long/error",
+    "F19": "DELIVERED old endpoint/error/reopen/late",
+    "F20": "DELIVERED fifth result",
+    "F21": "DELIVERED current guide",
+    "F22": "DELIVERED source-level handoff; installed NOT_REACHED",
+    "F23": "DELIVERED stable props/callback, boolean readiness retained",
+    "F24": "DELIVERED sixth result and status"
+  },
+  "recipes": {
+    "callback": "onOpenRecipe(TrialRecipeSelection) only: {suggestionId, projectId, kind, allowedPaths, profileId}",
+    "noLocalFields": "F no longer builds goal/scope/criteria/profile creation fields; main 0073 preview returns complete fields",
+    "projectState": "project must exist/be selected/dispatchable/not discussion/not expired; profile admission alone is not project dispatchability",
+    "scope": "allowedPaths must be a subset of project atoms; every project excludedPath must remain (extra exclusions allowed); externalActions may only narrow; expiresAt never extended",
+    "previewSelection": "kind restricted to regression_fix/scoped_change/verification_followup; atoms non-empty unique in project; profile bound and admitted; declared checks/profiles consistent",
+    "refusals": ["unknown source", "foreign/undeclared/deleted project", "all-projects", "blocked/discussion/expired project", "needs_input/unsupported", "missing/wider atoms", "dropped exclusion", "contradictory check", "unbound/blocked/mismatched profile"]
+  },
+  "insights": {
+    "source": "main GET /v1/insights via useUsageObservation (7 days, current project)",
+    "windowContract": "optional insightWindow + onSelectInsightWindow(7|30); main re-reads; mismatch hides old rows; loading/error/reload props",
+    "gate": "scope/window/coverage required; current project included; truncated complete refused; null unknown; layers/currencies separate"
+  },
+  "evidence": {
+    "runner": "node e2e/trial/run-all.mjs",
+    "suites": [
+      { "id": "unit", "exit": 0, "result": "19 PASS (12 state + 7 recipe)" },
+      { "id": "typecheck-app", "exit": 0 },
+      { "id": "typecheck-e2e", "exit": 0 },
+      { "id": "build", "exit": 0 },
+      { "id": "hook-async", "exit": 0, "result": "7/7" },
+      { "id": "browser-states", "exit": 0, "result": "31/31" },
+      { "id": "http-journey", "exit": 0, "result": "6/6" },
+      { "id": "app-targets", "exit": 0, "result": "6/6" },
+      { "id": "app-two-projects", "exit": 0, "result": "8/8" },
+      { "id": "app-daily-flow", "exit": 0, "result": "6/6" }
+    ],
+    "runAll": "10/10 suites exit 0",
+    "mainApp": "trial-workbench-browser 8/8 PASS",
+    "mainObservation": "usage-observation-browser 6/6 PASS",
+    "mainRecipeTemplate": "project-recipes-browser 6/6 PASS, previewPosts13, acceptedWorks2, errors0 (after workspace package build)",
+    "dailyFlow": {
+      "projects": ["项目 Alpha", "项目 Beta"],
+      "profiles": ["profile-fixture-question", "profile-fixture-pass"],
+      "posts": 9,
+      "reviewActivityConflicts": 2,
+      "modelCalls": 0,
+      "acceptedWorks": 2,
+      "reloadHistoryChecked": true
+    },
+    "viewports": ["1440x900", "390x844"],
+    "browser": "Chromium (Playwright 1.65)",
+    "visualGate": "programmatic layout/contrast/control audit; session cannot consume images, no F pixel verdict"
+  },
+  "handoff": {
+    "runtimeSources": [
+      "apps/console/src/trial/index.ts",
+      "apps/console/src/trial/TrialWorkspace.tsx",
+      "apps/console/src/trial/useTrialReadiness.ts",
+      "apps/console/src/trial/trial-view.ts",
+      "apps/console/src/trial/insights.ts",
+      "apps/console/src/trial/recipes.ts",
+      "apps/console/src/trial/trial.css"
+    ],
+    "mainIntegration": "main must pass an initial restricted selection into NewWorkForm and let its 0073 preview/apply/revalidate own complete fields; F does not create work",
+    "mustNotPackage": ["apps/console/e2e/trial/**", "apps/console/test/trial/**", "harness", "fixtures", "screenshots", "temporary state"],
+    "dependencies": "existing React 18, lucide-react, @personal-agent/contracts; type-only transport/configuration labels; no dependency/lock change; CSS imported by component",
+    "docs": ["reports/trial-experience/main-integration.zh-CN.md", "docs/user-guide/"]
+  },
+  "modelNativeTurns": 0,
+  "preserved": {
+    "userServicesChanged": 0,
+    "stateProfileTarLedgerTouched": false,
+    "privateTempRoots": "created under /tmp and removed",
+    "unrelatedCredentialsRead": false
+  },
+  "notTested": [
+    "real vendor model or native Codex execution (0 turns)",
+    "main passing recipe selection into NewWorkForm (contract only; main 0073 template flow itself passes independently)",
+    "real 30-day observation path in main (control/callback only; 7-day real path passes)",
+    "installed distribution artifact acceptance (D 1ba lacks J/template)",
+    "manual screen-reader walkthrough, non-Chromium browsers, 200% zoom, forced colors",
+    "real server-side mid-session auth expiry"
+  ],
+  "dependencies": [
+    "main must wire onOpenRecipe selection to its original NewWorkForm template mode",
+    "main decides whether to expose 30-day window and loading/error props",
+    "E independently verifies the same artifact; F does not self-admit release"
+  ],
+  "notes": "Historical wave25-28 statuses retained. No root/App/transport/CSS/contracts edits. Two review-activity 409 telemetry conflicts remain main-owned and did not affect delivery."
+}

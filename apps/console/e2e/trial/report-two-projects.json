@@ -3,7 +3,7 @@
   "viewport": "1440x900",
   "projects": [
     {
-      "id": "project-9429626ac49fdc1e70637d2e",
+      "id": "project-6cad32aa59790303b6466974",
       "displayName": "项目 Alpha"
     },
     {
@@ -20,7 +20,7 @@
     "/v1/projects"
   ],
   "modelCalls": 0,
-  "generatedAt": "2026-11-15T02:06:00.114Z",
+  "generatedAt": "2026-11-15T05:21:38.134Z",
   "results": [
     {
       "id": "DEFAULT-CONVERSATION-AND-NO-EAGER-READ",
@@ -31,43 +31,43 @@
     {
       "id": "TWO-REAL-CONVERSATIONS-SWITCH",
       "status": "PASS",
-      "ms": 220,
+      "ms": 241,
       "detail": "two real conversations keep separate drafts keyed by conversation identity"
     },
     {
       "id": "TRIAL-SHOWS-CURRENT-CONVERSATION-AND-PRESERVES-DRAFT",
       "status": "PASS",
-      "ms": 164,
+      "ms": 198,
       "detail": "trial round trips preserve draft, project and conversation identity with one read per open"
     },
     {
       "id": "IMPORT-SECOND-PROJECT-THROUGH-THE-REAL-FORM",
       "status": "PASS",
-      "ms": 197,
+      "ms": 179,
       "detail": "the real import form adds the second project and keeps the unsent draft"
     },
     {
       "id": "TRIAL-TWO-PROJECT-IDENTITY",
       "status": "PASS",
-      "ms": 190,
+      "ms": 184,
       "detail": "the trial view names the imported project and marks it current without inventing readiness"
     },
     {
       "id": "DELEGATION-DRAFT-NOT-SUBMITTED",
       "status": "PASS",
-      "ms": 94,
+      "ms": 88,
       "detail": "the delegation draft is inspectable, disabled without an admitted executor, and never submitted"
     },
     {
       "id": "EXECUTOR-ROUND-TRIP-KEEPS-IDENTITY",
       "status": "PASS",
-      "ms": 153,
+      "ms": 185,
       "detail": "executor check and return keep the same project, conversation and draft"
     },
     {
       "id": "NO-MODEL-NO-COMMAND-AND-NO-ERROR",
       "status": "PASS",
-      "ms": 0,
+      "ms": 1,
       "detail": "the journey sends no command, calls no model and logs no browser error"
     }
   ],

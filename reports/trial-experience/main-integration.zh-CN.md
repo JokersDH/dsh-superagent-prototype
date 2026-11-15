@@ -14,30 +14,29 @@
 
 ## 2. 本轮新增可选输入
 
-### 2.1 项目声明草案（J）
+### 2.1 项目声明草案（J）——只传受限选择
+
+main 0073 已在原 NewWorkForm 实现模板选择/预览/应用/重验。F 不再构造 scope/criteria/profile 草稿；只把受限选择交给 main，由 main 打开原表单并 POST 真实 preview。
 
 ```tsx
-const [recipeSuggestions, setRecipeSuggestions] = useState<readonly TrialRecipeSuggestion[]>()
-const [recipesLoading, setRecipesLoading] = useState(false)
-const [recipesError, setRecipesError] = useState<string>()
-
 <TrialWorkspace
   /* ...existing props... */
   recipes={recipeSuggestions}
   recipesLoading={recipesLoading}
   recipesError={recipesError}
-  onPrepareRecipe={draft => {
-    // Re-read current configuration/facts first, then prefill the original NewWorkForm with all fields:
-    // draft.goal / draft.projectId / draft.scope / draft.criteria / draft.profileId
-    // The user still confirms in the original form; do not dispatch directly.
+  onOpenRecipe={selection => {
+    // selection = { suggestionId, projectId, kind, allowedPaths, profileId }
+    // main: open NewWorkForm with this initial recipe selection and let its own
+    // useProjectRecipe read POST /v1/projects/:id/recipes/preview, then the user
+    // previews/applies/edits goal and confirms the original create.
   }}
 />
 ```
 
-- `TrialRecipeSuggestion` / `TrialRecipeDraft` 来自 `./trial/index.ts`（`recipes.ts`）。草案是**只读展示输入**，由 J/main 映射。
-- 适用性按当前配置项目判断：项目存在且被选中、草案属于该项目、检查在项目默认验收标准且已注册、执行器绑定到该项目且已准入、声明的范围原子已在项目范围内（不把前缀当权限）。
-- `onPrepareRecipe(draft)` 不是第五个导航动作，也不发 HTTP；`draft` 已含 goal/scope/criteria/profileId，main 必须用当前配置重新核验后再预填原表单。F 不自动加检查、加权限或提交。
-- F 显示所有声明（含 foreign/unknown/缺失），但只对合格草案启用按钮；同一草案 300ms 内重复点击只回调一次。用户取消或编辑后是否被新草案覆盖由 main 决定。
+- `TrialRecipeSelection`/`TrialRecipeSuggestion` 来自 `./trial/index.ts`（`recipes.ts`）。F 的 applicable 只是展示判断，不是授权；main 仍重读 config/facts、服务端 preview 和原确认。
+- 适用性按当前配置项目：项目存在且被选中、可派工、未过期、非讨论项目；检查在该项目 `defaultCriteria` 且已注册；执行器绑定该项目且已准入；选择的 allowedPaths 是项目 atoms 的子集；声明的排除项必须保留项目全部排除（可增加、不可遗漏）；外部动作只能收窄。
+- `kind` 只能是 `regression_fix|scoped_change|verification_followup`；完整 goal/scope/criteria 由服务端 `ProjectRecipePreview.fields` 给出，F 不复制。
+- 同一草案 300ms 内重复点击只回调一次；取消/编辑/stale/未知 commandId 重试由原表单负责。
 
 ### 2.2 真实观察（main 已实现，F 为消费者）
 
@@ -83,17 +82,17 @@ index.ts  TrialWorkspace.tsx  useTrialReadiness.ts  trial-view.ts  insights.ts  
 
 ```sh
 cd apps/console
-node --test test/trial/*.case.ts        # 18 项：状态/actions/准入/配方/文案
+node --test test/trial/*.case.ts        # 19 项：状态/actions/项目内准入/受限选择/文案
 npx tsc -p tsconfig.json --noEmit
 npx tsc -p e2e/trial/tsconfig.json --noEmit
 node e2e/trial/run-all.mjs              # 10 套件，全部 exit 0（含两项目日常与 7 天观察回归）
 ```
 
-main 自有真实 App 浏览器测试在本包改动后重跑 8/8 PASS；main 的真实观察浏览器测试 6/6 PASS（含项目范围、late、503/404）。
+main 自有测试在本包改动后重跑：trial App 8/8、真实观察 6/6、0073 模板浏览器（J 61/工具与两项目预填/创建/接受）通过。
 
 ## 6. 明确未达
 
-- main 已接入真实 7 天观察；`recipes` 仍未接入，默认不显示。30 天窗口与加载/错误 props 需要 main 扩展其观察 hook。
+- main 已接入真实 7 天观察与 0073 原表单模板；F 的 `onOpenRecipe` 接线仍需 main 给 NewWorkForm 一个初始受限选择入口。30 天窗口与加载/错误 props 需要 main 扩展其观察 hook。
 - J/G 模块未进入本仓库默认产品；F 只有 typed consumer、fixtures 与校验。
 - 真实 vendor/model/native 0；`app-daily-flow` 使用 controlled fixture（固定 scratch 写入），不是原生或安装包证明。
 - 非 Chromium、人工屏幕阅读器、真实服务端会话中途过期未测。

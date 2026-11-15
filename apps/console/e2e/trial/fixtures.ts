@@ -112,6 +112,7 @@ const longConversationTitle = '把本机执行器的连接状态、项目导入�
 const baseRecipe = {
   version: '1', source: 'project-recipes' as const, projectId: 'project-atlas', scopeNote: 'src/ · 现有检查',
   status: 'draft' as const, missingInputs: [], scope: null,
+  preview: { kind: 'scoped_change' as const, allowedPaths: ['src/'], profileId: 'profile-codex-local' },
   checks: [{ id: 'check-unit', required: true, declared: true }],
   profiles: [{ id: 'profile-codex-local', required: true }],
   provenance: { manifest: 'package.json', declaredRoot: '.', note: '只读项目声明' },
@@ -128,12 +129,13 @@ const recipes: readonly TrialRecipeSuggestion[] = [
 ]
 const recipeScopeCases: readonly TrialRecipeSuggestion[] = [
   { ...baseRecipe, id: 'recipe-scope-valid', title: '范围与项目一致的草案', goalPreview: '范围只使用项目现有原子。',
-    scope: { allowedPaths: ['src/'], excludedPaths: [], externalActions: [] } },
+    scope: { allowedPaths: ['src/'], excludedPaths: ['.git'], externalActions: [] } },
   { ...baseRecipe, id: 'recipe-wide-scope', title: '范围超出当前项目的草案', goalPreview: '范围声明到了项目之外。',
-    scope: { allowedPaths: ['.'], excludedPaths: [], externalActions: [] } },
+    scope: { allowedPaths: ['.'], excludedPaths: ['.git'], externalActions: [] } },
   { ...baseRecipe, id: 'recipe-contradiction', title: '检查声明矛盾的草案', goalPreview: '检查声明与项目不符。',
     checks: [{ id: 'check-unit', required: true, declared: false }] },
   { ...baseRecipe, id: 'recipe-unbound-profile', profiles: [{ id: 'profile-other', required: true }],
+    preview: { kind: 'scoped_change', allowedPaths: ['src/'], profileId: 'profile-other' },
     title: '执行器未绑定的草案', goalPreview: '执行器不在当前项目。' },
   { ...baseRecipe, id: 'recipe-long', title: '一个非常长的草案标题用于检查中文与 English mixed identifiers 在没有空格时也不会溢出容器或覆盖相邻状态标签',
     goalPreview: '在已有 Node 检查上补充声明，并保持原始命令与授权范围不变。'.repeat(12),
@@ -173,11 +175,33 @@ const wrongProjectInsights: TrialInsightsView = {
   limitations: [],
 }
 
+const blockedRecipeConfiguration = configuration({
+  projects: [{ ...dispatchableProject('project-atlas', '流程测试项目', ['profile-codex-local']), dispatchAllowed: false, blockedReason: 'auth_required' }],
+  profiles: [nativeProfile], executionAvailability: { state: 'available', kind: 'native' },
+})
+const expiredRecipeConfiguration = configuration({
+  projects: [{ ...dispatchableProject('project-atlas', '流程测试项目', ['profile-codex-local']),
+    scope: { ...scope('project-atlas'), expiresAt: '2020-01-01T00:00:00.000Z' } }],
+  profiles: [nativeProfile], executionAvailability: { state: 'available', kind: 'native' },
+})
+const exclusionRecipeConfiguration = configuration({
+  projects: [{ ...dispatchableProject('project-atlas', '流程测试项目', ['profile-codex-local']),
+    scope: { ...scope('project-atlas'), excludedPaths: ['.git'] } }],
+  profiles: [nativeProfile], executionAvailability: { state: 'available', kind: 'native' },
+})
+const exclusionCases: readonly TrialRecipeSuggestion[] = [
+  { ...baseRecipe, id: 'recipe-omit-exclusion', title: '遗漏排除项的草案', goalPreview: '没有保留 .git 排除。',
+    scope: { allowedPaths: ['src/'], excludedPaths: [], externalActions: [] } },
+  { ...baseRecipe, id: 'recipe-extra-exclusion', title: '增加排除项的草案', goalPreview: '保留并增加排除项。',
+    scope: { allowedPaths: ['src/'], excludedPaths: ['.git', 'node_modules'], externalActions: [] } },
+]
+
 export const trialStates = [
   'configured', 'unconfigured', 'blocked', 'needs-project', 'no-projects', 'fixture', 'unknown', 'readonly',
   'noreadiness', 'loading', 'unavailable', 'error', 'long', 'insights-empty', 'insights-unscoped', 'insights-wrong-project',
   'insights-truncated', 'insights-partial', 'recipes', 'recipes-scope', 'recipes-all-projects',
   'recipes-loading', 'recipes-error', 'insights-window', 'insights-window-mismatch', 'insights-loading',
+  'recipes-blocked', 'recipes-expired', 'recipes-exclusions',
 ] as const
 export type TrialHarnessState = (typeof trialStates)[number]
 
@@ -269,6 +293,17 @@ export function trialHarnessProps(state: TrialHarnessState): TrialHarnessProps {
     case 'insights-loading': return {
       readiness: readiness(), configuration: configured, activeProjectId: 'project-atlas',
       insights: { ...longInsights, days: 7 }, insightWindow: 7, insightsLoading: true,
+    }
+    case 'recipes-blocked': return {
+      readiness: readiness(), configuration: blockedRecipeConfiguration, activeProjectId: 'project-atlas',
+      recipes: [{ ...baseRecipe, id: 'recipe-blocked', title: '不可派工项目的草案', goalPreview: '项目当前不可派工。' }],
+    }
+    case 'recipes-expired': return {
+      readiness: readiness(), configuration: expiredRecipeConfiguration, activeProjectId: 'project-atlas',
+      recipes: [{ ...baseRecipe, id: 'recipe-expired', title: '过期项目的草案', goalPreview: '项目授权已过期。' }],
+    }
+    case 'recipes-exclusions': return {
+      readiness: readiness(), configuration: exclusionRecipeConfiguration, activeProjectId: 'project-atlas', recipes: exclusionCases,
     }
     case 'recipes-loading': return {
       readiness: readiness(), configuration: configured, activeProjectId: 'project-atlas', recipesLoading: true,

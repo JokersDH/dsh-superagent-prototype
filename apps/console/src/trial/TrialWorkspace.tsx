@@ -11,7 +11,7 @@ import {
 import type { ApplicationConfiguration, TrialNavigationAction, TrialReadiness } from '@personal-agent/contracts'
 import type { TrialInsightsLayer, TrialInsightsView } from './insights.ts'
 import { trialInsightsAdmission, trialInsightsCount } from './insights.ts'
-import type { TrialRecipeDraft, TrialRecipeSuggestion } from './recipes.ts'
+import type { TrialRecipeSelection, TrialRecipeSuggestion } from './recipes.ts'
 import { trialRecipeContext, trialRecipeOutcome } from './recipes.ts'
 import type { TrialStatusValue, TrialTone } from './trial-view.ts'
 import { formatObservedAt, shortRevision, trialActions, trialHeadline, trialProjectValue, trialStrip } from './trial-view.ts'
@@ -34,7 +34,7 @@ export interface TrialWorkspaceProps {
   readonly recipes?: readonly TrialRecipeSuggestion[] | undefined
   readonly recipesLoading?: boolean | undefined
   readonly recipesError?: string | undefined
-  readonly onPrepareRecipe?: ((draft: TrialRecipeDraft) => void) | undefined
+  readonly onOpenRecipe?: ((selection: TrialRecipeSelection) => void) | undefined
   readonly onAction: (action: TrialNavigationAction) => void
   readonly onReload?: (() => void) | undefined
   readonly headingLevel?: 2 | 3 | undefined
@@ -91,7 +91,7 @@ function CountRow({ label, value, detail }: { readonly label: string; readonly v
 export function TrialWorkspace({
   readiness, loading = false, error, unavailable = false, configuration, activeProjectId,
   activeConversationTitle, insights, insightWindow, onSelectInsightWindow, insightsLoading = false,
-  insightsError, onReloadInsights, recipes, recipesLoading = false, recipesError, onPrepareRecipe,
+  insightsError, onReloadInsights, recipes, recipesLoading = false, recipesError, onOpenRecipe,
   onAction, onReload, headingLevel = 2, className,
 }: TrialWorkspaceProps) {
   const base = useId()
@@ -128,12 +128,15 @@ export function TrialWorkspace({
   const recipeRows = recipes?.slice(0, 6).map(suggestion => ({ suggestion, outcome: trialRecipeOutcome(suggestion, recipeContext) }))
   const recipeTotal = recipes?.length
   const lastRecipe = useRef<{ id: string; at: number } | undefined>(undefined)
-  const prepareRecipe = (suggestion: TrialRecipeSuggestion, draft: TrialRecipeDraft) => {
-    if (onPrepareRecipe === undefined) return
+  const openRecipe = (suggestion: TrialRecipeSuggestion, selection: TrialRecipeSelection) => {
+    if (onOpenRecipe === undefined) return
     const now = Date.now()
     if (lastRecipe.current !== undefined && lastRecipe.current.id === suggestion.id && now - lastRecipe.current.at < 300) return
     lastRecipe.current = { id: suggestion.id, at: now }
-    onPrepareRecipe(draft)
+    onOpenRecipe(selection)
+  }
+  const recipeKindLabel: Record<TrialRecipeSelection['kind'], string> = {
+    regression_fix: '回归修复', scoped_change: '范围变更', verification_followup: '验证跟进',
   }
   const projectLabel = (id: string) => configuration?.projects.find(project => project.id === id)?.displayName ?? id
   const profileLabel = (id: string) => configuration?.profiles.find(profile => profile.id === id)?.displayName ?? id
@@ -405,19 +408,18 @@ export function TrialWorkspace({
                         {outcome.reasons.map(reason => <li key={reason}>{reason}</li>)}
                       </ul>
                     )}
-                    {outcome.draft !== undefined && (
+                    {outcome.selection !== undefined && (
                       <dl className="trial-recipe-fields">
-                        <div><dt>项目</dt><dd>{projectLabel(outcome.draft.projectId)}</dd></div>
-                        <div><dt>范围</dt><dd className="trial-mono">{outcome.draft.scope.allowedPaths.join('、') || '—'}</dd></div>
-                        <div><dt>执行器</dt><dd>{profileLabel(outcome.draft.profileId)}</dd></div>
-                        <div><dt>检查</dt><dd>{outcome.draft.criteria.map(criterion =>
-                          criterion.kind === 'machine' && criterion.checkDefinitionRef !== undefined ? criterion.checkDefinitionRef : criterion.id).join('、') || '—'}</dd></div>
+                        <div><dt>项目</dt><dd>{projectLabel(outcome.selection.projectId)}</dd></div>
+                        <div><dt>模板</dt><dd>{recipeKindLabel[outcome.selection.kind]}</dd></div>
+                        <div><dt>范围</dt><dd className="trial-mono">{outcome.selection.allowedPaths.join('、') || '—'}</dd></div>
+                        <div><dt>执行器</dt><dd>{profileLabel(outcome.selection.profileId)}</dd></div>
                       </dl>
                     )}
-                    {onPrepareRecipe !== undefined && (
+                    {onOpenRecipe !== undefined && (
                       <button type="button" className="quiet trial-recipe-prepare" disabled={!outcome.applicable}
-                        onClick={() => { if (outcome.applicable && outcome.draft !== undefined) prepareRecipe(suggestion, outcome.draft) }}>
-                        准备草案
+                        onClick={() => { if (outcome.applicable && outcome.selection !== undefined) openRecipe(suggestion, outcome.selection) }}>
+                        打开原表单模板
                       </button>
                     )}
                   </li>
@@ -427,7 +429,7 @@ export function TrialWorkspace({
             {recipeTotal !== undefined && recipeTotal > 6 && (
               <p className="trial-note">另有 {recipeTotal - 6} 条草案未显示。</p>
             )}
-            <p className="trial-note">选择只会把草案数据交回原委托表单；创建、检查与执行仍由你在原确认页决定。</p>
+            <p className="trial-note">这里只显示声明并带上受限选择；完整字段由原表单的模板预览给出，创建、检查与执行仍由你在原确认页决定。</p>
           </section>
         )}
 
