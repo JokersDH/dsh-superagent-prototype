@@ -16,6 +16,7 @@
  * `native-write-intent` and their replies). Nothing here adds a wire version or changes the frozen
  * Runner hash.
  */
+import { randomBytes } from 'node:crypto'
 import {
   CoordinatorChannelLimitsSchema,
   CoordinatorChannelProducerSchema,
@@ -61,6 +62,8 @@ type PendingPayload = PendingBase & {
 }
 type PendingWrite = PendingBase & {
   readonly kind: 'write'
+  /** The caller's original business identity; the correlation key is the fresh intent id. */
+  readonly businessCommandId: string
   readonly resolve: () => void
   readonly reject: (error: Error) => void
 }
@@ -72,6 +75,17 @@ type ActiveLease = {
   readonly send: (request: CoordinatorChannelRequest) => void | Promise<void>
   readonly receive: (reply: unknown) => boolean
   readonly close: (reason?: string) => void
+}
+
+/** Purely local bookkeeping: a pending request left the module and its transport entry is dead. */
+export type CoordinatorChannelSettlement = {
+  readonly kind: 'fact' | 'payload' | 'write'
+  readonly id: string
+}
+
+/** Implementation options: the shared options plus one local queue-notification hook. */
+export type CoordinatorChannelModuleOptions = CoordinatorChannelOptions & {
+  readonly onPendingSettled?: (settled: CoordinatorChannelSettlement) => void
 }
 
 const DEFAULT_LIMITS: CoordinatorChannelLimits = CoordinatorChannelLimitsSchema.parse({
@@ -112,6 +126,7 @@ export class CoordinatorChannelModule implements CoordinatorChannel {
   readonly #limits: CoordinatorChannelLimits
   readonly #now: () => number
   readonly #schedule: (delayMs: number, callback: () => void) => () => void
+  readonly #onPendingSettled: ((settled: CoordinatorChannelSettlement) => void) | undefined
 
   #generation = 0
   #lease: ActiveLease | undefined
@@ -128,8 +143,13 @@ export class CoordinatorChannelModule implements CoordinatorChannel {
 
   #payloadSeq = 0
   #timerSeq = 0
+  /** Per-module salt so intent correlation ids cannot collide across instances/attempts. */
+  readonly #intentSalt = randomBytes(4).toString('hex')
+  #intentSeq = 0
+  /** At most one in-flight intent per original business command. */
+  readonly #activeWriteCommands = new Set<string>()
 
-  constructor(options: CoordinatorChannelOptions) {
+  constructor(options: CoordinatorChannelModuleOptions) {
     const producer = CoordinatorChannelProducerSchema.safeParse(options.producer)
     if (!producer.success) throw new CoordinatorChannelError('identity_mismatch', 'producer_invalid')
     const limits = CoordinatorChannelLimitsSchema.safeParse(options.limits)
@@ -138,6 +158,7 @@ export class CoordinatorChannelModule implements CoordinatorChannel {
     this.#limits = limits.data
     this.#now = options.now ?? defaultNow
     this.#schedule = options.schedule ?? defaultSchedule
+    this.#onPendingSettled = options.onPendingSettled
   }
 
   get producer(): CoordinatorChannelProducer {
@@ -270,18 +291,24 @@ export class CoordinatorChannelModule implements CoordinatorChannel {
   beforeNativeWrite(command: RunnerCommand): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       let request: CoordinatorChannelRequest
+      let key: string
       try {
         this.#assertUsable()
         if (command.kind !== 'answer')
           throw new CoordinatorChannelError('protocol_error', 'unsupported_command', 'only the answer hook requests native write admission')
-        request = this.#request({ v: 1, type: 'native-write-intent', id: command.id, command })
+        // `frame.id` is this module's correlation for one admission attempt; `command` keeps the
+        // original business id, attempt and native binding byte-for-byte.
+        key = this.#nextIntentId()
+        request = this.#request({ v: 1, type: 'native-write-intent', id: key, command })
       } catch (error) {
         reject(error)
         return
       }
-      const key = String(command.id)
-      if (this.#writes.has(key)) {
-        reject(new CoordinatorChannelError('protocol_error', 'write_already_pending', `native write ${key} is already pending`))
+      const businessCommandId = String(command.id)
+      // One in-flight intent per original command: sequential fresh intents are allowed, concurrent
+      // racing intents for the same command are not.
+      if (this.#activeWriteCommands.has(businessCommandId)) {
+        reject(new CoordinatorChannelError('protocol_error', 'write_already_pending', `native write ${businessCommandId} is already pending`))
         return
       }
       const bytes = encodedBytes(request)
@@ -293,8 +320,9 @@ export class CoordinatorChannelModule implements CoordinatorChannel {
       }
       const pending: PendingWrite = {
         kind: 'write', key, request, bytes, expiresAt: this.#now() + this.#limits.requestTimeoutMs,
-        cancel: undefined, armToken: 0, resolve, reject,
+        cancel: undefined, armToken: 0, resolve, reject, businessCommandId,
       }
+      this.#activeWriteCommands.add(pending.businessCommandId)
       this.#register(pending)
       this.#arm(pending, this.#limits.requestTimeoutMs)
       this.#dispatch(pending)
@@ -317,6 +345,17 @@ export class CoordinatorChannelModule implements CoordinatorChannel {
     this.#settledSet.clear()
   }
 
+  /**
+   * Absolute local deadline of a still-pending correlation, or undefined when nothing is pending.
+   *
+   * A pull-based route uses this to tell the answering client how much of the original window is
+   * left; it never refreshes a deadline and never grants anything.
+   */
+  deadline(kind: CoordinatorChannelSettlement['kind'], correlationId: string): number | undefined {
+    const map = kind === 'fact' ? this.#facts : kind === 'payload' ? this.#payloads : this.#writes
+    return map.get(correlationId)?.expiresAt
+  }
+
   inspect(): {
     readonly state: 'unbound' | 'bound' | 'closed'
     readonly generation: number
@@ -336,6 +375,14 @@ export class CoordinatorChannelModule implements CoordinatorChannel {
   }
 
   // --- internals ------------------------------------------------------------
+
+  /** Monotonic, per-module, never reused: a settled reply can never name a later intent. */
+  #nextIntentId(): string {
+    if (this.#intentSeq >= Number.MAX_SAFE_INTEGER)
+      throw new CoordinatorChannelError('capacity', 'intent_correlation_exhausted', 'local intent correlation space is exhausted')
+    this.#intentSeq += 1
+    return `intent-${this.#intentSalt}-${this.#intentSeq}`
+  }
 
   #assertUsable(): void {
     if (this.#closed) throw new CoordinatorChannelError('closed', 'module_closed')
@@ -415,8 +462,15 @@ export class CoordinatorChannelModule implements CoordinatorChannel {
       pending.cancel = undefined
     }
     pending.armToken = 0
+    if (pending.kind === 'write') this.#activeWriteCommands.delete(pending.businessCommandId)
     this.#pendingBytes = Math.max(0, this.#pendingBytes - pending.bytes)
     this.#recordSettled(key)
+    // Local transport bookkeeping must never be able to keep a promise from settling.
+    try {
+      this.#onPendingSettled?.({ kind: pending.kind, id: key })
+    } catch {
+      // ignored on purpose
+    }
     return pending
   }
 
@@ -533,7 +587,7 @@ export class CoordinatorChannelModule implements CoordinatorChannel {
         const taken = this.#take('write', value.id) as PendingWrite | undefined
         if (!taken) return false
         if (value.allowed) taken.resolve()
-        else taken.reject(new NativeWriteDenied(value.id))
+        else taken.reject(new NativeWriteDenied(taken.businessCommandId))
         return true
       }
       default:

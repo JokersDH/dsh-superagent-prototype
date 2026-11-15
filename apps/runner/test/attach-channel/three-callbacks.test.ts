@@ -103,25 +103,36 @@ test('readPayload refuses an invalid reference and an oversized reply without ke
 test('beforeNativeWrite asks for a fresh decision on every intent and never caches an allowed one', async () => {
   const h = makeHarness()
   const first = h.channel.beforeNativeWrite(makeCommand('answer', { id: 'cmd-1' }))
-  assert.deepEqual(h.frames.at(-1), { v: 1, type: 'native-write-intent', id: 'cmd-1', command: makeCommand('answer', { id: 'cmd-1' }) })
-  assert.equal(h.lease.receive({ v: 1, type: 'write-admission', id: 'cmd-1', allowed: true }), true)
+  const firstIntent = h.frames.at(-1)
+  assert.ok(firstIntent && firstIntent.type === 'native-write-intent')
+  // Fresh local correlation; byte-for-byte original business command.
+  assert.notEqual(firstIntent.id, 'cmd-1')
+  assert.deepEqual(firstIntent.command, makeCommand('answer', { id: 'cmd-1' }))
+  assert.equal(h.lease.receive({ v: 1, type: 'write-admission', id: firstIntent.id, allowed: true }), true)
   await first
 
   const second = h.channel.beforeNativeWrite(makeCommand('answer', { id: 'cmd-2' }))
-  assert.equal(h.lease.receive({ v: 1, type: 'write-admission', id: 'cmd-2', allowed: true }), true)
+  const secondIntent = h.frames.at(-1)
+  assert.ok(secondIntent && secondIntent.type === 'native-write-intent')
+  assert.equal(h.lease.receive({ v: 1, type: 'write-admission', id: secondIntent.id, allowed: true }), true)
   await second
 
-  // Same command id, same text: a new intent still has to reach the current guard.
+  // Same command id, same text: a new intent still has to reach the current guard, with its own id.
   const third = h.channel.beforeNativeWrite(makeCommand('answer', { id: 'cmd-1' }))
+  const thirdIntent = h.frames.at(-1)
+  assert.ok(thirdIntent && thirdIntent.type === 'native-write-intent')
   assert.equal(h.frames.filter(frame => frame.type === 'native-write-intent').length, 3)
-  assert.equal(h.lease.receive({ v: 1, type: 'write-admission', id: 'cmd-1', allowed: true }), true)
+  assert.notEqual(thirdIntent.id, firstIntent.id)
+  assert.equal(h.lease.receive({ v: 1, type: 'write-admission', id: thirdIntent.id, allowed: true }), true)
   await third
 })
 
 test('a refused admission is an authoritative denial, not a timeout or a silent success', async () => {
   const h = makeHarness()
   const pending = h.channel.beforeNativeWrite(makeCommand('answer', { id: 'cmd-deny' }))
-  assert.equal(h.lease.receive({ v: 1, type: 'write-admission', id: 'cmd-deny', allowed: false }), true)
+  const intent = h.frames.at(-1)
+  assert.ok(intent && intent.type === 'native-write-intent')
+  assert.equal(h.lease.receive({ v: 1, type: 'write-admission', id: intent.id, allowed: false }), true)
   await assert.rejects(pending, (error: unknown) => {
     assert.ok(error instanceof NativeWriteDenied)
     assert.equal(error.commandId, 'cmd-deny')

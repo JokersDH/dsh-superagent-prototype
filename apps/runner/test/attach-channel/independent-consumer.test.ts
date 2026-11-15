@@ -134,3 +134,45 @@ test('independent consumer: a foreign producer claim is refused before the trans
   )
   assert.deepEqual(received, [])
 })
+
+test('independent consumer: a settled admission cannot authorise a later intent for the same command', async () => {
+  const time = clock()
+  const channel = new CoordinatorChannelModule({ producer, limits, now: time.now, schedule: time.schedule })
+  const received: CoordinatorChannelRequest[] = []
+  const lease = channel.bind({ producer, connectionId: 'sock-1', expectedGeneration: 0, send: request => { received.push(request) } })
+  const command = { ...attemptFields(), kind: 'answer' as const, id: 'cmd-independent-reuse', nativeBindingRef: 'binding-i', answerRef: 'answer-i' }
+
+  const first = channel.beforeNativeWrite(command)
+  const firstIntent = received.at(-1)
+  assert.ok(firstIntent && firstIntent.type === 'native-write-intent')
+  assert.equal(firstIntent.command.id, command.id)
+  assert.notEqual(firstIntent.id, command.id)
+  assert.equal(lease.receive({ v: 1, type: 'write-admission', id: firstIntent.id, allowed: true }), true)
+  await first
+
+  const second = channel.beforeNativeWrite(command)
+  const secondIntent = received.at(-1)
+  assert.ok(secondIntent && secondIntent.type === 'native-write-intent')
+  assert.notEqual(secondIntent.id, firstIntent.id)
+
+  // Replaying the settled allowed frame is refused; only a fresh decision settles the new intent.
+  assert.equal(lease.receive({ v: 1, type: 'write-admission', id: firstIntent.id, allowed: true }), false)
+  assert.equal(channel.inspect().pendingWrites, 1)
+  assert.equal(lease.receive({ v: 1, type: 'write-admission', id: secondIntent.id, allowed: true }), true)
+  await second
+  assert.equal(channel.inspect().pendingWrites, 0)
+})
+
+test('independent consumer: intent correlations do not repeat across module instances', () => {
+  const build = () => {
+    const time = clock()
+    const channel = new CoordinatorChannelModule({ producer, limits, now: time.now, schedule: time.schedule })
+    const received: CoordinatorChannelRequest[] = []
+    channel.bind({ producer, connectionId: 'sock-1', expectedGeneration: 0, send: request => { received.push(request) } })
+    channel.beforeNativeWrite({ ...attemptFields(), kind: 'answer', id: 'cmd-salt', nativeBindingRef: 'b', answerRef: 'a' })
+    const intent = received.at(-1)
+    assert.ok(intent && intent.type === 'native-write-intent')
+    return intent.id
+  }
+  assert.notEqual(build(), build())
+})

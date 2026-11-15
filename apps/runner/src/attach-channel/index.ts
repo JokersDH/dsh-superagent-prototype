@@ -5,6 +5,8 @@
  * from this entry: the shared contract types plus the one implementation and its bounded errors.
  */
 export { CoordinatorChannelModule, DEFAULT_LIMITS, sameCoordinatorChannelProducer } from './coordinator-channel.ts'
+export { RunnerAttachChannel } from './attach.ts'
+export type { AttachHooks, AttachNext, AttachOptions, AttachRefusal, AttachReply } from './attach.ts'
 export { CoordinatorChannelError, NativeWriteDenied, isCoordinatorChannelError } from './errors.ts'
 export {
   CoordinatorChannelLimitsSchema,
@@ -22,3 +24,4 @@ export type {
   CoordinatorChannelReply,
   CoordinatorChannelRequest,
 } from '../../../../packages/contracts/src/coordinator-channel.ts'
+export type { CoordinatorChannelModuleOptions, CoordinatorChannelSettlement } from './coordinator-channel.ts'
