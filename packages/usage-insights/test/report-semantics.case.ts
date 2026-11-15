@@ -28,21 +28,27 @@ const native = makeOutcome({
   cost: { currency: 'EUR', amount: 2.5 }, durationMs: 4_000,
 })
 
+const rowsFor = (markdown: string, metricId: string): string[] =>
+  markdown.split('\n').filter(line => line.startsWith('| ') && line.split(' | ')[1] === metricId)
+
 test('the report keeps one row per layer and per currency and never prints a combined total', () => {
   const analysis = analyzeUsageInsights(bundle([controlled, native]))
   const markdown = renderMarkdown(analysis)
-  const durationRows = markdown.split('\n').filter(line => line.startsWith('| execution.durationMs |'))
+  const durationRows = rowsFor(markdown, 'execution.durationMs')
   assert.equal(durationRows.length, 2, 'one duration row per evidence layer')
   assert.ok(durationRows.some(line => line.includes('controlled')))
   assert.ok(durationRows.some(line => line.includes('actual_native')))
   assert.equal(durationRows.some(line => /3000|3,000/.test(line)), false, 'layers are never averaged together')
 
-  const costRows = markdown.split('\n').filter(line => line.startsWith('| usage.cost |'))
+  const costRows = rowsFor(markdown, 'usage.cost')
   assert.equal(costRows.length, 2, 'one cost row per currency')
   assert.ok(costRows.some(line => line.includes('USD') && line.includes('1.25')))
   assert.ok(costRows.some(line => line.includes('EUR') && line.includes('2.5')))
   assert.equal(costRows.some(line => /3\.75|3,75/.test(line)), false, 'currencies are never added')
   assert.ok(markdown.includes('Currencies are grouped per recorded currency') || markdown.includes('per recorded currency'))
+  // The stable identity is a column, so two currencies/layers are addressable lines.
+  assert.ok(markdown.includes('| Row id |'), 'the table names the stable row identity')
+  assert.ok(durationRows.every(line => line.startsWith('| execution.durationMs@')), 'each row carries metric@layer@currency')
 })
 
 test('a partial proxy row stays partial while the source stays complete', () => {
@@ -53,10 +59,10 @@ test('a partial proxy row stays partial while the source stays complete', () => 
   const analysis = analyzeUsageInsights(bundle([accepted]))
   assert.equal(analysis.summary.coverage.overall, 'complete')
   const markdown = renderMarkdown(analysis)
-  const proxyRow = markdown.split('\n').find(line => line.startsWith('| review.activeMs |'))
+  const proxyRow = rowsFor(markdown, 'review.activeMs').find(Boolean)
   assert.ok(proxyRow)
   assert.ok(proxyRow.includes('partial'), 'the proxy row carries its own partial coverage')
-  const headerRow = markdown.split('\n').find(line => line.startsWith('| outcomes.count |'))
+  const headerRow = rowsFor(markdown, 'outcomes.count').find(Boolean)
   assert.ok(headerRow?.includes('complete'))
   assert.ok(markdown.includes('partial UI-visibility proxy') || markdown.includes('UI-visibility proxy'))
 })
@@ -65,11 +71,11 @@ test('unknown usage and cost are printed as unavailable, never as zero', () => {
   const unknown = makeOutcome({ seed: 'report-unknown', acceptance: 'unknown' })
   const analysis = analyzeUsageInsights(bundle([unknown]))
   const markdown = renderMarkdown(analysis)
-  const tokenRow = markdown.split('\n').find(line => line.startsWith('| usage.inputTokens |'))
+  const tokenRow = rowsFor(markdown, 'usage.inputTokens').find(Boolean)
   assert.ok(tokenRow)
   assert.ok(tokenRow.includes('—'), 'a dash marks the missing value')
   assert.ok(tokenRow.includes('insufficient data'))
-  assert.equal(/^\| usage\.cost \|/m.test(markdown), false, 'no cost row is invented without a recorded currency')
+  assert.equal(rowsFor(markdown, 'usage.cost').length, 0, 'no cost row is invented without a recorded currency')
   assert.ok(markdown.includes('Records without cost: 1'))
 })
 

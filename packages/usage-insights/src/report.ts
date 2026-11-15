@@ -5,6 +5,7 @@
  */
 import { METRIC_DEFINITIONS } from './protocol.ts'
 import type { MetricRow, UsageInsightsAnalysis, UsageInsightsSummary } from './protocol.ts'
+import { metricRowKey, rowSemantics } from './facing.ts'
 
 const MAX_TEXT = 512
 
@@ -95,14 +96,17 @@ export function renderMarkdown(analysis: UsageInsightsAnalysis): string {
   lines.push('')
   if (summary.metrics.length === 0) lines.push('_No metric could be derived from this bundle._')
   else {
-    lines.push('| Metric | Layer | Unit | Value | Samples | Unknown | Excluded | Coverage | Missing reason |')
-    lines.push('| --- | --- | --- | --- | --- | --- | --- | --- | --- |')
+    lines.push('| Row id | Metric | Layer | Unit | Value | Samples | Unknown | Excluded | Coverage | Value state | Missing reason |')
+    lines.push('| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |')
     for (const row of summary.metrics) {
-      lines.push(`| ${row.metricId} | ${row.layer ?? 'product record'} | ${unitLabel(row)} | ${format(row.value)} | ${row.sampleCount} | ${row.unknownCount} | ${row.excludedCount} | ${coverageLabel(row.coverage)} | ${row.value === null ? nullReasonText(row.nullReason) : ''} |`)
+      const semantics = rowSemantics(row, summary)
+      lines.push(`| ${metricRowKey(row)} | ${row.metricId} | ${row.layer ?? 'product record'} | ${unitLabel(row)} | ${format(row.value)} | ${row.sampleCount} | ${row.unknownCount} | ${row.excludedCount} | ${coverageLabel(row.coverage)} | ${semantics.valueState} | ${row.value === null ? nullReasonText(row.nullReason) : ''} |`)
     }
   }
   lines.push('')
   lines.push('A dash means the value was not observed; the missing-reason column says why. Unknown counts stay separate and are never filled with zero.')
+  lines.push('')
+  lines.push('The `Row id` column is the stable identity (`metric@layer@currency`) of one row, so two currencies or two evidence layers never collapse into one line. A row\'s `Samples` count that row\'s own records; a header sample count elsewhere counts the works a reader enumerated. Those are different bases and are not expected to be equal. `Value state` distinguishes a measurement from a UI-visibility proxy and from a value that was simply not recorded.')
   lines.push('')
   const used = [...new Set(summary.metrics.map(row => row.metricId))].sort()
   if (used.length) {

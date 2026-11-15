@@ -133,6 +133,53 @@ export const metricRowKey = (row: MetricRow): string =>
 /** Unit label for a row: the currency code for money, otherwise the unit token. */
 export const metricUnitLabel = (row: MetricRow): string => unitLabel(row)
 
+/** How a row's value came to be, so a reader never confuses the bases. */
+export interface RowSemantics {
+  /** What the sample count counts for this row. */
+  readonly basis: 'outcome_record' | 'product_record'
+  /** Whether the number is a measurement, a proxy or not observed at all. */
+  readonly valueState: 'known' | 'unknown' | 'partial_proxy'
+  /** One sentence the report prints, derived only from the row and its metric definition. */
+  readonly sampleMeaning: string
+  readonly note: string | null
+}
+
+/**
+ * Explain one row without changing it.
+ *
+ * The header sample count elsewhere is a different base (the works a reader enumerated), so a row's
+ * own sample count must say what it counts. A UI-visibility interval stays a proxy even when the
+ * source around it enumerated completely; a missing value stays unknown and is never rendered as 0.
+ */
+export function rowSemantics(row: MetricRow, summary?: Pick<UsageInsightsSummary, 'coverage'>): RowSemantics {
+  const definition = METRIC_DEFINITIONS[row.metricId]
+  const basis: RowSemantics['basis'] = definition?.scope === 'work' ? 'product_record' : 'outcome_record'
+  const proxy = row.metricId === 'review.activeMs'
+  const valueState: RowSemantics['valueState'] = row.value === null ? 'unknown' : proxy ? 'partial_proxy' : 'known'
+  const sampleMeaning = basis === 'outcome_record'
+    ? 'samples = outcome records carrying this metric in this layer/currency'
+    : 'samples = product interaction records (works) carrying this fact'
+  const sourceBounded = summary !== undefined && summary.coverage.overall !== 'complete'
+  const note = valueState === 'unknown'
+    ? `not observed (${row.nullReason ?? 'no reason recorded'}); never zero`
+    : valueState === 'partial_proxy'
+      ? 'UI-visibility proxy, not human working time'
+      : sourceBounded
+        ? 'value is from the observed part only; the source is not complete'
+        : null
+  return { basis, valueState, sampleMeaning, note }
+}
+
+/** The row's own coverage as a sentence, so "complete" is never read as "this row has a value". */
+export function rowCoverageMeaning(row: MetricRow): string {
+  if (row.coverage === 'complete')
+    return row.value === null ? 'source enumerated completely, but no value was recorded' : 'source enumerated completely'
+  if (row.coverage === 'partial') return 'source partially enumerated or a proxy interval'
+  if (row.coverage === 'source_missing') return 'source missing; the value is unknown'
+  if (row.coverage === 'not_collected') return 'not collected'
+  return 'unsupported'
+}
+
 /**
  * Total observed outcomes when it is genuinely known. A complete empty window is `0`; an
  * uncollected or missing source is `null`, because a zero would be a fabricated count.
