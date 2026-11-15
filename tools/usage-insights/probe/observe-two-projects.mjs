@@ -322,6 +322,22 @@ async function main() {
   // The two windows cover the same facts here, so the numbers must agree; only the window differs.
   assert.deepEqual(observation7.metrics, observation30.metrics, '7-day and 30-day reads agree when the facts are inside both')
 
+  // The readable report and the coordinator DTO describe the same facts: compare the numbers the
+  // report printed with the values the product serves.
+  const dtoNumber = text => (text === null ? null : Number(String(text).replace(/,/g, '')))
+  for (const metricId of ['outcomes.count', 'outcomes.accepted', 'interventions.questions',
+    'interventions.answers', 'interventions.acceptances', 'interventions.total',
+    'review.readyToAcceptanceMs', 'review.activeMs']) {
+    const fromSummary = summary.metrics.find(row => row.metricId === metricId)?.value ?? null
+    const fromDto = dtoNumber(observationRow(observation7, metricId)?.value ?? null)
+    if (fromSummary === null || fromDto === null) {
+      assert.equal(fromSummary, fromDto, `${metricId}: both entries must agree on availability`)
+      continue
+    }
+    assert.ok(Math.abs(fromSummary - fromDto) <= 0.05,
+      `${metricId}: report ${fromSummary} disagrees with the served value ${fromDto}`)
+  }
+
   // ---- authorized Node composition over the same product reads (G5-G8) ------------------------
   // The port is exactly what main would hand over after authorizing a principal: a work list with its
   // project identity plus the existing readers. No HTTP, no SQL, no credential is created here.
