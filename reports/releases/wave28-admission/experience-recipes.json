@@ -1,0 +1,122 @@
+{
+  "protocol": "wave28-experience-recipes-admission/1",
+  "date": "2026-11-15",
+  "baselineMain": "22d0c759c59e6387ee397476f3d15d28425818df",
+  "candidates": {
+    "F": {
+      "id": "F",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-f",
+      "branch": "codex/g4-trial-experience",
+      "head": "2a862525894b89cdfe17b4ea84862624447ee609",
+      "dirty": "",
+      "evidencePath": "reports/trial-experience/wave27-status.json"
+    },
+    "J": {
+      "id": "J",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-j",
+      "branch": "codex/g5-project-recipes",
+      "head": "46020ff2e2d748961835a64cc8bf1a39cb91d378",
+      "dirty": "",
+      "evidencePath": "reports/project-recipes/wave27-status.json"
+    }
+  },
+  "checks": [
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-j",
+      "command": "node --test packages/project-recipes/test/*.case.ts",
+      "exitCode": 0,
+      "passed": 42,
+      "failed": 0
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-j",
+      "command": "node --test tools/project-recipes/test/*.case.ts",
+      "exitCode": 0,
+      "passed": 30,
+      "failed": 0
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-j",
+      "command": "pnpm --dir packages/project-recipes typecheck",
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-f",
+      "command": "node --test apps/console/test/trial/*.case.ts",
+      "exitCode": 0,
+      "passed": 16,
+      "failed": 0
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "command": "node --test --test-name-pattern='real Product/Broker' tests/integration/usage-observation.case.mjs",
+      "exitCode": 0,
+      "passed": 1,
+      "scope": "Actual original Product/Broker/Store/check/current candidate/manual acceptance for two controlled projects; normal path only, not recovered or native"
+    }
+  ],
+  "findings": [
+    {
+      "id": "J28-ORIGINAL-SCOPE-CONSUMER-COMPATIBILITY",
+      "priority": "P2_PRODUCT_COMPATIBILITY",
+      "file": "packages/project-recipes/src/match.ts",
+      "line": 92,
+      "positive": "Normal public grant ['src'] and selected ['src/file.ts'] gives draft.",
+      "negativeControls": [
+        {
+          "grant": [
+            "."
+          ],
+          "selection": [
+            "src/file.ts"
+          ],
+          "kind": "scoped_change",
+          "observed": "needs_input scope_path_outside_allowed",
+          "expected": "Current product scopeWithin uses declared atoms, so this refusal is consistent with main. Do not invent broader prefix authorization to make a recipe pass."
+        },
+        {
+          "grant": [
+            "src/"
+          ],
+          "selection": null,
+          "kind": "verification_followup",
+          "observed": "needs_input scope_path_outside_allowed",
+          "expected": "The original controlled product uses ['src/']; a project-scope check follow-up retaining this exact grant atom must not reject it as malformed."
+        }
+      ],
+      "additionalActualConsumer": "Using J's own valid ['src','test'] configuration and facts, scoped_change(['src/file.ts']) returns draft; the resulting public UserCommand is schema-valid, but an actual createProductApplication with that SAME configured grant rejects it as forbidden: Scope exceeds the configured project grant. J's prefix containment differs from the original application's declared-atom containment.",
+      "boundary": "No permission bypass: ordinary create_work still validates scope and refuses the incompatible draft. Both trailing grant atoms and the original application's exact containment semantics must be respected; a new candidates table, ledger or broader grant is not a fix.",
+      "requiredOutcome": "Reuse current Scope authorization semantics and preserve original allowed/excluded atoms (including '.' and trailing-directory strings). If a requested child path is not an existing permitted atom, return needs_input rather than a falsely actionable draft. Add an actual public Application dispatch consumer over the SAME configuration, plus real NativeProjectRegistry/root and controlled configurations."
+    },
+    {
+      "id": "F28-UNQUALIFIED-RECIPE-DISPLAY-ADMISSION",
+      "priority": "P2_PRESENTATION_ONLY",
+      "file": "apps/console/src/trial/recipes.ts",
+      "line": 104,
+      "positive": "Candidate16 state/recipe tests pass. Specific-current-project filtering and missing-profile/check cases are real.",
+      "observed": "trialRecipeOutcome accepts source='unknown', foreign project with no activeProjectId, and check.declared=false when global registered check/profile IDs match: applicable=true/reasons=[].",
+      "boundary": "Optional presentation input only. Main currently passes no recipe suggestions and no prepare callback; existing App command authority is not bypassed.",
+      "requiredOutcome": "Require supported source and a project actually present in current configuration, constrain enabled profile/check refs to that project and treat contradictory declarations explicitly. Main must regenerate/validate against current original project/configuration and original form; UI applicability is not authorization."
+    }
+  ],
+  "existingProgress": {
+    "F": "Actual real-App two-project delegation/question/verification/evidence/acceptance and hook journeys are documented in candidate reports. Only16 pure cases independently rerun here; no blanket rerun/relabel of candidate browser/installed evidence.",
+    "J": "Concrete deterministic library, typed draft/revision/preview and readonly metadata/CLI exist.42 package/30 tools tests and strict independently pass; no main HTTP/form or installed/native admission yet.",
+    "main": "Source18f already implements G Node public-reader/GETinsights/real App; F/G claims that main never passes metrics are stale after their ca01-based checkout. Existing normal candidate/acceptance is proven without a candidates SQL table."
+  },
+  "integrationAdvice": {
+    "F": "Do not pass arbitrary untrusted recipe suggestions. Existing insights/trial compatibility can be integrated in a scoped source slice after actual main consumer verification.",
+    "J": "Repair ordinary '.' and 'src/' compatibility before claiming general actual-project integration. Keep catalog/facts/preview in Node; no browser crypto import, no raw path/root in public requests, no model proposal fiction.",
+    "nextProductOwner": "Main retains registered-root authorization, shared HTTP/display DTO, App/NewWorkForm/explicit confirmation. J supplies bounded runtime metadata observation and exact current-input preview; F presents data only."
+  },
+  "preservation": {
+    "realVendorSends": 0,
+    "realModelTurns": 0,
+    "nativeTurnStarts": 0,
+    "signals": 0,
+    "oldServicesTouched": false,
+    "candidateWorkingTreesEdited": false,
+    "rootUserLogsPreserved": true,
+    "allOwnExecSessionsCompleted": true
+  }
+}
