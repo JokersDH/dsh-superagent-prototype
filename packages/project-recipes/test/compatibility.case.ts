@@ -8,7 +8,7 @@ import { test } from 'node:test'
 import { matchRecipe } from '../src/index.ts'
 import { NOW, alphaFacts, alphaCriteria, configuration, withFacts } from './fixtures.ts'
 
-const scope = { projectId: 'project-alpha', allowedPaths: ['src'], excludedPaths: [], externalActions: [] } as const
+const scope = { projectId: 'project-alpha', allowedPaths: ['src/'], excludedPaths: [], externalActions: [] } as const
 
 const fixtureProfile = {
   id: 'profile-fixture',
@@ -30,7 +30,7 @@ const configWith = (profiles: readonly (typeof fixtureProfile | typeof nativePro
 })
 
 const match = (overrides: Partial<Parameters<typeof matchRecipe>[0]> = {}) =>
-  matchRecipe({ facts: alphaFacts, configuration, kind: 'regression_fix', selection: { paths: ['src/a.ts'] }, now: NOW, ...overrides })
+  matchRecipe({ facts: alphaFacts, configuration, kind: 'regression_fix', selection: { paths: ['src/'] }, now: NOW, ...overrides })
 
 test('a controlled-fixture configuration yields a fixture draft, never a native claim', () => {
   const fixtureOnly = configWith([fixtureProfile], 'profile-fixture', { state: 'available', kind: 'controlled_fixture' })
@@ -57,12 +57,12 @@ test('a native configuration does not inherit fixture readiness wording', () => 
 
 test('an explicit profile choice is honoured and never replaced by another profile', () => {
   const both = configWith([nativeProfile, fixtureProfile], 'profile-native', { state: 'available', kind: 'native' })
-  const chosen = match({ configuration: both, selection: { paths: ['src/a.ts'], profileId: 'profile-fixture' } })
+  const chosen = match({ configuration: both, selection: { paths: ['src/'], profileId: 'profile-fixture' } })
   assert.equal(chosen.status, 'draft')
   if (chosen.status !== 'draft') return
   assert.equal(chosen.profileId, 'profile-fixture')
 
-  const unknown = match({ configuration: both, selection: { paths: ['src/a.ts'], profileId: 'profile-absent' } })
+  const unknown = match({ configuration: both, selection: { paths: ['src/'], profileId: 'profile-absent' } })
   assert.equal(unknown.status, 'needs_input')
   if (unknown.status !== 'needs_input') return
   assert.deepEqual(unknown.needsInput.map((item) => item.code), ['profile_not_enabled'])
@@ -100,7 +100,7 @@ test('the draft scope never carries external actions or an expiry copied from no
   if (mined.status !== 'draft') return
   assert.deepEqual(mined.scope.externalActions, [])
   assert.equal(mined.scope.expiresAt, undefined)
-  assert.deepEqual(mined.scope.allowedPaths, ['src/a.ts'])
+  assert.deepEqual(mined.scope.allowedPaths, ['src/'])
   void scope
 })
 
@@ -109,7 +109,7 @@ test('two projects sharing a display name but not an identity never share a sugg
   const twin = {
     ...alpha,
     id: 'project-twin',
-    scope: { projectId: 'project-twin', allowedPaths: ['src'], excludedPaths: [], externalActions: [] },
+    scope: { projectId: 'project-twin', allowedPaths: ['src/'], excludedPaths: [], externalActions: [] },
     defaultCriteria: [{ id: 'twin-tests', description: 'Twin tests pass.', kind: 'machine' as const, required: true as const, checkDefinitionRef: 'check-node-test' }],
   }
   const both = { ...configuration, projects: [alpha, twin] }
@@ -120,8 +120,8 @@ test('two projects sharing a display name but not an identity never share a sugg
   if (alphaDraft.status !== 'draft' || twinDraft.status !== 'draft') return
   assert.equal(alphaDraft.provenance.configuration.projectId, 'project-alpha')
   assert.equal(twinDraft.provenance.configuration.projectId, 'project-twin')
-  assert.deepEqual(alphaDraft.scope.allowedPaths, ['src/a.ts'])
-  assert.deepEqual(twinDraft.scope.allowedPaths, ['src/a.ts'])
+  assert.deepEqual(alphaDraft.scope.allowedPaths, ['src/'])
+  assert.deepEqual(twinDraft.scope.allowedPaths, ['src/'])
   assert.notEqual(alphaDraft.projectId, twinDraft.projectId)
   assert.notEqual(alphaDraft.criteria[0]!.id, twinDraft.criteria[0]!.id)
   assert.notEqual(alphaDraft.revision, twinDraft.revision)

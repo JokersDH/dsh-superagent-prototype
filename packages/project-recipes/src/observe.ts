@@ -1,11 +1,11 @@
 /**
- * Bounded, read-only project metadata observation for `tools/project-recipes`.
+ * Bounded, read-only project metadata observation — the runtime export main consumes.
  *
- * Rules this module enforces (see docs/project-recipes/facts-contract.md):
- *  - only an explicitly authorized absolute root, never the caller's cwd, home directory or `/`;
+ * Rules this module enforces (see docs/project-recipes/README.zh-CN.md):
+ *  - only an explicitly supplied absolute root, never the caller's cwd, home directory or `/`;
  *  - only allow-listed *names* directly under that root — no recursion, no sibling, no parent;
  *  - `O_NOFOLLOW` + `fstat` on every read: a symlink or non-regular file is refused, not followed;
- *  - hard byte budgets for each file, for the whole observation and for the number of reads;
+ *  - hard byte budgets per file, for the whole observation and for the number of reads;
  *  - `package.json` is parsed as JSON; lockfiles are hashed as opaque bytes and never parsed;
  *  - the result carries names, digests, counts and closed-enum flags only — no script bodies,
  *    no absolute paths, no environment, no credentials;
@@ -15,11 +15,11 @@ import { closeSync, constants, fstatSync, lstatSync, openSync, readSync, realpat
 import { createHash } from 'node:crypto'
 import { homedir } from 'node:os'
 import { basename, dirname, isAbsolute, join, sep } from 'node:path'
-import type { ProjectFacts } from '../../packages/project-recipes/src/index.ts'
+import type { ProjectFacts } from './facts.ts'
 
 /**
- * Closed name lists kept local so this reader has no runtime dependency on the library build; a test
- * asserts they match the package's exported constants.
+ * Closed name lists owned by this reader; a test asserts they stay equal to the facts contract's
+ * exported constants.
  */
 export const KNOWN_LOCKFILE_NAMES = ['package-lock.json', 'pnpm-lock.yaml', 'npm-shrinkwrap.json', 'yarn.lock', 'bun.lockb'] as const
 export const FOREIGN_MARKER_NAMES = ['pyproject.toml', 'go.mod', 'Cargo.toml', 'pom.xml', 'build.gradle'] as const
@@ -47,6 +47,7 @@ export type MetadataRefusalCode =
   | 'root_missing'
   | 'root_not_directory'
   | 'root_forbidden'
+  | 'root_not_registered'
   | 'symlink'
   | 'not_regular_file'
   | 'too_large'
@@ -318,4 +319,52 @@ export function observeProjectMetadata(input: {
   }
   if (hasTsconfig) notes.push('观察到 tsconfig.json 标记（只探测存在性，未读取内容）。')
   return { facts, notes }
+}
+
+
+/** Stable protocol string for the registered-root observer below. */
+export const FACTS_OBSERVER_PROTOCOL = 'project-facts-observer/1' as const
+
+/**
+ * Trusted lookup of a project's already-registered root. It belongs to the caller (main owns the
+ * project registry); this module never enumerates projects, scans directories or accepts a root
+ * from a public request.
+ */
+export interface RegisteredProjectRoots {
+  rootFor(projectId: string): string | undefined
+}
+
+export interface ProjectFactsObserverInput {
+  readonly projectId: string
+  readonly observedAt: string
+}
+
+/**
+ * The port main should depend on. `observe` takes no path: a public request can therefore never
+ * choose an arbitrary root, only a project the caller already registered.
+ */
+export interface ProjectFactsObserver {
+  readonly protocol: typeof FACTS_OBSERVER_PROTOCOL
+  observe(input: ProjectFactsObserverInput): Observation
+}
+
+export function createProjectFactsObserver(
+  roots: RegisteredProjectRoots,
+  options: { readonly provider?: string; readonly limits?: Partial<MetadataLimits> } = {},
+): ProjectFactsObserver {
+  return Object.freeze({
+    protocol: FACTS_OBSERVER_PROTOCOL,
+    observe(input: ProjectFactsObserverInput): Observation {
+      const root = roots.rootFor(input.projectId)
+      if (root === undefined)
+        throw new MetadataRefused('root_not_registered', input.projectId, '项目未在当前应用的已登记项目中，观察被拒绝')
+      return observeProjectMetadata({
+        root,
+        projectId: input.projectId,
+        observedAt: input.observedAt,
+        ...(options.provider === undefined ? {} : { provider: options.provider }),
+        ...(options.limits === undefined ? {} : { limits: options.limits }),
+      })
+    },
+  })
 }

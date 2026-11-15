@@ -18,7 +18,7 @@ import {
 import { NOW, alphaFacts, configuration } from './fixtures.ts'
 
 const draft = () => {
-  const result = matchRecipe({ facts: alphaFacts, configuration, kind: 'regression_fix', now: NOW, selection: { paths: ['src/parser.ts'] } })
+  const result = matchRecipe({ facts: alphaFacts, configuration, kind: 'regression_fix', now: NOW, selection: { paths: ['src/'] } })
   assert.equal(result.status, 'draft')
   if (result.status !== 'draft') throw new Error('fixture must be a draft')
   return result
@@ -30,7 +30,7 @@ test('a draft becomes exactly the fields the existing create_work command needs'
   assert.equal(fields.authorization, 'none')
   assert.equal(fields.projectId, 'project-alpha')
   assert.equal(fields.profileId, 'profile-native')
-  assert.deepEqual(fields.scope.allowedPaths, ['src/parser.ts'])
+  assert.deepEqual(fields.scope.allowedPaths, ['src/'])
   assert.deepEqual(fields.criteria.map((criterion) => criterion.id), ['tests', 'review'])
   assert.deepEqual(fields.recipe, { id: 'regression_fix', version: 1, revision: draft().revision })
 })
@@ -62,13 +62,18 @@ test('a draft produced against an older configuration or older facts is refused'
   assert.doesNotThrow(() => assertDraftCurrent(current, { configuration, facts: alphaFacts }))
   assert.doesNotThrow(() => previewInputs(current, { configuration, facts: alphaFacts }))
 
+  for (const [input, probe] of [
+    ['configuration', { configuration: { ...configuration, revision: '9'.repeat(64) }, facts: alphaFacts }],
+    ['facts', { configuration, facts: { ...alphaFacts, scripts: ['build', 'test', 'lint'] } }],
+  ] as const) {
+    assert.throws(
+      () => assertDraftCurrent(current, probe),
+      (error: unknown) => error instanceof PreviewError && error.code === 'stale_inputs' && error.staleInputs.length === 1 && error.staleInputs[0] === input,
+    )
+  }
   assert.throws(
-    () => assertDraftCurrent(current, { configuration: { ...configuration, revision: '9'.repeat(64) }, facts: alphaFacts }),
-    (error: unknown) => error instanceof PreviewError && error.code === 'stale_inputs',
-  )
-  assert.throws(
-    () => assertDraftCurrent(current, { configuration, facts: { ...alphaFacts, scripts: ['build', 'test', 'lint'] } }),
-    (error: unknown) => error instanceof PreviewError && error.code === 'stale_inputs',
+    () => assertDraftCurrent(current, { configuration: { ...configuration, revision: '9'.repeat(64) }, facts: { ...alphaFacts, scripts: [] } }),
+    (error: unknown) => error instanceof PreviewError && error.staleInputs.length === 2,
   )
 })
 

@@ -15,14 +15,14 @@ const nativeProject = configuration.projects[0]!
 const nativeProfile = configuration.profiles[0]!
 
 test('a project missing from the current configuration is unsupported', () => {
-  const draft = run({ selection: { paths: ['src'] }, facts: withFacts({ projectId: 'project-ghost' }) })
+  const draft = run({ selection: { paths: ['src/'] }, facts: withFacts({ projectId: 'project-ghost' }) })
   assert.equal(draft.status, 'unsupported')
   assert.deepEqual(codes(draft), ['project_unknown'])
 })
 
 test('a non-Node root is unsupported instead of being defaulted to Node', () => {
   const draft = run({
-    selection: { paths: ['src'] },
+    selection: { paths: ['src/'] },
     facts: withFacts({
       stack: { kind: 'not_node', markers: ['pyproject.toml'] },
       manager: { kind: 'none' },
@@ -36,7 +36,7 @@ test('a non-Node root is unsupported instead of being defaulted to Node', () => 
 
 test('an unobserved stack is unsupported', () => {
   const draft = run({
-    selection: { paths: ['src'] },
+    selection: { paths: ['src/'] },
     facts: withFacts({ stack: { kind: 'unknown', reason: 'unparsable' }, manager: { kind: 'unknown', reason: 'unobserved' }, locks: [], languages: [] }),
   })
   assert.equal(draft.status, 'unsupported')
@@ -44,38 +44,38 @@ test('an unobserved stack is unsupported', () => {
 })
 
 test('an unsupported package manager is unsupported; an unobserved one needs input', () => {
-  const yarn = run({ selection: { paths: ['src'] }, facts: withFacts({ manager: { kind: 'unsupported', name: 'yarn' }, locks: [{ name: 'yarn.lock' }] }) })
+  const yarn = run({ selection: { paths: ['src/'] }, facts: withFacts({ manager: { kind: 'unsupported', name: 'yarn' }, locks: [{ name: 'yarn.lock' }] }) })
   assert.equal(yarn.status, 'unsupported')
   assert.ok(codes(yarn).includes('manager_unsupported'))
 
-  const unknown = run({ selection: { paths: ['src'] }, facts: withFacts({ manager: { kind: 'unknown', reason: 'unobserved' }, locks: [] }) })
+  const unknown = run({ selection: { paths: ['src/'] }, facts: withFacts({ manager: { kind: 'unknown', reason: 'unobserved' }, locks: [] }) })
   assert.equal(unknown.status, 'needs_input')
   assert.deepEqual(codes(unknown), ['manager_unknown'])
 })
 
 test('conflicting lockfiles need explicit input', () => {
-  const both = run({ selection: { paths: ['src'] }, facts: withFacts({ locks: [{ name: 'pnpm-lock.yaml' }, { name: 'package-lock.json' }] }) })
+  const both = run({ selection: { paths: ['src/'] }, facts: withFacts({ locks: [{ name: 'pnpm-lock.yaml' }, { name: 'package-lock.json' }] }) })
   assert.equal(both.status, 'needs_input')
   assert.deepEqual(codes(both), ['locks_ambiguous'])
 
-  const mismatch = run({ selection: { paths: ['src'] }, facts: withFacts({ manager: { kind: 'pnpm' }, locks: [{ name: 'package-lock.json' }] }) })
+  const mismatch = run({ selection: { paths: ['src/'] }, facts: withFacts({ manager: { kind: 'pnpm' }, locks: [{ name: 'package-lock.json' }] }) })
   assert.equal(mismatch.status, 'needs_input')
   assert.deepEqual(codes(mismatch), ['locks_ambiguous'])
 })
 
 test('stale or future facts need a refresh', () => {
-  const stale = run({ selection: { paths: ['src'] }, now: '2026-11-14T20:00:00.000Z' })
+  const stale = run({ selection: { paths: ['src/'] }, now: '2026-11-14T20:00:00.000Z' })
   assert.equal(stale.status, 'needs_input')
   assert.deepEqual(codes(stale), ['facts_stale'])
 
-  const future = run({ selection: { paths: ['src'] }, facts: withFacts({ observedAt: '2026-11-15T00:00:00.000Z' }) })
+  const future = run({ selection: { paths: ['src/'] }, facts: withFacts({ observedAt: '2026-11-15T00:00:00.000Z' }) })
   assert.equal(future.status, 'needs_input')
   assert.deepEqual(codes(future), ['facts_stale'])
 })
 
 test('a discussion-only project is explained, never dispatched', () => {
   const draft = run({
-    selection: { paths: ['src'] },
+    selection: { paths: ['src/'] },
     configuration: withConfiguration({
       executionAvailability: { state: 'unavailable', reason: 'recovery_readonly' },
       profiles: [{ ...nativeProfile, dispatchAllowed: false, readiness: 'not_tested', blockedReason: 'unsupported_capability' }],
@@ -89,7 +89,7 @@ test('a discussion-only project is explained, never dispatched', () => {
 
 test('a disabled project reports its block reason', () => {
   const draft = run({
-    selection: { paths: ['src'] },
+    selection: { paths: ['src/'] },
     configuration: withConfiguration({ projects: [{ ...nativeProject, dispatchAllowed: false, blockedReason: 'policy_unprepared' }] }),
   })
   assert.equal(draft.status, 'needs_input')
@@ -98,7 +98,7 @@ test('a disabled project reports its block reason', () => {
 
 test('an unavailable execution state is a needs_input, not an inferred fixture fallback', () => {
   const draft = run({
-    selection: { paths: ['src'] },
+    selection: { paths: ['src/'] },
     configuration: withConfiguration({
       executionAvailability: { state: 'unavailable', reason: 'not_installed' },
       profiles: [{ ...nativeProfile, dispatchAllowed: false, readiness: 'not_tested', blockedReason: 'unsupported_capability' }],
@@ -110,41 +110,57 @@ test('an unavailable execution state is a needs_input, not an inferred fixture f
 })
 
 test('an explicitly selected but disabled profile is refused', () => {
-  const draft = run({ selection: { profileId: 'profile-other', paths: ['src'] } })
+  const draft = run({ selection: { profileId: 'profile-other', paths: ['src/'] } })
   assert.equal(draft.status, 'needs_input')
   assert.deepEqual(codes(draft), ['profile_not_enabled'])
 })
 
 test('an unknown criterion id is refused rather than dropped', () => {
-  const draft = run({ selection: { paths: ['src'], criteriaIds: ['tests', 'invented'] } })
+  const draft = run({ selection: { paths: ['src/'], criteriaIds: ['tests', 'invented'] } })
   assert.equal(draft.status, 'needs_input')
   assert.deepEqual(codes(draft), ['criteria_selection_unknown'])
 })
 
-test('paths outside the configured scope and invalid paths are refused', () => {
+test('undeclared atoms and malformed atoms are refused with distinct codes', () => {
   const outside = run({ selection: { paths: ['docs'] } })
   assert.equal(outside.status, 'needs_input')
   assert.deepEqual(codes(outside), ['scope_path_outside_allowed'])
 
+  // Trailing slash is part of the declared atom: 'src' is not 'src/'.
+  const differentAtom = run({ selection: { paths: ['src'] } })
+  assert.equal(differentAtom.status, 'needs_input')
+  assert.deepEqual(codes(differentAtom), ['scope_path_outside_allowed'])
+
+  // A child path is not a narrower atom; it needs the original configuration authorization.
+  const child = run({ selection: { paths: ['src/file.ts'] } })
+  assert.equal(child.status, 'needs_input')
+  assert.deepEqual(codes(child), ['scope_path_outside_allowed'])
+
   const absolute = run({ selection: { paths: ['/etc/passwd'] } })
   assert.equal(absolute.status, 'needs_input')
-  assert.deepEqual(codes(absolute), ['scope_path_outside_allowed'])
+  assert.deepEqual(codes(absolute), ['scope_path_invalid'])
 
   const traversal = run({ selection: { paths: ['src/../etc'] } })
   assert.equal(traversal.status, 'needs_input')
-  assert.deepEqual(codes(traversal), ['scope_path_outside_allowed'])
+  assert.deepEqual(codes(traversal), ['scope_path_invalid'])
 
-  const excluded = run({ selection: { paths: ['src'], excludedPaths: ['../secret'] } })
+  const excluded = run({ selection: { paths: ['src/'], excludedPaths: ['../secret'] } })
   assert.equal(excluded.status, 'needs_input')
-  assert.deepEqual(codes(excluded), ['scope_path_outside_allowed'])
+  assert.deepEqual(codes(excluded), ['scope_path_invalid'])
 })
 
-test('an authorized path may be narrowed but not broadened', () => {
-  const narrowed = run({ selection: { paths: ['src/parser/lexer.ts'] } })
-  assert.equal(narrowed.status, 'draft')
-  const broadened = run({ selection: { paths: ['src/parser', 'srcx'] } })
-  assert.equal(broadened.status, 'needs_input')
-  assert.deepEqual(codes(broadened), ['scope_path_outside_allowed'])
+test('a draft keeps the declared atoms verbatim and never invents smaller ones', () => {
+  const exact = run({ selection: { paths: ['src/'] } })
+  assert.equal(exact.status, 'draft')
+  if (exact.status !== 'draft') return
+  assert.deepEqual(exact.scope.allowedPaths, ['src/'])
+
+  const trailing = run({ selection: { paths: ['test/'] } })
+  assert.equal(trailing.status, 'draft')
+
+  const invented = run({ selection: { paths: ['src/parser'] } })
+  assert.equal(invented.status, 'needs_input')
+  assert.deepEqual(codes(invented), ['scope_path_outside_allowed'])
 })
 
 test('a monorepo root needs explicit member paths before a bounded draft', () => {
@@ -152,19 +168,19 @@ test('a monorepo root needs explicit member paths before a bounded draft', () =>
   assert.equal(root.status, 'needs_input')
   assert.deepEqual(codes(root), ['workspace_member_required'])
 
-  const scoped = run({ facts: withFacts({ workspace: { declaration: 'pnpm_workspace_yaml' } }), selection: { paths: ['src/app.ts'] } })
+  const scoped = run({ facts: withFacts({ workspace: { declaration: 'pnpm_workspace_yaml' } }), selection: { paths: ['src/'] } })
   assert.equal(scoped.status, 'draft')
   if (scoped.status !== 'draft') return
-  assert.deepEqual(scoped.scope.allowedPaths, ['src/app.ts'])
+  assert.deepEqual(scoped.scope.allowedPaths, ['src/'])
   assert.ok(scoped.notes.some((note) => note.includes('monorepo')))
 
-  const unknownLayout = run({ facts: withFacts({ workspace: { declaration: 'unknown' } }), selection: { paths: ['src'] } })
+  const unknownLayout = run({ facts: withFacts({ workspace: { declaration: 'unknown' } }), selection: { paths: ['src/'] } })
   assert.equal(unknownLayout.status, 'needs_input')
   assert.ok(codes(unknownLayout).includes('workspace_unknown'))
 })
 
 test('an unsupported configuration protocol is unsupported and records no revision', () => {
-  const draft = run({ selection: { paths: ['src'] }, configuration: { ...configuration, protocol: 'application-configuration/2' } })
+  const draft = run({ selection: { paths: ['src/'] }, configuration: { ...configuration, protocol: 'application-configuration/2' } })
   assert.equal(draft.status, 'unsupported')
   assert.deepEqual(codes(draft), ['configuration_unsupported_version'])
   assert.equal(draft.provenance.configuration.protocol, 'application-configuration/2')
@@ -172,7 +188,7 @@ test('an unsupported configuration protocol is unsupported and records no revisi
 })
 
 test('a configuration that fails the public schema is unsupported, not repaired', () => {
-  const draft = run({ selection: { paths: ['src'] }, configuration: { ...configuration, revision: 'not-a-digest' } })
+  const draft = run({ selection: { paths: ['src/'] }, configuration: { ...configuration, revision: 'not-a-digest' } })
   assert.equal(draft.status, 'unsupported')
   assert.deepEqual(codes(draft), ['configuration_invalid'])
   assert.equal(draft.provenance.configuration.revision, null)

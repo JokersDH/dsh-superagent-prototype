@@ -48,6 +48,7 @@ export const RECIPE_ISSUE_CODES = [
   'criteria_selection_unknown',
   'scope_paths_required',
   'scope_path_outside_allowed',
+  'scope_path_invalid',
 ] as const
 export type RecipeIssueCode = (typeof RECIPE_ISSUE_CODES)[number]
 

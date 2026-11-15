@@ -31,12 +31,18 @@ export interface CreateWorkFields {
 
 export type PreviewErrorCode = 'not_actionable' | 'revision_mismatch' | 'stale_inputs'
 
+/** Which prerequisite changed, so a caller can tell the user exactly what to regenerate. */
+export type StaleInput = 'configuration' | 'facts'
+
 export class PreviewError extends Error {
   readonly code: PreviewErrorCode
-  constructor(code: PreviewErrorCode, message: string) {
+  /** Only populated for `stale_inputs`. */
+  readonly staleInputs: readonly StaleInput[]
+  constructor(code: PreviewErrorCode, message: string, staleInputs: readonly StaleInput[] = []) {
     super(message)
     this.name = 'PreviewError'
     this.code = code
+    this.staleInputs = Object.freeze([...staleInputs])
   }
 }
 
@@ -94,12 +100,14 @@ export function toCreateWorkCommand(draft: ProjectRecipeDraft, ids: { readonly c
  */
 export function assertDraftCurrent(draft: ProjectRecipeDraft, current: { readonly configuration: unknown; readonly facts: unknown }): void {
   verify(draft)
+  const stale: StaleInput[] = []
   const revision = (current.configuration as { revision?: unknown } | null | undefined)?.revision
-  if (typeof revision === 'string' && revision !== draft.provenance.configuration.revision)
-    throw new PreviewError('stale_inputs', 'The configuration revision changed after this draft was produced; regenerate it')
+  if (typeof revision === 'string' && revision !== draft.provenance.configuration.revision) stale.push('configuration')
   const factsDigest = canonicalDigest(current.facts as unknown as Json)
-  if (factsDigest !== draft.provenance.facts.digest)
-    throw new PreviewError('stale_inputs', 'The project facts changed after this draft was produced; re-observe and regenerate it')
+  if (factsDigest !== draft.provenance.facts.digest) stale.push('facts')
+  if (stale.length === 0) return
+  const guidance = stale.map((input) => (input === 'configuration' ? '配置已变化：请按当前配置重新生成' : '项目事实已变化：请重新观察后生成')).join('；')
+  throw new PreviewError('stale_inputs', `草稿前提已过期（${stale.join(', ')}）：${guidance}`, stale)
 }
 
 /** Convenience for a consumer that wants both checks before showing a form. */

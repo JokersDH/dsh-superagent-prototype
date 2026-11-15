@@ -22,7 +22,7 @@ const configuration = {
   projects: [{
     id: 'project-alpha',
     displayName: 'Alpha 服务',
-    scope: { projectId: 'project-alpha', allowedPaths: ['src', 'test'], excludedPaths: ['src/generated'], externalActions: [] },
+    scope: { projectId: 'project-alpha', allowedPaths: ['src/', 'test/'], excludedPaths: ['src/private/'], externalActions: [] },
     profileIds: ['profile-native'],
     defaultProfileId: 'profile-native',
     defaultCriteria: [
@@ -60,7 +60,7 @@ interface Row {
 
 // An omitted `paths` list means "no narrowing requested"; an explicitly empty list is missing input.
 const cases: readonly { kind: string; paths?: readonly string[] }[] = [
-  { kind: 'regression_fix', paths: ['src/parser.ts'] },
+  { kind: 'regression_fix', paths: ['src/'] },
   { kind: 'scoped_change' },
   { kind: 'verification_followup' },
 ]

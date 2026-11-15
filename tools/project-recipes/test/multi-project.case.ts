@@ -56,8 +56,8 @@ const withRoots = (fn: (alpha: string, beta: string) => void) => {
 test('two authorized roots produce two isolated, project-specific drafts', () => {
   withRoots((alpha, beta) => {
     const configPath = fixture('configuration.json')
-    const a = run(['--config', configPath, '--root', alpha, '--project', 'project-alpha', '--paths', 'src/parser.ts', '--kind', 'regression_fix', '--now', NOW])
-    const b = run(['--config', configPath, '--root', beta, '--project', 'project-beta', '--paths', 'packages/core/src/index.ts', '--kind', 'regression_fix', '--now', NOW])
+    const a = run(['--config', configPath, '--root', alpha, '--project', 'project-alpha', '--paths', 'src/', '--kind', 'regression_fix', '--now', NOW])
+    const b = run(['--config', configPath, '--root', beta, '--project', 'project-beta', '--paths', 'packages/core/src/', '--kind', 'regression_fix', '--now', NOW])
     assert.equal(a.status, 0, a.stderr)
     assert.equal(b.status, 0, b.stderr)
 
@@ -69,8 +69,8 @@ test('two authorized roots produce two isolated, project-specific drafts', () =>
 
     assert.equal(draftA.projectId, 'project-alpha')
     assert.equal(draftB.projectId, 'project-beta')
-    assert.deepEqual(draftA.scope.allowedPaths, ['src/parser.ts'])
-    assert.deepEqual(draftB.scope.allowedPaths, ['packages/core/src/index.ts'])
+    assert.deepEqual(draftA.scope.allowedPaths, ['src/'])
+    assert.deepEqual(draftB.scope.allowedPaths, ['packages/core/src/'])
     assert.deepEqual(draftA.criteria.map((criterion) => criterion.id), ['tests', 'review'])
     assert.deepEqual(draftB.criteria.map((criterion) => criterion.id), ['beta-tests'])
     assert.notEqual(draftA.revision, draftB.revision)
@@ -93,7 +93,7 @@ test('the monorepo root without explicit member paths needs input, and no draft 
 
 test('a draft cannot be reused against another configuration or another project observation', () => {
   withRoots((alpha) => {
-    const result = run(['--config', fixture('configuration.json'), '--root', alpha, '--project', 'project-alpha', '--paths', 'src', '--now', NOW])
+    const result = run(['--config', fixture('configuration.json'), '--root', alpha, '--project', 'project-alpha', '--paths', 'src/', '--now', NOW])
     assert.equal(result.status, 0, result.stderr)
     const draft = parseProjectRecipeDraft(JSON.parse(result.stdout))
     if (draft.status !== 'draft') throw new Error('fixture must draft')
@@ -120,9 +120,23 @@ test('a draft cannot be reused against another configuration or another project 
   })
 })
 
+test('a monorepo member atom must already be declared by the root configuration', () => {
+  withRoots((alpha, beta) => {
+    void alpha
+    const declared = run(['--config', fixture('configuration.json'), '--root', beta, '--project', 'project-beta', '--paths', 'packages/core/src/', '--now', NOW])
+    assert.equal(declared.status, 0, declared.stderr)
+
+    // A sibling member the root configuration never declared is not silently authorized.
+    const undeclared = run(['--config', fixture('configuration.json'), '--root', beta, '--project', 'project-beta', '--paths', 'packages/web/src/', '--now', NOW])
+    assert.equal(undeclared.status, 3, undeclared.stderr)
+    const draft = JSON.parse(undeclared.stdout)
+    assert.ok(draft.needsInput.some((item: { code: string }) => item.code === 'scope_path_outside_allowed'))
+  })
+})
+
 test('the same root observed twice yields byte-identical drafts', () => {
   withRoots((alpha) => {
-    const args = ['--config', fixture('configuration.json'), '--root', alpha, '--project', 'project-alpha', '--paths', 'src', '--now', NOW]
+    const args = ['--config', fixture('configuration.json'), '--root', alpha, '--project', 'project-alpha', '--paths', 'src/', '--now', NOW]
     const first = run(args)
     const second = run(args)
     assert.equal(first.status, 0, first.stderr)

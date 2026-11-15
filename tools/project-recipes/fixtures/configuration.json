@@ -7,7 +7,7 @@
     {
       "id": "project-alpha",
       "displayName": "Alpha 服务",
-      "scope": { "projectId": "project-alpha", "allowedPaths": ["src", "test"], "excludedPaths": ["src/generated"], "externalActions": [] },
+      "scope": { "projectId": "project-alpha", "allowedPaths": ["src/", "test/"], "excludedPaths": ["src/private/"], "externalActions": [] },
       "profileIds": ["profile-native"],
       "defaultProfileId": "profile-native",
       "defaultCriteria": [
@@ -19,7 +19,7 @@
     {
       "id": "project-beta",
       "displayName": "Beta 工具",
-      "scope": { "projectId": "project-beta", "allowedPaths": ["packages/core/src"], "excludedPaths": [], "externalActions": [] },
+      "scope": { "projectId": "project-beta", "allowedPaths": ["packages/core/src/"], "excludedPaths": [], "externalActions": [] },
       "profileIds": ["profile-native"],
       "defaultProfileId": "profile-native",
       "defaultCriteria": [

@@ -7,10 +7,14 @@ import { lstatSync, mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync }
 import { homedir, tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
-import { matchRecipe } from '../../../packages/project-recipes/src/index.ts'
-import { FOREIGN_MARKER_NAMES, KNOWN_LOCKFILE_NAMES, MetadataRefused, observeProjectMetadata } from '../metadata.ts'
-import { HELP_KINDS } from '../cli.ts'
-import { fixture } from './paths.ts'
+import {
+  FOREIGN_MARKER_NAMES,
+  KNOWN_LOCKFILE_NAMES,
+  MetadataRefused,
+  createProjectFactsObserver,
+  matchRecipe,
+  observeProjectMetadata,
+} from '../src/index.ts'
 
 const NOW = '2026-11-14T12:00:00.000Z'
 
@@ -36,7 +40,7 @@ const minimalConfiguration = {
   projects: [{
     id: 'project-alpha',
     displayName: 'Alpha',
-    scope: { projectId: 'project-alpha', allowedPaths: ['src'], excludedPaths: [], externalActions: [] },
+    scope: { projectId: 'project-alpha', allowedPaths: ['src/'], excludedPaths: [], externalActions: [] },
     profileIds: ['profile-native'],
     defaultProfileId: 'profile-native',
     defaultCriteria: [{ id: 'tests', description: 'Tests pass.', kind: 'machine', required: true, checkDefinitionRef: 'check-node-test' }],
@@ -185,7 +189,7 @@ test('a conflicting pnpm+npm lock pair is observed honestly and needs input', ()
       facts,
       configuration: minimalConfiguration,
       kind: 'regression_fix',
-      selection: { paths: ['src'] },
+      selection: { paths: ['src/'] },
       now: NOW,
     })
     assert.equal(draft.status, 'needs_input')
@@ -201,14 +205,6 @@ test('an unsupported package manager declaration is observed, not executed', () 
     assert.deepEqual(facts.manager, { kind: 'unsupported', name: 'bun' })
     assert.equal(facts.stack.kind === 'node' && facts.stack.packageManagerField, 'bun@1.2.0')
   })
-})
-
-test('the committed example project observes cleanly', () => {
-  const { facts } = observe(fixture('example-project'))
-  assert.equal(facts.stack.kind, 'node')
-  assert.deepEqual(facts.manager, { kind: 'pnpm', declaredVersion: '11.7.0' })
-  assert.deepEqual(facts.scripts, ['build', 'test'])
-  assert.equal(facts.workspace.declaration, 'none')
 })
 
 test('observation is read-only: no file in the project changes', () => {
@@ -270,9 +266,34 @@ test('refusal messages never echo file contents or secrets', () => {
   })
 })
 
-test('the reader name lists match the package constants they mirror', async () => {
-  const pkg = await import('../../../packages/project-recipes/src/index.ts')
+test('the reader name lists match the facts contract constants', async () => {
+  const pkg = await import('../src/index.ts')
   assert.deepEqual([...KNOWN_LOCKFILE_NAMES], [...pkg.KNOWN_LOCKFILES])
   assert.deepEqual([...FOREIGN_MARKER_NAMES], [...pkg.FOREIGN_STACK_MARKERS])
-  assert.deepEqual([...HELP_KINDS], [...pkg.RECIPE_KINDS])
+})
+
+test('the registered-root observer takes no path and refuses an unregistered project', () => {
+  withDir((dir) => {
+    write(dir, 'package.json', JSON.stringify(packageJson))
+    const observer = createProjectFactsObserver({ rootFor: (id) => (id === 'project-alpha' ? dir : undefined) })
+    assert.equal(observer.protocol, 'project-facts-observer/1')
+    const { facts } = observer.observe({ projectId: 'project-alpha', observedAt: NOW })
+    assert.equal(facts.projectId, 'project-alpha')
+    assert.equal(facts.stack.kind, 'node')
+    assert.throws(
+      () => observer.observe({ projectId: 'project-unknown', observedAt: NOW }),
+      (error: unknown) => error instanceof MetadataRefused && error.code === 'root_not_registered',
+    )
+  })
+})
+
+test('the registered-root observer honours the caller root and cannot be redirected by a public field', () => {
+  withDir((dir) => {
+    write(dir, 'package.json', JSON.stringify({ ...packageJson, packageManager: 'npm@11.6.0' }))
+    write(dir, 'package-lock.json', '{"lockfileVersion":3}')
+    const observer = createProjectFactsObserver({ rootFor: () => dir })
+    const { facts } = observer.observe({ projectId: 'project-alpha', observedAt: NOW })
+    assert.deepEqual(facts.manager, { kind: 'npm', declaredVersion: '11.6.0' })
+    assert.equal(typeof facts.provenance.provider, 'string')
+  })
 })

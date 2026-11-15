@@ -40,6 +40,7 @@ import {
   type RecipeProvenance,
 } from './draft.ts'
 import { PROJECT_FACTS_PROTOCOL, ProjectFactsSchema, type ProjectFacts } from './facts.ts'
+import { isProjectAtom } from './scope.ts'
 
 /** Default freshness budget for injected facts: older observations need an explicit refresh. */
 export const DEFAULT_MAX_FACTS_AGE_MS = 60 * 60 * 1000
@@ -81,17 +82,6 @@ const issue = (code: RecipeIssueCode, field: RecipeIssueField, message: string):
 
 const sortedUnique = (values: readonly string[] | undefined): readonly string[] | undefined =>
   values === undefined ? undefined : Object.freeze([...new Set(values)].sort())
-
-const isRelativePath = (value: string): boolean =>
-  value.length > 0 && value.length <= 1024 && !value.startsWith('/') && !/^[A-Za-z]:/.test(value) &&
-  !value.includes('\\') && !value.includes('\0') && !value.split('/').includes('..') && value.split('/').every((segment) => segment !== '')
-
-/** True when `candidate` is the allowed path itself or lies strictly inside it. */
-export function pathWithin(candidate: string, allowed: string): boolean {
-  if (candidate === allowed) return true
-  const base = allowed.replace(/\/+$/, '')
-  return base.length > 0 && candidate.startsWith(`${base}/`)
-}
 
 const lockFamilies = (facts: ProjectFacts): ReadonlySet<'pnpm' | 'npm'> => {
   const families = new Set<'pnpm' | 'npm'>()
@@ -299,21 +289,31 @@ export function matchRecipe(input: RecipeMatchInput): ProjectRecipeDraft {
     needs.push(issue('criteria_machine_required', 'criteria', '所选 criteria 中没有必需的已登记机器检查；请补充检查或改用项目默认 criteria。'))
   if (template.criteria === 'machine') notes.push('只复用已登记的机器检查；人工接受仍在原确认流程中进行。')
 
-  // --- scope ----------------------------------------------------------------
+  // --- scope: declared atoms only, exactly as the application compares them ----
   const projectScope: Scope = project.scope
-  const requested = selectedPaths ?? (template.scope === 'project' ? Object.freeze([...projectScope.allowedPaths]) : undefined)
-  const excluded = sortedUnique([...projectScope.excludedPaths, ...(selection.excludedPaths ?? [])]) ?? Object.freeze([] as string[])
-  const invalidScopeEntries = [...(requested ?? []), ...excluded].filter((candidate) => !isRelativePath(candidate))
-  if (invalidScopeEntries.length > 0)
-    needs.push(issue('scope_path_outside_allowed', 'scope', '出现了不是项目相对路径的条目（不允许绝对路径、反斜杠或 ..）。'))
+  const requestedAtoms = selectedPaths
+  const selectionExclusions = sortedUnique(selection.excludedPaths) ?? Object.freeze([] as string[])
+  const malformed = [...(requestedAtoms ?? []), ...selectionExclusions].filter((atom) => !isProjectAtom(atom))
+  if (malformed.length > 0)
+    needs.push(issue('scope_path_invalid', 'scope', `以下条目不是合法的项目相对原子（不允许绝对路径、盘符、反斜杠或 ..）：${malformed.slice(0, 8).join(', ')}。`))
   let scopePaths: readonly string[] | undefined
-  if (requested === undefined || requested.length === 0) {
-    if (!memberRequired) needs.push(issue('scope_paths_required', 'scope', '请显式列出本次工作涉及的项目相对路径；无边界变更不会自动生成。'))
+  if (requestedAtoms === undefined || requestedAtoms.length === 0) {
+    if (template.scope === 'project') scopePaths = sortedUnique(projectScope.allowedPaths)
+    else if (!memberRequired) needs.push(issue('scope_paths_required', 'scope', '请显式选择项目已声明的授权原子；配方不会新增或推导范围。'))
   } else {
-    const outside = requested.filter(isRelativePath).filter((candidate) => !projectScope.allowedPaths.some((allowed) => pathWithin(candidate, allowed)))
-    if (outside.length > 0) needs.push(issue('scope_path_outside_allowed', 'scope', `以下路径不在项目授权范围内：${outside.slice(0, 8).join(', ')}。`))
-    else scopePaths = requested
+    const undeclared = requestedAtoms.filter(isProjectAtom).filter((atom) => !projectScope.allowedPaths.includes(atom))
+    if (undeclared.length > 0)
+      needs.push(
+        issue(
+          'scope_path_outside_allowed',
+          'scope',
+          `以下条目不是项目已声明的授权原子，配方不能新增：${undeclared.slice(0, 8).join(', ')}。需要更小范围时请走原配置授权流程。`,
+        ),
+      )
+    else scopePaths = requestedAtoms
   }
+  // Exclusions may only grow: the grant's exclusions must all survive, extras narrow further.
+  const excluded = sortedUnique([...projectScope.excludedPaths, ...selectionExclusions]) ?? Object.freeze([] as string[])
 
   if (unsupported.length > 0) return emit({ ...envelope(facts, template, kind, provenance, notes), status: 'unsupported', unsupported: dedupe(unsupported) })
   if (needs.length > 0) return emit({ ...envelope(facts, template, kind, provenance, notes), status: 'needs_input', needsInput: dedupe(needs) })

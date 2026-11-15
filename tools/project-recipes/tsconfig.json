@@ -12,5 +12,5 @@
     "noEmit": true,
     "types": ["node"]
   },
-  "include": ["cli.ts", "metadata.ts", "test/**/*.ts"]
+  "include": ["cli.ts", "test/**/*.ts"]
 }

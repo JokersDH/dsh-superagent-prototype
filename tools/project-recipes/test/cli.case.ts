@@ -8,7 +8,8 @@ import { mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'n
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
-import { parseProjectRecipeDraft } from '../../../packages/project-recipes/src/index.ts'
+import { RECIPE_KINDS, parseProjectRecipeDraft } from '../../../packages/project-recipes/src/index.ts'
+import { HELP_KINDS } from '../cli.ts'
 import { cliPath, fixture } from './paths.ts'
 
 const NOW = '2026-11-14T12:00:00.000Z'
@@ -27,6 +28,7 @@ const withTemp = (fn: (dir: string) => void) => {
 }
 
 test('--help exits 0, documents every recipe kind and touches no file', () => {
+  assert.deepEqual([...HELP_KINDS], [...RECIPE_KINDS], 'the help list mirrors the catalog')
   const result = run(['--help'])
   assert.equal(result.status, 0)
   assert.match(result.stdout, /project-recipes — 只读的项目任务\/检查声明建议/)
@@ -35,13 +37,13 @@ test('--help exits 0, documents every recipe kind and touches no file', () => {
 })
 
 test('a complete draft exits 0 and its JSON passes the shared revision check', () => {
-  const result = run([...base, '--paths', 'src/parser.ts', '--kind', 'regression_fix'])
+  const result = run([...base, '--paths', 'src/', '--kind', 'regression_fix'])
   assert.equal(result.status, 0, result.stderr)
   const draft = parseProjectRecipeDraft(JSON.parse(result.stdout))
   assert.equal(draft.status, 'draft')
   assert.equal(draft.authorization, 'none')
   if (draft.status !== 'draft') return
-  assert.deepEqual(draft.scope.allowedPaths, ['src/parser.ts'])
+  assert.deepEqual(draft.scope.allowedPaths, ['src/'])
   assert.equal(draft.profileId, 'profile-native')
   assert.equal(draft.provenance.configuration.revision, 'c'.repeat(64))
 })
@@ -97,12 +99,12 @@ test('--output never overwrites an existing file and writes an identical new one
   withTemp((dir) => {
     const existing = join(dir, 'report.json')
     writeFileSync(existing, '{"keep":true}')
-    const refused = run([...base, '--paths', 'src', '--output', existing])
+    const refused = run([...base, '--paths', 'src/', '--output', existing])
     assert.equal(refused.status, 5)
     assert.equal(readFileSync(existing, 'utf8'), '{"keep":true}')
 
     const fresh = join(dir, 'new-report.json')
-    const written = run([...base, '--paths', 'src', '--output', fresh])
+    const written = run([...base, '--paths', 'src/', '--output', fresh])
     assert.equal(written.status, 0, written.stderr)
     assert.deepEqual(JSON.parse(readFileSync(fresh, 'utf8')), JSON.parse(written.stdout))
   })
@@ -111,13 +113,13 @@ test('--output never overwrites an existing file and writes an identical new one
 test('reading an authorized root yields a draft and keeps script bodies and paths out of stdout', () => {
   withTemp((dir) => {
     const project = join(dir, 'project')
-    const result = run(['--config', fixture('configuration.json'), '--root', project, '--project', 'project-alpha', '--paths', 'src', '--now', NOW])
+    const result = run(['--config', fixture('configuration.json'), '--root', project, '--project', 'project-alpha', '--paths', 'src/', '--now', NOW])
     // A directory that does not exist yet is refused, never created.
     assert.equal(result.status, 5)
     assert.ok(!result.stdout.includes(project))
   })
 
-  const result = run(['--config', fixture('configuration.json'), '--root', fixture('example-project'), '--project', 'project-alpha', '--paths', 'src', '--now', NOW])
+  const result = run(['--config', fixture('configuration.json'), '--root', fixture('example-project'), '--project', 'project-alpha', '--paths', 'src/', '--now', NOW])
   assert.equal(result.status, 0, result.stderr)
   const draft = JSON.parse(result.stdout)
   assert.equal(draft.status, 'draft')
@@ -126,7 +128,7 @@ test('reading an authorized root yields a draft and keeps script bodies and path
 })
 
 test('stale facts reach the documented needs_input exit through the CLI', () => {
-  const stale = run(['--config', fixture('configuration.json'), '--facts', fixture('facts-alpha.json'), '--now', '2026-11-20T00:00:00.000Z', '--paths', 'src'])
+  const stale = run(['--config', fixture('configuration.json'), '--facts', fixture('facts-alpha.json'), '--now', '2026-11-20T00:00:00.000Z', '--paths', 'src/'])
   assert.equal(stale.status, 3, stale.stderr)
   const draft = JSON.parse(stale.stdout)
   assert.equal(draft.status, 'needs_input')

@@ -13,8 +13,19 @@
 import { writeFileSync } from 'node:fs'
 import { pathToFileURL } from 'node:url'
 import { resolve } from 'node:path'
-import { MetadataRefused, observeProjectMetadata, readJsonFile } from './metadata.ts'
 import type { RecipeSelection } from '../../packages/project-recipes/src/index.ts'
+
+/** Local refusal used only when the workspace dependency itself cannot be loaded. */
+class Refused extends Error {
+  readonly code: string
+  readonly target: string
+  constructor(code: string, target: string, message: string) {
+    super(message)
+    this.name = 'Refused'
+    this.code = code
+    this.target = target
+  }
+}
 
 export const EXIT = Object.freeze({ draft: 0, usage: 2, needsInput: 3, unsupported: 4, refused: 5 })
 
@@ -31,7 +42,7 @@ const loadLibrary = async (): Promise<Library> => {
   try {
     return await import('../../packages/project-recipes/src/index.ts')
   } catch {
-    throw new MetadataRefused('unreadable', 'packages/contracts/dist', '缺少已构建的 workspace 依赖：请先运行 pnpm --dir packages/contracts build 后重试')
+    throw new Refused('unreadable', 'packages/contracts/dist', '缺少已构建的 workspace 依赖：请先运行 pnpm --dir packages/contracts build 后重试')
   }
 }
 
@@ -47,7 +58,7 @@ const HELP = `project-recipes — 只读的项目任务/检查声明建议（不
   --facts    已观察好的 project-facts/1 JSON；优先复用现有 inspection，不再扫描环境。
   --root     明确授权的项目根目录；只读取根下白名单元数据（package.json、锁文件名、tsconfig 存在性）。
   --project  项目 ID；省略时默认取 --config 中唯一的项目。
-  --paths    本次工作的项目相对路径，逗号分隔。有限范围配方必须显式给出。
+  --paths    项目已声明的授权原子（如 src/、.），逗号分隔，逐字匹配配置；子路径不是更小原子。
   --kind     配方类型，默认 regression_fix。
 
 结果（stdout 一个 JSON）：
@@ -60,6 +71,7 @@ const HELP = `project-recipes — 只读的项目任务/检查声明建议（不
 边界：
   - 不安装、不运行、不注册任何脚本或检查；不调用模型/agent；不写项目。
   - --root 只读根下白名单名字：NOFOLLOW、必须是普通文件、有字节/文件数上限；不做递归扫描。
+  - scope 是声明原子：src/ 与 src 不同，src/file.ts 不会被视为 src/ 的收窄。
   - 不读取 home/环境变量/.npmrc/凭据；脚本正文与锁文件内容从不解析。
   - 输出里的路径只有项目相对路径；绝对路径只出现在 --root/--config 参数本身。
 `
@@ -160,13 +172,13 @@ export async function main(argv: readonly string[], io: { stdout: (text: string)
     for (const [flag, value] of [['--paths', parsed.paths], ['--exclude', parsed.exclude], ['--criteria', parsed.criteria]] as const)
       if (value !== undefined && value.length === 0) throw new UsageError(`${flag} needs at least one value`)
     library = await loadLibrary()
-    const configuration = readJsonFile(parsed.config)
+    const configuration = library.readJsonFile(parsed.config)
     const now = parsed.now ?? new Date().toISOString()
     if (!Number.isFinite(Date.parse(now))) throw new UsageError('--now must be an ISO timestamp')
 
     const notes: string[] = []
     // `--facts` already names its project; `--root` needs one before the observation exists.
-    const injected = parsed.facts === undefined ? undefined : readJsonFile(parsed.facts)
+    const injected = parsed.facts === undefined ? undefined : library.readJsonFile(parsed.facts)
     const factsProjectId = typeof (injected as { projectId?: unknown } | undefined)?.projectId === 'string'
       ? String((injected as { projectId: string }).projectId)
       : undefined
@@ -177,7 +189,7 @@ export async function main(argv: readonly string[], io: { stdout: (text: string)
     if (injected !== undefined) {
       facts = injected
     } else {
-      const observation = observeProjectMetadata({ root: parsed.root!, projectId, observedAt: now })
+      const observation = library.observeProjectMetadata({ root: parsed.root!, projectId, observedAt: now })
       facts = observation.facts
       notes.push(...observation.notes)
     }
@@ -198,7 +210,7 @@ export async function main(argv: readonly string[], io: { stdout: (text: string)
       try {
         writeFileSync(target, text, { flag: 'wx', encoding: 'utf8' })
       } catch {
-        throw new MetadataRefused('unreadable', target.split('/').pop() ?? 'output', '输出文件已存在或不可写；不覆盖既有文件')
+        throw new library.MetadataRefused('unreadable', target.split('/').pop() ?? 'output', '输出文件已存在或不可写；不覆盖既有文件')
       }
       io.stderr(`wrote: ${target}\n`)
     }
@@ -218,7 +230,7 @@ export async function main(argv: readonly string[], io: { stdout: (text: string)
       io.stderr(`usage: ${error.message}\n`)
       return EXIT.usage
     }
-    if (error instanceof MetadataRefused) {
+    if (error instanceof Refused || (library !== undefined && error instanceof library.MetadataRefused)) {
       io.stderr(`refused [${error.code}] ${error.target}: ${error.message}\n`)
       return EXIT.refused
     }

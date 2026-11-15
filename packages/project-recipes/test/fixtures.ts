@@ -12,8 +12,8 @@ export const LOCK_DIGEST = 'd'.repeat(64)
 
 export const alphaScope = {
   projectId: 'project-alpha',
-  allowedPaths: ['src', 'test'],
-  excludedPaths: ['src/generated'],
+  allowedPaths: ['src/', 'test/'],
+  excludedPaths: ['src/private/'],
   externalActions: [],
 } as const
 
@@ -40,7 +40,7 @@ export const configuration: ApplicationConfiguration = {
     {
       id: 'project-beta',
       displayName: 'Beta 工具',
-      scope: { projectId: 'project-beta', allowedPaths: ['packages/core/src'], excludedPaths: [], externalActions: [] },
+      scope: { projectId: 'project-beta', allowedPaths: ['packages/core/src/'], excludedPaths: [], externalActions: [] },
       profileIds: ['profile-native'],
       defaultProfileId: 'profile-native',
       defaultCriteria: [{ id: 'beta-tests', description: 'Beta package tests pass.', kind: 'machine', required: true, checkDefinitionRef: 'check-npm-test' }],

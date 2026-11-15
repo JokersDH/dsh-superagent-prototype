@@ -16,20 +16,25 @@ application's existing preview and explicit user confirmation.
 | Module | Contract | Purpose |
 | --- | --- | --- |
 | `facts.ts` | `project-facts/1` | Only names, digests, counts and closed-enum flags of an observation. No script bodies, argv, absolute paths or credentials. |
+| `observe.ts` | `project-facts-observer/1` | Bounded read-only metadata observation plus the registered-root port main consumes. |
+| `scope.ts` | — | Declared-atom scope rules, mirroring the application's own `scopeWithin`. |
 | `catalog.ts` | `project-recipes` v1 | Three versioned kinds: `regression_fix`, `scoped_change`, `verification_followup`. |
 | `match.ts` | pure function | `matchRecipe({ facts, configuration, kind, selection, now })` → deterministic result. |
 | `draft.ts` | `project-recipe-draft/1` | Result schema plus `draftRevision` / `parseProjectRecipeDraft`. |
-| `preview.ts` | `project-recipe-create-work-fields/1` | Reshape a `draft` into the existing `create_work` command input, and refuse stale inputs. |
+| `preview.ts` | `project-recipe-create-work-fields/1` | Reshape a `draft` into the existing `create_work` command input, with precise stale-input refusal. |
 
 ## Guarantees
 
 - **Deterministic.** No clock, environment, filesystem or network access inside `matchRecipe`; `now`
   is an input. Identical input yields identical bytes and `revision`.
-- **References already exist.** Project id, scope paths, profile and criteria come from the current
-  configuration; a machine criterion must name a check that the configuration lists as registered.
-  Nothing is inferred from repository text.
-- **Never widens.** Scope paths may only narrow (or equal) the configured project scope, exclusions
-  may only grow, `externalActions` is always empty, and no fallback profile/fixture/agent is chosen.
+- **References already exist.** Project id, scope atoms, profile and criteria come from the current
+  configuration; a machine criterion must name a check the configuration lists as registered.
+- **Scope is atom containment, not prefixes.** The application compares `allowedPaths`/`excludedPaths`
+  literally, so a recipe may only pass through atoms the project already declares: `src/` stays
+  `src/`, `.` stays `.`, and `src/file.ts` is *not* a narrower form of `src/`. Narrowing below a
+  declared atom belongs to the original configuration/authorization flow.
+- **Never widens.** Exclusions may only grow, `externalActions` is always empty, and no fallback
+  profile/fixture/agent is chosen.
 - **Unknown stays unknown.** An unobserved stack, manager, lockfile pair or workspace layout becomes
   `needs_input`/`unsupported`; it never becomes an executable default.
 
@@ -38,28 +43,33 @@ application's existing preview and explicit user confirmation.
 | Status | Meaning | Consumer action |
 | --- | --- | --- |
 | `draft` | Complete suggestion: `goal`, `scope`, `criteria`, `profileId`. | Prefill the existing form; require explicit confirmation. |
-| `needs_input` | Correctable: explicit paths, profile, criteria, or a facts refresh. | Ask the user; do not guess. |
+| `needs_input` | Correctable: declared atoms, profile, criteria, or a facts refresh. | Ask the user; do not guess. |
 | `unsupported` | The request class is not served (non-Node stack, unsupported manager, unknown project/version). | Explain; do not substitute another executor. |
 
 `RecipeInputError` (`invalid_facts`, `unknown_kind`, `invalid_clock`) is a caller bug, not a product
-answer: the input could not even be interpreted.
+answer. `MetadataRefused` covers bounded-read refusals (`symlink`, `too_large`,
+`root_not_registered`, …).
 
 ## Use
 
 ```ts
-import { matchRecipe, parseProjectRecipeDraft, previewInputs } from '@personal-agent/project-recipes'
+import { matchRecipe, parseProjectRecipeDraft, previewInputs, createProjectFactsObserver } from '@personal-agent/project-recipes'
+
+// Facts: injected, or observed through the registered-root port (the call carries no path).
+const observer = createProjectFactsObserver({ rootFor: (id) => registry.rootFor(id) })
+const { facts } = observer.observe({ projectId, observedAt: new Date().toISOString() })
 
 const result = matchRecipe({
-  facts,                 // project-facts/1
+  facts,
   configuration,         // public ApplicationConfiguration projection
   kind: 'regression_fix',
-  selection: { paths: ['src/parser.ts'] },
+  selection: { paths: ['src/'] },   // an atom the configuration already declares
   now: '2026-11-14T12:00:00.000Z',
 })
 
 const draft = parseProjectRecipeDraft(result)   // verifies the revision
 if (draft.status === 'draft') {
-  const fields = previewInputs(draft, { configuration, facts })  // throws when inputs went stale
+  const fields = previewInputs(draft, { configuration, facts })  // throws stale_inputs with the changed input
   // hand `fields` to the existing delegation form / create_work confirmation
 }
 ```
@@ -80,7 +90,11 @@ node packages/project-recipes/examples/preview-consumer.ts   # in-memory sample,
 `pnpm-lock.yaml` importer; before that it rewrites the root lock, so the direct commands above are
 the non-mutating form.
 
-The package is private and ships from `src/`; `dist/` is not tracked.
+## Distribution
+
+`exports["."]` points at `dist/index.js` / `dist/index.d.ts`; `files: ["dist", "README.md"]`.
+`npm pack --dry-run` yields 34 files (~36 KB) with no `src/`, `tools/` or tests. Runtime dependencies
+are `@personal-agent/contracts` (workspace) and `zod`; everything else is a Node builtin.
 
 ## Ownership
 

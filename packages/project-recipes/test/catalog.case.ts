@@ -11,7 +11,8 @@ import {
   isActionableDraft,
   matchRecipe,
   parseProjectRecipeDraft,
-  pathWithin,
+  isProjectAtom,
+  scopeAtomWithin,
   recipeCatalogEntries,
   type RecipeMatchInput,
 } from '../src/index.ts'
@@ -38,7 +39,7 @@ test('catalog ships three distinct, versioned task recipes', () => {
 })
 
 test('regression_fix produces a complete draft over the configured project', () => {
-  const draft = match('regression_fix', { selection: { paths: ['src/parser.ts'] } })
+  const draft = match('regression_fix', { selection: { paths: ['src/'] } })
   assert.equal(draft.status, 'draft')
   assert.ok(isActionableDraft(draft))
   if (draft.status !== 'draft') return
@@ -47,8 +48,8 @@ test('regression_fix produces a complete draft over the configured project', () 
   assert.equal(draft.profileId, 'profile-native')
   assert.deepEqual(draft.scope, {
     projectId: 'project-alpha',
-    allowedPaths: ['src/parser.ts'],
-    excludedPaths: ['src/generated'],
+    allowedPaths: ['src/'],
+    excludedPaths: ['src/private/'],
     externalActions: [],
   })
   // Criteria are exactly the configured defaults; nothing is invented.
@@ -74,12 +75,12 @@ test('verification_followup reuses only registered machine checks and the projec
   assert.equal(draft.status, 'draft')
   if (draft.status !== 'draft') return
   assert.deepEqual(draft.criteria, [{ id: 'tests', description: 'Registered project tests pass.', kind: 'machine', required: true, checkDefinitionRef: 'check-node-test' }])
-  assert.deepEqual(draft.scope.allowedPaths, ['src', 'test'])
+  assert.deepEqual(draft.scope.allowedPaths, ['src/', 'test/'])
   assert.equal(draft.scope.externalActions.length, 0)
 })
 
 test('identical input yields byte-identical output and revision', () => {
-  const selection = { paths: ['src/a.ts', 'src/b.ts'], excludedPaths: ['test'] }
+  const selection = { paths: ['src/'], excludedPaths: ['test/'] }
   const first = match('regression_fix', { selection })
   const second = match('regression_fix', { selection })
   assert.deepEqual(first, second)
@@ -113,35 +114,46 @@ test('two projects with different facts keep separate suggestions', () => {
   assert.equal(alpha.projectId, 'project-alpha')
   assert.equal(beta.projectId, 'project-beta')
   assert.deepEqual(beta.criteria.map((criterion) => criterion.id), ['beta-tests'])
-  assert.deepEqual(beta.scope.allowedPaths, ['packages/core/src'])
+  assert.deepEqual(beta.scope.allowedPaths, ['packages/core/src/'])
   assert.notEqual(alpha.revision, beta.revision)
   assert.notEqual(alpha.provenance.facts.digest, beta.provenance.facts.digest)
 })
 
 test('explicit criteria selection may only narrow the configured defaults', () => {
-  const draft = match('regression_fix', { selection: { paths: ['src'], criteriaIds: ['review'] } })
+  const draft = match('regression_fix', { selection: { paths: ['src/'], criteriaIds: ['review'] } })
   assert.equal(draft.status, 'needs_input')
   if (draft.status !== 'needs_input') return
   assert.deepEqual(draft.needsInput.map((item) => item.code), ['criteria_machine_required'])
 
-  const onlyTests = match('regression_fix', { selection: { paths: ['src'], criteriaIds: ['tests'] } })
+  const onlyTests = match('regression_fix', { selection: { paths: ['src/'], criteriaIds: ['tests'] } })
   assert.equal(onlyTests.status, 'draft')
   if (onlyTests.status !== 'draft') return
   assert.deepEqual(onlyTests.criteria.map((criterion) => criterion.id), ['tests'])
 })
 
 test('scope exclusion may only grow, never disappear', () => {
-  const draft = match('regression_fix', { selection: { paths: ['src'], excludedPaths: ['test'] } })
+  const draft = match('regression_fix', { selection: { paths: ['src/'], excludedPaths: ['test/'] } })
   assert.equal(draft.status, 'draft')
   if (draft.status !== 'draft') return
-  assert.deepEqual(draft.scope.excludedPaths, ['src/generated', 'test'])
+  assert.deepEqual(draft.scope.excludedPaths, ['src/private/', 'test/'])
 })
 
-test('pathWithin respects directory boundaries', () => {
-  assert.equal(pathWithin('src', 'src'), true)
-  assert.equal(pathWithin('src/a.ts', 'src'), true)
-  assert.equal(pathWithin('srcx/a.ts', 'src'), false)
-  assert.equal(pathWithin('src', 'src/a.ts'), false)
+test('scope atoms follow the application rule: exact declared strings, never child paths', () => {
+  const grant = { projectId: 'p', allowedPaths: ['src/', '.'], excludedPaths: ['src/private/'], externalActions: [] }
+  const within = (allowed: string[], excluded: string[] = ['src/private/']) => scopeAtomWithin({ projectId: 'p', allowedPaths: allowed, excludedPaths: excluded, externalActions: [] }, grant)
+  assert.equal(within(['src/']), true)
+  assert.equal(within(['.']), true)
+  assert.equal(within(['src/file.ts']), false, 'a child path is not a narrower atom')
+  assert.equal(within(['src']), false, 'src and src/ are different atoms')
+  assert.equal(within(['src/'], []), false, 'the grant exclusion must survive')
+  assert.equal(within(['src/', 'test/']), false)
+  assert.equal(isProjectAtom('src/'), true)
+  assert.equal(isProjectAtom('.'), true)
+  assert.equal(isProjectAtom('src/file.ts'), true)
+  assert.equal(isProjectAtom('/etc/passwd'), false)
+  assert.equal(isProjectAtom('../x'), false)
+  assert.equal(isProjectAtom('a\\b'), false)
+  assert.equal(isProjectAtom(''), false)
 })
 
 test('a Node project with no manager declaration is still served, with a note', () => {
