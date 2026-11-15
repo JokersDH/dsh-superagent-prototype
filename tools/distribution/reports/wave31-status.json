@@ -156,36 +156,37 @@
       "actual": "R2 frozen static/runtime"
     },
     "D9": {
-      "status": "PASS_SCOPE_LIMITED",
-      "consumer": "install relocation/new private root",
-      "positive": "personal relocated install PASS",
-      "negative": "wrong root/config refused by same-store/lifecycle tests",
+      "status": "PASS",
+      "consumer": "nonempty business relocation + new private root",
+      "positive": "workflow-evidence v1/v2 real data, personal bundle, second-root readonly, source facts 4/4",
+      "negative": "wrong root/config/mode retained by lifecycle tests",
       "evidence": [
+        "reports/wave31/R2-business-relocation.json",
         "reports/wave31/R2-personal-lifecycle.json"
       ],
-      "actual": "same-machine independent directory only"
+      "actual": "same-machine relocation of retained nonempty data; no cross-machine claim"
     },
     "D10": {
-      "status": "PASS_SCOPE_LIMITED",
-      "consumer": "R2 backup/restore/readonly",
-      "positive": "backup6, restore fresh root readonly, personal7",
-      "negative": "nonempty data protection via baseline tests; no empty-DB success",
+      "status": "PASS",
+      "consumer": "R2 backup/restore/readonly + A/C exact content",
+      "positive": "backup6 (v1/v2/13), real business relocation4, fresh-root readonly",
+      "negative": "corrupt bundle/future schema refused; no empty-DB substitute",
       "evidence": [
         "reports/wave31/R2-backup.json",
-        "reports/wave31/R2-personal-lifecycle.json"
+        "reports/wave31/R2-business-relocation.json"
       ],
-      "actual": "R2 nonempty package state"
+      "actual": "nonempty R2 data and artifacts"
     },
     "D11": {
       "status": "PASS_LIMITED_LIVE",
-      "consumer": "actual R2 launcher+api birth record -> cleanupBornResources exact proof",
-      "positive": "parent SIGKILL; known child alive; cleanup UNKNOWN retained; no material deletion; child stopped only after fresh start/uid check",
-      "negative": "stale/wrong/foreign/mixed/unknown pure 13 controls retain",
+      "consumer": "actual R2 launcher/api exact birth + cleanupBornResources",
+      "positive": "parent SIGKILL, child alive, cleanup UNKNOWN retained, no material deletion, child stopped only after fresh start/uid",
+      "negative": "pure stale/wrong/foreign/mixed/unknown 13 controls retain; corrupt/future backup refused",
       "evidence": [
         "reports/wave31/D11-live-fault.json",
         "reports/wave31/cleanup-pure.json"
       ],
-      "actual": "one exact-own parent-exit-child-live window on R2 4dcd28f; no forced global cleanup"
+      "actual": "one exact-own parent-exit-child-live window; partial-write/interrupted-restore live windows not claimed"
     },
     "D12": {
       "status": "PASS",
@@ -201,14 +202,22 @@
     }
   },
   "remaining": [
-    "E independent verdict for R1 (1fba subject) and R2 (4dcd28f)",
-    "R9 migration native/private/target/cross-machine",
-    "real vendor/model/native 0",
-    "D11 partial-write/interrupted restore windows beyond parent-exit-child-live"
+    "E independent verdict for R1 and R2",
+    "partial-write/interrupted-restore live windows beyond parent-exit-child-live",
+    "private/target/value/cross-machine/48h",
+    "real vendor/model/native 0"
   ],
   "limits": [
     "D selftests are not release admission",
     "R2 runtime source 303b2c6a; build checkout c0a1f897 includes D tools/reports only",
     "historical tars/states/ledgers/services preserved"
-  ]
+  ],
+  "status": "COMPLETE_CANDIDATE",
+  "index": {
+    "R1": "reports/wave31/R1-manifest.json",
+    "R2": "reports/wave31/R2-manifest.json",
+    "status": "reports/wave31-status.json",
+    "guide": "recipes/wave31-r1-r2-guide.zh-CN.md",
+    "e": "recipes/wave31-e-acceptance.zh-CN.md"
+  }
 }
