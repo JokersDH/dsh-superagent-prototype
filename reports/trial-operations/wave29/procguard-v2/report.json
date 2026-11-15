@@ -1,0 +1,438 @@
+{
+  "protocol": "procguard-v2/1",
+  "generatedAt": "2026-11-15T05:32:45.920Z",
+  "births": {
+    "normal": {
+      "pid": 90392,
+      "ppid": 90390,
+      "uid": 501,
+      "start": "Sun Nov 15 13:32:45 2026",
+      "command": "~/.nvm/versions/node/v24.21.0/bin/node ~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/normal/probe/probe.mjs --root ~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/normal/probe --config ~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/normal/probe/config.json --operation wave29-procguard-normal",
+      "root": "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/normal/probe",
+      "config": "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/normal/probe/config.json",
+      "operation": "wave29-procguard-normal",
+      "argv": [
+        "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/normal/probe/probe.mjs",
+        "--root",
+        "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/normal/probe",
+        "--config",
+        "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/normal/probe/config.json",
+        "--operation",
+        "wave29-procguard-normal"
+      ],
+      "birth": {
+        "source": "child_report+ps+spawn",
+        "argv": [
+          "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/normal/probe/probe.mjs",
+          "--root",
+          "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/normal/probe",
+          "--config",
+          "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/normal/probe/config.json",
+          "--operation",
+          "wave29-procguard-normal"
+        ],
+        "pid": 90392,
+        "ppid": 90390,
+        "uid": 501,
+        "cwd": "~/Desktop/joker/superagent-agent-h",
+        "root": "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/normal/probe",
+        "config": "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/normal/probe/config.json",
+        "operation": "wave29-procguard-normal"
+      }
+    },
+    "stubborn": {
+      "pid": 90398,
+      "ppid": 90390,
+      "uid": 501,
+      "start": "Sun Nov 15 13:32:45 2026",
+      "command": "~/.nvm/versions/node/v24.21.0/bin/node ~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/stubborn/probe/probe.mjs --root ~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/stubborn/probe --config ~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/stubborn/probe/config.json --operation wave29-procguard-stubborn",
+      "root": "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/stubborn/probe",
+      "config": "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/stubborn/probe/config.json",
+      "operation": "wave29-procguard-stubborn",
+      "argv": [
+        "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/stubborn/probe/probe.mjs",
+        "--root",
+        "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/stubborn/probe",
+        "--config",
+        "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/stubborn/probe/config.json",
+        "--operation",
+        "wave29-procguard-stubborn"
+      ],
+      "birth": {
+        "source": "child_report+ps+spawn",
+        "argv": [
+          "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/stubborn/probe/probe.mjs",
+          "--root",
+          "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/stubborn/probe",
+          "--config",
+          "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/stubborn/probe/config.json",
+          "--operation",
+          "wave29-procguard-stubborn"
+        ],
+        "pid": 90398,
+        "ppid": 90390,
+        "uid": 501,
+        "cwd": "~/Desktop/joker/superagent-agent-h",
+        "root": "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/stubborn/probe",
+        "config": "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/stubborn/probe/config.json",
+        "operation": "wave29-procguard-stubborn"
+      }
+    },
+    "sibling": {
+      "pid": 90410,
+      "ppid": 90390,
+      "uid": 501,
+      "start": "Sun Nov 15 13:32:45 2026",
+      "command": "~/.nvm/versions/node/v24.21.0/bin/node ~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/sibling/probe/probe.mjs --root ~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/sibling/probe --config ~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/sibling/probe/config.json --operation wave29-procguard-sibling",
+      "root": "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/sibling/probe",
+      "config": "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/sibling/probe/config.json",
+      "operation": "wave29-procguard-sibling",
+      "argv": [
+        "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/sibling/probe/probe.mjs",
+        "--root",
+        "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/sibling/probe",
+        "--config",
+        "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/sibling/probe/config.json",
+        "--operation",
+        "wave29-procguard-sibling"
+      ],
+      "birth": {
+        "source": "child_report+ps+spawn",
+        "argv": [
+          "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/sibling/probe/probe.mjs",
+          "--root",
+          "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/sibling/probe",
+          "--config",
+          "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/sibling/probe/config.json",
+          "--operation",
+          "wave29-procguard-sibling"
+        ],
+        "pid": 90410,
+        "ppid": 90390,
+        "uid": 501,
+        "cwd": "~/Desktop/joker/superagent-agent-h",
+        "root": "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/sibling/probe",
+        "config": "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/sibling/probe/config.json",
+        "operation": "wave29-procguard-sibling"
+      }
+    },
+    "unknown": {
+      "pid": 90419,
+      "ppid": 90390,
+      "uid": 501,
+      "start": "Sun Nov 15 13:32:45 2026",
+      "command": "~/.nvm/versions/node/v24.21.0/bin/node ~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/unknown/probe/probe.mjs --root ~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/unknown/probe --config ~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/unknown/probe/config.json --operation wave29-procguard-unknown",
+      "root": "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/unknown/probe",
+      "config": "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/unknown/probe/config.json",
+      "operation": "wave29-procguard-unknown",
+      "argv": [
+        "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/unknown/probe/probe.mjs",
+        "--root",
+        "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/unknown/probe",
+        "--config",
+        "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/unknown/probe/config.json",
+        "--operation",
+        "wave29-procguard-unknown"
+      ],
+      "birth": {
+        "source": "child_report+ps+spawn",
+        "argv": [
+          "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/unknown/probe/probe.mjs",
+          "--root",
+          "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/unknown/probe",
+          "--config",
+          "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/unknown/probe/config.json",
+          "--operation",
+          "wave29-procguard-unknown"
+        ],
+        "pid": 90419,
+        "ppid": 90390,
+        "uid": 501,
+        "cwd": "~/Desktop/joker/superagent-agent-h",
+        "root": "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/unknown/probe",
+        "config": "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave29/procguard-v2/unknown/probe/config.json",
+        "operation": "wave29-procguard-unknown"
+      }
+    }
+  },
+  "controls": [
+    {
+      "id": "own_handle",
+      "result": {
+        "ok": true,
+        "issues": []
+      },
+      "expected": true
+    },
+    {
+      "id": "plain_record_rejected",
+      "signal": {
+        "sent": false,
+        "refused": "not_registered",
+        "issues": [
+          "birth_not_registered"
+        ]
+      },
+      "expectedRefusal": "not_registered"
+    },
+    {
+      "id": "missing_birth",
+      "result": {
+        "ok": false,
+        "issues": [
+          "record_birth_missing",
+          "birth_source_invalid",
+          "birth_argv_mismatch",
+          "birth_root_mismatch",
+          "birth_config_mismatch",
+          "birth_operation_mismatch"
+        ]
+      },
+      "expected": false
+    },
+    {
+      "id": "missing_argv",
+      "result": {
+        "ok": false,
+        "issues": [
+          "record_argv_missing",
+          "birth_argv_mismatch"
+        ]
+      },
+      "expected": false
+    },
+    {
+      "id": "prefix_root",
+      "result": {
+        "ok": false,
+        "issues": [
+          "birth_root_mismatch"
+        ]
+      },
+      "expected": false
+    },
+    {
+      "id": "prefix_operation",
+      "result": {
+        "ok": false,
+        "issues": [
+          "birth_operation_mismatch"
+        ]
+      },
+      "expected": false
+    },
+    {
+      "id": "foreign_uid",
+      "result": {
+        "ok": false,
+        "issues": [
+          "uid_mismatch"
+        ]
+      },
+      "expected": false
+    },
+    {
+      "id": "recycled_start",
+      "result": {
+        "ok": false,
+        "issues": [
+          "start_mismatch"
+        ]
+      },
+      "expected": false
+    },
+    {
+      "id": "sibling_pid",
+      "result": {
+        "ok": false,
+        "issues": [
+          "pid_mismatch"
+        ]
+      },
+      "expected": false
+    },
+    {
+      "id": "ps_unknown",
+      "signal": {
+        "sent": false,
+        "refused": "unknown_observation",
+        "issues": [
+          "observed_unknown"
+        ],
+        "observed": {
+          "state": "unknown",
+          "reason": "ps_failed"
+        }
+      },
+      "expectedRefusal": "unknown_observation"
+    }
+  ],
+  "proofs": {
+    "term": {
+      "sent": true,
+      "signal": "SIGTERM",
+      "observedAt": "2026-11-15T05:32:45.375Z",
+      "observed": {
+        "pid": 90392,
+        "start": "Sun Nov 15 13:32:45 2026",
+        "uid": 501,
+        "ppid": 90390
+      }
+    },
+    "firstTerm": {
+      "sent": true,
+      "signal": "SIGTERM",
+      "observedAt": "2026-11-15T05:32:45.426Z",
+      "observed": {
+        "pid": 90398,
+        "start": "Sun Nov 15 13:32:45 2026",
+        "uid": 501,
+        "ppid": 90390
+      }
+    },
+    "kill": {
+      "sent": true,
+      "signal": "SIGKILL",
+      "observedAt": "2026-11-15T05:32:45.659Z",
+      "observed": {
+        "pid": 90398,
+        "start": "Sun Nov 15 13:32:45 2026",
+        "uid": 501,
+        "ppid": 90390
+      }
+    },
+    "forgedResult": {
+      "sent": false,
+      "refused": "not_registered",
+      "issues": [
+        "birth_not_registered"
+      ]
+    },
+    "siblingTerm": {
+      "sent": true,
+      "signal": "SIGTERM",
+      "observedAt": "2026-11-15T05:32:45.817Z",
+      "observed": {
+        "pid": 90410,
+        "start": "Sun Nov 15 13:32:45 2026",
+        "uid": 501,
+        "ppid": 90390
+      }
+    },
+    "unknownGone": {
+      "gone": false,
+      "unknown": true,
+      "reason": "ps_failed"
+    },
+    "unknownSignal": {
+      "sent": false,
+      "refused": "unknown_observation",
+      "issues": [
+        "observed_unknown"
+      ],
+      "observed": {
+        "state": "unknown",
+        "reason": "ps_failed"
+      }
+    },
+    "unknownTerm": {
+      "sent": true,
+      "signal": "SIGTERM",
+      "observedAt": "2026-11-15T05:32:45.896Z",
+      "observed": {
+        "pid": 90419,
+        "start": "Sun Nov 15 13:32:45 2026",
+        "uid": 501,
+        "ppid": 90390
+      }
+    }
+  },
+  "waits": {
+    "normalGone": {
+      "gone": true,
+      "via": "child_exit",
+      "code": null,
+      "signal": "SIGTERM"
+    },
+    "stubbornGone": {
+      "gone": true,
+      "via": "child_exit",
+      "code": null,
+      "signal": "SIGKILL"
+    },
+    "siblingGone": {
+      "gone": true,
+      "via": "child_exit",
+      "code": null,
+      "signal": "SIGTERM"
+    },
+    "unknownGone": {
+      "gone": false,
+      "unknown": true,
+      "reason": "ps_failed"
+    },
+    "unknownRealGone": {
+      "gone": true,
+      "via": "child_exit",
+      "code": null,
+      "signal": "SIGTERM"
+    }
+  },
+  "psClassification": {
+    "alive": {
+      "state": "alive",
+      "pid": 10,
+      "ppid": 1,
+      "uid": 501,
+      "start": "Sun Nov 15 10:00:00 2026",
+      "command": "/usr/bin/node fixture"
+    },
+    "gone": {
+      "state": "gone",
+      "reason": "ps_not_found"
+    },
+    "unknownPermission": {
+      "state": "unknown",
+      "reason": "ps_failed",
+      "status": 1
+    },
+    "unknownParse": {
+      "state": "unknown",
+      "reason": "ps_unparsable"
+    }
+  },
+  "counts": {
+    "signalsSent": 5,
+    "foreignSignals": 0
+  },
+  "checks": {
+    "birthComplete": true,
+    "exactArgs": true,
+    "birthRootConfigOperation": true,
+    "pureControls": true,
+    "termSent": true,
+    "normalGone": true,
+    "stubbornIgnoredTerm": true,
+    "killFreshSent": true,
+    "stubbornGone": true,
+    "plainRecordRejected": true,
+    "siblingUnaffected": true,
+    "siblingCleaned": true,
+    "unknownNotGone": true,
+    "unknownSignalRefused": true,
+    "unknownRealGone": true,
+    "noForeignSignals": true,
+    "psClassification": true
+  },
+  "ok": true,
+  "notReached": [
+    "product/B daemon lifecycle",
+    "product/B runner SIGKILL",
+    "global discovery"
+  ],
+  "limits": [
+    "only registered probes spawned by this run are signalled",
+    "UNKNOWN ps observation never becomes gone",
+    "exact argv/root/config/operation and fresh re-read before every signal"
+  ]
+}

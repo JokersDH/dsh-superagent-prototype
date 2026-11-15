@@ -1,0 +1,824 @@
+{
+  "protocol": "trial-operations-status/1",
+  "wave": "product-wave-29",
+  "owner": "H",
+  "branch": "codex/g4-trial-operations",
+  "base": "2d1e494",
+  "mergedMain": "79525b6",
+  "currentH": "5a4aea9",
+  "updatedAt": "2026-11-15T05:38:38.931Z",
+  "goal": {
+    "established": true,
+    "tokenBudget": null,
+    "checkpoints": [
+      "H4",
+      "H8",
+      "H12",
+      "H16",
+      "H20",
+      "H24"
+    ],
+    "continueAfterCheckpoint": true
+  },
+  "ownedPaths": [
+    "tools/trial-kit/",
+    "tests/operational-soak/",
+    "docs/internal-trial/",
+    "reports/trial-operations/"
+  ],
+  "phases": {
+    "H1": {
+      "status": "COMPLETED",
+      "deliverable": "current I/B/H source by commit, branch, expected file set, materialized bytes and post-run re-check; no old head pin"
+    },
+    "H2": {
+      "status": "COMPLETED",
+      "deliverable": "current committed I module legal frames/transitive imports; fresh frame correlation and queue namespace executed"
+    },
+    "H3": {
+      "status": "COMPLETED",
+      "deliverable": "current B serveRunner three callbacks plus external allow/deny and sink-only guard finding"
+    },
+    "H4": {
+      "status": "COMPLETED",
+      "deliverable": "current unique consumer checkpoint"
+    },
+    "H5": {
+      "status": "COMPLETED",
+      "deliverable": "registered own-probe birth from spawn args + child report + ps, no plain JSON ownership"
+    },
+    "H6": {
+      "status": "COMPLETED",
+      "deliverable": "exact root/config/operation equality to spawn args (no prefix) and complete resource record"
+    },
+    "H7": {
+      "status": "COMPLETED",
+      "deliverable": "ps failures remain UNKNOWN; gone requires child exit or definite not-found; unknown retained"
+    },
+    "H8": {
+      "status": "COMPLETED",
+      "deliverable": "safe tool checkpoint for B/main live use"
+    },
+    "H9": {
+      "status": "COMPLETED",
+      "deliverable": "original A/Broker controlled Work/question/answer/native_applied input consumed"
+    },
+    "H10": {
+      "status": "COMPLETED",
+      "deliverable": "same-Runner two-client through B actual product route NOT_REACHED; module-level CAS observed"
+    },
+    "H11": {
+      "status": "COMPLETED",
+      "deliverable": "I CAS/fresh/namespace/prune and B vendored/current source difference recorded; no implementation edit"
+    },
+    "H12": {
+      "status": "COMPLETED",
+      "deliverable": "original-data rebind support checkpoint with honest NOT_REACHED"
+    },
+    "H13": {
+      "status": "COMPLETED",
+      "deliverable": "safe SIGKILL helper only; no product/B SIGKILL executed"
+    },
+    "H14": {
+      "status": "COMPLETED",
+      "deliverable": "original question/version/target/answer values collected from current product path"
+    },
+    "H15": {
+      "status": "COMPLETED",
+      "deliverable": "begin/answer/accept same-ID replay and conflict windows observed; recovered unknown windows NOT_REACHED"
+    },
+    "H16": {
+      "status": "COMPLETED",
+      "deliverable": "original identity fault support checkpoint"
+    },
+    "H17": {
+      "status": "COMPLETED",
+      "deliverable": "current normal candidate/manual accept/delivered with wrong-generation refusal; WorkView.work.id"
+    },
+    "H18": {
+      "status": "COMPLETED",
+      "deliverable": "2/4 controlled works delivered; native slot resource set NOT_REACHED"
+    },
+    "H19": {
+      "status": "COMPLETED",
+      "deliverable": "1fbaf94 package exact preflight/machinecheck with REFUSED-gated commands"
+    },
+    "H20": {
+      "status": "COMPLETED",
+      "deliverable": "complete product trial support checkpoint"
+    },
+    "H21": {
+      "status": "COMPLETED",
+      "deliverable": "raw material, hashes, redaction and reader boundaries retained"
+    },
+    "H22": {
+      "status": "COMPLETED",
+      "deliverable": "no new long soak; wave28 20s material preserved; guard/consumer safety observations added"
+    },
+    "H23": {
+      "status": "COMPLETED",
+      "deliverable": "current source/consumers/safe tool/delivery/package handoff"
+    },
+    "H24": {
+      "status": "COMPLETED",
+      "deliverable": "six checkpoints, status and final handoff"
+    }
+  },
+  "milestones": {
+    "H4": {
+      "status": "COMPLETED"
+    },
+    "H8": {
+      "status": "COMPLETED"
+    },
+    "H12": {
+      "status": "COMPLETED"
+    },
+    "H16": {
+      "status": "COMPLETED"
+    },
+    "H20": {
+      "status": "COMPLETED"
+    },
+    "H24": {
+      "status": "COMPLETED"
+    }
+  },
+  "selectedSources": {
+    "I": {
+      "commit": "861c03edf9e77c5c250fab59a02103ebb93e56c3",
+      "branch": "codex/g5-coordinator-channel",
+      "headObserved": "861c03edf9e77c5c250fab59a02103ebb93e56c3",
+      "files": [
+        {
+          "rel": "apps/runner/src/attach-channel/attach.ts",
+          "commitBlob": "321738dae3b87e6ad7d235f52aaa65e6f63ab527",
+          "sha256": "79b3189bfdd589b17cbc41fa8b359b85128e076db77716b9efb75c47f1626c59"
+        },
+        {
+          "rel": "apps/runner/src/attach-channel/coordinator-channel.ts",
+          "commitBlob": "d1ef81eb9d51b24417645151440eb1e262c20546",
+          "sha256": "5cb142ac905fdcd08063aa678aea768a0397f2341fb60a38b56b7832eadfa7b0"
+        },
+        {
+          "rel": "apps/runner/src/attach-channel/errors.ts",
+          "commitBlob": "ec8ce909d0f30ab1d96488db56cdf3b6a4ab7f49",
+          "sha256": "b9c9bd111cd672b479314faf284d308ba6a1c2d3f5520af6decbded220d08b10"
+        },
+        {
+          "rel": "apps/runner/src/attach-channel/index.ts",
+          "commitBlob": "6314546e1d1facde00d0d2195edf1c14ad7a85d2",
+          "sha256": "6cb777c2fcc13fc7b81afd1890da5914ffbfac79aabb9b064cc79b7e964a3971"
+        },
+        {
+          "rel": "packages/contracts/src/coordinator-channel.ts",
+          "commitBlob": "cf451efe433b8f9140d992ccfb415df9cd74b92c",
+          "sha256": "a1445944e47379a13a3f47593173d35c5a20cd0d27a02daa6a880bce98a4f3c1"
+        },
+        {
+          "rel": "packages/contracts/src/schemas.ts",
+          "commitBlob": "0eaafbf444c5ef099971fbc226c36a33002f983d",
+          "sha256": "763732584c3b9150f90b644301b679465e252498d75dec19ad601b536f0db045"
+        },
+        {
+          "rel": "packages/contracts/src/types.ts",
+          "commitBlob": "423043fe2b999a2e71e0dd3995c7d33f522144de",
+          "sha256": "ed6661e6bcaa26a24892ad82086bcd5375a19aec3a184f1d6f256af8655103ac"
+        }
+      ],
+      "zod": {
+        "version": "4.4.3"
+      }
+    },
+    "B": {
+      "commit": "1930278ca56e9b82a638907af87c2727b63105f7",
+      "branch": "codex/g1-runtime",
+      "headObserved": "1930278ca56e9b82a638907af87c2727b63105f7",
+      "files": [
+        {
+          "rel": "apps/runner/src/attach-channel/attach.ts",
+          "commitBlob": "321738dae3b87e6ad7d235f52aaa65e6f63ab527",
+          "sha256": "79b3189bfdd589b17cbc41fa8b359b85128e076db77716b9efb75c47f1626c59"
+        },
+        {
+          "rel": "apps/runner/src/attach-channel/coordinator-channel.ts",
+          "commitBlob": "d1ef81eb9d51b24417645151440eb1e262c20546",
+          "sha256": "5cb142ac905fdcd08063aa678aea768a0397f2341fb60a38b56b7832eadfa7b0"
+        },
+        {
+          "rel": "apps/runner/src/attach-channel/errors.ts",
+          "commitBlob": "ec8ce909d0f30ab1d96488db56cdf3b6a4ab7f49",
+          "sha256": "b9c9bd111cd672b479314faf284d308ba6a1c2d3f5520af6decbded220d08b10"
+        },
+        {
+          "rel": "apps/runner/src/attach-channel/index.ts",
+          "commitBlob": "b26154f343634cb6c7536aa5cd5bcb7169e0b980",
+          "sha256": "709e4dc2b046b40f4d1748875d37984b8aec81ff16008405193ecb5831dfac40"
+        },
+        {
+          "rel": "apps/runner/src/runner-service.ts",
+          "commitBlob": "1e7f0bd0fb5f9a7a20c0b19edaf1dc99e2811c29",
+          "sha256": "80e85e9e5868dd58330c21e628791312b8d909c6ba0f88eed3b3c01d1974afdc"
+        },
+        {
+          "rel": "apps/runner/src/business-attach.ts",
+          "commitBlob": "2f69fedf5b4a33343968b8cc8a0269598dacbc1f",
+          "sha256": "9f3a4640c27847f624c0496c262dfb0789014c6fbaf40e73ce55d2b6e2d78f9e"
+        }
+      ],
+      "note": "B imports the same current I attach-channel blobs; runner-service blob is the consumer entry"
+    },
+    "main": {
+      "commit": "5a4aea9fca8d36c7399b38a433e5fa132e99dff8",
+      "branch": "codex/g4-trial-operations",
+      "files": [
+        {
+          "rel": "packages/contracts/src/coordinator-channel.ts",
+          "commitBlob": "cf451efe433b8f9140d992ccfb415df9cd74b92c",
+          "sha256": "a1445944e47379a13a3f47593173d35c5a20cd0d27a02daa6a880bce98a4f3c1"
+        }
+      ]
+    },
+    "legacy": "wave28 d95/cb4 material retained as historical scope; not relabelled current",
+    "material": [
+      {
+        "path": "reports/trial-operations/wave29/selected-current/source.json",
+        "bytes": 4965,
+        "sha256": "d4ca7a06135a27b250162d835af343df722de717cbc06005d41bebbbfc691317"
+      },
+      {
+        "path": "reports/trial-operations/wave29/selected-current/materialized.json",
+        "bytes": 3167,
+        "sha256": "1efc61354e1d90f4b1dda90d1dbf5275e47cf005a4acc600fcb4df2535036012"
+      }
+    ]
+  },
+  "currentConsumer": {
+    "I": {
+      "checks": {
+        "fact": true,
+        "ackFailed": true,
+        "payload": true,
+        "writeAllow": true,
+        "writeDeny": true,
+        "freshIntentFixed": true,
+        "queueNamespace": true,
+        "timeoutPrune": true,
+        "generation": true,
+        "oldLease": true,
+        "capacity": true,
+        "close": true
+      },
+      "cases": [
+        {
+          "id": "I-fact"
+        },
+        {
+          "id": "I-ack-failed"
+        },
+        {
+          "id": "I-payload"
+        },
+        {
+          "id": "I-write-allow"
+        },
+        {
+          "id": "I-write-deny"
+        },
+        {
+          "id": "I-fresh-intent"
+        },
+        {
+          "id": "I-queue-namespace"
+        },
+        {
+          "id": "I-timeout-prune"
+        },
+        {
+          "id": "I-generation"
+        },
+        {
+          "id": "I-old-lease"
+        },
+        {
+          "id": "I-capacity"
+        },
+        {
+          "id": "I-close"
+        }
+      ],
+      "material": [
+        {
+          "path": "reports/trial-operations/wave29/selected-current/i.json",
+          "bytes": 3313,
+          "sha256": "c3082b79609eded9083cc11e7ebd02ccd300d88add5a7073d62c23d2fd893deb"
+        }
+      ]
+    },
+    "B": {
+      "checks": {
+        "factThreeFrames": true,
+        "duplicateReceipt": true,
+        "payloadRead": true,
+        "externalAllow": true,
+        "externalDeny": true,
+        "sinkOnlyFinding": true
+      },
+      "normal": {
+        "factFrames": 3,
+        "payloadReadFrames": 4,
+        "writeIntentFrames": 1,
+        "receipts": 2,
+        "ackFailed": 1,
+        "externalGuardCalls": 1,
+        "externalDenied": 0,
+        "sinkOnlyHookResolved": false
+      },
+      "deny": {
+        "factFrames": 3,
+        "payloadReadFrames": 4,
+        "writeIntentFrames": 1,
+        "receipts": 2,
+        "ackFailed": 1,
+        "externalGuardCalls": 1,
+        "externalDenied": 1,
+        "sinkOnlyHookResolved": false
+      },
+      "sinkOnly": {
+        "factFrames": 0,
+        "payloadReadFrames": 0,
+        "writeIntentFrames": 0,
+        "receipts": 0,
+        "ackFailed": 0,
+        "externalGuardCalls": 0,
+        "externalDenied": 0,
+        "sinkOnlyHookResolved": true
+      },
+      "findings": [
+        {
+          "id": "B29-SINK-ONLY-NATIVE-HOOK-AUTOBYPASS",
+          "owner": "B",
+          "detail": "sink-only native hook resolved with externalGuardCalls=0; main/Broker guard was not supplied or consulted"
+        }
+      ],
+      "material": [
+        {
+          "path": "reports/trial-operations/wave29/selected-current/b.json",
+          "bytes": 2962,
+          "sha256": "9d35f69237759b3608b1863cf03aa512ac1bdd6d0cfc2113d2cae68da6225e94"
+        }
+      ]
+    },
+    "report": {
+      "path": "reports/trial-operations/wave29/selected-current/report.json",
+      "bytes": 9320,
+      "sha256": "87542eafa7553eb6446464a9dfc0f2227e87d8175f7d3ca2e65922258c09d34f"
+    },
+    "checks": {
+      "sourcesOk": true,
+      "sourcesUnchanged": true,
+      "materializedUnchanged": true,
+      "iChecks": true,
+      "bChecks": true,
+      "bSinkFinding": true,
+      "zeroModel": true,
+      "zeroSignals": true
+    },
+    "notReached": [
+      "same-Runner dual client as a real process handover on a product/B route",
+      "SIGKILL original Work/question recovery; no product/B SIGKILL executed",
+      "recovered candidate/accept; B ordinary5PASS is not recovery",
+      "real product readonly/SSE target and vendor/native"
+    ]
+  },
+  "procguard": {
+    "checks": {
+      "birthComplete": true,
+      "exactArgs": true,
+      "birthRootConfigOperation": true,
+      "pureControls": true,
+      "termSent": true,
+      "normalGone": true,
+      "stubbornIgnoredTerm": true,
+      "killFreshSent": true,
+      "stubbornGone": true,
+      "plainRecordRejected": true,
+      "siblingUnaffected": true,
+      "siblingCleaned": true,
+      "unknownNotGone": true,
+      "unknownSignalRefused": true,
+      "unknownRealGone": true,
+      "noForeignSignals": true,
+      "psClassification": true
+    },
+    "counts": {
+      "signalsSent": 5,
+      "foreignSignals": 0
+    },
+    "psClassification": {
+      "alive": {
+        "state": "alive",
+        "pid": 10,
+        "ppid": 1,
+        "uid": 501,
+        "start": "Sun Nov 15 10:00:00 2026",
+        "command": "/usr/bin/node fixture"
+      },
+      "gone": {
+        "state": "gone",
+        "reason": "ps_not_found"
+      },
+      "unknownPermission": {
+        "state": "unknown",
+        "reason": "ps_failed",
+        "status": 1
+      },
+      "unknownParse": {
+        "state": "unknown",
+        "reason": "ps_unparsable"
+      }
+    },
+    "controls": [
+      {
+        "id": "own_handle",
+        "result": {
+          "ok": true,
+          "issues": []
+        },
+        "expected": true
+      },
+      {
+        "id": "plain_record_rejected",
+        "signal": {
+          "sent": false,
+          "refused": "not_registered",
+          "issues": [
+            "birth_not_registered"
+          ]
+        },
+        "expectedRefusal": "not_registered"
+      },
+      {
+        "id": "missing_birth",
+        "result": {
+          "ok": false,
+          "issues": [
+            "record_birth_missing",
+            "birth_source_invalid",
+            "birth_argv_mismatch",
+            "birth_root_mismatch",
+            "birth_config_mismatch",
+            "birth_operation_mismatch"
+          ]
+        },
+        "expected": false
+      },
+      {
+        "id": "missing_argv",
+        "result": {
+          "ok": false,
+          "issues": [
+            "record_argv_missing",
+            "birth_argv_mismatch"
+          ]
+        },
+        "expected": false
+      },
+      {
+        "id": "prefix_root",
+        "result": {
+          "ok": false,
+          "issues": [
+            "birth_root_mismatch"
+          ]
+        },
+        "expected": false
+      },
+      {
+        "id": "prefix_operation",
+        "result": {
+          "ok": false,
+          "issues": [
+            "birth_operation_mismatch"
+          ]
+        },
+        "expected": false
+      },
+      {
+        "id": "foreign_uid",
+        "result": {
+          "ok": false,
+          "issues": [
+            "uid_mismatch"
+          ]
+        },
+        "expected": false
+      },
+      {
+        "id": "recycled_start",
+        "result": {
+          "ok": false,
+          "issues": [
+            "start_mismatch"
+          ]
+        },
+        "expected": false
+      },
+      {
+        "id": "sibling_pid",
+        "result": {
+          "ok": false,
+          "issues": [
+            "pid_mismatch"
+          ]
+        },
+        "expected": false
+      },
+      {
+        "id": "ps_unknown",
+        "signal": {
+          "sent": false,
+          "refused": "unknown_observation",
+          "issues": [
+            "observed_unknown"
+          ],
+          "observed": {
+            "state": "unknown",
+            "reason": "ps_failed"
+          }
+        },
+        "expectedRefusal": "unknown_observation"
+      }
+    ],
+    "births": {
+      "normal": {
+        "pid": 90392,
+        "ppid": 90390,
+        "uid": 501,
+        "start": "Sun Nov 15 13:32:45 2026",
+        "operation": "wave29-procguard-normal",
+        "argvCount": 7
+      },
+      "stubborn": {
+        "pid": 90398,
+        "ppid": 90390,
+        "uid": 501,
+        "start": "Sun Nov 15 13:32:45 2026",
+        "operation": "wave29-procguard-stubborn",
+        "argvCount": 7
+      },
+      "sibling": {
+        "pid": 90410,
+        "ppid": 90390,
+        "uid": 501,
+        "start": "Sun Nov 15 13:32:45 2026",
+        "operation": "wave29-procguard-sibling",
+        "argvCount": 7
+      },
+      "unknown": {
+        "pid": 90419,
+        "ppid": 90390,
+        "uid": 501,
+        "start": "Sun Nov 15 13:32:45 2026",
+        "operation": "wave29-procguard-unknown",
+        "argvCount": 7
+      }
+    },
+    "material": [
+      {
+        "path": "reports/trial-operations/wave29/procguard-v2/report.json",
+        "bytes": 14942,
+        "sha256": "1d6f6dc051474521155dc5de559ee93590dd5c0ff6bdc1599a279b4e2b2ddbce"
+      }
+    ],
+    "notReached": [
+      "product/B daemon lifecycle",
+      "product/B runner SIGKILL",
+      "global discovery"
+    ]
+  },
+  "delivery": {
+    "normal": {
+      "workId": "0a3c3213f00cdcd181ab8db13dca1894",
+      "workViewId": "0a3c3213f00cdcd181ab8db13dca1894",
+      "phaseBeforeAccept": "needs_user",
+      "phaseAfterAccept": "delivered",
+      "questionId": "de22a4e2f617841ed779228f093aa308",
+      "questionVersion": 1,
+      "targetAttemptId": "attempt-23efa9e6-9869-4f61-b1e5-c9ae4df5e985",
+      "answerDelivery": "native_applied",
+      "currentCandidate": {
+        "ticketId": "13b1ca03acc4a07ea39c4bd9f53acd24",
+        "assignmentId": "4cc9137fa2f12541c81c3875ba4b4851",
+        "contract": {
+          "workId": "0a3c3213f00cdcd181ab8db13dca1894",
+          "revision": 1,
+          "digest": "4d7f353c47e01fa098cc3254630cc65c19ba132f9c64362da6e5e5c98e67b78a"
+        },
+        "candidateGeneration": 3
+      },
+      "acceptedStatus": "recorded",
+      "wrongCandidateStatus": "rejected",
+      "wrongCandidateError": "verification_failed",
+      "artifactIds": [
+        "82d58f67452b9839000ab689261e6eeeefa2ed848c05b2e3f966c9ff088a841c",
+        "1822672fb21520769ab626ab4ff94bfe4563373368f291baefc4b31fec8ed7c5",
+        "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+        "e17bd4b6819d58acc754a8789153a81228d4ae5b33fc58d7a378e48dddf14db8"
+      ],
+      "artifactCount": 4,
+      "resourceStatus": "quiescent",
+      "beginFrames": 1,
+      "answerFrames": 1,
+      "queueDue": 0,
+      "answerReceiptStatus": "recorded",
+      "answerReplaySame": true,
+      "answerConflictStatus": "rejected",
+      "answerConflictError": "question_expired"
+    },
+    "slots": {
+      "2": {
+        "works": 2,
+        "delivered": 2,
+        "workViewIdsMatch": true,
+        "artifactCounts": [
+          4,
+          4
+        ],
+        "resourceStatuses": [
+          "quiescent",
+          "quiescent"
+        ],
+        "beginFrames": 2,
+        "uniqueAttemptIds": null,
+        "queueDue": 0,
+        "slotCapObserved": "not_configurable_in_fixture",
+        "attemptIdentityNote": "begin frame count is observed; the receipt projection carries no attemptId, so unique attempt identity is unknown"
+      },
+      "4": {
+        "works": 4,
+        "delivered": 4,
+        "workViewIdsMatch": true,
+        "artifactCounts": [
+          4,
+          4,
+          4,
+          4
+        ],
+        "resourceStatuses": [
+          "quiescent",
+          "quiescent",
+          "quiescent",
+          "quiescent"
+        ],
+        "beginFrames": 4,
+        "uniqueAttemptIds": null,
+        "queueDue": 0,
+        "slotCapObserved": "not_configurable_in_fixture",
+        "attemptIdentityNote": "begin frame count is observed; the receipt projection carries no attemptId, so unique attempt identity is unknown"
+      }
+    },
+    "beginReplay": {
+      "first": "recorded",
+      "second": "recorded",
+      "sameReceipt": true,
+      "workCount": 1,
+      "sameWork": true
+    },
+    "doubleAccept": {
+      "first": "recorded",
+      "second": "recorded",
+      "sameReceipt": true
+    },
+    "checks": {
+      "normalAnswered": true,
+      "normalCandidate": true,
+      "normalAccepted": true,
+      "wrongCandidateRefused": true,
+      "delivered": true,
+      "workViewIdentity": true,
+      "duplicateAcceptIdempotent": true,
+      "slots2": true,
+      "slots4": true,
+      "answerReplayIdempotent": true,
+      "answerConflictRejected": true,
+      "beginReplayIdempotent": true
+    },
+    "material": [
+      {
+        "path": "reports/trial-operations/wave29/delivery/delivery.json",
+        "bytes": 3685,
+        "sha256": "930b09d310250ffb6533073a954c8e7a1786023cd35a89ed426f821df0b6ba94"
+      },
+      {
+        "path": "reports/trial-operations/wave29/delivery/report.json",
+        "bytes": 1238,
+        "sha256": "393449a1ca6a601a3b12c818d480441cd44cef6f01123f26506789b0f93fef39"
+      }
+    ],
+    "notReached": [
+      "native vendor execution / native compatibility",
+      "recovered Work candidate/accept after a real B/I channel rebind",
+      "native 2/4 slot resource set (no slot-cap configuration in this fixture)"
+    ]
+  },
+  "package": {
+    "name": "wave29-target-1fbaf94",
+    "tarSha256": "daee1a94b43156cec659f7df2a3b08e1ecb89b645fde1ea81c35a81d75b47d7a",
+    "bytes": 20458656,
+    "tuple": {
+      "buildId": "2d94a7c31ef97b57",
+      "schema": 18,
+      "source": "1fbaf940d426fa34ff6289304e073b9159586ed9"
+    },
+    "observed": {
+      "closureDigest": "c2920614d1e0d45b86f0cebf4ff2891306d7be87c88d96877061c576f84e6ed4",
+      "files": 6826,
+      "symlinks": 23
+    },
+    "preflight": {
+      "result": "DEGRADED",
+      "checks": {
+        "PASS": 32,
+        "UNKNOWN": 1
+      }
+    },
+    "machinecheck": {
+      "result": "DEGRADED",
+      "checks": {
+        "PASS": 46,
+        "UNKNOWN": 3
+      },
+      "unknowns": [
+        "host_sqlite",
+        "support"
+      ]
+    },
+    "note": "read-only input; not E installed/release authority",
+    "material": [
+      {
+        "path": "reports/trial-operations/wave29/package-1fbaf94/preflight/preflight-report.json",
+        "bytes": 19537,
+        "sha256": "66a2c765e3ae30d96839e87ba208533f3adbfad709899dfd39c1c28b940042c3"
+      },
+      {
+        "path": "reports/trial-operations/wave29/package-1fbaf94/machinecheck/machinecheck-report.json",
+        "bytes": 27841,
+        "sha256": "bb7fdbadc7592cdc6fd33d89a2babe7f018083aacba34c761c938336e092245a"
+      }
+    ]
+  },
+  "tests": {
+    "command": "node --test tests/operational-soak/*.case.mjs tests/operational-soak/{recovery,channel,selected,procguard,delivery}/*.case.mjs",
+    "total": 41,
+    "pass": 41,
+    "fail": 0,
+    "suites": {
+      "preflight": 9,
+      "machinecheck": 5,
+      "soak": 6,
+      "hardening": 4,
+      "recovery": 3,
+      "channel": 3,
+      "selected": 6,
+      "procguard": 4,
+      "delivery": 1
+    }
+  },
+  "findings": [
+    {
+      "id": "B29-SINK-ONLY-NATIVE-HOOK-AUTOBYPASS",
+      "owner": "B",
+      "status": "REPRODUCED",
+      "detail": "sink-only native hook resolved with externalGuardCalls=0; main/Broker guard was not supplied or consulted",
+      "note": "requires main/Broker fresh guard before native write; H did not modify B"
+    }
+  ],
+  "preservedOld": {
+    "wave28Selected": "d95/cb4 historical material retained; not current",
+    "wave25to28Runs": "600/1800/30/20 second raw material retained; no 40-minute rerun",
+    "wave28Procguard": "old guard1 material retained; guard2 supersedes for current safety"
+  },
+  "budgets": {
+    "vendorModelNativeTurns": 0,
+    "newModelAllowanceCreated": 0,
+    "newDriver": false,
+    "cac": false,
+    "desktopShell": false,
+    "pilot": "BLOCKED (24 turn / 200000 token / USD5 / one-in-flight unchanged)"
+  },
+  "preserved": {
+    "userServices": "twelve instances 5180/8796 .. 5191/8807 untouched",
+    "state": "no personal state/profile/credential read or modified; fixture roots only",
+    "liveSignals": "own registered probes only; 5 own signals, 0 foreign; UNKNOWN never gone",
+    "oldEvidence": "all old state/profile/tar/ledger/dirty retained"
+  },
+  "releaseAuthority": false,
+  "eAssertions": "independent; H material is raw observation only",
+  "limitations": [
+    "current I/B modules materialized from commits for in-process consumers; same-Runner route and SIGKILL recovery NOT_REACHED",
+    "B sink-only native hook still auto-allows without an external main/Broker guard; B-owned fix required",
+    "recovered candidate/accept and native 2/4 slot resource set NOT_REACHED; ordinary delivery is not recovery",
+    "real product readonly/SSE and vendor/native not measured"
+  ]
+}
