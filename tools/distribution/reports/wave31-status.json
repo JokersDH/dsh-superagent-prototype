@@ -177,15 +177,15 @@
       "actual": "R2 nonempty package state"
     },
     "D11": {
-      "status": "PARTIAL",
-      "consumer": "pure cleanup controls + manifest negative",
-      "positive": "cleanup controls PASS; complete own identity",
-      "negative": "wrong/foreign/unknown retained, no live forceproof",
+      "status": "PASS_LIMITED_LIVE",
+      "consumer": "actual R2 launcher+api birth record -> cleanupBornResources exact proof",
+      "positive": "parent SIGKILL; known child alive; cleanup UNKNOWN retained; no material deletion; child stopped only after fresh start/uid check",
+      "negative": "stale/wrong/foreign/mixed/unknown pure 13 controls retain",
       "evidence": [
-        "reports/wave31/cleanup-pure.json",
-        "reports/wave31/R1-negative.json"
+        "reports/wave31/D11-live-fault.json",
+        "reports/wave31/cleanup-pure.json"
       ],
-      "actual": "no high-risk live injection this round; NOT_REACHED"
+      "actual": "one exact-own parent-exit-child-live window on R2 4dcd28f; no forced global cleanup"
     },
     "D12": {
       "status": "PASS",
@@ -202,9 +202,9 @@
   },
   "remaining": [
     "E independent verdict for R1 (1fba subject) and R2 (4dcd28f)",
-    "D11 high-risk live fault injection NOT_REACHED",
     "R9 migration native/private/target/cross-machine",
-    "real vendor/model/native 0"
+    "real vendor/model/native 0",
+    "D11 partial-write/interrupted restore windows beyond parent-exit-child-live"
   ],
   "limits": [
     "D selftests are not release admission",

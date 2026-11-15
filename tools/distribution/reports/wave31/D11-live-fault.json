@@ -1,0 +1,47 @@
+{
+  "protocol": "wave31-d11-live-fault/1",
+  "status": "PASS",
+  "root": "/tmp/w31-d11b",
+  "port": "58310",
+  "apiPort": "58311",
+  "before": {
+    "launcher": "35282     1   501 Sun Nov 15 23:14:09 2026     node /tmp/w31frozen/install/app/apps/launcher/bin/pa.mjs start --json --install /tmp/w31frozen/install/app --config-root /tmp/w31-d11b/config --data-root /tmp/w31-d11b/state --cache-root /tmp/w31-d11b/cache --logs-root /tmp/w31-d11b/logs --workspace-root /tmp/w31-d11b/ws --port 58310 --api-port 58311 --discussion-only",
+    "api": "35310 35282   501 Sun Nov 15 23:14:11 2026     /Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/tmp/w31frozen/install/app/apps/coordinator/product/demo.ts --port 58311 --state /private/tmp/w31-d11b/state --console-origin http://127.0.0.1:58310 --startup-mode normal --assistant --discussion-only --local-access",
+    "children": [
+      "35310"
+    ]
+  },
+  "proof": {
+    "owned": true,
+    "checks": [
+      {
+        "pid": 35282,
+        "startOk": true,
+        "uidOk": true,
+        "argvOk": true,
+        "entryOk": true
+      },
+      {
+        "pid": 35310,
+        "startOk": true,
+        "uidOk": true,
+        "argvOk": true,
+        "entryOk": true
+      }
+    ]
+  },
+  "parentKill": "SIGKILL",
+  "after": {
+    "parentAlive": false,
+    "childAlive": true
+  },
+  "cleanup": {
+    "status": "UNKNOWN",
+    "retained": true,
+    "unknown": [
+      "process_missing"
+    ]
+  },
+  "childAfterCleanup": true,
+  "childStop": "stopped_exact"
+}
