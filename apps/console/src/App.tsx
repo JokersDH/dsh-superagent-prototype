@@ -72,6 +72,7 @@ import type { ConsoleTransport, ExecutorSnapshot, TargetDelivery, VerificationDe
 import { TransportError } from './transport.ts'
 import { ProjectSettings } from './ProjectSettings.tsx'
 import { useReviewActivity } from './useReviewActivity.ts'
+import { useUsageObservation } from './useUsageObservation.ts'
 import { AttentionInbox } from './AttentionInbox.tsx'
 import { DecisionWorkspace } from './DecisionWorkspace.tsx'
 import { ProposalWorkspace } from './ProposalWorkspace.tsx'
@@ -660,6 +661,11 @@ export function App({ transport }: { transport: ConsoleTransport }) {
     : '个人工作区'
   const trialIdentity = useMemo(() => newId('trial-client'), [transport, auth])
   const trial = useTrialReadiness(transport, { enabled: auth === 'ready' && workspaceView === 'trial', identity: trialIdentity })
+  const usage = useUsageObservation(transport, { enabled: auth === 'ready' && workspaceView === 'trial', identity: trialIdentity, projectId: projectFilter })
+  const usageView = usage.error ? usage.data
+    ? { ...usage.data, coverage: `${usage.data.coverage} · 上次观察`, limitations: [usage.error, ...usage.data.limitations] }
+    : { status: 'unavailable' as const, sampleCount: null, metrics: [], limitations: [usage.error] }
+    : usage.data
   const openView = (view: typeof workspaceView) => {
     attentionNavigation.current += 1
     setWorkspaceView(view)
@@ -1059,7 +1065,8 @@ export function App({ transport }: { transport: ConsoleTransport }) {
             {workspaceView === 'executors' && <ExecutorDirectory configuration={configuration} state={configState} onReload={() => void refreshConfiguration()} />}
             {workspaceView === 'trial' && <TrialWorkspace readiness={trial.readiness} loading={trial.loading} error={trial.error}
               unavailable={trial.unavailable} configuration={configuration} activeProjectId={projectFilter} activeConversationTitle={conversationTitle}
-              onReload={() => { trial.reload(); void refreshConfiguration() }}
+              insights={usageView}
+              onReload={() => { trial.reload(); usage.reload(); void refreshConfiguration() }}
               onAction={action => {
                 switch (action) {
                   case 'configure_model':

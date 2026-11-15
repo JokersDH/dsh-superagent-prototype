@@ -1,0 +1,159 @@
+{
+  "protocol": "wave28-data-admission/1",
+  "date": "2026-11-15",
+  "status": "PASS_SCOPED_OLD_THREE_COUNTEREXAMPLES_CLOSED_EXACT_CE64_DUAL_FLOW_PASSED",
+  "observedMainAtClose": "22d0c759c59e6387ee397476f3d15d28425818df",
+  "fixedSources": {
+    "A": "aeeced18907a548e0f21263f99ec826d55402aef",
+    "C": "f2c4af69bb0ed495822ae3ed6f8cdda53c21a0bf"
+  },
+  "sourceHashes": {
+    "ADataManifestTs": "f568580a39c07f7c77c102a27596f81f53b061870bcd16fe126addd9e4ebf7e2",
+    "AContentProofTs": "b3185adccac8c6fdeae9d2e4de6218112457ac8c592e745b6770fa330e80050e",
+    "ARestoreTs": "de1cb0837052e611ef56e1a78539d18e941c6a213994dde3eca8c9a0e0667874"
+  },
+  "dirtyBeforeAndAfter": { "A": [], "C": ["pnpm-lock.yaml"] },
+  "executed": [
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "command": "node --test packages/storage/test/content-proof.case.ts packages/workflows/test/wave25-dual-snapshot-personal.case.ts",
+      "exitCode": 0,
+      "passed": 2,
+      "scope": "Current content v2 real-FTS/prefix/bounds/legacy vectors and actual same-Store v1/v2 workflow snapshot create/verify/restore, original Work/Q&A/native_applied/context reads, C proof positive/message drift/emptied inventory negatives. Supported Node24 entry, no vendor/native turns."
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "command": "pnpm --filter @personal-agent/storage --filter @personal-agent/workflows typecheck",
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "command": "pnpm --filter @personal-agent/context --filter @personal-agent/knowledge typecheck",
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "command": "node --experimental-strip-types /tmp/pa-wave28-data-audit-CK5f1m/probe-closed-controls.ts",
+      "exitCode": 0,
+      "positiveControls": 3,
+      "correctIndependentNegativeRefusals": 3,
+      "report": "/tmp/pa-wave28-data-audit-CK5f1m/controls/result.json",
+      "scope": "Fresh private real controlled Store/snapshot and current pinned A/C modules. Correct independent23-artifact restore positive; missing file blocks, then deleting report inventory and changing count to0 still blocks. Separate fresh target positive then work.accepted event mutation is mismatch. Ordinary prefix-named durable table changes v2 digest; legacy v1 remains explicitly reproducible."
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "command": "node --experimental-strip-types /tmp/pa-wave28-data-audit-CK5f1m/probe-ce64-package.ts",
+      "exitCode": 0,
+      "positiveFlows": 2,
+      "report": "/tmp/pa-wave28-data-audit-CK5f1m/ce64/result.json",
+      "scope": "Immutable exactce64 package verified by tar hash/source/build, two real independent A workflow restores, current single C driver actually invokes original A manifest plus independent snapshot/content/artifact/root proof, actual package readonly original-ID HTTP/readiness and verifiable stop. Each package statusAfter STOPPED; provider2->2. No browser/native/current-main release claim."
+    }
+  ],
+  "closedPreviousFindings": [
+    {
+      "id": "A27-REPORT-INVENTORY-OMISSION-BYPASSES-INDEPENDENT-ARTIFACT-PROOF",
+      "status": "CLOSED_FOR_PINNED_INDEPENDENT_INVENTORY",
+      "evidence": { "originalCount": 23, "positive": "ok", "basis": "independent", "artifactCoverage": "independent", "missingFile": "blocked", "shrunkReportAndCount": "blocked" },
+      "implementation": "Exact independent id/digest/bytes inventory, count consistency, duplicate/safe-id/byte bounds and target-directory/file closure are now checked. Removing report.artifacts and changing snapshot count does not shrink the independently expected subject. Report-only is labelled separately."
+    },
+    {
+      "id": "A27-ARBITRARY-FTS-PREFIX-OMITS-DURABLE-CONTENT",
+      "status": "CLOSED_FOR_CURRENT_WORKFLOW_CONTENT_V2",
+      "evidence": { "protocol": "workflow-content/2", "createdOrdinaryTable": "conversation_search_private_audit", "included": true, "digestChanged": true, "legacyV1DigestReproducible": true },
+      "implementation": "Current proof uses SQLite virtual/shadow metadata and actual FTS roots, binds the real derived omission set, includes the ordinary prefix table and refuses unsupported virtual/shadow metadata. Legacy content/1 is historical compatibility, not the v2 completeness claim; workflow snapshot version1 is a separate protocol and is supported with content/2."
+    },
+    {
+      "id": "C27-ENTIRE-EVENT-LOG-IS-AN-OVERBROAD-OPERATIONAL-EXCEPTION",
+      "status": "CLOSED_FOR_CURRENT_A_OFFICIAL_CONTENT_CONSUMER",
+      "evidence": { "positive": "ok", "workAcceptedEventMutation": "mismatch", "exitCode": 1, "verification": "blocked", "allowed": ["subject.dataRoot"] },
+      "implementation": "C removed its family allow-list and calls A's official verifier with independent protocol/snapshot/content/artifact/source-root expectations, then compares the original manifest subject. Business event changes now alter content and cannot be called operational delta. No new confirmation/authorization authority was introduced."
+    }
+  ],
+  "exactPackageCheckpoint": {
+    "tar": "/Users/hh/Desktop/joker/pa-artifacts/wave26-target/wave26-target-ce64fc1.tar.gz",
+    "sha256": "8c36aaeb472263bbb7c6ab5e4dafb3e9394306c83b3b6e1ab257d8770480c33a",
+    "source": "ce64fc1fd986bde9a6eba5ace1a4658beadcda21",
+    "buildId": "d4b1780d999a4b74",
+    "schema": 18,
+    "runtime": "Node24.21.0/darwin-arm64/ABI137",
+    "formats": [
+      { "workflowSnapshot": 1, "driverExit": 0, "driverStatus": "verified-flow", "targetProof": "ok", "basis": "independent", "artifactCoverage": "independent", "contentProtocol": "workflow-content/2", "readinessDevelopment": "readonly", "statusAfter": "STOPPED" },
+      { "workflowSnapshot": 2, "driverExit": 0, "driverStatus": "verified-flow", "targetProof": "ok", "basis": "independent", "artifactCoverage": "independent", "contentProtocol": "workflow-content/2", "readinessDevelopment": "readonly", "statusAfter": "STOPPED" }
+    ],
+    "sameExecutionManifestAndConsumer": true,
+    "realIndependentARestorePerFormat": true,
+    "originalControlledWorkQuestionAnswerNativeApplied": true,
+    "providerCallsBefore": 2,
+    "providerCallsAfter": 2,
+    "authorization": "none",
+    "notClaimed": ["F browser interactions", "later current-main metrics/UI/package bytes", "E independent installed/release verdict", "B/I live business attach or native result", "private permission/target activation", "physical writer quiescence", "vendor native compatibility", "upgrade/rollback or48h soak"]
+  },
+  "newFindings": [],
+  "reviewConclusion": "No new substantive blocker was found in the finite examined data/readonly scope. The three prior counterexamples are genuinely closed with complete fresh positives and isolated negatives. This is scoped module and exactce64 consumer admission, not automatic whole-package or execution/release admission.",
+  "remainingBoundaries": [
+    "A correctly keeps wholePackageComplete=false for live B/I result landing and installed-tier dependencies. Absence of a tar in A's own checkout does not revoke the independently executed C/ce64 package result.",
+    "C's developer tool imports explicitly selected A source/API for the tested consumer. Current-main packaged dependency closure and browser/user journeys still need their own exact frozen subject and independent E verdict.",
+    "Legacy content/1 reproduces its historical recipe, including the historical prefix omission. It is not the newly admitted content/2 completeness policy and must not be silently upgraded or relabelled.",
+    "Read-only source/content/artifact identity proves data only. It does not prove writer quiescence, preserve a native permission, authorize a fresh execution target or make an unobserved result native_applied.",
+    "This review did not repeat long resource/scale/concurrent-writer matrices or the whole owned suites; broaden only for actual consumer changes and unresolved risk."
+  ],
+  "minimalIntegrationSlice": {
+    "candidateASourceClosure": [
+      "packages/storage/src/content-proof.ts",
+      "packages/storage/src/index.ts selected content exports",
+      "packages/workflows/src/data-manifest.ts if the real consumer requires the prior manifest API",
+      "packages/workflows/src/restore.ts",
+      "packages/workflows/src/index.ts selected data/restore exports"
+    ],
+    "focusedTests": ["packages/storage/test/content-proof.case.ts", "packages/workflows/test/wave25-dual-snapshot-personal.case.ts", "existing manifest input/subject guards as affected"],
+    "integrationConditions": "Apply minimal dependency-consistent bytes to current main and compile its actual consumer before default wiring. Preserve content protocol version, exact independent inventory and current v1/v2 snapshot recipes. No SQL migration or new execution permission is required by this slice; do not wholesale merge historical reports or unneeded data sinks.",
+    "candidateCConsumer": ["packages/context/tools/wave27-target-proof.mjs", "current personal-review-driver manifest/target-proof inputs", "public typed examples from packages/context/docs/WAVE27-RECIPE.md"],
+    "CAdmissionBoundary": "Reusable development/readonly consumer in its measured scope, not a new default HTTP/SQL/confirmation authority. Main may compose a stable public data port rather than requiring colleague installs to reference another agent's checkout."
+  },
+  "nextCompleteResults": [
+    {
+      "result": 1,
+      "outcome": "Current-main proof consumer closure",
+      "owners": ["A", "C", "main"],
+      "acceptance": "Minimal content/independent-inventory/restore API integrated and exact main consumer strictly compiles and runs both legitimate snapshot formats with isolated data/artifact/event drift refusals. Preserve the now-closed controls instead of redispatching them as new repairs."
+    },
+    {
+      "result": 2,
+      "outcome": "Portable single-manifest current-product package",
+      "owners": ["C", "D", "main"],
+      "acceptance": "One accurately frozen current-main package, supplied through public data/proof ports rather than hidden other-checkout dependencies, runs both actual restores, original Q/A/native_applied/Work/context reads, configuration-only readiness and verified stop. Data proof does not unlock execution."
+    },
+    {
+      "result": 3,
+      "outcome": "Original-fact reader and qualified runtime result landing",
+      "owners": ["A", "B", "I", "main"],
+      "acceptance": "Reuse original bindings/commands/dispatch/observations/receipts and existing ProductCompletion/verification current/accept path. After B/I actual callback admission, persist actual original-ID results idempotently and preserve unknown. Do not create a candidate table, second ledger or synthetic approval to make a consumer pass."
+    },
+    {
+      "result": 4,
+      "outcome": "Bounded data and consumer failure operation",
+      "owners": ["A", "C", "H", "E"],
+      "acceptance": "Finite operation failures, unsupported/legacy versions, missing source, changed tuples, limits and interrupted consumer phases have precise preserved/unknown results and exact owned cleanup. E independently consumes raw evidence; new D/E mode bugs are scoped separately rather than declaring every package unusable."
+    },
+    {
+      "result": 5,
+      "outcome": "Stable API and accurate internal delivery handoff",
+      "owners": ["A", "C", "D", "E", "main"],
+      "acceptance": "Versioned callable data/proof interfaces, public examples and exact artifact/consumer evidence guide a colleague through ordinary readonly/restore usage. Current-main UI/insights, installed and native scopes each retain their own independent verdicts and budgets; no deadline-driven scope reduction or repeated same microfix packages."
+    }
+  ],
+  "preservation": {
+    "realVendorModelCalls": 0,
+    "nativeTurnStarts": 0,
+    "userServiceActions": 0,
+    "globalSocketDiscovery": false,
+    "foreignCredentialsRead": false,
+    "candidateOrMainImplementationEdited": false,
+    "eAssertionsOrRootConfigEdited": false,
+    "allPrivateExecSessionsCompleted": true,
+    "exactPrivatePackageStatusesAfter": ["STOPPED", "STOPPED"],
+    "privateEvidenceRoot": "/tmp/pa-wave28-data-audit-CK5f1m",
+    "budgetsAndLedgersUnchanged": true,
+    "releaseApproved": false
+  }
+}
