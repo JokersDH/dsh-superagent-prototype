@@ -22,7 +22,7 @@ const root = mkdtempSync(join(tmpdir(), 'pa-w27-live-'))
 const recoveryRoot = join(root, 'recovery')
 mkdirSync(recoveryRoot, { recursive: true, mode: 0o700 })
 const ENTRY = fileURLToPath(new URL('../../apps/runner/src/runner-service-entry.ts', import.meta.url))
-const producer = { source: 'codex-fake', runnerIdentityRef: 'b27-live-runner' }
+const producer = { source: 'codex-native', runnerIdentityRef: 'b27-live-runner' }
 let runner
 try {
   process.env.PA_RUNNER_RECOVERY_ROOT = recoveryRoot
@@ -67,8 +67,10 @@ try {
   else log.fail(`client A read no usable facts: ${JSON.stringify(aIds)}`)
 
   log.begin('B27-LIVE-B-REPLAYS-SAME-IDS-AFTER-A-LEAVES', 'client B replays the same original ids', 'controlled_process')
-  const aLease = await A.channelNext('lease-live-a')
-  const bLease = await B.channelNext('lease-live-b')
+  const aState = await A.channelState()
+  const aLease = await A.channelNext('lease-live-a', aState.generation)
+  const bState = await B.channelState()
+  const bLease = await B.channelNext('lease-live-b', bState.generation)
   const bPage = await B.facts(0, 16_384)
   const bIds = bPage.frames.map(frame => frame.fact?.factId)
   log.evidence({ aLease: aLease?.generation ?? null, bLease: bLease?.generation ?? null, sameIds: JSON.stringify(aIds) === JSON.stringify(bIds), bIds })
@@ -77,7 +79,7 @@ try {
 
   log.begin('B27-LIVE-OLD-CLIENT-REFUSED', 'the previous client cannot answer for the new lease', 'controlled_process')
   let stale = null
-  try { stale = await A.channelReply('lease-live-a', { id: 'no-such-request', kind: 'write-admission', value: true }) }
+  try { stale = await A.channelReply('lease-live-a', { v: 1, type: 'write-admission', id: 'no-such-request', allowed: true }) }
   catch (error) { stale = { error: String(error?.message ?? error).slice(0, 90) } }
   log.evidence({ stale })
   if (stale?.error || stale?.accepted === false) log.pass('a reply from the previous lease was refused on the live Runner')

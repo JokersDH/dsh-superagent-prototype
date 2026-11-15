@@ -25,7 +25,7 @@ const recoveryRoot = join(root, 'recovery')
 mkdirSync(recoveryRoot, { recursive: true, mode: 0o700 })
 const ENTRY = fileURLToPath(new URL('../../apps/runner/src/runner-service-entry.ts', import.meta.url))
 const CHILD = fileURLToPath(new URL('./b27-coordinator-child.mjs', import.meta.url))
-const producer = { source: 'fixture', runnerIdentityRef: 'b27-sigkill-runner' }
+const producer = { source: 'fake-driver', runnerIdentityRef: 'b27-sigkill-runner' }
 let runner
 let childA
 let childB

@@ -223,7 +223,7 @@ export class RunnerLink {
       waitExit: () => exitPromise,
       close: async () => {
         try {
-          write({ type: 'shutdown' })
+          write({ v: 1, type: 'shutdown', id: 'shutdown' })
           closing = true
           child.stdin.end()
         } catch {

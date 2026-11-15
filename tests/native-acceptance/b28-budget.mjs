@@ -25,7 +25,7 @@ let runner
 try {
   process.env.PA_RUNNER_RECOVERY_ROOT = recoveryRoot
   const spec = makeAttemptSpec()
-  const link = new RunnerLink({ executable: process.execPath, entry: ENTRY, args: ['codex-fake-approval'], stateRoot: join(root, 'attempt'), producer: { source: 'codex-fake', runnerIdentityRef: 'b28-budget' } })
+  const link = new RunnerLink({ executable: process.execPath, entry: ENTRY, args: ['codex-fake-approval'], stateRoot: join(root, 'attempt'), producer: { source: 'codex-native', runnerIdentityRef: 'b28-budget' } })
   link.bindPayload(spec.policySnapshotRef, { kind: 'fixture-settings/1', workspacePath: process.cwd(), scope: { projectId: 'p', allowedPaths: ['src/'], excludedPaths: [], externalActions: [] }, approvalPolicy: 'on-request', timeoutMs: 600000 })
   link.bindPayload('input-budget', { inputId: 'input-budget', contract: spec.contract, text: 'budget', contextRefs: [], sourceMessageRefs: [], provenance: 'authorized_work_input' })
   const sink = []

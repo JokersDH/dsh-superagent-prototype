@@ -32,16 +32,17 @@ if (mode === 'serve') {
   // A serving coordinator: bind the lease FIRST, then answer whatever the Runner asks for. Binding before
   // begin is what makes the Runner route its facts here instead of over stdio.
   const leaseId = registration.leaseId
-  await client.channelNext(leaseId)
+  const initialState = await client.channelState()
+  await client.channelNext(leaseId, initialState.generation)
   process.stdout.write(`${JSON.stringify({ bound: true, pid: process.pid, leaseId })}\n`)
   for (;;) {
     const page = await client.channelNext(leaseId).catch(() => null)
     const request = page?.request
     if (request?.type === 'fact') {
-      await client.channelReply(leaseId, { id: request.id, kind: 'receipt', value: { factId: request.id, persisted: true, seq: Date.now() } }).catch(() => undefined)
+      await client.channelReply(leaseId, { v: 1, type: 'receipt', id: request.id, factId: request.id, receipt: { factId: request.id, persisted: true, seq: Date.now() } }).catch(() => undefined)
       process.stdout.write(`${JSON.stringify({ served: request.type, id: request.id })}\n`)
     } else if (request?.type === 'payload-read') {
-      await client.channelReply(leaseId, { id: request.id, kind: 'payload', value: { requestId: request.requestId } }).catch(() => undefined)
+      await client.channelReply(leaseId, { v: 1, type: 'payload', id: request.requestId, requestId: request.requestId, value: { requestId: request.requestId } }).catch(() => undefined)
       process.stdout.write(`${JSON.stringify({ served: 'payload-read', id: request.id })}\n`)
     } else await new Promise(resolve => setTimeout(resolve, 30))
   }

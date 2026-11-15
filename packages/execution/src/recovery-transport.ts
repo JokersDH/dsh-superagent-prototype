@@ -1,7 +1,7 @@
 import { request, createServer } from 'node:http'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import { randomBytes, timingSafeEqual } from 'node:crypto'
-import { openSync, writeSync, fsyncSync, closeSync, lstatSync, readFileSync, chmodSync } from 'node:fs'
+import { appendFileSync, openSync, writeSync, fsyncSync, closeSync, lstatSync, readFileSync, chmodSync } from 'node:fs'
 import { dirname, isAbsolute } from 'node:path'
 import { performance } from 'node:perf_hooks'
 import { z } from 'zod'
@@ -44,7 +44,13 @@ export interface RecoveryRunnerPort {
    */
   payload?(ref: string, offset: number, length: number): Promise<{ total: number; digest: string; base64: string }>
   /** Hand the current lease the next outbound callback the Runner is waiting to have answered. */
-  channelNext?(producer: RuntimeProducer, leaseId: string): Promise<{ generation: number; request: unknown } | null>
+  /** Read-only generation for an authenticated producer; it grants nothing and binds nothing. */
+  channelState?(producer: RuntimeProducer): Promise<{ generation: number }>
+  /**
+   * Explicit CAS bind plus poll. `expectedGeneration` is the generation the caller observed from
+   * channelState; a caller that already owns `leaseId` only consumes its own lease and never rebinds.
+   */
+  channelNext?(producer: RuntimeProducer, leaseId: string, expectedGeneration: number): Promise<{ generation: number; request: unknown } | null>
   /** Route one reply to the outbound request it names; a reply for another lease is refused. */
   channelReply?(producer: RuntimeProducer, reply: unknown, leaseId: string): Promise<{ accepted: boolean; generation: number }>
   /**
@@ -138,6 +144,28 @@ export async function serveRunnerRecovery(endpoint: Pick<RunnerEndpoint, 'socket
   // shadow each other's id, while both keep the same conflict and capacity rules.
   const commands = new Map<string, { body: string; result: Promise<RunnerInspection> }>()
   const inspect = async (state: RunnerState) => RunnerInspectionSchema.parse({ ...state, protocol: 1, ...trusted, observedAt: new Date().toISOString() })
+  // A caller may CLAIM which registered producer it expects. The claim is never authority: the credential
+  // authenticates the connection, and the claim is only compared against this endpoint's immutable
+  // registration, so a foreign claim is refused before any bind or callback exposure.
+  const claimedProducer = (request: IncomingMessage): { producer: RuntimeProducer | null; error: string | null } => {
+    const raw = request.headers['x-pa-producer']
+    if (typeof raw !== 'string' || raw.length === 0) return { producer: null, error: null }
+    try {
+      const value = JSON.parse(Buffer.from(raw, 'base64').toString('utf8')) as Record<string, unknown>
+      const attempt = value?.attempt as Record<string, unknown> | undefined
+      if (!attempt || typeof value.runnerIdentityRef !== 'string' || typeof value.source !== 'string') return { producer: null, error: 'invalid_producer' }
+      return {
+        producer: {
+          attempt: {
+            ticketId: String(attempt.ticketId), assignmentId: String(attempt.assignmentId), attemptId: String(attempt.attemptId),
+            fenceEpoch: Number(attempt.fenceEpoch), contract: attempt.contract as RuntimeProducer['attempt']['contract'],
+          },
+          runnerIdentityRef: value.runnerIdentityRef, source: value.source,
+        } as RuntimeProducer,
+        error: null,
+      }
+    } catch { return { producer: null, error: 'invalid_producer' } }
+  }
   const server = createServer((req, res) => { void (async () => {
     const supplied = typeof req.headers.authorization === 'string' ? req.headers.authorization : ''
     const expected = `Bearer ${key}`
@@ -190,14 +218,38 @@ export async function serveRunnerRecovery(endpoint: Pick<RunnerEndpoint, 'socket
       res.end(encoded)
       return
     }
-    if (req.method === 'GET' && req.url === '/v1/channel/next') {
+    if (req.method === 'GET' && req.url === '/v1/channel/state') {
+      if (!backend.channelState) { reply(res, 404, { error: 'unsupported_recovery_action' }); return }
+      const claim = claimedProducer(req)
+      if (claim.error) { reply(res, 400, { error: claim.error }); return }
+      // Read-only: it reports the generation an attaching caller must present to CAS on. It grants no
+      // lease, starts no waiter and never binds, so a stale caller reading it changes nothing.
+      reply(res, 200, await backend.channelState(claim.producer ?? trusted))
+      return
+    }
+    if (req.method === 'GET' && req.url?.startsWith('/v1/channel/next')) {
       if (!backend.channelNext) { reply(res, 404, { error: 'unsupported_recovery_action' }); return }
       // The lease is bound from the AUTHENTICATED producer; the lease id only scopes which client
       // instance owns the waiters, so it grants nothing on its own.
       const leaseId = typeof req.headers['x-pa-lease'] === 'string' ? req.headers['x-pa-lease'].trim() : ''
       if (!/^[A-Za-z0-9._:-]{1,128}$/.test(leaseId)) { reply(res, 400, { error: 'invalid_lease' }); return }
-      const bound = await backend.channelNext(trusted, leaseId)
-      reply(res, 200, bound ?? { generation: 0, request: null })
+      const rawGeneration = new URL(req.url, 'http://runner').searchParams.get('generation') ?? '0'
+      const expectedGeneration = Number(rawGeneration)
+      if (!/^\d+$/.test(rawGeneration) || !Number.isSafeInteger(expectedGeneration) || expectedGeneration < 0) {
+        reply(res, 400, { error: 'invalid_generation' }); return
+      }
+      try {
+        const claim = claimedProducer(req)
+        if (claim.error) { reply(res, 400, { error: claim.error }); return }
+        const bound = await backend.channelNext(claim.producer ?? trusted, leaseId, expectedGeneration)
+        reply(res, 200, bound ?? { generation: expectedGeneration, request: null })
+      } catch (error) {
+        const named = error as { code?: unknown; reason?: unknown }
+        if (named?.code === 'stale_connection' || named?.code === 'identity_mismatch' || named?.code === 'foreign_producer') {
+          reply(res, 409, { error: named.code, reason: typeof named.reason === 'string' ? named.reason : null }); return
+        }
+        throw error
+      }
       return
     }
     if (req.method === 'POST' && req.url === '/v1/channel/reply') {
@@ -205,7 +257,9 @@ export async function serveRunnerRecovery(endpoint: Pick<RunnerEndpoint, 'socket
       const leaseId = typeof req.headers['x-pa-lease'] === 'string' ? req.headers['x-pa-lease'].trim() : ''
       if (!/^[A-Za-z0-9._:-]{1,128}$/.test(leaseId)) { reply(res, 400, { error: 'invalid_lease' }); return }
       const bodyValue = await body(req)
-      const routed = await backend.channelReply(trusted, bodyValue, leaseId)
+      const claim = claimedProducer(req)
+      if (claim.error) { reply(res, 400, { error: claim.error }); return }
+      const routed = await backend.channelReply(claim.producer ?? trusted, bodyValue, leaseId)
       if (!routed?.accepted) { reply(res, 409, { error: 'stale_lease' }); return }
       reply(res, 200, routed)
       return
@@ -329,7 +383,8 @@ export function connectRunnerRecovery(input: RunnerEndpoint, context: RuntimePro
             let refused: { error?: unknown; reason?: unknown } = {}
             try { refused = JSON.parse(Buffer.concat(chunks).toString('utf8')) as typeof refused } catch {}
             const serverError = typeof refused.error === 'string' ? refused.error : null
-            const code = res.statusCode === 401 ? 'auth_failed' : res.statusCode === 409 ? 'identity_mismatch' : 'unknown_outcome'
+            const named = serverError === 'stale_connection' || serverError === 'identity_mismatch' || serverError === 'foreign_producer' || serverError === 'generation_mismatch'
+      const code = res.statusCode === 401 ? 'auth_failed' : named ? serverError! : res.statusCode === 409 ? 'refused' : 'unknown_outcome'
             reject(Object.assign(new RunnerLinkError(code, `Runner recovery request was refused (${serverError ?? `status_${res.statusCode}`})`), { serverError, status: res.statusCode }))
             return
           }
@@ -372,14 +427,27 @@ export function connectRunnerRecovery(input: RunnerEndpoint, context: RuntimePro
       return { producer: pageProducer, frames: replay.frames as unknown[], next: replay.next as number, done: replay.done as boolean }
     },
     command: (command: ReturnType<typeof RunnerCommandSchema.parse>) => call('POST', '/v1/commands', { producer: trusted, command }),
-    channelNext: async (leaseId: string) => {
-      const { value } = await invoke('GET', '/v1/channel/next', undefined, { 'x-pa-lease': leaseId }) as { value: unknown }
+    channelState: async () => {
+      const { value } = await invoke('GET', '/v1/channel/state', undefined, { 'x-pa-producer': Buffer.from(JSON.stringify(trusted), 'utf8').toString('base64') }) as { value: unknown }
+      const state = value as { generation?: unknown }
+      if (!Number.isSafeInteger(state?.generation)) throw new RunnerLinkError('invalid_response', 'Runner channel state did not match the attach protocol')
+      return { generation: state.generation as number }
+    },
+    channelNext: async (leaseId: string, expectedGeneration = 0) => {
+      const { value } = await invoke('GET', `/v1/channel/next?generation=${encodeURIComponent(String(expectedGeneration))}`, undefined, {
+        'x-pa-lease': leaseId,
+        'x-pa-producer': Buffer.from(JSON.stringify(trusted), 'utf8').toString('base64'),
+      }) as { value: unknown }
       const page = value as { generation?: unknown; request?: unknown }
       if (!Number.isSafeInteger(page?.generation)) throw new RunnerLinkError('invalid_response', 'Runner channel page did not match the attach protocol')
-      return (page.request ?? null) === null ? null : { generation: page.generation as number, request: page.request }
+      // The page always carries the generation so a caller can CAS on it; a request-less page is normal.
+      return { generation: page.generation as number, request: page.request ?? null }
     },
     channelReply: async (leaseId: string, reply: unknown) => {
-      const { value } = await invoke('POST', '/v1/channel/reply', reply, { 'x-pa-lease': leaseId }) as { value: unknown }
+      const { value } = await invoke('POST', '/v1/channel/reply', reply, {
+        'x-pa-lease': leaseId,
+        'x-pa-producer': Buffer.from(JSON.stringify(trusted), 'utf8').toString('base64'),
+      }) as { value: unknown }
       const routed = value as { accepted?: unknown; generation?: unknown }
       if (typeof routed?.accepted !== 'boolean') throw new RunnerLinkError('invalid_response', 'Runner channel reply result did not match the attach protocol')
       return { accepted: routed.accepted, generation: Number(routed.generation ?? 0) }

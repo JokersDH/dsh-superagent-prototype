@@ -23,7 +23,7 @@ let runner
 try {
   process.env.PA_RUNNER_RECEIVER_LOG = receiverLog
   const spec = makeAttemptSpec()
-  const link = new RunnerLink({ executable: process.execPath, entry: ENTRY, args: ['waiting-user'], stateRoot: join(root, 'attempt'), producer: { source: 'fixture', runnerIdentityRef: 'b27-points' } })
+  const link = new RunnerLink({ executable: process.execPath, entry: ENTRY, args: ['waiting-user'], stateRoot: join(root, 'attempt'), producer: { source: 'fake-driver', runnerIdentityRef: 'b27-points' } })
   link.bindPayload(spec.policySnapshotRef, { kind: 'fixture-settings/1', workspacePath: process.cwd(), scope: { projectId: 'p', allowedPaths: ['src/'], excludedPaths: [], externalActions: [] }, approvalPolicy: 'on-request', timeoutMs: 600000 })
   link.bindPayload('input-points', { inputId: 'input-points', contract: spec.contract, text: 'ack points', contextRefs: [], sourceMessageRefs: [], provenance: 'authorized_work_input' })
   const sinkPoints = []

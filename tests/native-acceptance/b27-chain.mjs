@@ -22,7 +22,7 @@ const recoveryRoot = join(root, 'recovery')
 mkdirSync(recoveryRoot, { recursive: true, mode: 0o700 })
 const ENTRY = fileURLToPath(new URL('../../apps/runner/src/runner-service-entry.ts', import.meta.url))
 const CHILD = fileURLToPath(new URL('./b27-coordinator-child.mjs', import.meta.url))
-const producer = { source: 'fixture', runnerIdentityRef: 'b27-chain-runner' }
+const producer = { source: 'codex-native', runnerIdentityRef: 'b27-chain-runner' }
 const children = []
 const serve = registration => new Promise(resolve => {
   const child = spawn(process.execPath, [CHILD], { env: { ...process.env, PA_W27_REGISTRATION: registration, PA_W27_MODE: 'serve' }, stdio: ['ignore', 'pipe', 'pipe'] })

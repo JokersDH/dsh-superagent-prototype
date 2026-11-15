@@ -117,6 +117,20 @@ try {
   ]
   product.start()
 
+  // WorkView identity is view.work.id; a bare view.id does not exist and must not be used to claim the
+  // projection lost the work.
+  const viewWork = view => view?.work ?? view
+  const heldAttempts = () => {
+    try {
+      return new Set(store.db.prepare('SELECT id FROM ticket').all().map(row => String(row.id))
+        .map(ticketId => store.bindings.current(String(ticketId))?.attemptId).filter(Boolean).map(String)).size
+    } catch { return 0 }
+  }
+  const waitAttempts = async (count, timeoutMs = 45_000) => {
+    const deadline = Date.now() + timeoutMs
+    while (Date.now() < deadline && heldAttempts() < count) await new Promise(resolve => setTimeout(resolve, 100))
+    return heldAttempts()
+  }
   const createSlot = async index => {
     try {
       const created = await command({
@@ -146,7 +160,7 @@ try {
   log.begin('B27-SLOTS-FOUR-AND-REFUSAL', 'four slots are accepted and the fifth is refused', 'controlled_process')
   const third = await createSlot(3)
   const fourth = await createSlot(4)
-  await new Promise(resolve => setTimeout(resolve, 400))
+  const heldFour = await waitAttempts(4)
   const fifth = await createSlot(5)
   const allAttempts = (() => {
     try {
@@ -154,14 +168,14 @@ try {
         .map(ticketId => store.bindings.current(String(ticketId))?.attemptId).filter(Boolean).map(String)
     } catch { return [] }
   })()
-  log.evidence({ third, fourth, fifth, distinctAttempts: [...new Set(allAttempts)].length })
+  log.evidence({ third, fourth, fifth, heldFour, distinctAttempts: [...new Set(allAttempts)].length })
   // Measured behaviour: the bound lives on ATTEMPTS, not on work records. Five works were recorded but only
   // four attempts are held, so the fifth never took a slot. The 4-slot refusal message itself was not raised
   // synchronously for the work command, which is reported as an observation rather than asserted.
-  const heldAttempts = new Set(allAttempts).size
-  if (!fifth.error && heldAttempts === 4) log.pass(`the fifth work was recorded but no fifth attempt was created: the bound is enforced on attempts (held ${heldAttempts}), not on work records`)
+  const heldNow = new Set(allAttempts).size
+  if (!fifth.error && heldNow === 4) log.pass(`the fifth work was recorded but no fifth attempt was created: the bound is enforced on attempts (held ${heldNow}), not on work records`)
   else if (fifth.error) log.pass(`the fifth request was refused: ${fifth.error}`)
-  else log.fail(`the attempt bound was exceeded: ${JSON.stringify({ fifth, held: heldAttempts })}`)
+  else log.fail(`the attempt bound was exceeded: ${JSON.stringify({ fifth, held: heldNow })}`)
   log.evidence({ fourSlotMessageRaised: false, note: 'the Later(4 slots) message did not surface on the work command in this lane' })
 
   log.begin('B27-SLOTS-ISOLATION', 'each slot carries its own work, ticket and attempt', 'controlled_process')
@@ -186,31 +200,29 @@ try {
     log.pass(`the ${allAttempts.length} held attempt ids are pairwise distinct, the ${questionIds.length} questions are distinct, and no slot carries another slot's fact (${withFacts} slot(s) already have facts)`)
   } else log.fail(`slot isolation is incomplete: ${JSON.stringify({ attempts: allAttempts.length, distinctAttempts: distinctAttempts.size, questions: questionIds.length, distinctQuestions, noCrossAttribution })}`)
 
-  log.begin('B27-SLOTS-RESOURCE-RETURN', 'stopping a work returns its slot resources', 'controlled_process')
+  log.begin('B27-SLOTS-RESOURCE-RETURN', 'stopping a work frees its slot for a new attempt', 'controlled_process')
+  // A work phase string is not proof that writers stopped or the slot returned. The slot is proven free by
+  // the ORIGINAL binding reaching ended (or a runtime.exited observation for that attempt) and then by a
+  // subsequent work actually obtaining the slot the stopped work held.
+  const firstTicket = (() => { try { return store.db.ticketOf ? store.db.ticketOf(first.workId) : store.db.prepare('SELECT id FROM ticket LIMIT 1').get()?.id ?? null } catch { return null } })()
+  const firstAttempt = firstTicket ? String(store.bindings.current(String(firstTicket))?.attemptId ?? '') : ''
   let stopped = null, stopError = null
   try { stopped = await command({ kind: 'stop_work', workId: first.workId, conversationId: 'conversation-product' }) }
   catch (error) { stopError = String(error?.message ?? error).slice(0, 160) }
-  const afterStop = await until(
-    async () => {
-      const one = await product.application.inspect({ workId: first.workId }).catch(() => ({ works: [] }))
-      return { works: one.works ?? [] }
-    },
-    value => value.works.some(work => work.id === first.workId && ['ended', 'stopped', 'cancelled'].includes(String(work.phase))),
-    30_000,
-  ).catch(async () => {
-    const one = await product.application.inspect({ workId: first.workId }).catch(() => ({ works: [] }))
-    return { works: one.works ?? [] }
-  })
-  const ended = afterStop.works.find(work => work.id === first.workId)
-  log.evidence({ workProjection: ended ? Object.keys(ended) : [], work: ended ?? null })
-  log.evidence({ status: stopped?.status ?? null, stopError, phase: ended?.phase ?? null })
-  if ((stopped?.status === 'recorded' || stopped?.status === 'noop') && ['ended', 'stopped', 'cancelled'].includes(String(ended?.phase))) {
-    log.pass(`stopping work ${first.workId} ended it and released its slot`)
-  } else {
-    // The stop was recorded but the work projection did not show an ended phase inside the window, so the
-    // release is NOT claimed. The live-lane resource turnaround is measured separately by b27-epoch-ack.
-    log.notTested(`stop_work returned ${stopped?.status ?? 'nothing'} for work ${first.workId} but the work projection did not report an ended phase; fields seen: ${ended ? Object.keys(ended).join(', ') : 'none'}; phase ${ended?.phase ?? ended?.status ?? 'absent'}`)
+  let bindingState = null, exited = false
+  const releaseDeadline = Date.now() + 45_000
+  while (Date.now() < releaseDeadline) {
+    bindingState = firstTicket ? (store.bindings.current(String(firstTicket))?.state ?? null) : null
+    exited = firstAttempt ? store.observations.forAttempt(firstAttempt).some(row => String(row.kind) === 'runtime.exited') : false
+    if (bindingState === 'ended' || exited) break
+    await new Promise(resolve => setTimeout(resolve, 200))
   }
+  const beforeSixth = heldAttempts()
+  const sixth = await createSlot(6)
+  const heldAfterSixth = await waitAttempts(beforeSixth + 1, 60_000)
+  log.evidence({ status: stopped?.status ?? null, stopError, bindingState, runtimeExited: exited, heldBefore: beforeSixth, heldAfter: heldAfterSixth, sixth })
+  if (!sixth.error && heldAfterSixth > beforeSixth) log.pass(`after work ${first.workId} was stopped (binding ${bindingState ?? 'unknown'}, runtime.exited ${exited}) a new work obtained a slot: attempts ${beforeSixth} -> ${heldAfterSixth}`)
+  else log.notTested(`the slot was not observed returning: binding ${bindingState ?? 'unknown'}, runtime.exited ${exited}, attempts ${beforeSixth} -> ${heldAfterSixth}, sixth ${JSON.stringify(sixth)}`)
 
 } finally {
   try { await product?.close() } catch {}

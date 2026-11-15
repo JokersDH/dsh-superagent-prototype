@@ -23,7 +23,7 @@ const root = mkdtempSync(join(tmpdir(), 'pa-w27-epoch-'))
 const recoveryRoot = join(root, 'recovery')
 mkdirSync(recoveryRoot, { recursive: true, mode: 0o700 })
 const ENTRY = fileURLToPath(new URL('../../apps/runner/src/runner-service-entry.ts', import.meta.url))
-const producer = { source: 'fixture', runnerIdentityRef: 'b27-epoch-runner' }
+const producer = { source: 'fake-driver', runnerIdentityRef: 'b27-epoch-runner' }
 let runner
 try {
   process.env.PA_RUNNER_RECOVERY_ROOT = recoveryRoot
@@ -63,11 +63,13 @@ try {
   else log.fail(`the current-epoch command was refused too: ${JSON.stringify(current)}`)
 
   log.begin('B27-ACK-LATE-REFUSED', 'a receipt that arrives after its lease ended is refused', 'controlled_process')
-  await client.channelNext('lease-epoch-1')
+  const epochState1 = await client.channelState()
+  await client.channelNext('lease-epoch-1', epochState1.generation)
   // A lease replacement detaches the old lease; a reply naming it afterwards must not settle anything.
-  const bLease = await client.channelNext('lease-epoch-2')
+  const epochState2 = await client.channelState()
+  const bLease = await client.channelNext('lease-epoch-2', epochState2.generation)
   let late = null
-  try { late = await client.channelReply('lease-epoch-1', { id: 'fact-late', kind: 'receipt', value: { factId: 'fact-late', persisted: true, seq: 9 } }) }
+  try { late = await client.channelReply('lease-epoch-1', { v: 1, type: 'receipt', id: 'fact-late', factId: 'fact-late', receipt: { factId: 'fact-late', persisted: true, seq: 9 } }) }
   catch (error) { late = { refused: true, code: error?.code ?? null } }
   log.evidence({ bLease: bLease?.generation ?? null, late })
   if (late?.refused || late?.accepted === false) log.pass('the late receipt from the previous lease was refused instead of being accepted')

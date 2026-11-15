@@ -28,7 +28,15 @@ import { createHash } from 'node:crypto'
 import { FileCriticalJournal } from './file-journal.ts'
 import { AttemptArtifactManifest } from './artifact-manifest.ts'
 import { serveRecoveryEndpoint, endpointDirectory, type RecoveryEndpoint } from './recovery-endpoint.ts'
-import { createBusinessChannel } from './business-channel.ts'
+// ONE communication implementation: I owns the concrete channel module; this file only adapts it to the
+// authenticated transport and keeps business admission/dispatch/lifecycle.
+import {
+  CoordinatorChannelModule,
+  DEFAULT_LIMITS,
+  isCoordinatorChannelError,
+  sameCoordinatorChannelProducer,
+} from './attach-channel/index.ts'
+import type { CoordinatorChannelLease, CoordinatorChannelProducer } from './attach-channel/index.ts'
 import { ProcessHost } from './process-host.ts'
 import { RunnerPayloadStore, LocalPayloadMissing } from './payload-store.ts'
 import { AttemptRunner } from './runner.ts'
@@ -131,8 +139,11 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
   const closeAdmission = () => {
     preparation.abort()
     businessClosed = true; processHost.closeAdmission(); runner?.closeAdmission()
-    // One channel owns every pending waiter, so closing admission cannot leave a stale map behind.
-    channel.detach({ reason: 'Attempt admission is closed' })
+    // Closing admission detaches the LEASES that carry business work, so pending native writes become
+    // indeterminate. The module itself stays open: it is the communication surface a recovery client
+    // attaches to, and module close means physical teardown, not "this attempt stopped".
+    stdioLease?.close('Attempt admission is closed')
+    sinkLease?.close('Attempt admission is closed')
   }
   const stopPhysical = async () => {
     closeAdmission()
@@ -140,8 +151,23 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
     physicallyStopped = stopped?.quiescence === 'confirmed' && processHost.inventory().every(item => item.writer === 'quiescent')
   }
   const receipts = new Map<string, DurableReceipt>()
-  // Single generation-scoped store for fact receipts, payload reads and native-write admission.
-  const channel = createBusinessChannel()
+  // The single channel implementation. `connections` only maps an authenticated connection to the queue its
+  // own lease's `send` filled; it holds no waiter, timer or generation state of its own.
+  let channel: CoordinatorChannelModule | undefined
+  let channelProducer: CoordinatorChannelProducer | undefined
+  let stdioLease: CoordinatorChannelLease | undefined
+  let sinkLease: CoordinatorChannelLease | undefined
+  const connections = new Map<string, { lease: CoordinatorChannelLease; generation: number; queue: unknown[] }>()
+  let currentConnection = ''
+  const channelError = (code: string, reason: string, message = reason): Error =>
+    Object.assign(new Error(message), { code, reason })
+  const asChannelReply = (frame: object): unknown => ({ v: 1, ...frame })
+  // A foreign registration is refused before any bind/CAS, so its poll changes nothing (no generation bump).
+  const assertChannelProducer = (producer: unknown): void => {
+    if (!channelProducer || !sameCoordinatorChannelProducer(producer, channelProducer)) {
+      throw channelError('identity_mismatch', 'foreign_producer', 'The attach registration does not match this Runner')
+    }
+  }
   const readLocal = async (reference: string): Promise<Json> => {
     if (!localPayloads) throw new LocalPayloadMissing('Payload store is not ready')
     return localPayloads.read(reference)
@@ -151,10 +177,6 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
    * this, so begin-once, the prepared policy, admission state and the receiver log cannot be bypassed by
    * whichever channel a caller happens to use.
    */
-  /** One lease identity for the attach channel, derived from the registered producer. */
-  const leaseRef = (producer: { runnerIdentityRef: string; attempt: { attemptId: string } }, leaseId: string): string =>
-    `${producer.runnerIdentityRef}|${producer.attempt.attemptId}|${leaseId}`
-
   const admitCommand = async (command: RunnerCommand, id: string): Promise<{ code: string; reason: string; message: string } | null> => {
     if (!spec || !runner) return { code: 'state_indeterminate', reason: 'not_bootstrapped', message: 'Commands require a bootstrap first' }
     // Optional receiver log (wave-16 B1). Off by default and inert when unset; when a path is supplied,
@@ -190,14 +212,11 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
   }
 
   const hooks = { beforeNativeWrite: (command: RunnerCommand) => {
-    if (businessClosed || command.kind !== 'answer') return Promise.reject(new Error('Native write admission is closed'))
-    // With a bound lease the admission is requested from it; otherwise the stdio channel still serves it.
-    if (channel.hasLease()) return channel.requestWrite(command.id, command)
-    const admission = channel.awaitWrite(command.id)
-    write({ type: 'native-write-intent', id: command.id, command })
-    return admission
+    if (!channel || businessClosed || command.kind !== 'answer') return Promise.reject(new Error('Native write admission is closed'))
+    // Each intent gets a fresh correlation id while the original command id/body stay untouched; the module
+    // never lets an earlier allowed frame approve a later intent.
+    return channel.beforeNativeWrite(command)
   } }
-  let payloadSeq = 0
 
   const finish = (): void => {
     closed = true
@@ -261,6 +280,54 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
           localPayloads = new RunnerPayloadStore(payloadRoot)
           journal = new FileCriticalJournal({ path: frame.journalPath })
           const recovery = await journal.open()
+          channelProducer = {
+            attempt: {
+              ticketId: spec.ticketId,
+              assignmentId: spec.assignmentId,
+              attemptId: spec.attemptId,
+              fenceEpoch: spec.fenceEpoch,
+              contract: spec.contract,
+            },
+            runnerIdentityRef: frame.producer.runnerIdentityRef,
+            source: frame.producer.source,
+          }
+          channel = new CoordinatorChannelModule({ producer: channelProducer, limits: DEFAULT_LIMITS })
+          if (options.sink) {
+            // In-process coordinator (product lane): the lease dispatches straight into the caller's sink.
+            sinkLease = channel.bind({
+              producer: channelProducer,
+              connectionId: 'sink',
+              expectedGeneration: 0,
+              send: async request => {
+                const outbound = request as { type: string; id: string; fact?: CriticalFact; requestId?: string; reference?: string }
+                try {
+                  if (outbound.type === 'fact' && outbound.fact) {
+                    const receipt = await options.sink!.record(outbound.fact)
+                    sinkLease?.receive(asChannelReply({ type: 'receipt', id: outbound.fact.factId, factId: outbound.fact.factId, receipt }))
+                  } else if (outbound.type === 'payload-read' && outbound.requestId && outbound.reference) {
+                    const value = await readLocal(outbound.reference)
+                    sinkLease?.receive(asChannelReply({ type: 'payload', id: outbound.requestId, requestId: outbound.requestId, value }))
+                  } else if (outbound.type === 'native-write-intent') {
+                    sinkLease?.receive(asChannelReply({ type: 'write-admission', id: outbound.id, allowed: !businessClosed }))
+                  }
+                } catch {
+                  // Leave the operation pending: the module owns its bounded deadline and the exact failure.
+                }
+              },
+            })
+          } else {
+            // Stdio coordinator keeps its original frames; only the version tag is stripped, and every
+            // correlation id stays the original one the caller already knows.
+            stdioLease = channel.bind({
+              producer: channelProducer,
+              connectionId: `stdio-${process.pid}`,
+              expectedGeneration: 0,
+              send: request => {
+                const { v: _version, ...frame } = request as Record<string, unknown>
+                write(frame)
+              },
+            })
+          }
           runner = new AttemptRunner({
             payloads: {
               read: reference => {
@@ -268,11 +335,9 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
                 // Local first: a reference this Runner wrote, or one the coordinator supplies.
                 return readLocal(reference).catch((error) => {
                   if (!(error instanceof LocalPayloadMissing)) throw error
-                  const requestId = `payload-${++payloadSeq}`
-                  if (channel.hasLease()) return channel.requestPayload(requestId, reference)
-                  const pending = channel.awaitPayload(requestId)
-                  write({ type: 'payload-read', id: requestId, requestId, reference } as never)
-                  return pending
+                  // The module decides which live lease is asked; the reference is the original immutable one.
+                  if (!channel) return Promise.reject(error)
+                  return channel.readPayload(reference)
                 })
               },
               // The Runner keeps a bounded local payload area next to its journal so a fact can be
@@ -284,17 +349,9 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
             },
             factSink: {
               record: async (fact: CriticalFact) => {
-                if (businessClosed) throw new Error('Attempt fact channel is closed')
-                const receipt = channel.hasLease()
-                  // A bound attach lease is asked first and by the original fact id.
-                  ? await channel.requestFact(fact)
-                  : options.sink
-                    ? await options.sink.record(fact)
-                    : await (async () => {
-                        const pending = channel.awaitFact(fact.factId)
-                        write({ type: 'fact', id: fact.factId, fact } as never)
-                        return pending
-                      })()
+                if (!channel || businessClosed) throw new Error('Attempt fact channel is closed')
+                // The fact is asked by its ORIGINAL id; a replacement lease can only resend that same id.
+                const receipt = await channel.recordFact(fact)
                 receipts.set(fact.factId, receipt)
                 write({ type: 'receipt', id: fact.factId, factId: fact.factId, receipt })
                 return receipt
@@ -352,16 +409,50 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
               },
               // A frame too large to inline is delivered by reference and read in bounded chunks here,
               // so a legitimate large payload stays readable without widening the transport cap.
-              channelNext: async (producer, leaseId) => {
-                // A different lease id replaces the current lease, which detaches it: pending native
-                // writes become indeterminate and are not answered by the new client.
-                channel.lease(leaseRef(producer as never, leaseId))
-                return { generation: channel.generation, request: channel.nextOutbound() }
+              // Read-only generation. It grants nothing: an attaching caller must present this exact
+              // generation to CAS, and reading it binds no lease and starts no waiter.
+              channelState: async producer => {
+                assertChannelProducer(producer)
+                return { generation: channel!.inspect().generation }
               },
-              channelReply: async (producer, reply, leaseId) => ({
-                accepted: channel.reply(leaseRef(producer as never, leaseId), reply as never),
-                generation: channel.generation,
-              }),
+              // Explicit CAS bind from the authenticated producer, then poll THAT lease's own queue. A caller
+              // that already owns a live connection never rebinds: polling is read-only consumption.
+              channelNext: async (producer, leaseId, expectedGeneration) => {
+                assertChannelProducer(producer)
+                const active = connections.get(leaseId)
+                if (active) {
+                  if (currentConnection !== leaseId) throw channelError('stale_connection', 'lease_not_current', 'This lease is not the live connection')
+                  return { generation: active.generation, request: active.queue.shift() ?? null }
+                }
+                const queue: unknown[] = []
+                let bound: CoordinatorChannelLease
+                try {
+                  bound = channel!.bind({
+                    producer: producer as never,
+                    connectionId: leaseId,
+                    expectedGeneration,
+                    // Outbound requests wait in THIS connection's queue; only its own poll can take them.
+                    send: request => { queue.push({ ...(request as object) }) },
+                  })
+                } catch (error) {
+                  const mapped = error as { code?: string; reason?: string }
+                  throw channelError(mapped?.code ?? 'protocol_error', mapped?.reason ?? 'bind_failed')
+                }
+                connections.set(leaseId, { lease: bound, generation: bound.generation, queue })
+                currentConnection = leaseId
+                // Any earlier connection is inert: its queue is dropped and its replies are refused below.
+                for (const [id, entry] of connections) if (id !== leaseId) entry.queue.length = 0
+                const entry = connections.get(leaseId)!
+                return { generation: entry.generation, request: entry.queue.shift() ?? null }
+              },
+              channelReply: async (producer, reply, leaseId) => {
+                assertChannelProducer(producer)
+                const entry = connections.get(leaseId)
+                if (!entry || currentConnection !== leaseId) {
+                  return { accepted: false, generation: channel!.inspect().generation }
+                }
+                return { accepted: entry.lease.receive(asChannelReply(reply as object)), generation: entry.generation }
+              },
               payload: async (ref, offset, length) => {
                 const entry = journal!.entries().find(candidate => candidate.fact.payloadRef === ref)
                 if (!entry) throw new Error('Unknown payload reference')
@@ -403,30 +494,25 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
         }
 
         case 'receipt': {
-          channel.resolveReceipt(frame.factId, frame.receipt)
+          stdioLease?.receive(asChannelReply({ type: 'receipt', id: frame.factId, factId: frame.factId, receipt: frame.receipt }))
           break
         }
 
         case 'payload': {
-          channel.resolvePayload(frame.requestId, frame.value as Json)
+          stdioLease?.receive(asChannelReply({ type: 'payload', id: frame.requestId, requestId: frame.requestId, value: frame.value as Json }))
           break
         }
         case 'write-admission': {
-          // Grant only while admission is still open; otherwise the waiter learns it is closed.
-          channel.resolveWrite(frame.id, frame.allowed && !businessClosed)
+          // Grant only while admission is still open; the module settles the exact pending intent.
+          stdioLease?.receive(asChannelReply({ type: 'write-admission', id: frame.id, allowed: frame.allowed && !businessClosed }))
           break
         }
 
         case 'ack-failed': {
           // The coordinator could not persist the fact: keep it spooled and fail the in-flight
           // acknowledge so the Driver sees a real error instead of waiting forever.
-          channel.rejectReceipt(
-            frame.factId,
-            Object.assign(new Error(`ingress refused fact ${frame.factId}: ${frame.reason}`), {
-              code: 'state_indeterminate',
-              reason: 'ingress_unavailable',
-            }),
-          )
+          void channelError
+          stdioLease?.receive(asChannelReply({ type: 'ack-failed', id: frame.factId, factId: frame.factId, reason: frame.reason }))
           write({ type: 'progress', id: frame.id, text: `ack failed for ${frame.factId}: ${frame.reason}`, observedAt: new Date().toISOString() })
           break
         }

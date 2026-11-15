@@ -19,5 +19,65 @@
     "limit": "the fixture lane produced only 3 real journal facts, so the 160-small-record continuity is still only observed at the helper level (wave-27 b27-small-pages), not on the actual service"
   },
   "wholePackageComplete": false,
-  "budget": { "modelCallsThisWave": 0, "nativeTurnsThisWave": 0, "cap4": "UNKNOWN unspendable" }
+  "budget": {
+    "modelCallsThisWave": 0,
+    "nativeTurnsThisWave": 0,
+    "cap4": "UNKNOWN unspendable"
+  },
+  "mergedI": "4bbef86 (codex/g5-coordinator-channel) merged into codex/g1-runtime as 423df04",
+  "b2_uniqueImplementation": {
+    "status": "CONSUMED AND OBSERVED",
+    "selected": "apps/runner/src/attach-channel/ (I) is now the ONLY pending/lease/timer implementation",
+    "retired": [
+      "apps/runner/src/business-channel.ts",
+      "apps/runner/src/business-dispatch.ts",
+      "tests/native-acceptance/b27-channel.mjs",
+      "tests/native-acceptance/b27-dispatch.mjs",
+      "tests/native-acceptance/b27-dual-client.mjs",
+      "tests/native-acceptance/b27-faults.mjs"
+    ],
+    "adapter": "runner-service owns authenticated transport adapter, admission/dispatch, lifecycle and the per-connection queue; it holds no waiter/timer/generation state of its own",
+    "note": "retiring a filename did not remove business guards: begin-once, prepared policy, native-write admission and idempotent dispatch stay in runner-service"
+  },
+  "b3_explicitCas": {
+    "harness": "tests/native-acceptance/b28-cas.mjs",
+    "result": "7 PASS / 0 FAIL / 1 NOT_TESTED",
+    "evidence": [
+      "A binds from the generation it read (1 -> 2)",
+      "B replaces A only with the current generation (2 -> 3)",
+      "old A poll refused stale_connection and the generation stayed 3",
+      "foreign registration claim refused identity_mismatch before any bind, generation unchanged",
+      "CAS for generation +7 refused, generation unchanged",
+      "late reply from the replaced lease refused, nothing about the live connection changed",
+      "B keeps polling its own lease at the same generation (no implicit rebind)",
+      "read/state never binds: it only reports a generation"
+    ]
+  },
+  "b18_slotRelease": {
+    "harness": "tests/native-acceptance/b27-slots.mjs",
+    "fix": "WorkView identity is view.work.id; the earlier harness read view.id and wrongly concluded the projection vanished",
+    "observed": "stop_work -> original binding state ended (runtime.exited was not the trigger) -> a NEW work obtained a slot: attempts 4 -> 5",
+    "slotBound": "five works were recorded but only four attempts were held: the bound is on attempts, not on work rows",
+    "isolation": "the four attempt ids are pairwise distinct, questions are distinct, and no slot carries another slot fact"
+  },
+  "sweep": {
+    "b27-dual-live": "6/0/1",
+    "b27-chain": "4/0/1",
+    "b27-sigkill": "7/0/1",
+    "b27-epoch-ack": "4/0/1",
+    "b27-ack-points": "5/0/1",
+    "b28-budget": "4/0/1",
+    "b28-cas": "7/0/1",
+    "b26-ref-payload": "4/0/1",
+    "b27-small-pages": "2/0/1",
+    "b27-ack-windows": "5/0/2",
+    "b18": "4 PASS/1 known-stale FAIL/1 NT",
+    "root typecheck": "exit 0"
+  },
+  "nextSteps": [
+    "B5: replace bespoke PID-only SIGKILL/cleanup tooling with independently-born identity/fresh-recheck tooling before running any further live kill matrix (the existing unsafeb27-chain/b27-sigkill kill paths must not be the sole evidence)",
+    "B6: prove the three callbacks against original A ingress/Store/main Guard through the selected module",
+    "B9-B16: original-A recovery, bounded SIGKILL, product-lane candidate/manual accept via ProductCompletion",
+    "B17-B20: 2/4 slot matrix with control re-entry and complete resources"
+  ]
 }
