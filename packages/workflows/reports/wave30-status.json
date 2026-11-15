@@ -1,0 +1,50 @@
+{
+  "role": "A",
+  "package": ["packages/storage", "packages/workflows"],
+  "branch": "codex/g2-workspaces-verification",
+  "fixedBaseline": "c80ec34",
+  "mergedMain": "6f385a54",
+  "mergeCommit": "5b762230",
+  "testedSourceCommit": "c914014",
+  "productSchema": 18,
+  "newMigrationThisWave": null,
+  "modelOrNativeTurns": 0,
+  "fourSourceResults": true,
+  "wholePackageComplete": false,
+  "commands": [
+    {"command": "node --test test/wave25-input-guards.case.ts test/wave25-dual-snapshot-personal.case.ts test/wave25-original-result.case.ts test/wave23-process-reader.case.ts test/wave24-subject-consistency.case.ts test/acceptance.case.ts", "cwd": "packages/workflows", "exit": 0, "result": "12 pass / 0 fail", "evidence": "wave30-node.txt"},
+    {"command": "npx tsx --test packages/workflows/test/*.case.ts", "exit": 0, "result": "123 pass / 0 fail", "evidence": "wave30-workflow-tests.txt"},
+    {"command": "npx tsx --test packages/storage/test/*.case.ts", "exit": 0, "result": "88 pass / 0 fail", "evidence": "wave30-storage-tests.txt"},
+    {"command": "npx tsc --noEmit -p packages/storage", "exit": 0, "result": "strict ok", "evidence": "wave30-strict-storage.txt"},
+    {"command": "npx tsc --noEmit -p packages/workflows", "exit": 0, "result": "strict ok", "evidence": "wave30-strict-workflows.txt"},
+    {"command": "npx tsc -p packages/storage/tsconfig.build.json", "exit": 0, "result": "build ok", "evidence": "wave30-build-storage.txt"},
+    {"command": "npx tsc -p packages/workflows/tsconfig.build.json", "exit": 0, "result": "build ok", "evidence": "wave30-build-workflows.txt"},
+    {"command": "npx tsc --noEmit -p apps/coordinator/tsconfig.product.json", "exit": 0, "result": "current main consumer strict ok", "evidence": "wave30-product-strict.txt"},
+    {"command": "node tests/integration/project-recipes.case.mjs", "exit": 0, "result": "5 pass / 0 fail; current J preview to original Work/check/currentCandidate/manualaccept", "evidence": "wave30-project-recipes.txt"},
+    {"command": "node tests/integration/usage-observation.case.mjs", "exit": 0, "result": "8 pass / 0 fail; actual Product/Broker/check/accept", "evidence": "wave30-main-completion.txt"}
+  ],
+  "phases": [
+    {"phase": "A1", "status": "PASS", "scope": "historical validity vs current eligibility",
+      "evidence": ["wave30-completion.txt", "wave30-node.txt", "wave30-data-api.md"],
+      "note": "each canonical review is validated against its own historical attempt binding; current binding is not reused. review exposes bindingState/currentLink; epoch+1 current attempt leaves the old review canonical and readable as historical. strict shape/key/work/contract/candidate/verification/artifact checks and unclassified reasons remain; coverage/limits explicit."},
+    {"phase": "A2", "status": "PASS", "scope": "stable main/C completion-data consumer",
+      "evidence": ["wave30-completion.txt", "wave30-product-strict.txt", "packages/storage/src/index.ts", "packages/workflows/src/index.ts"],
+      "note": "completion facts/key and proof/restore/result APIs are exported; current main product strict compiles and C wave29-completion-facts reads the same reader; canonical key lookup avoids all-receipt JSON scan; no new writer/registry/grant."},
+    {"phase": "A3", "status": "PASS_SOURCE_ONLY", "scope": "original product flow, receipts and current-package dual format",
+      "evidence": ["wave30-project-recipes.txt", "wave30-dual.txt", "wave30-main-completion.txt"],
+      "note": "actual main J preview/apply and Product/Broker/check/accept flow 5/5 and 8/8; original IDs/receipts remain; v1/v2 restore + C proof independent/independent ok with drift/emptied mismatch. Installed D package remains NOT_REACHED and its metadata is not relabelled."},
+    {"phase": "A4", "status": "PASS_SOURCE_SCOPE", "scope": "fault, limits and support",
+      "evidence": ["wave30-completion.txt", "wave30-original-result.txt", "wave30-content-proof.txt", "wave30-data-api.md"],
+      "note": "cross-process historical readback, original-result duplicate/unknown/foreign, restore failure atomicity, artifact/content limits and truncation are bounded and recorded. No user instance/native/model call or second lifecycle was touched; E assertions untouched."}
+  ],
+  "notReached": [
+    {"item": "installed/frozen D package same-package dual chain", "owner": "D/E", "reason": "A records package metadata but does not install or certify 1ba/1fbaf94; E remains ce64-scoped"},
+    {"item": "B/I live attach and recovered native result", "owner": "B/I/main", "reason": "no admitted transport; A provides original completion/result data only"},
+    {"item": "F App/readiness package and E final verdict", "owner": "main/F/E", "reason": "separate subject; source and old package checks are not a new installed verdict"}
+  ],
+  "preserved": [
+    "c80ec34 strict canonical classification 6/6",
+    "artifact/FTS/content-v2 and 1cd dual-format results",
+    "all prior branches, reports, ledgers, state and running services"
+  ]
+}
