@@ -216,6 +216,9 @@ export function matchRecipe(input: RecipeMatchInput): ProjectRecipeDraft {
     })
   }
 
+  if (project.scope.expiresAt !== undefined && Date.parse(project.scope.expiresAt) <= nowMs)
+    needs.push(issue('project_scope_expired', 'project', '项目授权已过期；请更新配置后再生成建议。'))
+
   // --- stack / manager / lockfile support ----------------------------------
   if (facts.stack.kind === 'not_node') {
     unsupported.push(issue('stack_not_node', 'stack', `只支持 Node 项目；观察到非 Node 标记：${facts.stack.markers.join('、') || '无'}。`))

@@ -26,6 +26,12 @@ export type KnownLockfile = (typeof KNOWN_LOCKFILES)[number]
 export const FOREIGN_STACK_MARKERS = ['pyproject.toml', 'go.mod', 'Cargo.toml', 'pom.xml', 'build.gradle'] as const
 export type ForeignStackMarker = (typeof FOREIGN_STACK_MARKERS)[number]
 
+/** Why a known field is absent or partial; an empty `missing` alone must not imply completeness. */
+export const FACT_OMISSION_REASONS = ['too_large', 'unreadable', 'unsupported', 'truncated', 'not_observed'] as const
+export type FactOmissionReason = (typeof FACT_OMISSION_REASONS)[number]
+export const FACT_FIELDS = ['packageJson', 'lockfile', 'manager', 'enginesNode', 'scripts', 'workspace'] as const
+export type FactField = (typeof FACT_FIELDS)[number]
+
 /** Conservative script-name alphabet: untrusted names outside it are counted, never echoed. */
 const ScriptNameSchema = z.string().regex(/^[A-Za-z0-9:._-]{1,128}$/)
 
@@ -85,7 +91,9 @@ export const ProjectFactsSchema = z
     /** Declared language markers. `node` always accompanies a Node stack. */
     languages: z.array(z.enum(['node', 'typescript', 'javascript'])).max(8).readonly(),
     /** Fields the observer could not provide; a gap is a gap, never an empty value. */
-    missing: z.array(z.enum(['packageJson', 'lockfile', 'manager', 'enginesNode', 'scripts', 'workspace'])).max(8).readonly(),
+    missing: z.array(z.enum(FACT_FIELDS)).max(8).readonly(),
+    /** Field-level reason for a partial or omitted observation (bounded, path-free). */
+    omissions: z.array(z.strictObject({ field: z.enum(FACT_FIELDS), reason: z.enum(FACT_OMISSION_REASONS) })).max(16).readonly(),
   })
   .superRefine((value, ctx) => {
     if (new Set(value.locks.map((lock) => lock.name)).size !== value.locks.length)

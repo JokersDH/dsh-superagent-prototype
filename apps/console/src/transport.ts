@@ -52,12 +52,14 @@ import {
   TrialReadinessSchema,
   UsageObservationQuerySchema,
   UsageObservationSchema,
+  UsageObservationDownloadSchema,
   ProjectRecipePreviewInputSchema,
   ProjectRecipePreviewSchema,
 } from '@personal-agent/contracts'
 import type {
   UsageObservationQuery,
   UsageObservation,
+  UsageObservationDownload,
   ProjectRecipePreviewInput,
   ProjectRecipePreview,
   AgentProfile,
@@ -178,6 +180,7 @@ export interface ConsoleTransport {
   readiness?(): Promise<TrialReadiness | undefined>
   previewProjectRecipe?(input: ProjectRecipePreviewInput, signal?: AbortSignal): Promise<ProjectRecipePreview | undefined>
   usageObservation?(query: UsageObservationQuery, signal?: AbortSignal): Promise<UsageObservation | undefined>
+  downloadUsageObservation?(query: UsageObservationQuery, signal?: AbortSignal): Promise<UsageObservationDownload | undefined>
   /** Authenticated local session check/bootstrap (HTTP lane); the fixture lane is always authenticated. */
   session?(): Promise<boolean>
   bootstrap?(bootstrapToken: string): Promise<void>
@@ -557,6 +560,28 @@ export class HttpTransport implements ConsoleTransport {
     try {
       const value = await this.request('/v1/readiness', { signal: AbortSignal.timeout(10000) }, 'json404')
       return value === missingOptionalResource ? undefined : TrialReadinessSchema.parse(value)
+    } catch (error) {
+      if (error instanceof TransportError && error.code === 'unsupported_capability') return undefined
+      throw error
+    }
+  }
+  async downloadUsageObservation(input: UsageObservationQuery, signal?: AbortSignal): Promise<UsageObservationDownload | undefined> {
+    const query = UsageObservationQuerySchema.parse(input), params = new URLSearchParams()
+    if (query.projectId) params.set('projectId', query.projectId)
+    params.set('days', String(query.days ?? 7)); params.set('timezone', query.timezone ?? 'UTC')
+    try {
+      const body = await this.request(`/v1/insights/export?${params}`, {
+        signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(10000)]) : AbortSignal.timeout(10000),
+      }, 'json404')
+      if (body === missingOptionalResource) return undefined
+      const value = UsageObservationDownloadSchema.parse(body), dto = value.observation
+      if (dto.days !== (query.days ?? 7) || dto.timezone !== (query.timezone ?? 'UTC') || (query.projectId &&
+        (dto.scope.projectIds.length !== 1 || dto.scope.projectIds[0] !== query.projectId)))
+        throw new TransportError('schema_mismatch', '导出不属于当前项目或窗口')
+      const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value.text))
+      const actual = [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, '0')).join('')
+      if (actual !== value.sha256) throw new TransportError('schema_mismatch', '导出内容摘要不一致')
+      return value
     } catch (error) {
       if (error instanceof TransportError && error.code === 'unsupported_capability') return undefined
       throw error
