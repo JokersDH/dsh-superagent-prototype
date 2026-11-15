@@ -13,6 +13,8 @@ G（`codex/g4-usage-insights`）的只读观测证据。全部内容都是从已
 | [`probe/two-project-20261115T084148.export.json`](probe/two-project-20261115T084148.export.json) | 同一 snapshot 的数值导出（`usage-insights-export/2`，含 `snapshot` 块） |
 | [`probe/two-project-20261115T084148.display-export.json`](probe/two-project-20261115T084148.display-export.json) | 由真实 `/v1/insights` 响应生成的 display-only 导出（`usage-insights-display-export/1`，无数值字段） |
 | [`probe/two-project-20261115T084148.crosscheck.json`](probe/two-project-20261115T084148.crosscheck.json) | 页面↔分析（`page`）与页面↔CLI 独立 HTTP 读（`http`）的逐行核对结果 |
+| [`probe/two-project-20261115T152615.download.json`](probe/two-project-20261115T152615.download.json) | 主线 `GET /v1/insights/export` 实际交付给用户的 display-only 文件（`usage-insights-display-export/1`，12 行、无数值字段） |
+| [`probe/two-project-20261115T152615.support.json`](probe/two-project-20261115T152615.support.json) | 同一次下载的 `verify --dto` 支持摘要：只有 scope/窗口/覆盖/行身份/是否有值，无 formatted 值 |
 | [`f-integration/consumer-view.example.json`](f-integration/consumer-view.example.json) | 给 F 的稳定投影样例（`TrialInsightsView` 形状） |
 | [`f-integration/README.md`](f-integration/README.md) | F 接入契约与语义规则 |
 | [`wave26-status.json`](wave26-status.json) | 第二轮（G1–G16）范围/未知/硬界/流式预算的交付与实测值 |
@@ -20,6 +22,7 @@ G（`codex/g4-usage-insights`）的只读观测证据。全部内容都是从已
 | [`wave28-status.json`](wave28-status.json) | 第四轮（G1–G24）真实 /v1/insights 前身 reader/DTO/F admission 验证 |
 | [`wave29-status.json`](wave29-status.json) | 第二十九轮（G1–G24）真实 `/v1/insights`、7/30 窗口、行语义与有界导出 |
 | [`wave30-status.json`](wave30-status.json) | 本轮（G1–G4 四成果）同授权窗口的报告/导出闭环、display-only 导出、跨读者逐行核对与快照连续性 |
+| [`wave31-status.json`](wave31-status.json) | 本轮三包 12 成果：R1 固定 RC 基线与包能力核对、R2 主线默认下载全链、R3 重复观察与支持 |
 
 ## 与主线的实际接线（2026-11-15）
 
@@ -52,6 +55,24 @@ usage-insights/observation 入口，本包源码能力不能贴到它的 install
 - `two-project-20261115T084148.export.json` 的 `snapshot.snapshotId` 与同目录报告中的 `Summary id`
   相同；`display-export.json` 的 `snapshot.snapshotId` 是服务端 DTO 的 `summaryId`（`13e9e314…`），
   两个 identity 属于两条 reader 路径，不互相冒充。
+
+## 本轮新增（wave 31）
+
+三个交付包分列，不互相贴结论：
+
+- **包一（R1，固定 829RC）**：`package --tar` 只读核对出该归档的实际能力 —— sha256
+  `04926739…`、20481470 bytes、manifest source `82ee5b8f…` / build `8296720d8a25f38c`、
+  `pageObservation` 存在，`numericExport` 与 `displayDownload` **不在包内**（dist 无对应入口、
+  无 `/v1/insights/export`、无 `download(`、无 `downloadUsageObservation`）。因此 R1 用户只能看页面，
+  下载能力准确未达；G 的工具/checkout 能力不冒充 RC 功能。
+- **包二（R2，main 303b2c6a）**：`GET /v1/insights/export` 真实路由 + 真实 `download` + main 的
+  `usage-observation-download/1` contract 全部通过：200、`cache-control: no-store`、sha256 与实际
+  文本一致、文件名含 summary 前 12 位、`snapshot.snapshotId` 等于本次观察、`truncation.bytes` 等于
+  实际 UTF-8 字节、行与同次 `observation` 逐字段一致、无数值字段。交付文件见
+  `two-project-20261115T152615.download.json`（5140 bytes、12 行）。
+- **包三（R3）**：同一 scope 再次读取是新观察（不同 `summaryId`/`snapshotId`），行身份与值不变、
+  未知行不会被上一次的值填满；导出后再读原 Work 仍可用，导出与读取期间产品事件增量 **0**。支持摘要
+  （`support.json`）只含元数据，可用于同事排障。
 
 ## 这批证据说明了什么
 

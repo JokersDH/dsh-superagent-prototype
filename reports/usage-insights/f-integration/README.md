@@ -146,3 +146,16 @@ node -e "import('./packages/usage-insights/dist/index.js').then(async m => {
 两条路径都不会把 `12.3` 反解成数字：display-only 文档里根本没有数值字段，数值导出只从 summary 取值。
 再次读取（`--previous-export`）会明确写出 `new_snapshot`，旧导出的值不会被扩展或复用。F 仍只消费
 `TrialInsightsView` 形状的数据，不解析导出文件，也不由导出推导收益或人力工时。
+
+## 默认下载与支持（wave 31）
+
+main 303b2c6a 已把下载接到工作台：`GET /v1/insights/export` → `ProductUsageObservation.download` →
+G 的 `buildDisplayExport`（`maxRows 32` / `maxBytes 65536`）→ `usage-observation-download/1` →
+浏览器 `downloadUsageObservation(query, signal)` 生成文件。
+
+- 文件是 **display-only**：只有服务端格式化字符串、行身份、层、单位、样本数，没有数值字段。
+- 每次点击都是**新观察**：`snapshot.snapshotId` 是本次读取的 summary id，不冒充点击前页面那一版；
+  文件里带自己的 `observedAt`/`window`/`scope`/`header`/`truncation`。
+- 同名前端 key（identity/project/days/timezone/config）切换会取消旧下载；缺该可选端口时保持原工作台。
+- 支持摘要用 `verify --dto <file> --format markdown` 生成：只有 scope/窗口/覆盖/行身份/是否有值，
+  可直接贴进工单，不含值、label、detail 或路径。

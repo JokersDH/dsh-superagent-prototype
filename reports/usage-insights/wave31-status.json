@@ -1,0 +1,445 @@
+{
+  "protocol": "wave31-usage-insights-status/1",
+  "agent": "G",
+  "branch": "codex/g4-usage-insights",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-g",
+  "origin": "https://github.com/JokersDH/dsh-superagent-prototype.git",
+  "fixedStart": "1f2964558e21061402f0217e2cca37308e9776f0",
+  "syncedMain": "8deda18d",
+  "generatedAt": "2026-11-15T15:34:00Z",
+  "program": {
+    "shape": "three continuous packages, four complete outcomes each (12)",
+    "tokenBudget": "none",
+    "deadline": "none",
+    "vendorModelNativeTurns": 0,
+    "blockedPilot": "E original 24turn/200000token/USD5 single-in-flight pilot remains BLOCKED; no reset, top-up, refund, replacement sample, price or billing-recipe research.",
+    "notReDispatched": [
+      "nested atomic record cap / permanent A→B→A tombstone (closed wave-27)",
+      "authorized reader + DTO (wave-28/29)",
+      "numeric export + display export + cross-check (wave-30); this wave consumes them through the product path and pins the R1/R2 split"
+    ]
+  },
+  "ownedPaths": [
+    "packages/usage-insights/",
+    "tools/usage-insights/",
+    "reports/usage-insights/"
+  ],
+  "artifacts": {
+    "r1": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave30-target/wave30-target-8296720.tar.gz",
+      "sha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "bytes": 20481470,
+      "manifestSource": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "buildId": "8296720d8a25f38c",
+      "sourceDirty": false,
+      "supportMatrix": {
+        "measured": "darwin/arm64 + Node 24.21.x + SQLite ABI 137",
+        "node": ">=24.21.0 <25",
+        "abi": "137"
+      },
+      "archiveAccounting": {
+        "contentFiles": 6827,
+        "symlinks": 23,
+        "manifestDeclared": 6849,
+        "delta": 1,
+        "appleDouble": 7405,
+        "paxHeaders": 7405
+      },
+      "capabilities": {
+        "pageObservation": true,
+        "numericExport": false,
+        "displayDownload": false
+      },
+      "verifiedBy": "tools/usage-insights/cli.mjs package --tar <path> (read-only; nothing extracted, installed or executed)",
+      "installVerdict": "NOT_G_OWNED; D records the package, E's independent verdict for these bytes is NOT_REACHED"
+    },
+    "r2": {
+      "commit": "303b2c6a974856661c21d0617bd710ebe87374d1",
+      "route": "GET /v1/insights/export",
+      "envelope": "usage-observation-download/1 (observation + fileName + mediaType + text + sha256)",
+      "displayDocument": "usage-insights-display-export/1 built by G's buildDisplayExport(observation, {maxRows:32, maxBytes:65536})",
+      "installedTar": "none for these bytes; no E verdict"
+    }
+  },
+  "outcomes": [
+    {
+      "id": "G1",
+      "package": "R1",
+      "title": "Lock the RC/public-reader observation input",
+      "sourceCommit": "48a2f7ba",
+      "implementation": [
+        "tools/usage-insights/lib/tar.mjs: in-memory ustar/tar.gz reader with header checksum, size guard and gzip output bound",
+        "tools/usage-insights/lib/package-surface.mjs: capability report from packaged files (page route, dist entry exports, download method, browser interface)",
+        "cli.mjs package: explicit path, digest/build expectations, capability expectations"
+      ],
+      "consumer": "G's CLI against the real R1 tar; the same command is reusable for any successor tar",
+      "acceptance": {
+        "positive": [
+          "R1 archive sha256/bytes/source/build match the declared tuple",
+          "pageObservation present; numericExport and displayDownload absent",
+          "--expect pageObservation exits 0"
+        ],
+        "negative": [
+          "--expect displayDownload exits 3 with capability_missing",
+          "--expect-sha256/--expect-build mismatch exits 5",
+          "over-budget archive exits 5 before inflation",
+          "malformed archive exits 5 naming no path",
+          "non-absolute path exits 2",
+          "an unknown capability name exits 2"
+        ],
+        "commands": [
+          "node tools/usage-insights/cli.mjs package --tar <r1>.tar.gz --expect-sha256 <sha> --expect-build 8296720d8a25f38c --expect pageObservation  -> exit 0",
+          "node tools/usage-insights/cli.mjs package --tar <r1>.tar.gz --expect pageObservation,displayDownload  -> exit 3"
+        ]
+      },
+      "state": "delivered"
+    },
+    {
+      "id": "G2",
+      "package": "R1",
+      "title": "Header, row and source coverage semantics",
+      "sourceCommit": "464ece2c",
+      "implementation": [
+        "facing.rowSemantics: sample basis (outcome vs product record), value state (known/unknown/partial_proxy), note",
+        "facing.rowCoverageMeaning: what a row's coverage does and does not establish"
+      ],
+      "consumer": "the report renderer (Markdown + terminal) and any Node caller; main/F admission unchanged",
+      "acceptance": {
+        "positive": [
+          "outcome and product-record rows declare different bases",
+          "a complete source with no value is unknown, not zero"
+        ],
+        "negative": [
+          "a UI-visibility interval stays partial_proxy even when overall is complete",
+          "a bounded source qualifies its values and never upgrades an unknown one",
+          "each coverage value maps to its own explanation"
+        ]
+      },
+      "state": "delivered"
+    },
+    {
+      "id": "G3",
+      "package": "R1",
+      "title": "Table and report content integrity",
+      "sourceCommit": "464ece2c",
+      "implementation": [
+        "Markdown metric table gains a stable `Row id` column (metric@layer@currency) and a `Value state` column",
+        "the report states that row samples and header samples are different bases, and that a dash is not zero"
+      ],
+      "consumer": "renderMarkdown/renderTerminal, exercised through the CLI report and the checked-in report artifacts",
+      "acceptance": {
+        "positive": [
+          "two currencies and two layers are addressable, never summed",
+          "the currency row prints as known and the proxy row as partial_proxy"
+        ],
+        "negative": [
+          "null prints as a dash with its reason, never 0",
+          "an unknown row keeps a null sample count",
+          "long text stays escaped (existing cases retained)"
+        ]
+      },
+      "state": "delivered"
+    },
+    {
+      "id": "G4",
+      "package": "R1",
+      "title": "R1 repeated reads and package-1 delivery",
+      "sourceCommit": "48a2f7ba",
+      "implementation": [
+        "the RC has no download entry; G states that from the archive rather than offering its own tool as an RC feature",
+        "repeated reads of the same window are deterministic per observation; a later read is a new observation"
+      ],
+      "consumer": "probe + CLI; the page path is main's, G does not add a reader",
+      "acceptance": {
+        "positive": [
+          "two reads at the same observation time are byte-identical exports",
+          "a later read has its own summary id"
+        ],
+        "negative": [
+          "R1 capability report lists displayDownload as absent",
+          "no G checkout tool is presented as an installed RC feature"
+        ]
+      },
+      "state": "delivered",
+      "note": "The R1 download gap is accurate and intended: 829RC predates main 303b2c6a."
+    },
+    {
+      "id": "G5",
+      "package": "R2",
+      "title": "Default display export formal runtime interface",
+      "sourceCommit": "a437ecc1",
+      "implementation": [
+        "the existing display export is now consumed through main's real route and real download method",
+        "no new collector, analysis authority or second export pipeline"
+      ],
+      "consumer": "apps/coordinator/http/app.ts `GET /v1/insights/export` + ProductUsageObservation.download + contracts UsageObservationDownloadSchema (all imported by G's tests, not modified)",
+      "acceptance": {
+        "positive": [
+          "200 with usage-observation-download/1, cache-control no-store, fileName/mediaType/sha256 correct, 12 rows, no numeric field"
+        ],
+        "negative": [
+          "401 without bearer",
+          "403 foreign project",
+          "400 for days=14/abc, invalid timezone, duplicate and unknown parameters",
+          "422 when the download port is absent",
+          "422 when no authorized scope exists",
+          "an internally inconsistent envelope is refused (400) and a scope-contradicting one is refused (400/503)"
+        ]
+      },
+      "state": "delivered"
+    },
+    {
+      "id": "G6",
+      "package": "R2",
+      "title": "Real page/export snapshot consistency",
+      "sourceCommit": "a437ecc1",
+      "implementation": [
+        "the export is a fresh read: its snapshot id is its own observation's summary id and it carries its own observedAt/window",
+        "the file never claims the page's previously displayed snapshot"
+      ],
+      "consumer": "probe (page → export → analysis) and the route test with a movable clock",
+      "acceptance": {
+        "positive": [
+          "with a frozen clock two exports are byte-identical",
+          "page rows and file rows share row identities and values"
+        ],
+        "negative": [
+          "with a later clock the export's summary id and snapshot id differ from the page's",
+          "the file's window end is its own observedAt, not the page's"
+        ]
+      },
+      "state": "delivered"
+    },
+    {
+      "id": "G7",
+      "package": "R2",
+      "title": "Format, truncation and file-write integrity",
+      "sourceCommit": "a437ecc1",
+      "implementation": [
+        "truncation.bytes equals the delivered UTF-8 size; sha256 is of the delivered text",
+        "main's contract pins 32 rows / 65536 bytes / byRows false; G's library honours those bounds for the served path"
+      ],
+      "consumer": "main's UsageObservationDownloadSchema (the real contract) applied to G's documents",
+      "acceptance": {
+        "positive": [
+          "an honest document passes the contract",
+          "an untouched re-serialization is still accepted (deterministic formatting)"
+        ],
+        "negative": [
+          "a hidden row omission is refused",
+          "a wrong fileName is refused",
+          "a changed byte count is refused",
+          "a doc truncated under an explicit smaller budget is not presented as a 64 KiB-bound document"
+        ]
+      },
+      "state": "delivered"
+    },
+    {
+      "id": "G8",
+      "package": "R2",
+      "title": "Page → export → original work delivery",
+      "sourceCommit": "e3e58375",
+      "implementation": [
+        "probe drives the real route, validates the envelope, cross-checks the file against an analysis of its own window, then re-reads the original works"
+      ],
+      "consumer": "probe over the real product runtime; main/F own the browser flow",
+      "acceptance": {
+        "positive": [
+          "download 200 in 5140 bytes with 12 rows and a matching digest",
+          "the original works are still readable afterwards",
+          "page agrees with the file 13/13"
+        ],
+        "negative": [
+          "no download port → 422 while the page still works",
+          "no events are created by the export or the following read (delta 0)"
+        ]
+      },
+      "state": "delivered"
+    },
+    {
+      "id": "G9",
+      "package": "R3",
+      "title": "Repeated observation and cross-scope continuity",
+      "sourceCommit": "e3e58375",
+      "implementation": [
+        "repeated reads are new observations; row identities and values stay stable when the facts did not change",
+        "an unknown row is never filled from a previous read"
+      ],
+      "consumer": "probe (two exports of the same scope) and the export continuity block",
+      "acceptance": {
+        "positive": [
+          "the second export has a different snapshot id and the same row identities/values"
+        ],
+        "negative": [
+          "an unknown row stays unknown in the repeat",
+          "the earlier export's values are not reused or averaged"
+        ]
+      },
+      "state": "delivered"
+    },
+    {
+      "id": "G10",
+      "package": "R3",
+      "title": "Bounded cost and sanitized diagnostics",
+      "sourceCommit": "e3e58375",
+      "implementation": [
+        "verify --dto: metadata-only support summary of a served document (no values, labels, details or paths)",
+        "scan/size guards unchanged: streaming HTTP with abort, bundle size before parse, archive budget before inflation"
+      ],
+      "consumer": "a colleague running the CLI; the summary is safe to paste into a ticket",
+      "acceptance": {
+        "positive": [
+          "3 rows reported with 2 known and 1 unknown; row ids and sample counts preserved"
+        ],
+        "negative": [
+          "a canary in a served label/detail and a private path never reach the summary",
+          "insufficient → exit 4, unavailable → exit 5",
+          "--input with --dto → exit 2"
+        ]
+      },
+      "state": "delivered"
+    },
+    {
+      "id": "G11",
+      "package": "R3",
+      "title": "Portable tools, documents and support contract",
+      "sourceCommit": "e3e58375",
+      "implementation": [
+        "READMEs separate page vs document vs analysis vs export, and state that a display document has no numeric values",
+        "the CLI runs from an unrelated working directory with absolute inputs only"
+      ],
+      "consumer": "a fresh Node consumer (existing package-consumer case) plus the cwd-independent CLI case",
+      "acceptance": {
+        "positive": [
+          "analyze/export from /tmp produce the expected protocols"
+        ],
+        "negative": [
+          "no home/credential discovery; unknown files and unsupported formats are refused"
+        ]
+      },
+      "state": "delivered"
+    },
+    {
+      "id": "G12",
+      "package": "R3",
+      "title": "Accurate long-term package use and final handoff",
+      "sourceCommit": "this status commit",
+      "implementation": [
+        "this file records the three packages, the R1/R2 tuples and every remaining gap"
+      ],
+      "consumer": "main/D/E/F and the next reader of this worktree",
+      "acceptance": {
+        "positive": [
+          "all 12 outcomes have an implementation, a consumer and runnable evidence"
+        ],
+        "negative": [
+          "R1's missing download, R2's missing installed tar and the unmeasured value/native/operator range are listed as not reached, not as done"
+        ]
+      },
+      "state": "delivered"
+    }
+  ],
+  "measured": {
+    "r1": {
+      "archive": "sha256 04926739…, 20481470 bytes, 6827 content files + 23 symlinks (manifest 6849, delta 1)",
+      "capabilities": {
+        "pageObservation": true,
+        "numericExport": false,
+        "displayDownload": false
+      },
+      "absenceEvidence": [
+        "usage-insights dist has no export/display-export/crosscheck module",
+        "coordinator http app has '/v1/insights' but not '/v1/insights/export'",
+        "usage-observation has no download( method",
+        "console transport has no downloadUsageObservation"
+      ]
+    },
+    "r2": {
+      "route": "GET /v1/insights/export?days=7&timezone=UTC -> 200, cache-control no-store",
+      "fileName": "observation-7d-8f41fba66bf9.json",
+      "sha256": "1ed3b569d34ccf29ca18c9ef2ad44c37700c98850192f2b307cbcef3920e1bb6",
+      "bytes": 5140,
+      "rows": 12,
+      "snapshotId": "8f41fba66bf9100bfd50ecc6579dc64437a8a8cc95d496879c557b73d278ac25",
+      "continuity": "first_observation",
+      "numericFields": false,
+      "absentPortStatus": 422,
+      "repeatIsNewSnapshot": true,
+      "pageAgreesWithFile": "13/13 checked, 13 agreements, 0 disagreements",
+      "eventsDuringExportAndWorkRead": 0
+    },
+    "evidence": {
+      "download": "reports/usage-insights/probe/two-project-20261115T152615.download.json",
+      "support": "reports/usage-insights/probe/two-project-20261115T152615.support.json",
+      "displayExport": "reports/usage-insights/probe/two-project-20261115T152615.display-export.json",
+      "export": "reports/usage-insights/probe/two-project-20261115T152615.export.json",
+      "report": "reports/usage-insights/probe/two-project-20261115T152615.report.md",
+      "bundle": "reports/usage-insights/probe/two-project-20261115T152615.bundle.json",
+      "crossCheck": "reports/usage-insights/probe/two-project-20261115T152615.crosscheck.json"
+    },
+    "performance": {
+      "collectMs": 143,
+      "analyzeMs": 101,
+      "note": "one machine, one bounded observation; not a soak or cross-machine claim"
+    }
+  },
+  "mainFindings": [
+    "The download contract (`UsageObservationDownloadSchema`) verifies text/bytes/fileName/rows but never recomputes `sha256` from `text`: a producer could advertise a wrong digest and the contract would still accept it. G's tests assert the advertised digest is correct; the contract itself does not.",
+    "An envelope whose own fields contradict each other is refused by the schema before the route's scope check runs, so that case returns 400 rather than 503. Both refuse, but the status differs and a client should not rely on 503 alone.",
+    "The served DTO still uses the literal `product` in its metric id for a layer-less row (G maps it explicitly) and its header `coverageState` still folds any partial row into `partial`. G did not change main."
+  ],
+  "notReached": [
+    "R2 installed package and E verdict for these bytes: no tar carries main 303b2c6a yet; installedAdmission false",
+    "R1 download: genuinely absent in 829RC — the package has no route, no method and no library export for it",
+    "operator long-term history, model cost baseline and value/benefit: NOT_TESTED; no comparison or benefit figure is produced",
+    "actual_native execution: NOT_TESTED — the controlled fixture driver ran; no vendor model or native turn was performed",
+    "browser rendering of the download control: main/F own it; G verified the transport contract and the file, not the UI"
+  ],
+  "limitations": [
+    "A display document has no numeric values by construction; the support summary carries metadata only.",
+    "The numeric export still needs an authorization-scoped analysis summary; it is not derived from the served strings.",
+    "Snapshot identity is the analysis summary id: two readers of the same window produce different ids and are compared row-wise, not claimed identical.",
+    "Agreement in a cross-check is bounded by the coordinator's one-decimal rounding; a larger difference is a disagreement.",
+    "review.activeMs stays a partial UI-visibility proxy; unknown usage/cost stay unknown."
+  ],
+  "boundaries": {
+    "noSqlOrPrivateDb": true,
+    "noRuntimeHttpUiChanges": true,
+    "noNewCollector": true,
+    "noSecondLedger": true,
+    "noModelOrNativeCalls": true,
+    "noRootLockOrContractsChanges": true,
+    "noEAssertionsChanged": true,
+    "noBrowserNodeImports": true,
+    "mainUntouched": "apps/*, packages/contracts, root manifests and the lock file were not modified; main's modules are imported read-only in tests. packages/contracts/dist was rebuilt locally because the merged source added the download schema.",
+    "userServicesPreserved": "twelve 5180/8796 … 5191/8807 instances and all state/profile/tar/ledger left untouched"
+  },
+  "verification": {
+    "commands": [
+      "packages/contracts/node_modules/.bin/tsc -p packages/contracts/tsconfig.build.json",
+      "packages/usage-insights/node_modules/.bin/tsc -p packages/usage-insights/tsconfig.json",
+      "packages/usage-insights/node_modules/.bin/tsc -p packages/usage-insights/tsconfig.build.json",
+      "node --test packages/usage-insights/test/*.case.ts",
+      "node --test tools/usage-insights/test/*.case.mjs",
+      "node tools/usage-insights/probe/observe-two-projects.mjs --keep",
+      "node tools/usage-insights/cli.mjs package --tar <r1>.tar.gz --expect-sha256 <sha> --expect-build 8296720d8a25f38c --expect pageObservation"
+    ],
+    "results": {
+      "typecheck": "pass",
+      "build": "pass",
+      "packageTests": {
+        "total": 149,
+        "pass": 149,
+        "fail": 0
+      },
+      "toolTests": {
+        "total": 57,
+        "pass": 57,
+        "fail": 0
+      },
+      "probe": "pass (download 200 / 5140 bytes / 12 rows, page 13/13, repeat new snapshot, 0 events)",
+      "r1Package": "exit 0 for pageObservation; exit 3 when displayDownload is expected"
+    },
+    "staticChecksConfer": "no runtime, native or release admission"
+  }
+}

@@ -123,6 +123,31 @@ and the result reports every disagreement (`window_mismatch`, `metric_missing_in
 consumer can map G's `metricRowKey` onto the served id; `metricRowKey` itself stays the stable
 identity of the export row.
 
+## Row semantics and support
+
+`rowSemantics(row, summary)` explains one row without changing it: whether the sample count is an
+outcome basis or a product-record basis, whether the value is `known`, `unknown` or `partial_proxy`,
+and a note (`not observed … never zero`, `UI-visibility proxy, not human working time`). The report
+prints that state as a `Value state` column next to the stable `Row id` (`metric@layer@currency`), so a
+proxy row is never read as a measurement and two currencies or layers never collapse into one line.
+`rowCoverageMeaning(row)` states what a row's coverage does and does not establish: an enumerated
+source with no recorded value is *not* a measured zero.
+
+`describeDisplayDocument(served)` returns a sanitized support summary of a served `usage-observation/1`
+document: status, identity, window, scope, coverage, counts and one entry per row with its layer, unit,
+value-present flag and sample count. It copies **no** formatted value, label, detail or path, so a
+support ticket cannot be turned into a numeric claim. `renderSupportSummary` renders it as Markdown.
+
+## Compatibility with the product download
+
+main's `GET /v1/insights/export` wraps `buildDisplayExport(observation, { maxRows: 32, maxBytes:
+65536 })` in a `usage-observation-download/1` envelope whose contract pins the display document shape
+(`snapshot.continuity: first_observation`, `previous: null`, `note: null`, `truncation.maxRows: 32`,
+`maxBytes: 65536`, `byRows: false`, `exportedFrom.reader` exact). That shape is therefore frozen for
+the served path: adding or removing a display field, changing a default bound or the reader string
+would make the product route reject its own export. `test/download-route.case.ts` mounts the real route
+and parses the real contract, so such a change fails there first.
+
 ## CLI
 
 ```sh

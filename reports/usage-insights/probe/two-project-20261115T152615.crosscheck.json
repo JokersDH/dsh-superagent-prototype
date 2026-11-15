@@ -1,0 +1,36 @@
+{
+  "protocol": "usage-insights-cross-check-evidence/1",
+  "servedSummaryId": "f28f389423061c968d82daf72e86b8f0a7a3ca2a41a620c9e59fbc8824d3b388",
+  "page": {
+    "sameObservation": false,
+    "comparable": true,
+    "snapshot": {
+      "display": "f28f389423061c968d82daf72e86b8f0a7a3ca2a41a620c9e59fbc8824d3b388",
+      "analysis": "71c6ced7a4f77e15da02bef193e746a0fab1ea4c14c8e7839c2126e4b994e61a"
+    },
+    "checked": 13,
+    "agreements": 13,
+    "disagreements": [],
+    "notes": [],
+    "tolerance": {
+      "absolute": 0.05,
+      "note": "Agreement is bounded by half the display rounding; the parsed value is used only here and is never exported."
+    }
+  },
+  "http": {
+    "sameObservation": false,
+    "comparable": true,
+    "snapshot": {
+      "display": "f28f389423061c968d82daf72e86b8f0a7a3ca2a41a620c9e59fbc8824d3b388",
+      "analysis": "7c3f926dd936da477e932a2913a9d4a9ac3dc0d9e1ba45706b5d224630873774"
+    },
+    "checked": 13,
+    "agreements": 13,
+    "disagreements": [],
+    "notes": [],
+    "tolerance": {
+      "absolute": 0.05,
+      "note": "Agreement is bounded by half the display rounding; the parsed value is used only here and is never exported."
+    }
+  }
+}

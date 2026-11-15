@@ -219,6 +219,29 @@ targetLayer、sampleCount、value、coverage；手填工时/预期节省写在 `
 指向同一 `snapshotId`；`--days 7|30` 使用 coordinator 的滚动窗口（`--to` 默认当前，capture 时间
 默认等于窗口末端），可与服务端 7/30 观察对齐。
 
+## 包能力核对（`package`）
+
+`package` 只读一个发布归档（`.tar` / `.tar.gz`），报告**包内实际存在**的观察能力，不解包、不安装、
+不执行：
+
+```sh
+node tools/usage-insights/cli.mjs package --tar /abs/app.tar.gz [--json] \
+  [--expect-sha256 <hex>] [--expect-build <id>] [--expect pageObservation,numericExport,displayDownload]
+```
+
+- 归档：sha256、bytes、内容文件/符号链接/AppleDouble/pax 计数；`install/install.json` 的 source
+  commit、build id、`supportMatrix` 与实际文件计数（manifest 不自列自身，差 1 是预期）。
+- 能力：`pageObservation`（服务端 `/v1/insights` 路由 + dist 分析入口）、`numericExport`
+  （`buildInsightExport` 在包内 dist）、`displayDownload`（`buildDisplayExport` + `/v1/insights/export`
+  路由 + `download(` + 浏览器 `downloadUsageObservation` 同时存在）。库里有函数但产品没路由，只算
+  库能力，不算可下载。
+- `--expect` 声明期望能力：缺失时 exit 3 并列出 `capability_missing`；`--expect-sha256`/`--expect-build`
+  与归档不符时 exit 5。归档过大（`--max-archive-bytes`，默认 512 MiB）或不合法时 exit 5，不先解压。
+
+`verify --dto <served.json>`（`--format json|markdown`）核对 coordinator 服务的 `usage-observation/1`
+文档并输出**仅元数据**的支持摘要：scope/window/summary id/覆盖/每行 id/层/单位/是否有值/样本数；
+不复制 formatted 值、label、detail 或路径，也不把它们反解成数字。
+
 ## 输出安全
 
 - bundle/报告以 `0600` **独占创建**：目标已存在、目标是符号链接、父目录是符号链接、父目录不存在或不可写，

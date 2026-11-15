@@ -1,0 +1,122 @@
+{
+  "protocol": "usage-insights-support-summary/1",
+  "observationProtocol": "usage-observation/1",
+  "status": "ready",
+  "summaryId": "8f41fba66bf9100bfd50ecc6579dc64437a8a8cc95d496879c557b73d278ac25",
+  "observedAt": "2026-11-15T15:26:16.206Z",
+  "days": 7,
+  "timezone": "UTC",
+  "window": {
+    "from": "2026-11-08T15:26:16.206Z",
+    "to": "2026-11-15T15:26:16.206Z"
+  },
+  "scope": {
+    "projectIds": [
+      "project-arcade",
+      "project-beacon"
+    ],
+    "aggregation": "declared_multi_project",
+    "label": "本次 2 个项目"
+  },
+  "coverage": "部分覆盖",
+  "coverageState": "partial",
+  "counts": {
+    "rows": 12,
+    "withValue": 8,
+    "unknown": 4,
+    "sampleCount": 2
+  },
+  "rows": [
+    {
+      "rowId": "execution.durationMs@controlled@",
+      "layer": "controlled",
+      "unit": "ms",
+      "hasValue": false,
+      "sampleCount": 0
+    },
+    {
+      "rowId": "interventions.acceptances@product@",
+      "layer": "observed",
+      "unit": "",
+      "hasValue": true,
+      "sampleCount": 2
+    },
+    {
+      "rowId": "interventions.answers@product@",
+      "layer": "observed",
+      "unit": "",
+      "hasValue": true,
+      "sampleCount": 2
+    },
+    {
+      "rowId": "interventions.questions@product@",
+      "layer": "observed",
+      "unit": "",
+      "hasValue": true,
+      "sampleCount": 2
+    },
+    {
+      "rowId": "interventions.total@product@",
+      "layer": "observed",
+      "unit": "",
+      "hasValue": true,
+      "sampleCount": 2
+    },
+    {
+      "rowId": "outcomes.accepted@controlled@",
+      "layer": "controlled",
+      "unit": "",
+      "hasValue": true,
+      "sampleCount": 2
+    },
+    {
+      "rowId": "outcomes.count@controlled@",
+      "layer": "controlled",
+      "unit": "",
+      "hasValue": true,
+      "sampleCount": 2
+    },
+    {
+      "rowId": "queue.waitMs@controlled@",
+      "layer": "controlled",
+      "unit": "ms",
+      "hasValue": false,
+      "sampleCount": 0
+    },
+    {
+      "rowId": "review.activeMs@controlled@",
+      "layer": "controlled",
+      "unit": "ms",
+      "hasValue": true,
+      "sampleCount": 2
+    },
+    {
+      "rowId": "review.readyToAcceptanceMs@controlled@",
+      "layer": "controlled",
+      "unit": "ms",
+      "hasValue": true,
+      "sampleCount": 2
+    },
+    {
+      "rowId": "usage.inputTokens@controlled@",
+      "layer": "controlled",
+      "unit": "tokens",
+      "hasValue": false,
+      "sampleCount": 0
+    },
+    {
+      "rowId": "usage.outputTokens@controlled@",
+      "layer": "controlled",
+      "unit": "tokens",
+      "hasValue": false,
+      "sampleCount": 0
+    }
+  ],
+  "limitations": [
+    "仅统计现有工作证据；未记录的执行耗时、排队、用量与成本保持未知。",
+    "界面可见审阅时长是部分活动代理，不是人工工时或效率收益。"
+  ],
+  "numericValues": false,
+  "note": "Display document: the served values are formatted strings. This summary carries metadata only; it is not a numeric analysis result.",
+  "authorization": "none"
+}
