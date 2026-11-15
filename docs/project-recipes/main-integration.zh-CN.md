@@ -128,11 +128,11 @@ node tools/project-recipes/cli.ts --config <config.json> --root <绝对项目根
 
 | 项 | 状态 |
 | --- | --- |
-| 纯库 `matchRecipe` / 结果 schema / revision 校验 / 原子 scope / 内容摘要 | 已实现并通过 67 项库测试 |
+| 纯库 `matchRecipe` / 结果 schema / revision 校验 / 原子 scope / 内容摘要 / 时间与预算校验 | 已实现并通过 75 项库测试 |
 | 只读 facts observer（注册根 port，无任意 root）+ CLI | 已实现并通过测试；CLI 26 项 |
 | `create_work` 命令候选 + 过期保护（精确 staleInputs） | 已实现 |
 | 真实 `createProductApplication` 消费者（same-config dispatch） | 已实现：`recorded`；子路径原子 `forbidden` |
-| main 实际 HTTP/App 组合 | **已接入**（0073：`POST /v1/projects/:id/recipes/preview`、原 NewWorkForm 预填、创建前重验、两项目原委托/人工接受） |
+| main 实际 HTTP/App 组合 | **已接入**（0073/0076/0077：`POST /v1/projects/:id/recipes/preview`、工作台建议、原 NewWorkForm 预填、创建前重验、两项目原委托/人工接受；本轮 clean-source 8/8 浏览器流程） |
 | main 契约 `ProjectRecipePreviewInput/Fields/Preview` | 已对齐（`ProjectRecipeFieldsSchema` 通过；`factsContentDigest` 与 main 公式一致） |
 | F 实际表单呈现 | 由 F 消费 main 的 preview 结果；J 只提供字段 |
 | 模型提案路径复用 | 不适用：配方不是模型提案 |

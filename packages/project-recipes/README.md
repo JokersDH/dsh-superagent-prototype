@@ -27,9 +27,14 @@ application's existing preview and explicit user confirmation.
 
 - **Deterministic.** No clock, environment, filesystem or network access inside `matchRecipe`; `now`
   is an input. Identical input yields identical bytes and `revision`.
-- **Content and time are separate.** `provenance.facts.contentDigest` stays equal for a fresh read of
-  unchanged bytes, so an applied draft survives re-observation; a changed file or an observation
-  beyond the freshness budget is refused. The timestamp is never an authorization.
+- **Content and time are separate, and time is always checked.** `provenance.facts.contentDigest`
+  stays equal for a fresh read of unchanged bytes, so an applied draft survives re-observation, but a
+  future or expired observation, an expired scope, an unsupported/malformed current configuration or
+  an invalid clock is refused — omitting `now` does not skip the check. The timestamp is never an
+  authorization.
+- **Budgets are validated.** `MetadataLimits` must be safe integers inside `MAX_METADATA_LIMITS`;
+  zero, negative, fractional, `NaN`, `Infinity` or oversized values are refused, and observations
+  record field-level `omissions` with reasons instead of an empty list that looks complete.
 - **References already exist.** Project id, scope atoms, profile and criteria come from the current
   configuration; a machine criterion must name a check the configuration lists as registered.
 - **Scope is atom containment, not prefixes.** The application compares `allowedPaths`/`excludedPaths`
@@ -98,7 +103,7 @@ the non-mutating form.
 ## Distribution
 
 `exports["."]` points at `dist/index.js` / `dist/index.d.ts`; `files: ["dist", "README.md"]`.
-`npm pack --dry-run` yields 34 files (~39 KB) with no `src/`, `tools/` or tests, and every `dist` import is a Node builtin, `@personal-agent/contracts`, `zod` or a sibling module (asserted by `test/distribution.case.ts`). Runtime dependencies
+`npm pack --dry-run` yields 34 files (~41 KB) with no `src/`, `tools/` or tests, and every `dist` import is a Node builtin, `@personal-agent/contracts`, `zod` or a sibling module (asserted by `test/distribution.case.ts`). Runtime dependencies
 are `@personal-agent/contracts` (workspace) and `zod`; everything else is a Node builtin.
 
 ## Ownership

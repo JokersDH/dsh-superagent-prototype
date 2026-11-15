@@ -2,13 +2,76 @@
 
 工作树 `/Users/hh/Desktop/joker/superagent-agent-j`，分支 `codex/g5-project-recipes`。
 
-- 当前（wave-29）机读状态：[wave29-status.json](wave29-status.json)
+- 当前（wave-30）机读状态：[wave30-status.json](wave30-status.json)
+- 历史（wave-29）：[wave29-status.json](wave29-status.json)
 - 历史（wave-28）：[wave28-status.json](wave28-status.json)
 - 历史（wave-27）：[wave27-status.json](wave27-status.json)
 
 ---
 
-# wave-29（2026-11-15）
+# wave-30（2026-11-15）
+
+起点 `bd027a44`，合并 `origin/main`（wave-30 派工 `6f385a54`，含 0076/0077 工作台组合）后按 `agent-tasks/product-wave-30/agent-j-project-recipes.zh-CN.md` 执行四个完整子系统成果。main 本轮按 `bd027a44` 原字节更新了我 5 个 src，并在预览里使用 `factsContentDigest` 与服务端时间；本轮只改 J-owned 缺陷，不重造 HTTP/matcher。
+
+## 1. 通用 freshness 与输入兼容（P2 关闭）
+
+wave-30 复核指出：`assertDraftCurrent` 只测「过去」，同内容但 `observedAt` 在未来（如 2099）仍能通过 `now` 校验。现在的规则：
+
+- **时间总是被核**：不传 `now` 时使用真实时钟，调用方无法靠省略 `now` 假装已核当前；未来观察或超过保留期（默认 60 分钟）都被拒绝。
+- `now` 无法解析、`maxFactsAgeMs` 负数/小数/NaN/Infinity → `invalid_clock`。
+- 当前配置用公开 schema **重新解析**：版本不支持、结构损坏、项目被移除 → `stale_inputs`（`configuration`），不再只信任 `revision` 字符串。
+- 生成阶段：项目授权 `expiresAt` 已过 → `needs_input: project_scope_expired`；复用阶段：草稿 scope/配置授权过期 → `stale_inputs`（`staleInputs` 含 `expiry`）。
+- 旧草稿（缺 `provenance.facts.contentDigest`）→ `stale_draft_version`，明确要求重新生成。
+- 同内容、更新观察时间仍可通过（`contentDigest` 不变）；内容变化仍拒绝。
+
+## 2. 有界读取与版本治理
+
+- `MetadataLimits` 自身被校验：`0`/负数/小数/`NaN`/`Infinity`/超过硬上界（JSON 16 MiB、锁 64 MiB、64 文件、128 MiB）→ `invalid_limits`，不能靠配置预算绕过边界。
+- 观察结果新增 `omissions: [{field, reason}]`（`too_large`/`truncated`/`unsupported`/`not_observed`），空列表不再看起来像完整来源。
+- `lstat`↔`fstat` 的 `dev/ino/size` 与读后 `size/mtime` 检查、NOFOLLOW、普通文件、根校验、注册 root 全部保留；重复有界读取确定性稳定且只读。
+- 未知 stack/manager/版本仍 `needs_input`/`unsupported`；monorepo 不猜成员；只引用已登记 check/profile。
+
+## 3. 三模板到真实多项目消费
+
+- 在一个真实 `createProductApplication` 内，三类模板 × 两个项目全部 `dispatch` `recorded`；跨项目原子 → `needs_input`。
+- 同名不同 ID、不同 profile/check/scope、goal 编辑只改 goal：测试覆盖；字段继续通过 main 发布的 `ProjectRecipePreviewInput/Fields/Preview` schema。
+- main 的真实链路（HTTP preview → 工作台建议 → 原表单预填 → 创建前重验 → 原 `create_work` → 候选 → 人工接受）本轮独立复跑：Node 集成 5/5，浏览器 8/8（clean source `11bf0d46`，两个 controlled work 被明确接受）。
+
+## 4. 实际验证（本机，Node 24.21.0）
+
+| 命令 | exit | 结果 |
+| --- | --- | --- |
+| `./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.json` | 0 | strict |
+| `node --test packages/project-recipes/test/*.case.ts` | 0 | 75 tests / 75 pass |
+| `./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.build.json` | 0 | dist |
+| `./node_modules/.bin/tsc -p tools/project-recipes/tsconfig.json` | 0 | strict |
+| `node --test tools/project-recipes/test/*.case.ts` | 0 | 26 tests / 26 pass |
+| `node packages/project-recipes/examples/preview-consumer.ts` | 0 | 三态自检 |
+| `node --test tests/integration/project-recipes.case.mjs` | 0 | main 真实链路 5/5 |
+| `node tests/integration/project-recipes-browser.mjs reports/project-recipes/wave30-browser` | 0 | main 工作台流程 8/8，clean source，2 个人工接受 |
+| `node agent-tasks/product-wave-30/verify.mjs` | 0 | 静态派工校验 |
+| `npm pack --dry-run` | 0 | 34 files / 41,948 bytes（dist+README） |
+
+## 5. 分层与未达
+
+| 层 | 状态 |
+| --- | --- |
+| source | PASS（75 库 / 26 工具 / strict / build / example / 派工校验） |
+| controlled | PASS（真实 Application 三模板×两项目；main 5 集成；main 8 浏览器 clean source） |
+| installed | NOT_REACHED（无安装包；仅 pack 列表） |
+| native | NOT_APPLICABLE（真实 vendor/model/native = 0） |
+| value | NOT_CLAIMED |
+| activation | PASS_PRODUCT_PATH_CONTROLLED（main 实际 HTTP/工作台/原表单已存在并通过；无 installed/native 准入） |
+
+未达：F 的呈现验证（F-owned）、E 独立断言、安装包/native 结论、收益主张。
+
+## 6. main 重新导入时的差异
+
+改动文件：`src/facts.ts`、`src/observe.ts`、`src/draft.ts`、`src/match.ts`、`src/preview.ts`（另有测试/示例/文档）。新增：`facts.omissions`、`validateMetadataLimits`/`MAX_METADATA_LIMITS`、`invalid_clock`/`stale_draft_version`/`StaleInput 'expiry'`、`project_scope_expired`、`invalid_limits`。公开函数签名不变；根依赖/锁、HTTP、App、SQL 未改。main 已用服务端时间调用 `previewInputs`，新逻辑在其路径上等价且更严格（未来/过期时间会被拒绝）。
+
+---
+
+# 历史：wave-29（2026-11-15）
 
 起点 `448a414e`，合并 `origin/main`（wave-29 派工，`79525b6`；含 main `a40232e` 的 0073 接入）后按 `agent-tasks/product-wave-29/agent-j-project-recipes.zh-CN.md` 推进。**本轮不再把 main 的 HTTP/App 标为未实现**：0073 的实际入口已存在，我消费它并独立跑了 main 的集成测试。
 

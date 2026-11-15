@@ -1,0 +1,191 @@
+{
+  "protocol": "project-recipes-wave30-status/1",
+  "owner": "J",
+  "date": "2026-11-15",
+  "branch": "codex/g5-project-recipes",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-j",
+  "baseline": "bd027a4450e43dde09d5b18b4659e5028664d911",
+  "mergedOriginMain": "6f385a54 (wave-30 dispatch); includes f9bd5bc2/18e79cc3 (0076/0077 workbench composition)",
+  "packet": "agent-tasks/product-wave-30/agent-j-project-recipes.zh-CN.md",
+  "fourOutcomes": [
+    {
+      "id": "J1",
+      "title": "current facts and template reuse consistency",
+      "status": "PASS",
+      "goal": "main's registered root -> J -> workbench suggestion -> original form is the real consumer; fix generic freshness/input compatibility before shipping the stable module.",
+      "source": [
+        "packages/project-recipes/src/preview.ts",
+        "packages/project-recipes/src/match.ts",
+        "packages/project-recipes/src/draft.ts",
+        "packages/project-recipes/test/freshness.case.ts"
+      ],
+      "checks": [
+        { "command": "./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.json", "exit": 0 },
+        { "command": "node --test packages/project-recipes/test/*.case.ts", "exit": 0, "tests": 75, "pass": 75, "fail": 0 },
+        { "command": "node --test tests/integration/project-recipes.case.mjs", "exit": 0, "tests": 5, "pass": 5 },
+        { "command": "node tests/integration/project-recipes-browser.mjs reports/project-recipes/wave30-browser", "exit": 0, "observed": "8/8 PASS, sourceCommit 11bf0d46, sourceWorktreeClean true, two accepted works" }
+      ],
+      "actualActions": [
+        "The wave-30 P2 is closed: revalidation now always checks time (real clock when now is omitted), so identical content with a future observedAt is refused; invalid now/maxFactsAgeMs -> invalid_clock.",
+        "Current configuration is re-parsed with the public schema: unsupported version, malformed body or a removed project is stale configuration instead of trusting a bare revision.",
+        "An expired project scope is needs_input project_scope_expired at generation and stale expiry at reuse.",
+        "Drafts without provenance.facts.contentDigest are refused with stale_draft_version."
+      ],
+      "consumer": "main 0073/0076/0077 HTTP + workbench + original form; main's 5-case integration test and 8-case browser flow executed against this source.",
+      "notReached": ["F-owned presentation behaviour verification", "E independent assertions"]
+    },
+    {
+      "id": "J2",
+      "title": "bounded reads and version governance for real projects",
+      "status": "PASS",
+      "goal": "Reliable Node module around repeated reads, file replacement and missing capabilities; no new scanner or install system.",
+      "source": [
+        "packages/project-recipes/src/observe.ts",
+        "packages/project-recipes/src/facts.ts",
+        "packages/project-recipes/test/observe.case.ts"
+      ],
+      "checks": [
+        { "command": "node --test packages/project-recipes/test/observe.case.ts", "exit": 0, "tests": 22, "pass": 22 },
+        { "command": "./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.build.json", "exit": 0 }
+      ],
+      "actualActions": [
+        "MetadataLimits themselves are validated: zero, negative, fractional, NaN, Infinity and oversized budgets are invalid_limits, so a caller cannot lift a read bound.",
+        "Observations carry bounded field-level omissions (too_large / truncated / unsupported / not_observed) so an empty list never looks like a complete source.",
+        "lstat/open inode+size and post-read size/mtime checks, NOFOLLOW, regular-file, whitelist and root checks are retained; repeated bounded reads of the same tree stay deterministic and read-only.",
+        "Unknown stack/manager/version remain needs_input/unsupported; monorepo members are never guessed; only registered checks/profiles are referenced."
+      ],
+      "consumer": "main's ProductProjectRecipes via createProjectFactsObserver (registered root only, no arbitrary path).",
+      "notReached": ["runtime/native admission", "installed package verdict"]
+    },
+    {
+      "id": "J3",
+      "title": "templates to real multi-project user work",
+      "status": "PASS",
+      "goal": "Three practical templates and the current Application/Workspace/CheckRegistry produce actual delegation input for two different projects.",
+      "source": [
+        "tools/project-recipes/test/actual-application.case.ts",
+        "tools/project-recipes/test/main-contract.case.ts"
+      ],
+      "checks": [
+        { "command": "node --test tools/project-recipes/test/*.case.ts", "exit": 0, "tests": 26, "pass": 26 },
+        { "command": "node --test tests/integration/project-recipes.case.mjs", "exit": 0, "tests": 5, "pass": 5, "observed": "two previews through original Work/check/currentCandidate/manualaccept" }
+      ],
+      "actualActions": [
+        "regression_fix, scoped_change and verification_followup all run on two projects inside one real createProductApplication and every dispatch is recorded; a cross-project atom is needs_input.",
+        "Same display name with different IDs keeps separate provenance, criteria and revision; user goal edits change only the goal.",
+        "Fields remain aligned with main's published ProjectRecipePreviewInput/Fields/Preview schemas; no fabricated model proposal and no command ledger.",
+        "main's browser flow confirms preview/apply only prefill the original form, a changed fact refuses creation until re-applied, and two explicit creates reach original candidates and manual acceptance."
+      ],
+      "consumer": "Original main HTTP/App/form plus the original Application; J does not modify App, HTTP or E assertions.",
+      "notReached": ["installed/native/recovered paths", "value benefit claims"]
+    },
+    {
+      "id": "J4",
+      "title": "packaged module and colleague handoff",
+      "status": "PASS",
+      "goal": "Deliver an installable runtime/CLI/docs/API with a same-package tuple usable by main/D/E.",
+      "source": [
+        "packages/project-recipes/package.json",
+        "packages/project-recipes/test/distribution.case.ts",
+        "docs/project-recipes",
+        "reports/project-recipes"
+      ],
+      "checks": [
+        { "command": "npm pack --dry-run", "exit": 0, "observed": "34 files / 41,948 bytes, only dist/ + README.md" },
+        { "command": "node packages/project-recipes/examples/preview-consumer.ts", "exit": 0 },
+        { "command": "node agent-tasks/product-wave-30/verify.mjs", "exit": 0 }
+      ],
+      "actualActions": [
+        "Source/dist/exports stay consistent; a test asserts every dist import is a builtin, contracts, zod or a sibling, and that the package ships only dist+README.",
+        "Documentation covers the new time/clock/config/expiry policy, budget bounds, omissions, error codes, main 0073/0076/0077 consumption and fresh reproduce commands.",
+        "D closure: contracts -> project-recipes build order and the runtime dependency list are stated for a successor package; E must bind the exact successor tuple, historical 1fba or earlier pack listings do not certify this source.",
+        "Root workspace importer/lock remain main-owned; J changed neither."
+      ],
+      "consumer": "D packaging, E independent installed checks (by exact tuple), main re-import of the changed files.",
+      "notReached": ["packaged installation", "independent installed verdict for this source"]
+    }
+  ],
+  "layers": {
+    "source": {
+      "status": "PASS",
+      "evidence": ["packages/project-recipes", "tools/project-recipes"],
+      "note": "strict typecheck 0, 75 package tests, 26 tools tests, build 0, example 0, wave-30 dispatch verifier 0."
+    },
+    "controlled": {
+      "status": "PASS_CONTROLLED_CONFIG",
+      "evidence": [
+        "tools/project-recipes/test/actual-application.case.ts",
+        "tests/integration/project-recipes.case.mjs",
+        "reports/project-recipes/wave30-browser/browser-report.json"
+      ],
+      "note": "Real ProductStore/createProductApplication (three templates x two projects), main's 5 integration cases, and main's 8 browser cases from clean source 11bf0d46 with two accepted works. Controlled fixture mode; zero real model/native turns."
+    },
+    "installed": { "status": "NOT_REACHED", "note": "No packaged installation produced; npm pack --dry-run only lists contents." },
+    "native": { "status": "NOT_APPLICABLE", "note": "Real vendor/model/native turns: 0." },
+    "value": { "status": "NOT_CLAIMED", "note": "No benefit, time-saving or quality claim; only field-level observation and product-path evidence." },
+    "activation": {
+      "status": "PASS_PRODUCT_PATH_CONTROLLED",
+      "note": "main's actual HTTP/workbench/original form and the original Completion/manual accept were exercised in controlled mode; no installed/native admission and no user-service restart."
+    }
+  },
+  "evidence": {
+    "package": { "typecheckExit": 0, "tests": 75, "pass": 75, "fail": 0, "buildExit": 0 },
+    "tools": { "typecheckExit": 0, "tests": 26, "pass": 26, "fail": 0 },
+    "exampleExit": 0,
+    "wave30VerifierExit": 0,
+    "mainIntegration": { "command": "node --test tests/integration/project-recipes.case.mjs", "exit": 0, "tests": 5, "pass": 5 },
+    "mainBrowser": { "command": "node tests/integration/project-recipes-browser.mjs reports/project-recipes/wave30-browser", "exit": 0, "cases": 8, "pass": 8, "sourceCommit": "11bf0d46", "sourceWorktreeClean": true, "acceptedWorks": 2 },
+    "packDryRun": { "files": 34, "bytes": 41948, "contains": ["dist/", "README.md"] }
+  },
+  "handoff": {
+    "changedPackageFilesForReimport": [
+      "packages/project-recipes/src/facts.ts",
+      "packages/project-recipes/src/observe.ts",
+      "packages/project-recipes/src/draft.ts",
+      "packages/project-recipes/src/match.ts",
+      "packages/project-recipes/src/preview.ts"
+    ],
+    "newPublicExports": ["validateMetadataLimits", "MAX_METADATA_LIMITS", "FACT_OMISSION_REASONS", "FACT_FIELDS"],
+    "newContracts": [
+      "facts.omissions: [{ field, reason }] (bounded)",
+      "PreviewError codes: invalid_clock, stale_draft_version; StaleInput 'expiry'",
+      "RecipeDraftError code: stale_draft_version",
+      "issue code: project_scope_expired",
+      "MetadataRefusalCode: invalid_limits"
+    ],
+    "mainMustKeep": ["root workspace importer/lock (unchanged by J)", "registered-root lookup", "HTTP/workbench/form authority", "server-generated observation time"],
+    "dConsumes": ["build order contracts -> project-recipes", "dist closure: builtins + @personal-agent/contracts + zod"],
+    "eConsumes": ["exact packaged tuple for this source only"],
+    "reproduce": [
+      "./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.json && node --test packages/project-recipes/test/*.case.ts",
+      "./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.build.json",
+      "./node_modules/.bin/tsc -p tools/project-recipes/tsconfig.json && node --test tools/project-recipes/test/*.case.ts",
+      "pnpm -r --workspace-concurrency=2 run build && node --test tests/integration/project-recipes.case.mjs",
+      "node tests/integration/project-recipes-browser.mjs reports/project-recipes/wave30-browser",
+      "node packages/project-recipes/examples/preview-consumer.ts"
+    ]
+  },
+  "notReached": [
+    "F-owned presentation behaviour verification for recipe fields",
+    "E independent product-acceptance assertions",
+    "packaged installation and installed verdict",
+    "real model/native/runtime admission",
+    "value/efficiency claims"
+  ],
+  "limits": {
+    "realModelTurns": 0,
+    "nativeTurns": 0,
+    "vendorCalls": 0,
+    "dependencyInstalls": 0,
+    "executedProjectCommands": 0,
+    "checkRegistrations": 0,
+    "sqlWrites": 0,
+    "executionLifecycles": 0,
+    "userServicesTouched": 0,
+    "newWorktreesCreated": 0
+  },
+  "ownership": {
+    "owned": ["packages/project-recipes/", "tools/project-recipes/", "docs/project-recipes/", "reports/project-recipes/"],
+    "untouchedByDesign": ["pnpm-lock.yaml", "root package.json", "packages/contracts/", "apps/", "A/B/C/D/E/F/G/H/I paths"]
+  }
+}

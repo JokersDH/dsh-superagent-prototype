@@ -82,7 +82,7 @@ fixture 与 native 的区分由配置决定，本模块不参与判定，但保�
 - `scripts` 只有**名字**（排序去重、最多 512 条）；脚本正文从不读取，也不会出现在输出里。
 - `locks` 只记录白名单文件名与摘要；锁文件内容不解析。
 - `manager: { kind: "unknown" }` 表示「没能确定」，不是「没有」；`none` 才是「确认没有声明也没有锁文件」。
-- `missing` 列出观察缺口；缺口不会被补成默认值。
+- `missing` 列出观察缺口；`omissions` 给出字段级原因（`too_large`/`unreadable`/`unsupported`/`truncated`/`not_observed`），空列表不假装来源完整。缺口不会被补成默认值。
 - `provenance.authority` 恒为 `none`：事实是数据，不含执行许可。
 - `observedAt` 由调用方给出；`matchRecipe` 用调用方传入的 `now` 判断是否过期（默认 60 分钟），因此结果可复现。
 
@@ -114,7 +114,14 @@ const { facts, notes } = observer.observe({ projectId, observedAt: new Date().to
 | `provenance.facts.observedAt` | 本次观察时间 | 新鲜度；不是授权 |
 
 - 同一份字节读两次（时间不同）→ `contentDigest` 相同、`digest` 不同；内容变化（即使文件长度不变）→ 两者都变。
-- 复用规则：`previewInputs(draft, { configuration, facts })` 只比较内容；传入更新的 `observedAt` 不会让相同内容失效。若调用方同时给出 `now`，超过保留期限（默认 60 分钟）的观察会被拒绝——旧观察不能升级为新的授权。
+- 复用规则：`previewInputs(draft, { configuration, facts, now })` 比较内容，并**总是**核对时间：
+  - 传入更新的 `observedAt` 但内容相同不会失效；
+  - 观察时间在**未来**、或超过保留期限（默认 60 分钟）都会被拒绝；
+  - 调用方不传 `now` 时使用真实时钟，不会因此跳过时间检查；
+  - `now` 无法解析或 `maxFactsAgeMs` 非法 → `invalid_clock`，不被当成"当前"；
+  - `draft.scope.expiresAt` 已过（或当前配置项目授权已过期）→ `stale_inputs` 且 `staleInputs` 含 `expiry`。
+- 当前配置会用公开 schema **重新解析**：未知版本或结构损坏按 `configuration` 过期处理，不信任裸 `revision` 字符串。
+- 旧草稿（缺少 `provenance.facts.contentDigest`）按 `stale_draft_version` 明确拒绝并提示重新生成。
 - 导出 `factsContentDigest(facts)`，与 main 预览契约里的算法一致（`canonicalDigest(facts 去掉 observedAt)`），由 `tools/project-recipes/test/main-contract.case.ts` 对齐校验。
 - 摘要只是观察身份，不是命令 token、批准或执行结果；`authorization` 始终 `none`。
 
@@ -124,7 +131,7 @@ const { facts, notes } = observer.observe({ projectId, observedAt: new Date().to
 - 只打开根目录下白名单名字：`package.json`、`tsconfig.json`、`pnpm-workspace.yaml`、`package-lock.json`、`pnpm-lock.yaml`、`npm-shrinkwrap.json`、`yarn.lock`、`bun.lockb`、`pyproject.toml`、`go.mod`、`Cargo.toml`、`pom.xml`、`build.gradle`。不递归、不进子目录。
 - 每次都 `O_NOFOLLOW` + `fstat`：符号链接、非普通文件一律拒绝。
 - 打开前后比对 `dev/ino/size`，读完再比对 `size/mtime`：文件在读取期间被替换或改写时以 `replaced` / `changed_during_read` 拒绝，不会把不完整的内容当完整事实。
-- 默认上限：`package.json` 256 KiB，锁文件 4 MiB，最多读 12 个文件，整次观察 8 MiB；超出即拒绝。
+- 默认上限：`package.json` 256 KiB，锁文件 4 MiB，最多读 12 个文件，整次观察 8 MiB；上限本身也受校验：`MetadataLimits` 必须是有限安全整数且在允许范围内，`0`/负数/小数/`NaN`/`Infinity`/超大预算一律 `invalid_limits`，不能靠配置预算绕过边界。
 - 只解析 `package.json` 的 JSON；YAML/锁文件只做存在性判断或有界哈希。
 - 不读 home、环境变量、`.npmrc`、凭据；不执行 `--version` 或任何项目脚本。
 
@@ -228,6 +235,7 @@ node tools/project-recipes/cli.ts … --output /tmp/recipe-draft.json
 | `project_discussion_only` / `project_dispatch_blocked` | needs_input | 只读讨论 / 项目不可派工 |
 | `execution_unavailable` | needs_input | 配置声明执行不可用 |
 | `profile_required` / `profile_not_enabled` | needs_input | 无默认 profile / 指定 profile 未启用 |
+| `project_scope_expired` | needs_input | 项目授权 `expiresAt` 已过期（生成阶段即拒绝） |
 | `criteria_machine_required` | needs_input | 所选 criteria 没有必需的已登记机器检查 |
 | `criteria_check_unregistered` | unsupported | criteria 引用了未登记检查（防御性） |
 | `criteria_selection_unknown` | needs_input | 指定的 criteria id 不在默认集合 |
@@ -301,6 +309,12 @@ const command = toCreateWorkCommand(draft, { commandId, conversationId })
 | 未知 kind | `RecipeInputError: unknown_kind`（CLI exit 2） |
 | facts 多余字段/错误协议 | `RecipeInputError: invalid_facts`（CLI exit 5） |
 | `package.json` 是符号链接/目录/超限/坏 JSON | `symlink` / `not_regular_file` / `too_large` / `invalid_json`（exit 5） |
+| facts 观察时间在未来 / 超过保留期 | `stale_inputs`（`staleInputs: ['facts']`） |
+| `now` 无法解析 / `maxFactsAgeMs` 非法 | `invalid_clock` |
+| 当前配置版本不支持 / schema 损坏 / 项目被移除 | `stale_inputs`（`staleInputs: ['configuration']`） |
+| 草稿 scope 或配置授权已过期 | `stale_inputs`（`staleInputs: ['expiry']`）；生成阶段为 `needs_input: project_scope_expired` |
+| 旧版草稿（缺 `contentDigest`） | `stale_draft_version`（重新生成） |
+| `MetadataLimits` 为 0/负数/小数/NaN/Infinity/超大 | `invalid_limits`（exit 5） |
 | 根是 `/`、home、相对路径、不存在、未登记 | `root_forbidden` / `root_not_absolute` / `root_missing` / `root_not_registered`（exit 5） |
 | 读取期间文件被替换 / 被改写 | `replaced` / `changed_during_read`（exit 5） |
 | `--output` 指向已存在文件 | exit 5，原文件字节不变 |
@@ -316,6 +330,8 @@ const command = toCreateWorkCommand(draft, { commandId, conversationId })
 - 未知 facts 版本/多余字段 → 拒绝（`invalid_facts`），因为无法解释其语义。
 - 配方目录内容变化必须提升 `RECIPE_CATALOG_VERSION`；每份草稿记录 catalog 版本与摘要。
 - criteria 只引用已登记的**检查 ID**；检查的具体 revision 由原 verifier 在执行时记录，本模块不固定 revision，也不判断检查是否通过。
+- `MetadataLimits` 有硬上界（`MAX_METADATA_LIMITS`：JSON 16 MiB / 锁 64 MiB / 64 文件 / 128 MiB），超界即拒绝。
+- `facts` 增加 `omissions`；旧 facts 缺少它会被拒绝，旧草稿缺少 `contentDigest` 会被 `stale_draft_version` 拒绝。
 - 同名不同 ID 的项目不会混用：provenance、projectId、criteria 与 revision 都按真实 ID 区分。
 
 分发 closure（J-owned）：
@@ -333,7 +349,7 @@ const command = toCreateWorkCommand(draft, { commandId, conversationId })
 
 未达（如实记录）：
 
-- main 已接入并在真实产品链路通过（0073：HTTP preview、原表单预填、创建前重验、两项目原 Work/check/candidate/manualaccept）。F 的呈现与 E 的独立断言仍按各自范围，不由本包声明。
+- main 已接入并在真实产品链路通过（0073/0076/0077：HTTP preview、工作台建议、原表单预填、创建前重验、两项目原 Work/check/candidate/manualaccept；本轮 clean source 8/8 浏览器流程由 main 入口执行）。F 的呈现与 E 的独立断言仍按各自范围，不由本包声明。
 - 没有产出安装包或 installed/native 结论；本包的真实 vendor/model/native 调用为 0。
 - 不枚举 monorepo 成员（不解析 `pnpm-workspace.yaml` 内容）；只接受显式声明原子。
 - 不探测包管理器实际版本（不执行 `--version`）；只记录声明值。
@@ -351,7 +367,7 @@ pnpm --dir packages/contracts build
 
 # 纯库
 ./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.json
-node --test packages/project-recipes/test/*.case.ts     # 67 tests
+node --test packages/project-recipes/test/*.case.ts     # 75 tests
 ./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.build.json
 
 # CLI 与真实 Application 消费者（后者需要产品包构建）
@@ -362,6 +378,7 @@ node --test tools/project-recipes/test/*.case.ts        # 26 tests
 pnpm -r --workspace-concurrency=2 run build
 # 或逐个直接构建；main 的集成测试还需要 coordinator/console 依赖的 dist
 node --test tests/integration/project-recipes.case.mjs   # main 的 5 项真实链路测试
+node tests/integration/project-recipes-browser.mjs reports/project-recipes/wave30-browser  # main 的 8 项工作台浏览器流程（Playwright）
 
 # 端到端样例（draft / needs_input / unsupported）
 node tools/project-recipes/cli.ts --config tools/project-recipes/fixtures/configuration.json \
