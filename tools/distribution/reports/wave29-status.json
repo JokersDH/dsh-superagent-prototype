@@ -1,0 +1,131 @@
+{
+  "protocol": "wave29-status/1",
+  "owner": "agent-d",
+  "branch": "codex/g3-local-distribution",
+  "base": "083c4fa",
+  "mergedMain": "abb84b2",
+  "frozenSource": "1fbaf94",
+  "status": "CANDIDATE_SUCCESSOR",
+  "successor": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave29-target/wave29-target-1fbaf94.tar.gz",
+    "sha256": "daee1a94b43156cec659f7df2a3b08e1ecb89b645fde1ea81c35a81d75b47d7a",
+    "tarBytes": 20458656,
+    "buildId": "2d94a7c31ef97b57",
+    "source": {
+      "commit": "1fbaf940d426fa34ff6289304e073b9159586ed9",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "files": {
+      "count": 6849,
+      "bytes": 68407152
+    },
+    "productSchema": 18,
+    "environment": {
+      "node": "24.21.0",
+      "pnpm": "11.7.0",
+      "sqlite": "3.53.4",
+      "abi": "137",
+      "platform": "darwin",
+      "arch": "arm64"
+    }
+  },
+  "closure": "120/120",
+  "phases": {
+    "d1": {
+      "status": "PASS",
+      "summary": "Six argv cases cover normal/restored personal/fixture; requested fixture is not rewritten to personal."
+    },
+    "d2": {
+      "status": "PASS",
+      "summary": "Restored fixture actual start stays fixture/recovery_readonly with no personal flags; STOPPED and record removed."
+    },
+    "d3": {
+      "status": "PASS",
+      "summary": "Normal fixture keeps lazy --assistant with no --native; actual health fixture/normal; configured provider sends no task."
+    },
+    "d4": {
+      "status": "PASS",
+      "summary": "Fixture compatibility source plus pure/actual controls published."
+    },
+    "d5": {
+      "status": "PASS",
+      "summary": "Fixture and personal mode STOPPED with exact record removal; no force cleanup."
+    },
+    "d6": {
+      "status": "PASS",
+      "summary": "Wrong mode/root guards retained; config/state isolation not weakened."
+    },
+    "d7": {
+      "status": "PASS",
+      "summary": "Personal/same-store/J source consumers continue; no model/queue replay."
+    },
+    "d8": {
+      "status": "PASS",
+      "summary": "Functional mode closure with old personal scope preserved."
+    },
+    "d9": {
+      "status": "PASS_WITH_INSTALLED_J_LIMIT",
+      "summary": "Main 0073 J source browser 6/6; package includes J dist and API; installed J UI not rerun."
+    },
+    "d10": {
+      "status": "PASS",
+      "summary": "Build includes J/G dist; closure 120/120; J not in browser Node analysis."
+    },
+    "d11": {
+      "status": "PASS",
+      "summary": "F identity and J source both in current build; no F subtree edits."
+    },
+    "d12": {
+      "status": "PASS",
+      "summary": "Successor clean source closure and J/G dist packaged."
+    },
+    "d13": {
+      "status": "PASS",
+      "summary": "Single freeze after real runtime changes; old tars preserved."
+    },
+    "d14": {
+      "status": "PASS",
+      "summary": "Install/upgrade ordinary tests pass; cold evidence from wave28 preserved separately."
+    },
+    "d15": {
+      "status": "PASS",
+      "summary": "Noexec4/samebase3/upgrade7/data5/backup6/portable5; matrix19/multi8."
+    },
+    "d16": {
+      "status": "PASS_WITH_E_PENDING",
+      "summary": "Successor tuple and E recipe handed; E independent pending."
+    }
+  },
+  "testLayers": {
+    "fixtureActual": 2,
+    "fixtureArgv": 6,
+    "jSource": 6,
+    "browser": 8,
+    "readiness": 1,
+    "personal": 7,
+    "sameStore": 4,
+    "multi": 8,
+    "matrix": 19,
+    "noexec": 4,
+    "samebase": 3,
+    "upgrade": 7,
+    "data": 5,
+    "backup": 6,
+    "portable": 5
+  },
+  "notDone": [
+    "installed J UI end-to-end",
+    "E successor independent verdict",
+    "B/private/target"
+  ],
+  "limits": [
+    "zero real vendor/model/native turns",
+    "installed J UI not rerun",
+    "bounded observations only"
+  ],
+  "evidence": [
+    "tools/distribution/reports/wave29/*",
+    "tools/distribution/recipes/wave29-e-acceptance.zh-CN.md"
+  ]
+}

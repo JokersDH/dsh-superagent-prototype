@@ -1,0 +1,53 @@
+{
+  "protocol": "wave14-personal-no-executor/1",
+  "status": "PASS",
+  "startedAt": "2026-11-15T05:23:49.889Z",
+  "steps": [
+    {
+      "id": "personal-not-fixture",
+      "status": "PASS",
+      "detail": {
+        "healthMode": "personal",
+        "recordMode": "personal",
+        "buildId": "2d94a7c31ef97b57"
+      }
+    },
+    {
+      "id": "execution-degraded-explicit",
+      "status": "PASS",
+      "detail": {
+        "executionAvailability": {
+          "state": "unavailable",
+          "reason": "operator_disabled"
+        },
+        "anyDispatchDisabled": true
+      }
+    },
+    {
+      "id": "dispatch-refused",
+      "status": "PASS",
+      "detail": {
+        "httpStatus": 422,
+        "code": "unsupported_capability"
+      }
+    },
+    {
+      "id": "cold-stop",
+      "status": "PASS",
+      "detail": {
+        "status": "STOPPED"
+      }
+    }
+  ],
+  "limitations": [
+    "The empty HOME/PATH removes Codex discovery; this is the no-executor input, not a native/profile reset.",
+    "Only a loopback fixture-free personal instance on isolated roots is started; no model request is made."
+  ],
+  "build": {
+    "buildId": "2d94a7c31ef97b57",
+    "commit": "1fbaf940d426fa34ff6289304e073b9159586ed9",
+    "schema": 18,
+    "dirty": false
+  },
+  "finishedAt": "2026-11-15T05:23:52.466Z"
+}

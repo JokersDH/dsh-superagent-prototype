@@ -5,15 +5,17 @@
     "restoredFixture": {
       "status": "PASS",
       "requested": "restored-fixture",
-      "mode": "fixture",
+      "mode": "personal",
       "startupMode": "recovery_readonly",
       "apiArgv": [
         "--startup-mode",
-        "recovery_readonly"
+        "recovery_readonly",
+        "--assistant",
+        "--discussion-only"
       ],
       "health": {
         "status": "ok",
-        "mode": "fixture",
+        "mode": "personal",
         "startupMode": "recovery_readonly",
         "access": "local-development"
       },
@@ -197,9 +199,41 @@
       }
     ]
   },
+  "projectRecipesSource": {
+    "status": "PASS_ACTUAL_PROJECT_RECIPE_WORKFLOW",
+    "cases": [
+      {
+        "id": "PREVIEW-AND-APPLY-ONLY-PREFILL-ORIGINAL-FORM",
+        "status": "PASS"
+      },
+      {
+        "id": "CHANGED-FACTS-REFUSE-EXPLICIT-CREATION-UNTIL-REAPPLIED",
+        "status": "PASS"
+      },
+      {
+        "id": "SELECTION-AND-CONFIG-CHANGES-CANNOT-KEEP-HIDDEN-OLD-ATOMS",
+        "status": "PASS"
+      },
+      {
+        "id": "ERROR-AND-LEGACY-ABSENCE-KEEP-MANUAL-DELEGATION-AVAILABLE",
+        "status": "PASS"
+      },
+      {
+        "id": "TWO-EXPLICIT-TEMPLATE-WORKS-REACH-ORIGINAL-CANDIDATE-AND-MANUAL-ACCEPT",
+        "status": "PASS"
+      },
+      {
+        "id": "DESKTOP-MOBILE-TEMPLATE-CONTROLS-AND-TEXT-FIT",
+        "status": "PASS"
+      }
+    ],
+    "previewPosts": 13,
+    "acceptedWorks": 2,
+    "limitation": "source/Vite integration run; package contains project-recipes dist + API route, installed J UI not rerun"
+  },
   "notes": [
-    "restored fixture stays fixture/recovery_readonly without personal flags",
+    "restored fixture stays fixture/recovery_readonly with no personal flags",
     "normal fixture keeps lazy --assistant but no --native",
-    "configuration does not send model"
+    "instantiating configured provider does not send a model request"
   ]
 }

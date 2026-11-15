@@ -1,0 +1,40 @@
+{
+  "protocol": "wave29-artifacts/1",
+  "successor": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave29-target/wave29-target-1fbaf94.tar.gz",
+    "sha256": "daee1a94b43156cec659f7df2a3b08e1ecb89b645fde1ea81c35a81d75b47d7a",
+    "tarBytes": 20458656,
+    "buildId": "2d94a7c31ef97b57",
+    "source": {
+      "commit": "1fbaf940d426fa34ff6289304e073b9159586ed9",
+      "branch": "codex/g3-local-distribution",
+      "dirty": false
+    },
+    "files": {
+      "count": 6849,
+      "bytes": 68407152
+    },
+    "productSchema": 18,
+    "environment": {
+      "node": "24.21.0",
+      "pnpm": "11.7.0",
+      "sqlite": "3.53.4",
+      "abi": "137",
+      "platform": "darwin",
+      "arch": "arm64"
+    }
+  },
+  "closure": "120/120",
+  "features": {
+    "fixtureMode": "restored fixture remains fixture/recovery; normal fixture lazy assistant preserved",
+    "projectRecipes": "J source 8 files + coordinator integration + dist packaged",
+    "usageInsights": "packaged",
+    "fApp": "installed 8/8"
+  },
+  "limits": [
+    "installed J UI flow not rerun; source J browser 6/6",
+    "E successor independent verdict pending",
+    "no native/private/target",
+    "zero real vendor/model/native turns"
+  ]
+}
