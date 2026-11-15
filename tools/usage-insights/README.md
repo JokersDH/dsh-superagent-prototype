@@ -14,6 +14,7 @@ node tools/usage-insights/cli.mjs catalogue                 # 指标目录：单
 node tools/usage-insights/cli.mjs analyze --input /abs/bundle.json [--format terminal|json|markdown] [--out /abs/out]
 node tools/usage-insights/cli.mjs report  --input /abs/bundle.json --out /abs/report.md
 node tools/usage-insights/cli.mjs verify  --input /abs/bundle.json [--expect-digest <sha256>]
+node tools/usage-insights/cli.mjs analyze --input /abs/bundle.json --days 7      # 与主线相同的滚动窗口
 node tools/usage-insights/cli.mjs collect --base-url http://127.0.0.1:<port> \
   --token-file /abs/private/token --from 2026-11-13T00:00:00Z --to 2026-11-14T00:00:00Z \
   --project project-atlas --include-attention --out /abs/bundle.json [--report /abs/report.md]
@@ -146,7 +147,7 @@ main 已实现并保留以下真实路径，G 不另建 collector：
 | --- | --- | --- |
 | 授权/reader | main | `ProductUsageObservation` 用已授权 readers 枚举 work 并读 `WorkEvidence` |
 | 上限 | main | 50 works / 10000 nested records / 2 MiB 编码字节 / 单次 2 秒 deadline |
-| 窗口 | main | `days=7|30`，`window.to = observedAt`，`from = to - days*86400000`，半开区间 |
+| 窗口 | main | `days=7|30`，`window.to = observedAt`，`from = to - days*86400000`，半开区间；CLI 的 `--days 7|30` 复现同一形状 |
 | DTO | main | `usage-observation/1`，header `sampleCount` = 枚举 work 数，行保留自身 sample/layer/unit |
 | HTTP/App | main | `GET /v1/usage-observation`（Bearer，项目范围）与试用视图按需读取 |
 | 分析/语义 | G | 记录级 scope/去重/quarantine/limits/层/币种/unknown 与 summary |

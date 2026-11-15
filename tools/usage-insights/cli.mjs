@@ -57,6 +57,7 @@ Common options
   --max-records <n>           Analysis bound on presented records; applied before parsing
   --max-works <n>             Analysis bound on attributable works
   --max-pages <n>             Analysis bound on history/attention pages
+  --days <7|30>               Use the coordinator's rolling window ending at --to (or the bundle's end)
 
 verify only
   --expect-digest <sha256>    Refuse when the bundle bytes do not match the pinned digest
@@ -101,12 +102,12 @@ const SPECS = {
   analyze: {
     input: flag(), out: flag(), format: flag(), project: flag('list'), from: flag(), to: flag(),
     timezone: flag(), baseline: flag(), 'max-input-bytes': flag(),
-    'max-records': flag(), 'max-works': flag(), 'max-pages': flag(),
+    'max-records': flag(), 'max-works': flag(), 'max-pages': flag(), days: flag(),
   },
   report: {
     input: flag(), out: flag(), format: flag(), project: flag('list'), from: flag(), to: flag(),
     timezone: flag(), baseline: flag(), 'max-input-bytes': flag(),
-    'max-records': flag(), 'max-works': flag(), 'max-pages': flag(),
+    'max-records': flag(), 'max-works': flag(), 'max-pages': flag(), days: flag(),
   },
   verify: {
     input: flag(), 'max-input-bytes': flag(), 'max-records': flag(), 'max-works': flag(), 'max-pages': flag(),
@@ -151,7 +152,15 @@ function applyOverrides(bundle, options, digest) {
       throw new UsageInsightsError('source_unavailable', 'The bundle digest does not match its own bytes; refusing to analyse a changed source')
     copy.source.digest = digest
   }
-  if (options.from || options.to) {
+  if (options.days !== undefined) {
+    // The coordinator's rolling window is exactly 7 or 30 days ending at the observation time. The CLI
+    // offers the same shape so a manual analysis can reproduce a served observation.
+    const days = options.days
+    if (!['7', '30'].includes(days)) throw new UsageError('--days must be 7 or 30')
+    const to = options.to ? parseUtc(options.to, 'to') : (copy?.window?.to ?? copy?.capturedAt)
+    if (!to) throw new UsageError('--days needs a window end or a capturedAt in the bundle')
+    copy.window = { from: new Date(Date.parse(to) - Number(days) * 86_400_000).toISOString(), to }
+  } else if (options.from || options.to) {
     const from = options.from ? parseUtc(options.from, 'from') : copy?.window?.from
     const to = options.to ? parseUtc(options.to, 'to') : copy?.window?.to
     if (!from || !to) throw new UsageError('Overriding the window needs --from and --to')

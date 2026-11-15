@@ -276,3 +276,33 @@ test('a report never republishes collection diagnostics or a secret from a bundl
   assert.equal(content.includes('SUPER-SECRET-TOKEN-VALUE'), false, 'diagnostic text stays out of the shared report')
   assert.equal(content.includes('collectionIssues'), false)
 })
+
+test('--days reproduces the coordinator rolling window and refuses other values', () => {
+  const seven = run(['analyze', '--input', complete, '--days', '7', '--format', 'json'])
+  assert.equal(seven.status, 0, seven.stderr)
+  const window = JSON.parse(seven.stdout).summary.window
+  assert.equal(Date.parse(window.to) - Date.parse(window.from), 7 * 86_400_000)
+  const thirty = run(['analyze', '--input', complete, '--days', '30', '--format', 'json'])
+  assert.equal(Date.parse(JSON.parse(thirty.stdout).summary.window.to) - Date.parse(JSON.parse(thirty.stdout).summary.window.from), 30 * 86_400_000)
+  assert.equal(run(['analyze', '--input', complete, '--days', '14']).status, 2)
+  const explicit = run(['analyze', '--input', complete, '--days', '7', '--to', '2026-11-13T12:00:00Z', '--format', 'json'])
+  assert.equal(explicit.status, 0, explicit.stderr)
+  assert.equal(JSON.parse(explicit.stdout).summary.window.to, '2026-11-13T12:00:00Z')
+})
+
+test('a canary in raw work detail never reaches the report', () => {
+  const directory = workspace()
+  const body = JSON.parse(readFileSync(complete, 'utf8'))
+  const canary = 'CANARY-7f3a9c-DO-NOT-SHARE'
+  body.workEvidence[0].entries[0].detail = { title: canary, note: canary }
+  const input = join(directory, 'canary.json')
+  writeFileSync(input, JSON.stringify(body))
+  const target = join(directory, 'report.md')
+  const result = run(['report', '--input', input, '--out', target])
+  assert.equal(result.status, 0, result.stderr)
+  const content = readFileSync(target, 'utf8')
+  assert.equal(content.includes(canary), false, 'raw source text is never republished')
+  // Source names appear in the loss table by design; raw record bodies do not.
+  assert.equal(content.includes('"detail"'), false)
+  assert.equal(content.includes('"entries"'), false)
+})
