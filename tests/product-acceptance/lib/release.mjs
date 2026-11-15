@@ -577,7 +577,7 @@ export function lifecycleNoRecordExitIssues(value) {
   if (value.clean !== true || value.legitimateExit !== true) issues.push('not_legitimate')
   if (!Array.isArray(value.signals) || value.signals.length !== 0) issues.push('signalled')
   if (!Array.isArray(value.resources) || value.resources.length !== 1) issues.push('set')
-  if (value.observedChildren !== null && value.observedChildren !== 0) issues.push('children')
+  if (Number.isSafeInteger(value.observedChildren) && value.observedChildren > 0) issues.push('children')
   return issues
 }
 export function lifecycleNoRecordReuseIssues(value) {
