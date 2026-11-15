@@ -1,7 +1,8 @@
 /** Wave-06 A2: accepted event -> exact outcome projection, no duplicate acceptance or invented facts. */
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { mkdtempSync, rmSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
+import { existsSync, mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { ProductStore, canonicalDigest, productReviewCommandId } from '@personal-agent/storage'
@@ -19,6 +20,15 @@ const timed = {
   activeReviewCompleteness: 'unknown' as const, evidenceRefs: [],
 }
 const tmp = (prefix: string): string => mkdtempSync(join(tmpdir(), prefix))
+const runCompletionConsumer = (store: ProductStore) => {
+  const cRoot = process.env.PA_C_WORKTREE ?? '/Users/hh/Desktop/joker/superagent-agent-c'
+  const driver = join(cRoot, 'packages/context/tools/wave29-completion-facts.mjs')
+  if (!existsSync(driver)) return null
+  const run = spawnSync(process.execPath, [driver, '--a-worktree', join(import.meta.dirname, '../../..'), '--db', store.database.path,
+    '--work', 'work-author', '--project', 'project-1'], { encoding: 'utf8', timeout: 20000 })
+  if (run.status !== 0) throw new Error(run.stderr || run.stdout)
+  return JSON.parse(run.stdout) as any
+}
 
 function fixture(): { store: ProductStore; seq: number; reopen(): ProductStore; path: string } {
   let dir = tmp('acceptance-')
@@ -262,5 +272,42 @@ test('reviews require canonical key and full work/contract/candidate shape; fail
       ['artifact_or_attempt_shape', 'foreign_work_or_binding', 'noncanonical_review_key', 'review_shape'])
     console.log('WAVE29_REVIEW_CLASSIFICATION', JSON.stringify({ reviews: work.completion.reviews.length,
       unclassified: work.completion.unclassifiedReviews.map(value => value.reason).sort() }))
+    const consumer = runCompletionConsumer(store)
+    if (consumer) {
+      assert.equal(consumer.status, 'ok'); assert.equal(consumer.completion.reviews.length, 1)
+      assert.equal(consumer.completion.reviews[0].canonical, true)
+      assert.equal(consumer.completion.unclassifiedReviews.length, 4)
+      console.log('WAVE30_C_COMPLETION_CONSUMER', JSON.stringify({ pid: consumer.pid, status: consumer.status,
+        reviews: consumer.completion.reviews.length, unclassified: consumer.completion.unclassifiedReviews.length }))
+    }
+  } finally { store.close(); rmSync(join(store.database.path, '..'), { recursive: true, force: true }) }
+})
+
+test('a later current epoch does not erase or reclassify an older canonical review', () => {
+  const { store } = fixture()
+  try {
+    const ports = createWorkflowPorts(store)
+    const before = ports.index.work('work-author', ['project-1'])!
+    assert.equal(before.completion.reviews.length, 1)
+    assert.equal(before.completion.reviews[0]!.bindingState, 'ended')
+    assert.equal(before.completion.reviews[0]!.currentLink, 'historical_attempt')
+    store.bindings.record({ attemptId: 'author-attempt-2', ticketId: 'author-ticket', assignmentId: 'author-assignment-2',
+      fenceEpoch: 3, contract, state: 'active', runnerIdentityRef: 'runner-2', source: 'controlled-product-fixture', resources: [] })
+    store.bindings.setCurrent('author-ticket', 'author-attempt-2')
+    const after = ports.index.work('work-author', ['project-1'])!
+    assert.equal(after.completion.reviews.length, 1)
+    assert.equal(after.completion.reviews[0]!.attemptId, 'author-attempt')
+    assert.equal(after.completion.reviews[0]!.bindingState, 'ended')
+    assert.equal(after.completion.reviews[0]!.currentLink, 'historical_attempt')
+    assert.equal(after.completion.unclassifiedReviews.length, 0)
+    const consumer = runCompletionConsumer(store)
+    if (consumer) {
+      assert.equal(consumer.completion.reviews[0].attemptId, 'author-attempt')
+      assert.equal(consumer.completion.reviews[0].bindingState, 'ended')
+      assert.equal(consumer.completion.reviews[0].currentLink, 'historical_attempt')
+    }
+    console.log('WAVE30_HISTORICAL_REVIEW', JSON.stringify({ attemptId: after.completion.reviews[0]!.attemptId,
+      bindingState: after.completion.reviews[0]!.bindingState, currentLink: after.completion.reviews[0]!.currentLink,
+      currentAttemptId: store.bindings.current('author-ticket')?.attemptId }))
   } finally { store.close(); rmSync(join(store.database.path, '..'), { recursive: true, force: true }) }
 })

@@ -619,6 +619,10 @@ export interface CompletionReviewFact {
   commandId: string; payloadDigest: string; seq: number; recordedAt: string
   proposal: Record<string, unknown>; verification: Record<string, unknown>
   artifactIds: readonly string[]; attemptId: string
+  /** The original attempt's historical binding state; historical validity is not current eligibility. */
+  bindingState: string
+  /** Whether the ticket's current pointer still names this review's attempt. Data link only. */
+  currentLink: 'current_attempt' | 'historical_attempt'
 }
 export interface CompletionVerificationFact {
   id: string; ticketId: string; assignmentId: string; candidateGeneration: number
@@ -800,11 +804,8 @@ export class WorkflowIndex {
         candidateGeneration: Number(acceptance.candidate_generation), artifactDigest: text(acceptance.artifact_digest),
         criterionIds: json<string[]>(acceptance.criterion_ids), actorRef: text(acceptance.actor_ref), acceptedAt: text(acceptance.accepted_at),
       })
-      const bindingRow = (this.db.prepare(`SELECT rb.value FROM runtime_current rc
-        JOIN runtime_bindings rb ON rb.attempt_id = rc.attempt_id WHERE rc.ticket_id = ?`).get(ticketId) as Row | undefined) ??
-        (this.db.prepare(`SELECT value FROM runtime_bindings WHERE ticket_id = ?
-          ORDER BY json_extract(value, '$.fenceEpoch') DESC, attempt_id DESC LIMIT 1`).get(ticketId) as Row | undefined)
-      const binding = bindingRow ? json<Record<string, unknown>>(bindingRow.value) : undefined
+      const currentRow = this.db.prepare('SELECT attempt_id FROM runtime_current WHERE ticket_id = ?').get(ticketId) as Row | undefined
+      const currentAttemptId = currentRow ? text(currentRow.attempt_id) : null
       for (const verification of verifications) {
         let contract: { workId: string; revision: number; digest: string }
         try { contract = json(verification.contract) } catch { unclassifiedReviews.push({ commandId: '', reason: 'verification_contract_invalid' }); continue }
@@ -819,7 +820,6 @@ export class WorkflowIndex {
         try { parsed = json<Record<string, unknown>>(receipt.result) } catch { unclassified('result_not_json'); continue }
         const keys = Object.keys(parsed).sort().join(',')
         if (keys !== 'artifactIds,attemptId,proposal,verification') { unclassified('review_shape'); continue }
-        if (!binding) { unclassified('binding_missing'); continue }
         const proposal = CompletionProposalSchema.safeParse(parsed.proposal)
         const verified = VerificationSchema.safeParse(parsed.verification)
         if (!proposal.success) { unclassified('proposal_shape'); continue }
@@ -830,6 +830,9 @@ export class WorkflowIndex {
           artifactIds.some(value => !IdSchema.safeParse(value).success) || new Set(artifactIds).size !== artifactIds.length) {
           unclassified('artifact_or_attempt_shape'); continue
         }
+        const bindingRow = this.db.prepare('SELECT value FROM runtime_bindings WHERE attempt_id = ?').get(attemptId.data) as Row | undefined
+        const binding = bindingRow ? json<Record<string, unknown>>(bindingRow.value) : undefined
+        if (!binding) { unclassified('historical_binding_missing'); continue }
         if (proposal.data.ticketId !== ticketId || proposal.data.contract.workId !== workId ||
           proposal.data.ticketId !== text(binding.ticketId) || proposal.data.assignmentId !== text(binding.assignmentId) ||
           attemptId.data !== text(binding.attemptId) || digest(proposal.data.contract) !== digest(binding.contract)) {
@@ -846,6 +849,7 @@ export class WorkflowIndex {
           commandId, payloadDigest: text(receipt.payload_digest), seq: Number(receipt.seq),
           recordedAt: text(receipt.recorded_at), proposal: proposal.data as unknown as Record<string, unknown>,
           verification: verified.data as unknown as Record<string, unknown>, artifactIds: [...artifactIds] as string[], attemptId: attemptId.data,
+          bindingState: text(binding.state), currentLink: currentAttemptId === attemptId.data ? 'current_attempt' : 'historical_attempt',
         })
       }
     }
