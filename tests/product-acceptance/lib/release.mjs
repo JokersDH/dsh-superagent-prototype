@@ -506,6 +506,29 @@ export function packagedStopIssues(value) {
     !Array.isArray(cleaned.signals) || cleaned.signals.length === 0 || cleaned.signals.some(item => item.ok !== true))) issues.push('proof_cleanup')
   return issues
 }
+/** A record may not lend another state's birth to the launcher. */
+export function lifecycleBirthRootIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (value.reason !== 'resource_scope_mismatch') issues.push('reason')
+  if (value.blocked?.label !== 'launcher' || value.blocked?.birthOk !== false) issues.push('blocked')
+  if (!Array.isArray(value.signals) || value.signals.length !== 0) issues.push('signalled')
+  if (value.alive !== true) issues.push('killed')
+  if (value.recordPresent !== true) issues.push('record_deleted')
+  if (value.birthState === value.requestedState) issues.push('same_state')
+  return issues
+}
+/** A wrong-root coordinator child blocks the whole set before the launcher is signalled. */
+export function lifecycleChildScopeIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (value.reason !== 'resource_scope_mismatch') issues.push('reason')
+  if (value.blocked?.label !== 'api' || value.blocked?.stateOk !== false) issues.push('blocked')
+  if (!Array.isArray(value.signals) || value.signals.length !== 0) issues.push('signalled')
+  if (!Array.isArray(value.alive) || value.alive.length !== 2 || !value.alive.every(Boolean)) issues.push('killed')
+  if (value.recordPresent !== true) issues.push('record_deleted')
+  return issues
+}
 export function lifecycleOwnIssues(value) {
   if (!value || typeof value !== 'object') return ['missing']
   const issues = []
@@ -1358,7 +1381,7 @@ export function evaluateRelease({
           failures.push(fail('evidence_history_invalid', `Evidence history ${issue}`, entry.id))
       }
       for (const [key, fn] of [['contextUse', contextUseIssues], ['sse', contextSseIssues], ['guards', contextGuardIssues], ['sourceConfirm', sourceConfirmIssues], ['sourceConfirmRefusal', sourceConfirmRefusalIssues], ['candidateFlow', candidateFlowIssues], ['history', contextHistoryIssues], ['sources', contextSourcesIssues], ['contextUi', contextUiIssues], ['concurrency', concurrencyIssues], ['schemaMigration', schemaMigrationIssues], ['legacyMigration', legacyMigrationIssues], ['frozenScope', frozenScopeIssues], ['ownershipCopy', ownershipCopyIssues], ['ownershipMocks', ownershipMocksIssues], ['installedCandidates', installedCandidatesIssues], ['secondRoot', secondRootIssues], ['workflowFormats', workflowFormatsIssues], ['personalReview', personalReviewIssues], ['restoredReviewRefusals', restoredReviewRefusalsIssues], ['reviewReuse', reviewReuseIssues], ['scopeDiagnostics', scopeDiagnosticsIssues], ['readiness', readinessIssues], ['trialUi', trialUiIssues],
-      ['packagedStop', packagedStopIssues], ['stopFunctional', stopFunctionalIssues], ['lifecycleOwn', lifecycleOwnIssues], ['lifecycleWrongStart', lifecycleWrongStartIssues], ['lifecycleSibling', lifecycleSiblingIssues],
+      ['packagedStop', packagedStopIssues], ['stopFunctional', stopFunctionalIssues], ['lifecycleOwn', lifecycleOwnIssues], ['lifecycleBirthRoot', lifecycleBirthRootIssues], ['lifecycleChildScope', lifecycleChildScopeIssues], ['lifecycleWrongStart', lifecycleWrongStartIssues], ['lifecycleSibling', lifecycleSiblingIssues],
       ['lifecycleForeignChild', lifecycleForeignChildIssues], ['lifecycleMixedUnknown', lifecycleMixedUnknownIssues],
       ['lifecycleStartWindow', lifecycleStartWindowIssues], ['lifecycleRefusedStop', lifecycleRefusedStopIssues],
       ['lifecycleIdempotent', lifecycleIdempotentIssues], ['installedSourceConfirm', installedSourceConfirmIssues], ['installedStability', installedStabilityIssues], ['upgradeFaults', upgradeFaultsIssues], ['currentInstall', currentInstallIssues], ['installedContext', installedContextIssues], ['backupContextReply', backupContextReplyIssues], ['replyDurable', replyDurableIssues], ['replyUnknown', replyUnknownIssues], ['replyMessageWindow', replyWindowIssues], ['replyBadArtifact', replyBadArtifactIssues], ['completedReply', completedReplyIssues], ['unknownReply', unknownReplyIssues]]) {
