@@ -12,7 +12,7 @@
   "mainRecipeSource": "18e79cc3",
   "mainWindowSource": "84b34c25",
   "dSource": "f87034dd",
-  "finalSourceCommit": null,
+  "finalSourceCommit": "86aeaa20",
   "state": "DELIVERED_WITH_INSTALLED_NOT_REACHED",
   "fourResults": {
     "R1_TEMPLATE_DELIVERY": "trial server-preview suggestions -> restricted selection -> main NewWorkForm initialRecipe -> re-preview/apply/edit/explicit create -> question/check/candidate/manual accept in two projects",
