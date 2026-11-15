@@ -8,7 +8,7 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { analyzeUsageInsights } from '../src/analyze.ts'
 import {
-  EXPORT_DEFAULT_MAX_BYTES, ExportDocumentSchema, ExportFault, buildInsightExport, exportDigest,
+  EXPORT_DEFAULT_MAX_BYTES, ExportDocumentSchema, ExportFault, buildInsightExport, exportDigest, previousSnapshotOf,
 } from '../src/export.ts'
 import { metricRowKey, toInsightConsumerView } from '../src/facing.ts'
 import type { UsageInsightsInput } from '../src/protocol.ts'
@@ -24,7 +24,7 @@ test('the export is deterministic and carries the source identity', () => {
   assert.equal(first.text, second.text, 'the same summary serializes identically')
   assert.equal(exportDigest(first.document), exportDigest(second.document))
   const document = ExportDocumentSchema.parse(first.document)
-  assert.equal(document.protocol, 'usage-insights-export/1')
+  assert.equal(document.protocol, 'usage-insights-export/2')
   assert.equal(document.authorization, 'none')
   assert.equal(document.exportedFrom.summaryId, summary.summaryId)
   assert.equal(document.exportedFrom.inputDigest, summary.inputDigest)
@@ -38,6 +38,12 @@ test('the export is deterministic and carries the source identity', () => {
   assert.equal(document.truncation.includedRows, summary.metrics.length)
   assert.equal(document.truncation.bytes, Buffer.byteLength(first.text),
     'the recorded byte count is exactly the written document size')
+  // The document belongs to exactly one observation.
+  assert.equal(document.snapshot.snapshotId, summary.summaryId)
+  assert.equal(document.snapshot.capturedAt, summary.capturedAt)
+  assert.equal(document.snapshot.continuity, 'first_observation')
+  assert.equal(document.snapshot.previous, null)
+  assert.equal(document.snapshot.note, null)
 })
 
 test('each row keeps its identity, unit, layer, currency and unknown counts', () => {
@@ -134,4 +140,53 @@ test('the default row bound truncates a many-currency observation explicitly', (
   // Ordering is stable, so the same bound keeps the same rows.
   const again = buildInsightExport(summary)
   assert.deepEqual(again.document.rows.map(row => row.rowId), document.rows.map(row => row.rowId))
+})
+
+test('a declared previous export is either the same snapshot or explicitly a new one', () => {
+  const summary = summaryOf(completeBundle())
+  const first = buildInsightExport(summary)
+  // The same observation declared again is continuous, and its note stays empty.
+  const continued = buildInsightExport(summary, {
+    previous: { snapshotId: summary.summaryId, capturedAt: summary.capturedAt },
+  })
+  assert.equal(continued.document.snapshot.continuity, 'same_snapshot')
+  assert.equal(continued.document.snapshot.note, null)
+  assert.deepEqual(continued.document.snapshot.previous,
+    { snapshotId: summary.summaryId, capturedAt: summary.capturedAt })
+  assert.deepEqual(continued.document.rows, first.document.rows, 'continuity never changes a value')
+
+  // A different observation replaces the earlier one: the document says so and never reuses its values.
+  const later = summaryOf({ ...completeBundle(), capturedAt: '2026-11-15T08:00:00.000Z' } as UsageInsightsInput)
+  assert.notEqual(later.summaryId, summary.summaryId, 'a later observation has its own identity')
+  const replaced = buildInsightExport(later, { previous: { snapshotId: summary.summaryId, capturedAt: summary.capturedAt } })
+  assert.equal(replaced.document.snapshot.continuity, 'new_snapshot')
+  assert.match(replaced.document.snapshot.note ?? '', /not reused/)
+  assert.deepEqual(replaced.document.snapshot.previous,
+    { snapshotId: summary.summaryId, capturedAt: summary.capturedAt })
+  assert.equal(replaced.document.limitations[0], replaced.document.snapshot.note,
+    'the discontinuity is stated in the limitations too')
+  assert.equal(JSON.stringify(replaced.document.rows).includes(summary.summaryId), false,
+    'the previous snapshot contributes an identity, never a value')
+
+  // A declared previous without an identity cannot be continued, so it is reported as replaced.
+  const unidentified = buildInsightExport(summary, { previous: { snapshotId: null, capturedAt: 'then' } })
+  assert.equal(unidentified.document.snapshot.continuity, 'new_snapshot')
+  assert.throws(() => buildInsightExport(summary, { previous: { snapshotId: summary.summaryId, capturedAt: summary.capturedAt }, maxBytes: 200 }),
+    (error: unknown) => error instanceof ExportFault && error.code === 'export_too_large')
+})
+
+test('a previous export is read only for its snapshot identity', () => {
+  const summary = summaryOf(completeBundle())
+  const current = buildInsightExport(summary).document
+  assert.deepEqual(previousSnapshotOf(current), { snapshotId: summary.summaryId, capturedAt: summary.capturedAt })
+  // Documents written before the snapshot block carried the summary id in `exportedFrom`.
+  assert.deepEqual(previousSnapshotOf({
+    protocol: 'usage-insights-export/1',
+    exportedFrom: { summaryId: 'a'.repeat(64), capturedAt: '2026-11-14T00:00:00.000Z' },
+  }), { snapshotId: 'a'.repeat(64), capturedAt: '2026-11-14T00:00:00.000Z' })
+  // A document without either identity is not silently treated as continuous.
+  assert.deepEqual(previousSnapshotOf({ exportedFrom: { capturedAt: '2026-11-14T00:00:00.000Z' } }),
+    { snapshotId: null, capturedAt: '2026-11-14T00:00:00.000Z' })
+  assert.equal(previousSnapshotOf({ protocol: 'usage-insights-input/1' }), null)
+  assert.equal(previousSnapshotOf(null), null)
 })

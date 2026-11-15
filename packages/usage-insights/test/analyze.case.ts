@@ -306,3 +306,32 @@ test('a baseline in another currency, unit or aggregation is refused rather than
       error => (error as { name?: string }).name === 'UsageInsightsFault', JSON.stringify(bad))
   }
 })
+
+test('a new contract revision is its own subject and never inherits the older acceptance', () => {
+  const first = makeOutcome({ seed: 'rev1', acceptance: 'accepted', contract: { workId: 'work-keep', revision: 1, digest: 'a'.repeat(64) } })
+  const second = makeOutcome({ seed: 'rev2', acceptance: 'unknown', contract: { workId: 'work-keep', revision: 2, digest: 'b'.repeat(64) } })
+  const analysis = analyzeUsageInsights({ ...completeBundle(), outcomes: [first, second], workEvidence: [] } as UsageInsightsInput)
+  const subjects = analysis.subjects.filter(subject => subject.workId === 'work-keep')
+  assert.equal(subjects.length, 2, 'a revision is a separate subject, not a renamed work')
+  assert.deepEqual(subjects.map(subject => subject.contract.revision).sort(), [1, 2])
+  assert.equal(new Set(subjects.map(subject => subject.subjectKey)).size, 2, 'the identities are distinct')
+  assert.equal(metric(analysis, 'outcomes.count')?.value, 2, 'both recorded outcomes are counted')
+  assert.equal(metric(analysis, 'outcomes.accepted')?.value, 1,
+    'only the record that carries acceptance counts; the new revision does not inherit it')
+})
+
+test('a replayed receipt counts once and a contradictory one is quarantined', () => {
+  const once = makeOutcome({ seed: 'dup', acceptance: 'unknown' })
+  const replay = analyzeUsageInsights({ ...completeBundle(), outcomes: [once, once], workEvidence: [] } as UsageInsightsInput)
+  assert.equal(metric(replay, 'outcomes.count')?.value, 1, 'the same receipt is not counted twice')
+  assert.equal(replay.summary.losses.outcomes.seen, 2)
+  assert.equal(replay.summary.losses.outcomes.accepted, 1)
+
+  const conflicting = { ...once, durationMs: 1234 }
+  const clash = analyzeUsageInsights({ ...completeBundle(), outcomes: [once, conflicting], workEvidence: [] } as UsageInsightsInput)
+  assert.equal(clash.summary.quarantine.total, 1, 'the same id with different content is quarantined')
+  assert.equal(clash.summary.losses.outcomes.conflicted, 1)
+  // A fully conflicted identity yields no count row at all: a zero would claim the records were
+  // verified and counted as none, which is exactly what a conflict does not establish.
+  assert.equal(metric(clash, 'outcomes.count'), undefined)
+})
