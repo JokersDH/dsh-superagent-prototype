@@ -1,0 +1,94 @@
+{
+  "protocol": "wave31-main-integration/1",
+  "date": "2026-11-15",
+  "source": "303b2c6a974856661c21d0617bd710ebe87374d1",
+  "baseline": "6f385a545d8ae38fcdaa494a0fd0646f45721a15",
+  "status": "SOURCE_AND_CONTROLLED_APP_PASSED_NOT_FULL_PRODUCT",
+  "sources": {
+    "J": "e640042948c04dd0eb33b310a09c75dba211b5f7",
+    "G": "1f2964558e21061402f0217e2cca37308e9776f0",
+    "B": "fbc933166758f446ba8907ce93795d04d34d11d7",
+    "I": "4bce0673388f22952513b5e530381f7a95e7a794"
+  },
+  "importedExactJFiles": 5,
+  "importedExactGFiles": 6,
+  "importedMinimalBICoreFiles": 7,
+  "runnerLinkCompatibilityAndBootstrapCleanup": true,
+  "authenticatedDisplayDownloadImplemented": true,
+  "downloadUsesFreshRead": true,
+  "formattedValuesNotReverseParsed": true,
+  "strictEmbeddedExportAndExactBytes": true,
+  "sourceWorktreesEdited": false,
+  "rootLockChanged": false,
+  "newExternalDependencies": 0,
+  "migrationsAdded": 0,
+  "userServicesRestarted": false,
+  "newTarCreated": false,
+  "browserReport": "reports/releases/wave31-integration/browser/browser-report.json",
+  "recipesBrowserReport": "reports/releases/wave31-integration/recipes-browser/browser-report.json",
+  "independentExportReview": "reports/releases/wave31-admission/main-export-review.json",
+  "independentRunnerReview": "reports/releases/wave31-admission/main-runner-cleanup-review.json",
+  "checks": {
+    "downloadBackendTransport": 5,
+    "existingProjectAndObservationBackend": 13,
+    "contracts": 241,
+    "runnerEndpointAdmissionAdapter": 28,
+    "runnerCancelled": 0,
+    "observationBrowser": 13,
+    "recipeBrowser": 8,
+    "acceptedControlledWorks": 2,
+    "JLibrary": 75,
+    "JTools": 26,
+    "GTargeted": 22,
+    "consoleStrict": "PASS",
+    "coordinatorStrict": "PASS",
+    "actualNativeRuntimeConsumerStrict": "PASS",
+    "consoleBuild": "PASS",
+    "generatedCheck": "PASS",
+    "frozenRunnerHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d"
+  },
+  "initialFailures": [
+    {
+      "scope": "legacy RunnerLink before fixture producer/shutdown compatibility",
+      "result": "16PASS_4FAIL",
+      "closedWithExactExecInterrupt": true
+    },
+    {
+      "scope": "legacy runner after compatibility but before bootstrap EOF cleanup",
+      "result": "20PASS_FILE_TIMEOUT_CANCELLED1",
+      "closedWithExactExecInterrupt": true
+    },
+    {
+      "scope": "clean-source observation+recipes browsers run alongside contracts check/build",
+      "result": "FAIL_HMR_RELOADED_PAGE",
+      "reports": "reports/releases/wave31-integration/initial-concurrent-build/",
+      "correction": "Finished contract build first; same-source browsers rerun with no active build, both exit0"
+    }
+  ],
+  "safetyScope": "No new process discovery or OS-signal cleanup was introduced. Independent B/H/E signal probes were mocked and unsafe bespoke tools not run. Legacy RunnerLink tests use their existing close path; no blanket physical-signal-zero claim is made for controlled fixture tests.",
+  "visual": {
+    "desktop": [
+      1440,
+      1000
+    ],
+    "mobile": [
+      390,
+      844
+    ],
+    "screenshotsInspected": true,
+    "noHorizontalOverflow": true,
+    "downloadSameToolbarAsWindow": true,
+    "detectorExistingAdvisories": 14,
+    "bundleSizeAdvisory": true
+  },
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "independentR1InstalledAdmission": false,
+  "independentR2InstalledAdmission": false,
+  "sameOriginalRecoveredDeliveryAdmission": false,
+  "valueBenefitAdmission": false,
+  "privateTargetActivationAdmission": false,
+  "releaseApproved": false,
+  "completionEstimateRef": "reports/releases/wave13-admission/progress.json",
+  "completionRaisedByTestOrTaskCount": false
+}

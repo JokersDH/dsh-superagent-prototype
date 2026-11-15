@@ -1,0 +1,174 @@
+{
+  "protocol": "wave31-dispatch-static-review/1",
+  "date": "2026-11-15",
+  "status": "PASS_STATIC_ONLY_ORIGINAL_TWO_P2_CLOSED",
+  "scope": "Pure static review of wave31 README, dispatch, forward prompts, main packet, complete A/C/F/G/J packets and B/D/E/H/I package/outcome headings plus ownership and safety preambles. Compared previous wave30 outcome headings and original ownership. No runtime execution or candidate edits.",
+  "observedMainSource": "303b2c6a974856661c21d0617bd710ebe87374d1",
+  "inputDigestsAtReview": {
+    "agent-tasks/product-wave-31/README.zh-CN.md": "7b0324ac3a0273e00940a903ddabbd0b9782ccaf2ead2b14d25c64de9e7d7d3b",
+    "agent-tasks/product-wave-31/dispatch.json": "30d258db2b3e8af4d02a912cbc994be6ee40ee6c0e8e5e7805daf4ddd67da52b",
+    "agent-tasks/product-wave-31/forward-prompts.zh-CN.md": "e4d98dee70d75981f99fadf4afdb00f6a81905959f59e7b578fcc16ce0f2647c",
+    "agent-tasks/product-wave-31/main.zh-CN.md": "8abf433e5e6d732d0948c9edbd5ba86ff9be1d50c7436416a54473fe3f06fdad"
+  },
+  "staticCommand": {
+    "command": "node agent-tasks/product-wave-31/verify.mjs --workspaces",
+    "exitCode": 0,
+    "result": {
+      "status": "PASS_THREE_TIMES_OUTCOME_PROGRAM_STATIC_ONLY",
+      "externalAgents": 10,
+      "ownersIncludingMain": 11,
+      "packagesPerOwner": 3,
+      "completeOutcomesPerOwner": 12,
+      "scopeMultiplier": 3,
+      "totalPlannedOutcomesIncludingMain": 132,
+      "mechanicalMicroPhaseExpansion": false,
+      "checkpoints": 24,
+      "localLinks": 263,
+      "localWorkspacesChecked": 11,
+      "ownershipDisjoint": true,
+      "acyclic": true,
+      "lockedR1": true,
+      "R2Separate": true,
+      "sourceAndInstalledSeparate": true,
+      "budgetUnchanged": true,
+      "preservedServicePairs": 12,
+      "runtimeTests": 0,
+      "nativeTurnStarts": 0,
+      "releaseApproved": false
+    }
+  },
+  "confirmedStaticBoundaries": {
+    "plannedScope": {
+      "previousOutcomesPerOwner": 4,
+      "currentOutcomesPerOwner": 12,
+      "completePackagesPerOwner": 3,
+      "outcomesPerPackage": 4,
+      "assessment": "Every role has twelve ordered outcomes in three continuous product packages, not only extra test phases. A/C/F/G/J outcomes specify implementation, actual consumer, positive/negative acceptance and source handoff. B/D/E/H/I retain distinct ordinary/adoption, recovery or successor, and repeated-use/support packages. This validates the planned 4-to-12 outcome expansion; it does not measure an exact threefold implementation effort or completed work."
+    },
+    "ownership": {
+      "originalTenExternalRootsAndBranchesPreserved": true,
+      "newWorktrees": 0,
+      "ownedPathsAndExclusionsMatchWave30": true,
+      "effectiveOwnedPathsDisjoint": true,
+      "mainRetainsSharedRootContractsConfigLockHttpProviderAppTransportGlobalCss": true,
+      "aOnlyProductionMigrations": true,
+      "eOnlyProductAcceptanceAssertions": true,
+      "bExcludesIAttachChannel": true,
+      "mainExcludesFTrialSubtrees": true
+    },
+    "ordinaryDependencies": {
+      "graphAcyclic": true,
+      "ordinaryWorkbenchExportRecipesFreezeColleagueWorkflowNotGatedByBRecoveredDeliveryOrPrivateTarget": true,
+      "pilotGatesProductAcceptance": false,
+      "normalInstallRequiresRecoveryActivation": false,
+      "independentQueuesRequired": true,
+      "note": "The graph, detailed packets and corrected A forward/README summaries keep ordinary work independent of B live recovery."
+    },
+    "releaseLanes": {
+      "R1": {
+        "state": "LOCKED_BYTES_PENDING_INDEPENDENT_E",
+        "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+        "buildId": "8296720d8a25f38c",
+        "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+        "refreezeForDocsOrTests": false,
+        "eCurrentHistoricalVerdict": "Exact older 1fba only: 278 PASS / 0 FAIL / 19 NOT_TESTED, ordinary189 and functional190 PASS. This is not admission of 829."
+      },
+      "R2": {
+        "state": "SOURCE_READY_NOT_FROZEN",
+        "source": "303b2c6a974856661c21d0617bd710ebe87374d1",
+        "requiresIndependentDImmutableFreezeAndESameTarVerdict": true,
+        "sourceAdmissionIsInstalledAdmission": false
+      },
+      "R3": {
+        "requiresNewTar": false,
+        "scope": "Repeated use and colleague support on an admitted fixed package."
+      }
+    },
+    "continuation": {
+      "goalCoversAllTwelveOutcomes": true,
+      "continueAfterCheckpoint": true,
+      "earlyIntermediateFinalSourceHandoffs": true,
+      "externalDependencyBlocksOnlyItsOwnOutcome": true,
+      "sameDayDeadline": null,
+      "tokenBudgetAdded": false,
+      "implementationDurationPromised": false
+    },
+    "budget": {
+      "newModelAllowance": 0,
+      "vendorModelNativeStartsByDispatch": 0,
+      "bHistoricalLimit": 4,
+      "bRemaining": "UNKNOWN_NOT_SPENDABLE",
+      "bResetLedger": false,
+      "eGrantId": "wave05-independent-review-pilot-01",
+      "eState": "BLOCKED_CURRENT_RECIPE_NO_SEND_THIS_WAVE",
+      "eMaxNativeTurnStarts": 24,
+      "eMaxAuthorTurnStarts": 8,
+      "eMaxReviewTurnStarts": 16,
+      "eMaxBillableTokens": 200000,
+      "eMaxCostUSD": 5,
+      "eMaxInFlight": 1,
+      "eResetLedger": false,
+      "eUnknownCostIsZero": false,
+      "eCliFallbackAllowed": false
+    }
+  },
+  "remainingFindings": [],
+  "closedFindings": [
+    {
+      "id": "DISPATCH-A-SUMMARY",
+      "priority": "P2",
+      "status": "CLOSED_CURRENT_TEXT_INDEPENDENTLY_REREAD",
+      "title": "A package-two summary implies a recovered-Work prerequisite absent from the detailed ordinary-data package",
+      "references": [
+        { "file": "agent-tasks/product-wave-31/forward-prompts.zh-CN.md", "line": 13 },
+        { "file": "agent-tasks/product-wave-31/README.zh-CN.md", "line": 11 },
+        { "file": "agent-tasks/product-wave-31/agent-a-data.zh-CN.md", "line": 115 }
+      ],
+      "originalObserved": "The original forward prompt said package two was the same recovered Work's candidates/checks/facts. A5-A8 instead implement ordinary two-project Q&A/check/accept, original receipts/unknown reopen and source-level v1/v2 snapshot restore, explicitly continuing while B/I live recovery is not admitted.",
+      "impact": "An agent following the summary can wait for B recovered delivery or pursue the wrong consumer even though the graph and detailed packet deliberately leave ordinary data work independent.",
+      "verifiedCorrection": "Current README and forward A package two now specify ordinary two-project Q&A/check/accept, unknown receipts and source-level v1/v2 restore. The forward text explicitly says it does not depend on B live recovery. Static verify --workspaces passes after the correction.",
+      "originalReadmeSha256": "0dad03d761f9e978045b86192a79c1dcc4db5c17018bde4bd4bcff96db69ce73",
+      "originalForwardSha256": "3165a0770f222cf8899e30d7974dc8d2d0d90645f482abbc292013e54150b488",
+      "productionOrCandidateChangedByReview": false
+    },
+    {
+      "id": "DISPATCH-G-SUMMARY",
+      "priority": "P2",
+      "status": "CLOSED_CURRENT_TEXT_INDEPENDENTLY_REREAD",
+      "title": "G summary puts the new R2 default download in the R1 baseline package",
+      "references": [
+        { "file": "agent-tasks/product-wave-31/forward-prompts.zh-CN.md", "line": 114 },
+        { "file": "agent-tasks/product-wave-31/README.zh-CN.md", "line": 17 },
+        { "file": "agent-tasks/product-wave-31/agent-g-insights.zh-CN.md", "line": 17 },
+        { "file": "agent-tasks/product-wave-31/agent-g-insights.zh-CN.md", "line": 114 }
+      ],
+      "originalObserved": "The original forward prompt's package one immediately consumed main's new GET/export/App download, and the README also labeled G package one as default download. G1-G4 explicitly lock the 829 R1 observation/report baseline and mark a missing later download unavailable. G5-G8 are the current-source R2 default-export package.",
+      "impact": "This can mix source-only R2 results into fixed R1 evidence or send G to the wrong release lane, despite the otherwise correct R1/R2 tuple separation.",
+      "verifiedCorrection": "Current README and forward G package one lock the R1 public-reader observation/table/report baseline and explicitly forbid filling a missing new download from checkout. Package two now consumes the actual R2 main303 GET/export/App download with format/truncation/snapshot semantics. Static verify --workspaces passes after the correction.",
+      "originalReadmeSha256": "0dad03d761f9e978045b86192a79c1dcc4db5c17018bde4bd4bcff96db69ce73",
+      "originalForwardSha256": "3165a0770f222cf8899e30d7974dc8d2d0d90645f482abbc292013e54150b488",
+      "productionOrCandidateChangedByReview": false
+    }
+  ],
+  "remainingExecutionNotRevalidatedHere": [
+    "C upstream completion.coverage propagation remains the reviewed P2 until an actual source consumer preserves A's source truncation.",
+    "B/H independent birth and UNKNOWN cleanup safety gaps must close before live fault signals; this static review sends no signals.",
+    "E full-known-resource, valid ppid and post-stop oracle gaps still precede new R1 independent live admission.",
+    "R1 829 needs E's actual same-tar ordinary/functional verdict; old 1fba evidence is preserved at its original scope.",
+    "R2 303 source needs a separately frozen immutable artifact and actual independent same-package consumers before installed claims.",
+    "Same-original-Work recovered delivery, native/vendor compatibility, private/target activation, value benefit and long-duration stability are not established by this review."
+  ],
+  "actionsByThisReview": {
+    "runtimeTests": 0,
+    "nativeOrModelTurns": 0,
+    "processSignals": 0,
+    "serviceRestarts": 0,
+    "newTarCreated": false,
+    "productionEdits": false,
+    "candidateWorktreeEdits": false,
+    "commits": 0,
+    "externalAgentMessagesSent": false,
+    "onlyCreatedArtifact": "reports/releases/wave31-admission/dispatch-review.json"
+  },
+  "limitation": "Static consistency and original-branch checks are not proof that any of the 132 planned outcomes has executed, that implementation effort is exactly three times the prior wave, or that product/native/recovery/release admission is granted."
+}
