@@ -1,0 +1,16 @@
+TAP version 13
+# Subtest: history coverage composes A per-ticket caps with the local window instead of calling a truncated source complete
+ok 1 - history coverage composes A per-ticket caps with the local window instead of calling a truncated source complete
+  ---
+  duration_ms: 2577.042875
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2951.048958
