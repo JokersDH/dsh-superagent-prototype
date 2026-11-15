@@ -10,10 +10,10 @@ import { buildPersonalChain, projectId, restoreSnapshotWithA } from './helpers/p
 
 const repoRoot = fileURLToPath(new URL('../../../', import.meta.url))
 const driver = join(repoRoot, 'packages/context/tools/personal-review-driver.mjs')
-const packageTar = process.env.PA_WAVE28_PACKAGE ?? '/Users/hh/Desktop/joker/pa-artifacts/wave27-target/wave27-target-1cdab25.tar.gz'
-const expectedTarSha = 'dcfda014ce0ac04ff4a78ebcf27cea9c3659e12bc3156583c985b869401fa86e'
-const expectedSource = '1cdab25a76748edad5054ce1a5150a69d5ad9361'
-const expectedBuild = 'ecffaa6d3f784426'
+const packageTar = process.env.PA_WAVE29_PACKAGE ?? '/Users/hh/Desktop/joker/pa-artifacts/wave28-target/wave28-target-1ba0032.tar.gz'
+const expectedTarSha = '504dfdc1ceb191828d3836017cc47d9d0023dc27cc1291e6caf28e08aafcfb9e'
+const expectedSource = '1ba003239237d3fc7a92bde8cbe897549abcbd5d'
+const expectedBuild = '67abd96690030eb7'
 
 async function availablePort(): Promise<number> {
   const { createServer } = await import('node:net')
@@ -24,7 +24,7 @@ async function availablePort(): Promise<number> {
   return port
 }
 
-test('the current 1cdab25 package runs readiness plus manifest-driven v1/v2 restored data read-only', { timeout: 600000 }, async (t) => {
+test('the current 1ba0032 package runs readiness plus manifest-driven v1/v2 restored data read-only', { timeout: 600000 }, async (t) => {
   if (!existsSync(packageTar)) { t.diagnostic(`NOT_REACHED: package missing at ${packageTar}`); return }
   assert.equal(createHash('sha256').update(readFileSync(packageTar)).digest('hex'), expectedTarSha)
   const root = mkdtempSync(join(tmpdir(), 'pa-wave26-current-package-'))
