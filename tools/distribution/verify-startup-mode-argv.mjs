@@ -18,7 +18,8 @@ const inspect = (id, options, expected) => {
 }
 inspect('normal-personal-discussion', { mode: 'personal', discussionOnly: true }, { startupMode: 'normal', assistant: true, discussionOnly: true, native: false, review: false })
 inspect('normal-personal-native', { mode: 'personal', discussionOnly: false }, { startupMode: 'normal', assistant: true, discussionOnly: false, native: true, review: false })
-inspect('fixture-normal', { mode: 'fixture', discussionOnly: false }, { startupMode: 'normal', assistant: false, discussionOnly: false, native: false, review: false })
+inspect('fixture-normal', { mode: 'fixture', discussionOnly: false }, { startupMode: 'normal', assistant: true, discussionOnly: false, native: false, review: false })
+inspect('restored-fixture', { mode: 'fixture', discussionOnly: false, startupMode: 'recovery_readonly' }, { startupMode: 'recovery_readonly', assistant: false, discussionOnly: false, native: false, review: false })
 inspect('restored-no-review-file', { mode: 'personal', discussionOnly: true, startupMode: 'recovery_readonly' }, { startupMode: 'recovery_readonly', assistant: true, discussionOnly: true, native: false, review: false })
 inspect('restored-with-review-file', { mode: 'personal', discussionOnly: true, startupMode: 'recovery_readonly', reviewRestoredScope: '/private/review.json' }, { startupMode: 'recovery_readonly', assistant: true, discussionOnly: true, native: false, review: true })
 console.log(JSON.stringify({ protocol: 'wave28-startup-mode-argv/1', status: 'PASS', runtimeTurns: 0, cases }, null, 2))

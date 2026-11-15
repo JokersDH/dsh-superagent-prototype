@@ -1,0 +1,205 @@
+{
+  "protocol": "wave29-fixture-mode/1",
+  "status": "PASS",
+  "cases": {
+    "restoredFixture": {
+      "status": "PASS",
+      "requested": "restored-fixture",
+      "mode": "fixture",
+      "startupMode": "recovery_readonly",
+      "apiArgv": [
+        "--startup-mode",
+        "recovery_readonly"
+      ],
+      "health": {
+        "status": "ok",
+        "mode": "fixture",
+        "startupMode": "recovery_readonly",
+        "access": "local-development"
+      },
+      "stopStatus": "STOPPED",
+      "stopped": true,
+      "recordRemoved": true
+    },
+    "normalFixture": {
+      "status": "PASS",
+      "requested": "normal-fixture",
+      "mode": "fixture",
+      "startupMode": "normal",
+      "apiArgv": [
+        "--startup-mode",
+        "normal",
+        "--assistant"
+      ],
+      "health": {
+        "status": "ok",
+        "mode": "fixture",
+        "access": "local-development"
+      },
+      "stopStatus": "STOPPED",
+      "stopped": true,
+      "recordRemoved": true
+    }
+  },
+  "pureArgv": {
+    "protocol": "wave28-startup-mode-argv/1",
+    "status": "PASS",
+    "runtimeTurns": 0,
+    "cases": [
+      {
+        "id": "normal-personal-discussion",
+        "status": "PASS",
+        "argv": [
+          "/opt/app/apps/coordinator/product/demo.ts",
+          "--port",
+          "1234",
+          "--state",
+          "/private/state",
+          "--console-origin",
+          "http://127.0.0.1:1233",
+          "--startup-mode",
+          "normal",
+          "--assistant",
+          "--discussion-only",
+          "--local-access"
+        ],
+        "checks": {
+          "startupMode": true,
+          "assistant": true,
+          "discussionOnly": true,
+          "native": true,
+          "review": true
+        }
+      },
+      {
+        "id": "normal-personal-native",
+        "status": "PASS",
+        "argv": [
+          "/opt/app/apps/coordinator/product/demo.ts",
+          "--port",
+          "1234",
+          "--state",
+          "/private/state",
+          "--console-origin",
+          "http://127.0.0.1:1233",
+          "--startup-mode",
+          "normal",
+          "--assistant",
+          "--native",
+          "--local-access"
+        ],
+        "checks": {
+          "startupMode": true,
+          "assistant": true,
+          "discussionOnly": true,
+          "native": true,
+          "review": true
+        }
+      },
+      {
+        "id": "fixture-normal",
+        "status": "PASS",
+        "argv": [
+          "/opt/app/apps/coordinator/product/demo.ts",
+          "--port",
+          "1234",
+          "--state",
+          "/private/state",
+          "--console-origin",
+          "http://127.0.0.1:1233",
+          "--startup-mode",
+          "normal",
+          "--assistant",
+          "--local-access"
+        ],
+        "checks": {
+          "startupMode": true,
+          "assistant": true,
+          "discussionOnly": true,
+          "native": true,
+          "review": true
+        }
+      },
+      {
+        "id": "restored-fixture",
+        "status": "PASS",
+        "argv": [
+          "/opt/app/apps/coordinator/product/demo.ts",
+          "--port",
+          "1234",
+          "--state",
+          "/private/state",
+          "--console-origin",
+          "http://127.0.0.1:1233",
+          "--startup-mode",
+          "recovery_readonly",
+          "--local-access"
+        ],
+        "checks": {
+          "startupMode": true,
+          "assistant": true,
+          "discussionOnly": true,
+          "native": true,
+          "review": true
+        }
+      },
+      {
+        "id": "restored-no-review-file",
+        "status": "PASS",
+        "argv": [
+          "/opt/app/apps/coordinator/product/demo.ts",
+          "--port",
+          "1234",
+          "--state",
+          "/private/state",
+          "--console-origin",
+          "http://127.0.0.1:1233",
+          "--startup-mode",
+          "recovery_readonly",
+          "--assistant",
+          "--discussion-only",
+          "--local-access"
+        ],
+        "checks": {
+          "startupMode": true,
+          "assistant": true,
+          "discussionOnly": true,
+          "native": true,
+          "review": true
+        }
+      },
+      {
+        "id": "restored-with-review-file",
+        "status": "PASS",
+        "argv": [
+          "/opt/app/apps/coordinator/product/demo.ts",
+          "--port",
+          "1234",
+          "--state",
+          "/private/state",
+          "--console-origin",
+          "http://127.0.0.1:1233",
+          "--startup-mode",
+          "recovery_readonly",
+          "--assistant",
+          "--discussion-only",
+          "--review-restored-scope",
+          "/private/review.json",
+          "--local-access"
+        ],
+        "checks": {
+          "startupMode": true,
+          "assistant": true,
+          "discussionOnly": true,
+          "native": true,
+          "review": true
+        }
+      }
+    ]
+  },
+  "notes": [
+    "restored fixture stays fixture/recovery_readonly without personal flags",
+    "normal fixture keeps lazy --assistant but no --native",
+    "configuration does not send model"
+  ]
+}
