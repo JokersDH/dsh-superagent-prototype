@@ -31,6 +31,8 @@ import { createLocalHttpApp } from '../../../apps/coordinator/http/app.ts'
 import { listenLocalHttp } from '../../../apps/coordinator/http/server.ts'
 import { analyzeUsageInsights } from '../../../packages/usage-insights/src/analyze.ts'
 import { consumerAdmission, toInsightConsumerView } from '../../../packages/usage-insights/src/facing.ts'
+import { buildDisplayExport, displayExportDigest } from '../../../packages/usage-insights/src/display-export.ts'
+import { crossCheckAnalysisWithDisplay } from '../../../packages/usage-insights/src/crosscheck.ts'
 
 const CLI = fileURLToPath(new URL('../cli.mjs', import.meta.url))
 const principal = { userId: 'local-insights-probe', authorityRef: 'local-insights-authority' }
@@ -400,6 +402,80 @@ async function main() {
   assert.equal(consumerAdmission(composedView).admitted, true)
   assert.equal(composedView.scope?.aggregation, 'declared_multi_project')
 
+  // ---- W30: one observation across the page, the report and the export (G1/G2) ----------------
+  // The analysis of the served window, from the same authorized reads, so every structural fact
+  // (window, scope, days, timezone) is identical and the rows can be compared one by one.
+  const alignedSummary = analyzeUsageInsights({
+    ...composed.bundle, window: served.window, capturedAt: served.observedAt,
+  }).summary
+
+  // The served document exports as display-only: the strings are preserved verbatim and there is no
+  // numeric field anywhere, so nothing can be reverse-parsed into a measurement.
+  const display = buildDisplayExport(served)
+  assert.equal(display.document.protocol, 'usage-insights-display-export/1')
+  assert.equal(display.document.rows.length, served.metrics.length)
+  assert.equal(display.document.sourceIdentity.numericValues, false)
+  assert.equal(JSON.stringify(display.document.rows).includes('"value"'), false)
+  for (const [index, metric] of served.metrics.entries()) {
+    assert.equal(display.document.rows[index].rowId, metric.id, 'the served identity is kept verbatim')
+    assert.equal(display.document.rows[index].formatted, metric.value, 'the served string is kept verbatim')
+  }
+  assert.equal(display.document.snapshot.snapshotId, served.summaryId)
+  assert.match(displayExportDigest(display.document), /^[a-f0-9]{64}$/)
+
+  // The served page and the authorized analysis describe the same observation.
+  const pageCheck = crossCheckAnalysisWithDisplay({ dto: served, summary: alignedSummary })
+  assert.equal(pageCheck.comparable, true)
+  assert.deepEqual(pageCheck.disagreements, [], JSON.stringify(pageCheck.disagreements))
+  assert.equal(pageCheck.agreements, pageCheck.checked)
+  assert.equal(pageCheck.snapshot.display, served.summaryId)
+
+  // The CLI reads the same window over HTTP and writes the report and the export of that one read.
+  const loopBundle = join(directory, 'wave30-bundle.json')
+  const loopReport = join(directory, 'wave30-report.md')
+  const loopExport = join(directory, 'wave30-export.json')
+  const loop = await run(['collect', '--base-url', `http://127.0.0.1:${port}`, '--token-file', tokenFile,
+    '--from', served.window.from, '--to', served.window.to,
+    '--project', PROJECT_A, '--project', PROJECT_B, '--include-attention',
+    '--snapshot-limit', '20', '--history-pages', '5', '--history-limit', '100',
+    '--input-id', 'probe-served-window', '--out', loopBundle, '--report', loopReport, '--export', loopExport])
+  assert.equal(loop.status, 0, loop.stderr)
+  const loopDocument = JSON.parse(readFileSync(loopExport, 'utf8'))
+  const loopMarkdown = readFileSync(loopReport, 'utf8')
+  assert.deepEqual(loopDocument.window, served.window, 'the export is bound to the served window')
+  assert.equal(loopDocument.snapshot.continuity, 'first_observation')
+  assert.ok(loopMarkdown.includes(`Summary id | ${loopDocument.snapshot.snapshotId}`),
+    'the report and the export name the same snapshot')
+  const loopSummary = JSON.parse((await run(['analyze', '--input', loopBundle])).stdout).summary
+  assert.equal(loopSummary.summaryId, loopDocument.snapshot.snapshotId,
+    'a later analysis of the written bundle is the same snapshot')
+  // The page (main's readers) and the CLI's HTTP read agree on every number for that window.
+  const httpCheck = crossCheckAnalysisWithDisplay({ dto: served, summary: loopSummary })
+  assert.equal(httpCheck.comparable, true)
+  assert.deepEqual(httpCheck.disagreements, [], JSON.stringify(httpCheck.disagreements))
+  assert.equal(httpCheck.agreements, httpCheck.checked)
+
+  // A second read of the same window is a new snapshot; the earlier export's values are not reused.
+  // The capture time is stamped after the reads, so waiting guarantees a later observation.
+  await new Promise(resolveDelay => setTimeout(resolveDelay, 25))
+  const secondExport = join(directory, 'wave30-export-2.json')
+  const second = await run(['collect', '--base-url', `http://127.0.0.1:${port}`, '--token-file', tokenFile,
+    '--from', served.window.from, '--to', served.window.to,
+    '--project', PROJECT_A, '--project', PROJECT_B, '--include-attention',
+    '--snapshot-limit', '20', '--history-pages', '5', '--history-limit', '100',
+    '--input-id', 'probe-served-window-2', '--out', join(directory, 'wave30-bundle-2.json'),
+    '--export', secondExport, '--previous-export', loopExport])
+  assert.equal(second.status, 0, second.stderr)
+  const secondDocument = JSON.parse(readFileSync(secondExport, 'utf8'))
+  assert.equal(secondDocument.snapshot.continuity, 'new_snapshot')
+  assert.deepEqual(secondDocument.snapshot.previous,
+    { snapshotId: loopDocument.snapshot.snapshotId, capturedAt: loopDocument.snapshot.capturedAt })
+  assert.ok(second.stderr.includes('new_snapshot'), second.stderr)
+  assert.match(secondDocument.snapshot.note, /not reused/)
+
+  // The display export of the same served document is stable: an identical document serializes identically.
+  assert.equal(buildDisplayExport(served).text, display.text)
+
   // ---- single-project isolation from the same product (G9) ------------------------------------
   const singleBundlePath = join(directory, 'bundle-single.json')
   const single = await run(['collect', '--base-url', `http://127.0.0.1:${port}`, '--token-file', tokenFile,
@@ -471,9 +547,24 @@ async function main() {
     const directoryOut = fileURLToPath(new URL('../../../reports/usage-insights/probe/', import.meta.url))
     mkdirSync(directoryOut, { recursive: true })
     const stamp = bundle.capturedAt.replace(/[-:]/g, '').replace(/\..*$/, '')
-    published = { bundle: join(directoryOut, `two-project-${stamp}.bundle.json`), report: join(directoryOut, `two-project-${stamp}.report.md`) }
-    for (const [source, target] of [[bundlePath, published.bundle], [reportPath, published.report]])
+    published = {
+      bundle: join(directoryOut, `two-project-${stamp}.bundle.json`),
+      report: join(directoryOut, `two-project-${stamp}.report.md`),
+      export: join(directoryOut, `two-project-${stamp}.export.json`),
+      displayExport: join(directoryOut, `two-project-${stamp}.display-export.json`),
+      crossCheck: join(directoryOut, `two-project-${stamp}.crosscheck.json`),
+    }
+    for (const [source, target] of [[bundlePath, published.bundle], [reportPath, published.report],
+      [loopExport, published.export]])
       writeFileSync(target, readFileSync(source), { flag: 'wx', mode: 0o600 })
+    // The display export and the cross-check are generated in this run, not copied from a bundle.
+    writeFileSync(published.displayExport, display.text, { flag: 'wx', mode: 0o600 })
+    writeFileSync(published.crossCheck, `${JSON.stringify({
+      protocol: 'usage-insights-cross-check-evidence/1',
+      servedSummaryId: served.summaryId,
+      page: pageCheck,
+      http: httpCheck,
+    }, null, 2)}\n`, { flag: 'wx', mode: 0o600 })
   }
 
   process.stdout.write(`${JSON.stringify({
@@ -501,6 +592,19 @@ async function main() {
       : { state: row.coverage === 'partial' ? 'partial' : 'known', samples: row.sampleCount,
           ...(row.currency ? { currency: row.currency } : {}), layer: row.layer }])),
     compositionAgreesWithCli: true,
+    // One observation across the page, the report and the export.
+    snapshotCoherence: {
+      servedSummaryId: served.summaryId,
+      pageCheck: { comparable: pageCheck.comparable, checked: pageCheck.checked, agreements: pageCheck.agreements,
+        disagreements: pageCheck.disagreements.length },
+      httpCheck: { comparable: httpCheck.comparable, checked: httpCheck.checked, agreements: httpCheck.agreements,
+        disagreements: httpCheck.disagreements.length },
+      displayExport: { protocol: display.document.protocol, rows: display.document.rows.length,
+        numericFields: false, digest: displayExportDigest(display.document) },
+      cliExport: { snapshotId: loopDocument.snapshot.snapshotId, continuity: loopDocument.snapshot.continuity,
+        rows: loopDocument.truncation.includedRows },
+      secondRead: { continuity: secondDocument.snapshot.continuity, previous: secondDocument.snapshot.previous },
+    },
     digest: verified.digest,
     repeatedCollectionIdentical: true,
     readOnlyCollection: true,

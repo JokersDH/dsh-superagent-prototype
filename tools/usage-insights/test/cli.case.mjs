@@ -314,9 +314,12 @@ test('export writes a bounded sanitized document with exclusive 0600 output', ()
   assert.equal(result.status, 0, result.stderr)
   assert.equal(statSync(target).mode & 0o777, 0o600)
   const document = JSON.parse(readFileSync(target, 'utf8'))
-  assert.equal(document.protocol, 'usage-insights-export/1')
+  assert.equal(document.protocol, 'usage-insights-export/2')
   assert.equal(document.authorization, 'none')
   assert.equal(typeof document.exportedFrom.summaryId, 'string')
+  assert.equal(document.snapshot.snapshotId, document.exportedFrom.summaryId)
+  assert.equal(document.snapshot.continuity, 'first_observation')
+  assert.ok(result.stdout.includes(`snapshot=${document.snapshot.snapshotId}`), result.stdout)
   assert.equal(document.truncation.byRows, false)
   assert.ok(document.rows.every(row => row.rowId && row.metricId && row.unit !== undefined))
   assert.equal(readFileSync(target, 'utf8').includes(directory), false, 'no absolute path in the export')
@@ -342,4 +345,90 @@ test('an impossible byte budget is refused without writing a fragment', () => {
   assert.equal(result.status, 5, result.stderr)
   assert.ok(/exceeds the 200-byte budget/.test(result.stderr), result.stderr)
   assert.equal(existsSync(target), false)
+})
+
+test('a served document exports display-only, with no numeric field at all', () => {
+  const directory = workspace()
+  const served = join(directory, 'served.json')
+  const dto = {
+    protocol: 'usage-observation/1',
+    observedAt: '2026-11-15T06:00:00.000Z',
+    status: 'ready',
+    summaryId: 'a'.repeat(64),
+    days: 7,
+    timezone: 'UTC',
+    window: { from: '2026-11-08T06:00:00.000Z', to: '2026-11-15T06:00:00.000Z' },
+    windowLabel: '近 7 天 · +00:00',
+    coverage: '完整覆盖',
+    coverageState: 'complete',
+    scope: { projectIds: ['one', 'two'], aggregation: 'declared_multi_project', label: '本次 2 个项目' },
+    sampleCount: 2,
+    unknownCount: null,
+    metrics: [
+      { id: 'outcomes.count@controlled@', label: '已观察执行次数', value: '1', detail: '未知 0 · 完整', unit: 'count', layer: 'controlled', sampleCount: 1 },
+      { id: 'usage.cost@controlled@USD', label: '已知记录成本', value: '1.5', detail: '未知 0 · 完整', unit: 'USD', layer: 'controlled', sampleCount: 1 },
+      { id: 'queue.waitMs@controlled@', label: '平均记录排队耗时', value: null, detail: '未知 1 · 完整', unit: 'ms', layer: 'controlled', sampleCount: null },
+    ],
+    limitations: ['仅统计现有工作证据；未记录的执行耗时、排队、用量与成本保持未知。'],
+    authorization: 'none',
+  }
+  writeFileSync(served, JSON.stringify(dto))
+  const target = join(directory, 'display.json')
+  const result = run(['export', '--dto', served, '--out', target])
+  assert.equal(result.status, 0, result.stderr)
+  assert.equal(statSync(target).mode & 0o777, 0o600)
+  const document = JSON.parse(readFileSync(target, 'utf8'))
+  assert.equal(document.protocol, 'usage-insights-display-export/1')
+  assert.equal(document.sourceIdentity.kind, 'display_dto')
+  assert.equal(document.sourceIdentity.numericValues, false)
+  assert.equal(document.rows.length, 3)
+  assert.equal(document.rows[0].formatted, '1')
+  assert.equal(document.rows[1].unit, 'USD')
+  assert.equal(document.rows[1].formatted, '1.5')
+  assert.equal(document.rows[2].formatted, null, 'an unknown value stays null, never zero')
+  assert.equal(JSON.stringify(document.rows).includes('"value"'), false, 'no numeric field exists to reverse-parse')
+  assert.equal(document.snapshot.snapshotId, dto.summaryId)
+  assert.equal(document.snapshot.continuity, 'first_observation')
+  assert.ok(result.stdout.includes('display-only'), result.stdout)
+
+  // The served document is one fixed observation: it cannot be re-scoped or mixed with a bundle.
+  assert.equal(run(['export', '--dto', served, '--days', '7', '--out', join(directory, 'd1.json')]).status, 2)
+  assert.equal(run(['export', '--dto', served, '--input', complete, '--out', join(directory, 'd2.json')]).status, 2)
+  assert.equal(run(['export', '--out', join(directory, 'd3.json')]).status, 2)
+  // A bundle is not a served document.
+  assert.equal(run(['export', '--dto', complete, '--out', join(directory, 'd4.json')]).status, 5)
+})
+
+test('a declared previous export states whether the snapshot continued or was replaced', () => {
+  const directory = workspace()
+  const first = join(directory, 'first.json')
+  assert.equal(run(['export', '--input', complete, '--out', first]).status, 0)
+  const firstDocument = JSON.parse(readFileSync(first, 'utf8'))
+
+  const continued = join(directory, 'continued.json')
+  const same = run(['export', '--input', complete, '--previous-export', first, '--out', continued])
+  assert.equal(same.status, 0, same.stderr)
+  const continuedDocument = JSON.parse(readFileSync(continued, 'utf8'))
+  assert.equal(continuedDocument.snapshot.continuity, 'same_snapshot')
+  assert.deepEqual(continuedDocument.snapshot.previous, {
+    snapshotId: firstDocument.snapshot.snapshotId,
+    capturedAt: firstDocument.snapshot.capturedAt,
+  })
+  assert.equal(same.stderr.includes('new_snapshot'), false)
+
+  // A later capture of the same facts is a different observation.
+  const later = join(directory, 'later-bundle.json')
+  const bundle = JSON.parse(readFileSync(complete, 'utf8'))
+  bundle.capturedAt = '2026-11-13T18:00:00.000Z'
+  bundle.source.capturedAt = '2026-11-13T18:00:00.000Z'
+  writeFileSync(later, JSON.stringify(bundle))
+  const replacedPath = join(directory, 'replaced.json')
+  const replaced = run(['export', '--input', later, '--previous-export', first, '--out', replacedPath])
+  assert.equal(replaced.status, 0, replaced.stderr)
+  const replacedDocument = JSON.parse(readFileSync(replacedPath, 'utf8'))
+  assert.notEqual(replacedDocument.snapshot.snapshotId, firstDocument.snapshot.snapshotId)
+  assert.equal(replacedDocument.snapshot.continuity, 'new_snapshot')
+  assert.match(replacedDocument.snapshot.note, /not reused/)
+  assert.ok(replaced.stderr.includes('new_snapshot'), replaced.stderr)
+  assert.equal(replacedDocument.limitations[0], replacedDocument.snapshot.note)
 })

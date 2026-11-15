@@ -392,3 +392,81 @@ test('negative: a large error body is discarded within a fixed cap', async (t) =
   assert.ok(result.stderr.includes('server_error'), result.stderr)
   assert.ok(/errorBodyLimit=16384/.test(result.stderr), result.stderr)
 })
+
+test('one live read produces the report and the export of the same snapshot', async (t) => {
+  const directory = mkdtempSync(join(tmpdir(), 'usage-adapter-'))
+  const token = withToken(directory)
+  const server = await stub(t, (request, response) => {
+    const url = new URL(request.url, 'http://127.0.0.1')
+    if (url.pathname === '/v1/snapshot') return json(response, snapshot)
+    if (url.pathname === '/v1/works/work-a/evidence') return json(response, evidence('work-a'))
+    if (url.pathname === '/v1/works/work-a/evidence/history') return json(response, history('work-a'))
+    if (url.pathname === '/v1/attention') {
+      return json(response, {
+        protocol: 'attention-inbox/1', observedAt: '2026-11-08T12:00:00.000Z', items: [], ranks: [],
+        ranking: 'waiting_order', scannedWorks: 1, questionCoverage: 'complete', hasMore: false,
+      })
+    }
+    json(response, { error: { code: 'not_found' } }, 404)
+  })
+  const bundlePath = join(directory, 'bundle.json')
+  const reportPath = join(directory, 'report.md')
+  const exportPath = join(directory, 'export.json')
+  const result = await run(['collect', '--base-url', server.base, '--token-file', token,
+    '--project', 'project-atlas', '--include-attention', '--days', '7', '--to', '2026-11-08T12:00:00.000Z',
+    '--out', bundlePath, '--report', reportPath, '--export', exportPath])
+  assert.equal(result.status, 0, result.stderr)
+  const document = JSON.parse(readFileSync(exportPath, 'utf8'))
+  const report = readFileSync(reportPath, 'utf8')
+  const bundle = JSON.parse(readFileSync(bundlePath, 'utf8'))
+  // The rolling window is exactly the coordinator's shape, and the capture time is its end.
+  assert.equal(bundle.capturedAt, '2026-11-08T12:00:00.000Z')
+  assert.equal(bundle.window.to, '2026-11-08T12:00:00.000Z')
+  assert.equal(Date.parse(bundle.window.to) - Date.parse(bundle.window.from), 7 * 86_400_000)
+  // The report and the export describe one observation: the same summary id.
+  assert.ok(report.includes(`| Summary id | ${document.snapshot.snapshotId} |`), 'the report names the same snapshot')
+  assert.equal(document.protocol, 'usage-insights-export/2')
+  assert.equal(document.snapshot.continuity, 'first_observation')
+  assert.equal(document.exportedFrom.capturedAt, '2026-11-08T12:00:00.000Z')
+  // `--days` and `--from` are alternatives, and only 7 or 30 is a valid window.
+  assert.equal((await run(['collect', '--base-url', server.base, '--token-file', token, '--project', 'project-atlas',
+    '--days', '7', '--from', '2026-11-01T00:00:00Z', '--out', join(directory, 'c1.json')])).status, 2)
+  assert.equal((await run(['collect', '--base-url', server.base, '--token-file', token, '--project', 'project-atlas',
+    '--days', '14', '--out', join(directory, 'c2.json')])).status, 2)
+  await server.close()
+})
+
+test('a second live read replaces the snapshot instead of extending the earlier export', async (t) => {
+  const directory = mkdtempSync(join(tmpdir(), 'usage-adapter-'))
+  const token = withToken(directory)
+  const server = await stub(t, (request, response) => {
+    const url = new URL(request.url, 'http://127.0.0.1')
+    if (url.pathname === '/v1/snapshot') return json(response, snapshot)
+    if (url.pathname === '/v1/works/work-a/evidence') return json(response, evidence('work-a'))
+    if (url.pathname === '/v1/works/work-a/evidence/history') return json(response, history('work-a'))
+    json(response, { error: { code: 'not_found' } }, 404)
+  })
+  const collect = (to, out, extra = []) => run(['collect', '--base-url', server.base, '--token-file', token,
+    '--project', 'project-atlas', '--days', '7', '--to', to, '--out', out, ...extra])
+  const firstExport = join(directory, 'first.json')
+  assert.equal((await collect('2026-11-08T12:00:00.000Z', join(directory, 'b1.json'), ['--export', firstExport])).status, 0)
+  const first = JSON.parse(readFileSync(firstExport, 'utf8'))
+
+  // Re-exporting the same bundle is the same observation.
+  const samePath = join(directory, 'same.json')
+  const same = await run(['export', '--input', join(directory, 'b1.json'), '--previous-export', firstExport, '--out', samePath])
+  assert.equal(same.status, 0, same.stderr)
+  assert.equal(JSON.parse(readFileSync(samePath, 'utf8')).snapshot.continuity, 'same_snapshot')
+  assert.equal(same.stderr.includes('new_snapshot'), false)
+
+  // A later read of the same facts is a new snapshot; the earlier values are not reused.
+  const secondExport = join(directory, 'second.json')
+  const second = await collect('2026-11-08T13:00:00.000Z', join(directory, 'b2.json'), ['--export', secondExport, '--previous-export', firstExport])
+  assert.equal(second.status, 0, second.stderr)
+  const later = JSON.parse(readFileSync(secondExport, 'utf8'))
+  assert.notEqual(later.snapshot.snapshotId, first.snapshot.snapshotId)
+  assert.equal(later.snapshot.continuity, 'new_snapshot')
+  assert.deepEqual(later.snapshot.previous, { snapshotId: first.snapshot.snapshotId, capturedAt: first.snapshot.capturedAt })
+  assert.ok(second.stderr.includes('new_snapshot'), second.stderr)
+  await server.close()
+})
