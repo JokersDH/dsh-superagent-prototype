@@ -1,0 +1,81 @@
+{
+  "protocol": "wave29-status/1",
+  "agent": "C",
+  "branch": "codex/g3-assistant-context",
+  "base": { "mergeCommit": "273de3a", "originMain": "79525b6", "rfcs": ["WP-16/0073", "WP-16/0074", "WP-16/0075"] },
+  "wave": 29,
+  "checkpoints": [
+    { "commit": "2f04f2fc", "result": "A strict completion facts consumer; raw receipts never current/accepted" },
+    { "commit": "01a90047", "result": "registered project template -> original create/accept -> A facts" },
+    { "commit": "9542c459", "result": "current 1ba0032 dual-root restore + readiness + STOPPED" },
+    { "commit": "51932cf7", "result": "WAVE29 recipe + facts consumer API" },
+    { "commit": "dbb528fa", "result": "wave29 UI input contract" }
+  ],
+  "sources": {
+    "aHead": "c80ec34ccbd2c8398258d318eac7c53c232da9aa",
+    "aWorkflowsDirty": { "path": "packages/storage/src/workflows.ts", "sha256": "27f3142ef1a8348acadf02f9f482008ff277081f976530bd9bba69033ae8f908", "onOriginMain": false, "note": "strict CompletionFacts classifier with unclassifiedReviews + productReviewCommandId; source/worktree level only" },
+    "completionFactsTool": "packages/context/tools/wave29-completion-facts.mjs",
+    "completionFactsProtocol": "wave29-completion-facts/1",
+    "driver": "personal-review-driver/2",
+    "currentPackage": { "tar": "wave28-target-1ba0032.tar.gz", "sha256": "504dfdc1ceb191828d3836017cc47d9d0023dc27cc1291e6caf28e08aafcfb9e", "source": "1ba003239237d3fc7a92bde8cbe897549abcbd5d", "build": "67abd96690030eb7", "schema": 18, "node": "24.21.0", "abi": 137 },
+    "dStatus": "D 1ba carries statistics but no J module",
+    "eStatus": "E independent verdict still binds ce64; no ce64/1ba relabel"
+  },
+  "stages": {
+    "C1": { "status": "passed", "note": "fixed 039fffb7 ancestry, merged origin/main, lock diff preserved/not committed" },
+    "C2": { "status": "passed", "note": "A strict facts: reviews derived from completion_verifications + canonical productReviewCommandId; unclassifiedReviews preserved" },
+    "C3": { "status": "passed", "note": "source Store and A-restored copy yield identical canonical review/verification/acceptance" },
+    "C4": { "status": "passed", "note": "raw review receipt never becomes review/current/accepted; counts unchanged; no candidates table" },
+    "C5": { "status": "passed", "note": "ProductCompletion current/metadata remains the application authority; facts are read-only data" },
+    "C6": { "status": "passed", "note": "no SQL writer, second confirmation, private LLM loop or HTTP added by C" },
+    "C7": { "status": "passed", "note": "current 1ba package: prepare/start/read/STOPPED with v1 and v2 independent restores" },
+    "C8": { "status": "passed", "note": "readiness authorization none, recovery_readonly, development readonly, dispatchable 0, admitted 0" },
+    "C9": { "status": "passed", "note": "J preview HTTP returns draft/authorization none; fields align with explicit project/profile/scope; no root leak" },
+    "C10": { "status": "passed", "note": "preview -> original create_work/check/accept_candidate delivered; original business identity preserved" },
+    "C11": { "status": "passed", "note": "A strict facts read the same Work after delivery (canonical review, verification, acceptance)" },
+    "C12": { "status": "not_reached", "note": "J module absent from current 1ba package; same-package template flow source-only" },
+    "C13": { "status": "not_reached", "note": "live B/I callback/approval consumer has no admitted surface; C does not fabricate one" },
+    "C14": { "status": "passed", "note": "restore/data read does not become startup or execution permission; separate layers recorded" },
+    "C15": { "status": "not_reached", "note": "private activation/target/native remain outside C; no permissions question converted to automatic approval" },
+    "C16": { "status": "passed", "note": "ordinary-model approval remains the confirmation path; template fields are prefill only" },
+    "C17": { "status": "passed", "note": "complete package identity gate (launcher/api pid + processStart, state/install/configRoot/review)" },
+    "C18": { "status": "passed", "note": "legal reuse/keep and verified cleanup; owned stop failure downgrades result" },
+    "C19": { "status": "passed", "note": "per-request/total deadline, readiness deadline, cleanup reserve" },
+    "C20": { "status": "passed", "note": "silent peer, half JSON, early exit, readiness timeout, SIGKILL escalation fault controls" },
+    "C21": { "status": "passed", "note": "bounded logs; output/evidence explicit paths, no historical overwrite" },
+    "C22": { "status": "passed", "note": "four-package strict typecheck and build pass" },
+    "C23": { "status": "passed", "note": "driver/dialect API stable; source and package dialects keep one implementation" },
+    "C24": { "status": "passed", "note": "D/E/main/F consumable: facts consumer contract, UI input, package tuple, limitations documented" }
+  },
+  "suites": {
+    "context": { "tests": 129, "pass": 129, "fail": 0, "tap": "packages/context/reports/wave29-final-context.tap" },
+    "proposals": { "tests": 41, "pass": 41, "fail": 0, "tap": "packages/context/reports/wave29-final-proposals.tap" },
+    "knowledge": { "tests": 119, "pass": 119, "fail": 0, "tap": "packages/context/reports/wave29-final-knowledge.tap" },
+    "routing": { "tests": 44, "pass": 44, "fail": 0, "tap": "packages/context/reports/wave29-final-routing.tap" },
+    "total": { "tests": 333, "pass": 333, "fail": 0 },
+    "typecheck": "pass (context/proposals/knowledge/routing)",
+    "build": "pnpm -r --workspace-concurrency=4 run build exit 0"
+  },
+  "evidence": {
+    "strictFactsCase": "A strict completion facts classify canonical reviews and never turn raw receipts into current/accepted",
+    "sourceRestoreEquality": "original completion facts are read from existing ProductCompletion records, not a candidate table",
+    "templateCase": "a registered project recipe enters the original form/create/accept flow and A completion facts read it",
+    "packageCase": "the current 1ba0032 package runs readiness plus manifest-driven v1/v2 restored data read-only"
+  },
+  "layers": {
+    "source": "context/proposals/knowledge/routing + A dirty strict facts (c80ec34)",
+    "package": "1ba0032 exact tuple; J/statistics absent in that package",
+    "installed": "not independently verified by C (E owns)",
+    "normal": "template preview + original form/create/accept delivered on fixture project",
+    "recovered": "readonly readiness + v1/v2 restored data read",
+    "native": "0; private activation/target not attempted"
+  },
+  "limits": [
+    "A strict facts classifier is not on origin/main; packaged integration NOT_REACHED",
+    "live B/I callback and J-in-package flows NOT_REACHED",
+    "private permission/target/native and F UI/E release outside C",
+    "long-term revocation, concurrent writers and soak untested",
+    "real vendor model/native turns 0; B cap4 UNKNOWN unspendable; E pilot stays BLOCKED"
+  ],
+  "preserved": ["pnpm-lock.yaml diff uncommitted", "twelve services 5180-5191/8796-8807", "state/profile/tar/ledger/historical reports", "no control of user instances"]
+}
