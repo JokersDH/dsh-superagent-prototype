@@ -72,6 +72,7 @@ import {
   ContextSourcesSchema,
   UsageObservationQuerySchema,
   UsageObservationSchema,
+  UsageObservationDownloadSchema,
   ProjectRecipePreviewInputSchema,
   ProjectRecipePreviewSchema,
 } from '@personal-agent/contracts'
@@ -133,6 +134,7 @@ import type {
   RecoverySourceConfirm,
   UsageObservation,
   UsageObservationQuery,
+  UsageObservationDownload,
   ProjectRecipePreviewInput,
   ProjectRecipePreview,
 } from '@personal-agent/contracts'
@@ -204,6 +206,7 @@ export interface LocalHttpOptions {
   read?: {
     projectRecipePreview?(input: ProjectRecipePreviewInput): Promise<ProjectRecipePreview>
     usageObservation?(query: UsageObservationQuery): Promise<UsageObservation>
+    usageObservationDownload?(query: UsageObservationQuery): Promise<UsageObservationDownload>
     attention?(query: AttentionQuery): Promise<AttentionPage>
     decisions?(query: DecisionQuery): Promise<DecisionPage>
     recovery?(): Promise<RecoveryInspection>
@@ -446,13 +449,26 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
     return c.json(projectTrialReadiness(configuration, provider, { mode: options.mode,
       startupMode: options.startupMode ?? 'normal', observedAt: new Date(now()).toISOString() }))
   })
+  const observationQuery = (request: { queries(): Record<string, string[]>; query(): Record<string, string> }) => {
+    if (Object.values(request.queries()).some(values => values.length !== 1))
+      throw new ApplicationFault('invalid_request', 'Observation query parameters must be unique')
+    const raw = request.query(), input = { ...raw } as Record<string, unknown>
+    if (raw.days !== undefined) input.days = /^(7|30)$/.test(raw.days) ? Number(raw.days) : NaN
+    return UsageObservationQuerySchema.parse(input)
+  }
+  app.get('/v1/insights/export', async c => {
+    if (!options.read?.usageObservationDownload) throw new ApplicationFault('unsupported_capability', 'Observation download is not connected')
+    const query = observationQuery(c.req), value = UsageObservationDownloadSchema.parse(await options.read.usageObservationDownload(query))
+    const observed = value.observation
+    if ((query.projectId && (observed.scope.projectIds.length !== 1 || observed.scope.projectIds[0] !== query.projectId)) ||
+      observed.days !== (query.days ?? 7) || observed.timezone !== (query.timezone ?? 'UTC'))
+      throw new ApplicationFault('storage_unavailable', 'Observation export scope mismatch', 'none')
+    c.header('cache-control', 'no-store')
+    return c.json(value)
+  })
   app.get('/v1/insights', async c => {
     if (!options.read?.usageObservation) throw new ApplicationFault('unsupported_capability', 'Usage observation is not connected')
-    if (Object.values(c.req.queries()).some(values => values.length !== 1))
-      throw new ApplicationFault('invalid_request', 'Observation query parameters must be unique')
-    const raw = c.req.query(), input = { ...raw } as Record<string, unknown>
-    if (raw.days !== undefined) input.days = /^(7|30)$/.test(raw.days) ? Number(raw.days) : NaN
-    const query = UsageObservationQuerySchema.parse(input)
+    const query = observationQuery(c.req)
     const value = UsageObservationSchema.parse(await options.read.usageObservation(query))
     if ((query.projectId && (value.scope.projectIds.length !== 1 || value.scope.projectIds[0] !== query.projectId)) ||
       value.days !== (query.days ?? 7) || value.timezone !== (query.timezone ?? 'UTC'))

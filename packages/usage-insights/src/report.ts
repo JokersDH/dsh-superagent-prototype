@@ -70,6 +70,7 @@ export function renderMarkdown(analysis: UsageInsightsAnalysis): string {
   lines.push(`| Window | ${safeText(summary.window.from)} → ${safeText(summary.window.to)} (${safeText(summary.timezone)}) |`)
   lines.push(`| Projects | ${summary.projects.length === 0 ? '—' : summary.projects.map(project => safeText(project.projectId)).join(', ')} |`)
   lines.push(`| Summary id | ${summary.summaryId} |`)
+  lines.push('| Snapshot | the summary id identifies this observation; reading the source again produces a different one, so an earlier report or export is never extended with newer values |')
   lines.push(`| Input digest | ${summary.inputDigest ?? 'not supplied'} |`)
   lines.push('')
   lines.push('## Coverage')
