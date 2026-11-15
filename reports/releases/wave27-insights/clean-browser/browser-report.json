@@ -1,0 +1,38 @@
+{
+  "status": "PASS_ACTUAL_SCOPED_INSIGHTS_APP",
+  "sourceCommit": "d6c4f80da26d37468e34b25b590c41c234faee27",
+  "sourceWorktreeClean": false,
+  "cases": [
+    {
+      "id": "DEFAULT-CONVERSATION-DOES-NOT-COLLECT-INSIGHTS",
+      "status": "PASS"
+    },
+    {
+      "id": "REAL-PROJECT-SELECTION-SCOPES-OBSERVATIONS",
+      "status": "PASS"
+    },
+    {
+      "id": "LATE-OLD-PROJECT-RESPONSE-CANNOT-REPLACE-CURRENT-DATA",
+      "status": "PASS"
+    },
+    {
+      "id": "INVALID-OR-FAILED-READ-KEEPS-DATED-OBSERVATION-WITH-SANITIZED-ERROR",
+      "status": "PASS"
+    },
+    {
+      "id": "LEGACY-OPTIONAL-ABSENCE-KEEPS-THE-OLD-WORKBENCH-USABLE",
+      "status": "PASS"
+    },
+    {
+      "id": "DESKTOP-MOBILE-SCOPED-DATA-FITS-WITHOUT-WRITES",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "insightReads": 8,
+  "postRequests": 0,
+  "eventDelta": 0,
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "scope": "Actual App/React/Product/Broker/SQLite/HTTP/G Node analyzer, private controlled question fixtures; no installed/native/recovery/benefit admission"
+}
