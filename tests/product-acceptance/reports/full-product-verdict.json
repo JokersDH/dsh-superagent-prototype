@@ -3,12 +3,12 @@
   "tier": "full-product",
   "status": "FAIL",
   "ok": false,
-  "checkedAt": "2026-11-15T09:36:01.239Z",
+  "checkedAt": "2026-11-15T09:52:40.152Z",
   "source": {
-    "commit": "bbe7923e667f9268d26d8cf16948646711576e05",
+    "commit": "a77cab4f41ab6f39975541606fc0f15df1655e55",
     "dirty": false
   },
-  "expectedSource": "bbe7923e667f9268d26d8cf16948646711576e05",
+  "expectedSource": "a77cab4f41ab6f39975541606fc0f15df1655e55",
   "requirements": [
     {
       "id": "E1-GATE-CONTROL",
@@ -1001,7 +1001,7 @@
   "claimedBy": {
     "status": "PASS",
     "tier": "controlled-product-workflow",
-    "decidedAt": "2026-11-15T09:27:57.763Z",
+    "decidedAt": "2026-11-15T09:44:41.094Z",
     "failureCodes": []
   },
   "notes": [

@@ -3,10 +3,10 @@
   "agent": "E",
   "branch": "codex/g3-product-acceptance",
   "base": "6369eea",
-  "checkpoint": "bbe7923",
-  "head": "bbe7923e667f9268d26d8cf16948646711576e05",
+  "checkpoint": "a77cab4",
+  "head": "a77cab4f41ab6f39975541606fc0f15df1655e55",
   "worktreeDirtyAtRun": false,
-  "checkedAt": "2026-11-15T09:27:57.744Z",
+  "checkedAt": "2026-11-15T09:44:41.079Z",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -1584,12 +1584,12 @@
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-15T09:27:57.763Z",
+    "checkedAt": "2026-11-15T09:44:41.094Z",
     "source": {
-      "commit": "bbe7923e667f9268d26d8cf16948646711576e05",
+      "commit": "a77cab4f41ab6f39975541606fc0f15df1655e55",
       "dirty": false
     },
-    "expectedSource": "bbe7923e667f9268d26d8cf16948646711576e05",
+    "expectedSource": "a77cab4f41ab6f39975541606fc0f15df1655e55",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -2354,31 +2354,31 @@
       "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability; there is no allow-gap switch."
     ]
   },
-  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z",
+  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z",
   "evidence": {
-    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/report.json",
-    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/release.json",
+    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/report.json",
+    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/release.json",
     "screenshots": [
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/screenshots/desktop-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/screenshots/notebook-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/screenshots/mobile-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/screenshots/mobile-navigation.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/screenshots/mobile-detail.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/screenshots/desktop-delivered.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/screenshots/desktop-error.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/screenshots/desktop-offline.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/screenshots/desktop-keyboard.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/screenshots/mobile-conversations.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/screenshots/desktop-verification-blocked.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/screenshots/desktop-verification-recovered.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/screenshots/desktop-review-activity.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/screenshots/mobile-attention-inbox.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/proposal-preview-desktop.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/proposal-preview-notebook.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/proposal-preview-mobile.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/screenshots/context-confirm-desktop.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/screenshots/context-confirm-mobile.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-20-43-835Z/screenshots/context-history-mobile.png"
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/screenshots/desktop-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/screenshots/notebook-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/screenshots/mobile-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/screenshots/mobile-navigation.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/screenshots/mobile-detail.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/screenshots/desktop-delivered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/screenshots/desktop-error.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/screenshots/desktop-offline.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/screenshots/desktop-keyboard.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/screenshots/mobile-conversations.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/screenshots/desktop-verification-blocked.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/screenshots/desktop-verification-recovered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/screenshots/desktop-review-activity.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/screenshots/mobile-attention-inbox.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/proposal-preview-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/proposal-preview-notebook.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/proposal-preview-mobile.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/screenshots/context-confirm-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/screenshots/context-confirm-mobile.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T09-38-26-313Z/screenshots/context-history-mobile.png"
     ],
     "matrix": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/release-matrix.json",
     "executionStatus": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/execution-status.json",
@@ -2694,8 +2694,8 @@
       "proof": {
         "proven": true,
         "stopped": [
-          25026,
-          25027
+          45342,
+          45343
         ],
         "unknownLive": []
       }
@@ -2829,38 +2829,38 @@
           "present": true,
           "mode": "personal",
           "startupMode": "normal",
-          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/seed-state",
-          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/install/app",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/seed-state",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/app",
           "resources": [
             {
               "label": "launcher",
-              "pid": 55474,
-              "start": "Sun Nov 15 17:27:32 2026",
+              "pid": 75776,
+              "start": "Sun Nov 15 17:44:19 2026",
               "uid": 501,
               "parentPid": null,
-              "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/install/app/apps/launcher/bin/pa.mjs start --json --port 63174 --api-port 63175 --discussion-only"
+              "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/app/apps/launcher/bin/pa.mjs start --json --port 49488 --api-port 49489 --discussion-only"
             },
             {
               "label": "child",
-              "pid": 55510,
-              "start": "Sun Nov 15 17:27:32 2026",
+              "pid": 75812,
+              "start": "Sun Nov 15 17:44:19 2026",
               "uid": 501,
-              "parentPid": 55474,
-              "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/install/app/apps/coordinator/product/demo.ts --port 63175 --state /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/seed-state --console-origin htt"
+              "parentPid": 75776,
+              "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/app/apps/coordinator/product/demo.ts --port 49489 --state /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/seed-state --console-origin htt"
             }
           ]
         },
         "after": [
           {
-            "pid": 55474,
-            "expectedStart": "Sun Nov 15 17:27:32 2026",
+            "pid": 75776,
+            "expectedStart": "Sun Nov 15 17:44:19 2026",
             "alive": false,
             "start": null,
             "sameIdentity": false
           },
           {
-            "pid": 55510,
-            "expectedStart": "Sun Nov 15 17:27:32 2026",
+            "pid": 75812,
+            "expectedStart": "Sun Nov 15 17:44:19 2026",
             "alive": false,
             "start": null,
             "sameIdentity": false
@@ -2884,38 +2884,38 @@
           "present": true,
           "mode": "personal",
           "startupMode": "recovery_readonly",
-          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/restored",
-          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/install/app",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/restored",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/app",
           "resources": [
             {
               "label": "launcher",
-              "pid": 55788,
-              "start": "Sun Nov 15 17:27:34 2026",
+              "pid": 76089,
+              "start": "Sun Nov 15 17:44:21 2026",
               "uid": 501,
               "parentPid": null,
-              "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/install/app/apps/launcher/bin/pa.mjs start --json --port 63184 --api-port 63185 --discussion-only"
+              "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/app/apps/launcher/bin/pa.mjs start --json --port 49497 --api-port 49498 --discussion-only"
             },
             {
               "label": "child",
-              "pid": 55826,
-              "start": "Sun Nov 15 17:27:34 2026",
+              "pid": 76125,
+              "start": "Sun Nov 15 17:44:21 2026",
               "uid": 501,
-              "parentPid": 55788,
-              "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/install/app/apps/coordinator/product/demo.ts --port 63185 --state /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/restored --console-origin http:"
+              "parentPid": 76089,
+              "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/app/apps/coordinator/product/demo.ts --port 49498 --state /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/restored --console-origin http:"
             }
           ]
         },
         "after": [
           {
-            "pid": 55788,
-            "expectedStart": "Sun Nov 15 17:27:34 2026",
+            "pid": 76089,
+            "expectedStart": "Sun Nov 15 17:44:21 2026",
             "alive": false,
             "start": null,
             "sameIdentity": false
           },
           {
-            "pid": 55826,
-            "expectedStart": "Sun Nov 15 17:27:34 2026",
+            "pid": 76125,
+            "expectedStart": "Sun Nov 15 17:44:21 2026",
             "alive": false,
             "start": null,
             "sameIdentity": false
@@ -2948,7 +2948,7 @@
     "restoredPersonalReview": {
       "status": "PASS",
       "consumerOrigin": "package",
-      "healthDigest": "0c18dc67561c7faaf37411ea0cb10a57b3df1dd6a186d44f941f7adfdfedd367"
+      "healthDigest": "f28ddc5fd9614504df6cb031e91aff9cf675967f2a8f8ed78dd6ef936fa937a7"
     },
     "restoredReviewRefusals": "PASS",
     "reviewReuse": {
@@ -2968,7 +2968,7 @@
       "status": "PASS",
       "normal": {
         "protocol": "trial-readiness/1",
-        "observedAt": "2026-11-15T09:27:28.844Z",
+        "observedAt": "2026-11-15T09:44:16.760Z",
         "configurationRevision": "a9c826f123324b2d8f1a07902775e6a1c453f4de86b467027490a903c324e84b",
         "mode": "personal",
         "startupMode": "normal",
@@ -2999,8 +2999,8 @@
       },
       "readonly": {
         "protocol": "trial-readiness/1",
-        "observedAt": "2026-11-15T09:27:30.201Z",
-        "configurationRevision": "e4f895f8e7180c06ce2ce7cc7b5470b620a613d2a307a7f7e31746c5b5b6283b",
+        "observedAt": "2026-11-15T09:44:17.854Z",
+        "configurationRevision": "af1e9636a40f4e9339d3f6edb94ef6087650f7b70ea078bed8847fba70a8bf06",
         "mode": "personal",
         "startupMode": "recovery_readonly",
         "discussion": "unknown",
@@ -3030,7 +3030,7 @@
       },
       "fixture": {
         "protocol": "trial-readiness/1",
-        "observedAt": "2026-11-15T09:27:31.817Z",
+        "observedAt": "2026-11-15T09:44:19.176Z",
         "configurationRevision": "83d2a00c18fe919d4671f2916ce9baec23e44fc5cfd8f51b3ba2d241462e06af",
         "mode": "fixture",
         "startupMode": "normal",
@@ -3076,21 +3076,21 @@
       "screenshots": [
         {
           "path": "tests/product-acceptance/reports/wave27/browser/desktop.png",
-          "sha256": "594a4da544e5c77f8d0e8bc14091aad03b631afe96d9d0a87e8dc98891c88b2f",
-          "bytes": 124754,
-          "size": 124754
+          "sha256": "19ff8f9cc54b815f2ac8d347032a0432f156407119c7f29f715b21e84377b134",
+          "bytes": 124724,
+          "size": 124724
         },
         {
           "path": "tests/product-acceptance/reports/wave27/browser/mobile.png",
-          "sha256": "9f1ae21f8742d8b59e34547f5300c3f49fb5ffca9286e06f618bb741beb6e555",
-          "bytes": 55862,
-          "size": 55862
+          "sha256": "57337e0250d4a69c30b5e398768c168bbc9eb96d7de06f688e5e4af9f18de324",
+          "bytes": 55834,
+          "size": 55834
         },
         {
           "path": "tests/product-acceptance/reports/wave27/browser/configured-conversation.png",
-          "sha256": "1db9470e1d7c1f06b92ae0fa7c45dc3edabecf82fffa91c16f0385c71ef85151",
-          "bytes": 76517,
-          "size": 76517
+          "sha256": "78c0eb1d366de861cc08c882c53d924e090ab5b0c76f40b230e0da0847a88a68",
+          "bytes": 76516,
+          "size": 76516
         }
       ],
       "bundle": {
@@ -3106,10 +3106,10 @@
           "copied": 22,
           "digests": [
             {
-              "id": "7d431ff73e133c9ff50a919c9eb510a6f8719128caac4b0650445837e068ad7c",
+              "id": "b3c82dc1faade816426c3a61ca7104d8580182f5861c75875d6615f0380b15c0",
               "present": true,
-              "digest": "7d431ff73e133c9ff50a919c9eb510a6f8719128caac4b0650445837e068ad7c",
-              "registryDigest": "7d431ff73e133c9ff50a919c9eb510a6f8719128caac4b0650445837e068ad7c",
+              "digest": "b3c82dc1faade816426c3a61ca7104d8580182f5861c75875d6615f0380b15c0",
+              "registryDigest": "b3c82dc1faade816426c3a61ca7104d8580182f5861c75875d6615f0380b15c0",
               "match": true,
               "bytes": 412
             },
@@ -3122,34 +3122,34 @@
               "bytes": 234
             },
             {
-              "id": "a9fc15d035bc5c18c66b354504e2a52ed431c483553bd41aa81d787783da2b76",
+              "id": "688b96281aec53d8f1dd9681e49d855039621aade67d20edef3a9f3c866a3904",
               "present": true,
-              "digest": "a9fc15d035bc5c18c66b354504e2a52ed431c483553bd41aa81d787783da2b76",
-              "registryDigest": "a9fc15d035bc5c18c66b354504e2a52ed431c483553bd41aa81d787783da2b76",
+              "digest": "688b96281aec53d8f1dd9681e49d855039621aade67d20edef3a9f3c866a3904",
+              "registryDigest": "688b96281aec53d8f1dd9681e49d855039621aade67d20edef3a9f3c866a3904",
               "match": true,
               "bytes": 704
             },
             {
-              "id": "9fa48ae78356a735db7620927091c6e8b1f402778d204f27d18abf0c38c6cca1",
+              "id": "9e2d326a300067e159437360c33c94d8f828fd7dd9db7c322b43e7f0af7fb49f",
               "present": true,
-              "digest": "9fa48ae78356a735db7620927091c6e8b1f402778d204f27d18abf0c38c6cca1",
-              "registryDigest": "9fa48ae78356a735db7620927091c6e8b1f402778d204f27d18abf0c38c6cca1",
+              "digest": "9e2d326a300067e159437360c33c94d8f828fd7dd9db7c322b43e7f0af7fb49f",
+              "registryDigest": "9e2d326a300067e159437360c33c94d8f828fd7dd9db7c322b43e7f0af7fb49f",
               "match": true,
               "bytes": 712
             },
             {
-              "id": "b261aae1bfb223f78a7e9be02519c0f1af9561dd6aeb8b649b4a0b8d6a45384c",
+              "id": "fc4c51a2eecf0ffaf50c896d85d5093416d6b90e730b5b546d14def3487fa5bd",
               "present": true,
-              "digest": "b261aae1bfb223f78a7e9be02519c0f1af9561dd6aeb8b649b4a0b8d6a45384c",
-              "registryDigest": "b261aae1bfb223f78a7e9be02519c0f1af9561dd6aeb8b649b4a0b8d6a45384c",
+              "digest": "fc4c51a2eecf0ffaf50c896d85d5093416d6b90e730b5b546d14def3487fa5bd",
+              "registryDigest": "fc4c51a2eecf0ffaf50c896d85d5093416d6b90e730b5b546d14def3487fa5bd",
               "match": true,
               "bytes": 262
             },
             {
-              "id": "96571989e083e91dc8f37c8442ab2ac62ed06b99dd5c5e941d1411dcfa81ba37",
+              "id": "67068857a1fb359aa0ce0206c933abb562adc8ddd1beb71adfcc9ad762cc4117",
               "present": true,
-              "digest": "96571989e083e91dc8f37c8442ab2ac62ed06b99dd5c5e941d1411dcfa81ba37",
-              "registryDigest": "96571989e083e91dc8f37c8442ab2ac62ed06b99dd5c5e941d1411dcfa81ba37",
+              "digest": "67068857a1fb359aa0ce0206c933abb562adc8ddd1beb71adfcc9ad762cc4117",
+              "registryDigest": "67068857a1fb359aa0ce0206c933abb562adc8ddd1beb71adfcc9ad762cc4117",
               "match": true,
               "bytes": 267
             },
@@ -3162,50 +3162,50 @@
               "bytes": 153
             },
             {
-              "id": "15a8a996998b6a53fbd0d045ada12d1c8b686492a7f3d8a3d4ed9152e01becc2",
+              "id": "e8ecbc7085cfc8ed345ace491f0b67b1e906d94a1152a1c6ac0e61bf863b3968",
               "present": true,
-              "digest": "15a8a996998b6a53fbd0d045ada12d1c8b686492a7f3d8a3d4ed9152e01becc2",
-              "registryDigest": "15a8a996998b6a53fbd0d045ada12d1c8b686492a7f3d8a3d4ed9152e01becc2",
+              "digest": "e8ecbc7085cfc8ed345ace491f0b67b1e906d94a1152a1c6ac0e61bf863b3968",
+              "registryDigest": "e8ecbc7085cfc8ed345ace491f0b67b1e906d94a1152a1c6ac0e61bf863b3968",
               "match": true,
               "bytes": 1330
             },
             {
-              "id": "7141b66b6bf8bdd7d29b5a807017542a87263594f9dd5a4d9c5df454d95cbf32",
+              "id": "a681f3caae83d438088bc044d51d6b6c664429c8c014b2c4b17450230c598b72",
               "present": true,
-              "digest": "7141b66b6bf8bdd7d29b5a807017542a87263594f9dd5a4d9c5df454d95cbf32",
-              "registryDigest": "7141b66b6bf8bdd7d29b5a807017542a87263594f9dd5a4d9c5df454d95cbf32",
+              "digest": "a681f3caae83d438088bc044d51d6b6c664429c8c014b2c4b17450230c598b72",
+              "registryDigest": "a681f3caae83d438088bc044d51d6b6c664429c8c014b2c4b17450230c598b72",
               "match": true,
               "bytes": 570
             },
             {
-              "id": "66b3d35bfc4f004ea8658fe90231364d4017d6f353a3e0d2b8d49b99b4edc483",
+              "id": "deffc242dd597bdd4f6f0694501b6e737121e4bed9588e1ecf7429b4e19cc2ab",
               "present": true,
-              "digest": "66b3d35bfc4f004ea8658fe90231364d4017d6f353a3e0d2b8d49b99b4edc483",
-              "registryDigest": "66b3d35bfc4f004ea8658fe90231364d4017d6f353a3e0d2b8d49b99b4edc483",
+              "digest": "deffc242dd597bdd4f6f0694501b6e737121e4bed9588e1ecf7429b4e19cc2ab",
+              "registryDigest": "deffc242dd597bdd4f6f0694501b6e737121e4bed9588e1ecf7429b4e19cc2ab",
               "match": true,
               "bytes": 790
             },
             {
-              "id": "43ac06f224e8dd9e040be37b908f1cbed0f7113c847a1a0be539bb879b98e1ee",
+              "id": "154ac59e7ed8902c78926b4363ead6395fb74f750f41727cad36251af7ff5926",
               "present": true,
-              "digest": "43ac06f224e8dd9e040be37b908f1cbed0f7113c847a1a0be539bb879b98e1ee",
-              "registryDigest": "43ac06f224e8dd9e040be37b908f1cbed0f7113c847a1a0be539bb879b98e1ee",
+              "digest": "154ac59e7ed8902c78926b4363ead6395fb74f750f41727cad36251af7ff5926",
+              "registryDigest": "154ac59e7ed8902c78926b4363ead6395fb74f750f41727cad36251af7ff5926",
               "match": true,
               "bytes": 174
             },
             {
-              "id": "96c5c463a76367c8689e79cf335ceedbada41d8ad83c0628bdc19c67d7c11b10",
+              "id": "4f838b6834e78e9301ec85c79646e9c22d8a1160feb2422453ba665fff227522",
               "present": true,
-              "digest": "96c5c463a76367c8689e79cf335ceedbada41d8ad83c0628bdc19c67d7c11b10",
-              "registryDigest": "96c5c463a76367c8689e79cf335ceedbada41d8ad83c0628bdc19c67d7c11b10",
+              "digest": "4f838b6834e78e9301ec85c79646e9c22d8a1160feb2422453ba665fff227522",
+              "registryDigest": "4f838b6834e78e9301ec85c79646e9c22d8a1160feb2422453ba665fff227522",
               "match": true,
               "bytes": 187
             },
             {
-              "id": "793e2b474ad81474eff6a960d69417006b1b36361db0fc25ae5f343e1a840889",
+              "id": "10c2c9a2bac5ba4431ed362fc5d4c26403b835a20a5ed0813b24833d5cd46ec4",
               "present": true,
-              "digest": "793e2b474ad81474eff6a960d69417006b1b36361db0fc25ae5f343e1a840889",
-              "registryDigest": "793e2b474ad81474eff6a960d69417006b1b36361db0fc25ae5f343e1a840889",
+              "digest": "10c2c9a2bac5ba4431ed362fc5d4c26403b835a20a5ed0813b24833d5cd46ec4",
+              "registryDigest": "10c2c9a2bac5ba4431ed362fc5d4c26403b835a20a5ed0813b24833d5cd46ec4",
               "match": true,
               "bytes": 253
             },
@@ -3218,28 +3218,20 @@
               "bytes": 142
             },
             {
-              "id": "745a2aebc5beac066a094b119228d82e055cba999bffe3d44af6a7abd9d2021e",
+              "id": "05203a48c6c9b712300da00728df8c5bed237b657146cf8cf28fc93a962e5755",
               "present": true,
-              "digest": "745a2aebc5beac066a094b119228d82e055cba999bffe3d44af6a7abd9d2021e",
-              "registryDigest": "745a2aebc5beac066a094b119228d82e055cba999bffe3d44af6a7abd9d2021e",
+              "digest": "05203a48c6c9b712300da00728df8c5bed237b657146cf8cf28fc93a962e5755",
+              "registryDigest": "05203a48c6c9b712300da00728df8c5bed237b657146cf8cf28fc93a962e5755",
               "match": true,
               "bytes": 874
             },
             {
-              "id": "16839111b6b49a17b1bbb09e4c950ae6770802b221d8bb8e4f769e5f3050c1fb",
+              "id": "bc8d74956fb69895f58bc2b86e4de79b2b483a3ec813a2a7f37aaa77a3c030c3",
               "present": true,
-              "digest": "16839111b6b49a17b1bbb09e4c950ae6770802b221d8bb8e4f769e5f3050c1fb",
-              "registryDigest": "16839111b6b49a17b1bbb09e4c950ae6770802b221d8bb8e4f769e5f3050c1fb",
+              "digest": "bc8d74956fb69895f58bc2b86e4de79b2b483a3ec813a2a7f37aaa77a3c030c3",
+              "registryDigest": "bc8d74956fb69895f58bc2b86e4de79b2b483a3ec813a2a7f37aaa77a3c030c3",
               "match": true,
               "bytes": 234
-            },
-            {
-              "id": "48808517996119de8921341150c090855d585422cbca31c1792433e539397bad",
-              "present": true,
-              "digest": "48808517996119de8921341150c090855d585422cbca31c1792433e539397bad",
-              "registryDigest": "48808517996119de8921341150c090855d585422cbca31c1792433e539397bad",
-              "match": true,
-              "bytes": 1143
             },
             {
               "id": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
@@ -3258,18 +3250,26 @@
               "bytes": 213
             },
             {
-              "id": "d46c4eb88aa018ea6adefaaa2bc64811792bdee7bb6e2e332211972820bc69cc",
+              "id": "8fb32b0a605194be74b143d6d65072ccd2b829b22058659d83ff712555ada2e3",
               "present": true,
-              "digest": "d46c4eb88aa018ea6adefaaa2bc64811792bdee7bb6e2e332211972820bc69cc",
-              "registryDigest": "d46c4eb88aa018ea6adefaaa2bc64811792bdee7bb6e2e332211972820bc69cc",
+              "digest": "8fb32b0a605194be74b143d6d65072ccd2b829b22058659d83ff712555ada2e3",
+              "registryDigest": "8fb32b0a605194be74b143d6d65072ccd2b829b22058659d83ff712555ada2e3",
+              "match": true,
+              "bytes": 1143
+            },
+            {
+              "id": "e7a433656ff39f14a94a83070a6e5b6453002805df536dd3601afe163999e682",
+              "present": true,
+              "digest": "e7a433656ff39f14a94a83070a6e5b6453002805df536dd3601afe163999e682",
+              "registryDigest": "e7a433656ff39f14a94a83070a6e5b6453002805df536dd3601afe163999e682",
               "match": true,
               "bytes": 376
             },
             {
-              "id": "213d2ea0e99c78c1f9535f0e77abde3861841c94ea2d2e0dfc91aedaf2117e88",
+              "id": "ee5731a554e275c017a213e34843376e64186005eebb6ea38114c8ae1062788d",
               "present": true,
-              "digest": "213d2ea0e99c78c1f9535f0e77abde3861841c94ea2d2e0dfc91aedaf2117e88",
-              "registryDigest": "213d2ea0e99c78c1f9535f0e77abde3861841c94ea2d2e0dfc91aedaf2117e88",
+              "digest": "ee5731a554e275c017a213e34843376e64186005eebb6ea38114c8ae1062788d",
+              "registryDigest": "ee5731a554e275c017a213e34843376e64186005eebb6ea38114c8ae1062788d",
               "match": true,
               "bytes": 1615
             },
@@ -3288,10 +3288,10 @@
           "copied": 22,
           "digests": [
             {
-              "id": "7d431ff73e133c9ff50a919c9eb510a6f8719128caac4b0650445837e068ad7c",
+              "id": "b3c82dc1faade816426c3a61ca7104d8580182f5861c75875d6615f0380b15c0",
               "present": true,
-              "digest": "7d431ff73e133c9ff50a919c9eb510a6f8719128caac4b0650445837e068ad7c",
-              "registryDigest": "7d431ff73e133c9ff50a919c9eb510a6f8719128caac4b0650445837e068ad7c",
+              "digest": "b3c82dc1faade816426c3a61ca7104d8580182f5861c75875d6615f0380b15c0",
+              "registryDigest": "b3c82dc1faade816426c3a61ca7104d8580182f5861c75875d6615f0380b15c0",
               "match": true,
               "bytes": 412
             },
@@ -3304,34 +3304,34 @@
               "bytes": 234
             },
             {
-              "id": "a9fc15d035bc5c18c66b354504e2a52ed431c483553bd41aa81d787783da2b76",
+              "id": "688b96281aec53d8f1dd9681e49d855039621aade67d20edef3a9f3c866a3904",
               "present": true,
-              "digest": "a9fc15d035bc5c18c66b354504e2a52ed431c483553bd41aa81d787783da2b76",
-              "registryDigest": "a9fc15d035bc5c18c66b354504e2a52ed431c483553bd41aa81d787783da2b76",
+              "digest": "688b96281aec53d8f1dd9681e49d855039621aade67d20edef3a9f3c866a3904",
+              "registryDigest": "688b96281aec53d8f1dd9681e49d855039621aade67d20edef3a9f3c866a3904",
               "match": true,
               "bytes": 704
             },
             {
-              "id": "9fa48ae78356a735db7620927091c6e8b1f402778d204f27d18abf0c38c6cca1",
+              "id": "9e2d326a300067e159437360c33c94d8f828fd7dd9db7c322b43e7f0af7fb49f",
               "present": true,
-              "digest": "9fa48ae78356a735db7620927091c6e8b1f402778d204f27d18abf0c38c6cca1",
-              "registryDigest": "9fa48ae78356a735db7620927091c6e8b1f402778d204f27d18abf0c38c6cca1",
+              "digest": "9e2d326a300067e159437360c33c94d8f828fd7dd9db7c322b43e7f0af7fb49f",
+              "registryDigest": "9e2d326a300067e159437360c33c94d8f828fd7dd9db7c322b43e7f0af7fb49f",
               "match": true,
               "bytes": 712
             },
             {
-              "id": "b261aae1bfb223f78a7e9be02519c0f1af9561dd6aeb8b649b4a0b8d6a45384c",
+              "id": "fc4c51a2eecf0ffaf50c896d85d5093416d6b90e730b5b546d14def3487fa5bd",
               "present": true,
-              "digest": "b261aae1bfb223f78a7e9be02519c0f1af9561dd6aeb8b649b4a0b8d6a45384c",
-              "registryDigest": "b261aae1bfb223f78a7e9be02519c0f1af9561dd6aeb8b649b4a0b8d6a45384c",
+              "digest": "fc4c51a2eecf0ffaf50c896d85d5093416d6b90e730b5b546d14def3487fa5bd",
+              "registryDigest": "fc4c51a2eecf0ffaf50c896d85d5093416d6b90e730b5b546d14def3487fa5bd",
               "match": true,
               "bytes": 262
             },
             {
-              "id": "96571989e083e91dc8f37c8442ab2ac62ed06b99dd5c5e941d1411dcfa81ba37",
+              "id": "67068857a1fb359aa0ce0206c933abb562adc8ddd1beb71adfcc9ad762cc4117",
               "present": true,
-              "digest": "96571989e083e91dc8f37c8442ab2ac62ed06b99dd5c5e941d1411dcfa81ba37",
-              "registryDigest": "96571989e083e91dc8f37c8442ab2ac62ed06b99dd5c5e941d1411dcfa81ba37",
+              "digest": "67068857a1fb359aa0ce0206c933abb562adc8ddd1beb71adfcc9ad762cc4117",
+              "registryDigest": "67068857a1fb359aa0ce0206c933abb562adc8ddd1beb71adfcc9ad762cc4117",
               "match": true,
               "bytes": 267
             },
@@ -3344,50 +3344,50 @@
               "bytes": 153
             },
             {
-              "id": "15a8a996998b6a53fbd0d045ada12d1c8b686492a7f3d8a3d4ed9152e01becc2",
+              "id": "e8ecbc7085cfc8ed345ace491f0b67b1e906d94a1152a1c6ac0e61bf863b3968",
               "present": true,
-              "digest": "15a8a996998b6a53fbd0d045ada12d1c8b686492a7f3d8a3d4ed9152e01becc2",
-              "registryDigest": "15a8a996998b6a53fbd0d045ada12d1c8b686492a7f3d8a3d4ed9152e01becc2",
+              "digest": "e8ecbc7085cfc8ed345ace491f0b67b1e906d94a1152a1c6ac0e61bf863b3968",
+              "registryDigest": "e8ecbc7085cfc8ed345ace491f0b67b1e906d94a1152a1c6ac0e61bf863b3968",
               "match": true,
               "bytes": 1330
             },
             {
-              "id": "7141b66b6bf8bdd7d29b5a807017542a87263594f9dd5a4d9c5df454d95cbf32",
+              "id": "a681f3caae83d438088bc044d51d6b6c664429c8c014b2c4b17450230c598b72",
               "present": true,
-              "digest": "7141b66b6bf8bdd7d29b5a807017542a87263594f9dd5a4d9c5df454d95cbf32",
-              "registryDigest": "7141b66b6bf8bdd7d29b5a807017542a87263594f9dd5a4d9c5df454d95cbf32",
+              "digest": "a681f3caae83d438088bc044d51d6b6c664429c8c014b2c4b17450230c598b72",
+              "registryDigest": "a681f3caae83d438088bc044d51d6b6c664429c8c014b2c4b17450230c598b72",
               "match": true,
               "bytes": 570
             },
             {
-              "id": "66b3d35bfc4f004ea8658fe90231364d4017d6f353a3e0d2b8d49b99b4edc483",
+              "id": "deffc242dd597bdd4f6f0694501b6e737121e4bed9588e1ecf7429b4e19cc2ab",
               "present": true,
-              "digest": "66b3d35bfc4f004ea8658fe90231364d4017d6f353a3e0d2b8d49b99b4edc483",
-              "registryDigest": "66b3d35bfc4f004ea8658fe90231364d4017d6f353a3e0d2b8d49b99b4edc483",
+              "digest": "deffc242dd597bdd4f6f0694501b6e737121e4bed9588e1ecf7429b4e19cc2ab",
+              "registryDigest": "deffc242dd597bdd4f6f0694501b6e737121e4bed9588e1ecf7429b4e19cc2ab",
               "match": true,
               "bytes": 790
             },
             {
-              "id": "43ac06f224e8dd9e040be37b908f1cbed0f7113c847a1a0be539bb879b98e1ee",
+              "id": "154ac59e7ed8902c78926b4363ead6395fb74f750f41727cad36251af7ff5926",
               "present": true,
-              "digest": "43ac06f224e8dd9e040be37b908f1cbed0f7113c847a1a0be539bb879b98e1ee",
-              "registryDigest": "43ac06f224e8dd9e040be37b908f1cbed0f7113c847a1a0be539bb879b98e1ee",
+              "digest": "154ac59e7ed8902c78926b4363ead6395fb74f750f41727cad36251af7ff5926",
+              "registryDigest": "154ac59e7ed8902c78926b4363ead6395fb74f750f41727cad36251af7ff5926",
               "match": true,
               "bytes": 174
             },
             {
-              "id": "96c5c463a76367c8689e79cf335ceedbada41d8ad83c0628bdc19c67d7c11b10",
+              "id": "4f838b6834e78e9301ec85c79646e9c22d8a1160feb2422453ba665fff227522",
               "present": true,
-              "digest": "96c5c463a76367c8689e79cf335ceedbada41d8ad83c0628bdc19c67d7c11b10",
-              "registryDigest": "96c5c463a76367c8689e79cf335ceedbada41d8ad83c0628bdc19c67d7c11b10",
+              "digest": "4f838b6834e78e9301ec85c79646e9c22d8a1160feb2422453ba665fff227522",
+              "registryDigest": "4f838b6834e78e9301ec85c79646e9c22d8a1160feb2422453ba665fff227522",
               "match": true,
               "bytes": 187
             },
             {
-              "id": "793e2b474ad81474eff6a960d69417006b1b36361db0fc25ae5f343e1a840889",
+              "id": "10c2c9a2bac5ba4431ed362fc5d4c26403b835a20a5ed0813b24833d5cd46ec4",
               "present": true,
-              "digest": "793e2b474ad81474eff6a960d69417006b1b36361db0fc25ae5f343e1a840889",
-              "registryDigest": "793e2b474ad81474eff6a960d69417006b1b36361db0fc25ae5f343e1a840889",
+              "digest": "10c2c9a2bac5ba4431ed362fc5d4c26403b835a20a5ed0813b24833d5cd46ec4",
+              "registryDigest": "10c2c9a2bac5ba4431ed362fc5d4c26403b835a20a5ed0813b24833d5cd46ec4",
               "match": true,
               "bytes": 253
             },
@@ -3400,28 +3400,20 @@
               "bytes": 142
             },
             {
-              "id": "745a2aebc5beac066a094b119228d82e055cba999bffe3d44af6a7abd9d2021e",
+              "id": "05203a48c6c9b712300da00728df8c5bed237b657146cf8cf28fc93a962e5755",
               "present": true,
-              "digest": "745a2aebc5beac066a094b119228d82e055cba999bffe3d44af6a7abd9d2021e",
-              "registryDigest": "745a2aebc5beac066a094b119228d82e055cba999bffe3d44af6a7abd9d2021e",
+              "digest": "05203a48c6c9b712300da00728df8c5bed237b657146cf8cf28fc93a962e5755",
+              "registryDigest": "05203a48c6c9b712300da00728df8c5bed237b657146cf8cf28fc93a962e5755",
               "match": true,
               "bytes": 874
             },
             {
-              "id": "16839111b6b49a17b1bbb09e4c950ae6770802b221d8bb8e4f769e5f3050c1fb",
+              "id": "bc8d74956fb69895f58bc2b86e4de79b2b483a3ec813a2a7f37aaa77a3c030c3",
               "present": true,
-              "digest": "16839111b6b49a17b1bbb09e4c950ae6770802b221d8bb8e4f769e5f3050c1fb",
-              "registryDigest": "16839111b6b49a17b1bbb09e4c950ae6770802b221d8bb8e4f769e5f3050c1fb",
+              "digest": "bc8d74956fb69895f58bc2b86e4de79b2b483a3ec813a2a7f37aaa77a3c030c3",
+              "registryDigest": "bc8d74956fb69895f58bc2b86e4de79b2b483a3ec813a2a7f37aaa77a3c030c3",
               "match": true,
               "bytes": 234
-            },
-            {
-              "id": "48808517996119de8921341150c090855d585422cbca31c1792433e539397bad",
-              "present": true,
-              "digest": "48808517996119de8921341150c090855d585422cbca31c1792433e539397bad",
-              "registryDigest": "48808517996119de8921341150c090855d585422cbca31c1792433e539397bad",
-              "match": true,
-              "bytes": 1143
             },
             {
               "id": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
@@ -3440,18 +3432,26 @@
               "bytes": 213
             },
             {
-              "id": "d46c4eb88aa018ea6adefaaa2bc64811792bdee7bb6e2e332211972820bc69cc",
+              "id": "8fb32b0a605194be74b143d6d65072ccd2b829b22058659d83ff712555ada2e3",
               "present": true,
-              "digest": "d46c4eb88aa018ea6adefaaa2bc64811792bdee7bb6e2e332211972820bc69cc",
-              "registryDigest": "d46c4eb88aa018ea6adefaaa2bc64811792bdee7bb6e2e332211972820bc69cc",
+              "digest": "8fb32b0a605194be74b143d6d65072ccd2b829b22058659d83ff712555ada2e3",
+              "registryDigest": "8fb32b0a605194be74b143d6d65072ccd2b829b22058659d83ff712555ada2e3",
+              "match": true,
+              "bytes": 1143
+            },
+            {
+              "id": "e7a433656ff39f14a94a83070a6e5b6453002805df536dd3601afe163999e682",
+              "present": true,
+              "digest": "e7a433656ff39f14a94a83070a6e5b6453002805df536dd3601afe163999e682",
+              "registryDigest": "e7a433656ff39f14a94a83070a6e5b6453002805df536dd3601afe163999e682",
               "match": true,
               "bytes": 376
             },
             {
-              "id": "213d2ea0e99c78c1f9535f0e77abde3861841c94ea2d2e0dfc91aedaf2117e88",
+              "id": "ee5731a554e275c017a213e34843376e64186005eebb6ea38114c8ae1062788d",
               "present": true,
-              "digest": "213d2ea0e99c78c1f9535f0e77abde3861841c94ea2d2e0dfc91aedaf2117e88",
-              "registryDigest": "213d2ea0e99c78c1f9535f0e77abde3861841c94ea2d2e0dfc91aedaf2117e88",
+              "digest": "ee5731a554e275c017a213e34843376e64186005eebb6ea38114c8ae1062788d",
+              "registryDigest": "ee5731a554e275c017a213e34843376e64186005eebb6ea38114c8ae1062788d",
               "match": true,
               "bytes": 1615
             },
@@ -3471,7 +3471,7 @@
           "status": "blocked",
           "artifacts": [
             {
-              "id": "7d431ff73e133c9ff50a919c9eb510a6f8719128caac4b0650445837e068ad7c",
+              "id": "b3c82dc1faade816426c3a61ca7104d8580182f5861c75875d6615f0380b15c0",
               "status": "corrupt"
             },
             {
@@ -3479,19 +3479,19 @@
               "status": "ok"
             },
             {
-              "id": "a9fc15d035bc5c18c66b354504e2a52ed431c483553bd41aa81d787783da2b76",
+              "id": "688b96281aec53d8f1dd9681e49d855039621aade67d20edef3a9f3c866a3904",
               "status": "ok"
             },
             {
-              "id": "9fa48ae78356a735db7620927091c6e8b1f402778d204f27d18abf0c38c6cca1",
+              "id": "9e2d326a300067e159437360c33c94d8f828fd7dd9db7c322b43e7f0af7fb49f",
               "status": "ok"
             },
             {
-              "id": "b261aae1bfb223f78a7e9be02519c0f1af9561dd6aeb8b649b4a0b8d6a45384c",
+              "id": "fc4c51a2eecf0ffaf50c896d85d5093416d6b90e730b5b546d14def3487fa5bd",
               "status": "ok"
             },
             {
-              "id": "96571989e083e91dc8f37c8442ab2ac62ed06b99dd5c5e941d1411dcfa81ba37",
+              "id": "67068857a1fb359aa0ce0206c933abb562adc8ddd1beb71adfcc9ad762cc4117",
               "status": "ok"
             },
             {
@@ -3499,27 +3499,27 @@
               "status": "ok"
             },
             {
-              "id": "15a8a996998b6a53fbd0d045ada12d1c8b686492a7f3d8a3d4ed9152e01becc2",
+              "id": "e8ecbc7085cfc8ed345ace491f0b67b1e906d94a1152a1c6ac0e61bf863b3968",
               "status": "ok"
             },
             {
-              "id": "7141b66b6bf8bdd7d29b5a807017542a87263594f9dd5a4d9c5df454d95cbf32",
+              "id": "a681f3caae83d438088bc044d51d6b6c664429c8c014b2c4b17450230c598b72",
               "status": "ok"
             },
             {
-              "id": "66b3d35bfc4f004ea8658fe90231364d4017d6f353a3e0d2b8d49b99b4edc483",
+              "id": "deffc242dd597bdd4f6f0694501b6e737121e4bed9588e1ecf7429b4e19cc2ab",
               "status": "ok"
             },
             {
-              "id": "43ac06f224e8dd9e040be37b908f1cbed0f7113c847a1a0be539bb879b98e1ee",
+              "id": "154ac59e7ed8902c78926b4363ead6395fb74f750f41727cad36251af7ff5926",
               "status": "ok"
             },
             {
-              "id": "96c5c463a76367c8689e79cf335ceedbada41d8ad83c0628bdc19c67d7c11b10",
+              "id": "4f838b6834e78e9301ec85c79646e9c22d8a1160feb2422453ba665fff227522",
               "status": "ok"
             },
             {
-              "id": "793e2b474ad81474eff6a960d69417006b1b36361db0fc25ae5f343e1a840889",
+              "id": "10c2c9a2bac5ba4431ed362fc5d4c26403b835a20a5ed0813b24833d5cd46ec4",
               "status": "ok"
             },
             {
@@ -3527,15 +3527,11 @@
               "status": "ok"
             },
             {
-              "id": "745a2aebc5beac066a094b119228d82e055cba999bffe3d44af6a7abd9d2021e",
+              "id": "05203a48c6c9b712300da00728df8c5bed237b657146cf8cf28fc93a962e5755",
               "status": "ok"
             },
             {
-              "id": "16839111b6b49a17b1bbb09e4c950ae6770802b221d8bb8e4f769e5f3050c1fb",
-              "status": "ok"
-            },
-            {
-              "id": "48808517996119de8921341150c090855d585422cbca31c1792433e539397bad",
+              "id": "bc8d74956fb69895f58bc2b86e4de79b2b483a3ec813a2a7f37aaa77a3c030c3",
               "status": "ok"
             },
             {
@@ -3547,11 +3543,15 @@
               "status": "ok"
             },
             {
-              "id": "d46c4eb88aa018ea6adefaaa2bc64811792bdee7bb6e2e332211972820bc69cc",
+              "id": "8fb32b0a605194be74b143d6d65072ccd2b829b22058659d83ff712555ada2e3",
               "status": "ok"
             },
             {
-              "id": "213d2ea0e99c78c1f9535f0e77abde3861841c94ea2d2e0dfc91aedaf2117e88",
+              "id": "e7a433656ff39f14a94a83070a6e5b6453002805df536dd3601afe163999e682",
+              "status": "ok"
+            },
+            {
+              "id": "ee5731a554e275c017a213e34843376e64186005eebb6ea38114c8ae1062788d",
               "status": "ok"
             },
             {
@@ -3691,7 +3691,7 @@
     "command": "node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record",
     "exitCode": 0,
     "source": {
-      "commit": "bbe7923e667f9268d26d8cf16948646711576e05",
+      "commit": "a77cab4f41ab6f39975541606fc0f15df1655e55",
       "dirty": false
     }
   },
@@ -3861,9 +3861,9 @@
       "status": "ok",
       "mode": "personal",
       "startupMode": "recovery_readonly",
-      "digest": "0c18dc67561c7faaf37411ea0cb10a57b3df1dd6a186d44f941f7adfdfedd367"
+      "digest": "f28ddc5fd9614504df6cb031e91aff9cf675967f2a8f8ed78dd6ef936fa937a7"
     },
-    "healthDigest": "0c18dc67561c7faaf37411ea0cb10a57b3df1dd6a186d44f941f7adfdfedd367",
+    "healthDigest": "f28ddc5fd9614504df6cb031e91aff9cf675967f2a8f8ed78dd6ef936fa937a7",
     "scopeDiagnostics": "present",
     "packageCapability": {
       "source": "1fbaf940d426fa34ff6289304e073b9159586ed9",
@@ -3873,7 +3873,7 @@
     },
     "registry": {
       "present": true,
-      "digest": "8a33239bfdcd69f12f4e04e9a77e2bf6d95bd37241e079d936a3b6f9133e5d0b"
+      "digest": "9650946a063a850dd549fa9848bb4f5852856d89371a7260c2ae88de0b33c416"
     },
     "restore": {
       "verify": "VERIFIED",
@@ -3929,69 +3929,69 @@
       "tarSha256": "daee1a94b43156cec659f7df2a3b08e1ecb89b645fde1ea81c35a81d75b47d7a",
       "digestSupported": true
     },
-    "healthDigest": "9bf78957b79a9c90ef74680cacb68e9349ced6528035ed17460619e10d1ec342",
+    "healthDigest": "c9bdd3fc17b503e9610db81b3fec3f361b5650841a831bc92abbb8500d6e9640",
     "digestAvailable": true,
-    "sameDigest": "9bf78957b79a9c90ef74680cacb68e9349ced6528035ed17460619e10d1ec342",
+    "sameDigest": "c9bdd3fc17b503e9610db81b3fec3f361b5650841a831bc92abbb8500d6e9640",
     "processes": {
-      "live": "Sun Nov 15 17:27:21 2026",
-      "reused": "Sun Nov 15 17:27:21 2026"
+      "live": "Sun Nov 15 17:44:10 2026",
+      "reused": "Sun Nov 15 17:44:10 2026"
     },
-    "firstPid": 53310,
-    "unboundPid": 54226,
-    "pidAfterRefusals": 53310,
-    "pidAfterUnbound": 54226,
+    "firstPid": 73617,
+    "unboundPid": 74521,
+    "pidAfterRefusals": 73617,
+    "pidAfterUnbound": 74521,
     "outcomes": {
       "sameFile": {
         "status": "REUSED",
         "instance": {
           "protocol": "personal-product-instance/1",
-          "pid": 53310,
-          "processStart": "Sun Nov 15 17:27:21 2026",
-          "apiPid": 53346,
-          "consolePid": 53310,
-          "apiURL": "http://127.0.0.1:63104",
-          "consoleURL": "http://127.0.0.1:63103",
-          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/restored",
-          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/install/app",
+          "pid": 73617,
+          "processStart": "Sun Nov 15 17:44:10 2026",
+          "apiPid": 73653,
+          "consolePid": 73617,
+          "apiURL": "http://127.0.0.1:49429",
+          "consoleURL": "http://127.0.0.1:49428",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/restored",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/app",
           "buildId": "2d94a7c31ef97b57",
           "mode": "personal",
           "access": "local-development",
           "startupMode": "recovery_readonly",
           "launcherArgv": [
             "/Users/hh/.nvm/versions/node/v24.21.0/bin/node",
-            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/install/app/apps/launcher/bin/pa.mjs",
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/app/apps/launcher/bin/pa.mjs",
             "start",
             "--json",
             "--port",
-            "63103",
+            "49428",
             "--api-port",
-            "63104",
+            "49429",
             "--discussion-only",
             "--review-restored-scope",
-            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/reuse-first.json"
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/reuse-first.json"
           ],
-          "launcherCwd": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY",
+          "launcherCwd": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo",
           "apiArgv": [
             "/Users/hh/.nvm/versions/node/v24.21.0/bin/node",
-            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/install/app/apps/coordinator/product/demo.ts",
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/app/apps/coordinator/product/demo.ts",
             "--port",
-            "63104",
+            "49429",
             "--state",
-            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/restored",
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/restored",
             "--console-origin",
-            "http://127.0.0.1:63103",
+            "http://127.0.0.1:49428",
             "--startup-mode",
             "recovery_readonly",
             "--assistant",
             "--discussion-only",
             "--review-restored-scope",
-            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/reuse-first.json",
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/reuse-first.json",
             "--local-access"
           ],
-          "apiProcessStart": "Sun Nov 15 17:27:21 2026",
+          "apiProcessStart": "Sun Nov 15 17:44:11 2026",
           "apiUid": 501,
-          "startedAt": "2026-11-15T09:27:22.110Z",
-          "configRoot": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/config"
+          "startedAt": "2026-11-15T09:44:11.523Z",
+          "configRoot": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/config"
         },
         "recovery": {
           "startupMode": "recovery_readonly",
@@ -4005,22 +4005,22 @@
             "Project bindings not explicitly remapped stay pending and must be rebound to a local path."
           ],
           "pendingRebind": [
-            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/historical-project"
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/historical-project"
           ]
         },
         "stderr": "",
         "birth": {
-          "pid": 53372,
-          "start": "Sun Nov 15 17:27:22 2026",
+          "pid": 73679,
+          "start": "Sun Nov 15 17:44:11 2026",
           "uid": 501,
-          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/install/bin/pa start --json --port 63103 --api-port 63104 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/reuse-first.json",
-          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/install",
-          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/restored",
-          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/config",
-          "consolePort": 63103,
-          "apiPort": 63104,
+          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/bin/pa start --json --port 49428 --api-port 49429 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/reuse-first.json",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/restored",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/config",
+          "consolePort": 49428,
+          "apiPort": 49429,
           "argvExact": false,
-          "recordedAt": "2026-11-15T09:27:22.129Z"
+          "recordedAt": "2026-11-15T09:44:11.536Z"
         }
       },
       "differentFile": {
@@ -4028,24 +4028,24 @@
         "code": "restored_review_selection_mismatch",
         "message": "本次显式 review 选择与已运行实例的实际选择不同；保留旧 PID，不复用、不结束",
         "detail": {
-          "requestedReviewIdentity": "1327e42872dbe40a2b6ee3aa8419295a42c5ff972271e38ba703aaa3d126fe5d",
-          "liveReviewIdentity": "9bf78957b79a9c90ef74680cacb68e9349ced6528035ed17460619e10d1ec342",
-          "pid": 53310
+          "requestedReviewIdentity": "00a13f66fdac3e78b5ca8b3efe9cfabc8c8c71bfdb7ebe982f43224c12c06bfe",
+          "liveReviewIdentity": "c9bdd3fc17b503e9610db81b3fec3f361b5650841a831bc92abbb8500d6e9640",
+          "pid": 73617
         },
         "hint": "用与运行实例相同的已验证文件复用，或先 `pa stop` 旧实例再以新选择启动；不会重新签发/刷新旧窗口。",
         "stderr": "",
         "birth": {
-          "pid": 53528,
-          "start": "Sun Nov 15 17:27:22 2026",
+          "pid": 73835,
+          "start": "Sun Nov 15 17:44:11 2026",
           "uid": 501,
-          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/install/bin/pa start --json --port 63103 --api-port 63104 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/reuse-narrow.json",
-          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/install",
-          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/restored",
-          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/config",
-          "consolePort": 63103,
-          "apiPort": 63104,
+          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/bin/pa start --json --port 49428 --api-port 49429 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/reuse-narrow.json",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/restored",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/config",
+          "consolePort": 49428,
+          "apiPort": 49429,
           "argvExact": false,
-          "recordedAt": "2026-11-15T09:27:22.756Z"
+          "recordedAt": "2026-11-15T09:44:12.001Z"
         }
       },
       "missingFile": {
@@ -4054,23 +4054,23 @@
         "message": "本次显式 review 选择与已运行实例的实际选择不同；保留旧 PID，不复用、不结束",
         "detail": {
           "requestedReviewIdentity": null,
-          "liveReviewIdentity": "9bf78957b79a9c90ef74680cacb68e9349ced6528035ed17460619e10d1ec342",
-          "pid": 53310
+          "liveReviewIdentity": "c9bdd3fc17b503e9610db81b3fec3f361b5650841a831bc92abbb8500d6e9640",
+          "pid": 73617
         },
         "hint": "用与运行实例相同的已验证文件复用，或先 `pa stop` 旧实例再以新选择启动；不会重新签发/刷新旧窗口。",
         "stderr": "",
         "birth": {
-          "pid": 53686,
-          "start": "Sun Nov 15 17:27:23 2026",
+          "pid": 73991,
+          "start": "Sun Nov 15 17:44:12 2026",
           "uid": 501,
-          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/install/bin/pa start --json --port 63103 --api-port 63104 --discussion-only",
-          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/install",
-          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/restored",
-          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/config",
-          "consolePort": 63103,
-          "apiPort": 63104,
+          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/bin/pa start --json --port 49428 --api-port 49429 --discussion-only",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/restored",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/config",
+          "consolePort": 49428,
+          "apiPort": 49429,
           "argvExact": false,
-          "recordedAt": "2026-11-15T09:27:23.384Z"
+          "recordedAt": "2026-11-15T09:44:12.473Z"
         }
       },
       "missingFilePath": {
@@ -4078,22 +4078,22 @@
         "code": "review_scope_missing",
         "message": "显式 review 配置文件不存在",
         "detail": {
-          "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/reuse-gone.json"
+          "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/reuse-gone.json"
         },
         "hint": "用 main 的 review-restored 命令重新生成新的私有文件。",
         "stderr": "",
         "birth": {
-          "pid": 53847,
-          "start": "Sun Nov 15 17:27:24 2026",
+          "pid": 74148,
+          "start": "Sun Nov 15 17:44:12 2026",
           "uid": 501,
-          "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/install/app/apps/launcher/bin/pa.mjs start --json --port 63103 --api-port 63104 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/reuse-gone.json",
-          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/install",
-          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/restored",
-          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/config",
-          "consolePort": 63103,
-          "apiPort": 63104,
+          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/bin/pa start --json --port 49428 --api-port 49429 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/reuse-gone.json",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/restored",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/config",
+          "consolePort": 49428,
+          "apiPort": 49429,
           "argvExact": false,
-          "recordedAt": "2026-11-15T09:27:24.017Z"
+          "recordedAt": "2026-11-15T09:44:12.951Z"
         }
       },
       "portChange": {
@@ -4104,35 +4104,35 @@
           "differences": [
             {
               "field": "consoleURL",
-              "expected": "http://127.0.0.1:63124",
-              "actual": "http://127.0.0.1:63103"
+              "expected": "http://127.0.0.1:49442",
+              "actual": "http://127.0.0.1:49428"
             },
             {
               "field": "apiURL",
-              "expected": "http://127.0.0.1:63125",
-              "actual": "http://127.0.0.1:63104"
+              "expected": "http://127.0.0.1:49443",
+              "actual": "http://127.0.0.1:49429"
             }
           ],
           "running": {
-            "pid": 53310,
-            "consoleURL": "http://127.0.0.1:63103",
-            "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/restored"
+            "pid": 73617,
+            "consoleURL": "http://127.0.0.1:49428",
+            "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/restored"
           }
         },
         "hint": "用与运行实例相同的参数复用；要切换请先 `pa stop`，再以新参数启动。",
         "stderr": "",
         "birth": {
-          "pid": 53883,
-          "start": "Sun Nov 15 17:27:24 2026",
+          "pid": 74184,
+          "start": "Sun Nov 15 17:44:13 2026",
           "uid": 501,
-          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/install/bin/pa start --json --port 63124 --api-port 63125 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/reuse-first.json",
-          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/install",
-          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/restored",
-          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/config",
-          "consolePort": 63124,
-          "apiPort": 63125,
+          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/bin/pa start --json --port 49442 --api-port 49443 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/reuse-first.json",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/restored",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/config",
+          "consolePort": 49442,
+          "apiPort": 49443,
           "argvExact": false,
-          "recordedAt": "2026-11-15T09:27:24.457Z"
+          "recordedAt": "2026-11-15T09:44:13.357Z"
         }
       },
       "unboundThenSelection": {
@@ -4140,24 +4140,24 @@
         "code": "restored_review_selection_mismatch",
         "message": "本次显式 review 选择与已运行实例的实际选择不同；保留旧 PID，不复用、不结束",
         "detail": {
-          "requestedReviewIdentity": "9bf78957b79a9c90ef74680cacb68e9349ced6528035ed17460619e10d1ec342",
+          "requestedReviewIdentity": "c9bdd3fc17b503e9610db81b3fec3f361b5650841a831bc92abbb8500d6e9640",
           "liveReviewIdentity": null,
-          "pid": 54226
+          "pid": 74521
         },
         "hint": "用与运行实例相同的已验证文件复用，或先 `pa stop` 旧实例再以新选择启动；不会重新签发/刷新旧窗口。",
         "stderr": "",
         "birth": {
-          "pid": 54289,
-          "start": "Sun Nov 15 17:27:26 2026",
+          "pid": 74592,
+          "start": "Sun Nov 15 17:44:14 2026",
           "uid": 501,
-          "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/install/app/apps/launcher/bin/pa.mjs start --json --port 63129 --api-port 63130 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/reuse-first.json",
-          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/install",
-          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/restored",
-          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/config",
-          "consolePort": 63129,
-          "apiPort": 63130,
+          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/bin/pa start --json --port 49447 --api-port 49448 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/reuse-first.json",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/restored",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/config",
+          "consolePort": 49447,
+          "apiPort": 49448,
           "argvExact": false,
-          "recordedAt": "2026-11-15T09:27:26.274Z"
+          "recordedAt": "2026-11-15T09:44:14.801Z"
         }
       }
     },
@@ -4262,7 +4262,7 @@
         "status": 200,
         "body": {
           "protocol": "trial-readiness/1",
-          "observedAt": "2026-11-15T09:27:28.844Z",
+          "observedAt": "2026-11-15T09:44:16.760Z",
           "configurationRevision": "a9c826f123324b2d8f1a07902775e6a1c453f4de86b467027490a903c324e84b",
           "mode": "personal",
           "startupMode": "normal",
@@ -4330,8 +4330,8 @@
         "status": 200,
         "body": {
           "protocol": "trial-readiness/1",
-          "observedAt": "2026-11-15T09:27:28.977Z",
-          "configurationRevision": "f5ad87ae4f13bbda11517f19e193b315e3de549f83fe8aeb6b45c797a3658461",
+          "observedAt": "2026-11-15T09:44:16.874Z",
+          "configurationRevision": "7b5a6a82ab75d5c8402f695412b03a2bf3183c5678386022ffd7cdc1dd962a48",
           "mode": "personal",
           "startupMode": "normal",
           "discussion": "configuration_present",
@@ -4369,8 +4369,8 @@
         "status": 200,
         "body": {
           "protocol": "trial-readiness/1",
-          "observedAt": "2026-11-15T09:27:30.201Z",
-          "configurationRevision": "e4f895f8e7180c06ce2ce7cc7b5470b620a613d2a307a7f7e31746c5b5b6283b",
+          "observedAt": "2026-11-15T09:44:17.854Z",
+          "configurationRevision": "af1e9636a40f4e9339d3f6edb94ef6087650f7b70ea078bed8847fba70a8bf06",
           "mode": "personal",
           "startupMode": "recovery_readonly",
           "discussion": "unknown",
@@ -4400,7 +4400,7 @@
         }
       },
       "configuration": {
-        "revision": "e4f895f8e7180c06ce2ce7cc7b5470b620a613d2a307a7f7e31746c5b5b6283b",
+        "revision": "af1e9636a40f4e9339d3f6edb94ef6087650f7b70ea078bed8847fba70a8bf06",
         "projects": [
           {
             "discussionOnly": true,
@@ -4449,7 +4449,7 @@
         "status": "ok",
         "mode": "personal",
         "startupMode": "recovery_readonly",
-        "restoredReviewDigest": "e09fb6659eccd0a44e708eaf193107af42e6bbf270c86109d1b46bc4be799946",
+        "restoredReviewDigest": "c94f071827d96814262c753beb2991b4ef43f3e66639ce27d05187635466743f",
         "access": "local-development"
       },
       "code": null,
@@ -4463,7 +4463,7 @@
         "status": 200,
         "body": {
           "protocol": "trial-readiness/1",
-          "observedAt": "2026-11-15T09:27:31.817Z",
+          "observedAt": "2026-11-15T09:44:19.176Z",
           "configurationRevision": "83d2a00c18fe919d4671f2916ce9baec23e44fc5cfd8f51b3ba2d241462e06af",
           "mode": "fixture",
           "startupMode": "normal",
@@ -4632,38 +4632,38 @@
         "present": true,
         "mode": "personal",
         "startupMode": "normal",
-        "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/seed-state",
-        "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/install/app",
+        "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/seed-state",
+        "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/app",
         "resources": [
           {
             "label": "launcher",
-            "pid": 55474,
-            "start": "Sun Nov 15 17:27:32 2026",
+            "pid": 75776,
+            "start": "Sun Nov 15 17:44:19 2026",
             "uid": 501,
             "parentPid": null,
-            "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/install/app/apps/launcher/bin/pa.mjs start --json --port 63174 --api-port 63175 --discussion-only"
+            "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/app/apps/launcher/bin/pa.mjs start --json --port 49488 --api-port 49489 --discussion-only"
           },
           {
             "label": "child",
-            "pid": 55510,
-            "start": "Sun Nov 15 17:27:32 2026",
+            "pid": 75812,
+            "start": "Sun Nov 15 17:44:19 2026",
             "uid": 501,
-            "parentPid": 55474,
-            "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/install/app/apps/coordinator/product/demo.ts --port 63175 --state /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/seed-state --console-origin htt"
+            "parentPid": 75776,
+            "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/app/apps/coordinator/product/demo.ts --port 49489 --state /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/seed-state --console-origin htt"
           }
         ]
       },
       "after": [
         {
-          "pid": 55474,
-          "expectedStart": "Sun Nov 15 17:27:32 2026",
+          "pid": 75776,
+          "expectedStart": "Sun Nov 15 17:44:19 2026",
           "alive": false,
           "start": null,
           "sameIdentity": false
         },
         {
-          "pid": 55510,
-          "expectedStart": "Sun Nov 15 17:27:32 2026",
+          "pid": 75812,
+          "expectedStart": "Sun Nov 15 17:44:19 2026",
           "alive": false,
           "start": null,
           "sameIdentity": false
@@ -4687,38 +4687,38 @@
         "present": true,
         "mode": "personal",
         "startupMode": "recovery_readonly",
-        "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/restored",
-        "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/install/app",
+        "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/restored",
+        "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/app",
         "resources": [
           {
             "label": "launcher",
-            "pid": 55788,
-            "start": "Sun Nov 15 17:27:34 2026",
+            "pid": 76089,
+            "start": "Sun Nov 15 17:44:21 2026",
             "uid": 501,
             "parentPid": null,
-            "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/install/app/apps/launcher/bin/pa.mjs start --json --port 63184 --api-port 63185 --discussion-only"
+            "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/app/apps/launcher/bin/pa.mjs start --json --port 49497 --api-port 49498 --discussion-only"
           },
           {
             "label": "child",
-            "pid": 55826,
-            "start": "Sun Nov 15 17:27:34 2026",
+            "pid": 76125,
+            "start": "Sun Nov 15 17:44:21 2026",
             "uid": 501,
-            "parentPid": 55788,
-            "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/install/app/apps/coordinator/product/demo.ts --port 63185 --state /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-cuwmNY/restored --console-origin http:"
+            "parentPid": 76089,
+            "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/install/app/apps/coordinator/product/demo.ts --port 49498 --state /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-c4GPCo/restored --console-origin http:"
           }
         ]
       },
       "after": [
         {
-          "pid": 55788,
-          "expectedStart": "Sun Nov 15 17:27:34 2026",
+          "pid": 76089,
+          "expectedStart": "Sun Nov 15 17:44:21 2026",
           "alive": false,
           "start": null,
           "sameIdentity": false
         },
         {
-          "pid": 55826,
-          "expectedStart": "Sun Nov 15 17:27:34 2026",
+          "pid": 76125,
+          "expectedStart": "Sun Nov 15 17:44:21 2026",
           "alive": false,
           "start": null,
           "sameIdentity": false
@@ -4799,8 +4799,8 @@
       "abi": "137"
     },
     "bundle": {
-      "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-support-9hxYoR/support-one.pab",
-      "bytes": 13966,
+      "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-support-lcmvIp/support-one.pab",
+      "bytes": 13961,
       "mode": "600"
     },
     "repeated": {
@@ -4923,21 +4923,21 @@
     "screenshots": [
       {
         "path": "tests/product-acceptance/reports/wave27/browser/desktop.png",
-        "sha256": "594a4da544e5c77f8d0e8bc14091aad03b631afe96d9d0a87e8dc98891c88b2f",
-        "bytes": 124754,
-        "size": 124754
+        "sha256": "19ff8f9cc54b815f2ac8d347032a0432f156407119c7f29f715b21e84377b134",
+        "bytes": 124724,
+        "size": 124724
       },
       {
         "path": "tests/product-acceptance/reports/wave27/browser/mobile.png",
-        "sha256": "9f1ae21f8742d8b59e34547f5300c3f49fb5ffca9286e06f618bb741beb6e555",
-        "bytes": 55862,
-        "size": 55862
+        "sha256": "57337e0250d4a69c30b5e398768c168bbc9eb96d7de06f688e5e4af9f18de324",
+        "bytes": 55834,
+        "size": 55834
       },
       {
         "path": "tests/product-acceptance/reports/wave27/browser/configured-conversation.png",
-        "sha256": "1db9470e1d7c1f06b92ae0fa7c45dc3edabecf82fffa91c16f0385c71ef85151",
-        "bytes": 76517,
-        "size": 76517
+        "sha256": "78c0eb1d366de861cc08c882c53d924e090ab5b0c76f40b230e0da0847a88a68",
+        "bytes": 76516,
+        "size": 76516
       }
     ],
     "problems": [
@@ -4952,26 +4952,26 @@
     "providerAfter": 0,
     "lifecycle": {
       "stages": [],
-      "root": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-8zaMCS",
+      "root": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-PMww89",
       "startA": {
         "status": "RUNNING",
         "code": null,
         "birth": {
-          "pid": 56452,
-          "start": "Sun Nov 15 17:27:42 2026",
+          "pid": 76723,
+          "start": "Sun Nov 15 17:44:27 2026",
           "uid": 501,
-          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-8zaMCS/install/bin/pa start --json --port 63217 --api-port 63218 --discussion-only",
-          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-8zaMCS/install",
-          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-8zaMCS/state",
-          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-8zaMCS/config",
-          "consolePort": 63217,
-          "apiPort": 63218,
+          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-PMww89/install/bin/pa start --json --port 49517 --api-port 49518 --discussion-only",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-PMww89/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-PMww89/state",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-PMww89/config",
+          "consolePort": 49517,
+          "apiPort": 49518,
           "argvExact": false,
-          "recordedAt": "2026-11-15T09:27:42.729Z"
+          "recordedAt": "2026-11-15T09:44:27.749Z"
         },
         "instance": {
           "mode": "personal",
-          "processStart": "Sun Nov 15 17:27:42 2026"
+          "processStart": "Sun Nov 15 17:44:27 2026"
         }
       },
       "stageAStop": {
@@ -4986,21 +4986,21 @@
         "status": "RUNNING",
         "code": null,
         "birth": {
-          "pid": 56713,
-          "start": "Sun Nov 15 17:27:45 2026",
+          "pid": 76971,
+          "start": "Sun Nov 15 17:44:30 2026",
           "uid": 501,
-          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-8zaMCS/install/bin/pa start --json --port 63239 --api-port 63240 --discussion-only",
-          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-8zaMCS/install",
-          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-8zaMCS/state",
-          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-8zaMCS/config",
-          "consolePort": 63239,
-          "apiPort": 63240,
+          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-PMww89/install/bin/pa start --json --port 49540 --api-port 49541 --discussion-only",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-PMww89/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-PMww89/state",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-PMww89/config",
+          "consolePort": 49540,
+          "apiPort": 49541,
           "argvExact": false,
-          "recordedAt": "2026-11-15T09:27:45.656Z"
+          "recordedAt": "2026-11-15T09:44:30.388Z"
         },
         "instance": {
           "mode": "personal",
-          "processStart": "Sun Nov 15 17:27:45 2026"
+          "processStart": "Sun Nov 15 17:44:30 2026"
         }
       },
       "stageBStop": {
@@ -5036,7 +5036,7 @@
     "UNKNOWN": 0
   },
   "testCodeSource": {
-    "commit": "bbe7923e667f9268d26d8cf16948646711576e05",
+    "commit": "a77cab4f41ab6f39975541606fc0f15df1655e55",
     "dirty": false,
     "branch": "codex/g3-product-acceptance"
   },

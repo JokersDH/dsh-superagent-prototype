@@ -642,7 +642,7 @@ const evidenceFor = (key) => {
     case 'recipePreview':
       return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
         capability: { '/v1/insights': true, 'recipes/preview': true }, projectId: 'project-1', profileId: 'profile-1', atom: 'src/',
-        status: 'draft', authorization: 'none', fields: { projectId: 'project-1', profileId: 'profile-1', atoms: ['src/'], goalLength: 12 },
+        status: 'draft', authorization: 'none', fields: { projectId: 'project-1', profileId: 'profile-1', atoms: ['src/'], goalLength: 12 }, previewIssues: [],
         digests: { facts: DIGEST, catalog: DIGEST }, issues: [],
         negatives: { query: 400, mismatch: 400, duplicate: 400, badKind: 400, crossSite: 403, badBearer: 401, noJson: 400 },
         worksBefore: 1, worksAfter: 1 }

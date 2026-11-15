@@ -512,11 +512,12 @@ export function recipePreviewIssues(value) {
     if (!(fields.goalLength >= 1)) issues.push('field_goal')
     if (!HEX64(String(value.digests?.facts ?? '')) || !HEX64(String(value.digests?.catalog ?? ''))) issues.push('digests')
     if (!Array.isArray(value.issues) || value.issues.length !== 0) issues.push('draft_issues')
+    if (Array.isArray(value.previewIssues) && value.previewIssues.length > 0) issues.push('draft_has_issues')
   } else {
     // A non-draft preview must explain itself and must not carry draft fields; this is a legitimate
     // observation (needs_input/unsupported/unavailable), not a defect.
     if (value.fields !== null && value.fields !== undefined) issues.push('fields_for_non_draft')
-    const reasoned = Array.isArray(value.issues) && value.issues.length > 0
+    const reasoned = Array.isArray(value.previewIssues) && value.previewIssues.length > 0
     const recordedGap = value.schemaViolation?.kind === 'non_draft_without_issues' && value.schemaViolation?.status === value.status &&
       isSubstantive(value.schemaViolation?.contract) && isSubstantive(value.schemaViolation?.owner)
     if (!reasoned && !recordedGap) issues.push('issues')

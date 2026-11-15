@@ -192,7 +192,7 @@ export async function runUserSurfaces() {
         status: body.status ?? null, fields: fields ? { projectId: fields.projectId, profileId: fields.profileId, goalLength: fields.goal.length,
           atoms: fields.scope?.allowedPaths ?? null, criteria: fields.criteria?.length ?? null } : null,
         digests: { facts: body.factsDigest ?? null, catalog: body.catalogDigest ?? null },
-        authorization: body.authorization ?? null, issues,
+        authorization: body.authorization ?? null, issues, previewIssues: body.issues ?? null,
         schemaViolation: body.status !== 'draft' && (!Array.isArray(body.issues) || body.issues.length === 0)
           ? { kind: 'non_draft_without_issues', status: body.status, contract: 'project-recipe-preview/1 requires issues for a non-draft status', owner: 'main/J recipe preview' }
           : null,
