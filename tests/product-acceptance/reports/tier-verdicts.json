@@ -4,12 +4,12 @@
     "tier": "module",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-14T12:02:29.974Z",
+    "checkedAt": "2026-11-15T03:05:04.363Z",
     "source": {
-      "commit": "373c195ecbb8709f74763ee437d427dca904a791",
+      "commit": "516203efa95fcd0b08bdcc5127545c6d8996c745",
       "dirty": false
     },
-    "expectedSource": "373c195ecbb8709f74763ee437d427dca904a791",
+    "expectedSource": "516203efa95fcd0b08bdcc5127545c6d8996c745",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -378,6 +378,16 @@
       },
       {
         "id": "E1-MUTATE-PILOT-NO-ORACLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-BIRTH-ROOT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-CHILD-SCOPE",
         "required": true,
         "status": "PASS"
       },
@@ -446,7 +456,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-14T12:00:52.590Z",
+      "decidedAt": "2026-11-15T03:03:02.835Z",
       "failureCodes": []
     },
     "notes": [
@@ -459,12 +469,12 @@
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-14T12:02:29.977Z",
+    "checkedAt": "2026-11-15T03:05:04.366Z",
     "source": {
-      "commit": "373c195ecbb8709f74763ee437d427dca904a791",
+      "commit": "516203efa95fcd0b08bdcc5127545c6d8996c745",
       "dirty": false
     },
-    "expectedSource": "373c195ecbb8709f74763ee437d427dca904a791",
+    "expectedSource": "516203efa95fcd0b08bdcc5127545c6d8996c745",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -833,6 +843,16 @@
       },
       {
         "id": "E1-MUTATE-PILOT-NO-ORACLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-BIRTH-ROOT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-CHILD-SCOPE",
         "required": true,
         "status": "PASS"
       },
@@ -1181,7 +1201,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-14T12:00:52.590Z",
+      "decidedAt": "2026-11-15T03:03:02.835Z",
       "failureCodes": []
     },
     "notes": [
@@ -1194,12 +1214,12 @@
     "tier": "actual-native-control",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-14T12:02:29.978Z",
+    "checkedAt": "2026-11-15T03:05:04.368Z",
     "source": {
-      "commit": "373c195ecbb8709f74763ee437d427dca904a791",
+      "commit": "516203efa95fcd0b08bdcc5127545c6d8996c745",
       "dirty": false
     },
-    "expectedSource": "373c195ecbb8709f74763ee437d427dca904a791",
+    "expectedSource": "516203efa95fcd0b08bdcc5127545c6d8996c745",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -1568,6 +1588,16 @@
       },
       {
         "id": "E1-MUTATE-PILOT-NO-ORACLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-BIRTH-ROOT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-CHILD-SCOPE",
         "required": true,
         "status": "PASS"
       },
@@ -1937,7 +1967,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-14T12:00:52.590Z",
+      "decidedAt": "2026-11-15T03:03:02.835Z",
       "failureCodes": []
     },
     "notes": [
@@ -1950,12 +1980,12 @@
     "tier": "installed-alpha",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-14T12:02:29.979Z",
+    "checkedAt": "2026-11-15T03:05:04.369Z",
     "source": {
-      "commit": "373c195ecbb8709f74763ee437d427dca904a791",
+      "commit": "516203efa95fcd0b08bdcc5127545c6d8996c745",
       "dirty": false
     },
-    "expectedSource": "373c195ecbb8709f74763ee437d427dca904a791",
+    "expectedSource": "516203efa95fcd0b08bdcc5127545c6d8996c745",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -2324,6 +2354,16 @@
       },
       {
         "id": "E1-MUTATE-PILOT-NO-ORACLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-BIRTH-ROOT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-CHILD-SCOPE",
         "required": true,
         "status": "PASS"
       },
@@ -2852,7 +2892,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-14T12:00:52.590Z",
+      "decidedAt": "2026-11-15T03:03:02.835Z",
       "failureCodes": []
     },
     "notes": [
@@ -2860,17 +2900,17 @@
       "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability; there is no allow-gap switch."
     ]
   },
-  "advisory-routing": {
+  "installed-functional": {
     "schema": "product-acceptance-release/1",
-    "tier": "advisory-routing",
+    "tier": "installed-functional",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-14T12:02:29.980Z",
+    "checkedAt": "2026-11-15T03:05:04.370Z",
     "source": {
-      "commit": "373c195ecbb8709f74763ee437d427dca904a791",
+      "commit": "516203efa95fcd0b08bdcc5127545c6d8996c745",
       "dirty": false
     },
-    "expectedSource": "373c195ecbb8709f74763ee437d427dca904a791",
+    "expectedSource": "516203efa95fcd0b08bdcc5127545c6d8996c745",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -3239,6 +3279,952 @@
       },
       {
         "id": "E1-MUTATE-PILOT-NO-ORACLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-BIRTH-ROOT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-CHILD-SCOPE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-OWN",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-WRONG-START",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-SIBLING",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-FOREIGN-CHILD",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-MIXED-UNKNOWN",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-START-WINDOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-REFUSED-STOP",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-IDEMPOTENT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-CONFIGURATION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-DAILY-VERTICAL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-ARTIFACT-ROUNDTRIP",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-WORK-EVIDENCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-EVIDENCE-HISTORY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REOPEN-PERSISTENCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REPLAY-AND-CONFLICT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-SESSION-ISOLATION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-STALE-BUSINESS-REJECTION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-MACHINE-FAIL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-ONE-WRITER",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-SCOPE-AND-PROFILE-GUARDS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-AUTH-AND-ORIGIN",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-ASSISTANT-SDK-MOCK",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-CONVERSATION-CATALOG",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-ATTENTION-SIGNAL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REVIEW-TIMING",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-ROUTE-FIXTURE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-REVIEW-FIXTURES",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-SEALED-COPY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-REVIEW-ACTIVITY-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-ATTENTION-INBOX",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-ATTENTION-INBOX-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-DECISION-WORKFLOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-PROPOSAL-HTTP",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-PROPOSAL-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONTEXT-PREVIEW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONTEXT-USE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONTEXT-SSE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONTEXT-GUARDS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-CANDIDATE-FLOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONTEXT-HISTORY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONTEXT-SOURCES",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONTEXT-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-SOURCE-CONFIRM",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-SOURCE-CONFIRM-REFUSAL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-COMPLETED-REPLY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REPLY-DURABLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REPLY-UNKNOWN-DURABLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REPLY-MESSAGE-WINDOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REPLY-BAD-ARTIFACT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E8-SCHEMA-MIGRATION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E8-LEGACY16-MIGRATION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E9-CONTEXT-CONCURRENCY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-DESKTOP-GEOMETRY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-NOTEBOOK-GEOMETRY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-MOBILE-GEOMETRY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-QUESTION-FORM",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-ACCEPT-AND-DOWNLOAD",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-ASSISTANT-SCHEMA-FIXTURES",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONVERSATION-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-VERIFICATION-RECOVERY-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-OFFLINE-AND-ERROR",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-KEYBOARD-AND-SCROLL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-BOUNDED-CYCLES",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-PORTABILITY-CHECKLIST",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-RECOVERY-PREFLIGHT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-RECOVERY-READONLY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-VERIFICATION-RECOVERY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-VERIFICATION-FINISHED-STATES",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E6-ARTIFACT-CURRENT-SCOPE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-INSTALL-ARTIFACT-IDENTITY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E7-BACKUP-CONTEXT-REPLY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E5-INSTALLED-CANDIDATES",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E7-SECOND-ROOT-READONLY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E6-INSTALLED-SOURCE-CONFIRM",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E9-INSTALLED-STABILITY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E5-WORKFLOW-FORMATS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-PERSONAL-RESTORED-REVIEW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E5-RESTORED-REVIEW-REFUSALS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E5-REVIEW-REUSE-CONSISTENCY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E7-SCOPE-DIAGNOSTICS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E7-READINESS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E8-PACKAGED-STOP-CONSISTENCY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E6-TARGET-CONTENT-DRIFT",
+        "required": false,
+        "status": "NOT_TESTED"
+      },
+      {
+        "id": "E9-COORDINATOR-CHANNEL-CONTRACT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E17-SUPPORT-MATERIAL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E11-TRIAL-IDENTITY-FIELDS",
+        "required": false,
+        "status": "NOT_TESTED"
+      },
+      {
+        "id": "E13-G-SCOPED-SUMMARY",
+        "required": false,
+        "status": "NOT_TESTED"
+      },
+      {
+        "id": "E3-TRIAL-WORKBENCH-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E6-INSTALLED-CONTEXT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-PERSONAL-COLD-START",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-INSTALL-FIRST-RUN",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-INSTALL-CONFIG-ROOT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-INSTALL-REUSE-CONCURRENCY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-INSTALL-HOST-GUARDS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-BACKUP-RESTORE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-INSTALL-TAMPER",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-INSTALL-ROLLBACK",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-UPGRADE-FAULTS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E7-OWNERSHIP-COPY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E5-D-OWNERSHIP-MOCKS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E6-CURRENT-MAIN-INSTALL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-UPGRADE-ROLLBACK",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-UPGRADE-CROSS-SCHEMA",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-MULTI-STATE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E5-STOP-FUNCTIONAL",
+        "required": true,
+        "status": "FAIL"
+      }
+    ],
+    "failures": [
+      {
+        "code": "case_not_pass",
+        "detail": "Required case E5-STOP-FUNCTIONAL is FAIL",
+        "caseId": "E5-STOP-FUNCTIONAL"
+      }
+    ],
+    "claimedBy": {
+      "status": "PASS",
+      "tier": "controlled-product-workflow",
+      "decidedAt": "2026-11-15T03:03:02.835Z",
+      "failureCodes": []
+    },
+    "notes": [
+      "Controlled fixture, SDK mock, readonly and installed evidence never substitute for actual-native execution.",
+      "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability; there is no allow-gap switch."
+    ]
+  },
+  "advisory-routing": {
+    "schema": "product-acceptance-release/1",
+    "tier": "advisory-routing",
+    "status": "FAIL",
+    "ok": false,
+    "checkedAt": "2026-11-15T03:05:04.371Z",
+    "source": {
+      "commit": "516203efa95fcd0b08bdcc5127545c6d8996c745",
+      "dirty": false
+    },
+    "expectedSource": "516203efa95fcd0b08bdcc5127545c6d8996c745",
+    "requirements": [
+      {
+        "id": "E1-GATE-CONTROL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-MISSING-CASE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-UNKNOWN-STATUS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-UNCERTAIN-ACCEPT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-STALE-REPORT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-SOURCE-MISMATCH",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-NO-CANDIDATE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-VACUOUS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-FAILED-ASSERTION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-MISSING-EVIDENCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-DUPLICATE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-BAD-PATCH",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-UNAPPLIED-PATCH",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-MALFORMED-PATCH",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-UNEXECUTED-NATIVE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-INVALID-RESPONSE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-STALE-CASE-BINDING",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-FIXTURE-DRIFT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-SCHEMA",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-FIXTURE-STRICT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-FIXTURE-PORTABILITY-STRICT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-WRONG-LAYER",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-DIRTY-SOURCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-MISSING-SOURCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-STALE-REPORT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-CROSS-COMMIT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-UNBOUND-CASE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-EMPTY-EVIDENCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-EMPTY-OBJECT-EVIDENCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-MISSING-CASE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-FAILED-ASSERTION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-NO-DOWNLOAD-BYTES",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-DOWNLOAD-DIGEST",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-PATCH-NOT-APPLIED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-PATCH-DIGEST",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-DUPLICATE-ID",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-UNKNOWN-STATUS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-UNKNOWN-LAYER",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-NOT-EXECUTED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-NO-VERSION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-NO-ATTEMPT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-NO-EVIDENCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-NO-MODEL-TASKS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-INSTALL-NOT-STAGED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-INSTALL-NOT-INDEPENDENT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-NOT-TESTED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-SELF-CLAIM",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-ADMISSION-PROBE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-ADMISSION-FAIL-CLOSED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-PREFLIGHT-NO-FALLBACK",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-STRUCTURE-TIER-SUPERSET",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-STRUCTURE-NO-ALLOW-GAP",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-ROUTE-NO-ELIGIBLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-ROUTE-OVERLAP",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-ROUTE-EXPIRED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-ROUTE-NO-EVIDENCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-ROUTE-DEFAULT-PATH",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-REVIEW-DISPOSITION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-REVIEW-SAME-ASSIGNMENT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-REVIEW-NO-ISOLATION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-REVIEW-BAD-DIGEST",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-HETERO-SAME-PROTOCOL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-HETERO-NOT-EXECUTED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-HETERO-NO-VERSION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-HETERO-NO-BUDGET",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-HETERO-NO-ISOLATION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-HETERO-NO-SUBJECT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-CONTROL-NOT-EXECUTED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-CONTROL-NO-STOP",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-CONTROL-NO-RECOVERY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-PILOT-ZERO-TURNS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-PILOT-UNKNOWN-USAGE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-PILOT-BLOCKED-PASS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-PILOT-NO-ORACLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-BIRTH-ROOT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-CHILD-SCOPE",
         "required": true,
         "status": "PASS"
       },
@@ -3613,7 +4599,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-14T12:00:52.590Z",
+      "decidedAt": "2026-11-15T03:03:02.835Z",
       "failureCodes": []
     },
     "notes": [
@@ -3626,12 +4612,12 @@
     "tier": "controlled-review",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-14T12:02:29.981Z",
+    "checkedAt": "2026-11-15T03:05:04.372Z",
     "source": {
-      "commit": "373c195ecbb8709f74763ee437d427dca904a791",
+      "commit": "516203efa95fcd0b08bdcc5127545c6d8996c745",
       "dirty": false
     },
-    "expectedSource": "373c195ecbb8709f74763ee437d427dca904a791",
+    "expectedSource": "516203efa95fcd0b08bdcc5127545c6d8996c745",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -4000,6 +4986,16 @@
       },
       {
         "id": "E1-MUTATE-PILOT-NO-ORACLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-BIRTH-ROOT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-CHILD-SCOPE",
         "required": true,
         "status": "PASS"
       },
@@ -4394,7 +5390,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-14T12:00:52.590Z",
+      "decidedAt": "2026-11-15T03:03:02.835Z",
       "failureCodes": []
     },
     "notes": [
@@ -4407,12 +5403,12 @@
     "tier": "actual-heterogeneous-review",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-14T12:02:29.982Z",
+    "checkedAt": "2026-11-15T03:05:04.374Z",
     "source": {
-      "commit": "373c195ecbb8709f74763ee437d427dca904a791",
+      "commit": "516203efa95fcd0b08bdcc5127545c6d8996c745",
       "dirty": false
     },
-    "expectedSource": "373c195ecbb8709f74763ee437d427dca904a791",
+    "expectedSource": "516203efa95fcd0b08bdcc5127545c6d8996c745",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -4781,6 +5777,16 @@
       },
       {
         "id": "E1-MUTATE-PILOT-NO-ORACLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-BIRTH-ROOT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-CHILD-SCOPE",
         "required": true,
         "status": "PASS"
       },
@@ -5185,7 +6191,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-14T12:00:52.590Z",
+      "decidedAt": "2026-11-15T03:03:02.835Z",
       "failureCodes": []
     },
     "notes": [
@@ -5198,12 +6204,12 @@
     "tier": "review-value",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-14T12:02:29.983Z",
+    "checkedAt": "2026-11-15T03:05:04.374Z",
     "source": {
-      "commit": "373c195ecbb8709f74763ee437d427dca904a791",
+      "commit": "516203efa95fcd0b08bdcc5127545c6d8996c745",
       "dirty": false
     },
-    "expectedSource": "373c195ecbb8709f74763ee437d427dca904a791",
+    "expectedSource": "516203efa95fcd0b08bdcc5127545c6d8996c745",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -5572,6 +6578,16 @@
       },
       {
         "id": "E1-MUTATE-PILOT-NO-ORACLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-BIRTH-ROOT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-CHILD-SCOPE",
         "required": true,
         "status": "PASS"
       },
@@ -5941,7 +6957,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-14T12:00:52.590Z",
+      "decidedAt": "2026-11-15T03:03:02.835Z",
       "failureCodes": []
     },
     "notes": [
@@ -5954,12 +6970,12 @@
     "tier": "local-alpha",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-14T12:02:29.984Z",
+    "checkedAt": "2026-11-15T03:05:04.375Z",
     "source": {
-      "commit": "373c195ecbb8709f74763ee437d427dca904a791",
+      "commit": "516203efa95fcd0b08bdcc5127545c6d8996c745",
       "dirty": false
     },
-    "expectedSource": "373c195ecbb8709f74763ee437d427dca904a791",
+    "expectedSource": "516203efa95fcd0b08bdcc5127545c6d8996c745",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -6328,6 +7344,16 @@
       },
       {
         "id": "E1-MUTATE-PILOT-NO-ORACLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-BIRTH-ROOT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-CHILD-SCOPE",
         "required": true,
         "status": "PASS"
       },
@@ -6856,7 +7882,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-14T12:00:52.590Z",
+      "decidedAt": "2026-11-15T03:03:02.835Z",
       "failureCodes": []
     },
     "notes": [
@@ -6869,12 +7895,12 @@
     "tier": "full-product",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-14T12:02:29.985Z",
+    "checkedAt": "2026-11-15T03:05:04.377Z",
     "source": {
-      "commit": "373c195ecbb8709f74763ee437d427dca904a791",
+      "commit": "516203efa95fcd0b08bdcc5127545c6d8996c745",
       "dirty": false
     },
-    "expectedSource": "373c195ecbb8709f74763ee437d427dca904a791",
+    "expectedSource": "516203efa95fcd0b08bdcc5127545c6d8996c745",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -7243,6 +8269,16 @@
       },
       {
         "id": "E1-MUTATE-PILOT-NO-ORACLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-BIRTH-ROOT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-CHILD-SCOPE",
         "required": true,
         "status": "PASS"
       },
@@ -7807,7 +8843,7 @@
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
-      "decidedAt": "2026-11-14T12:00:52.590Z",
+      "decidedAt": "2026-11-15T03:03:02.835Z",
       "failureCodes": []
     },
     "notes": [

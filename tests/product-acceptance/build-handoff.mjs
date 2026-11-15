@@ -750,6 +750,7 @@ if (!existsSync(join(reports, 'wave20-status.json')))
       baseline: byId.get('E4-UPGRADE-ROLLBACK')?.evidence?.upgrade?.baseline ?? null,
       control: byId.get('E5-D-OWNERSHIP-MOCKS')?.evidence?.ownershipMocks?.previousPackageHelper ?? null },
     functional: {
+      alphaVerdict: tierVerdicts['installed-alpha']?.status ?? 'MISSING',
       verdict: tierVerdicts['installed-functional']?.status ?? 'MISSING',
       detector: byId.get('E8-PACKAGED-STOP-CONSISTENCY')?.status ?? 'MISSING',
       functionalCase: byId.get('E5-STOP-FUNCTIONAL')?.status ?? 'MISSING',
@@ -826,6 +827,7 @@ if (!existsSync(join(reports, 'wave21-status.json')))
       current: 'the package-consumer lane uses package restored-review/bin-pa bytes and records consumerEntry hashes',
     },
     functional: {
+      alphaVerdict: tierVerdicts['installed-alpha']?.status ?? 'MISSING',
       verdict: tierVerdicts['installed-functional']?.status ?? 'MISSING',
       detector: byId.get('E8-PACKAGED-STOP-CONSISTENCY')?.status ?? 'MISSING',
       functionalCase: byId.get('E5-STOP-FUNCTIONAL')?.status ?? 'MISSING',
@@ -901,6 +903,7 @@ if (!existsSync(join(reports, 'wave22-status.json')))
       native: 'NOT_TESTED: 0 vendor/native sends; B recovery/private permission/target remain separate',
     },
     functional: {
+      alphaVerdict: tierVerdicts['installed-alpha']?.status ?? 'MISSING',
       verdict: tierVerdicts['installed-functional']?.status ?? 'MISSING',
       detector: byId.get('E8-PACKAGED-STOP-CONSISTENCY')?.status ?? 'MISSING',
       functionalCase: byId.get('E5-STOP-FUNCTIONAL')?.status ?? 'MISSING',
@@ -999,6 +1002,7 @@ if (!existsSync(join(reports, 'wave23-status.json')))
       value: 'BLOCKED: review pilot unchanged',
     },
     functional: {
+      alphaVerdict: tierVerdicts['installed-alpha']?.status ?? 'MISSING',
       verdict: tierVerdicts['installed-functional']?.status ?? 'MISSING',
       detector: byId.get('E8-PACKAGED-STOP-CONSISTENCY')?.status ?? 'MISSING',
       functionalCase: byId.get('E5-STOP-FUNCTIONAL')?.status ?? 'MISSING',
@@ -1114,6 +1118,7 @@ if (!existsSync(join(reports, 'wave24-status.json')))
       value: 'BLOCKED: review pilot unchanged',
     },
     functional: {
+      alphaVerdict: tierVerdicts['installed-alpha']?.status ?? 'MISSING',
       verdict: tierVerdicts['installed-functional']?.status ?? 'MISSING',
       detector: byId.get('E8-PACKAGED-STOP-CONSISTENCY')?.status ?? 'MISSING',
       functionalCase: byId.get('E5-STOP-FUNCTIONAL')?.status ?? 'MISSING',
@@ -1231,6 +1236,7 @@ writeFileSync(
       value: 'BLOCKED: review pilot unchanged',
     },
     functional: {
+      alphaVerdict: tierVerdicts['installed-alpha']?.status ?? 'MISSING',
       verdict: tierVerdicts['installed-functional']?.status ?? 'MISSING',
       detector: byId.get('E8-PACKAGED-STOP-CONSISTENCY')?.status ?? 'MISSING',
       functionalCase: byId.get('E5-STOP-FUNCTIONAL')?.status ?? 'MISSING',
