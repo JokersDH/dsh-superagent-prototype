@@ -1,0 +1,286 @@
+{
+  "$defs": {
+    "UsageObservation": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "authorization": {
+          "const": "none",
+          "type": "string"
+        },
+        "coverage": {
+          "maxLength": 256,
+          "minLength": 1,
+          "type": "string"
+        },
+        "coverageState": {
+          "enum": [
+            "complete",
+            "partial",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "days": {
+          "anyOf": [
+            {
+              "const": 7,
+              "type": "number"
+            },
+            {
+              "const": 30,
+              "type": "number"
+            }
+          ]
+        },
+        "limitations": {
+          "items": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 16,
+          "readOnly": true,
+          "type": "array"
+        },
+        "metrics": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "detail": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "id": {
+                "maxLength": 160,
+                "minLength": 1,
+                "type": "string"
+              },
+              "label": {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              "layer": {
+                "enum": [
+                  "observed",
+                  "controlled",
+                  "native",
+                  "operator",
+                  "unknown"
+                ],
+                "type": "string"
+              },
+              "sampleCount": {
+                "anyOf": [
+                  {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "unit": {
+                "maxLength": 16,
+                "type": "string"
+              },
+              "value": {
+                "anyOf": [
+                  {
+                    "maxLength": 128,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "label",
+              "value",
+              "detail",
+              "unit",
+              "layer",
+              "sampleCount"
+            ],
+            "type": "object"
+          },
+          "maxItems": 32,
+          "readOnly": true,
+          "type": "array"
+        },
+        "observedAt": {
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+          "type": "string"
+        },
+        "protocol": {
+          "const": "usage-observation/1",
+          "type": "string"
+        },
+        "sampleCount": {
+          "anyOf": [
+            {
+              "maximum": 9007199254740991,
+              "minimum": -9007199254740991,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "scope": {
+          "additionalProperties": false,
+          "properties": {
+            "aggregation": {
+              "enum": [
+                "single_project",
+                "declared_multi_project",
+                "cross_project"
+              ],
+              "type": "string"
+            },
+            "label": {
+              "maxLength": 128,
+              "minLength": 1,
+              "type": "string"
+            },
+            "projectIds": {
+              "items": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                "type": "string"
+              },
+              "maxItems": 32,
+              "readOnly": true,
+              "type": "array"
+            }
+          },
+          "required": [
+            "projectIds",
+            "aggregation",
+            "label"
+          ],
+          "type": "object"
+        },
+        "status": {
+          "enum": [
+            "ready",
+            "insufficient_data",
+            "unavailable"
+          ],
+          "type": "string"
+        },
+        "summaryId": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "timezone": {
+          "maxLength": 64,
+          "minLength": 1,
+          "type": "string"
+        },
+        "unknownCount": {
+          "anyOf": [
+            {
+              "maximum": 9007199254740991,
+              "minimum": -9007199254740991,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "window": {
+          "additionalProperties": false,
+          "properties": {
+            "from": {
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+              "type": "string"
+            },
+            "to": {
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "from",
+            "to"
+          ],
+          "type": "object"
+        },
+        "windowLabel": {
+          "maxLength": 200,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "protocol",
+        "observedAt",
+        "status",
+        "summaryId",
+        "days",
+        "timezone",
+        "window",
+        "windowLabel",
+        "coverage",
+        "coverageState",
+        "scope",
+        "sampleCount",
+        "unknownCount",
+        "metrics",
+        "limitations",
+        "authorization"
+      ],
+      "type": "object"
+    },
+    "UsageObservationQuery": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "days": {
+          "anyOf": [
+            {
+              "const": 7,
+              "type": "number"
+            },
+            {
+              "const": 30,
+              "type": "number"
+            }
+          ]
+        },
+        "projectId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "timezone": {
+          "maxLength": 64,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "$id": "urn:personal-agent:usage-observation:1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

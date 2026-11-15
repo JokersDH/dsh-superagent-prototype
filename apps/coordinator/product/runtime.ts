@@ -41,6 +41,7 @@ import { CompletedAssistantReplies } from './assistant-reply-results.ts'
 import { ProductContextRecords } from './context-records.ts'
 import { createDiscussionEffects } from './discussion-effects.ts'
 import type { ExecutionConsumer } from './discussion-effects.ts'
+import { ProductUsageObservation } from './usage-observation.ts'
 
 export const FIXTURE_CHECK = 'check-fixture-output'
 /** Operator-selected fixed executable/argv; contract or user text can only reference its registered ID. */
@@ -206,7 +207,11 @@ export function createProductRuntime(
       ...(completedReplies ? { completed: completedReplies } : {}),
       context: message => assistantContext?.forMessage(message) ?? Promise.resolve(undefined),
     })
+  const usage = new ProductUsageObservation({ projectIds: () => configuredProjects.map(project => project.id),
+    cursor: () => store.events.cursor(), listWorks: (projectIds, limit) => store.workflows.index.listWorks({ projectIds, limit }),
+    workEvidence: workId => read.workEvidence!(workId) }, options.now)
   const read: NonNullable<LocalHttpOptions['read']> = {
+    usageObservation: query => usage.read(query),
     recovery: async () => recovery.inspect(),
     recoveryActivation: async activationId => readRecoveryActivationRecord(store, activationId, options.principal),
     ...(completedReplies ? { replyCandidates: async (messageId: string) => proposals.replyCandidates(messageId) } : {}),
