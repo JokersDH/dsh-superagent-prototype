@@ -22,6 +22,7 @@ application's existing preview and explicit user confirmation.
 | `match.ts` | pure function | `matchRecipe({ facts, configuration, kind, selection, now })` → deterministic result. |
 | `draft.ts` | `project-recipe-draft/1` | Result schema plus `draftRevision` / `parseProjectRecipeDraft`. |
 | `preview.ts` | `project-recipe-create-work-fields/1` | Reshape a `draft` into the existing `create_work` command input, with precise stale-input refusal. |
+| `rebind.ts` | `project-facts-rebind/1` | Compare a previous observation with a re-observed root: `current`/`changed`/`unbound`/`foreign`, field-level changes, no root or grant in the report. |
 
 ## Guarantees
 
@@ -103,7 +104,7 @@ the non-mutating form.
 ## Distribution
 
 `exports["."]` points at `dist/index.js` / `dist/index.d.ts`; `files: ["dist", "README.md"]`.
-`npm pack --dry-run` yields 34 files (~41 KB) with no `src/`, `tools/` or tests, and every `dist` import is a Node builtin, `@personal-agent/contracts`, `zod` or a sibling module (asserted by `test/distribution.case.ts`). Runtime dependencies
+`npm pack --dry-run` yields 38 files (~47 KB) with no `src/`, `tools/` or tests, and every `dist` import is a Node builtin, `@personal-agent/contracts`, `zod` or a sibling module (asserted by `test/distribution.case.ts`). Runtime dependencies
 are `@personal-agent/contracts` (workspace) and `zod`; everything else is a Node builtin.
 
 ## Ownership

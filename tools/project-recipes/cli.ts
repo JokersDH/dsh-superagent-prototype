@@ -50,6 +50,7 @@ const HELP = `project-recipes — 只读的项目任务/检查声明建议（不
 
 用法：
   node tools/project-recipes/cli.ts --config <config.json> (--facts <facts.json> | --root <项目根>)
+      [--previous-facts <facts.json> --root <项目根>]   # 迁移/重绑对比模式
       [--project <id>] [--kind <${HELP_KINDS.join('|')}>] [--paths <a,b>] [--exclude <a,b>]
       [--criteria <x,y>] [--profile <id>] [--now <ISO>] [--max-facts-age-ms <n>] [--output <新文件>]
 
@@ -59,6 +60,7 @@ const HELP = `project-recipes — 只读的项目任务/检查声明建议（不
   --root     明确授权的项目根目录；只读取根下白名单元数据（package.json、锁文件名、tsconfig 存在性）。
   --project  项目 ID；省略时默认取 --config 中唯一的项目。
   --paths    项目已声明的授权原子（如 src/、.），逗号分隔，逐字匹配配置；子路径不是更小原子。
+  --previous-facts  迁移模式：与这份上一次 project-facts/1 对比，只输出对比报告（需 --root）。
   --kind     配方类型，默认 regression_fix。
 
 结果（stdout 一个 JSON）：
@@ -78,6 +80,7 @@ const HELP = `project-recipes — 只读的项目任务/检查声明建议（不
 
 type Parsed = {
   help: boolean
+  previousFacts?: string
   config?: string
   facts?: string
   root?: string
@@ -114,6 +117,7 @@ export function parseArgs(argv: readonly string[]): Parsed {
     switch (flag) {
       case '--config': parsed.config = value; break
       case '--facts': parsed.facts = value; break
+      case '--previous-facts': parsed.previousFacts = value; break
       case '--root': parsed.root = value; break
       case '--project': parsed.project = value; break
       case '--kind': parsed.kind = value; break
@@ -167,6 +171,7 @@ export async function main(argv: readonly string[], io: { stdout: (text: string)
   }
   let library: Library | undefined
   try {
+    if (parsed.previousFacts !== undefined) return await rebind(parsed, io)
     if (parsed.config === undefined) throw new UsageError('--config is required')
     if ((parsed.facts === undefined) === (parsed.root === undefined)) throw new UsageError('provide exactly one of --facts or --root')
     for (const [flag, value] of [['--paths', parsed.paths], ['--exclude', parsed.exclude], ['--criteria', parsed.criteria]] as const)
@@ -237,6 +242,47 @@ export async function main(argv: readonly string[], io: { stdout: (text: string)
     if (library !== undefined && error instanceof library.RecipeInputError) {
       io.stderr(`refused [${error.code}] ${error.message}\n`)
       return error.code === 'unknown_kind' ? EXIT.usage : EXIT.refused
+    }
+    io.stderr(`refused: ${(error as Error).message}\n`)
+    return EXIT.refused
+  }
+}
+
+/** Migration comparison mode: observe an explicitly authorized root and compare to prior facts. */
+async function rebind(parsed: Parsed, io: { stdout: (text: string) => void; stderr: (text: string) => void }): Promise<number> {
+  const library = await loadLibrary()
+  try {
+    if (parsed.root === undefined) throw new UsageError('迁移对比需要 --root（明确授权的项目根）')
+    if (parsed.facts !== undefined) throw new UsageError('迁移对比只使用 --root 重新观察，不接受 --facts')
+    for (const [flag, value] of [['--kind', parsed.kind], ['--paths', parsed.paths], ['--exclude', parsed.exclude], ['--criteria', parsed.criteria], ['--profile', parsed.profile], ['--output', parsed.output]] as const)
+      if (value !== undefined) throw new UsageError(`${flag} 不能与 --previous-facts 同用`)
+    const previous = library.readJsonFile(parsed.previousFacts!)
+    const observedAt = parsed.now ?? new Date().toISOString()
+    if (!Number.isFinite(Date.parse(observedAt))) throw new UsageError('--now must be an ISO timestamp')
+    const result = library.reobserveProjectFacts({
+      previous,
+      root: parsed.root,
+      ...(parsed.project === undefined ? {} : { projectId: parsed.project }),
+      observedAt,
+    })
+    io.stdout(`${JSON.stringify(result.report, null, 2)}\n`)
+    for (const note of result.report.notes) io.stderr(`note: ${note}\n`)
+    if (result.report.status === 'unbound') return EXIT.needsInput
+    if (result.report.status === 'foreign') return EXIT.refused
+    io.stderr(`rebind ${result.report.status} for ${result.report.projectId}${result.report.changes.length ? `: ${result.report.changes.join(', ')}` : ''}\n`)
+    return EXIT.draft
+  } catch (error) {
+    if (error instanceof UsageError) {
+      io.stderr(`usage: ${error.message}\n`)
+      return EXIT.usage
+    }
+    if (error instanceof Refused || error instanceof library.MetadataRefused) {
+      io.stderr(`refused [${error.code}] ${error.target}: ${error.message}\n`)
+      return EXIT.refused
+    }
+    if (error instanceof library.RebindError) {
+      io.stderr(`refused [${error.code}] ${error.message}\n`)
+      return EXIT.refused
     }
     io.stderr(`refused: ${(error as Error).message}\n`)
     return EXIT.refused
