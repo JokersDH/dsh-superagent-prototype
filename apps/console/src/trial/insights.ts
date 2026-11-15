@@ -17,6 +17,7 @@ export interface TrialInsightsMetric {
   readonly detail?: string
   /** Optional unit/currency: rows are never summed across different units or currencies. */
   readonly unit?: string
+  readonly currency?: string
   readonly layer?: TrialInsightsLayer
   /** null/absent means unknown, not zero. */
   readonly sampleCount?: number | null
@@ -31,12 +32,19 @@ export interface TrialInsightsScope {
 
 export interface TrialInsightsView {
   readonly status: 'ready' | 'insufficient_data' | 'unavailable'
+  /** Main's selected window (7/30 days) when supplied by the observation endpoint. */
+  readonly days?: 7 | 30
+  readonly timezone?: string
   /** Human-readable observation window, e.g. "11月1日–11月14日". Required to show measurements. */
   readonly windowLabel?: string
   /** Human-readable coverage statement, e.g. "complete" or "partial: 3 of 5 sources". Required to show measurements. */
   readonly coverage?: string
   readonly coverageState?: 'complete' | 'partial' | 'unknown'
   readonly scope?: TrialInsightsScope
+  /** The producer declares the window was cut short; a "complete" view must not be shown then. */
+  readonly truncated?: boolean
+  /** Known/unknown source counts; null means that count is not established. */
+  readonly sources?: { readonly known: number | null; readonly unknown: number | null }
   /** null means the sample count is unknown, not zero. */
   readonly sampleCount: number | null
   /** null/absent means the unknown count is not established, not zero. */
@@ -66,11 +74,13 @@ export function trialInsightsScopeLabel(value: TrialInsightsView): string | unde
  * Decide whether the optional report may show measurements. Any missing scope/window/coverage keeps the
  * rows hidden and names the missing declaration instead of implying a complete project-wide result.
  */
-export function trialInsightsAdmission(value: TrialInsightsView, activeProjectId?: string): TrialInsightsAdmission {
+export function trialInsightsAdmission(value: TrialInsightsView, activeProjectId?: string, selectedWindow?: 7 | 30): TrialInsightsAdmission {
   if (value.status === 'insufficient_data')
     return { admitted: false, rows: [], message: '样本不足，暂不展示效率结论。' }
   if (value.status === 'unavailable')
     return { admitted: false, rows: [], message: '当前没有可用的观察数据。' }
+  if (selectedWindow !== undefined && value.days !== undefined && value.days !== selectedWindow)
+    return { admitted: false, rows: [], message: `正在读取所选窗口（${selectedWindow} 天）…` }
   if (value.scope === undefined)
     return { admitted: false, rows: [], message: '缺少观测范围说明，暂不展示指标。' }
   if (value.scope.projectIds.length === 0)
@@ -82,6 +92,8 @@ export function trialInsightsAdmission(value: TrialInsightsView, activeProjectId
     return { admitted: false, rows: [], scopeLabel, message: '缺少观察窗口，暂不展示指标。' }
   if (value.coverage === undefined || value.coverage.trim().length === 0)
     return { admitted: false, rows: [], scopeLabel, message: '缺少覆盖说明，暂不展示指标。' }
+  if (value.truncated === true && (value.coverageState === undefined || value.coverageState === 'complete'))
+    return { admitted: false, rows: [], scopeLabel, message: '数据被截断，暂不展示完整指标。' }
   if (value.metrics.length === 0)
     return { admitted: false, rows: [], scopeLabel, message: '没有可展示的指标。' }
   return { admitted: true, rows: value.metrics, scopeLabel }
