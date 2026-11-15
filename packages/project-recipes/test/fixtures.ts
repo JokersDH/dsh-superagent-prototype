@@ -76,6 +76,7 @@ export const alphaFacts: ProjectFacts = {
   scripts: ['build', 'test'],
   languages: ['node', 'typescript'],
   missing: [],
+  omissions: [],
 }
 
 export const betaFacts: ProjectFacts = {
@@ -90,6 +91,7 @@ export const betaFacts: ProjectFacts = {
   scripts: ['ci', 'test'],
   languages: ['node', 'javascript'],
   missing: [],
+  omissions: [],
 }
 
 /** Clone with a shallow override of top-level keys, keeping the fixture immutable. */

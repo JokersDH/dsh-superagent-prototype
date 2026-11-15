@@ -11,7 +11,9 @@ import {
   FOREIGN_MARKER_NAMES,
   KNOWN_LOCKFILE_NAMES,
   MetadataRefused,
+  DEFAULT_METADATA_LIMITS,
   createProjectFactsObserver,
+  factsContentDigest,
   matchRecipe,
   observeProjectMetadata,
 } from '../src/index.ts'
@@ -295,5 +297,64 @@ test('the registered-root observer honours the caller root and cannot be redirec
     const { facts } = observer.observe({ projectId: 'project-alpha', observedAt: NOW })
     assert.deepEqual(facts.manager, { kind: 'npm', declaredVersion: '11.6.0' })
     assert.equal(typeof facts.provenance.provider, 'string')
+  })
+})
+
+test('metadata limits themselves are validated: no zero, negative, fractional, NaN or infinite budgets', () => {
+  withDir((dir) => {
+    write(dir, 'package.json', JSON.stringify(packageJson))
+    const bad: Partial<Record<keyof typeof DEFAULT_METADATA_LIMITS, unknown>>[] = [
+      { maxJsonBytes: 0 }, { maxJsonBytes: -5 }, { maxJsonBytes: 1.5 }, { maxJsonBytes: Number.NaN },
+      { maxJsonBytes: Number.POSITIVE_INFINITY }, { maxJsonBytes: 1_000_000_000 },
+      { maxLockfileBytes: 0 }, { maxFiles: 0 }, { maxFiles: Number.POSITIVE_INFINITY }, { maxTotalBytes: Number.NaN },
+    ]
+    for (const limits of bad)
+      assert.throws(
+        () => observe(dir, { limits: limits as Record<string, number> }),
+        (error: unknown) => error instanceof MetadataRefused && error.code === 'invalid_limits',
+        JSON.stringify(limits),
+      )
+    // A legitimate but small budget is honoured.
+    assert.doesNotThrow(() => observe(dir, { limits: { maxJsonBytes: 1024, maxTotalBytes: 2048, maxFiles: 2 } }))
+  })
+})
+
+test('refusals explain omissions instead of returning an empty list as complete', () => {
+  withDir((dir) => {
+    const scripts = Object.fromEntries(Array.from({ length: 600 }, (_, index) => [`task-${index}`, 'node --test']))
+    write(dir, 'package.json', JSON.stringify({ ...packageJson, scripts }))
+    write(dir, 'pnpm-lock.yaml', 'x'.repeat(100))
+    write(dir, 'pnpm-workspace.yaml', 'packages: []\n')
+    const { facts } = observe(dir, { limits: { maxLockfileBytes: 50 } })
+    assert.equal(facts.scripts.length, 512)
+    assert.deepEqual(facts.locks, [{ name: 'pnpm-lock.yaml' }])
+    assert.ok(facts.missing.includes('lockfile'))
+    assert.deepEqual(
+      [...facts.omissions].sort((left, right) => left.field.localeCompare(right.field) || left.reason.localeCompare(right.reason)),
+      [
+        { field: 'lockfile', reason: 'too_large' },
+        { field: 'scripts', reason: 'truncated' },
+        { field: 'workspace', reason: 'unsupported' },
+      ],
+    )
+    // Still no script body in the observation.
+    assert.equal(JSON.stringify(facts).includes('node --test'), false)
+  })
+  withDir((dir) => {
+    const { facts } = observe(dir)
+    assert.deepEqual(facts.omissions, [{ field: 'packageJson', reason: 'not_observed' }])
+    assert.ok(facts.missing.includes('packageJson'))
+  })
+})
+
+test('repeated observation of the same project under limits is deterministic and read-only', () => {
+  withDir((dir) => {
+    write(dir, 'package.json', JSON.stringify(packageJson))
+    write(dir, 'pnpm-lock.yaml', "lockfileVersion: '9.0'\n")
+    const limits = { maxJsonBytes: 4096, maxLockfileBytes: 4096, maxFiles: 4, maxTotalBytes: 8192 }
+    const first = observe(dir, { limits }).facts
+    const second = observe(dir, { limits }).facts
+    assert.equal(factsContentDigest(first), factsContentDigest(second))
+    assert.deepEqual(first.omissions, [])
   })
 })

@@ -59,20 +59,20 @@ test('a tampered draft cannot be handed over', () => {
 
 test('a draft produced against an older configuration or older facts is refused', () => {
   const current = draft()
-  assert.doesNotThrow(() => assertDraftCurrent(current, { configuration, facts: alphaFacts }))
-  assert.doesNotThrow(() => previewInputs(current, { configuration, facts: alphaFacts }))
+  assert.doesNotThrow(() => assertDraftCurrent(current, { configuration, facts: alphaFacts, now: NOW }))
+  assert.doesNotThrow(() => previewInputs(current, { configuration, facts: alphaFacts, now: NOW }))
 
   for (const [input, probe] of [
     ['configuration', { configuration: { ...configuration, revision: '9'.repeat(64) }, facts: alphaFacts }],
     ['facts', { configuration, facts: { ...alphaFacts, scripts: ['build', 'test', 'lint'] } }],
   ] as const) {
     assert.throws(
-      () => assertDraftCurrent(current, probe),
+      () => assertDraftCurrent(current, { ...probe, now: NOW }),
       (error: unknown) => error instanceof PreviewError && error.code === 'stale_inputs' && error.staleInputs.length === 1 && error.staleInputs[0] === input,
     )
   }
   assert.throws(
-    () => assertDraftCurrent(current, { configuration: { ...configuration, revision: '9'.repeat(64) }, facts: { ...alphaFacts, scripts: [] } }),
+    () => assertDraftCurrent(current, { configuration: { ...configuration, revision: '9'.repeat(64) }, facts: { ...alphaFacts, scripts: [] }, now: NOW }),
     (error: unknown) => error instanceof PreviewError && error.staleInputs.length === 2,
   )
 })

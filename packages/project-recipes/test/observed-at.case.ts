@@ -67,13 +67,13 @@ test('a re-observation with the same content stays applicable; changed content o
   assert.notEqual(fresher.observedAt, alphaFacts.observedAt)
   assert.equal(factsContentDigest(fresher), draft.provenance.facts.contentDigest)
   // Same content observed later is still applicable.
-  assert.doesNotThrow(() => previewInputs(draft, { configuration, facts: fresher }))
+  assert.doesNotThrow(() => previewInputs(draft, { configuration, facts: fresher, now: '2026-11-14T13:10:00.000Z' }))
   // But the draft's own provenance still records when it was produced.
   assert.equal(draft.provenance.facts.observedAt, alphaFacts.observedAt)
 
   const changed = { ...fresher, scripts: [...fresher.scripts, 'lint'] }
   assert.throws(
-    () => previewInputs(draft, { configuration, facts: changed }),
+    () => previewInputs(draft, { configuration, facts: changed, now: '2026-11-14T13:10:00.000Z' }),
     (error: unknown) => error instanceof PreviewError && error.code === 'stale_inputs' && error.staleInputs.includes('facts'),
   )
 
@@ -92,7 +92,7 @@ test('the user may edit the goal while scope, criteria and profile stay the draf
   assert.equal(draft.status, 'draft')
   if (draft.status !== 'draft') return
 
-  const edited = previewInputs(draft, { configuration, facts: alphaFacts }, { goal: '  只跟进失败用例并复验  ' })
+  const edited = previewInputs(draft, { configuration, facts: alphaFacts, now: NOW }, { goal: '  只跟进失败用例并复验  ' })
   assert.equal(edited.goal, '只跟进失败用例并复验')
   assert.deepEqual(edited.scope, draft.scope)
   assert.deepEqual(edited.criteria, draft.criteria)
@@ -106,7 +106,7 @@ test('the user may edit the goal while scope, criteria and profile stay the draf
   assert.deepEqual(command.scope, draft.scope)
 
   for (const goal of ['   ', 'x'.repeat(16385)]) assert.throws(
-    () => previewInputs(draft, { configuration, facts: alphaFacts }, { goal }),
+    () => previewInputs(draft, { configuration, facts: alphaFacts, now: NOW }, { goal }),
     (error: unknown) => error instanceof PreviewError && error.code === 'not_actionable',
   )
 })

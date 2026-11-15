@@ -55,7 +55,7 @@ test('the main preview input shape selects only declared atoms and an existing p
 
 test('my draft fields satisfy the published ProjectRecipeFields contract exactly', () => {
   const draft = draftFor()
-  const fields = previewInputs(draft, { configuration, facts: alphaFacts })
+  const fields = previewInputs(draft, { configuration, facts: alphaFacts, now: NOW })
   const { projectId, goal, scope, criteria, profileId } = fields
   const parsed = ProjectRecipeFieldsSchema.parse({ projectId, goal, scope, criteria, profileId })
   assert.deepEqual(parsed.scope.allowedPaths, ['src/'])
@@ -74,7 +74,7 @@ test('a synthesized main preview accepts my draft and my refusal issues', () => 
     observedAt: NOW,
     authorization: 'none' as const,
   }
-  const { projectId, goal, scope, criteria, profileId } = previewInputs(draft, { configuration, facts: alphaFacts })
+  const { projectId, goal, scope, criteria, profileId } = previewInputs(draft, { configuration, facts: alphaFacts, now: NOW })
   const actionable = ProjectRecipePreviewSchema.parse({
     ...base,
     status: 'draft',

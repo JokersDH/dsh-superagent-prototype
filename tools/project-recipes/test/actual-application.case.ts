@@ -63,6 +63,7 @@ const facts = {
   scripts: ['test'],
   languages: ['node'],
   missing: [],
+  omissions: [],
 } as const
 
 const fixture = (t: { after(fn: () => void): void }, grant: Scope = projectScope) => {
@@ -202,7 +203,7 @@ test('the whole chain works: authorized root → facts → draft → form fields
   if (draft.status !== 'draft') return
 
   // Current inputs still match what produced the draft, so the form fields are usable.
-  const fields = previewInputs(draft, { configuration, facts: observed.facts })
+  const fields = previewInputs(draft, { configuration, facts: observed.facts, now: NOW })
   assert.deepEqual(fields.scope.allowedPaths, ['src/'])
   assert.equal(fields.authorization, 'none')
 
@@ -239,7 +240,8 @@ test('two registered projects in one application keep their own atoms, profile a
     store.close()
     rmSync(directory, { recursive: true, force: true })
   })
-  const atlasScope: Scope = { projectId: 'project-atlas', allowedPaths: ['src/'], excludedPaths: ['src/private/'], externalActions: [] }
+  // Must match the configuration's atlas grant exactly, or the Application rightly refuses.
+  const atlasScope: Scope = { projectId: 'project-atlas', allowedPaths: ['src/', '.'], excludedPaths: ['src/private/'], externalActions: [] }
   const bravoScope: Scope = { projectId: 'project-bravo', allowedPaths: ['packages/core/src/'], excludedPaths: [], externalActions: [] }
   const application = createProductApplication({
     store,
@@ -269,28 +271,32 @@ test('two registered projects in one application keep their own atoms, profile a
     profiles: [...configuration.profiles, { id: 'profile-bravo', revision: 1, displayName: 'Bravo native', driverId: 'codex', kind: 'native' as const, readiness: 'native_test_passed' as const, dispatchAllowed: true }],
     checks: [...configuration.checks, { id: 'check:bravo', revision: 1, displayName: 'bravo' }],
   }
-  const drafts = [
-    { facts: { ...facts }, paths: ['src/'], commandId: 'command-two-atlas' },
-    { facts: { ...facts, projectId: 'project-bravo', locks: [], scripts: ['test'] }, paths: ['packages/core/src/'], commandId: 'command-two-bravo' },
+  const projects = [
+    { facts: { ...facts }, paths: ['src/'], profileId: 'profile-codex-local', key: 'atlas' },
+    { facts: { ...facts, projectId: 'project-bravo', locks: [], scripts: ['test'] }, paths: ['packages/core/src/'], profileId: 'profile-bravo', key: 'bravo' },
   ]
-  for (const entry of drafts) {
-    const draft = parseProjectRecipeDraft(matchRecipe({
-      facts: entry.facts,
-      configuration: twoProjectConfig,
-      kind: 'scoped_change',
-      selection: { paths: entry.paths },
-      now: NOW,
-    }))
-    assert.equal(draft.status, 'draft', entry.commandId)
-    if (draft.status !== 'draft') continue
-    assert.equal(draft.projectId, entry.facts.projectId)
-    assert.equal(draft.profileId, entry.facts.projectId === 'project-bravo' ? 'profile-bravo' : 'profile-codex-local')
-    const receipt = await application.dispatch(
-      toCreateWorkCommand(draft, { commandId: entry.commandId, conversationId: `conversation-${entry.commandId}` }),
-      actor,
-    )
-    assert.equal(receipt.status, 'recorded', `${entry.commandId}: ${JSON.stringify(receipt)}`)
-  }
+  // Every template on every project: the fields still enter the original delegation.
+  for (const project of projects)
+    for (const kind of ['regression_fix', 'scoped_change', 'verification_followup'] as const) {
+      const draft = parseProjectRecipeDraft(matchRecipe({
+        facts: project.facts,
+        configuration: twoProjectConfig,
+        kind,
+        // The project-scope template intentionally receives no narrowing selection.
+        selection: kind === 'verification_followup' ? {} : { paths: project.paths },
+        now: NOW,
+      }))
+      assert.equal(draft.status, 'draft', `${project.key}:${kind}`)
+      if (draft.status !== 'draft') continue
+      assert.equal(draft.projectId, project.facts.projectId)
+      assert.equal(draft.profileId, project.profileId)
+      const commandId = `command-two-${project.key}-${kind}`
+      const receipt = await application.dispatch(
+        toCreateWorkCommand(draft, { commandId, conversationId: `conversation-${commandId}` }),
+        actor,
+      )
+      assert.equal(receipt.status, 'recorded', `${commandId}: ${JSON.stringify(receipt)}`)
+    }
 
   // The other project's atom is never accepted for this project.
   const crossed = parseProjectRecipeDraft(matchRecipe({

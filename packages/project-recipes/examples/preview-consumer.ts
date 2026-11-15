@@ -47,6 +47,7 @@ const facts = {
   scripts: ['build', 'test'],
   languages: ['node', 'typescript'],
   missing: [],
+  omissions: [],
 } as const
 
 interface Row {
@@ -73,7 +74,7 @@ const rows: Row[] = cases.map(({ kind, paths }) => {
     const codes = draft.status === 'needs_input' ? draft.needsInput.map((item) => item.code) : draft.unsupported.map((item) => item.code)
     return { ...base, status: draft.status, codes }
   }
-  const fields = previewInputs(draft, { configuration, facts })
+  const fields = previewInputs(draft, { configuration, facts, now: NOW })
   const command = toCreateWorkCommand(draft, { commandId: 'command-example', conversationId: 'conversation-example' })
   if (command.kind !== 'create_work') throw new Error('expected a create_work command')
   return {

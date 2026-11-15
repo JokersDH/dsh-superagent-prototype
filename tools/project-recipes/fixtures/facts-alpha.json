@@ -9,5 +9,6 @@
   "workspace": { "declaration": "none" },
   "scripts": ["build", "test"],
   "languages": ["node", "typescript"],
-  "missing": []
+  "missing": [],
+  "omissions": []
 }

@@ -111,12 +111,13 @@ test('a draft cannot be reused against another configuration or another project 
       scripts: ['build', 'test'],
       languages: ['node'],
       missing: [],
+      omissions: [],
     }
     // Facts digest differs from the observed run, so the guard refuses reuse.
-    assert.throws(() => previewInputs(draft, { configuration: current, facts }), (error: unknown) => error instanceof PreviewError && error.code === 'stale_inputs')
+    assert.throws(() => previewInputs(draft, { configuration: current, facts, now: NOW }), (error: unknown) => error instanceof PreviewError && error.code === 'stale_inputs')
     // A configuration revision change is refused too.
     const changed = { ...current, revision: '9'.repeat(64) }
-    assert.throws(() => assertDraftCurrent(draft, { configuration: changed, facts }), (error: unknown) => error instanceof PreviewError && error.code === 'stale_inputs')
+    assert.throws(() => assertDraftCurrent(draft, { configuration: changed, facts, now: NOW }), (error: unknown) => error instanceof PreviewError && error.code === 'stale_inputs')
   })
 })
 

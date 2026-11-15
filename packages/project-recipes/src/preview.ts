@@ -9,7 +9,7 @@
  * What stays with the application: `commandId`, `conversationId`, the trusted actor, the preview
  * token and the explicit user confirmation. Nothing here submits, executes, registers or grants.
  */
-import { UserCommandSchema, type Scope, type RequiredCriteria, type UserCommand } from '@personal-agent/contracts'
+import { ApplicationConfigurationSchema, UserCommandSchema, type Scope, type RequiredCriteria, type UserCommand } from '@personal-agent/contracts'
 import { ProjectFactsSchema, factsContentDigest } from './facts.ts'
 import { RecipeDraftError, draftRevision, type ProjectRecipeDraft } from './draft.ts'
 
@@ -31,10 +31,10 @@ export interface CreateWorkFields {
   readonly authorization: 'none'
 }
 
-export type PreviewErrorCode = 'not_actionable' | 'revision_mismatch' | 'stale_inputs'
+export type PreviewErrorCode = 'not_actionable' | 'revision_mismatch' | 'stale_inputs' | 'invalid_clock' | 'stale_draft_version'
 
 /** Which prerequisite changed, so a caller can tell the user exactly what to regenerate. */
-export type StaleInput = 'configuration' | 'facts'
+export type StaleInput = 'configuration' | 'facts' | 'expiry'
 
 export class PreviewError extends Error {
   readonly code: PreviewErrorCode
@@ -49,6 +49,8 @@ export class PreviewError extends Error {
 }
 
 const verify = (draft: ProjectRecipeDraft): void => {
+  if (typeof (draft as { provenance?: { facts?: { contentDigest?: unknown } } }).provenance?.facts?.contentDigest !== 'string')
+    throw new PreviewError('stale_draft_version', '该草稿由较早版本生成（缺少 provenance.facts.contentDigest）；请用当前配置与事实重新生成')
   if (draftRevision(draft) !== draft.revision) throw new RecipeDraftError('revision_mismatch', 'Draft revision does not match its content')
 }
 
@@ -119,35 +121,72 @@ export function toCreateWorkCommand(
 export interface CurrentInputs {
   readonly configuration: unknown
   readonly facts: unknown
-  /** Optional: when supplied, an observation older than `maxFactsAgeMs` is not reusable. */
+  /**
+   * Optional: defaults to the real clock. Time is always checked, so omitting `now` cannot be used
+   * to claim that a stale or future observation was verified.
+   */
   readonly now?: string
   readonly maxFactsAgeMs?: number
+}
+
+const parseNow = (value: string | undefined): number => {
+  if (value === undefined) return Date.now()
+  const parsed = Date.parse(value)
+  if (!Number.isFinite(parsed)) throw new PreviewError('invalid_clock', 'now 必须是有效的 ISO 时间')
+  return parsed
 }
 
 /**
  * Revalidate a draft against the current world.
  *
- * Content is compared through the stable digest: a fresh read of unchanged bytes stays valid even
- * though `observedAt` moved. When `now` is supplied, an observation outside the freshness budget is
- * refused as well, so an old observation cannot silently become a new authorization.
+ * - configuration is re-parsed with the public schema: an unsupported version or malformed body is
+ *   refused instead of trusting a bare revision string;
+ * - facts are compared through the stable content digest, so a fresh read of unchanged bytes stays
+ *   valid even though `observedAt` moved;
+ * - time is always checked (real clock unless `now` is supplied): an observation in the future or
+ *   older than the freshness budget is refused, and so is an expired scope. A timestamp is never an
+ *   authorization, and a caller cannot skip these checks by omitting `now`.
  */
 export function assertDraftCurrent(draft: ProjectRecipeDraft, current: CurrentInputs): void {
   verify(draft)
   const stale: StaleInput[] = []
-  const revision = (current.configuration as { revision?: unknown } | null | undefined)?.revision
-  if (typeof revision === 'string' && revision !== draft.provenance.configuration.revision) stale.push('configuration')
+
+  const parsedConfiguration = ApplicationConfigurationSchema.safeParse(current.configuration)
+  if (!parsedConfiguration.success) {
+    const observed = (current.configuration as { protocol?: unknown } | null | undefined)?.protocol
+    const reason = typeof observed === 'string' && observed !== 'application-configuration/1'
+      ? `配置版本不受支持（${observed}）`
+      : '当前配置无法通过公开 schema'
+    throw new PreviewError('stale_inputs', `${reason}；请按当前配置重新生成`, ['configuration'])
+  }
+  const configuration = parsedConfiguration.data
+  if (configuration.revision !== draft.provenance.configuration.revision) stale.push('configuration')
+  const project = configuration.projects.find((entry) => entry.id === draft.projectId)
+  if (!project) stale.push('configuration')
+
   const parsedFacts = ProjectFactsSchema.safeParse(current.facts)
   if (!parsedFacts.success) throw new PreviewError('stale_inputs', '当前项目事实无法解析，请重新观察后生成', ['facts'])
   if (factsContentDigest(parsedFacts.data) !== draft.provenance.facts.contentDigest) stale.push('facts')
-  if (current.now !== undefined) {
-    const nowMs = Date.parse(current.now)
-    const observedMs = Date.parse(parsedFacts.data.observedAt)
-    const maxAge = current.maxFactsAgeMs ?? DEFAULT_REUSE_MAX_FACTS_AGE_MS
-    if (!Number.isFinite(nowMs) || !Number.isSafeInteger(maxAge) || maxAge < 0 || !Number.isFinite(observedMs) || nowMs - observedMs > maxAge)
-      if (!stale.includes('facts')) stale.push('facts')
+
+  const nowMs = parseNow(current.now)
+  const maxAge = current.maxFactsAgeMs ?? DEFAULT_REUSE_MAX_FACTS_AGE_MS
+  if (!Number.isSafeInteger(maxAge) || maxAge < 0) throw new PreviewError('invalid_clock', 'maxFactsAgeMs 必须是非负安全整数')
+  const observedMs = Date.parse(parsedFacts.data.observedAt)
+  if (!Number.isFinite(observedMs) || observedMs > nowMs || nowMs - observedMs > maxAge) {
+    if (!stale.includes('facts')) stale.push('facts')
   }
+
+  const draftExpiry = draft.status === 'draft' ? draft.scope.expiresAt : undefined
+  const expiry = draftExpiry ?? project?.scope.expiresAt
+  if (expiry !== undefined && Date.parse(expiry) <= nowMs && !stale.includes('expiry')) stale.push('expiry')
+
   if (stale.length === 0) return
-  const guidance = stale.map((input) => (input === 'configuration' ? '配置已变化：请按当前配置重新生成' : '项目事实已变化或已过期：请重新观察后生成')).join('；')
+  const guidance = stale
+    .map((input) =>
+      input === 'configuration' ? '配置已变化：请按当前配置重新生成'
+        : input === 'expiry' ? '项目授权已过期：请更新配置后再生成'
+          : '项目事实已变化、已过期或时间在未来：请重新观察后生成')
+    .join('；')
   throw new PreviewError('stale_inputs', `草稿前提已过期（${stale.join(', ')}）：${guidance}`, stale)
 }
 
