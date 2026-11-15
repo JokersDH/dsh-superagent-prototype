@@ -1,0 +1,31 @@
+{
+  "protocol": "wave31-history-consumer/1",
+  "tool": "packages/context/tools/wave31-completion-history.mjs",
+  "inputs": ["--a-worktree", "--db", "--work", "--project", "--limit", "--offset"],
+  "outputs": {
+    "completion.reviews[]": ["commandId", "canonical", "historical", "bindingState", "currentLink", "currentEligibility", "proposal", "verification", "attemptId"],
+    "completion.unclassifiedReviews[]": ["commandId", "reason"],
+    "completion.verifications[]": ["id", "ticketId", "artifactDigest", "criteriaDigest", "createdAt"],
+    "completion.acceptances[]": ["id", "ticketId", "artifactDigest", "actorRef", "acceptedAt"],
+    "coverage": {
+      "reviews": ["sourceState", "state(complete|truncated_local|truncated_source)", "offset", "limit", "returned", "availableKnown", "available", "localTruncated", "truncated", "nextOffset"],
+      "unclassifiedReviews": "inherits the verification source cap",
+      "verifications": "same shape", "acceptances": "same shape"
+    },
+    "source": ["coverage{reviews,verifications,acceptances}", "limits.perTicket"],
+    "window": ["offset", "limit", "returned", "totalKnown", "nextOffset"]
+  },
+  "semantics": {
+    "complete": "A source state complete and no local cut",
+    "truncated_source": "A per-ticket cap 50 applied; available unknown, paging cannot widen",
+    "truncated_local": "caller limit cut a complete source; nextOffset points forward",
+    "missing": "unknown Work exit 1",
+    "authority": "ProductCompletion metadata/current/preflight/accept; history is read-only and never acceptance/execution"
+  },
+  "auditCompanions": {
+    "evidence": "GET /v1/works/:id/evidence",
+    "evidenceHistory": "GET /v1/works/:id/evidence/history?limit=&cursor= (window complete|caller_limit|storage_cap)",
+    "frozenContext": "GET /v1/messages/:id/context; sources via /context/sources",
+    "decisionRevoke": "POST /v1/decisions/prepare + /commands (record_decision, revoke_decision)"
+  }
+}
