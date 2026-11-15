@@ -141,16 +141,21 @@ export function observedOutcomeCount(summary: UsageInsightsSummary): number | nu
 }
 
 /**
- * The declared scope of the numbers. Metrics are aggregated over every declared project, so two or
- * more projects are a cross-project aggregate and are labelled as such.
+ * The declared scope of the numbers.
+ *
+ * Metrics are aggregated over exactly the declared project list. One project is `single_project`;
+ * more than one is `declared_multi_project`, the same vocabulary the coordinator's
+ * `usage-observation/1` DTO uses, so the workspace renders "本次 N 个项目" instead of implying a
+ * single project's total. `cross_project` is reserved for a caller that deliberately aggregates a set
+ * wider than the declared scope, which this projection never does.
  */
 export function consumerScope(summary: UsageInsightsSummary): InsightConsumerScope {
   const projectIds = summary.projects.map(project => project.projectId).sort()
-  const aggregation = projectIds.length === 1 ? 'single_project' as const : 'cross_project' as const
+  const aggregation = projectIds.length === 1 ? 'single_project' as const : 'declared_multi_project' as const
   return {
     projectIds,
     aggregation,
-    label: projectIds.length === 1 ? projectIds[0]! : `跨项目（${projectIds.length} 个项目）`,
+    label: projectIds.length === 1 ? projectIds[0]! : `本次 ${projectIds.length} 个项目`,
   }
 }
 
@@ -191,8 +196,8 @@ export function toInsightConsumerView(summary: UsageInsightsSummary, options: Co
 
   const limitations = [...summary.limitations]
   const scope = consumerScope(summary)
-  if (scope.aggregation === 'cross_project')
-    limitations.push(`These numbers aggregate ${scope.projectIds.length} projects and are not any single project's total.`)
+  if (scope.aggregation === 'declared_multi_project')
+    limitations.push(`These numbers aggregate the ${scope.projectIds.length} declared projects and are not any single project's total.`)
   if (partial)
     limitations.push('The observation is partial; unknown or excluded records are counted separately and never filled with zero.')
   if (options.maxLimitations) limitations.splice(options.maxLimitations)

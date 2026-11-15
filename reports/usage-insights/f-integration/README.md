@@ -1,7 +1,19 @@
 # F 接入说明：效率观测 summary
 
-本目录是 G 交付给体验层（F）的稳定接口样例。F 不实现第二套统计，只渲染这里提供的聚合值与
-unknown/coverage/限制。main 负责在根 workspace 注册 `@personal-agent/usage-insights` 依赖与导出。
+本目录是 G 交付给体验层（F）的稳定接口样例。F 不实现第二套统计，只渲染可信聚合值与
+unknown/coverage/限制。
+
+**当前生产路径（wave-27 起已由 main 实现）**：main 的 `apps/coordinator/product/usage-observation.ts`
+用已授权的 work/evidence readers 调用本包的分析，投影成 `usage-observation/1` DTO，经
+`GET /v1/usage-observation`（Bearer 鉴权、项目范围、`days=7|30`）返回；App 的
+`useUsageObservation` 只在进入试用视图且认证就绪时读取，`TrialWorkspace` 直接用该 DTO 作为
+`TrialInsightsView` 渲染。也就是说：
+
+- **main 拥有**授权、reader、HTTP、DTO、App 接线与独立上限（50 works / 10000 nested records /
+  2 MiB / 2 s，header `sampleCount` 是枚举到的 work 数）；
+- **G 拥有**分析语义、Node 组合、browser-safe 类型/投影、CLI 与报告；
+- 本目录的 `toInsightConsumerView` 仍可用于 Node/非 App 消费者，但与 main 的 DTO 使用同一套
+  scope/aggregation/window/coverage 词汇（多项目为 `declared_multi_project`）。
 
 ## 契约
 

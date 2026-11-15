@@ -77,6 +77,12 @@ const view = toInsightConsumerView(summary)        // declares scope/coverage/wi
 no authority: main authenticates and authorizes, and this module only reads the facts that decision
 already covers. It creates no HTTP server and no SQL.
 
+In the shipped product the caller is the coordinator's own `usage-observation` reader, which applies
+its independent limits (50 works, 10 000 nested records, 2 MiB, 2 s) before calling
+`analyzeUsageInsights` and projects the summary into the `usage-observation/1` DTO the workspace
+renders. `test/main-consumer.case.ts` exercises that real reader and the real workspace admission
+function, so a drift in either consumer fails here.
+
 `analyzeUsageInsights` reads no clock, no filesystem and no network. `capturedAt` comes from the
 bundle, so a stored bundle always reproduces its summary.
 

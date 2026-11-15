@@ -138,6 +138,23 @@ outsideWindow/unmapped`；`invalid/conflicted/notParsed/unmapped` 会把对应�
 5. 完整空窗口是"完整 + 0 样本"，与"未采集/来源缺失"区分。
 6. 生产方自写的 `actual_native` 标签只记为"来源记录"，不升级为原生证据。
 
+## 与主线的当前集成（wave-27 起）
+
+main 已实现并保留以下真实路径，G 不另建 collector：
+
+| 层 | 归属 | 事实 |
+| --- | --- | --- |
+| 授权/reader | main | `ProductUsageObservation` 用已授权 readers 枚举 work 并读 `WorkEvidence` |
+| 上限 | main | 50 works / 10000 nested records / 2 MiB 编码字节 / 单次 2 秒 deadline |
+| 窗口 | main | `days=7|30`，`window.to = observedAt`，`from = to - days*86400000` |
+| DTO | main | `usage-observation/1`，header `sampleCount` = 枚举 work 数，行保留自身 sample/layer/unit |
+| HTTP/App | main | `GET /v1/usage-observation`（Bearer，项目范围）与试用视图按需读取 |
+| 分析/语义 | G | 记录级 scope/去重/quarantine/limits/层/币种/unknown 与 summary |
+| 工具 | G | `collect/analyze/report/verify`（HTTP/文件 reader）、报告与脱敏 |
+
+G 的 `composeUsageInsightsInput` 仍可用于非 coordinator 的 Node 消费者；它不替代 main 的授权
+reader，也不新增 HTTP/SQL 路径。
+
 ## 当前产品的字段可用性（给 main）
 
 这一轮在真实受控两项目链上逐项核对。缺字段不解名、不补零：

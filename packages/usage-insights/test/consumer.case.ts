@@ -67,10 +67,10 @@ test('the declared scope distinguishes one project from a cross-project aggregat
     projects: [{ projectId: 'project-atlas' }, { projectId: 'project-orbit' }],
   } as UsageInsightsInput).summary
   const view = toInsightConsumerView(cross)
-  assert.equal(view.scope?.aggregation, 'cross_project')
+  assert.equal(view.scope?.aggregation, 'declared_multi_project', 'the same vocabulary as usage-observation/1')
   assert.deepEqual(view.scope?.projectIds, ['project-atlas', 'project-orbit'])
-  assert.match(view.scope?.label ?? '', /跨项目/)
-  assert.ok(view.limitations.some(text => text.includes('aggregate 2 projects')))
+  assert.match(view.scope?.label ?? '', /本次 2 个项目/)
+  assert.ok(view.limitations.some(text => text.includes('aggregate the 2 declared projects')))
 })
 
 test('metric rows carry their unit, evidence layer and a truthful sample count', () => {

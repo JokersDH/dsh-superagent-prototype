@@ -23,6 +23,8 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { ProductStore } from '../../../packages/storage/dist/index.js'
+import { ProductUsageObservation } from '../../../apps/coordinator/product/usage-observation.ts'
+import { trialInsightsAdmission } from '../../../apps/console/src/trial/insights.ts'
 import { composeUsageInsightsInput } from '../../../packages/usage-insights/src/node-composition.ts'
 import { createControlledProduct, FIXTURE_CHECK } from '../../../apps/coordinator/product/runtime.ts'
 import { createLocalHttpApp } from '../../../apps/coordinator/http/app.ts'
@@ -272,6 +274,54 @@ async function main() {
   assert.equal(summary.attention.stale, false)
   assert.equal(summary.attention.coverage, 'complete')
 
+  // ---- the coordinator's real authorized reader over the same two-project data (G5-G8) --------
+  // This is the reader the product actually serves; it imposes its own 50 works / 10000 records /
+  // 2 MiB / 2 s bounds and its own 7/30 day window. G only supplies the analyzer behind it.
+  const coordinatorReaders = {
+    projectIds: () => PROJECTS,
+    cursor: () => store.events.cursor(),
+    listWorks: (projectIds, limit) => {
+      const works = created
+        .filter(entry => projectIds.includes(entry.projectId))
+        .slice(0, limit)
+        .map(entry => ({ id: entry.workId, projectId: entry.projectId }))
+      return { works, hasMore: false }
+    },
+    workEvidence: (workId) => product.read.workEvidence(workId),
+  }
+  const observation7 = await new ProductUsageObservation(coordinatorReaders).read({ days: 7, timezone: 'UTC' })
+  const observation30 = await new ProductUsageObservation(coordinatorReaders).read({ days: 30, timezone: 'UTC' })
+  const observationRow = (dto, id) => dto.metrics.find(metric => metric.id.startsWith(`${id}@`))
+  for (const [label, dto] of [['7d', observation7], ['30d', observation30]]) {
+    assert.equal(dto.status, 'ready', `${label}: ${JSON.stringify(dto.limitations)}`)
+    assert.equal(dto.authorization, 'none')
+    assert.match(dto.summaryId, /^[a-f0-9]{64}$/)
+    assert.equal(Date.parse(dto.window.to) - Date.parse(dto.window.from), dto.days * 86_400_000)
+    assert.deepEqual(new Set(dto.scope.projectIds), new Set(PROJECTS))
+    assert.equal(dto.scope.aggregation, 'declared_multi_project')
+    assert.equal(dto.sampleCount, 2, `${label}: the header counts the enumerated works`)
+    assert.equal(observationRow(dto, 'interventions.questions')?.value, '2')
+    assert.equal(observationRow(dto, 'interventions.answers')?.value, '2')
+    assert.equal(observationRow(dto, 'interventions.acceptances')?.value, '2')
+    assert.equal(observationRow(dto, 'outcomes.count')?.value, '2')
+    assert.equal(observationRow(dto, 'outcomes.accepted')?.value, '2')
+    assert.equal(observationRow(dto, 'review.readyToAcceptanceMs')?.layer, 'controlled')
+    assert.match(observationRow(dto, 'review.activeMs')?.detail ?? '', /部分或缺失/)
+    assert.equal(observationRow(dto, 'usage.inputTokens')?.value, null, `${label}: unknown usage stays null`)
+    assert.equal(observationRow(dto, 'usage.cost'), undefined, `${label}: no cost row without a currency`)
+    assert.equal(trialInsightsAdmission(dto).admitted, true)
+    const serialized = JSON.stringify(dto)
+    for (const entry of created) {
+      assert.equal(serialized.includes(entry.workId), false, 'the DTO carries no work identity')
+      assert.equal(serialized.includes(entry.questionId), false, 'the DTO carries no question identity')
+    }
+    assert.equal(serialized.includes('Produce the same reported goal'), false, 'the DTO carries no work title')
+    assert.equal(serialized.includes('/private/'), false)
+    assert.equal(serialized.includes(API_TOKEN), false)
+  }
+  // The two windows cover the same facts here, so the numbers must agree; only the window differs.
+  assert.deepEqual(observation7.metrics, observation30.metrics, '7-day and 30-day reads agree when the facts are inside both')
+
   // ---- authorized Node composition over the same product reads (G5-G8) ------------------------
   // The port is exactly what main would hand over after authorizing a principal: a work list with its
   // project identity plus the existing readers. No HTTP, no SQL, no credential is created here.
@@ -310,7 +360,7 @@ async function main() {
   assert.equal(composedSummary.coverage.overall, summary.coverage.overall)
   const composedView = toInsightConsumerView(composedSummary)
   assert.equal(consumerAdmission(composedView).admitted, true)
-  assert.equal(composedView.scope?.aggregation, 'cross_project')
+  assert.equal(composedView.scope?.aggregation, 'declared_multi_project')
 
   // ---- single-project isolation from the same product (G9) ------------------------------------
   const singleBundlePath = join(directory, 'bundle-single.json')
@@ -403,6 +453,10 @@ async function main() {
       value: row.value, sampleCount: row.sampleCount, unknownCount: row.unknownCount, nullReason: row.nullReason })),
     summaryId: summary.summaryId,
     composedSummaryId: composedSummary.summaryId,
+    coordinatorObservation: { status: observation7.status, days: observation7.days,
+      scope: observation7.scope, headerSampleCount: observation7.sampleCount,
+      summaryId: observation7.summaryId,
+      metricIds: observation7.metrics.map(metric => metric.id) },
     // What the product surface actually made available for this observation.
     availability: Object.fromEntries(summary.metrics.map(row => [row.metricId, row.value === null
       ? { state: 'unknown', reason: row.nullReason }
