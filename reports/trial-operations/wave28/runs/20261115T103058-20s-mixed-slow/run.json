@@ -1,0 +1,289 @@
+{
+  "protocol": "trial-soak/1",
+  "startedAt": "2026-11-15T02:30:58.699Z",
+  "endedAt": "2026-11-15T02:31:19.170Z",
+  "elapsedMs": 20470,
+  "wallElapsedSeconds": 20,
+  "requestedDurationSeconds": 20,
+  "stoppedBy": "duration",
+  "status": "COMPLETED_WITH_OBSERVED_DEFECT",
+  "scenario": {
+    "scenario": "mixed",
+    "defect": "slow",
+    "expectedDefectObservation": "deadline_or_latency",
+    "defectObserved": true,
+    "config": {
+      "pollMs": 400,
+      "sseIntervalMs": 400,
+      "reconnectBackoffMs": 150,
+      "sseIdleTimeoutMs": 3000,
+      "reopenSeconds": 8,
+      "sampleMs": 1000,
+      "maxRequests": 100000,
+      "maxSseEvents": 100000,
+      "maxReconnects": 2000,
+      "maxErrors": 100000,
+      "pollTimeoutMs": 150
+    }
+  },
+  "fixture": {
+    "url": "http://127.0.0.1:56732",
+    "port": 56732,
+    "defect": "slow",
+    "stats": {
+      "connections": 42,
+      "activeConnections": 0,
+      "maxConcurrentConnections": 2,
+      "readinessRequests": 39,
+      "readinessBytes": 22306,
+      "readinessStatuses": {
+        "200": 38
+      },
+      "sseConnections": 3,
+      "sseEvents": 50,
+      "sseBytes": 5646,
+      "sseClosed": 0
+    }
+  },
+  "counters": {
+    "pollRequests": 39,
+    "pollOk": 0,
+    "pollFailed": 39,
+    "latencyMs": {
+      "count": 39,
+      "p50": 151.63,
+      "p95": 153.06,
+      "max": 153.23
+    },
+    "httpStatuses": {},
+    "sseConnections": 3,
+    "sseEvents": 50,
+    "sseBytes": 5646,
+    "sseFailedConnections": 0,
+    "duplicates": 0,
+    "gaps": 0,
+    "reconnects": 2,
+    "reopens": 2,
+    "samples": 22,
+    "lastEventAt": "2026-11-15T02:31:18.626Z"
+  },
+  "failures": {
+    "total": 39,
+    "counts": {
+      "poll:poll_timeout": 39
+    },
+    "samples": [
+      {
+        "at": "2026-11-15T02:30:58.858Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:30:59.411Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:30:59.963Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:31:00.516Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:31:01.069Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:31:01.620Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:31:02.175Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:31:02.728Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:31:03.281Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:31:03.835Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:31:04.387Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:31:04.941Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:31:05.495Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:31:06.048Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:31:06.603Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:31:06.860Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:31:07.155Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:31:07.709Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:31:08.263Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:31:08.815Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:31:09.369Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:31:09.920Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:31:10.474Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:31:11.026Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:31:11.579Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:31:12.132Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:31:12.684Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:31:13.237Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:31:13.791Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:31:14.345Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:31:14.900Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:31:15.012Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:31:15.453Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:31:16.004Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:31:16.558Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:31:17.110Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:31:17.662Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:31:18.217Z",
+        "kind": "poll:poll_timeout"
+      },
+      {
+        "at": "2026-11-15T02:31:18.769Z",
+        "kind": "poll:poll_timeout"
+      }
+    ]
+  },
+  "samples": {
+    "path": "samples.ndjson",
+    "count": 22,
+    "sha256": "0134ad336b19f4f8a19f69bdcac105405bb90709a2fa1f51d9f57c500ffb0cbc",
+    "bytes": 5981
+  },
+  "cleanup": {
+    "closed": true,
+    "activeSockets": 0,
+    "activeConnections": 0
+  },
+  "consistency": {
+    "ok": true,
+    "issues": [],
+    "lastSampleElapsedMs": 20470
+  },
+  "unknowns": [
+    "client reopen is a new HTTP/SSE connection, not daemon process recovery",
+    "provider/queue/old-request behaviour is not observable from this fixture and is not claimed",
+    "server-side handler timing is not separately instrumented; client latency is reported",
+    "resource samples cover this process and the fixture server only, never another user process"
+  ],
+  "resume": {
+    "arguments": [
+      "node tools/trial-kit/bin/trial-soak.mjs",
+      "--scenario mixed",
+      "--duration-seconds 20",
+      "--poll-ms 400",
+      "--sse-interval-ms 400",
+      "--reconnect-backoff-ms 150",
+      "--reopen-seconds 8",
+      "--sample-ms 1000",
+      "--max-errors 100000",
+      "--failure-mode slow",
+      "--out <NEW-OUT>"
+    ],
+    "note": "replace <NEW-OUT>; the same duration and failure mode are required for comparability",
+    "line": "node tools/trial-kit/bin/trial-soak.mjs --scenario mixed --duration-seconds 20 --poll-ms 400 --sse-interval-ms 400 --reconnect-backoff-ms 150 --reopen-seconds 8 --sample-ms 1000 --max-errors 100000 --failure-mode slow --out <NEW-OUT>"
+  },
+  "tool": {
+    "name": "trial-kit",
+    "version": "0.1.0",
+    "command": "soak"
+  },
+  "outputRoot": "reports/trial-operations/wave28/runs/20261115T103058-20s-mixed-slow",
+  "measurementScope": {
+    "measured": "one finite fixture scenario of 20s (actual 20s)",
+    "notMeasured": [
+      "24h/48h soak",
+      "daemon recovery",
+      "provider/queue stability",
+      "other machines",
+      "real model/native execution"
+    ]
+  }
+}

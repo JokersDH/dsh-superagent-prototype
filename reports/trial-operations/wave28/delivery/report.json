@@ -1,0 +1,34 @@
+{
+  "protocol": "delivery-report/1",
+  "generatedAt": "2026-11-15T02:33:51.320Z",
+  "root": "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/delivery",
+  "source": "tests/operational-soak/delivery/produce.mjs",
+  "surface": "original controlled ProductRuntime/Application/QuestionBroker/A Store/Verifier/ProductCompletion",
+  "checks": {
+    "normalAnswered": true,
+    "normalCandidate": true,
+    "normalAccepted": true,
+    "wrongCandidateRefused": true,
+    "delivered": true,
+    "workViewIdentity": true,
+    "duplicateAcceptIdempotent": true,
+    "slots2": true,
+    "slots4": true,
+    "answerReplayIdempotent": true,
+    "answerConflictRejected": true
+  },
+  "ok": true,
+  "modelCalls": 0,
+  "vendorTurns": 0,
+  "signalsSent": 0,
+  "notReached": [
+    "native vendor execution / native compatibility",
+    "recovered Work candidate/accept after a real B/I channel rebind",
+    "native 2/4 slot resource set (no slot-cap configuration in this fixture)"
+  ],
+  "limits": [
+    "controlled fixture executor only; no vendor/native execution",
+    "no recovered Work candidate/accept; no native 2/4 slot resource set",
+    "workView identity is view.work.id, never view.id"
+  ]
+}

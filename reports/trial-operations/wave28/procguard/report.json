@@ -1,0 +1,266 @@
+{
+  "protocol": "procguard-report/1",
+  "generatedAt": "2026-11-15T02:34:28.545Z",
+  "root": "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard",
+  "births": {
+    "normal": {
+      "pid": 18125,
+      "ppid": 18117,
+      "uid": 501,
+      "start": "Sun Nov 15 10:34:28 2026",
+      "command": "~/.nvm/versions/node/v24.21.0/bin/node ~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/normal/probe/probe.mjs --root ~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/normal/probe --config ~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/normal/probe/config.json --operation wave28-procguard-normal",
+      "observedCommand": "~/.nvm/versions/node/v24.21.0/bin/node ~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/normal/probe/probe.mjs --root ~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/normal/probe --config ~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/normal/probe/config.json --operation wave28-procguard-normal",
+      "root": "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/normal/probe",
+      "config": "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/normal/probe/config.json",
+      "operation": "wave28-procguard-normal",
+      "argv": [
+        "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/normal/probe/probe.mjs",
+        "--root",
+        "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/normal/probe",
+        "--config",
+        "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/normal/probe/config.json",
+        "--operation",
+        "wave28-procguard-normal"
+      ],
+      "ready": "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/normal/probe/ready",
+      "birth": {
+        "source": "spawn_return+ps",
+        "observedAt": "2026-11-15T02:34:28.255Z"
+      }
+    },
+    "stubborn": {
+      "pid": 18169,
+      "ppid": 18117,
+      "uid": 501,
+      "start": "Sun Nov 15 10:34:28 2026",
+      "command": "~/.nvm/versions/node/v24.21.0/bin/node ~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/stubborn/probe/probe.mjs --root ~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/stubborn/probe --config ~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/stubborn/probe/config.json --operation wave28-procguard-stubborn",
+      "observedCommand": "~/.nvm/versions/node/v24.21.0/bin/node ~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/stubborn/probe/probe.mjs --root ~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/stubborn/probe --config ~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/stubborn/probe/config.json --operation wave28-procguard-stubborn",
+      "root": "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/stubborn/probe",
+      "config": "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/stubborn/probe/config.json",
+      "operation": "wave28-procguard-stubborn",
+      "argv": [
+        "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/stubborn/probe/probe.mjs",
+        "--root",
+        "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/stubborn/probe",
+        "--config",
+        "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/stubborn/probe/config.json",
+        "--operation",
+        "wave28-procguard-stubborn"
+      ],
+      "ready": "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/stubborn/probe/ready",
+      "birth": {
+        "source": "spawn_return+ps",
+        "observedAt": "2026-11-15T02:34:28.309Z"
+      }
+    },
+    "sibling": {
+      "pid": 18264,
+      "ppid": 18117,
+      "uid": 501,
+      "start": "Sun Nov 15 10:34:28 2026",
+      "command": "~/.nvm/versions/node/v24.21.0/bin/node ~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/sibling/probe/probe.mjs --root ~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/sibling/probe --config ~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/sibling/probe/config.json --operation wave28-procguard-sibling",
+      "observedCommand": "~/.nvm/versions/node/v24.21.0/bin/node ~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/sibling/probe/probe.mjs --root ~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/sibling/probe --config ~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/sibling/probe/config.json --operation wave28-procguard-sibling",
+      "root": "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/sibling/probe",
+      "config": "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/sibling/probe/config.json",
+      "operation": "wave28-procguard-sibling",
+      "argv": [
+        "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/sibling/probe/probe.mjs",
+        "--root",
+        "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/sibling/probe",
+        "--config",
+        "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/sibling/probe/config.json",
+        "--operation",
+        "wave28-procguard-sibling"
+      ],
+      "ready": "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/sibling/probe/ready",
+      "birth": {
+        "source": "spawn_return+ps",
+        "observedAt": "2026-11-15T02:34:28.515Z"
+      }
+    }
+  },
+  "controls": [
+    {
+      "id": "own_matches",
+      "ok": true,
+      "issues": []
+    },
+    {
+      "id": "foreign_uid",
+      "ok": false,
+      "issues": [
+        "uid_mismatch"
+      ]
+    },
+    {
+      "id": "foreign_ppid",
+      "ok": false,
+      "issues": [
+        "ppid_mismatch"
+      ]
+    },
+    {
+      "id": "recycled_start",
+      "ok": false,
+      "issues": [
+        "start_mismatch"
+      ]
+    },
+    {
+      "id": "wrong_argv",
+      "ok": false,
+      "issues": [
+        "argv_mismatch"
+      ]
+    },
+    {
+      "id": "missing_operation",
+      "ok": false,
+      "issues": [
+        "record_operation_missing",
+        "operation_root_config_missing"
+      ]
+    },
+    {
+      "id": "pre_record_pid",
+      "ok": false,
+      "issues": [
+        "pid_mismatch"
+      ]
+    },
+    {
+      "id": "missing_pid",
+      "ok": false,
+      "issues": [
+        "record_pid_missing",
+        "pid_mismatch"
+      ]
+    },
+    {
+      "id": "sibling_pid",
+      "ok": false,
+      "issues": [
+        "pid_mismatch"
+      ]
+    }
+  ],
+  "proofs": {
+    "term": {
+      "sent": true,
+      "signal": "SIGTERM",
+      "observedAt": "2026-11-15T02:34:28.259Z",
+      "observed": {
+        "pid": 18125,
+        "start": "Sun Nov 15 10:34:28 2026",
+        "uid": 501,
+        "ppid": 18117
+      }
+    },
+    "firstTerm": {
+      "sent": true,
+      "signal": "SIGTERM",
+      "observedAt": "2026-11-15T02:34:28.310Z",
+      "observed": {
+        "pid": 18169,
+        "start": "Sun Nov 15 10:34:28 2026",
+        "uid": 501,
+        "ppid": 18117
+      }
+    },
+    "secondTermReplay": {
+      "sent": true,
+      "signal": "SIGKILL",
+      "observedAt": "2026-11-15T02:34:28.465Z",
+      "observed": {
+        "pid": 18169,
+        "start": "Sun Nov 15 10:34:28 2026",
+        "uid": 501,
+        "ppid": 18117
+      }
+    },
+    "forgedRefused": {
+      "sent": false,
+      "refused": "identity_not_fresh",
+      "issues": [
+        "argv_mismatch",
+        "operation_root_config_missing",
+        "operation_root_config_missing",
+        "operation_root_config_missing"
+      ],
+      "observed": {
+        "alive": true,
+        "pid": 18264,
+        "ppid": 18117,
+        "uid": 501,
+        "start": "Sun Nov 15 10:34:28 2026",
+        "command": "~/.nvm/versions/node/v24.21.0/bin/node ~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/sibling/probe/probe.mjs --root ~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/sibling/probe --config ~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/procguard/sibling/probe/config.json --operation wave28-procguard-sibling",
+        "parse": true
+      }
+    },
+    "siblingTerm": {
+      "sent": true,
+      "signal": "SIGTERM",
+      "observedAt": "2026-11-15T02:34:28.520Z",
+      "observed": {
+        "pid": 18264,
+        "start": "Sun Nov 15 10:34:28 2026",
+        "uid": 501,
+        "ppid": 18117
+      }
+    },
+    "unknownRefused": {
+      "sent": false,
+      "refused": "identity_not_fresh",
+      "issues": [
+        "not_alive"
+      ],
+      "observed": {
+        "alive": false,
+        "reason": "missing"
+      }
+    }
+  },
+  "waits": {
+    "normalGone": {
+      "gone": true,
+      "at": "2026-11-15T02:34:28.283Z"
+    },
+    "stubbornGone": {
+      "gone": true,
+      "at": "2026-11-15T02:34:28.489Z"
+    },
+    "siblingGone": {
+      "gone": true,
+      "at": "2026-11-15T02:34:28.544Z"
+    }
+  },
+  "counts": {
+    "signalsSent": 4,
+    "foreignSignals": 0
+  },
+  "checks": {
+    "ownBirthComplete": true,
+    "ownMatches": true,
+    "pureRefusals": true,
+    "termFreshSent": true,
+    "termGone": true,
+    "stubbornIgnoredTerm": true,
+    "killFreshSent": true,
+    "stubbornGone": true,
+    "siblingRefused": true,
+    "siblingUnaffected": true,
+    "siblingCleaned": true,
+    "unknownRefused": true,
+    "noForeignSignals": true
+  },
+  "ok": true,
+  "notReached": [
+    "product/B daemon lifecycle stop/upgrade",
+    "SIGKILL of a product/B runner",
+    "global process/socket discovery"
+  ],
+  "limits": [
+    "only probes spawned by this run are signalled; no product or user process is touched",
+    "TERM/KILL each require a fresh whole-record match; unknown material is retained"
+  ]
+}

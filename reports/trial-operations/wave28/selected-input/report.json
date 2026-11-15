@@ -1,0 +1,456 @@
+{
+  "protocol": "selected-consumer-report/1",
+  "generatedAt": "2026-11-15T02:33:42.448Z",
+  "source": "tests/operational-soak/selected/produce.mjs",
+  "root": "~/Desktop/joker/superagent-agent-h/reports/trial-operations/wave28/selected-input",
+  "selected": {
+    "I": {
+      "head": "4d85cc349fba81a3f3d0149f1803e77d4ea454b8",
+      "commit": "d95df88bb9dfdeaef74fa49629dcc2aba25d4d1b",
+      "blobs": {
+        "apps/runner/src/attach-channel/coordinator-channel.ts": "bf5b25a6e87b6de1f02838cd3b5fe9b5ec394007",
+        "apps/runner/src/attach-channel/index.ts": "406b1c18d986b70fde08af7eb017ff2920b557f5"
+      },
+      "materialized": [
+        {
+          "rel": "apps/runner/src/attach-channel/coordinator-channel.ts",
+          "bytes": 22706,
+          "sha256": "6ad80b75bbae30669dd3746282a205e33e60b3809d0722ef96fee434121a3091"
+        },
+        {
+          "rel": "apps/runner/src/attach-channel/errors.ts",
+          "bytes": 1693,
+          "sha256": "b9c9bd111cd672b479314faf284d308ba6a1c2d3f5520af6decbded220d08b10"
+        },
+        {
+          "rel": "apps/runner/src/attach-channel/index.ts",
+          "bytes": 990,
+          "sha256": "1129ea715c50b32a026ce7f9fec538dc6c62ef46c38bc7e0ced286dd848cd04d"
+        },
+        {
+          "rel": "packages/contracts/src/coordinator-channel.ts",
+          "bytes": 6362,
+          "sha256": "a1445944e47379a13a3f47593173d35c5a20cd0d27a02daa6a880bce98a4f3c1"
+        },
+        {
+          "rel": "packages/contracts/src/schemas.ts",
+          "bytes": 30887,
+          "sha256": "763732584c3b9150f90b644301b679465e252498d75dec19ad601b536f0db045"
+        },
+        {
+          "rel": "packages/contracts/src/types.ts",
+          "bytes": 6016,
+          "sha256": "ed6661e6bcaa26a24892ad82086bcd5375a19aec3a184f1d6f256af8655103ac"
+        }
+      ],
+      "surface": "I CoordinatorChannelModule (actual source, local frames + manual clock)"
+    },
+    "B": {
+      "head": "423df04e46021f781adf4ee598ffb9b4b7620807",
+      "commit": "cb4e97504157e500799284bfd63d51768740c9fc",
+      "blobs": {
+        "apps/runner/src/runner-service.ts": "c2990056c0cd2858a57919f739e052fabadd374b",
+        "apps/runner/src/business-channel.ts": "75809b1f4d79c115e2f7e470dbd4c0b51337b7e2"
+      },
+      "materialized": [
+        {
+          "rel": "apps/runner/src/business-channel.ts",
+          "bytes": 8684,
+          "sha256": "572a1522b01caf0b367d4f0edfc2ce46519839228a8dba4a92561a429220995b"
+        }
+      ],
+      "surface": "B createBusinessChannel (actual source; in-process frames, no runner-service route)"
+    },
+    "main": {
+      "head": "089f401391fd2c51a179a4dc1760e7aca7004d73",
+      "files": [
+        {
+          "rel": "packages/contracts/src/coordinator-channel.ts",
+          "bytes": 6362,
+          "sha256": "a1445944e47379a13a3f47593173d35c5a20cd0d27a02daa6a880bce98a4f3c1",
+          "blob": "cf451efe433b8f9140d992ccfb415df9cd74b92c"
+        }
+      ]
+    }
+  },
+  "unchanged": {
+    "I": {
+      "role": "I",
+      "root": "~/Desktop/joker/superagent-agent-i",
+      "commit": "d95df88bb9dfdeaef74fa49629dcc2aba25d4d1b",
+      "ok": true,
+      "issues": [],
+      "head": "4d85cc349fba81a3f3d0149f1803e77d4ea454b8",
+      "blobs": {
+        "apps/runner/src/attach-channel/coordinator-channel.ts": "bf5b25a6e87b6de1f02838cd3b5fe9b5ec394007",
+        "apps/runner/src/attach-channel/index.ts": "406b1c18d986b70fde08af7eb017ff2920b557f5"
+      },
+      "dirtyEntries": 0
+    },
+    "B": {
+      "role": "B",
+      "root": "~/Desktop/joker/superagent-agent-b",
+      "commit": "cb4e97504157e500799284bfd63d51768740c9fc",
+      "ok": true,
+      "issues": [],
+      "head": "423df04e46021f781adf4ee598ffb9b4b7620807",
+      "blobs": {
+        "apps/runner/src/runner-service.ts": "c2990056c0cd2858a57919f739e052fabadd374b",
+        "apps/runner/src/business-channel.ts": "75809b1f4d79c115e2f7e470dbd4c0b51337b7e2"
+      },
+      "dirtyEntries": 21
+    },
+    "main": {
+      "role": "main",
+      "root": "~/Desktop/joker/superagent-agent-h",
+      "ok": true,
+      "issues": [],
+      "head": "089f401391fd2c51a179a4dc1760e7aca7004d73",
+      "files": [
+        {
+          "rel": "packages/contracts/src/coordinator-channel.ts",
+          "bytes": 6362,
+          "sha256": "a1445944e47379a13a3f47593173d35c5a20cd0d27a02daa6a880bce98a4f3c1",
+          "blob": "cf451efe433b8f9140d992ccfb415df9cd74b92c"
+        }
+      ]
+    },
+    "I_materialized": {
+      "ok": true,
+      "issues": [],
+      "files": [
+        {
+          "rel": "apps/runner/src/attach-channel/coordinator-channel.ts",
+          "bytes": 22706,
+          "sha256": "6ad80b75bbae30669dd3746282a205e33e60b3809d0722ef96fee434121a3091",
+          "blob": "bf5b25a6e87b6de1f02838cd3b5fe9b5ec394007"
+        },
+        {
+          "rel": "apps/runner/src/attach-channel/errors.ts",
+          "bytes": 1693,
+          "sha256": "b9c9bd111cd672b479314faf284d308ba6a1c2d3f5520af6decbded220d08b10",
+          "blob": "ec8ce909d0f30ab1d96488db56cdf3b6a4ab7f49"
+        },
+        {
+          "rel": "apps/runner/src/attach-channel/index.ts",
+          "bytes": 990,
+          "sha256": "1129ea715c50b32a026ce7f9fec538dc6c62ef46c38bc7e0ced286dd848cd04d",
+          "blob": "406b1c18d986b70fde08af7eb017ff2920b557f5"
+        },
+        {
+          "rel": "packages/contracts/src/coordinator-channel.ts",
+          "bytes": 6362,
+          "sha256": "a1445944e47379a13a3f47593173d35c5a20cd0d27a02daa6a880bce98a4f3c1",
+          "blob": "cf451efe433b8f9140d992ccfb415df9cd74b92c"
+        },
+        {
+          "rel": "packages/contracts/src/schemas.ts",
+          "bytes": 30887,
+          "sha256": "763732584c3b9150f90b644301b679465e252498d75dec19ad601b536f0db045",
+          "blob": "0eaafbf444c5ef099971fbc226c36a33002f983d"
+        },
+        {
+          "rel": "packages/contracts/src/types.ts",
+          "bytes": 6016,
+          "sha256": "ed6661e6bcaa26a24892ad82086bcd5375a19aec3a184f1d6f256af8655103ac",
+          "blob": "423043fe2b999a2e71e0dd3995c7d33f522144de"
+        }
+      ]
+    },
+    "B_materialized": {
+      "ok": true,
+      "issues": [],
+      "files": [
+        {
+          "rel": "apps/runner/src/business-channel.ts",
+          "bytes": 8684,
+          "sha256": "572a1522b01caf0b367d4f0edfc2ce46519839228a8dba4a92561a429220995b",
+          "blob": "75809b1f4d79c115e2f7e470dbd4c0b51337b7e2"
+        }
+      ]
+    }
+  },
+  "results": {
+    "i": [
+      {
+        "id": "I-fact-receipt",
+        "frameId": "fact-wave28-1",
+        "accepted": true,
+        "settled": {
+          "state": "resolved",
+          "value": {
+            "factId": "fact-wave28-1",
+            "persisted": true,
+            "seq": 7
+          },
+          "code": null,
+          "reason": null
+        },
+        "duplicate": false
+      },
+      {
+        "id": "I-fact-ack-failed",
+        "accepted": true,
+        "settled": {
+          "state": "rejected",
+          "code": "protocol_error",
+          "reason": "fact_ack_failed"
+        }
+      },
+      {
+        "id": "I-payload",
+        "requestId": "payload-1",
+        "wrong": false,
+        "accepted": true,
+        "settled": {
+          "state": "resolved",
+          "value": {
+            "right": true
+          },
+          "code": null,
+          "reason": null
+        }
+      },
+      {
+        "id": "I-write-allow",
+        "frameId": "cmd-answer",
+        "commandId": "cmd-answer",
+        "accepted": true,
+        "settled": {
+          "state": "resolved",
+          "code": null,
+          "reason": null
+        }
+      },
+      {
+        "id": "I-write-deny",
+        "accepted": true,
+        "settled": {
+          "state": "rejected",
+          "code": null,
+          "reason": "native_write_denied"
+        }
+      },
+      {
+        "id": "I-fresh-intent",
+        "firstFrameId": "cmd-answer",
+        "secondFrameId": "cmd-answer",
+        "sameFrameId": true,
+        "replayAccepted": true,
+        "firstSettled": "resolved",
+        "secondState": "resolved",
+        "defect": true,
+        "expectation": "a new intent needs a fresh correlation and its own guard decision"
+      },
+      {
+        "id": "I-generation-cas",
+        "firstGeneration": 1,
+        "secondGeneration": 2,
+        "staleError": null,
+        "wrongExpected": "stale_connection",
+        "oldReceiver": false
+      },
+      {
+        "id": "I-old-lease-close",
+        "accepted": true,
+        "settled": {
+          "state": "resolved",
+          "value": {
+            "ok": true
+          },
+          "code": null,
+          "reason": null
+        },
+        "generation": 2
+      },
+      {
+        "id": "I-timeout",
+        "settled": {
+          "state": "rejected",
+          "code": "timeout",
+          "reason": "request_timeout"
+        }
+      },
+      {
+        "id": "I-capacity",
+        "first": {
+          "state": "pending",
+          "code": null,
+          "reason": null
+        },
+        "second": {
+          "state": "rejected",
+          "code": "capacity",
+          "reason": "pending_facts"
+        }
+      },
+      {
+        "id": "I-close",
+        "settled": {
+          "state": "rejected",
+          "code": "indeterminate",
+          "reason": "module_closed_during_write"
+        }
+      }
+    ],
+    "b": [
+      {
+        "id": "B-generation",
+        "first": 1,
+        "again": 1,
+        "second": 2,
+        "monotonic": true
+      },
+      {
+        "id": "B-three-callbacks",
+        "factOutbound": {
+          "type": "fact",
+          "id": "fact-b-1",
+          "fact": {
+            "factId": "fact-b-1"
+          }
+        },
+        "factReply": true,
+        "factSettled": {
+          "state": "resolved",
+          "value": {
+            "factId": "fact-b-1",
+            "persisted": true,
+            "seq": 11
+          },
+          "code": null,
+          "reason": null
+        },
+        "duplicate": false,
+        "payloadOutbound": {
+          "type": "payload-read",
+          "id": "payload-b-1",
+          "requestId": "payload-b-1",
+          "reference": "payload-ref-b-1"
+        },
+        "payloadReply": true,
+        "payloadSettled": {
+          "state": "resolved",
+          "value": {
+            "ok": true
+          },
+          "code": null,
+          "reason": null
+        },
+        "writeOutbound": {
+          "type": "native-write-intent",
+          "id": "cmd-answer",
+          "command": {
+            "id": "cmd-answer",
+            "ticketId": "ticket-1",
+            "assignmentId": "assignment-1",
+            "attemptId": "attempt-1",
+            "fenceEpoch": 1,
+            "contract": {
+              "workId": "work-1",
+              "revision": 1,
+              "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            },
+            "kind": "answer",
+            "nativeBindingRef": "binding-1",
+            "answerRef": "answer-1"
+          }
+        },
+        "writeReply": true,
+        "writeSettled": {
+          "state": "resolved",
+          "code": null,
+          "reason": null
+        },
+        "pending": {
+          "facts": 0,
+          "payloads": 0,
+          "writes": 0
+        },
+        "outbound": 0
+      },
+      {
+        "id": "B-write-deny",
+        "reply": true,
+        "settled": {
+          "state": "rejected",
+          "code": null,
+          "reason": "Coordinator refused native write"
+        }
+      },
+      {
+        "id": "B-stale-reply",
+        "rebound": 2,
+        "stale": false,
+        "settled": {
+          "state": "rejected",
+          "code": "closed",
+          "reason": "channel_detached"
+        },
+        "implicitRebind": true
+      },
+      {
+        "id": "B-detach",
+        "before": {
+          "facts": 1,
+          "payloads": 0,
+          "writes": 1
+        },
+        "write": {
+          "state": "rejected",
+          "code": "state_indeterminate",
+          "reason": "write_indeterminate_after_detach"
+        },
+        "fact": {
+          "state": "rejected",
+          "code": "closed",
+          "reason": "channel_detached"
+        },
+        "after": {
+          "facts": 0,
+          "payloads": 0,
+          "writes": 0
+        }
+      }
+    ]
+  },
+  "checks": {
+    "sourcesUnchanged": true,
+    "iBase": true,
+    "iFreshIntentDefectObserved": true,
+    "bBase": true,
+    "zeroModel": true,
+    "zeroSignals": true
+  },
+  "ok": true,
+  "findings": [
+    {
+      "id": "I-fresh-intent",
+      "owner": "I",
+      "detail": {
+        "id": "I-fresh-intent",
+        "firstFrameId": "cmd-answer",
+        "secondFrameId": "cmd-answer",
+        "sameFrameId": true,
+        "replayAccepted": true,
+        "firstSettled": "resolved",
+        "secondState": "resolved",
+        "defect": true,
+        "expectation": "a new intent needs a fresh correlation and its own guard decision"
+      }
+    }
+  ],
+  "notReached": [
+    "B runner-service importing I attach-channel (unique selected implementation absent)",
+    "same-Runner dual client through B actual service route",
+    "B actual service-page budget/CAS/foreign-source fixes (B-owned)",
+    "SIGKILL cross-process original Work recovery; no signal executed here"
+  ],
+  "modelCalls": 0,
+  "vendorTurns": 0,
+  "signalsSent": 0,
+  "limits": [
+    "in-process modules only; no daemon, no route, no user state, no credential",
+    "B module consumption is createBusinessChannel, not the full runner-service route"
+  ]
+}

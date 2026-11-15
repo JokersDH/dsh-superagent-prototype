@@ -1,0 +1,728 @@
+{
+  "protocol": "trial-operations-status/1",
+  "wave": "product-wave-28",
+  "owner": "H",
+  "branch": "codex/g4-trial-operations",
+  "base": "0651a50f",
+  "mergedMain": "ea82d8f",
+  "currentH": "089f401",
+  "updatedAt": "2026-11-15T02:37:25.345Z",
+  "goal": {
+    "established": true,
+    "tokenBudget": null,
+    "checkpoints": [
+      "H4",
+      "H8",
+      "H12",
+      "H16",
+      "H20",
+      "H24"
+    ],
+    "continueAfterCheckpoint": true
+  },
+  "ownedPaths": [
+    "tools/trial-kit/",
+    "tests/operational-soak/",
+    "docs/internal-trial/",
+    "reports/trial-operations/"
+  ],
+  "phases": {
+    "H1": {
+      "status": "COMPLETED",
+      "deliverable": "selected B/I/main source bound by admitted commit, branch, blob, materialized bytes and post-run re-check"
+    },
+    "H2": {
+      "status": "COMPLETED",
+      "deliverable": "legal v1 frames and fresh intent correlation; I same-id settled-allow replay reproduced as a finding"
+    },
+    "H3": {
+      "status": "COMPLETED",
+      "deliverable": "actual I three callbacks plus actual B channel callbacks executed in-process; A durable receipts used"
+    },
+    "H4": {
+      "status": "COMPLETED",
+      "deliverable": "unique selected-source consumer checkpoint"
+    },
+    "H5": {
+      "status": "COMPLETED",
+      "deliverable": "own probe birth record pid/ppid/uid/start/full argv/root/config/operation"
+    },
+    "H6": {
+      "status": "COMPLETED",
+      "deliverable": "TERM/KILL each require a fresh whole-record re-read; stale proof refused"
+    },
+    "H7": {
+      "status": "COMPLETED",
+      "deliverable": "normal/ignore-TERM/sibling/unknown cleanup observed; unknown retained"
+    },
+    "H8": {
+      "status": "COMPLETED",
+      "deliverable": "safe-process checkpoint for B/main"
+    },
+    "H9": {
+      "status": "COMPLETED",
+      "deliverable": "original A/Broker controlled Work/question/answer/native_applied support consumed; no hand-written SQL"
+    },
+    "H10": {
+      "status": "COMPLETED",
+      "deliverable": "same-Runner dual client through B actual service route NOT_REACHED; I module dual-lease CAS observed separately"
+    },
+    "H11": {
+      "status": "COMPLETED",
+      "deliverable": "I CAS/generation/old-lease/late/timeout/capacity/close executed; B implicit lease rebind and missing CAS/timers recorded"
+    },
+    "H12": {
+      "status": "COMPLETED",
+      "deliverable": "rebind support checkpoint with honest NOT_REACHED"
+    },
+    "H13": {
+      "status": "COMPLETED",
+      "deliverable": "safe SIGKILL helper and pure controls ready; no product/B SIGKILL executed"
+    },
+    "H14": {
+      "status": "COMPLETED",
+      "deliverable": "original question/answer/receiver facts collected from the controlled product path"
+    },
+    "H15": {
+      "status": "COMPLETED",
+      "deliverable": "ACK replay/conflict windows observed; recovered unknown/ACK windows NOT_REACHED"
+    },
+    "H16": {
+      "status": "COMPLETED",
+      "deliverable": "original identity fault support checkpoint"
+    },
+    "H17": {
+      "status": "COMPLETED",
+      "deliverable": "currentCandidate/manual accept/delivered consumer with wrong-candidate refusal and WorkView.work.id"
+    },
+    "H18": {
+      "status": "COMPLETED",
+      "deliverable": "2/4 controlled works observed; native slot cap/resource set NOT_REACHED"
+    },
+    "H19": {
+      "status": "COMPLETED",
+      "deliverable": "1cd package preflight/machinecheck with exact tuple and REFUSED-gated package commands"
+    },
+    "H20": {
+      "status": "COMPLETED",
+      "deliverable": "product support checkpoint"
+    },
+    "H21": {
+      "status": "COMPLETED",
+      "deliverable": "raw material, hashes, redaction and reader contradiction boundaries retained"
+    },
+    "H22": {
+      "status": "COMPLETED",
+      "deliverable": "short 20s slow HTTP/SSE observation; old long runs preserved"
+    },
+    "H23": {
+      "status": "COMPLETED",
+      "deliverable": "selected source/consumers/safe signals/delivery/package handoff"
+    },
+    "H24": {
+      "status": "COMPLETED",
+      "deliverable": "six checkpoints and finished handoff"
+    }
+  },
+  "milestones": {
+    "H4": {
+      "status": "COMPLETED"
+    },
+    "H8": {
+      "status": "COMPLETED"
+    },
+    "H12": {
+      "status": "COMPLETED"
+    },
+    "H16": {
+      "status": "COMPLETED"
+    },
+    "H20": {
+      "status": "COMPLETED"
+    },
+    "H24": {
+      "status": "COMPLETED"
+    }
+  },
+  "selectedSources": {
+    "I": {
+      "commit": "d95df88bb9dfdeaef74fa49629dcc2aba25d4d1b",
+      "branch": "codex/g5-coordinator-channel",
+      "moduleBlobs": {
+        "apps/runner/src/attach-channel/coordinator-channel.ts": "bf5b25a6e87b6de1f02838cd3b5fe9b5ec394007",
+        "apps/runner/src/attach-channel/index.ts": "406b1c18d986b70fde08af7eb017ff2920b557f5"
+      },
+      "materialized": [
+        {
+          "rel": "apps/runner/src/attach-channel/coordinator-channel.ts",
+          "bytes": 22706,
+          "sha256": "6ad80b75bbae30669dd3746282a205e33e60b3809d0722ef96fee434121a3091"
+        },
+        {
+          "rel": "apps/runner/src/attach-channel/errors.ts",
+          "bytes": 1693,
+          "sha256": "b9c9bd111cd672b479314faf284d308ba6a1c2d3f5520af6decbded220d08b10"
+        },
+        {
+          "rel": "apps/runner/src/attach-channel/index.ts",
+          "bytes": 990,
+          "sha256": "1129ea715c50b32a026ce7f9fec538dc6c62ef46c38bc7e0ced286dd848cd04d"
+        },
+        {
+          "rel": "packages/contracts/src/coordinator-channel.ts",
+          "bytes": 6362,
+          "sha256": "a1445944e47379a13a3f47593173d35c5a20cd0d27a02daa6a880bce98a4f3c1"
+        },
+        {
+          "rel": "packages/contracts/src/schemas.ts",
+          "bytes": 30887,
+          "sha256": "763732584c3b9150f90b644301b679465e252498d75dec19ad601b536f0db045"
+        },
+        {
+          "rel": "packages/contracts/src/types.ts",
+          "bytes": 6016,
+          "sha256": "ed6661e6bcaa26a24892ad82086bcd5375a19aec3a184f1d6f256af8655103ac"
+        }
+      ],
+      "observedHead": "4d85cc349fba81a3f3d0149f1803e77d4ea454b8",
+      "dirtyEntries": 0
+    },
+    "B": {
+      "commit": "cb4e97504157e500799284bfd63d51768740c9fc",
+      "branch": "codex/g1-runtime",
+      "runnerServiceBlob": "c2990056c0cd2858a57919f739e052fabadd374b",
+      "businessChannelBlob": "75809b1f4d79c115e2f7e470dbd4c0b51337b7e2",
+      "observedHead": "423df04e46021f781adf4ee598ffb9b4b7620807"
+    },
+    "main": {
+      "currentH": "089f401391fd2c51a179a4dc1760e7aca7004d73",
+      "contractBlob": "cf451efe433b8f9140d992ccfb415df9cd74b92c"
+    },
+    "note": "I worktree advanced/dirty; only the admitted commit was materialized read-only for import. B runner-service blob is identity-checked but is not the consumer entry this round.",
+    "material": [
+      {
+        "path": "reports/trial-operations/wave28/selected-input/source.json",
+        "bytes": 5079,
+        "sha256": "cc2c9888c923d4af60c39b472f4cca8de4d066c6dfb363603d1e88b19338aa78"
+      }
+    ]
+  },
+  "selectedConsumer": {
+    "I": {
+      "checks": {
+        "factReceipt": true,
+        "ackFailed": true,
+        "payload": true,
+        "writeAllow": true,
+        "writeDeny": true,
+        "generation": true,
+        "oldLease": true,
+        "timeout": true,
+        "capacity": true,
+        "close": true,
+        "freshIntentDefectObserved": true
+      },
+      "defect": [
+        "I-fresh-intent"
+      ],
+      "cases": [
+        {
+          "id": "I-fact-receipt",
+          "defect": false
+        },
+        {
+          "id": "I-fact-ack-failed",
+          "defect": false
+        },
+        {
+          "id": "I-payload",
+          "defect": false
+        },
+        {
+          "id": "I-write-allow",
+          "defect": false
+        },
+        {
+          "id": "I-write-deny",
+          "defect": false
+        },
+        {
+          "id": "I-fresh-intent",
+          "defect": true
+        },
+        {
+          "id": "I-generation-cas",
+          "defect": false
+        },
+        {
+          "id": "I-old-lease-close",
+          "defect": false
+        },
+        {
+          "id": "I-timeout",
+          "defect": false
+        },
+        {
+          "id": "I-capacity",
+          "defect": false
+        },
+        {
+          "id": "I-close",
+          "defect": false
+        }
+      ],
+      "material": [
+        {
+          "path": "reports/trial-operations/wave28/selected-input/i.json",
+          "bytes": 3130,
+          "sha256": "594c8a45991ffee1aef4c4b9f9bf5cd0f673156cb152771ed5b0070909918365"
+        }
+      ]
+    },
+    "B": {
+      "checks": {
+        "generation": true,
+        "fact": true,
+        "factDuplicateRefused": true,
+        "payload": true,
+        "writeAllow": true,
+        "writeDeny": true,
+        "staleRefused": true,
+        "detachWriteIndeterminate": true,
+        "detachFactRefused": true
+      },
+      "observations": {
+        "hasExpectedGenerationCas": false,
+        "hasPerRequestTimer": false,
+        "hasConstructorPendingBytes": false,
+        "leaseRebind": "implicit lease(ref) increments generation without a CAS token",
+        "detach": "pending writes state_indeterminate; facts/payloads channel_detached"
+      },
+      "material": [
+        {
+          "path": "reports/trial-operations/wave28/selected-input/b.json",
+          "bytes": 3457,
+          "sha256": "3ab2f7dbd56890135205b3fad942d6b145857e670dfed9e4988dee6ea548d5b8"
+        }
+      ]
+    },
+    "report": {
+      "path": "reports/trial-operations/wave28/selected-input/report.json",
+      "bytes": 13424,
+      "sha256": "c08fe4148f87a6c386902fe9c3b3a9510be4c2c9a139ddb7fee8659c81901ead"
+    },
+    "notReached": [
+      "B runner-service importing I attach-channel (unique selected implementation absent)",
+      "same-Runner dual client through B actual service route",
+      "B actual service-page budget/CAS/foreign-source fixes (B-owned)",
+      "SIGKILL cross-process original Work recovery; no signal executed here"
+    ]
+  },
+  "procguard": {
+    "checks": {
+      "ownBirthComplete": true,
+      "ownMatches": true,
+      "pureRefusals": true,
+      "termFreshSent": true,
+      "termGone": true,
+      "stubbornIgnoredTerm": true,
+      "killFreshSent": true,
+      "stubbornGone": true,
+      "siblingRefused": true,
+      "siblingUnaffected": true,
+      "siblingCleaned": true,
+      "unknownRefused": true,
+      "noForeignSignals": true
+    },
+    "counts": {
+      "signalsSent": 4,
+      "foreignSignals": 0
+    },
+    "controls": [
+      {
+        "id": "own_matches",
+        "ok": true,
+        "issues": []
+      },
+      {
+        "id": "foreign_uid",
+        "ok": false,
+        "issues": [
+          "uid_mismatch"
+        ]
+      },
+      {
+        "id": "foreign_ppid",
+        "ok": false,
+        "issues": [
+          "ppid_mismatch"
+        ]
+      },
+      {
+        "id": "recycled_start",
+        "ok": false,
+        "issues": [
+          "start_mismatch"
+        ]
+      },
+      {
+        "id": "wrong_argv",
+        "ok": false,
+        "issues": [
+          "argv_mismatch"
+        ]
+      },
+      {
+        "id": "missing_operation",
+        "ok": false,
+        "issues": [
+          "record_operation_missing",
+          "operation_root_config_missing"
+        ]
+      },
+      {
+        "id": "pre_record_pid",
+        "ok": false,
+        "issues": [
+          "pid_mismatch"
+        ]
+      },
+      {
+        "id": "missing_pid",
+        "ok": false,
+        "issues": [
+          "record_pid_missing",
+          "pid_mismatch"
+        ]
+      },
+      {
+        "id": "sibling_pid",
+        "ok": false,
+        "issues": [
+          "pid_mismatch"
+        ]
+      }
+    ],
+    "births": {
+      "normal": {
+        "pid": 18125,
+        "ppid": 18117,
+        "uid": 501,
+        "start": "Sun Nov 15 10:34:28 2026",
+        "operation": "wave28-procguard-normal"
+      },
+      "stubborn": {
+        "pid": 18169,
+        "ppid": 18117,
+        "uid": 501,
+        "start": "Sun Nov 15 10:34:28 2026",
+        "operation": "wave28-procguard-stubborn"
+      },
+      "sibling": {
+        "pid": 18264,
+        "ppid": 18117,
+        "uid": 501,
+        "start": "Sun Nov 15 10:34:28 2026",
+        "operation": "wave28-procguard-sibling"
+      }
+    },
+    "material": [
+      {
+        "path": "reports/trial-operations/wave28/procguard/report.json",
+        "bytes": 10157,
+        "sha256": "747eae6a3ae8dcb9045cbed7513aadbb15b3513b77cbf8d04f5a826c5270b8ae"
+      }
+    ],
+    "notReached": [
+      "product/B daemon lifecycle stop/upgrade",
+      "SIGKILL of a product/B runner",
+      "global process/socket discovery"
+    ]
+  },
+  "delivery": {
+    "normal": {
+      "workId": "0a3c3213f00cdcd181ab8db13dca1894",
+      "workViewId": "0a3c3213f00cdcd181ab8db13dca1894",
+      "phaseBeforeAccept": "needs_user",
+      "phaseAfterAccept": "delivered",
+      "questionId": "06bdb0198101ecab4d83e86410e9743b",
+      "questionVersion": 1,
+      "targetAttemptId": "attempt-1265681a-7d72-4def-ae19-7298342821a9",
+      "answerDelivery": "native_applied",
+      "currentCandidate": {
+        "ticketId": "71af2c879f5b3edd366c4f8bbaddfd6e",
+        "assignmentId": "e5202a0d9e88aa3bb1d25de418b9347b",
+        "contract": {
+          "workId": "0a3c3213f00cdcd181ab8db13dca1894",
+          "revision": 1,
+          "digest": "4d7f353c47e01fa098cc3254630cc65c19ba132f9c64362da6e5e5c98e67b78a"
+        },
+        "candidateGeneration": 3
+      },
+      "acceptedStatus": "recorded",
+      "wrongCandidateStatus": "rejected",
+      "wrongCandidateError": "verification_failed",
+      "artifactIds": [
+        "0c9a0c17c831430fa879845d50cb1bc19c2bb2701f89232237b079fc82f8824d",
+        "1822672fb21520769ab626ab4ff94bfe4563373368f291baefc4b31fec8ed7c5",
+        "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+        "8a1b1ded3ea03260aeb9adb857896105a43ae686a9c55bf0b1398e825504c6dc"
+      ],
+      "artifactCount": 4,
+      "resourceStatus": "quiescent",
+      "beginFrames": 1,
+      "answerFrames": 1,
+      "queueDue": 0,
+      "answerReceiptStatus": "recorded",
+      "answerReplaySame": true,
+      "answerConflictStatus": "rejected",
+      "answerConflictError": "question_expired"
+    },
+    "slots": {
+      "2": {
+        "works": 2,
+        "delivered": 2,
+        "workViewIdsMatch": true,
+        "artifactCounts": [
+          4,
+          4
+        ],
+        "resourceStatuses": [
+          "quiescent",
+          "quiescent"
+        ],
+        "beginFrames": 2,
+        "uniqueAttemptIds": null,
+        "queueDue": 0,
+        "slotCapObserved": "not_configurable_in_fixture",
+        "attemptIdentityNote": "begin frame count is observed; the receipt projection carries no attemptId, so unique attempt identity is unknown"
+      },
+      "4": {
+        "works": 4,
+        "delivered": 4,
+        "workViewIdsMatch": true,
+        "artifactCounts": [
+          4,
+          4,
+          4,
+          4
+        ],
+        "resourceStatuses": [
+          "quiescent",
+          "quiescent",
+          "quiescent",
+          "quiescent"
+        ],
+        "beginFrames": 4,
+        "uniqueAttemptIds": null,
+        "queueDue": 0,
+        "slotCapObserved": "not_configurable_in_fixture",
+        "attemptIdentityNote": "begin frame count is observed; the receipt projection carries no attemptId, so unique attempt identity is unknown"
+      }
+    },
+    "doubleAccept": {
+      "first": "recorded",
+      "second": "recorded",
+      "sameReceipt": true
+    },
+    "checks": {
+      "normalAnswered": true,
+      "normalCandidate": true,
+      "normalAccepted": true,
+      "wrongCandidateRefused": true,
+      "delivered": true,
+      "workViewIdentity": true,
+      "duplicateAcceptIdempotent": true,
+      "slots2": true,
+      "slots4": true,
+      "answerReplayIdempotent": true,
+      "answerConflictRejected": true
+    },
+    "material": [
+      {
+        "path": "reports/trial-operations/wave28/delivery/delivery.json",
+        "bytes": 3509,
+        "sha256": "6b20078cdca4aa056ec351e622e0e2285047de1662b1dbff610903e1b10c2057"
+      },
+      {
+        "path": "reports/trial-operations/wave28/delivery/report.json",
+        "bytes": 1203,
+        "sha256": "f05f1eb265fd66d61ec7590225679f0637f781146e7a36e5cad70dfe3854da2f"
+      }
+    ],
+    "notReached": [
+      "native vendor execution / native compatibility",
+      "recovered Work candidate/accept after a real B/I channel rebind",
+      "native 2/4 slot resource set (no slot-cap configuration in this fixture)"
+    ]
+  },
+  "package": {
+    "name": "wave27-target-1cdab25",
+    "tarSha256": "dcfda014ce0ac04ff4a78ebcf27cea9c3659e12bc3156583c985b869401fa86e",
+    "bytes": 20283738,
+    "tuple": {
+      "buildId": "ecffaa6d3f784426",
+      "schema": 18,
+      "source": "1cdab25a76748edad5054ce1a5150a69d5ad9361"
+    },
+    "observed": {
+      "closureDigest": "c964a5aa563a7d12a4e3eaf4d869729286b44dbdabe0670a01e64e154670663c",
+      "files": 6738,
+      "symlinks": 21
+    },
+    "preflight": {
+      "result": "DEGRADED",
+      "checks": {
+        "PASS": 32,
+        "UNKNOWN": 1
+      }
+    },
+    "machinecheck": {
+      "result": "DEGRADED",
+      "checks": {
+        "PASS": 46,
+        "UNKNOWN": 3
+      },
+      "unknowns": [
+        "host_sqlite",
+        "support"
+      ]
+    },
+    "note": "contains main967 F identity, not main18f stats; read-only input, not installed/release",
+    "material": [
+      {
+        "path": "reports/trial-operations/wave28/package-1cd/preflight/preflight-report.json",
+        "bytes": 19076,
+        "sha256": "54b44edb96e6313e34122d41941b9df8b74db2a73d29bee4a23d095e2f1c7a30"
+      },
+      {
+        "path": "reports/trial-operations/wave28/package-1cd/machinecheck/machinecheck-report.json",
+        "bytes": 27548,
+        "sha256": "8612aaf94324f63a05316a8a2476fd0bcfeb7fe21cb6fe047e99060384880005"
+      }
+    ]
+  },
+  "runs": {
+    "short20Slow": {
+      "material": [
+        {
+          "path": "reports/trial-operations/wave28/runs/20261115T103058-20s-mixed-slow/run.json",
+          "bytes": 7353,
+          "sha256": "80b684a8da467c92a3b4fcfff3f6197690ff98eff690f88fb27a2c86366fe3f0"
+        },
+        {
+          "path": "reports/trial-operations/wave28/runs/20261115T103058-20s-mixed-slow/samples.ndjson",
+          "bytes": 5981,
+          "sha256": "0134ad336b19f4f8a19f69bdcac105405bb90709a2fa1f51d9f57c500ffb0cbc"
+        }
+      ],
+      "summary": {
+        "status": "COMPLETED_WITH_OBSERVED_DEFECT",
+        "startedAt": "2026-11-15T02:30:58.699Z",
+        "endedAt": "2026-11-15T02:31:19.170Z",
+        "wallElapsedSeconds": 20,
+        "requestedDurationSeconds": 20,
+        "stoppedBy": "duration",
+        "counters": {
+          "pollRequests": 39,
+          "pollOk": 0,
+          "pollFailed": 39,
+          "latencyMs": {
+            "count": 39,
+            "p50": 151.63,
+            "p95": 153.06,
+            "max": 153.23
+          },
+          "httpStatuses": {},
+          "sseConnections": 3,
+          "sseEvents": 50,
+          "sseBytes": 5646,
+          "sseFailedConnections": 0,
+          "duplicates": 0,
+          "gaps": 0,
+          "reconnects": 2,
+          "reopens": 2,
+          "samples": 22,
+          "lastEventAt": "2026-11-15T02:31:18.626Z"
+        },
+        "failures": 39,
+        "failureCounts": {
+          "poll:poll_timeout": 39
+        },
+        "cleanup": {
+          "closed": true,
+          "activeSockets": 0,
+          "activeConnections": 0
+        }
+      },
+      "check": {
+        "path": "reports/trial-operations/wave28/checks/20261115T103058-20s-mixed-slow/run-check.json",
+        "bytes": 1468,
+        "sha256": "b8ed867a19a8a3ab80791c3bbe8073db8ee674d4291be5ce76c6f062a53e7cd3"
+      }
+    },
+    "productReadonlyObservation": {
+      "status": "NOT_REACHED",
+      "reason": "no explicit independently-proven own product target; no user service/credential sampling"
+    },
+    "preserved": "wave25/26/27 raw runs and expected disconnect observations retained; no 40-minute rerun"
+  },
+  "tests": {
+    "command": "node --test tests/operational-soak/*.case.mjs tests/operational-soak/{recovery,channel,selected,procguard,delivery}/*.case.mjs",
+    "total": 36,
+    "pass": 36,
+    "fail": 0,
+    "suites": {
+      "preflight": 9,
+      "machinecheck": 5,
+      "soak": 6,
+      "hardening": 4,
+      "recovery": 3,
+      "channel": 3,
+      "selected": 3,
+      "procguard": 2,
+      "delivery": 1
+    }
+  },
+  "findings": [
+    {
+      "id": "I28-SETTLED-ALLOW-REPLAY-SAME-LEASE",
+      "owner": "I",
+      "status": "REPRODUCED",
+      "detail": {
+        "id": "I-fresh-intent",
+        "firstFrameId": "cmd-answer",
+        "secondFrameId": "cmd-answer",
+        "sameFrameId": true,
+        "replayAccepted": true,
+        "firstSettled": "resolved",
+        "secondState": "resolved",
+        "defect": true,
+        "expectation": "a new intent needs a fresh correlation and its own guard decision"
+      },
+      "note": "I must use a fresh frame.id/guard per intent; H did not modify I"
+    }
+  ],
+  "budgets": {
+    "vendorModelNativeTurns": 0,
+    "newModelAllowanceCreated": 0,
+    "newDriver": false,
+    "cac": false,
+    "desktopShell": false,
+    "pilot": "BLOCKED (24 turn / 200000 token / USD5 / one-in-flight unchanged)"
+  },
+  "preserved": {
+    "userServices": "twelve instances 5180/8796 .. 5191/8807 untouched",
+    "state": "no personal state/profile/credential read or modified; fixture roots only",
+    "liveSignals": "own probes only, fresh whole-record proof before every signal; zero foreign signals",
+    "oldEvidence": "wave25/26/27 raw material retained"
+  },
+  "releaseAuthority": false,
+  "eAssertions": "independent; H material is raw observation only",
+  "limitations": [
+    "selected committed source materialized for import; B runner-service actual route and unified B/I channel NOT_REACHED",
+    "same-Runner dual client, SIGKILL product recovery, recovered candidate/accept and native 2/4 slot resource set NOT_REACHED",
+    "real product readonly/SSE and vendor/native not measured; no signals to user/B processes",
+    "H does not replace E required assertions or authorize release"
+  ]
+}

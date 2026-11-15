@@ -1,0 +1,145 @@
+{
+  "protocol": "selected-b-consumer/1",
+  "surface": "B createBusinessChannel (actual source; in-process frames, no runner-service route)",
+  "modelCalls": 0,
+  "vendorTurns": 0,
+  "signalsSent": 0,
+  "cases": [
+    {
+      "id": "B-generation",
+      "first": 1,
+      "again": 1,
+      "second": 2,
+      "monotonic": true
+    },
+    {
+      "id": "B-three-callbacks",
+      "factOutbound": {
+        "type": "fact",
+        "id": "fact-b-1",
+        "fact": {
+          "factId": "fact-b-1"
+        }
+      },
+      "factReply": true,
+      "factSettled": {
+        "state": "resolved",
+        "value": {
+          "factId": "fact-b-1",
+          "persisted": true,
+          "seq": 11
+        },
+        "code": null,
+        "reason": null
+      },
+      "duplicate": false,
+      "payloadOutbound": {
+        "type": "payload-read",
+        "id": "payload-b-1",
+        "requestId": "payload-b-1",
+        "reference": "payload-ref-b-1"
+      },
+      "payloadReply": true,
+      "payloadSettled": {
+        "state": "resolved",
+        "value": {
+          "ok": true
+        },
+        "code": null,
+        "reason": null
+      },
+      "writeOutbound": {
+        "type": "native-write-intent",
+        "id": "cmd-answer",
+        "command": {
+          "id": "cmd-answer",
+          "ticketId": "ticket-1",
+          "assignmentId": "assignment-1",
+          "attemptId": "attempt-1",
+          "fenceEpoch": 1,
+          "contract": {
+            "workId": "work-1",
+            "revision": 1,
+            "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          },
+          "kind": "answer",
+          "nativeBindingRef": "binding-1",
+          "answerRef": "answer-1"
+        }
+      },
+      "writeReply": true,
+      "writeSettled": {
+        "state": "resolved",
+        "code": null,
+        "reason": null
+      },
+      "pending": {
+        "facts": 0,
+        "payloads": 0,
+        "writes": 0
+      },
+      "outbound": 0
+    },
+    {
+      "id": "B-write-deny",
+      "reply": true,
+      "settled": {
+        "state": "rejected",
+        "code": null,
+        "reason": "Coordinator refused native write"
+      }
+    },
+    {
+      "id": "B-stale-reply",
+      "rebound": 2,
+      "stale": false,
+      "settled": {
+        "state": "rejected",
+        "code": "closed",
+        "reason": "channel_detached"
+      },
+      "implicitRebind": true
+    },
+    {
+      "id": "B-detach",
+      "before": {
+        "facts": 1,
+        "payloads": 0,
+        "writes": 1
+      },
+      "write": {
+        "state": "rejected",
+        "code": "state_indeterminate",
+        "reason": "write_indeterminate_after_detach"
+      },
+      "fact": {
+        "state": "rejected",
+        "code": "closed",
+        "reason": "channel_detached"
+      },
+      "after": {
+        "facts": 0,
+        "payloads": 0,
+        "writes": 0
+      }
+    }
+  ],
+  "observations": {
+    "hasExpectedGenerationCas": false,
+    "hasPerRequestTimer": false,
+    "hasConstructorPendingBytes": false,
+    "leaseRebind": "implicit lease(ref) increments generation without a CAS token",
+    "detach": "pending writes state_indeterminate; facts/payloads channel_detached"
+  },
+  "checks": {
+    "generation": true,
+    "fact": true,
+    "factDuplicateRefused": true,
+    "payload": true,
+    "writeAllow": true,
+    "writeDeny": true,
+    "staleRefused": true,
+    "detachWriteIndeterminate": true,
+    "detachFactRefused": true
+  }
+}

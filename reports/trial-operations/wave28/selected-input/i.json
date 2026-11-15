@@ -1,0 +1,145 @@
+{
+  "protocol": "selected-i-consumer/1",
+  "surface": "I CoordinatorChannelModule (actual source, local frames + manual clock)",
+  "modelCalls": 0,
+  "vendorTurns": 0,
+  "signalsSent": 0,
+  "cases": [
+    {
+      "id": "I-fact-receipt",
+      "frameId": "fact-wave28-1",
+      "accepted": true,
+      "settled": {
+        "state": "resolved",
+        "value": {
+          "factId": "fact-wave28-1",
+          "persisted": true,
+          "seq": 7
+        },
+        "code": null,
+        "reason": null
+      },
+      "duplicate": false
+    },
+    {
+      "id": "I-fact-ack-failed",
+      "accepted": true,
+      "settled": {
+        "state": "rejected",
+        "code": "protocol_error",
+        "reason": "fact_ack_failed"
+      }
+    },
+    {
+      "id": "I-payload",
+      "requestId": "payload-1",
+      "wrong": false,
+      "accepted": true,
+      "settled": {
+        "state": "resolved",
+        "value": {
+          "right": true
+        },
+        "code": null,
+        "reason": null
+      }
+    },
+    {
+      "id": "I-write-allow",
+      "frameId": "cmd-answer",
+      "commandId": "cmd-answer",
+      "accepted": true,
+      "settled": {
+        "state": "resolved",
+        "code": null,
+        "reason": null
+      }
+    },
+    {
+      "id": "I-write-deny",
+      "accepted": true,
+      "settled": {
+        "state": "rejected",
+        "code": null,
+        "reason": "native_write_denied"
+      }
+    },
+    {
+      "id": "I-fresh-intent",
+      "firstFrameId": "cmd-answer",
+      "secondFrameId": "cmd-answer",
+      "sameFrameId": true,
+      "replayAccepted": true,
+      "firstSettled": "resolved",
+      "secondState": "resolved",
+      "defect": true,
+      "expectation": "a new intent needs a fresh correlation and its own guard decision"
+    },
+    {
+      "id": "I-generation-cas",
+      "firstGeneration": 1,
+      "secondGeneration": 2,
+      "staleError": null,
+      "wrongExpected": "stale_connection",
+      "oldReceiver": false
+    },
+    {
+      "id": "I-old-lease-close",
+      "accepted": true,
+      "settled": {
+        "state": "resolved",
+        "value": {
+          "ok": true
+        },
+        "code": null,
+        "reason": null
+      },
+      "generation": 2
+    },
+    {
+      "id": "I-timeout",
+      "settled": {
+        "state": "rejected",
+        "code": "timeout",
+        "reason": "request_timeout"
+      }
+    },
+    {
+      "id": "I-capacity",
+      "first": {
+        "state": "pending",
+        "code": null,
+        "reason": null
+      },
+      "second": {
+        "state": "rejected",
+        "code": "capacity",
+        "reason": "pending_facts"
+      }
+    },
+    {
+      "id": "I-close",
+      "settled": {
+        "state": "rejected",
+        "code": "indeterminate",
+        "reason": "module_closed_during_write"
+      }
+    }
+  ],
+  "defects": [
+    "I-fresh-intent"
+  ],
+  "checks": {
+    "factReceipt": true,
+    "ackFailed": true,
+    "payload": true,
+    "writeAllow": true,
+    "writeDeny": true,
+    "generation": true,
+    "oldLease": true,
+    "timeout": true,
+    "capacity": true,
+    "close": true,
+    "freshIntentDefectObserved": true
+  }
+}
