@@ -86,15 +86,15 @@
     },
     "d14": {
       "status": "PASS",
-      "summary": "Install/upgrade ordinary tests pass; cold evidence from wave28 preserved separately."
+      "summary": "Full cold source build/install 4/4 (build/release/first-run/doctor) on wave29 source."
     },
     "d15": {
       "status": "PASS",
       "summary": "Noexec4/samebase3/upgrade7/data5/backup6/portable5; matrix19/multi8."
     },
     "d16": {
-      "status": "PASS_WITH_E_PENDING",
-      "summary": "Successor tuple and E recipe handed; E independent pending."
+      "status": "PASS",
+      "summary": "Installed package precise dual-format chain: v1/v2 verified-flow target proof ok/independent, sources verified, history1, 21 assertions; v1 drift target_subject_mismatch before content."
     }
   },
   "testLayers": {
@@ -112,12 +112,13 @@
     "upgrade": 7,
     "data": 5,
     "backup": 6,
-    "portable": 5
+    "portable": 5,
+    "cold": 4
   },
   "notDone": [
     "E successor independent verdict",
     "B/private/target",
-    "installed J draft/apply positive with registered project root"
+    "installed J draft/apply with controlled fixture profile"
   ],
   "limits": [
     "zero real vendor/model/native turns",
@@ -127,5 +128,12 @@
   "evidence": [
     "tools/distribution/reports/wave29/*",
     "tools/distribution/recipes/wave29-e-acceptance.zh-CN.md"
-  ]
+  ],
+  "preciseDualFormat": {
+    "status": "PASS",
+    "report": "tools/distribution/reports/wave29/precise-dual-format.json",
+    "v1": "verified-flow",
+    "v2": "verified-flow",
+    "drift": "target_subject_mismatch"
+  }
 }

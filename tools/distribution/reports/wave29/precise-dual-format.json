@@ -1,0 +1,40 @@
+{
+  "protocol": "wave29-installed-precise-dual-format/1",
+  "status": "PASS",
+  "package": {
+    "build": "2d94a7c31ef97b57",
+    "tarSha256": "daee1a94b43156cec659f7df2a3b08e1ecb89b645fde1ea81c35a81d75b47d7a"
+  },
+  "formats": {
+    "v1": {
+      "format": "v1",
+      "status": "verified-flow",
+      "targetProof": "ok",
+      "verification": "ok",
+      "artifactCoverage": "independent",
+      "sources": "verified",
+      "history": 1,
+      "assertions": 21
+    },
+    "v2": {
+      "format": "v2",
+      "status": "verified-flow",
+      "targetProof": "ok",
+      "verification": "ok",
+      "artifactCoverage": "independent",
+      "sources": "verified",
+      "history": 1,
+      "assertions": 21
+    }
+  },
+  "drift": {
+    "status": "failed",
+    "code": "target_subject_mismatch",
+    "message": "restored row content differs from the restore report",
+    "mismatches": [
+      "restoreVerification"
+    ],
+    "bodyReturned": false
+  },
+  "note": "Fresh v1/v2 A restores from same source; C driver target-source-root avoids /private normalization; both verified-flow independent; v1 drift blocked before content."
+}
