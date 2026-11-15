@@ -11,7 +11,7 @@ import { runCase, notTested, LAYERS } from '../lib/status.mjs'
 import { LocalProductClient } from '../lib/http-client.mjs'
 import { candidateModel } from '../../../tests/integration/fixtures/assistant-candidate-model.mjs'
 import { DEFAULT_FROZEN_DIRS, frozenArtifactSubject, loadFrozenArtifact } from '../lib/frozen-package.mjs'
-import { readRecord, startOwned, stopOwned as stopOwnedInstance } from '../lib/packaged-instance.mjs'
+import { liveIdentity, readRecord, startOwned, stopOwned as stopOwnedInstance } from '../lib/packaged-instance.mjs'
 
 /**
  * Wave-21 explicit restored-personal review with the *package's own* prepare and startup consumer.
