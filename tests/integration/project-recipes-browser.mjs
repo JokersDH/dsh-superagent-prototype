@@ -35,7 +35,7 @@ const vite = await createServer({ root: resolve('apps/console'), configFile: res
   define: { 'import.meta.env.VITE_CONSOLE_MODE': JSON.stringify('http') }, server: { host: '127.0.0.1', port, strictPort: true,
     proxy: { '/v1': { target: `http://127.0.0.1:${api.address().port}`, changeOrigin: true } } } })
 const cases = [], errors = [], commands = [], acceptedWorks = []
-let browser, previewPosts = 0
+let browser, previewPosts = 0, unknownAfterRecorded = false
 const check = async (id, action) => { await action(); cases.push({ id, status: 'PASS' }) }
 const until = async (read, predicate) => {
   const deadline = Date.now() + 20000
@@ -123,15 +123,18 @@ try {
       const goal = `编辑后的有限目标 ${index}`
       await form.getByRole('textbox', { name: '目标', exact: true }).fill(goal)
       if (index === 0) {
-        await page.route('**/v1/commands', route => route.abort())
+        await page.route('**/v1/commands', async route => { await route.fetch(); await route.abort() })
         await form.getByRole('button', { name: '创建委托', exact: true }).click()
         await page.waitForFunction(() => [...document.querySelectorAll('.new-work button')].some(button => button.textContent === '创建委托' && !button.disabled))
+        assert.equal(store.product.works.listByProject(records[index].id, { limit: 10 }).length, 1)
+        unknownAfterRecorded = true
         await page.unroute('**/v1/commands')
       }
       await form.getByRole('button', { name: '创建委托', exact: true }).click(); await form.waitFor({ state: 'hidden' })
       const command = commands.filter(value => value.kind === 'create_work').at(-1)
       assert.equal(command.goal, goal); assert.equal(command.projectId, records[index].id); assert.deepEqual(command.scope.allowedPaths, ['src/'])
       assert.ok(command.criteria.some(criterion => criterion.kind === 'human' && criterion.required))
+      assert.equal(store.product.works.listByProject(records[index].id, { limit: 10 }).length, 1)
       const ready = await until(async () => (await product.application.inspect({ conversationId: command.conversationId })).works.find(work => work.work.projectId === records[index].id),
         work => work?.actions.available.includes('accept_candidate'))
       await page.getByRole('button', { name: '接受当前候选', exact: true }).click()
@@ -160,7 +163,7 @@ try {
   const report = { status: cases.length === 6 ? 'PASS_ACTUAL_PROJECT_RECIPE_WORKFLOW' : 'FAIL',
     sourceCommit: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
     sourceWorktreeClean: execFileSync('git', ['status', '--porcelain', '--', 'apps', 'packages', 'tests/integration/project-recipes*'], { encoding: 'utf8' }).trim() === '',
-    cases, errors, previewPosts, commands: commands.map(value => ({ kind: value.kind, commandId: value.commandId })), acceptedWorks: acceptedWorks.length,
+    cases, errors, previewPosts, unknownAfterRecorded, commands: commands.map(value => ({ kind: value.kind, commandId: value.commandId })), acceptedWorks: acceptedWorks.length,
     realModelTurns: 0, nativeTurnStarts: 0,
     scope: 'Actual App/React/J observer/registered project/HTTP/Product/Broker/check/accept controlled workflow; no installed, native or recovered admission' }
   writeFileSync(join(output, 'browser-report.json'), JSON.stringify(report, null, 2) + '\n'); console.log(JSON.stringify(report, null, 2))
