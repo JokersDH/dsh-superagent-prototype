@@ -97,6 +97,14 @@
     "d16": {
       "status": "PASS_WITH_E_PENDING",
       "summary": "Successor tuple and E recipe handed; E independent verdict pending."
+    },
+    "d17": {
+      "status": "PASS_MANUAL_PROOF",
+      "summary": "C wave27 precise proof with A workflow-content/2: baseline ok/independent; foreign FTS row, foreign event_log row and artifact byte mutation all mismatch/blocked before content. A/C whole-family exceptions are now closed in manual proof."
+    },
+    "d18": {
+      "status": "PASS_WITH_INSTALLED_DRIVER_BLOCK",
+      "summary": "Same package v2 precise target proof via C personal-review-driver is blocked by C source-root normalization (/private vs /var/folders), not by target content; manual proof with exact path passes."
     }
   },
   "testLayers": {
@@ -117,7 +125,10 @@
   },
   "notDone": [
     "J recipe composition",
-    "A/C precise FTS/event exceptions (wave27)",
+    "E successor independent verdict",
+    "B/private/target",
+    "C driver source-root normalization for installed precise proof",
+    "J recipe composition",
     "E successor independent verdict",
     "B/private/target"
   ],
@@ -129,5 +140,10 @@
   "evidence": [
     "tools/distribution/reports/wave28/*",
     "tools/distribution/recipes/wave28-e-acceptance.zh-CN.md"
-  ]
+  ],
+  "preciseExceptions": {
+    "status": "PASS_MANUAL",
+    "report": "tools/distribution/reports/wave28/precise-exceptions.json",
+    "installedDriver": "BLOCKED_C_ROOT_NORMALIZATION"
+  }
 }

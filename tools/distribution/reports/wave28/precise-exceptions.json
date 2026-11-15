@@ -1,0 +1,48 @@
+{
+  "protocol": "wave28-precise-restore-exceptions/1",
+  "status": "MANUAL_PROOF_PASS_INSTALLED_DRIVER_BLOCKED",
+  "cTool": {
+    "path": "/Users/hh/Desktop/joker/superagent-agent-c/packages/context/tools/wave27-target-proof.mjs",
+    "sha256": "2801906e4c7aa029c8e0011d2ed2c2e01fd80ec7870be4dabffc4b771b90689b"
+  },
+  "aHead": "1f080068bf79ed8c1ca144c3bfadc1ec3cc62efa",
+  "target": {
+    "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/wave26-keep-2-Aez602/state",
+    "protocol": "workflow-snapshot/2",
+    "snapshotDigest": "19afe158c12a548dff6d886d0022670db201298840fd7dbd9ad8384002914980",
+    "contentDigest": "42495125267f820cc3120592fd086270e329819a48ea6d99b1ef1d26ad2484e7"
+  },
+  "cases": {
+    "baseline": {
+      "status": "ok",
+      "verification": "ok",
+      "basis": "independent",
+      "artifactCoverage": "independent"
+    },
+    "ftsForeignRow": {
+      "status": "mismatch",
+      "verification": "blocked",
+      "message": "restored database failed re-verification"
+    },
+    "eventForeignRow": {
+      "status": "mismatch",
+      "verification": "blocked",
+      "message": "restored row content differs from the restore report"
+    },
+    "artifactByteMutation": {
+      "status": "mismatch",
+      "verification": "blocked",
+      "message": "restored artifact df45b645261594fe82199b4052fc476da2c473095f7e74a032bad4e24bebfec1 differs from the snapshot"
+    },
+    "restoredBaseline": {
+      "status": "ok"
+    }
+  },
+  "installedDriver": {
+    "status": "BLOCKED",
+    "code": "target_subject_mismatch",
+    "message": "restore source root mapping differs from the independent expectation",
+    "detail": "C personal-review-driver canonicalizes source root to /private while restore-report records /var/folders; manual C wave27 proof with exact /var path passes."
+  },
+  "conclusion": "A/C precise FTS/event/artifact exceptions are closed in the manual wave27 proof: foreign FTS row, foreign event_log row and artifact byte mutation all blocked before content. Installed package driver still needs C root normalization fix."
+}

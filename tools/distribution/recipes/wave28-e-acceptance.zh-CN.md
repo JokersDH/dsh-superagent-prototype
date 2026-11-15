@@ -5,4 +5,6 @@ ce64 `d4b1780d999a4b74` 与 1cd `ecffaa6d3f784426` 保留。
 
 必跑：本目录 `startup-mode-consistency.json`（四类实际启动：normal discussion personal/normal、restored no review personal/recovery、restored with review personal/recovery、fixture/normal；每类 STOPPED 且 record removed）、`installed-trial-workbench.json`（8/8）、`readiness.json`、`personal.json`、`same-store.json`、`multi/matrix/noexec/samebase/upgrade-artifact/data/backup/portable`。
 统计：安装包实际含 `packages/usage-insights` 且 coordinator 有 usage-insights API 路由；J recipes 不在本包。
-未达：J 配方组合、A/C 精确 FTS/event 例外（继承 wave27 缺口）、E independent verdict、B/private/target、真实供应商。
+精确例外：`precise-exceptions.json` 已由 C wave27 proof + A workflow-content/2 关闭——FTS 外来行、event_log 外来行、artifact 字节变更均在正文前 blocked；同包 C driver 目前因 /private 与 /var/folders 源根规范化差异返回 target_subject_mismatch，这是驱动路径问题不是内容通过。
+
+未达：J 配方组合、C driver 源根规范化、E independent verdict、B/private/target、真实供应商。
