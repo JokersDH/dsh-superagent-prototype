@@ -1,0 +1,35 @@
+{
+  "protocol": "wave31-recipes-insights-admission/1",
+  "date": "2026-11-15",
+  "candidates": {
+    "G": {
+      "head": "1f2964558e21061402f0217e2cca37308e9776f0",
+      "dirty": ""
+    },
+    "J": {
+      "head": "e640042948c04dd0eb33b310a09c75dba211b5f7",
+      "dirty": ""
+    }
+  },
+  "checks": {
+    "JLibrary": 75,
+    "JTools": 26,
+    "JStrict": "PASS",
+    "GExportDisplayCrosscheck": 22,
+    "GStrict": "PASS",
+    "GSourceBuild": "PASS",
+    "mainJObservationIntegration": 13,
+    "mainDownloadBackendAndTransport": 5,
+    "mainCurrentJSourceByteExact": 5,
+    "mainCurrentGSourceByteExact": 6
+  },
+  "previousJFutureFactsGap": "CLOSED_AT_TESTED_SCOPE",
+  "gPublicUserConsumer": "IMPLEMENTED_IN_MAIN_303b2c6a",
+  "publicExportType": "display-only formatted strings with no numeric reverse parsing",
+  "independentPublicReview": "reports/releases/wave31-admission/main-export-review.json",
+  "nativeModelStarts": 0,
+  "installedAdmission": false,
+  "recoveredAdmission": false,
+  "operatorBenefitMeasured": false,
+  "candidateTreesEdited": false
+}

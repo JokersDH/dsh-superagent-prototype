@@ -1,0 +1,182 @@
+{
+  "protocol": "wave31-data-experience-admission/1",
+  "date": "2026-11-15",
+  "status": "PASS_PRIOR_HISTORY_AND_SELECTION_FIXES_PARTIAL_UPSTREAM_COVERAGE_PROPAGATION",
+  "observedMain": "6f385a545d8ae38fcdaa494a0fd0646f45721a15",
+  "fixedSources": {
+    "A": "40626989dbfe4ffd86ab30983a0916d6bac285cb",
+    "C": "c25c4147d737156f7ee8f634992d65cc0471196d",
+    "F": "876fc970897b2b06bd75289546c03cca6f780716"
+  },
+  "dirtyBeforeAndAfter": { "A": [], "C": ["pnpm-lock.yaml"], "F": [] },
+  "executed": [
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "command": "node --test packages/workflows/test/acceptance.case.ts",
+      "exitCode": 0,
+      "passed": 7,
+      "scope": "Canonical review/full-subject/strict-shape history controls retained; new original-attempt historical binding, currentLink and cross-process C history consumer; explicit per-ticket truncation and existing acceptance/outcome/UoW behavior."
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "command": "pnpm --filter @personal-agent/storage --filter @personal-agent/workflows typecheck",
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "command": "node --test --test-concurrency=1 packages/knowledge/test/main-personal-completion-history.case.ts packages/knowledge/test/main-personal-two-project-flow.case.ts packages/knowledge/test/main-personal-decision-support-flow.case.ts",
+      "exitCode": 0,
+      "passed": 3,
+      "durationMs": 13143,
+      "scope": "Actual controlled same-Store completion history/current separation across A restore; two project current source HTTP recipe preview/context/candidate/proposal/original create/check/explicitaccept/evidence/insights7&30; accepted and dispatch unknown remain distinct; real record->supersede->revoke and receipt replay do not resurrect active decisions. No vendor/native or new installed verdict."
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "command": "pnpm --filter @personal-agent/context --filter @personal-agent/knowledge typecheck",
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-f",
+      "command": "node --test apps/console/test/trial/recipes.case.ts",
+      "exitCode": 0,
+      "passed": 8,
+      "scope": "Correct restricted selection, blocked/discussion/expired/source/project/check/profile controls retained; selection now must stay within declared suggestion scope; unrepresentable extra exclusions refuse instead of being dropped."
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-f",
+      "command": "pnpm --filter @personal-agent/console typecheck",
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "command": "node --experimental-strip-types /tmp/pa-wave31-data-experience-YkNCTc/probe-closed-historical-selection.ts",
+      "exitCode": 0,
+      "report": "/tmp/pa-wave31-data-experience-YkNCTc/controls-02/result.json",
+      "scope": "Private actual controlled completed Work and public original binding/verification Stores plus exact F pure mapping. Original canonical review survives new epoch2/current attempt with ended/historical_attempt, no read event delta. Fresh correct F suggestion positive; unique declared-src/preview-test and extra exclusion mutations refuse. Adds50 schema-valid verification metadata records to expose A's truthful50-of51 source truncation being relabelled complete by C wrapper.",
+      "earlierPositive": "/tmp/pa-wave31-data-experience-YkNCTc/controls/result.json",
+      "harnessCalibration": "Extending the local probe initially attempted to reuse its existing fixed source root and hit EEXIST before a new chain was created. The final run uses a fresh private controls-02 root. This is a probe path calibration, not a candidate product failure."
+    },
+    {
+      "command": "Read-only SHA256 and tar -xOzf install/install.json for the exact1fbaf94 archive, using Node execFileSync maxBuffer4MiB",
+      "exitCode": 0,
+      "scope": "Confirms supplied package's immutable tar/source/build/schema/J module tuple without extracting to an install or starting it. Initial default1MiB stdout buffer returned ENOBUFS on the large manifest; corrected only the private read command bound, no package or file was changed."
+    }
+  ],
+  "previousFindingsClosed": [
+    {
+      "id": "A30-HISTORICAL-REVIEW-VALIDITY-DEPENDS-ON-LATEST-BINDING",
+      "status": "CLOSED_FOR_ORIGINAL_HISTORICAL_BINDING",
+      "implementation": "Each parsed review attemptId now resolves its own historical runtime binding. The current pointer is read separately and only produces the data link current_attempt/historical_attempt; immutable shape/canonical key/work-contract-candidate verification remains enforced.",
+      "independentEvidence": { "beforeReviews": 1, "afterNewEpochReviews": 1, "newCurrentEpoch": 2, "bindingState": "ended", "currentLink": "historical_attempt", "unclassified": 0, "readEventDelta": 0 },
+      "authority": "Historical authenticity is data. Existing ProductCompletion.current/preflight/accept and main application authority are unchanged."
+    },
+    {
+      "id": "F30-DECLARED-SCOPE-AND-PREVIEW-SELECTION-CAN-DISAGREE",
+      "status": "CLOSED_FOR_REPORTED_SCOPE_AND_EXTRA_EXCLUSION_MUTATIONS",
+      "implementation": "Preview allowed atoms must be within both project and declared suggestion scope; extra declaration exclusions that cannot be carried by the restricted callback are refused. The displayed restricted selection is the same data sent to the original main form; complete fields are still provided by main's fresh server preview.",
+      "independentEvidence": { "correctSrcSelection": true, "declaredSrcPreviewTestApplicable": false, "declaredSrcPreviewTestSelection": null, "extraExclusionApplicable": false, "extraExclusionSelection": null },
+      "main0077Protection": "Main's existing same-server-fields mapping remains the authoritative source for actual suggestions and creation input. It was not relaxed or replaced by F applicability."
+    }
+  ],
+  "newFindings": [
+    {
+      "id": "C31-HISTORY-WRAPPER-DROPS-UPSTREAM-TRUNCATION",
+      "priority": "P2_HISTORY_COVERAGE_CORRECTNESS",
+      "file": "packages/context/tools/wave30-completion-history.mjs",
+      "line": 39,
+      "relatedLine": 55,
+      "problem": "The wrapper determines reviews coverage only from its local all.slice(0,limit) and labels verification/acceptance arrays complete_known. It ignores entry.completion.coverage/limits from A's actual reader. A real private source with51 schema-valid verification records returns50 with reviews/verifications='truncated'; the wrapper instead returns reviews.state='complete', truncated:false and verifications.state='complete_known'. Its available count describes only the already capped local array, not the complete source history.",
+      "evidence": "/tmp/pa-wave31-data-experience-YkNCTc/controls-02/result.json#cCoverage",
+      "positiveControl": "The original small real completion history and per-attempt current separation pass before introducing the cap case; A's underlying coverage remains truthful. The new finite metadata records are not a claim of additional native executions or accepted candidates.",
+      "scopeLimit": "New C developer history/data wrapper only. There is no main permission or acceptance bypass; A's reader and original ProductCompletion current/preflight/accept are unchanged. Small-history C source tests remain valid.",
+      "requiredOutcome": "Compose source coverage with local limit coverage for every collection. Propagate A's per-ticket bounds/truncated/unknown without converting them to complete; label local returned/available counts accurately and keep current eligibility delegated. Add one complete source plus upstream-truncated and local-limit controls through the real wrapper."
+    }
+  ],
+  "formalConsumerAssessment": {
+    "ASourceHistoricalAndCurrentSeparated": true,
+    "ACanonicalStrictClassificationRetained": true,
+    "AExplicitPerTicketCoverageRetained": true,
+    "CActualHistoricalConsumerUsesAReader": true,
+    "CActualTwoProjectMainHttpFlow": true,
+    "CActualDecisionRevokeSupersessionConsumer": true,
+    "FDeclaredScopeSelectionOldCounterexampleClosed": true,
+    "FNoLocalCreationFieldsOrNewAuthority": true,
+    "publicPackagedProofClosure": "C tools still explicitly load the selected A source/worktree for the examined development flow. Source compatibility and exact package data evidence do not establish a default packaged A history/proof endpoint; root/public API composition remains main-owned.",
+    "timedExpiryBoundary": "F's expiry applicability is checked against its current render/context time. Click-time original main preview/revalidation remains necessary. This review did not claim a running timed-revocation mechanism or grant from display state."
+  },
+  "packageMaterialAssessment": {
+    "path": "/Users/hh/Desktop/joker/pa-artifacts/wave29-target/wave29-target-1fbaf94.tar.gz",
+    "sha256": "daee1a94b43156cec659f7df2a3b08e1ecb89b645fde1ea81c35a81d75b47d7a",
+    "source": "1fbaf940d426fa34ff6289304e073b9159586ed9",
+    "buildId": "2d94a7c31ef97b57",
+    "schema": 18,
+    "bytes": 20458656,
+    "containsProjectRecipesModule": true,
+    "candidateCProvidedDualRestoreEvidence": "main-personal-package-j-window.case.ts binds exact hash/source/build, two A restores, current manifest/content/independent artifact proof, original Work/native_applied/source reads, readiness readonly and verified STOPPED. It also reads console bundle capability and honestly records no actual30-day selector in this artifact.",
+    "independentlyRerunPackageThisReview": false,
+    "reason": "Focused on new history/selection/formal consumers and did not repeat the old long dual/install/browser matrix. Immutable tuple was independently read; prior package positives remain in their precise measured scopes, not promoted to a new installed verdict.",
+    "currentSourceVsPackage": "Main0076/0077 and actual current7/30 selector/trial server-preview-to-original-form are implemented source features.1fbaf94 lacks later window/trial entry controls; that temporal scope is not a current-source missing feature. No ce64/1ba/1fba/current-main tuple relabeling is accepted.",
+    "independentEReleaseVerdict": false
+  },
+  "newlyObservedCurrentMainSourceProgress": {
+    "twoProjectFlow": "Recipes preview and original create/check/currentCandidate/explicit acceptance, context/candidates/proposals/frozen evidence and per-project7/30 insights are exercised through current source HTTP with original IDs; preview adds no Work, unknown command replay does not create replacements.",
+    "supportFlow": "Accepted history stays original, dispatch indeterminate refuses resend; decision record->supersede->revoke and original receipt replay do not reactivate revoked/superseded sources or add verification/acceptance/model work.",
+    "notClaimed": ["new F visual/browser verdict by this review", "new same-tar internal install/release verdict", "B/I live original Work crash recovery-to-delivery", "native compatibility", "physical writer quiescence", "private target activation", "48h soak or measured efficiency value"]
+  },
+  "minimalSourceClosure": {
+    "A": {
+      "source": ["packages/storage/src/workflows.ts per-review original binding and bindingState/currentLink fields"],
+      "tests": ["packages/workflows/test/acceptance.case.ts historical original review/new current epoch control"],
+      "conditions": "The exact added historical binding slice is narrow, old canonical/schema/classification remains admitted, and current package/source strict checks pass. If main has not yet integrated the prior completion types/exports, import their dependency-consistent minimal closure too. No migration is required; main current/preflight/accept remains unchanged."
+    },
+    "F": {
+      "source": ["apps/console/src/trial/recipes.ts declaration selection and extra-exclusion checks"],
+      "tests": ["apps/console/test/trial/recipes.case.ts updated coherence controls"],
+      "conditions": "Can adopt this exact scoped source after main consumer compilation. TrialWorkspace changes also contain window/header/row presentation that overlaps previously integrated main behavior; select exact required fragments or verified identical bytes, preserving current7/30 focus/reload behavior. No local creation-fields reconstruction, new backend or grant is needed."
+    },
+    "C": {
+      "source": ["packages/context/tools/wave30-completion-history.mjs as source data tool after upstream coverage propagation repair"],
+      "conditions": "Actual historical, two-project and decision support consumers are useful contract examples. Their tests/docs do not require a new production algorithm. Propagate A coverage before adopting the wrapper as a complete product history view; default public HTTP/UI composition stays main-owned."
+    }
+  },
+  "nextThreeContinuousDeliveryPackages": [
+    {
+      "package": 1,
+      "title": "Usable Trusted History Product",
+      "owners": ["A", "C", "main", "F"],
+      "scope": "Deliver one versioned public history data contract with authentic review/verification/acceptance/source relations, source and local coverage/cursors, historical/current distinction and bounded evidence/artifact access. Compose an actual current-main history/workbench consumer that navigates original Work/contract/attempt and audit sources, handles incomplete/unknown/old revision, preserves original acceptance authority, and provides an accurate explicit export/support artifact. No new candidate/ledger/permission lifecycle.",
+      "acceptance": "Real multi-attempt history remains after current changes; complete, source-truncated and caller-bounded pages are truthful; ordinary users can inspect/return/export exact original evidence without model/native calls or raw credential leakage. Current main consumer and its genuine user flow, not only helper arrays, are delivered."
+    },
+    {
+      "package": 2,
+      "title": "Complete Daily Multi-Project Workbench",
+      "owners": ["F", "C", "main", "J", "G"],
+      "scope": "Build on the implemented current App, not a new demonstration: two-project discussion and template selection/server-preview/original-form editing/confirmation, questions, verification/current candidate/manualaccept, history/source review, record/supersede/revoke and7/30 observation return. Complete identity changes, cancel/unknown command reconciliation, old-backend/error/loading, keyboard/mobile and accurate count/layer/coverage behaviors in a cohesive navigation flow. J/G remain data inputs and original main command authority is preserved.",
+      "acceptance": "Several distinct nonempty workflows are usable end to end on the same current source with preserved draft/identity and truthful observations. Main/F actual App journeys and source consumers share original data; a recipe/metric/history observation never automatically creates work, approves a native request or accepts a candidate."
+    },
+    {
+      "package": 3,
+      "title": "Same-Artifact Internal Delivery And Recovery Support",
+      "owners": ["A", "C", "D", "E", "F", "H", "main"],
+      "scope": "Close one current-source installed dependency/runtime/UI/data/proof package, with ordinary first use, exact-mode reopen, both genuine snapshot restores, trusted history/current data, actual current J/window interface and sanitized operational support. E independently verifies the exact frozen tuple; package/browser/data/private-source scopes remain separate. Integrate B/I original-ID live recovery only after actual channel/lifecycle/resource admission, as a real consumer rather than a new normal Work or synthetic receipt substitute.",
+      "acceptance": "A colleague can install/use the same bytes, complete ordinary daily flow, restore and inspect both formats, and obtain bounded accurate diagnostics/history/support with clear unknown preservation and safe owned cleanup. Old artifact temporal gaps do not reject current source; absent live/native/target permission is explicit and never bypassed to satisfy a release date."
+    }
+  ],
+  "planningPrinciple": "The user asks for approximately three times the actual implementation scope, delivered as three consecutive complete subsystem packages. These are not24/32 renamed microphases or three repeated test gates. Publish runnable source early and continue independent implementation; no same-day deadline, token budget or automatic model allowance is introduced.",
+  "preservation": {
+    "realVendorModelCalls": 0,
+    "nativeTurnStarts": 0,
+    "userServiceActions": 0,
+    "globalSocketOrProcessDiscovery": false,
+    "foreignCredentialsRead": false,
+    "candidateImplementationsEdited": false,
+    "eAssertionsOrRootConfigEdited": false,
+    "packageInstanceStartedByAudit": false,
+    "manualProcessSignalsByAudit": false,
+    "oldLongDualOrBrowserSuiteRepeated": false,
+    "allPrivateExecSessionsCompleted": true,
+    "privateEvidenceRoot": "/tmp/pa-wave31-data-experience-YkNCTc",
+    "budgetsLedgersAndHistoricalStateUnchanged": true,
+    "releaseApproved": false
+  }
+}

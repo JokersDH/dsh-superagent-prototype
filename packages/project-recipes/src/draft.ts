@@ -38,6 +38,7 @@ export const RECIPE_ISSUE_CODES = [
   'locks_ambiguous',
   'workspace_unknown',
   'workspace_member_required',
+  'project_scope_expired',
   'project_discussion_only',
   'project_dispatch_blocked',
   'execution_unavailable',
@@ -155,8 +156,9 @@ const withoutRevision = (value: object): Json => {
 export const draftRevision = (value: object): string => canonicalDigest(withoutRevision(value))
 
 export class RecipeDraftError extends Error {
-  readonly code: 'invalid_draft' | 'revision_mismatch'
-  constructor(code: 'invalid_draft' | 'revision_mismatch', message: string) {
+  /** `stale_draft_version` means the draft predates a provenance field and must be regenerated. */
+  readonly code: 'invalid_draft' | 'revision_mismatch' | 'stale_draft_version'
+  constructor(code: 'invalid_draft' | 'revision_mismatch' | 'stale_draft_version', message: string) {
     super(message)
     this.name = 'RecipeDraftError'
     this.code = code
@@ -168,7 +170,12 @@ export class RecipeDraftError extends Error {
  * that the draft was not edited after it was produced; this function is the check to run before
  * feeding a draft into the existing preview/confirmation path.
  */
+const hasContentDigest = (value: unknown): boolean =>
+  typeof (value as { provenance?: { facts?: { contentDigest?: unknown } } } | null | undefined)?.provenance?.facts?.contentDigest === 'string'
+
 export function parseProjectRecipeDraft(value: unknown): ProjectRecipeDraft {
+  if (!hasContentDigest(value))
+    throw new RecipeDraftError('stale_draft_version', '该草稿由较早版本生成（缺少 provenance.facts.contentDigest）；请用当前配置与事实重新生成')
   const parsed = ProjectRecipeDraftSchema.safeParse(value)
   if (!parsed.success) throw new RecipeDraftError('invalid_draft', `Not a project recipe draft: ${parsed.error.issues[0]?.message ?? 'invalid shape'}`)
   const draft = parsed.data

@@ -1,0 +1,277 @@
+{
+  "protocol": "wave31-runtime-channel-admission/1",
+  "date": "2026-11-15",
+  "status": "ACTUAL_SINGLE_OWNER_CALLBACK_RUNTIME_ADMITTED_NARROWLY_ORIGINAL_PRODUCT_RECOVERY_NOT_REACHED_SIGNAL_TOOLS_REFUSED",
+  "mainBaseline": "6f385a545d8ae38fcdaa494a0fd0646f45721a15",
+  "candidates": {
+    "B": {
+      "root": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "source": "fbc933166758f446ba8907ce93795d04d34d11d7",
+      "branch": "codex/g1-runtime",
+      "dirtyPreserved": [
+        "reports/releases/wave11-admission/runtime.json",
+        "reports/releases/wave12-admission/runtime.json",
+        "tests/native-acceptance/b16-real-begin.mjs (untracked)"
+      ]
+    },
+    "I": {
+      "root": "/Users/hh/Desktop/joker/superagent-agent-i",
+      "source": "4bce0673388f22952513b5e530381f7a95e7a794",
+      "branch": "codex/g5-coordinator-channel",
+      "dirty": []
+    },
+    "H": {
+      "root": "/Users/hh/Desktop/joker/superagent-agent-h",
+      "source": "55766f412bde0a4bf3b7b2569e8ae9c5b4c5f3ec",
+      "branch": "codex/g4-trial-operations",
+      "dirty": []
+    }
+  },
+  "verdicts": {
+    "actualBTransportOwner": "PASS: authenticated remote request is returned only by its remote poll; old stdio receives zero matching native-write-intent frames",
+    "actualBAdoptedIChannel": "PASS: same concrete CoordinatorChannelModule and RunnerAttachChannel as previous admitted scope, no competing pending map or poll queue",
+    "actualBFreshGuardAndStrict": "PASS: missing/denied/thrown fresh guard gives zero modeled effect; two allowed intents invoke the guard twice; direct and actual NativeProductAttempt consumers compile",
+    "BSignalTools": "REFUSED: omitted argv/resource/copy defects are closed, but any discovered direct child can still be registered from one partial argv token without original full spawn identity",
+    "HSignalTools": "REFUSED: returned-copy retarget defect is closed in guard3, but incomplete birth with UNKNOWN observation still unconditionally calls child.kill(SIGKILL)",
+    "HCurrentSourceConsumer": "PASS: corrected nonregression expectations consume exact current I/B sources; old sink bypass is no longer required",
+    "normalProductCandidateDelivery": "PASS_CONTROLLED_ORDINARY_SCOPE_ONLY",
+    "originalABrokerThreeCallbackJoin": "NOT_REACHED",
+    "sameOriginalWorkRecoveredBusiness": "NOT_REACHED",
+    "safeCoordinatorSIGKILLThenNewProcessAnswer": "NOT_REACHED",
+    "recoveredVerificationCandidateHumanAcceptance": "NOT_REACHED",
+    "actualMixedTwoFourSlotRelease": "NOT_REACHED",
+    "vendorNativeInstalledRelease": "NOT_MEASURED"
+  },
+  "checks": [
+    {
+      "command": "node /tmp/pa-wave29-runtime-channel-audit.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "probeMetadata": "Updated to exact wave31 B fbc9331/I4bce067 before execution; old filename does not imply historical output",
+      "exitCode": 0,
+      "passed": 12,
+      "failed": 0,
+      "scope": "Actual B serveRunner/FileCriticalJournal/authenticated endpoint and actual B/I classes, controlled in-process callback Driver only. No vendor/native child or process signals.",
+      "observed": {
+        "journalRecords": 161,
+        "wirePages": 160,
+        "maxWirePageBytes": 1821,
+        "requestedMaxBytes": 2048,
+        "contiguousOriginalSeq": true,
+        "payloadBytes": 135540,
+        "payloadChunks": 5,
+        "payloadByteEqualityAndSha256": true,
+        "CAS": [1, 2, 3, 3],
+        "oldOriginalAGeneration": 2,
+        "oldAAndForeignSourceRefusedWithoutGenerationChange": true,
+        "oldAllowedReplyCannotAuthorizeSecondIntent": true,
+        "crossKindRawIdAndTimeoutQueuePrune": true,
+        "externalDeny": { "guardCalls": 1, "effects": 0 },
+        "sinkMissing": { "guardCalls": 0, "effects": 0 },
+        "sinkDeny": { "guardCalls": 1, "effects": 0 },
+        "sinkThrow": { "guardCalls": 1, "effects": 0 },
+        "sinkAllowTwice": { "guardCalls": 2, "effects": 2 },
+        "remoteRequest": "native-write-intent",
+        "oldStdioRequests": [],
+        "remoteDenialOutcome": "denied"
+      }
+    },
+    {
+      "command": "node --test --test-timeout=8000 apps/runner/test/sink-write-admission.test.ts apps/runner/test/attach-adapter.test.ts apps/runner/test/native-write-admission.test.ts",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 0,
+      "passed": 8,
+      "failed": 0,
+      "scope": "Finite actual adapter, mandatory fresh sink guard and native intent callback tests; not product recovery"
+    },
+    {
+      "command": "pnpm exec tsc -p tests/native-acceptance/tsconfig.direct.json",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 0,
+      "scope": "Actual recovery transport direct strict/exactOptional consumer"
+    },
+    {
+      "command": "pnpm exec tsc -p /tmp/pa-wave31-native-consumer.tsconfig.json",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 0,
+      "scope": "Actual NativeProductAttempt, RunnerLink, runner-service, business-attach and business-reconnect under coordinator strict/exactOptional. Temporary external config specifies candidate node typeRoots; no tracked candidate config/source changed.",
+      "nativeConsumerBlobInMainAndB": "4fddc74e17ba97885b5c9352fc85f87a49d95fb3",
+      "originalCurrentCommandDigestAndLiveAnswerAdmissionUnchanged": true,
+      "initialProbeConfigCorrection": "First external /tmp config could not resolve node types; explicitly selecting candidate typeRoots fixed only the temporary config"
+    },
+    {
+      "command": "pnpm exec tsc -p apps/coordinator/tsconfig.product.json --noEmit",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 2,
+      "scope": "Broad candidate product strict attempt, not admitted as green",
+      "observed": "Missing installed workspace module/type declarations for @personal-agent/project-recipes and @personal-agent/usage-insights plus consequent implicit-any errors. No runtime attach or NativeProductAttempt errors. No lock/install/node_modules mutation performed.",
+      "requiredMainFollowup": "After narrow production integration, main runs its complete product/http strict with its existing installed dependencies"
+    },
+    {
+      "command": "node --test apps/runner/test/attach-channel/concurrency.test.ts apps/runner/test/attach-channel/handover.test.ts apps/runner/test/attach-channel/lane-ownership.test.ts",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-i",
+      "exitCode": 0,
+      "passed": 16,
+      "failed": 0,
+      "scope": "New I module/service-shaped contract cases: per-connection ownership, kind namespace, fresh intents, capacity, remaining deadlines and handover. No real A/Broker or process recovery."
+    },
+    {
+      "command": "node_modules/.bin/tsc -p apps/runner/src/attach-channel/tsconfig.json",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-i",
+      "exitCode": 0
+    },
+    {
+      "command": "node --experimental-test-module-mocks /tmp/pa-wave31-signal-mock-audit.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "exitCode": 1,
+      "passed": 12,
+      "failed": 2,
+      "realProcessSpawns": 0,
+      "realSignals": 0,
+      "scope": "Actual B signal-guard and H guard3 unchanged; all ps/pgrep/spawn/child.kill/process.kill mocked. Only private synthetic birth fixture files created and removed.",
+      "closedCases": [
+        "B original complete declared immutable record positive",
+        "B empty/missing exactArgs refuses",
+        "B omitted resource plan refuses before default signal",
+        "B frozen record and copied-retarget record refuse",
+        "B non-direct child refuses",
+        "B fresh child-set mismatch refuses every signal",
+        "B explicit ps failure remains UNKNOWN/not exited",
+        "H built-in 17 pure controls pass",
+        "H original complete birth positive",
+        "H modifying returned observation cannot retarget private original handle",
+        "H copied handle refuses",
+        "H explicit ps failure remains UNKNOWN/not gone"
+      ],
+      "failedCases": [
+        { "id": "B31-PARTIAL-DISCOVERED-BIRTH", "registered": true, "declaredArgs": ["/usr/bin/node"], "target": 42345, "mockSignal": "SIGKILL", "sent": true },
+        { "id": "H31-INCOMPLETE-BIRTH-CLEANUP-SIGNAL", "birth": null, "observation": "unknown", "mockChildKill": "SIGKILL", "count": 1 }
+      ]
+    },
+    {
+      "command": "node --test --test-timeout=15000 tests/operational-soak/procguard/guard3.case.mjs tests/operational-soak/selected/current.case.mjs tests/operational-soak/delivery/windows2.case.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-h",
+      "exitCode": 0,
+      "passed": 9,
+      "failed": 0,
+      "scope": "H pure own-guard comparison, exact committed current I/B materialization/consumer positives and wrong-source/tamper negatives, original-A-row ACK classification and synthetic complete-resource ledger. These are finite no-signal checks; no live procguard or soak was run."
+    },
+    {
+      "command": "node /tmp/pa-wave31-h-original-ingress.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-h",
+      "exitCode": 0,
+      "checksPassed": 8,
+      "scope": "Actual controlled ProductRuntime/Application/QuestionBroker normal fixture, reopen original A ProductStore through public readers. Work/question/answer/recorded command/native_applied/attempt/contract all bind. Explicit businessIngressJoin remains NOT_REACHED; this is not B callback persistence or recovery.",
+      "modelCalls": 0,
+      "vendorTurns": 0
+    },
+    {
+      "command": "node tests/native-acceptance/b28-delivery.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 0,
+      "passed": 5,
+      "failed": 0,
+      "notTested": 1,
+      "scope": "Actual ordinary controlled ProductCompletion/registered check/currentCandidate/explicit accept_candidate/delivered4 artifacts, stale candidate refused, artifacts/location readable. No candidates table/harness acceptance writes. Native vendor and recovered original-ID B/I path remain NOT_TESTED."
+    }
+  ],
+  "closedPriorFindings": [
+    { "id": "B30-REMOTE-CALLBACK-FORWARDED-TO-OLD-STDIO", "status": "CLOSED_ACTUAL_SERVICE", "evidence": "Remote lease intent exposed by actual authenticated poll, old stdio receives zero frame, remote deny settles denied" },
+    { "id": "B30-MISSING-ARGV-AND-DEFAULT-RESOURCE-BYPASS", "status": "CLOSED_FOR_OMITTED_FIELDS_AND_IMMUTABLE_RECORD", "evidence": "Required exactArgs/resource plan, frozen registry identity and every-signal child-set checks now refuse corresponding old negatives. Original independent full spawn proof remains a separate residual." },
+    { "id": "H30-MUTABLE-REGISTERED-RECORD-RETARGET", "status": "CLOSED_IN_CURRENT_GUARD3", "evidence": "Private deep-frozen facts plus defensive returned observation; changing returned pid/root/argv/birth/plan/resources leaves original handle targeting original PID. Historical guard2 is not retested or relabeled fixed." },
+    { "id": "H30-CURRENT-SOURCE-REQUIRES-OLD-SINK-BUG", "status": "CLOSED_CURRENT_CONSUMER", "evidence": "Current exact I/B producer now requires sinkMissingGuardRefused/sinkDenyRefused/sinkAllowFresh and findings0. All selected current/tamper/wrong-source tests pass." }
+  ],
+  "findings": [
+    {
+      "id": "B31-PARTIAL-DISCOVERED-BIRTH",
+      "priority": 1,
+      "file": "/Users/hh/Desktop/joker/superagent-agent-b/tests/native-acceptance/signal-guard.mjs",
+      "line": 56,
+      "detail": "born(pid) still registers observations rather than an independently captured original spawn. pgrep direct-child relation and any nonempty subset of observed tokens suffice. A synthetic unrelated direct child registered using only /usr/bin/node is accepted and signalOwned sends mock SIGKILL without original full argv/root/config/operation intent.",
+      "impact": "The helper is not admitted for live coordinator-death/resource matrices. This is a test-tool authority defect, not evidence of a public product callback bypass.",
+      "repair": "Spawner must create the opaque registration from its own ChildProcess and immutable original executable/full ordered argv/root/config/operation/resources before any PID discovery. Unknown/missing/mismatched birth refuses; every signal compares fresh identity and complete resource plan. Preserve existing frozen-copy and mandatory-plan fixes.",
+      "independentControl": "A second current direct child with matching node executable but no original registration must be refused. Full original own spawn positive must still signal only its synthetic target."
+    },
+    {
+      "id": "H31-INCOMPLETE-BIRTH-CLEANUP-SIGNAL",
+      "priority": 1,
+      "file": "/Users/hh/Desktop/joker/superagent-agent-h/tests/operational-soak/procguard/guard3.mjs",
+      "line": 107,
+      "detail": "spawnOwnProbe calls child.kill(SIGKILL) on the failure path when birth is incomplete or process observation is UNKNOWN, before its full immutable identity/resource registration is established. The mocked permission-denied/no-birth case records one SIGKILL after the three-second deadline.",
+      "impact": "Current normal immutable-handle fix is valid, but live producer3 is not admitted while its startup failure cleanup bypasses the exact same ownership rules.",
+      "repair": "Do not signal on incomplete/UNKNOWN birth. Retain the precise probe resource and failure evidence, or establish a separately complete fresh verified birth before any signal. Cleanup must use the same private registered guard and never raw child.kill fallback.",
+      "independentControl": "Mock no-birth/ps-unknown/unparseable/mismatch paths must each record zero spawn-side or process.kill signals; original complete probe still permits intended TERM and fresh escalation."
+    }
+  ],
+  "minimalSourceClosure": {
+    "relativeToMain": "6f385a545d8ae38fcdaa494a0fd0646f45721a15",
+    "runtimeRequired": [
+      { "path": "apps/runner/src/runner-service.ts", "blob": "b9f5f47c20d41d12254f6e6980e9b8e2dec357c3" },
+      { "path": "apps/runner/src/recovery-endpoint.ts", "blob": "25275e3480bda9b4f60edfe56105b41838527abf" },
+      { "path": "packages/execution/src/recovery-transport.ts", "blob": "73752579e28009a50c7062b4d35d91bb9ccca816" },
+      { "path": "apps/runner/src/attach-channel/attach.ts", "blob": "321738dae3b87e6ad7d235f52aaa65e6f63ab527" },
+      { "path": "apps/runner/src/attach-channel/coordinator-channel.ts", "blob": "d1ef81eb9d51b24417645151440eb1e262c20546" },
+      { "path": "apps/runner/src/attach-channel/errors.ts", "blob": "ec8ce909d0f30ab1d96488db56cdf3b6a4ab7f49" },
+      { "path": "apps/runner/src/attach-channel/index.ts", "blob": "b26154f343634cb6c7536aa5cd5bcb7169e0b980" }
+    ],
+    "optionalBusinessConsumers": [
+      "apps/runner/src/business-attach.ts (real thin authenticated command/fact port; no autonomous product join)",
+      "apps/runner/src/business-reconnect.ts (real exact registered inspect/cancel wrapper; no business resume claim)"
+    ],
+    "optionalCompatibilityChanges": [
+      "apps/runner/src/runner-link-client.ts: default fixture producer follows codex/fake args and close carries v1/id; NativeProductAttempt already supplies explicit producer",
+      "apps/runner/src/runner-service-entry.ts: PA_RUNNER_SCENARIO controlled-fixture override; exclude unless consciously adopting this environment test seam",
+      "apps/runner/src/attach-channel/tsconfig.json: direct development check only"
+    ],
+    "existingUnchangedContracts": {
+      "packages/contracts/src/coordinator-channel.ts": "cf451efe433b8f9140d992ccfb415df9cd74b92c",
+      "apps/coordinator/product/native-attempt.ts": "4fddc74e17ba97885b5c9352fc85f87a49d95fb3"
+    },
+    "notRequiredDoNotWholesaleMerge": [
+      "packages/driver-kit/src/index.ts additional diagnostics/send/review exports",
+      "packages/driver-kit/src/runtime-diagnostics.ts",
+      "packages/driver-kit/src/send-admission.ts",
+      "packages/driver-kit/src/review-sender.ts",
+      "packages/execution/src/index.ts additional resource-facts exports",
+      "packages/execution/src/resource-facts.ts",
+      "B/H signal helpers and live acceptance scripts",
+      "historical budget/study reports, lock files or new model paths"
+    ],
+    "adoptionBoundary": "The seven runtime files need only existing driver-kit JsonLineDecoder/encodeFrame and contracts. Additional review sender, send admission, runtime diagnostics and budget functionality is not a dependency. Actual main NativeProductAttempt/current command digest/live AnswerAdmission remains authoritative; copying source does not add recovery routing or permission. Main owns final source selection and complete strict/product regression."
+  },
+  "nextLargeProductOutcomes": {
+    "principle": "Use continuous delivery packages with four real product outcomes each; publishing a milestone does not end the whole package. First four outcomes must connect all three callbacks to one original Store/Broker Work, rather than end after repairing another harness.",
+    "package1OriginalAuthority": [
+      "Actual same-Runner bootstrap and immutable original A registration on one Work; expose exact current lease without changing business epoch",
+      "Actual factSink callback persists original critical facts/receipts in the original ingress and payload callback resolves the original frozen reference",
+      "Actual native intent invokes unchanged main/Broker current-command/live-answer checks; missing/deny/expired/wrong-generation writes zero; successful answer reaches original native_applied",
+      "Two actual clients hand over the same Work/Attempt/contract/producer with stale original client fenced; no third coordinator, ledger, command id or resource identity"
+    ],
+    "package2RecoveredDelivery": [
+      "After pure safety corrections and independent full birth admission, exact own coordinator SIGKILL leaves the same registered Runner alive",
+      "New process reopens original Store and pending question, rebinds same three callbacks and answers without a replacement Work/Attempt/Runner",
+      "Real ACK/durable/native-written windows reconcile original command/answer/delivery, preserving indeterminate and zero unsafe resend",
+      "Recovered Completion/registered check/currentCandidate/explicit human accept delivers the same artifacts with stale candidate refused"
+    ],
+    "package3CapacityAndIndependentEvidence": [
+      "Two mixed original Work slots retain original binding/resource identities through handover and only release after original complete fresh barrier",
+      "Four-slot mixed waiting/active/ended/unknown case keeps queue, waiter, journal, process/child/socket/fd/timer resources honest; UNKNOWN retains capacity",
+      "Independent H consumer binds actual callback, original Store rows, resource end evidence and same candidate delivery from the same run rather than parallel normal/module fixtures",
+      "Exact source/commands/status/refusals and remaining scopes delivered in one reproducible zero-vendor package; no claim of installed/native/release admission from module tests"
+    ],
+    "roleBoundary": "B owns actual service/transport/admission/lifecycle and original product caller integration only via main-owned composition review; I owns shared channel implementation/capacity/handover support, never another business owner; H independently consumes exact sources and original rows/resources, never creates a coordinator/ledger or replacement gate."
+  },
+  "safety": {
+    "newVendorModelCalls": 0,
+    "realVendorNativeTurns": 0,
+    "realSignalAuditProcessSpawns": 0,
+    "realSignalsSent": 0,
+    "liveProcguardOrCoordinatorSIGKILLRun": false,
+    "ordinaryControlledProductFixtureRuns": true,
+    "userServiceRestartOrTargetActions": 0,
+    "twelveUserServicePairsPreserved": "5180/8796 through5191/8807",
+    "unknownBGrantAndBlockedEStudyUnchanged": true,
+    "candidateProductionOrConfigEdits": 0,
+    "newPersistentArtifactByThisAudit": "reports/releases/wave31-admission/runtime-channel.json",
+    "completionPercentChangedByTestCounts": false
+  }
+}
