@@ -8,7 +8,7 @@ import { mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'n
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
-import { RECIPE_KINDS, parseProjectRecipeDraft } from '../../../packages/project-recipes/src/index.ts'
+import { RECIPE_KINDS, matchRecipe, parseProjectRecipeDraft } from '../../../packages/project-recipes/src/index.ts'
 import { HELP_KINDS } from '../cli.ts'
 import { cliPath, fixture } from './paths.ts'
 
@@ -133,4 +133,18 @@ test('stale facts reach the documented needs_input exit through the CLI', () => 
   const draft = JSON.parse(stale.stdout)
   assert.equal(draft.status, 'needs_input')
   assert.ok(draft.needsInput.some((item: { code: string }) => item.code === 'facts_stale'))
+})
+
+test('the CLI returns exactly what the library returns for the same inputs', () => {
+  const result = run([...base, '--paths', 'src/', '--kind', 'verification_followup'])
+  assert.equal(result.status, 0, result.stderr)
+  const json = (path: string): unknown => JSON.parse(readFileSync(path, 'utf8'))
+  const expected = matchRecipe({
+    facts: json(fixture('facts-alpha.json')),
+    configuration: json(fixture('configuration.json')),
+    kind: 'verification_followup',
+    selection: { paths: ['src/'] },
+    now: NOW,
+  })
+  assert.deepEqual(JSON.parse(result.stdout), JSON.parse(JSON.stringify(expected)))
 })

@@ -15,8 +15,8 @@ application's existing preview and explicit user confirmation.
 
 | Module | Contract | Purpose |
 | --- | --- | --- |
-| `facts.ts` | `project-facts/1` | Only names, digests, counts and closed-enum flags of an observation. No script bodies, argv, absolute paths or credentials. |
-| `observe.ts` | `project-facts-observer/1` | Bounded read-only metadata observation plus the registered-root port main consumes. |
+| `facts.ts` | `project-facts/1` | Only names, digests, counts and closed-enum flags of an observation, plus `factsContentDigest` (stable content, timestamp excluded). No script bodies, argv, absolute paths or credentials. |
+| `observe.ts` | `project-facts-observer/1` | Bounded read-only metadata observation (NOFOLLOW, dev/ino/size/mtime identity checks) plus the registered-root port main consumes. |
 | `scope.ts` | — | Declared-atom scope rules, mirroring the application's own `scopeWithin`. |
 | `catalog.ts` | `project-recipes` v1 | Three versioned kinds: `regression_fix`, `scoped_change`, `verification_followup`. |
 | `match.ts` | pure function | `matchRecipe({ facts, configuration, kind, selection, now })` → deterministic result. |
@@ -27,6 +27,9 @@ application's existing preview and explicit user confirmation.
 
 - **Deterministic.** No clock, environment, filesystem or network access inside `matchRecipe`; `now`
   is an input. Identical input yields identical bytes and `revision`.
+- **Content and time are separate.** `provenance.facts.contentDigest` stays equal for a fresh read of
+  unchanged bytes, so an applied draft survives re-observation; a changed file or an observation
+  beyond the freshness budget is refused. The timestamp is never an authorization.
 - **References already exist.** Project id, scope atoms, profile and criteria come from the current
   configuration; a machine criterion must name a check the configuration lists as registered.
 - **Scope is atom containment, not prefixes.** The application compares `allowedPaths`/`excludedPaths`
@@ -69,7 +72,9 @@ const result = matchRecipe({
 
 const draft = parseProjectRecipeDraft(result)   // verifies the revision
 if (draft.status === 'draft') {
-  const fields = previewInputs(draft, { configuration, facts })  // throws stale_inputs with the changed input
+  // throws stale_inputs (with the changed input) when the content or configuration moved
+  const fields = previewInputs(draft, { configuration, facts })
+  const edited = previewInputs(draft, { configuration, facts }, { goal: 'user-edited goal' })
   // hand `fields` to the existing delegation form / create_work confirmation
 }
 ```
@@ -93,7 +98,7 @@ the non-mutating form.
 ## Distribution
 
 `exports["."]` points at `dist/index.js` / `dist/index.d.ts`; `files: ["dist", "README.md"]`.
-`npm pack --dry-run` yields 34 files (~36 KB) with no `src/`, `tools/` or tests. Runtime dependencies
+`npm pack --dry-run` yields 34 files (~39 KB) with no `src/`, `tools/` or tests, and every `dist` import is a Node builtin, `@personal-agent/contracts`, `zod` or a sibling module (asserted by `test/distribution.case.ts`). Runtime dependencies
 are `@personal-agent/contracts` (workspace) and `zod`; everything else is a Node builtin.
 
 ## Ownership

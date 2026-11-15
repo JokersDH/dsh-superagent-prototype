@@ -231,3 +231,76 @@ test('the wave-28 admission scenario is closed: grant ["src"] never yields a chi
   )
   assert.equal(receipt.status, 'recorded', JSON.stringify(receipt))
 })
+
+test('two registered projects in one application keep their own atoms, profile and checks', async (t) => {
+  const directory = mkdtempSync(join(tmpdir(), 'pa-recipes-two-'))
+  const store = new ProductStore({ path: join(directory, 'state.sqlite'), artifactsRoot: join(directory, 'artifacts') })
+  t.after(() => {
+    store.close()
+    rmSync(directory, { recursive: true, force: true })
+  })
+  const atlasScope: Scope = { projectId: 'project-atlas', allowedPaths: ['src/'], excludedPaths: ['src/private/'], externalActions: [] }
+  const bravoScope: Scope = { projectId: 'project-bravo', allowedPaths: ['packages/core/src/'], excludedPaths: [], externalActions: [] }
+  const application = createProductApplication({
+    store,
+    principal: actor,
+    projects: [{ id: 'project-atlas', scope: atlasScope }, { id: 'project-bravo', scope: bravoScope }],
+    profileIds: ['profile-codex-local', 'profile-bravo'],
+    registeredChecks: ['check:unit', 'check:bravo'],
+    actionSecret: Buffer.alloc(32, 9),
+    nativeFence: () => 'current',
+    now: () => NOW,
+  })
+  const criteriaFor = (id: string, check: string) => [{ id, kind: 'machine' as const, required: true as const, description: `${id} checks`, checkDefinitionRef: check }]
+  const twoProjectConfig = {
+    ...configuration,
+    projects: [
+      { ...configuration.projects[0]!, profileIds: ['profile-codex-local'], defaultProfileId: 'profile-codex-local' },
+      {
+        id: 'project-bravo',
+        displayName: 'Bravo',
+        scope: bravoScope,
+        profileIds: ['profile-bravo'],
+        defaultProfileId: 'profile-bravo',
+        defaultCriteria: criteriaFor('bravo-tests', 'check:bravo'),
+        dispatchAllowed: true,
+      },
+    ],
+    profiles: [...configuration.profiles, { id: 'profile-bravo', revision: 1, displayName: 'Bravo native', driverId: 'codex', kind: 'native' as const, readiness: 'native_test_passed' as const, dispatchAllowed: true }],
+    checks: [...configuration.checks, { id: 'check:bravo', revision: 1, displayName: 'bravo' }],
+  }
+  const drafts = [
+    { facts: { ...facts }, paths: ['src/'], commandId: 'command-two-atlas' },
+    { facts: { ...facts, projectId: 'project-bravo', locks: [], scripts: ['test'] }, paths: ['packages/core/src/'], commandId: 'command-two-bravo' },
+  ]
+  for (const entry of drafts) {
+    const draft = parseProjectRecipeDraft(matchRecipe({
+      facts: entry.facts,
+      configuration: twoProjectConfig,
+      kind: 'scoped_change',
+      selection: { paths: entry.paths },
+      now: NOW,
+    }))
+    assert.equal(draft.status, 'draft', entry.commandId)
+    if (draft.status !== 'draft') continue
+    assert.equal(draft.projectId, entry.facts.projectId)
+    assert.equal(draft.profileId, entry.facts.projectId === 'project-bravo' ? 'profile-bravo' : 'profile-codex-local')
+    const receipt = await application.dispatch(
+      toCreateWorkCommand(draft, { commandId: entry.commandId, conversationId: `conversation-${entry.commandId}` }),
+      actor,
+    )
+    assert.equal(receipt.status, 'recorded', `${entry.commandId}: ${JSON.stringify(receipt)}`)
+  }
+
+  // The other project's atom is never accepted for this project.
+  const crossed = parseProjectRecipeDraft(matchRecipe({
+    facts,
+    configuration: twoProjectConfig,
+    kind: 'scoped_change',
+    selection: { paths: ['packages/core/src/'] },
+    now: NOW,
+  }))
+  assert.equal(crossed.status, 'needs_input')
+  if (crossed.status !== 'needs_input') return
+  assert.deepEqual(crossed.needsInput.map((item) => item.code), ['scope_path_outside_allowed'])
+})
