@@ -96,7 +96,8 @@ const unitLabel = (row: MetricRow): string => {
   return row.unit
 }
 
-const formatValue = (row: MetricRow): string | null => {
+/** Display formatting shared by the projection, the report and the export. */
+export function formatMetricValue(row: MetricRow): string | null {
   if (row.value === null) return null
   const value = Number.isInteger(row.value) ? String(row.value) : String(Math.round(row.value * 1000) / 1000)
   // A count is rendered as a bare number: the row label already names what is counted, and the unit
@@ -129,6 +130,9 @@ const windowLabel = (summary: UsageInsightsSummary): string => {
 export const metricRowKey = (row: MetricRow): string =>
   [row.metricId, row.layer ?? 'product', row.currency ?? ''].filter(Boolean).join('@')
 
+/** Unit label for a row: the currency code for money, otherwise the unit token. */
+export const metricUnitLabel = (row: MetricRow): string => unitLabel(row)
+
 /**
  * Total observed outcomes when it is genuinely known. A complete empty window is `0`; an
  * uncollected or missing source is `null`, because a zero would be a fabricated count.
@@ -141,16 +145,21 @@ export function observedOutcomeCount(summary: UsageInsightsSummary): number | nu
 }
 
 /**
- * The declared scope of the numbers. Metrics are aggregated over every declared project, so two or
- * more projects are a cross-project aggregate and are labelled as such.
+ * The declared scope of the numbers.
+ *
+ * Metrics are aggregated over exactly the declared project list. One project is `single_project`;
+ * more than one is `declared_multi_project`, the same vocabulary the coordinator's
+ * `usage-observation/1` DTO uses, so the workspace renders "本次 N 个项目" instead of implying a
+ * single project's total. `cross_project` is reserved for a caller that deliberately aggregates a set
+ * wider than the declared scope, which this projection never does.
  */
 export function consumerScope(summary: UsageInsightsSummary): InsightConsumerScope {
   const projectIds = summary.projects.map(project => project.projectId).sort()
-  const aggregation = projectIds.length === 1 ? 'single_project' as const : 'cross_project' as const
+  const aggregation = projectIds.length === 1 ? 'single_project' as const : 'declared_multi_project' as const
   return {
     projectIds,
     aggregation,
-    label: projectIds.length === 1 ? projectIds[0]! : `跨项目（${projectIds.length} 个项目）`,
+    label: projectIds.length === 1 ? projectIds[0]! : `本次 ${projectIds.length} 个项目`,
   }
 }
 
@@ -177,7 +186,7 @@ export function toInsightConsumerView(summary: UsageInsightsSummary, options: Co
   const metrics: InsightConsumerMetric[] = limited.map(row => ({
     id: metricRowKey(row),
     label: LABELS[row.metricId] ?? METRIC_DEFINITIONS[row.metricId].definition,
-    value: formatValue(row),
+    value: formatMetricValue(row),
     detail: `样本 ${row.sampleCount}，未知 ${row.unknownCount}，覆盖 ${coverageText(row.coverage)}${row.layer ? `，层级 ${row.layer}` : ''}`,
     unit: unitLabel(row),
     layer: consumerLayer(row.layer),
@@ -191,8 +200,8 @@ export function toInsightConsumerView(summary: UsageInsightsSummary, options: Co
 
   const limitations = [...summary.limitations]
   const scope = consumerScope(summary)
-  if (scope.aggregation === 'cross_project')
-    limitations.push(`These numbers aggregate ${scope.projectIds.length} projects and are not any single project's total.`)
+  if (scope.aggregation === 'declared_multi_project')
+    limitations.push(`These numbers aggregate the ${scope.projectIds.length} declared projects and are not any single project's total.`)
   if (partial)
     limitations.push('The observation is partial; unknown or excluded records are counted separately and never filled with zero.')
   if (options.maxLimitations) limitations.splice(options.maxLimitations)

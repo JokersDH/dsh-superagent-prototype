@@ -42,7 +42,12 @@ async function fixture(t: TestContext) {
   const deadline = Date.now() + 2000
   while (!frames.some((frame) => frame.type === 'native-write-intent') && Date.now() < deadline)
     await new Promise((resolve) => setTimeout(resolve, 5))
-  assert.ok(frames.some((frame) => frame.type === 'native-write-intent'))
+  const intents = frames.filter((frame) => frame.type === 'native-write-intent') as Array<{ id: string; command: { id: string } }>
+  assert.ok(intents.length >= 1)
+  // Fresh correlation: every intent carries its OWN frame id while the original business command id is
+  // untouched, so an already-settled approval can never approve a later intent that reuses command.id.
+  assert.ok(intents[0].id.length > 0)
+  assert.notEqual(intents[0].id, intents[0].command.id)
   t.after(async () => {
     input.end()
     const service = await serving
@@ -53,6 +58,7 @@ async function fixture(t: TestContext) {
     send,
     input,
     serving,
+    intents,
     get nativeWrites() {
       return nativeWrites
     },
@@ -64,7 +70,7 @@ test('native write waits for the coordinator admission of that command', { timeo
   h.send({ type: 'write-admission', id: 'unrelated-command', allowed: true })
   await new Promise((resolve) => setTimeout(resolve, 20))
   assert.equal(h.nativeWrites, 0)
-  h.send({ type: 'write-admission', id: 'cmd-answer', allowed: true })
+  h.send({ type: 'write-admission', id: h.intents[0].id, allowed: true })
   h.input.end()
   const handle = await h.serving
   assert.equal((await handle.done).reason, 'terminal')
@@ -72,7 +78,7 @@ test('native write waits for the coordinator admission of that command', { timeo
 })
 test('a refused native write never reaches the native side', { timeout: 3000 }, async (t) => {
   const h = await fixture(t)
-  h.send({ type: 'write-admission', id: 'cmd-answer', allowed: false })
+  h.send({ type: 'write-admission', id: h.intents[0].id, allowed: false })
   h.input.end()
   const handle = await h.serving
   assert.equal((await handle.done).reason, 'error')
@@ -81,7 +87,7 @@ test('a refused native write never reaches the native side', { timeout: 3000 }, 
 test('shutdown closes a pending write gate and cannot be reopened by a late approval', { timeout: 3000 }, async (t) => {
   const h = await fixture(t)
   h.send({ type: 'shutdown', id: 'shutdown' })
-  h.send({ type: 'write-admission', id: 'cmd-answer', allowed: true })
+  h.send({ type: 'write-admission', id: h.intents[0].id, allowed: true })
   h.input.end()
   const handle = await h.serving
   assert.equal((await handle.done).reason, 'error')
