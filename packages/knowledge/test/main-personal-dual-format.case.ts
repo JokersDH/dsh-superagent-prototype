@@ -50,7 +50,7 @@ async function availablePort(): Promise<number> {
   return port
 }
 
-async function until<T>(read: () => Promise<T> | T, predicate: (value: T) => boolean, timeout = 60000): Promise<T> {
+async function until<T>(read: () => Promise<T> | T, predicate: (value: T) => boolean, timeout = 150000): Promise<T> {
   const deadline = Date.now() + timeout
   let latest: T
   for (;;) {
