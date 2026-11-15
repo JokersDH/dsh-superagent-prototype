@@ -6,7 +6,7 @@
   "origin": "https://github.com/JokersDH/dsh-superagent-prototype.git",
   "fixedStart": "e7aec80e1c613d427cf550bf927d3d04776d33e2",
   "syncedMain": "6f385a54",
-  "generatedAt": "2026-11-15T08:52:00Z",
+  "generatedAt": "2026-11-15T08:54:18Z",
   "goal": {
     "statement": "One authorized observation, three usable exits: the page the coordinator serves, a traceable report and a downloadable export that agree with each other — with the snapshot and display-only limits stated instead of papered over.",
     "results": 4,
@@ -125,9 +125,13 @@
           "existing output file"
         ],
         "measured": {
-          "collectMs": 659,
-          "analyzeMs": 379,
-          "note": "single machine, one run; not a soak or cross-machine benchmark"
+          "collectMs": 237,
+          "analyzeMs": 161,
+          "earlierRun": {
+            "collectMs": 659,
+            "analyzeMs": 379
+          },
+          "note": "one machine, separate runs of one bounded observation each; not a soak or cross-machine benchmark"
         }
       }
     },
