@@ -1,0 +1,61 @@
+{
+  "agent": "B",
+  "branch": "codex/g1-runtime",
+  "fixedInput": "c2ea8dbcbc3cdc75ef692b3bcdba585704240dc9",
+  "synced": "origin/main 79525b6 merged; I final codex/g5-coordinator-channel 4d85cc3 (includes 7fefcc9 kind-namespace/prune) merged; B's vendored attach-channel subtree now byte-identical to I's final (diff -rq empty)",
+  "b1_latestIAdapter": {
+    "status": "DONE",
+    "change": "runner-service now instantiates I's RunnerAttachChannel and deletes its own connections/currentConnection/poll-queue store; B keeps only the two authenticated transports (stdio frames, in-process sink) as next/receive adapters",
+    "evidence": [
+      "apps/runner/test/attach-adapter.test.ts 2/2: same raw id in fact and native-write kinds is never collapsed; a stranded request is pruned by the bounded deadline",
+      "apps/runner/test/attach-channel 65/65 (I suite unchanged)",
+      "runner-service 137/137 with the adapter"
+    ]
+  },
+  "b2_sinkGuard": {
+    "status": "DONE",
+    "defect": "the in-process responder answered native-write-intent with allowed:!businessClosed, so a live fact sink with zero guard calls approved the write",
+    "change": "options.beforeNativeWrite is now mandatory for the sink responder; missing/deny/throw => allowed:false and zero native effect; a granted guard is asked again for every intent",
+    "evidence": [
+      "apps/runner/test/sink-write-admission.test.ts 3/3: sink without guard -> 0 writes; denying guard -> 0; granted -> exactly 2 writes with 2 fresh guard calls",
+      "apps/runner/test/native-write-admission.test.ts 3/3 updated: the intent frame id is fresh and is NOT the command id, while frame.command.id keeps 'cmd-answer'"
+    ]
+  },
+  "b3_directTypes": {
+    "status": "DONE",
+    "change": "RunnerLinkError gains the 'refused' base code; a named server refusal (stale_connection/identity_mismatch/foreign_producer/generation_mismatch/stale_lease) keeps its exact serverError while the base code is a transport classification",
+    "evidence": [
+      "tests/native-acceptance/direct-consumer.ts + tsconfig.direct.json: strict + exactOptionalPropertyTypes compiles the real consumer surface (connect/channelState/channelNext/channelReply, refusal classification); `npx tsc -p tests/native-acceptance/tsconfig.direct.json` exit 0"
+    ]
+  },
+  "regressions": {
+    "runnerLinkProducerDefault": "RunnerLink now declares the producer source of the driver it actually spawns (codex* -> codex-native, else fake-driver); a neutral 'runner-link' claim was refused by the channel and broke every fixture run",
+    "channelStaysOpenAfterAttempt": "finish() no longer closes the channel (channel close = physical teardown); closeAdmission drops the two adapter connections so pending native writes become indeterminate while recovery clients can still bind",
+    "pumpTimer": "the adapter pump is a real interval while the attempt is live and is cleared on finish, so a promise-only waiter cannot stall and the process can exit"
+  },
+  "harnesses": {
+    "b28-cas": "7/0/1",
+    "b27-dual-live": "6/0/1",
+    "b27-chain": "4/0/1",
+    "b27-sigkill": "7/0/1",
+    "b27-epoch-ack": "4/0/1",
+    "b27-ack-points": "5/0/1",
+    "b28-budget": "4/0/1",
+    "b28-faults": "5/0/1",
+    "b28-signal": "7/0/0",
+    "apps/runner/test": "137/137",
+    "attach-channel": "65/65"
+  },
+  "notDone": [
+    "B5/B6: exact birth/root/config/operation signal tool and UNKNOWN-not-gone (current tool still substring markers)",
+    "B7-B8: original A/Broker three callbacks and same-runner dual-client on original authority",
+    "B9-B12: new-process original-ID recovery and original question/ACK windows",
+    "B13-B16: recovered candidate/manual accept on the original completion chain",
+    "B17-B20: original scheduler 2/4 slot matrix with true release",
+    "B21-B24: consumer compatibility, docs, whole-run handover"
+  ],
+  "modelTurns": 0,
+  "nativeTurns": 0,
+  "cap4UnknownUnspendable": true,
+  "wholePackageComplete": false
+}

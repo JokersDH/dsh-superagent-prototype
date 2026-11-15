@@ -60,7 +60,12 @@ export interface RecoveryRunnerPort {
   command?(command: ReturnType<typeof RunnerCommandSchema.parse>): Promise<RunnerState>
 }
 export class RunnerLinkError extends Error {
-  readonly code: 'unavailable' | 'auth_failed' | 'identity_mismatch' | 'invalid_response' | 'timeout' | 'unknown_outcome' | 'stale_proof'
+  /**
+   * Transport-level base code. A named server refusal (stale_connection, identity_mismatch,
+   * foreign_producer, generation_mismatch, stale_lease) keeps its own `serverError` for the caller but
+   * the base code is `refused`: the request was understood and deliberately not granted.
+   */
+  readonly code: 'unavailable' | 'auth_failed' | 'identity_mismatch' | 'invalid_response' | 'timeout' | 'unknown_outcome' | 'stale_proof' | 'refused'
   constructor(code: RunnerLinkError['code'], message: string) { super(message); this.code = code }
 }
 
@@ -383,8 +388,9 @@ export function connectRunnerRecovery(input: RunnerEndpoint, context: RuntimePro
             let refused: { error?: unknown; reason?: unknown } = {}
             try { refused = JSON.parse(Buffer.concat(chunks).toString('utf8')) as typeof refused } catch {}
             const serverError = typeof refused.error === 'string' ? refused.error : null
-            const named = serverError === 'stale_connection' || serverError === 'identity_mismatch' || serverError === 'foreign_producer' || serverError === 'generation_mismatch'
-      const code = res.statusCode === 401 ? 'auth_failed' : named ? serverError! : res.statusCode === 409 ? 'refused' : 'unknown_outcome'
+            const named = serverError === 'stale_connection' || serverError === 'identity_mismatch' || serverError === 'foreign_producer' || serverError === 'generation_mismatch' || serverError === 'stale_lease'
+            // The base code is a transport classification; the named server refusal stays exact in serverError.
+            const code: RunnerLinkError['code'] = res.statusCode === 401 ? 'auth_failed' : named || res.statusCode === 409 ? 'refused' : 'unknown_outcome'
             reject(Object.assign(new RunnerLinkError(code, `Runner recovery request was refused (${serverError ?? `status_${res.statusCode}`})`), { serverError, status: res.statusCode }))
             return
           }

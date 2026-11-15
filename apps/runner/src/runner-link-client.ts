@@ -191,7 +191,14 @@ export class RunnerLink {
       spec,
       payloadRoot: join(stateRoot, 'payloads'),
       journalPath,
-      producer: this.#options.producer ?? { source: 'runner-link', runnerIdentityRef: `runner-${spec.attemptId}` },
+      // The registered producer source must describe the driver that actually emits the facts: the
+      // fixture scenarios emit `fake-driver`, the Codex fake-server scenarios emit `codex-native`.
+      // A mismatched claim is refused by the channel, so a neutral default would break every genuine
+      // fixture run rather than express a real foreign producer.
+      producer: this.#options.producer ?? {
+        source: (this.#options.args ?? []).some(arg => String(arg).startsWith('codex')) ? 'codex-native' : 'fake-driver',
+        runnerIdentityRef: `runner-${spec.attemptId}`,
+      },
     })
     await new Promise<void>((resolve, reject) => {
       let settled = false
