@@ -1,6 +1,6 @@
 # F 包 wave-31 最终报告：三包十二成果（R1 固定包、R2 导出、长用支持）
 
-日期：2026-11-15 · 分支 `codex/g4-trial-experience` · 基线 main `8deda18d`（已合并，含 0080 导出与 runner 通道），本包最终源码提交在 `wave31-status.json` 记录。
+日期：2026-11-15 · 分支 `codex/g4-trial-experience` · 基线 main `8deda18d`（已合并，含 0080 导出与 runner 通道），本包最终源码提交 `5832cb8f`（之后仅有文档/状态更新）。
 
 ## 交付包一：R1 固定准确包的日常工作台（4 成果）
 
