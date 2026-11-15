@@ -1,0 +1,154 @@
+{
+  "protocol": "wave28-runtime-channel-admission/1",
+  "date": "2026-11-15",
+  "status": "REAL_B_PROGRESS_AND_I_MODULE_PRESERVED_UNIQUE_CHANNEL_AND_FRESH_ADMISSION_NOT_ADMITTED",
+  "candidates": {
+    "B": { "root": "/Users/hh/Desktop/joker/superagent-agent-b", "source": "cb4e97504157e500799284bfd63d51768740c9fc", "branch": "codex/g1-runtime", "dirtyPreserved": ["reports/releases/wave11-admission/runtime.json", "reports/releases/wave12-admission/runtime.json", "tests/native-acceptance/b16-real-begin.mjs (untracked)"], "runnerServiceBlob": "c2990056c0cd2858a57919f739e052fabadd374b" },
+    "I": { "root": "/Users/hh/Desktop/joker/superagent-agent-i", "source": "d95df88bb9dfdeaef74fa49629dcc2aba25d4d1b", "branch": "codex/g5-coordinator-channel", "dirty": [], "baselineRunnerServiceBlob": "fbd433e52005846a854c221a0a9bbe0b5486d9e9" },
+    "H": { "root": "/Users/hh/Desktop/joker/superagent-agent-h", "source": "0651a50f70e589570aef6a2a91961ee94abbc839", "branch": "codex/g4-trial-operations", "dirty": [], "consumedRunnerServiceBlob": "fbd433e52005846a854c221a0a9bbe0b5486d9e9" }
+  },
+  "sourceAssessment": {
+    "originalThreeRunnerWaiterMapsDeletedInB": true,
+    "bRunnerUses": "apps/runner/src/business-channel.ts createBusinessChannel",
+    "bAdditionalTestedHelper": "apps/runner/src/business-dispatch.ts createBusinessDispatch; not the actual runner-service channel implementation",
+    "iConcreteModuleExists": true,
+    "iImportedByBRunnerService": false,
+    "uniqueSelectedImplementationAchieved": false,
+    "timestampCorrection": "I's report that the old runner-service still has15 waiter references describes its old main baseline, not the newer B tree. B genuinely deleted those old maps, but replaced them with its own same-responsibility channel rather than adopting I. Both facts must be preserved; no wrapper-only or maps-still-exist claim applies to current B.",
+    "bSingleCommandAdmissionExists": true,
+    "bActiveChannelBoundsAndCAS": "Actual createBusinessChannel has no expectedGeneration CAS, per-request timers or constructor byte/pending limits. The bounded createBusinessDispatch tested by separate harnesses is not the actual service channel; its passing tests cannot certify active channel bounds.",
+    "newChannelDefaultProductAdmission": false
+  },
+  "checks": [
+    {
+      "command": "node /tmp/pa-wave28-runtime-channel-audit.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "exitCode": 1, "passed": 5, "failed": 4,
+      "scope": "Actual B in-process serveRunner, real verified FileCriticalJournal, authenticated private Unix endpoint/client and concrete I module with injected local timers. No Driver/native child/model, no signals, no user state. Only exact private material was removed after service shutdown.",
+      "cases": [
+        { "id": "B-actual-inline-descriptor-multipage-contiguous-positive", "status": "PASS", "observed": "160 legal small runtime.error records plus one legal large writer.observed record replay as161 contiguous original seq/fact identities over3 pages; descriptor is discoverable." },
+        { "id": "B-actual-descriptor-five-chunks-original-digest-positive", "status": "PASS", "observed": "Original135540-byte payload reassembles in5 chunks, decoded units and SHA256 match." },
+        { "id": "B-effective-small-page-budget-is-a-real-bound", "status": "FAIL", "observed": "Requested2048 returns67 records/64753 parsed-page bytes/next67. Requested16384 complete replay has a64886-byte parsed page. Global64KB trimming now works, but effective requested budget is ignored by the actual service pager." },
+        { "id": "B-original-channel-client-bind-positive", "status": "PASS", "observed": "Actual authenticated channel next binds A at generation1, then B at generation2." },
+        { "id": "B-replaced-client-poll-must-not-reclaim-current-generation", "status": "FAIL", "observed": "A poll after B takes over returns HTTP200/generation3, implicitly reclaiming the active lease without a CAS token." },
+        { "id": "B-foreign-producer-channel-poll-must-refuse-before-bind", "status": "FAIL", "observed": "Client with foreign expected source and same pinned endpoint/credential is not refused; witness lease generation4 becomes6 after foreign poll and witness repoll, proving intervening rebind." },
+        { "id": "I-CAS-and-old-lease-fencing-positive", "status": "PASS" },
+        { "id": "I-actual-three-callback-reply-correlation-positive", "status": "PASS" },
+        { "id": "I-settled-native-allow-reply-cannot-authorize-next-same-id-intent", "status": "FAIL", "observed": "Two sequential beforeNativeWrite calls for the same command.id emit2 intents on one lease; replaying the first settled allowed reply returns true and resolves the second intent as allowed without a new guard decision." }
+      ]
+    },
+    {
+      "command": "node --test apps/runner/test/attach-channel/*.test.ts",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-i",
+      "exitCode": 0, "passed": 44, "failed": 0,
+      "scope": "Concrete I module contract, CAS, three callbacks, rebind, timer/bounds/close and local independent-consumer doubles. DurableSink is explicitly an in-memory ACK contract double, not actual A persisted ingress. These tests do not cover the new same-lease settled-allow replay negative."
+    },
+    {
+      "command": "node_modules/.bin/tsc -p apps/runner/src/attach-channel/tsconfig.json",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-i", "exitCode": 0
+    },
+    {
+      "command": "pnpm exec tsc --ignoreConfig --noEmit --strict --exactOptionalPropertyTypes --skipLibCheck --target ES2024 --module NodeNext --moduleResolution NodeNext --allowImportingTsExtensions --types node apps/runner/src/business-channel.ts apps/runner/src/business-dispatch.ts apps/runner/src/business-attach.ts apps/runner/src/runner-service.ts",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b", "exitCode": 0,
+      "scope": "Direct actual B module and import compilation, not root-tsconfig omission."
+    },
+    {
+      "command": "node --test tests/operational-soak/channel/channel.case.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-h",
+      "exitCode": 0, "passed": 3, "failed": 0,
+      "scope": "Actual H legacy stdio serveRunner callbacks with deterministic fixture Driver, generic ProductStore.facts receipt/dedupe, immutable payload responder and allow/deny hook. Protocol schema negatives execute; CAS/generation/capacity scenarios are explicitly recorded contract data, not execution of I or current B channel. No long soak or signaling."
+    },
+    {
+      "command": "node --test --test-name-pattern='product executes a real child, routes its original question and verifies a human-accepted artifact' tests/integration/product-execution.case.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 0, "passed": 1, "failed": 0,
+      "scope": "Same current B checkout's admitted ordinary controlled product pipeline: actual fixture child, original Broker question/answer native_applied, registered verification, currentCandidate, explicit accept_candidate, delivered artifacts and reopen. Not a newly recovered B/I channel or vendor-native test. Fixture cleanup uses the existing registered owned product lifecycle; unsafe bespoke SIGKILL scripts were not executed."
+    }
+  ],
+  "preservedProgress": [
+    "B has actual new channel/routes, one command admission, deleted original waiter maps, callback handling, private process/SIGKILL harness source and slot observations. It is not wrapper-only.",
+    "The previous unknown_outcome failure on a legitimate large page now has a real global-cap trim/continue positive. Complete161-record inline/descriptor replay and original5-chunk payload continuity pass together. Effective2KB/16KB limits remain separately incorrect.",
+    "I is a concrete immutable-producer/CAS/lease/timer/bounds module with44 passing cases and direct strict compilation. It is not merely a shared interface.",
+    "H actually drives all3 legacy stdio callbacks, including persisted receipt-row dedupe and allow/deny continuation. H does not execute current B/I generation semantics and correctly keeps attach-channel/SIGKILL NOT_REACHED."
+  ],
+  "findings": [
+    {
+      "id": "I28-SETTLED-ALLOW-REPLAY-IN-SAME-LEASE",
+      "priority": "P1_NEW_NATIVE_ADMISSION_MODULE",
+      "file": "apps/runner/src/attach-channel/coordinator-channel.ts", "line": 277,
+      "relatedLine": 530,
+      "problem": "Every beforeNativeWrite uses command.id as the pending/reply correlation key, even after a previous intent for that ID settled. A delayed duplicate allowed frame for the first intent can resolve a later pending intent on the same lease. The module sends a new request but cannot distinguish the old reply, so it does not ensure a new fresh guard decision.",
+      "scope": "Unadmitted I candidate module; the independent test resolves only local promises and performs no native write. No current main Broker/public permission bypass is asserted.",
+      "requiredOutcome": "Keep original business command.id immutable but correlate each permitted fresh admission attempt uniquely, or explicitly refuse invalid reused completed correlations after original-command reconciliation. The existing local v1 schema permits native intent frame.id distinct from command.id; a fresh local request ID can be implemented without a new wire version or ledger. Validate stale duplicate reply refusal alongside legitimate allow/deny/rebind tests."
+    },
+    {
+      "id": "B28-POLL-REBINDS-STALE-OR-FOREIGN-CALLER",
+      "priority": "P1_NEW_CHANNEL_BINDING",
+      "file": "apps/runner/src/runner-service.ts", "line": 350,
+      "relatedFile": "packages/execution/src/recovery-transport.ts", "relatedLine": 186,
+      "problem": "GET channel/next calls channel.lease for any valid lease string. Polling is also takeover, with no expectedGeneration CAS or structural old-lease fence. Old A reclaims generation3 after B generation2. The client method sends no expected producer envelope, and the server substitutes its own trusted producer, so foreign expected source also mutates binding while the same endpoint/credential is held.",
+      "scope": "Actual B candidate authenticated local route tested with its own private endpoint. Original expected-context registration protections are not replaced by possession of a credential. This new route remains outside default main product admission.",
+      "requiredOutcome": "Make explicit authenticated full-producer CAS bind create the current I lease, keep next/poll read-only to that original lease/generation, reject old/foreign requests before mutation and never forward old frames to a global current lease. Reuse I rather than adding another B-only fencing implementation."
+    },
+    {
+      "id": "B28-EFFECTIVE-PAGE-LIMIT-NOT-ENFORCED",
+      "priority": "P1_NEW_REPLAY_CONTRACT",
+      "file": "apps/runner/src/runner-service.ts", "line": 323,
+      "relatedFile": "packages/execution/src/recovery-transport.ts", "relatedLine": 172,
+      "problem": "Actual service still accumulates every inline/reference record. Recovery transport trims only against global MAX_BYTES, not the reported effective inline budget. A2048 request returns64753 parsed bytes/67 records. Submitted b27-small-pages supplies its own bounded backend and therefore masks actual service behavior.",
+      "requiredOutcome": "Budget the entire actual encoded candidate page against the effective requested bound, select inline/descriptor before accounting and stop with real cursor/donefalse. Keep the now-passing complete161-record replay and135540-byte5-chunk positive. Do not replace source validation with a copied fixture pager."
+    },
+    {
+      "id": "B28-PARALLEL-CHANNEL-IMPLEMENTATIONS",
+      "priority": "P1_RUNTIME_INTEGRATION",
+      "file": "apps/runner/src/runner-service.ts", "line": 31,
+      "problem": "B imports createBusinessChannel rather than I's CoordinatorChannelModule. A separate createBusinessDispatch helper is also tested but not used by the actual service channel. B's active replacement lacks the shared module's CAS/timeouts/byte limits, while I's real implementation remains unused. Literal deletion of the old3 maps is progress but does not close the agreed single-implementation integration result.",
+      "requiredOutcome": "I absorbs necessary concrete callback behavior in its own subtree; B uses only the actual I implementation through its adapter/auth/dispatch/lifecycle composition and removes its parallel channel/helper implementation once migrated. H consumes that exact selected source independently. No new coordinator/ledger/lifecycle or permanent fallback pending owner."
+    },
+    {
+      "id": "B28-CANDIDATE-AND-SLOT-HARNESS-MISREAD",
+      "priority": "P2_ACCEPTANCE_ADAPTER",
+      "file": "tests/native-acceptance/b27-ack-windows.mjs", "line": 206,
+      "relatedFile": "tests/native-acceptance/b27-slots.mjs", "relatedLine": 201,
+      "problem": "The candidate harness SELECTs a nonexistent candidates table and invents candidateId/workId instead of reading WorkView.actions.currentCandidate. The slot harness finds work.id, although inspect returns WorkView with identity at work.work.id. These ordinary adapter errors are presented as missing candidate storage/ended-work projection.",
+      "evidence": "The same checkout's existing targeted product test passes actual registered-check/currentCandidate/accept_candidate/delivered/reopen. ProductCompletion.current/verify/accept and execution completionCandidate→application.verify are implemented.",
+      "requiredOutcome": "Use original ProductCompletion→execution.verify/core candidate generation→WorkView.actions.currentCandidate→explicit accept_candidate; no candidates table/new A migration/ledger is needed. Find view.work.id and observe original bindings/runtime.exited/complete resources for slot release; do not equate work registration with occupied-attempt capacity or a single phase string with aggregate release."
+    },
+    {
+      "id": "B28-UNSAFE-BESPOKE-SIGKILL-CLEANUP",
+      "priority": "P1_TEST_TOOL_LIVE_ADMISSION",
+      "file": "tests/native-acceptance/b27-chain.mjs", "line": 82,
+      "problem": "The bespoke crash tools call process.kill(child.pid) and finally SIGKILL all saved PIDs without independent full birth/start/UID/argv/root/config/operation and a fresh check before each signal. Some paths delete private state after best-effort kills. They were not executed in this audit.",
+      "requiredOutcome": "Before any new live SIGKILL matrix, record exact probe-born identities, recheck all identity fields before every TERM/KILL/escalation, retain unknown material and exercise foreign/recycled/sibling/pre-record/refusal controls with complete positives. Existing scoped submitted observations are preserved but not independently rerun under unsafe cleanup."
+    }
+  ],
+  "recoveryScope": {
+    "reportedOSProcessProgress": "B submitted separate-PID and same-run successor callback harnesses are source progress. Their coordinator child reads a JSON registration file, fabricates receipt persistedtrue/seqDate.now and synthetic payload values, and does not load original A recovery registration or run the original Broker question/answer guard.",
+    "sameAOriginalIdsQuestionRecovery": "NOT_REACHED. Normal product answer/ACK counters and JSON-file/SIGKILL transport experiments are distinct lanes; their combination is not one original Work/question/answer/native_applied recovery proof.",
+    "recoveredCandidateAccept": "NOT_REACHED for B new recovery. Ordinary candidate/verification/acceptance is implemented and independently passed; extend the actual adapter/fixture into the recovered lane rather than inventing storage.",
+    "validStaleEpoch": "Submitted boundary uses current1 versus command2; this proves mismatched/future epoch refusal, not current>=2/old>=1 stale-original-command behavior.",
+    "slotsAndRelease": "Submitted2/4 slot held-attempt observations stay scoped. Aggregate slot release/credential/cursor/payload isolation remain NOT_REACHED; the missing-work claim is a wrong WorkView identity lookup, not an absent product interface."
+  },
+  "hSourceProvenance": {
+    "actualCallbacks": "Actual H runner-service legacy stdio frames call a private ProductStore.facts receipt sink, payload responder and boolean allow/deny hook. Duplicate fact rows reuse receipt seq; ack-failed is observed.",
+    "notActualFreshBroker": "H's allow/deny is an injected boolean fixture, not the main Broker's current original native target guard. ProductStore.facts.record uses an empty participant, so this proves durable receipt-row idempotency rather than the complete A runtime-ingress/business projection.",
+    "sourceIdentity": "H's consumed runner-service blob equals I's old main baselinefbd433, not current Bc299. H source says original B-owned service, but it must not certify current B custom channel or I module from that wording.",
+    "contractScenarios": "Generation/CAS/capacity/late scenarios are recorded contract fixtures only. H correctly marks I/sameRunner/SIGKILL not reached; next package should execute the selected actual I+B consumer rather than add another scenario-only gate.",
+    "longObservations": "Existing raw30s/600s/1800s fixture observation scopes were not rerun or relabeled; no extra live soak required to repair protocol consumers."
+  },
+  "minimalIntegration": {
+    "ordinaryProductPreserved": true,
+    "newDefaultBusinessRecoveryAdmitted": false,
+    "iSourceAfterReplayFix": ["apps/runner/src/attach-channel/coordinator-channel.ts", "apps/runner/src/attach-channel/errors.ts", "apps/runner/src/attach-channel/index.ts", "apps/runner/src/attach-channel/tsconfig.json"],
+    "iTestsAndDocs": "44 actual module cases and focused replay negative are reusable source evidence; concrete module not yet an admitted live B runtime.",
+    "bOwns": "runner-service/RunnerLinkClient, authenticated route adapter, one command admission/begin/prepared/physical lifecycle. Merge I through original branch/source and delete business-channel/business-dispatch duplication; do not concurrently edit I subtree.",
+    "hOwns": "Independent selected-source callbacks/consumer/faults and exact born-resource observation in its own paths. It does not build another coordinator or verdict authority.",
+    "candidateReuse": "Existing apps/coordinator/product/completion.ts current:59/accept:87/verify:102 and execution.ts candidate:173/652 plus tests/integration/product-execution.case.mjs first test are the correct original product path. No new candidate migration or dedicated table."
+  },
+  "nextWholePackages": {
+    "B": "Select actual I module, remove competing channel/helpers, fix effective page budgeting and authenticated CAS route adapter, then sameRunner/sameChild original A/Broker dual-client→safe original-ID SIGKILL answer/ACK→existing registered check/currentCandidate/manualaccept→2/4 slots including release. Correct harness source/shape and signal ownership first; not another sequence of isolated comparison fixes.",
+    "I": "Fresh per-intent native correlation with unchanged original business IDs, absorb actual B callback needs under constructor bounds/CAS/lease semantics, publish direct runnable adapter and independently consume it with B/H. Keep lifecycle/auth/routes/Store outside I and remove test-only/private-interface drift.",
+    "H": "Bind exact selected I/B source and execute real three callbacks/negative/limits/rebind with truthful persistent ingress and fresh guard scope; supply safe resource birth/fresh-signal controls and original question/candidate/slot consumer help, without new coordinator/ledger/gate or unsafe long reruns."
+  },
+  "preservation": { "dateBoundary": "2026-11-15 Asia/Shanghai", "realVendorModelTurns": 0, "nativeTurnStarts": 0, "unsafeBespokeSignalScriptsExecuted": false, "userServiceOperations": 0, "allTwelveInstancesDataProfilesTarsLedgersPreserved": true, "bHistoricalDirtyAndB16Preserved": true, "iAndHRemainClean": true, "candidateOrMainProductionEdits": false, "eAssertionsEdited": false, "globalDiscovery": false, "foreignCredentialsRead": false, "allOwnExecSessionsCompleted": true, "oldBCap4": "UNKNOWN_NOT_SPENDABLE", "ePilot": "UNCHANGED_BLOCKED" }
+}

@@ -26,6 +26,8 @@ B确实已删除原runner-service的三个waiter maps，并提供自己的 busin
 
 选择I独占的 `apps/runner/src/attach-channel/` 为唯一通信 implementation。I把实际B消费所需行为、错误、同步/异步发送与容量时序补进该module；B在原runner-service/recovery-endpoint/RunnerLinkClient中只保留认证、transport adapter、原command dispatch和生命周期。B删除或降为不保存pending/generation/timer的薄adapter，不永久保留第二组通信状态。H独立消费同一个具体module，不新server、coordinator、ledger或gate。
 
+这里退役的是重复通信状态，不是B原业务admission/幂等/dispatch守卫；这些仍由B统一拥有，不能仅按business-dispatch文件名删掉业务控制。
+
 本轮独立事实：B的160条小fact加135540字节五块完整还原与摘要通过，但实际 `facts(...,2048)` 仍可回64753字节；B自带small-pages另实现pager，不能认证真实service。修复必须在actualservice完整envelope上执行effective bound，保持64KiB总上限、descriptor、多页原seq与完整chunk正向。
 
 B回调 `.next()` 不能隐式bind/rebind：旧A在B取得generation2后读取，不得夺回generation3；foreign expected source也必须拒绝，不改变当前lease。连接替换是显式、已认证producer下的CAS动作，普通读不能改变所有权，旧reply/close不得伤新lease。

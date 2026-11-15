@@ -1,0 +1,210 @@
+{
+  "protocol": "wave28-delivery-insights-admission/1",
+  "date": "2026-11-15",
+  "scope": "Pinned D/E/G review with independent tar bytes, source/pure protocol controls, full real-report gate evaluation and bounded G source/tool/strict checks. No live installation/stop matrix, long soak, global discovery, real model/vendor/native turn or user-resource operation.",
+  "candidates": {
+    "D": "26f8ad6ca5c6c1c0764ce426e4fb5dd073e6a8a1",
+    "DDirty": false,
+    "E": "03349a6c4567b9b832ad3ff0f9612d2ef18cc74e",
+    "ETrackedDirty": false,
+    "EHistoricalUntrackedRuns": "Preserved",
+    "ETestSourceAtFinalRun": "373c195ecbb8709f74763ee437d427dca904a791",
+    "G": "2b41765a58687fc286af07e53eca5f37c21e6d53",
+    "GDirty": false,
+    "observedMainCommitted": "22d0c759c59e6387ee397476f3d15d28425818df",
+    "mainObservationSource": "18f892daab756fb2dbcebc9f591bd808ace686db"
+  },
+  "dSuccessorArtifact": {
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave27-target/wave27-target-1cdab25.tar.gz",
+    "source": "1cdab25a76748edad5054ce1a5150a69d5ad9361",
+    "sourceDirty": false,
+    "buildId": "ecffaa6d3f784426",
+    "sha256": "dcfda014ce0ac04ff4a78ebcf27cea9c3659e12bc3156583c985b869401fa86e",
+    "tarBytes": 20283738,
+    "schema": 18,
+    "platform": "darwin",
+    "arch": "arm64",
+    "node": "24.21.0",
+    "abi": "137",
+    "sqlite": "3.53.4",
+    "verifiedEntries": 6759,
+    "verifiedRegularFiles": 6738,
+    "verifiedInternalSymlinks": 21,
+    "verifiedRegularBytes": 67721476,
+    "fileDigestMismatches": [],
+    "verifiedInstall": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-wave28-package-lI8Tt0/install",
+    "byteVerificationExitCode": 0,
+    "contains": ["main967 F enabled/identity/readiness hardening successor", "existing ordinary F trial workbench and source-review surfaces"],
+    "containsUsageInsightsPackage": false,
+    "containsUsageObservationEntry": false,
+    "containsMain18fStatistics": false,
+    "currentSourceClaim": "Do not call this current-main18f or a metrics-capable installed product. Missing later statistics is temporal scope; normal startup should remain independently usable.",
+    "eIndependentVerdictForThisArtifact": "NOT_REACHED",
+    "oldCe64": "Preserve immutable ce64/164-required normal ordinary scope; no test/docs-only refreeze"
+  },
+  "eActualReport": {
+    "path": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-14T11-55-21-036Z/report.json",
+    "testSource": "373c195ecbb8709f74763ee437d427dca904a791",
+    "subject": "ce64fc1fd986bde9a6eba5ace1a4658beadcda21",
+    "buildId": "d4b1780d999a4b74",
+    "tarSha256": "8c36aaeb472263bbb7c6ab5e4dafb3e9394306c83b3b6e1ab257d8770480c33a",
+    "counts": { "PASS": 260, "FAIL": 0, "NOT_TESTED": 19 },
+    "requiredCases": 178,
+    "reportedInstalledAlpha": "PASS",
+    "independentFullRecordedGateReevaluation": { "exitCode": 0, "ok": true, "failures": [] },
+    "scope": "Still exactce64, not new1cd and not current18f metrics. Preserve actual original164-required normal ordinary/UI/readiness/install observations. The expanded178 gate includes a detected BLOCKED product stop as PASS; that is not evidence of functional restored startup/stop.",
+    "packagedStopCase": {
+      "id": "E8-PACKAGED-STOP-CONSISTENCY",
+      "caseStatus": "PASS",
+      "startStatus": "RUNNING",
+      "recordMode": "personal",
+      "actualHealthMode": "fixture",
+      "actualStartupMode": "recovery_readonly",
+      "stopStatus": "BLOCKED",
+      "stopCode": "instance_identity_mismatch",
+      "failures": ["runtime_mode"],
+      "cleanup": "Acceptance-tool equivalent proof, not a successful packaged stop",
+      "interpretation": "Detection of a truthful product refusal can pass a detection test, but cannot satisfy a functional requirement that the package can stop the process it just started. Separate these layers before claiming restoration/start-stop admission."
+    },
+    "historicalWrongStateDocument": "tests/product-acceptance/reports/defects/stop-claims-other-state.zh-CN.md describes old schema15/16 artifacts. It is not the new finding; current requested-root checks and same-install/two-state refusal remain intact."
+  },
+  "productModeMismatch": {
+    "finding": "D_RESTORED_PERSONAL_NO_REVIEW_MODE_ARGV_HEALTH_STOP_DIVERGE",
+    "priority": "P1_RESTORED_START_STOP_FUNCTIONAL_PATH",
+    "files": [
+      "/Users/hh/Desktop/joker/superagent-agent-d/apps/launcher/lib/daemon.mjs",
+      "/Users/hh/Desktop/joker/superagent-agent-d/apps/launcher/lib/start.mjs",
+      "/Users/hh/Desktop/joker/superagent-agent-d/apps/coordinator/product/demo.ts"
+    ],
+    "cause": "daemonArgv drops discussion-only/native on every recovery_readonly startup unless an explicit review file exists. demo personal mode depends on either flag. The launcher still records requested mode personal and only checks actual health mode in the review-file branch; later stop correctly refuses the recorded/actual mismatch.",
+    "independentPureCommand": "node --input-type=module heredoc importing actual D daemonArgv",
+    "pureExitCode": 0,
+    "controls": [
+      { "request": "normal personal discussion-only", "personalFlagForwarded": true },
+      { "request": "recovery_readonly personal discussion-only without review file", "personalFlagForwarded": false },
+      { "request": "recovery_readonly personal discussion-only with explicit review", "personalFlagForwarded": true }
+    ],
+    "new1cdDaemonHash": "1ac7fafa40daf225405c739de1e12669647b1a9d1c772d1c70ac340467614f8a",
+    "codeUnchangedFromCe64InReviewedD": true,
+    "notAWrongRootKill": true,
+    "stopGuardMustRemain": "Do not remove runtime-mode verification or requested-root guards to force stop through. Align intended personal readonly argv, actual health/start validation and recorded mode, then test stop on exact owned inputs.",
+    "minimalFixOwnership": "D/main integration: daemon argv mode propagation and general start health-mode consistency; targeted pure controls plus independently owned package functional start/stop once safe. Runtime bytes change, so a necessary successor freeze is appropriate after the fix."
+  },
+  "eLifecycleProgressAndResidual": {
+    "newHelper": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/lib/packaged-instance.mjs",
+    "closedAtMeasuredScope": [
+      "Old substring-only stopOwned function removed from new browser case",
+      "Birth facts captured before RUNNING wait",
+      "Whole missing-start set refuses before signals",
+      "Fresh start/UID/argv checks run before TERM/KILL",
+      "Refused package stop without explicit equivalent proof retains resources/material"
+    ],
+    "oldEightSubmittedPureControls": "Recorded own/wrongstart/sibling/foreign/mixed/start-window/refused-stop/idempotent positives retained; no live sleeper controls rerun here",
+    "residualFinding": {
+      "id": "E_EQUIVALENT_PROOF_SIGNALS_PARENT_BEFORE_VALIDATING_FULL_BIRTH_ROOT_SET",
+      "priority": "P1_TEST_TOOL_OWNERSHIP_ONLY",
+      "summary": "For a launcher, stateOk is true and birthOk compares only PID/start. The helper can signal the launcher before discovering that its recorded API belongs to a different state. Some equivalent-proof callers provide no independent birth object.",
+      "independentPureCommand": "node --experimental-test-module-mocks --input-type=module heredoc; import actual packaged-instance module, private synthetic record, inject ps and capture process.kill",
+      "exitCode": 0,
+      "controls": [
+        { "case": "complete own positive", "actual": "CLEAN", "signals": ["TERM101", "TERM102"] },
+        { "case": "record claims stateB but birth.state and actual API argv belong to stateA, same install", "expected": "NO_SIGNAL_RETAINED", "actual": "TERM101_THEN_REFUSE_API_RETAINED" }
+      ],
+      "realSignals": 0,
+      "next": "Bind independent birth install/state/config/operation as well as PID/start; prevalidate all resources and requested scope before the first signal, then still revalidate each individual signal. Missing birth cannot self-certify a launcher from a record/install alone. Retain the improvements already made."
+    }
+  },
+  "gVerification": {
+    "source": "2b41765a58687fc286af07e53eca5f37c21e6d53",
+    "oldNestedAndTombstoneFindings": "CLOSED_AT_INDEPENDENT_MEASURED_SCOPE",
+    "sourceTestCommand": "node --test packages/usage-insights/test/nested.case.ts packages/usage-insights/test/consumer.case.ts packages/usage-insights/test/composition.case.ts",
+    "sourceTests": { "exitCode": 0, "passed": 35, "failed": 0, "elapsedMs": 340 },
+    "toolTestCommand": "node --test tools/usage-insights/test/module-entry.case.mjs tools/usage-insights/test/http-adapter.case.mjs",
+    "toolTests": { "exitCode": 0, "passed": 21, "failed": 0, "elapsedMs": 4264 },
+    "strictCommand": "pnpm exec tsc -p packages/usage-insights/tsconfig.json --noEmit",
+    "strictExitCode": 0,
+    "independentControls": {
+      "commandForm": "node --input-type=module heredoc importing actual G source analyzer/projection, complete legal fixtures and main actual trialInsightsAdmission",
+      "exitCode": 0,
+      "nested": [
+        { "limit": 5, "admitted": 5, "notParsed": 0, "outcomes": 3, "coverage": "complete" },
+        { "limit": 4, "admitted": 0, "notParsed": 5, "outcomes": null, "coverage": "partial" }
+      ],
+      "mappingSequences": [
+        { "sequence": "A-B-A", "conflicted": 1, "outcomes": null, "questions": null, "coverage": "partial" },
+        { "sequence": "B-A-B", "conflicted": 1, "outcomes": null, "questions": null, "coverage": "partial" },
+        { "sequence": "A-B-B-A", "conflicted": 1, "outcomes": null, "questions": null, "coverage": "partial" }
+      ],
+      "actualMainFConsumer": {
+        "validScopedProjectionAdmitted": true,
+        "foreignProjectAdmitted": false,
+        "missingWindowAdmitted": false,
+        "scope": "single_project/project-atlas",
+        "coverage": "complete",
+        "unknownCount": null,
+        "countRowValue": "2"
+      }
+    },
+    "positiveScope": "Atomic container+derived-record charging, permanent conflicting-work tombstones, shared Node composition semantics and real current F admission compatibility are demonstrated. Do not reassign these old two repairs.",
+    "mainIntegrationAdvice": "Main keeps its authorized public reader, unique work mapping/quarantine refusal, independent50works/10000nested/2MiB/2s bounds and header work-sample mapping. Do not create a second collector or replace those controls with a generic G report. Browser continues to receive only scoped display DTOs, not Node analysis/raw evidence.",
+    "mainWorktreeObservation": "During this audit the parent was already integrating G: main usage-insights/src was byte-identical to G's source directory in a readonly comparison. Those uncommitted parent changes were not touched and do not certify any frozen artifact.",
+    "currentPackageScope": "Neither E ce64 nor D1cd is an installed metrics candidate. Main18f's actual source observations and this generic G verification remain separate until an accurately frozen successor is measured."
+  },
+  "findingsOrdered": [
+    {
+      "id": "D_MODE_ARGV_HEALTH_RECORD_STOP_MISMATCH",
+      "priority": "P1_RESTORED_FUNCTIONAL_PATH",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-d/apps/launcher/lib/daemon.mjs",
+      "summary": "Restored personal discussion-only without a review file is spawned as fixture while recorded as personal; pa stop safely refuses. Fix consistency without weakening guards."
+    },
+    {
+      "id": "E_DEFECT_DETECTION_PASS_COUNTED_AS_FUNCTIONAL_STOP_PASS",
+      "priority": "P1_ACCEPTANCE_SCOPE",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/lib/release.mjs",
+      "line": 476,
+      "summary": "packagedStopIssues explicitly accepts BLOCKED when the finding and equivalent cleanup are documented, so the full178-required installed-alpha still passes despite an unfunctional restored start/stop path. Separate detection-tool PASS from product-functional PASS; preserve only the actually measured normal ordinary scope."
+    },
+    {
+      "id": "E_EQUIVALENT_PROOF_INCOMPLETE_PREVALIDATION",
+      "priority": "P1_TEST_TOOL_ONLY",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/lib/packaged-instance.mjs",
+      "summary": "An independently mocked other-state birth/API can cause launcher TERM before the API mismatch is detected. Prevalidate complete birth roots and all resources before any signal, then retain per-signal freshness."
+    }
+  ],
+  "nextWholePackages": {
+    "D": [
+      "Align personal/fixture argv, health, start record and stop semantics on normal/restored-with-review/restored-without-review inputs; retain all root/runtime guards",
+      "Consume actual main18f and the parent's qualified G source integration in the real build/stage closure, plus later J/F only when actually composed",
+      "Freeze one necessary runtime successor with exact source/tar/build/schema/ABI and verify package includes usage-insights/observation route and current UI",
+      "Perform bounded same-package functional stop, two-state/reuse, upgrade/restore/support and accurate dual-format/content scope after independent resource proof"
+    ],
+    "E": [
+      "Keep old lifecycle improvements, fix complete birth-root/set prevalidation before any signal and pure controls before more live matrices",
+      "Split documented defect detection from functional capability required; a BLOCKED package stop is not successful functional stop",
+      "Move from ce64 to the exact corrected current-main artifact; keep ce64 normal164 scope and1cd temporal limitations separate",
+      "Measure actual context-use/source UI, scoped statistics and later recipe/template flows using already implemented main APIs; no blanket missing-entry claims",
+      "Maintain source/tar/file hashes, unknown/readonly/auth, dual-format and finite installation/availability evidence without native/value overclaims"
+    ],
+    "G": [
+      "Retain closed nested total cap and permanent conflict fixes; do not spend the next package repairing them again",
+      "Adapt to current main authorized public-reader/DTO inputs and preserve its independent collection limits rather than creating another collector/gate/ledger",
+      "Deliver stable7/30day observations/reports with truthful source losses, row samples, layer/currency separation, partial review proxy and unknown usage",
+      "Verify actual App/F projection and an accurately frozen current package only after main/D handoff; preserve source-only scopes",
+      "No value/pricing/billing-recipe investigation or real model/native samples; finite deterministic privacy/resource tests only"
+    ]
+  },
+  "safety": {
+    "realVendorSends": 0,
+    "realModelTurns": 0,
+    "nativeTurnStarts": 0,
+    "realProcessSignals": 0,
+    "liveStopOrInstallationMatricesRun": 0,
+    "longSoakRunsStarted": 0,
+    "globalDiscoveryOrOtherCredentialsUsed": false,
+    "userTwelveServicesTouched": false,
+    "oldStateProfilesTarsLedgersDirtyAndERunsPreserved": true,
+    "dEGSourcesRootAndAssertionsEdited": false,
+    "allExecSessionsCompleted": true,
+    "onlyDurableNewWorkspaceArtifact": "reports/releases/wave28-admission/delivery-insights.json"
+  }
+}
