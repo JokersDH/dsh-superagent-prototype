@@ -1,0 +1,17 @@
+{
+  "protocol": "wave28-proof-consumer/1",
+  "entry": "packages/context/tools/personal-review-driver.mjs",
+  "purpose": "strict consumer of an explicit A manifest/restore/content proof and a selected package/data root",
+  "explicitInputs": {
+    "required": ["--a-worktree", "--a-module", "--manifest-db", "--manifest-expectation", "--root-map", "--target-protocol", "--target-snapshot-digest", "--target-content-digest"],
+    "optional": ["--target-artifacts", "--target-source-root", "--manifest-output"],
+    "noDefaultSourceTree": "the driver has no built-in A/C checkout path; callers must supply the A module/worktree or a packaged equivalent",
+    "publicPackageIntegration": "NOT_REACHED: current main/A workspace has not yet exported the restore/content proof module as a product package; C does not vendor or reimplement it"
+  },
+  "independentExpectations": ["sourceStateRoot", "snapshot protocol", "snapshot digest", "workflow-content/2 digest", "artifact inventory", "A data-manifest expectation"],
+  "allowedTransform": ["subject.dataRoot"],
+  "notAllowed": ["appended business event (work.accepted)", "legal user message", "artifact byte replacement", "family-name exemption"],
+  "outputs": ["status", "verified", "descriptor/entries", "identity", "data.manifest", "data.targetProof (A restore verification basis/content/report)", "cleanup", "failure"],
+  "authority": ["content proof is not writer-quiescence", "readiness authorization none is not native/execution", "verified-flow is not release/installed verdict"],
+  "missing": ["live B/I callback consumer (NOT_REACHED)", "private permission/target/native recovery (out of scope)"]
+}
