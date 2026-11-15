@@ -35,9 +35,9 @@ F 不处理：安装命令、原生 profile 配置、数据库修复、恢复授
 ## 试用交班清单
 
 - 分支：`codex/g4-trial-experience`；自有路径：`apps/console/src/trial/`、`test/trial/`、`e2e/trial/`、`docs/user-guide/`、`reports/trial-experience/`。
-- 源码与范围：`reports/trial-experience/wave29-status.json`。
-- 当前 App 接线：main `79525b6`（含 0073 原表单模板与 18f 真实观察）；F 的试用准备/观察消费者已接，配方选择入口待 main 传初始选择。
+- 源码与范围：`reports/trial-experience/wave30-status.json`。
+- 当前 App 接线：main `f9bd5bc2`（含 0077 工作台→原表单与 0076 7/30 观察）；F 的试用准备/模板选择/观察消费者已接。
 - 证据：`apps/console/e2e/trial/report-all.json` 及各 `report-*.json`、`screenshots/`。
-- 未达依赖：J 草案尚未接入默认产品（对应段落不显示）；30 天观察切换需 main 传窗口回调；原生/安装包/E 最终验收不在 F 范围。
+- 未达依赖：D 的 1fbaf94 包尚未包含本轮 0077/0076 入口（已核 bundle 无配方/30天），installed 验收 NOT_REACHED；原生/E 最终验收不在 F 范围。
 
 交接时只交源代码、文档和可复现证据，不交任何状态目录、凭据或用户数据。

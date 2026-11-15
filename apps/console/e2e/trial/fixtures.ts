@@ -184,6 +184,11 @@ const expiredRecipeConfiguration = configuration({
     scope: { ...scope('project-atlas'), expiresAt: '2020-01-01T00:00:00.000Z' } }],
   profiles: [nativeProfile], executionAvailability: { state: 'available', kind: 'native' },
 })
+const twoAtomRecipeConfiguration = configuration({
+  projects: [{ ...dispatchableProject('project-atlas', '流程测试项目', ['profile-codex-local']),
+    scope: { ...scope('project-atlas'), allowedPaths: ['src/', 'test/'] } }],
+  profiles: [nativeProfile], executionAvailability: { state: 'available', kind: 'native' },
+})
 const exclusionRecipeConfiguration = configuration({
   projects: [{ ...dispatchableProject('project-atlas', '流程测试项目', ['profile-codex-local']),
     scope: { ...scope('project-atlas'), excludedPaths: ['.git'] } }],
@@ -201,7 +206,7 @@ export const trialStates = [
   'noreadiness', 'loading', 'unavailable', 'error', 'long', 'insights-empty', 'insights-unscoped', 'insights-wrong-project',
   'insights-truncated', 'insights-partial', 'recipes', 'recipes-scope', 'recipes-all-projects',
   'recipes-loading', 'recipes-error', 'insights-window', 'insights-window-mismatch', 'insights-loading',
-  'recipes-blocked', 'recipes-expired', 'recipes-exclusions',
+  'recipes-blocked', 'recipes-expired', 'recipes-exclusions', 'recipes-scope-mismatch',
 ] as const
 export type TrialHarnessState = (typeof trialStates)[number]
 
@@ -304,6 +309,12 @@ export function trialHarnessProps(state: TrialHarnessState): TrialHarnessProps {
     }
     case 'recipes-exclusions': return {
       readiness: readiness(), configuration: exclusionRecipeConfiguration, activeProjectId: 'project-atlas', recipes: exclusionCases,
+    }
+    case 'recipes-scope-mismatch': return {
+      readiness: readiness(), configuration: twoAtomRecipeConfiguration, activeProjectId: 'project-atlas',
+      recipes: [{ ...baseRecipe, id: 'recipe-mismatch', title: '声明与预览范围不一致的草案', goalPreview: '声明 src，但模板选择 test。',
+        scope: { allowedPaths: ['src/'], excludedPaths: ['.git'], externalActions: [] },
+        preview: { kind: 'scoped_change', allowedPaths: ['test/'], profileId: 'profile-codex-local' } }],
     }
     case 'recipes-loading': return {
       readiness: readiness(), configuration: configured, activeProjectId: 'project-atlas', recipesLoading: true,

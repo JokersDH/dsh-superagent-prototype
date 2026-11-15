@@ -384,7 +384,12 @@ try {
     assert(await omitted.getByRole('button', { name: '打开原表单模板', exact: true }).isDisabled(), 'dropping a project exclusion is refused')
     assert((await omitted.innerText()).includes('必须保留的排除项'), 'the missing exclusion is named')
     const extra = page.locator('.trial-recipe').filter({ hasText: '增加排除项的草案' })
-    assert(await extra.getByRole('button', { name: '打开原表单模板', exact: true }).isEnabled(), 'adding an exclusion narrows safely')
+    assert(await extra.getByRole('button', { name: '打开原表单模板', exact: true }).isDisabled(), 'an extra exclusion cannot be silently dropped by the restricted selection')
+    assert((await extra.innerText()).includes('追加排除项无法通过受限选择保留'), 'the dropped-exclusion risk is named')
+    await open('state=recipes-scope-mismatch')
+    const mismatch = page.locator('.trial-recipe').first()
+    assert(await mismatch.getByRole('button', { name: '打开原表单模板', exact: true }).isDisabled(), 'a preview atom outside the declared scope is refused')
+    assert((await mismatch.innerText()).includes('模板选择范围超出声明范围'), 'the declared/preview mismatch is explicit')
     await page.locator('.trial-view').screenshot({ path: join(screenshots, 'recipes-project-state.png') })
   }, 'blocked/expired projects and dropped exclusions cannot open the template entry')
 

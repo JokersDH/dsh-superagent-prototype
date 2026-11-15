@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 6,
+  "owner": "F",
+  "wave": "product-wave-30",
+  "goal": "whole-subsystem daily workbench: current-state-safe template entry, continuous two-project delivery, 7/30 observation return, precision/mobile quality and accurate handoff",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-f",
+  "branch": "codex/g4-trial-experience",
+  "baseMain": "6f385a54",
+  "mergeCommit": "f9b0dfa4",
+  "fixedStart": "901090ac6a3e818e28e4bf348a59e6a4cc38293f",
+  "mainAppSource": "f9bd5bc2",
+  "mainRecipeSource": "18e79cc3",
+  "mainWindowSource": "84b34c25",
+  "dSource": "f87034dd",
+  "finalSourceCommit": null,
+  "state": "DELIVERED_WITH_INSTALLED_NOT_REACHED",
+  "fourResults": {
+    "R1_TEMPLATE_DELIVERY": "trial server-preview suggestions -> restricted selection -> main NewWorkForm initialRecipe -> re-preview/apply/edit/explicit create -> question/check/candidate/manual accept in two projects",
+    "R2_DAILY_RETURN": "two-project works/decisions/delivery return, real 7/30 window controls, partial/unknown/sample/layer/currency, close/reopen and late isolation",
+    "R3_PRECISION_MOBILE": "local trial tokens, same display/click scope, keyboard/pressed semantics, 390/desktop/long/error audit",
+    "R4_HANDOFF": "current guide, source/installed separation (D 1fbaf94 lacks wave30 entry), exact consumer/command/limits"
+  },
+  "fixes": {
+    "P2_scope_preview_mismatch": "preview.allowedPaths must stay inside the declared suggestion scope as well as the project atoms; display and click use the same selection atoms",
+    "P2_extra_exclusions": "extra exclusions cannot be carried by the restricted selection and are now refused with an explicit reason instead of being silently dropped",
+    "previous": "blocked/discussion/expired project gating and missing original exclusions remain closed"
+  },
+  "recipes": {
+    "selection": "{suggestionId, projectId, kind, allowedPaths, profileId}; main maps it to ProjectRecipePreviewInput and NewWorkForm initialRecipe",
+    "sameRange": "displayed selection.allowedPaths is exactly the atoms sent/used; no local reconstruction of complete scope/criteria",
+    "serverFields": "complete goal/scope/criteria come from main's authenticated preview; F does not create work or call HTTP",
+    "gates": ["project exists/selected/dispatchable/not discussion/not expired", "project-local checks registered", "project-bound admitted profile", "selection within project atoms", "selection within declared scope", "all project exclusions preserved and no unpreservable extras", "source project-recipes and authority none"]
+  },
+  "insights": {
+    "source": "main real GET /v1/insights with 7/30 window state and current project",
+    "display": "scope/sources known-unknown/coverage/partial/window/row samples/layer/unit/currency/null unknown",
+    "switch": "window mismatch hides old rows immediately; loading/error/reload preserved",
+    "noClaims": "no human-hour or proven-benefit claim"
+  },
+  "evidence": {
+    "runner": "node e2e/trial/run-all.mjs",
+    "suites": [
+      { "id": "unit", "exit": 0, "result": "20 PASS (12 state + 8 recipe)" },
+      { "id": "typecheck-app", "exit": 0 },
+      { "id": "typecheck-e2e", "exit": 0 },
+      { "id": "build", "exit": 0 },
+      { "id": "hook-async", "exit": 0, "result": "7/7" },
+      { "id": "browser-states", "exit": 0, "result": "31/31" },
+      { "id": "http-journey", "exit": 0, "result": "6/6" },
+      { "id": "app-targets", "exit": 0, "result": "6/6" },
+      { "id": "app-two-projects", "exit": 0, "result": "8/8" },
+      { "id": "app-daily-flow", "exit": 0, "result": "7/7" }
+    ],
+    "runAll": "10/10 suites exit 0",
+    "mainTrialApp": "trial-workbench-browser 8/8 PASS",
+    "mainObservation": "usage-observation-browser 9/9 PASS (7/30 server windows, old-window hide, project scope, late/503/404)",
+    "mainRecipeTemplate": "project-recipes-browser 8/8 PASS (trial suggestions open original form, two template works to candidate/manual accept, desktop/mobile)",
+    "dailyFlow": {
+      "projects": ["项目 Alpha", "项目 Beta"],
+      "posts": "commands + recipes/preview + review-activity only",
+      "modelCalls": 0,
+      "acceptedWorks": 2,
+      "decisionsWorksDeliveryReturn": true,
+      "reloadHistoryChecked": true
+    },
+    "viewports": ["1440x900", "390x844"],
+    "browser": "Chromium (Playwright 1.65)",
+    "visualGate": "programmatic layout/contrast/control audit; no F pixel verdict"
+  },
+  "installedPackage": {
+    "candidate": "/Users/hh/Desktop/joker/pa-artifacts/wave29-target/wave29-target-1fbaf94.tar.gz",
+    "source": "1fbaf940d426fa34ff6289304e073b9159586ed9",
+    "buildId": "2d94a7c31ef97b57",
+    "sha256": "daee1a94b43156cec659f7df2a3b08e1ecb89b645fde1ea81c35a81d75b47d7a",
+    "bytes": 20458656,
+    "contains": "试用准备/使用观察/模板草稿",
+    "missing": "配方草案/打开原表单模板/30 天 window controls",
+    "verdict": "NOT_REACHED for wave30 entry; do not cite as installed wave30"
+  },
+  "layers": {
+    "source": "DELIVERED",
+    "controlled": "DELIVERED for two-project fixture daily flow and main 0076/0077 controlled tests",
+    "installed": "NOT_REACHED (D 1fbaf94 lacks wave30 entry)",
+    "native": "0 turns",
+    "value": "no efficiency claim",
+    "activation": "not applicable"
+  },
+  "handoff": {
+    "runtimeSources": [
+      "apps/console/src/trial/index.ts",
+      "apps/console/src/trial/TrialWorkspace.tsx",
+      "apps/console/src/trial/useTrialReadiness.ts",
+      "apps/console/src/trial/trial-view.ts",
+      "apps/console/src/trial/insights.ts",
+      "apps/console/src/trial/recipes.ts",
+      "apps/console/src/trial/trial.css"
+    ],
+    "mustNotPackage": ["apps/console/e2e/trial/**", "apps/console/test/trial/**", "harness", "fixtures", "screenshots", "temporary state"],
+    "dependencies": "existing React 18, lucide-react, @personal-agent/contracts; type-only transport/configuration labels; no dependency/lock change",
+    "docs": ["reports/trial-experience/main-integration.zh-CN.md", "docs/user-guide/"]
+  },
+  "modelNativeTurns": 0,
+  "preserved": {
+    "userServicesChanged": 0,
+    "stateProfileTarLedgerTouched": false,
+    "privateTempRoots": "created under /tmp and removed",
+    "unrelatedCredentialsRead": false
+  },
+  "notTested": [
+    "real vendor model or native Codex execution (0 turns)",
+    "installed wave30 entry (D artifact lacks it); E independent installed verdict",
+    "manual screen-reader walkthrough, non-Chromium browsers, 200% zoom, forced colors",
+    "real server-side mid-session auth expiry",
+    "benefit/time-saved claims (not measured)"
+  ],
+  "notes": "Historical wave25-29 statuses retained. No root/App/transport/CSS/contracts edits by F. Two review-activity 409 telemetry conflicts remain main-owned."
+}

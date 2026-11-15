@@ -16,7 +16,7 @@
 
 ### 2.1 项目声明草案（J）——只传受限选择
 
-main 0073 已在原 NewWorkForm 实现模板选择/预览/应用/重验。F 不再构造 scope/criteria/profile 草稿；只把受限选择交给 main，由 main 打开原表单并 POST 真实 preview。
+main 0077 已把试用准备的真实 server-preview 建议接到原 NewWorkForm（`initialRecipe`/`useProjectRecipe`）。F 只把受限选择交给 main；完整字段由 main 原表单 preview/apply/revalidate 提供。
 
 ```tsx
 <TrialWorkspace
@@ -36,11 +36,12 @@ main 0073 已在原 NewWorkForm 实现模板选择/预览/应用/重验。F 不�
 - `TrialRecipeSelection`/`TrialRecipeSuggestion` 来自 `./trial/index.ts`（`recipes.ts`）。F 的 applicable 只是展示判断，不是授权；main 仍重读 config/facts、服务端 preview 和原确认。
 - 适用性按当前配置项目：项目存在且被选中、可派工、未过期、非讨论项目；检查在该项目 `defaultCriteria` 且已注册；执行器绑定该项目且已准入；选择的 allowedPaths 是项目 atoms 的子集；声明的排除项必须保留项目全部排除（可增加、不可遗漏）；外部动作只能收窄。
 - `kind` 只能是 `regression_fix|scoped_change|verification_followup`；完整 goal/scope/criteria 由服务端 `ProjectRecipePreview.fields` 给出，F 不复制。
+- 选择范围必须同时是项目 atoms 与声明模板范围的子集；项目排除项必须保留，且额外排除项因受限选择无法携带而被拒绝。
 - 同一草案 300ms 内重复点击只回调一次；取消/编辑/stale/未知 commandId 重试由原表单负责。
 
-### 2.2 真实观察（main 已实现，F 为消费者）
+### 2.2 真实观察（main 已实现 7/30，F 为消费者）
 
-main 的 `useUsageObservation` 已读取 `GET /v1/insights`（当前固定 7 天、当前项目），并把 `UsageObservation` 直接传给 `insights`；它与 F 的 `TrialInsightsView` 结构兼容（`windowLabel/coverage/coverageState/scope/sampleCount/unknownCount/metrics/layer/unit/limitations`）。
+main 的 `useUsageObservation`/App 已实现 7/30 天真实读取并向 F 传 `insightWindow/onSelectInsightWindow/insightsLoading/insightsError/onReloadInsights`；它与 F 的 `TrialInsightsView` 结构兼容（`windowLabel/coverage/coverageState/scope/sampleCount/unknownCount/metrics/layer/unit/limitations`）。
 
 F 新增的可选窗口/状态输入（main 决定是否接）：
 
@@ -55,7 +56,7 @@ F 新增的可选窗口/状态输入（main 决定是否接）：
 />
 ```
 
-- 要支持 30 天，main 把 `useUsageObservation` 的 `days: 7` 改成可选 state 并在变更时重读；F 不直接调用 HTTP。
+- 30 天切换已由 main 实际实现；F 只渲染控件并遵守窗口不一致隐藏规则，不直接调用 HTTP。
 - F 的准入门仍然生效：缺 scope/window/coverage、范围不含当前项目、`truncated` 却宣称 complete、窗口不一致，都隐藏指标并说明原因；F 不补 0、不合计币种/层。
 - `UsageObservation` 的 `details/unit/layer/sampleCount` 原样展示；`null` 保持未知。
 
@@ -92,7 +93,7 @@ main 自有测试在本包改动后重跑：trial App 8/8、真实观察 6/6、0
 
 ## 6. 明确未达
 
-- main 已接入真实 7 天观察与 0073 原表单模板；F 的 `onOpenRecipe` 接线仍需 main 给 NewWorkForm 一个初始受限选择入口。30 天窗口与加载/错误 props 需要 main 扩展其观察 hook。
+- main 已接入 0077 原表单模板与 0076 7/30 观察；D 的 1fbaf94 包未包含这些入口，installed 验收 NOT_REACHED。
 - J/G 模块未进入本仓库默认产品；F 只有 typed consumer、fixtures 与校验。
 - 真实 vendor/model/native 0；`app-daily-flow` 使用 controlled fixture（固定 scratch 写入），不是原生或安装包证明。
 - 非 Chromium、人工屏幕阅读器、真实服务端会话中途过期未测。

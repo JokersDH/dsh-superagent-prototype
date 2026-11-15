@@ -6,42 +6,42 @@
   },
   "viewport": "1440x900",
   "stateRootKind": "private temporary root (not committed)",
-  "generatedAt": "2026-11-15T05:21:34.601Z",
+  "generatedAt": "2026-11-15T08:16:32.113Z",
   "results": [
     {
       "id": "SHELL",
       "status": "PASS",
-      "ms": 59,
+      "ms": 51,
       "detail": "chat, works, decisions, executors, model settings and import entries all exist"
     },
     {
       "id": "TARGET-INSPECT-EXECUTOR",
       "status": "PASS",
-      "ms": 80,
+      "ms": 59,
       "detail": "inspect_executor opens the real executor directory"
     },
     {
       "id": "TARGET-IMPORT-PROJECT",
       "status": "PASS",
-      "ms": 111,
+      "ms": 96,
       "detail": "import_project opens and dismisses the real project import form"
     },
     {
       "id": "TARGET-CONFIGURE-MODEL",
       "status": "PASS",
-      "ms": 204,
+      "ms": 193,
       "detail": "configure_model opens the real model settings panel"
     },
     {
       "id": "TARGET-CONVERSATION",
       "status": "PASS",
-      "ms": 98,
+      "ms": 43,
       "detail": "open_conversation returns to the real main conversation"
     },
     {
       "id": "BROWSER-ERRORS",
       "status": "PASS",
-      "ms": 0,
+      "ms": 1,
       "detail": "the real shell journey produces no page or console error"
     }
   ],

@@ -209,6 +209,21 @@ try {
     await page.screenshot({ path: join(screenshots, 'daily-two-projects.png') })
   }, 'the second project keeps its own conversation, draft and delivery')
 
+  await step('DAILY-VIEWS-RETURN-TO-ORIGINAL', async () => {
+    await page.getByRole('button', { name: '待我决定', exact: true }).click()
+    await page.locator('.attention-view').waitFor()
+    await page.getByRole('button', { name: '工作与交付', exact: true }).click()
+    await page.locator('.work-table').waitFor()
+    const betaWork = page.locator('.work-row').filter({ hasText: 'Beta：固定流程交付' })
+    await betaWork.waitFor()
+    check((await betaWork.innerText()).includes('已交付'), 'the delivered work is reachable from the daily works view')
+    await betaWork.click()
+    await page.locator('.detail .phase').filter({ hasText: '已交付' }).waitFor()
+    check(await page.locator('.artifacts li').count() === 4, 'the delivery artifacts are reachable from the daily works view')
+    await page.getByRole('button', { name: '主对话视图', exact: true }).click()
+    check(await page.locator('.composer textarea').inputValue() === 'Beta 未发送草稿：保持到返回', 'returning through daily views keeps the unsent draft')
+  }, 'decisions/works/delivery return to the original work without losing the draft')
+
   await step('RELOAD-AND-EXISTING-HISTORY', async () => {
     await page.reload({ waitUntil: 'networkidle' })
     await page.locator('.conversation-surface').waitFor()
@@ -234,7 +249,8 @@ try {
   await step('NO-MODEL-NO-UNEXPECTED-POSTS', async () => {
     check(modelCalls === 0, 'no model call was made')
     const unexpected = posts.filter(path => path !== '/v1/commands' && path !== '/v1/session' &&
-      !/^\/v1\/works\/[^/]+\/review-activity$/.test(path))
+      !/^\/v1\/works\/[^/]+\/review-activity$/.test(path) &&
+      !/^\/v1\/projects\/[^/]+\/recipes\/preview$/.test(path))
     check(unexpected.length === 0, `unexpected POST paths: ${JSON.stringify(unexpected)}`)
     check(posts.filter(path => path === '/v1/commands').length >= 5, `expected product commands were sent: ${JSON.stringify(posts)}`)
     check(errors.length === 0, `browser errors: ${errors.join('; ')}`)

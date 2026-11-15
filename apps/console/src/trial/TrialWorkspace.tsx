@@ -341,7 +341,9 @@ export function TrialWorkspace({
                     : insights.scope?.aggregation === 'cross_project' ? '跨项目聚合'
                       : insights.scope?.aggregation === 'single_project' ? '单项目' : '聚合未声明'}
                   {' · '}
-                  {insights.unknownCount === undefined || insights.unknownCount === null ? '未知数未声明' : `${insights.unknownCount} 个未知`}
+                  {insights.sources !== undefined
+                    ? `来源已知 ${insights.sources.known ?? '未知'} · 未知 ${insights.sources.unknown ?? '未知'}`
+                    : insights.unknownCount === undefined || insights.unknownCount === null ? '未知数未声明' : `${insights.unknownCount} 个未知`}
                 </dd>
               </div>
             </dl>
@@ -353,7 +355,7 @@ export function TrialWorkspace({
                     <div key={metric.id} className="trial-insight-row">
                       <dt>{metric.label}</dt>
                       <dd className={metric.value === null ? 'trial-unknown' : undefined}>
-                        <span className="trial-metric-value">{metric.value ?? '未知'}{metric.unit && <small>{metric.unit}</small>}</span>
+                        <span className="trial-metric-value">{metric.value ?? '未知'}{metric.unit && <small>{metric.unit}</small>}{metric.currency && <small>{metric.currency}</small>}</span>
                         <span className="trial-metric-meta">
                           {metric.layer !== undefined && <small>{layerLabel[metric.layer]}</small>}
                           {metric.sampleCount !== undefined && <small>{metric.sampleCount === null ? '样本未知' : `${metric.sampleCount} 个样本`}</small>}
