@@ -1,0 +1,850 @@
+{
+  "schemaVersion": 1,
+  "wave": "product-wave-30",
+  "date": "2026-11-15",
+  "status": "PLANNED_NOT_EXECUTED",
+  "deliveryCadence": "NORMAL_NO_SAME_DAY_DEADLINE",
+  "calendarDeadline": null,
+  "reviewBaseline": "fb3d671d2797367b6365119e6bc627bece16a2ff",
+  "observedMain": "f9bd5bc211a8b2f62ba25e930587885e3b221ff2",
+  "productRuntimeSource": "f9bd5bc211a8b2f62ba25e930587885e3b221ff2",
+  "externalAgentCount": 10,
+  "totalOwnersIncludingMain": 11,
+  "checkpointsPerOwner": 4,
+  "sharedBoundary": "docs/rfcs/WP-16/0079-wave-30-outcome-packages.md",
+  "sharedInputBoundary": "docs/rfcs/WP-16/0078-wave-30-reviewed-architecture.md",
+  "contracts": [
+    "packages/contracts/src/recovery-state.ts",
+    "packages/contracts/src/recovery-source.ts",
+    "packages/contracts/src/recovery-activation.ts",
+    "packages/contracts/src/recovery-target.ts",
+    "packages/contracts/src/assistant-candidates.ts",
+    "packages/contracts/src/recovery-source-confirmation.ts",
+    "packages/contracts/src/trial-readiness.ts",
+    "packages/contracts/src/coordinator-channel.ts",
+    "packages/contracts/src/usage-observation.ts",
+    "packages/contracts/src/project-recipe-preview.ts"
+  ],
+  "newModelAllowance": 0,
+  "nativeModelsStartedByThisDispatch": 0,
+  "newDriverImplementation": false,
+  "studyState": "BLOCKED_CURRENT_RECIPE",
+  "pilotGatesProductAcceptance": false,
+  "normalInstallRequiresRecoveryActivation": false,
+  "continueAfterCheckpoint": true,
+  "independentQueueRequired": true,
+  "unboundedPollingAllowed": false,
+  "preservedUserServices": [
+    [
+      5180,
+      8796
+    ],
+    [
+      5181,
+      8797
+    ],
+    [
+      5182,
+      8798
+    ],
+    [
+      5183,
+      8799
+    ],
+    [
+      5184,
+      8800
+    ],
+    [
+      5185,
+      8801
+    ],
+    [
+      5186,
+      8802
+    ],
+    [
+      5187,
+      8803
+    ],
+    [
+      5188,
+      8804
+    ],
+    [
+      5189,
+      8805
+    ],
+    [
+      5190,
+      8806
+    ],
+    [
+      5191,
+      8807
+    ]
+  ],
+  "roles": {
+    "A": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "branch": "codex/g2-workspaces-verification",
+      "candidate": "c80ec34ccbd2c8398258d318eac7c53c232da9aa",
+      "packet": "agent-tasks/product-wave-30/agent-a-data.zh-CN.md",
+      "ownedPaths": [
+        "packages/storage/",
+        "packages/workflows/"
+      ],
+      "evidencePath": "packages/workflows/reports/wave30-status.json",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "milestones": [
+        "A1",
+        "A2",
+        "A3",
+        "A4"
+      ],
+      "deliverables": [
+        "A1",
+        "A2",
+        "A3",
+        "A4"
+      ]
+    },
+    "B": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "branch": "codex/g1-runtime",
+      "candidate": "695efad8066433e2e30eff4f776ed74117c61608",
+      "packet": "agent-tasks/product-wave-30/agent-b-runtime.zh-CN.md",
+      "ownedPaths": [
+        "packages/execution/",
+        "packages/catalog/",
+        "packages/policy-preparation/",
+        "packages/driver-kit/",
+        "packages/testing/",
+        "packages/drivers/",
+        "apps/runner/",
+        "tests/native-acceptance/"
+      ],
+      "evidencePath": "tests/native-acceptance/reports/wave30-status.json",
+      "grantId": "wave03-b-native",
+      "historicalLimit": 4,
+      "remaining": "UNKNOWN_NOT_SPENDABLE",
+      "resetLedger": false,
+      "newFeasibilityInvestigations": 0,
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "milestones": [
+        "B1",
+        "B2",
+        "B3",
+        "B4"
+      ],
+      "excludedOwnedPaths": [
+        "apps/runner/src/attach-channel/",
+        "apps/runner/test/attach-channel/"
+      ],
+      "deliverables": [
+        "B1",
+        "B2",
+        "B3",
+        "B4"
+      ]
+    },
+    "C": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "branch": "codex/g3-assistant-context",
+      "candidate": "e1a486ec0007a8db5596682e4acce8b32630992b",
+      "packet": "agent-tasks/product-wave-30/agent-c-context.zh-CN.md",
+      "ownedPaths": [
+        "packages/context/",
+        "packages/proposals/",
+        "packages/knowledge/",
+        "packages/routing/"
+      ],
+      "evidencePath": "packages/context/reports/wave30-status.json",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "milestones": [
+        "C1",
+        "C2",
+        "C3",
+        "C4"
+      ],
+      "deliverables": [
+        "C1",
+        "C2",
+        "C3",
+        "C4"
+      ]
+    },
+    "D": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-d",
+      "branch": "codex/g3-local-distribution",
+      "candidate": "f87034ddc9d62c0f1c6126b4326dea831be28e70",
+      "packet": "agent-tasks/product-wave-30/agent-d-delivery.zh-CN.md",
+      "ownedPaths": [
+        "apps/launcher/",
+        "tools/distribution/",
+        "packages/portability/"
+      ],
+      "evidencePath": "tools/distribution/reports/wave30-status.json",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "milestones": [
+        "D1",
+        "D2",
+        "D3",
+        "D4"
+      ],
+      "deliverables": [
+        "D1",
+        "D2",
+        "D3",
+        "D4"
+      ]
+    },
+    "E": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-e",
+      "branch": "codex/g3-product-acceptance",
+      "candidate": "6369eea9a06bd228073281267506db9348c60d03",
+      "packet": "agent-tasks/product-wave-30/agent-e-acceptance.zh-CN.md",
+      "ownedPaths": [
+        "tests/product-acceptance/"
+      ],
+      "evidencePath": "tests/product-acceptance/reports/wave30-status.json",
+      "grantId": "wave05-independent-review-pilot-01",
+      "maxNativeTurnStarts": 24,
+      "maxAuthorTurnStarts": 8,
+      "maxReviewTurnStarts": 16,
+      "maxBillableTokens": 200000,
+      "maxCostUSD": 5,
+      "maxInFlight": 1,
+      "resetLedger": false,
+      "unknownCostIsZero": false,
+      "cliFallbackAllowed": false,
+      "executionPolicy": "BLOCKED_CURRENT_RECIPE_NO_SEND_THIS_WAVE",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "milestones": [
+        "E1",
+        "E2",
+        "E3",
+        "E4"
+      ],
+      "deliverables": [
+        "E1",
+        "E2",
+        "E3",
+        "E4"
+      ]
+    },
+    "main": {
+      "workdir": "/Users/hh/Desktop/joker/superagent",
+      "branch": "codex/g2-execution-integration",
+      "packet": "agent-tasks/product-wave-30/main.zh-CN.md",
+      "ownedPaths": [
+        "packages/contracts/",
+        "packages/application/",
+        "packages/questions/",
+        "apps/coordinator/",
+        "apps/console/",
+        "agent-tasks/product-wave-30/",
+        "tools/bootstrap/",
+        "docs/rfcs/WP-16/"
+      ],
+      "evidencePath": "reports/releases/wave30-integration/status.json",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "milestones": [
+        "M1",
+        "M2",
+        "M3",
+        "M4"
+      ],
+      "excludedOwnedPaths": [
+        "apps/console/src/trial/",
+        "apps/console/test/trial/",
+        "apps/console/e2e/trial/"
+      ],
+      "deliverables": [
+        "M1",
+        "M2",
+        "M3",
+        "M4"
+      ]
+    },
+    "F": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-f",
+      "branch": "codex/g4-trial-experience",
+      "preparedFrom": "fdb3f160b1d867f7167fb034d96a5c13bd16cdfb",
+      "packet": "agent-tasks/product-wave-30/agent-f-experience.zh-CN.md",
+      "ownedPaths": [
+        "apps/console/src/trial/",
+        "apps/console/test/trial/",
+        "apps/console/e2e/trial/",
+        "docs/user-guide/",
+        "reports/trial-experience/"
+      ],
+      "evidencePath": "reports/trial-experience/wave30-status.json",
+      "milestones": [
+        "F1",
+        "F2",
+        "F3",
+        "F4"
+      ],
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "implementationStatus": "SOURCE_EXISTS_CONTINUE_COMPLETE_CAPABILITY",
+      "candidate": "901090ac6a3e818e28e4bf348a59e6a4cc38293f",
+      "deliverables": [
+        "F1",
+        "F2",
+        "F3",
+        "F4"
+      ]
+    },
+    "G": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-g",
+      "branch": "codex/g4-usage-insights",
+      "preparedFrom": "fdb3f160b1d867f7167fb034d96a5c13bd16cdfb",
+      "packet": "agent-tasks/product-wave-30/agent-g-insights.zh-CN.md",
+      "ownedPaths": [
+        "packages/usage-insights/",
+        "tools/usage-insights/",
+        "reports/usage-insights/"
+      ],
+      "evidencePath": "reports/usage-insights/wave30-status.json",
+      "milestones": [
+        "G1",
+        "G2",
+        "G3",
+        "G4"
+      ],
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "implementationStatus": "SOURCE_EXISTS_CONTINUE_COMPLETE_CAPABILITY",
+      "candidate": "e7aec80e1c613d427cf550bf927d3d04776d33e2",
+      "deliverables": [
+        "G1",
+        "G2",
+        "G3",
+        "G4"
+      ]
+    },
+    "H": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-h",
+      "branch": "codex/g4-trial-operations",
+      "preparedFrom": "fdb3f160b1d867f7167fb034d96a5c13bd16cdfb",
+      "packet": "agent-tasks/product-wave-30/agent-h-trial-operations.zh-CN.md",
+      "ownedPaths": [
+        "tools/trial-kit/",
+        "tests/operational-soak/",
+        "docs/internal-trial/",
+        "reports/trial-operations/"
+      ],
+      "evidencePath": "reports/trial-operations/wave30-status.json",
+      "milestones": [
+        "H1",
+        "H2",
+        "H3",
+        "H4"
+      ],
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "implementationStatus": "SOURCE_EXISTS_CONTINUE_COMPLETE_CAPABILITY",
+      "candidate": "f8cf5713c269a3a920231f23baf11aadd90db736",
+      "deliverables": [
+        "H1",
+        "H2",
+        "H3",
+        "H4"
+      ]
+    },
+    "I": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-i",
+      "branch": "codex/g5-coordinator-channel",
+      "preparedFrom": "967dc0c677333ec307c215c0ed67e838b5487d92",
+      "packet": "agent-tasks/product-wave-30/agent-i-coordinator-channel.zh-CN.md",
+      "ownedPaths": [
+        "apps/runner/src/attach-channel/",
+        "apps/runner/test/attach-channel/",
+        "docs/runtime-channel/",
+        "reports/runtime-channel/"
+      ],
+      "evidencePath": "reports/runtime-channel/wave30-status.json",
+      "milestones": [
+        "I1",
+        "I2",
+        "I3",
+        "I4"
+      ],
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "implementationStatus": "SOURCE_EXISTS_CONTINUE_COMPLETE_CAPABILITY",
+      "candidate": "861c03edf9e77c5c250fab59a02103ebb93e56c3",
+      "deliverables": [
+        "I1",
+        "I2",
+        "I3",
+        "I4"
+      ]
+    },
+    "J": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-j",
+      "branch": "codex/g5-project-recipes",
+      "preparedFrom": "967dc0c677333ec307c215c0ed67e838b5487d92",
+      "packet": "agent-tasks/product-wave-30/agent-j-project-recipes.zh-CN.md",
+      "ownedPaths": [
+        "packages/project-recipes/",
+        "tools/project-recipes/",
+        "docs/project-recipes/",
+        "reports/project-recipes/"
+      ],
+      "evidencePath": "reports/project-recipes/wave30-status.json",
+      "milestones": [
+        "J1",
+        "J2",
+        "J3",
+        "J4"
+      ],
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "implementationStatus": "SOURCE_EXISTS_CONTINUE_COMPLETE_CAPABILITY",
+      "candidate": "bd027a4450e43dde09d5b18b4659e5028664d911",
+      "deliverables": [
+        "J1",
+        "J2",
+        "J3",
+        "J4"
+      ]
+    }
+  },
+  "admissionReports": {
+    "dataExperience": "reports/releases/wave30-admission/data-experience.json",
+    "runtime": "reports/releases/wave30-admission/runtime-channel.json",
+    "delivery": "reports/releases/wave30-admission/delivery.json",
+    "recipesInsights": "reports/releases/wave30-admission/recipes-insights.json",
+    "inventory": "reports/releases/wave30-admission/workspaces.json"
+  },
+  "providedInputs": {
+    "aStrictCanonicalClassifierClosed": true,
+    "aHistoricalVsCurrentAdmitted": false,
+    "cRealCompletionJFlowsPassed": true,
+    "fBlockedExclusionsExpiredClosed": true,
+    "fGenericDisplaySelectionConsistent": false,
+    "fMainServerMappingSameFields": true,
+    "jSourceContentReadChecksPassed": true,
+    "jGenericFutureFactsReuseAdmitted": false,
+    "gPureExportSourceTested": true,
+    "gDefaultUserExportImplemented": false,
+    "bLatestCoreAdapterAdopted": true,
+    "bFreshSinkGuardAdmittedAtTestedScope": true,
+    "bDirectConsumerStrictPassed": true,
+    "bRemoteIntentSingleTransportOwner": false,
+    "bSignalFullPlanAdmitted": false,
+    "hCurrentConsumersExist": true,
+    "hImmutableHandleAdmitted": false,
+    "bSameOriginalRecoveredDeliveryPassed": false,
+    "dSixModeSourceFixed": true,
+    "dArtifact": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave29-target/wave29-target-1fbaf94.tar.gz",
+      "source": "1fbaf940d426fa34ff6289304e073b9159586ed9",
+      "sourceDirty": false,
+      "buildId": "2d94a7c31ef97b57",
+      "sha256": "daee1a94b43156cec659f7df2a3b08e1ecb89b645fde1ea81c35a81d75b47d7a",
+      "tarBytes": 20458656,
+      "schema": 18,
+      "platform": "darwin",
+      "arch": "arm64",
+      "node": "24.21.0",
+      "abi": "137",
+      "sqlite": "3.53.4",
+      "verifiedEntries": 6849,
+      "verifiedRegularFiles": 6826,
+      "verifiedInternalSymlinks": 23,
+      "verifiedRegularBytes": 68407152,
+      "fileDigestMismatches": [],
+      "verifiedInstall": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-wave30-package-g5fu8f/install",
+      "verificationExitCode": 0,
+      "method": "Expected tar SHA/size, bounded safe member listing, extraction into a fresh private root, every manifest file hash/size and every internal symlink realpath checked",
+      "projectRecipesDistPresent": true,
+      "usageInsightsDistPresent": true,
+      "mainJFormPreviewSourceIsAncestor": true,
+      "main0076WindowSelectorSourceIsAncestor": false,
+      "ancestryCommands": [
+        {
+          "cmd": "git merge-base --is-ancestor a40232ed65a38022b255ce7c07b6dd2ebd0ce35d 1fbaf940d426fa34ff6289304e073b9159586ed9",
+          "exitCode": 0
+        },
+        {
+          "cmd": "git merge-base --is-ancestor 84b34c2507159526e519e793750f5f7127707bc8 1fbaf940d426fa34ff6289304e073b9159586ed9",
+          "exitCode": 1
+        }
+      ],
+      "actualSourceMapInspection": {
+        "method": "Parse the packaged console JS sourcemap with JSON; inspect only the exact App.tsx and TrialWorkspace.tsx sourcesContent entries",
+        "AppRecipePreviewAndApply": true,
+        "TrialWorkspaceInsightWindowProp": false,
+        "TrialWorkspaceOnSelectInsightWindow": false,
+        "AppUsageDaysSelection": false
+      },
+      "scope": "Genuine new J/G/template runtime package beyond1ba. It contains the original0073 preview/apply/form path and statistics, but not main0076's new7/30-day window selector. Do not call it the exact latest-window product; this is temporal scope, not a window regression.",
+      "independentEFinalVerdictForTheseBytes": "NOT_REACHED"
+    },
+    "dSamePackageJDeveloperEvidence": {
+      "latestReport": "/Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/reports/wave29/installed-j-ui.json",
+      "latestEvidenceCommit": "f87034ddc9d62c0f1c6126b4326dea831be28e70",
+      "reportedCases": 6,
+      "reportedPassed": 6,
+      "previewPosts": 13,
+      "acceptedWorks": 2,
+      "pageErrors": [],
+      "cases": [
+        "preview/apply only prefill original form with zero business write",
+        "changed facts reject explicit creation until reapplication",
+        "selection/config changes cannot retain hidden old atoms",
+        "error and legacy absence keep manual delegation available",
+        "two explicit template works reach original candidate and manual acceptance",
+        "desktop/mobile controls and text fit"
+      ],
+      "unknownRecordedCreateRetry": "Three create requests retain two unique commandIds; the post-record lost response retries the same original command and does not duplicate Work",
+      "sourceReviewOfExecutedHarness": "verify-installed-project-recipes-ui.mjs imports ProductStore/runtime/J registry/HTTP from its explicit APP install and serves that install's console dist. It uses a private controlled Product/Broker/check/accept runtime, not a product daemon/native/recovery run. The proxy now streams SSE with Readable.fromWeb; this is a harness fix, not a new product runtime.",
+      "intermediateNotReachedStatements": "Earlier installed-j.json/recipe/artifacts limitations still say installed UI was not rerun; they are superseded by latestf8706/6 evidence and should be reconciled in final documentation without relabeling runtime bytes.",
+      "independentEInstalledJVerdict": false,
+      "auditBrowserRerun": false,
+      "interpretation": "Retain this genuine developer same-package UI/API/control-flow evidence. E still needs independent same-target template/window/functional acceptance; do not require a refreeze merely to fix the stale reports."
+    },
+    "eMeasured": {
+      "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-15T07-03-05-041Z/report.json",
+      "testSource": "41693dd6335813da363d4be938736ee3ab7ddeb2",
+      "actualSubjectSource": "1ba003239237d3fc7a92bde8cbe897549abcbd5d",
+      "buildId": "67abd96690030eb7",
+      "tarSha256": "504dfdc1ceb191828d3836017cc47d9d0023dc27cc1291e6caf28e08aafcfb9e",
+      "counts": {
+        "PASS": 274,
+        "FAIL": 0,
+        "NOT_TESTED": 20
+      },
+      "ordinary": {
+        "tier": "installed-alpha",
+        "required": 186,
+        "reported": "PASS",
+        "independentRecordedGate": "PASS"
+      },
+      "functional": {
+        "tier": "installed-functional",
+        "required": 187,
+        "reported": "PASS",
+        "independentRecordedGate": "PASS"
+      },
+      "fullProduct": {
+        "required": 188,
+        "reported": "FAIL",
+        "independentRecordedGate": "FAIL_MISSING_NATIVE_DELIVERY_AND_CONTROL"
+      },
+      "actualFunctionalEvidence": "Normal and restored personal starts report personal/normal or personal/recovery_readonly; package stop returns STOPPED exit0, record removed and proofFallbackUsed=false. This genuinely advances past oldce64's functional failure.",
+      "physicalResourceEvidenceLimit": "The functional case re-reads instance.json only AFTER successful stop has removed it, then derives PIDs from that absent record. The recorded resourcesAlive=[] is therefore empty by construction, not an independent observation that each pre-start/recorded resource is gone. Retain packaged STOPPED/no-fallback observations but do not upgrade this to complete physical quiescence proof.",
+      "currentD1fbaActuallyTestedByE": false,
+      "trialIdentityAndGSummary": "NOT_TESTED_AS_REPORTED",
+      "interpretation": "E has truly moved fromce64 to1ba and correctly retains ordinary/functional/full-product separation. It has not measured the new J package or0076 window selector; do not relabel its1ba report."
+    },
+    "eOldDefaultNoRecordRetainClosed": true,
+    "eForcedProofBranchAdmitted": false,
+    "ePhysicalStopProofComplete": false,
+    "currentCompleteRuntimeInstalledAdmission": false,
+    "mainWorkbenchJourneyImplemented": true,
+    "mainLatestWindowImplemented": true,
+    "privatePermissionImplemented": false,
+    "targetActivationImplemented": false,
+    "unsafeLiveSignalsRerun": false
+  },
+  "checkpoints": {
+    "M-workbench-original-delivery": {
+      "owner": "main",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "M-window-controls": {
+      "owner": "main",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "M-mode-build-closure": {
+      "owner": "main",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "M-original-completion": {
+      "owner": "main",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "M-original-fresh-guard": {
+      "owner": "main",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "B-core-adapter-guard-strict-closed": {
+      "owner": "B",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "I-core-final-adopted": {
+      "owner": "I",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "H-current-consumer-positives": {
+      "owner": "H",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "A-strict-key-classifier-closed": {
+      "owner": "A",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "C-original-data-consumers": {
+      "owner": "C",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "F-blocked-exclusions-closed": {
+      "owner": "F",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "J-current-content-observer": {
+      "owner": "J",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "G-export-source-tested": {
+      "owner": "G",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "D-1fba-template-tar": {
+      "owner": "D",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "E-1ba-functional-passed": {
+      "owner": "E",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "A-history-current-split": {
+      "owner": "A",
+      "dependsOn": [
+        "A-strict-key-classifier-closed"
+      ]
+    },
+    "A-stable-data-port": {
+      "owner": "A",
+      "dependsOn": [
+        "A-history-current-split"
+      ]
+    },
+    "C-history-current-consumer": {
+      "owner": "C",
+      "dependsOn": [
+        "A-stable-data-port",
+        "C-original-data-consumers"
+      ]
+    },
+    "C-current-main-two-project": {
+      "owner": "C",
+      "dependsOn": [
+        "C-history-current-consumer",
+        "M-workbench-original-delivery"
+      ]
+    },
+    "I-single-owner-adapter": {
+      "owner": "I",
+      "dependsOn": [
+        "I-core-final-adopted"
+      ]
+    },
+    "H-private-immutable-birth": {
+      "owner": "H",
+      "dependsOn": [
+        "H-current-consumer-positives"
+      ]
+    },
+    "B-safe-single-owner-baseline": {
+      "owner": "B",
+      "dependsOn": [
+        "I-single-owner-adapter",
+        "B-core-adapter-guard-strict-closed",
+        "H-private-immutable-birth"
+      ]
+    },
+    "H-current-original-port": {
+      "owner": "H",
+      "dependsOn": [
+        "B-safe-single-owner-baseline"
+      ]
+    },
+    "B-original-A-Broker-dualclient": {
+      "owner": "B",
+      "dependsOn": [
+        "B-safe-single-owner-baseline",
+        "M-original-fresh-guard"
+      ]
+    },
+    "M-original-recovery-consumer": {
+      "owner": "main",
+      "dependsOn": [
+        "B-original-A-Broker-dualclient",
+        "M-original-completion"
+      ]
+    },
+    "B-original-crash-to-accept": {
+      "owner": "B",
+      "dependsOn": [
+        "B-original-A-Broker-dualclient",
+        "M-original-recovery-consumer"
+      ]
+    },
+    "B-original-slots-return": {
+      "owner": "B",
+      "dependsOn": [
+        "B-original-crash-to-accept"
+      ]
+    },
+    "H-external-crash-resources": {
+      "owner": "H",
+      "dependsOn": [
+        "B-original-A-Broker-dualclient",
+        "H-private-immutable-birth"
+      ]
+    },
+    "A-recovered-data-current-package": {
+      "owner": "A",
+      "dependsOn": [
+        "A-stable-data-port",
+        "B-original-crash-to-accept"
+      ]
+    },
+    "F-display-selection-consistency": {
+      "owner": "F",
+      "dependsOn": [
+        "F-blocked-exclusions-closed"
+      ]
+    },
+    "F-complete-project-journey": {
+      "owner": "F",
+      "dependsOn": [
+        "F-display-selection-consistency",
+        "M-workbench-original-delivery"
+      ]
+    },
+    "F-daily-repeatable-workbench": {
+      "owner": "F",
+      "dependsOn": [
+        "F-complete-project-journey",
+        "M-window-controls"
+      ]
+    },
+    "J-complete-current-inputs": {
+      "owner": "J",
+      "dependsOn": [
+        "J-current-content-observer",
+        "M-workbench-original-delivery"
+      ]
+    },
+    "J-real-root-module": {
+      "owner": "J",
+      "dependsOn": [
+        "J-complete-current-inputs"
+      ]
+    },
+    "G-authorized-export-consumer": {
+      "owner": "G",
+      "dependsOn": [
+        "G-export-source-tested",
+        "M-window-controls"
+      ]
+    },
+    "M-observation-export": {
+      "owner": "main",
+      "dependsOn": [
+        "G-authorized-export-consumer"
+      ]
+    },
+    "D-mode-format-source-bound": {
+      "owner": "D",
+      "dependsOn": [
+        "D-1fba-template-tar",
+        "M-mode-build-closure"
+      ]
+    },
+    "D-current-complete-freeze": {
+      "owner": "D",
+      "dependsOn": [
+        "D-mode-format-source-bound",
+        "M-workbench-original-delivery",
+        "M-window-controls"
+      ]
+    },
+    "E-safe-no-record-policy": {
+      "owner": "E",
+      "dependsOn": [
+        "E-1ba-functional-passed"
+      ]
+    },
+    "E-current-same-tar-matrix": {
+      "owner": "E",
+      "dependsOn": [
+        "E-safe-no-record-policy",
+        "D-current-complete-freeze"
+      ]
+    },
+    "D-same-tar-install-restore": {
+      "owner": "D",
+      "dependsOn": [
+        "D-current-complete-freeze"
+      ]
+    },
+    "C-current-J-window-dual-format": {
+      "owner": "C",
+      "dependsOn": [
+        "D-current-complete-freeze",
+        "C-history-current-consumer"
+      ]
+    },
+    "E-current-two-project-journey": {
+      "owner": "E",
+      "dependsOn": [
+        "E-current-same-tar-matrix",
+        "F-complete-project-journey"
+      ]
+    },
+    "H-current-package-readonly": {
+      "owner": "H",
+      "dependsOn": [
+        "D-current-complete-freeze",
+        "H-private-immutable-birth"
+      ]
+    },
+    "M-internal-trial-handoff": {
+      "owner": "main",
+      "dependsOn": [
+        "E-current-two-project-journey",
+        "D-same-tar-install-restore"
+      ]
+    },
+    "M-private-permission": {
+      "owner": "main",
+      "dependsOn": [
+        "M-original-recovery-consumer"
+      ]
+    },
+    "M-target-activation": {
+      "owner": "main",
+      "dependsOn": [
+        "M-private-permission",
+        "B-original-crash-to-accept"
+      ]
+    }
+  },
+  "completionEstimateRef": "reports/releases/wave13-admission/progress.json",
+  "releaseApproved": false,
+  "goalCoversWholePackage": true,
+  "goalsChangeExecutionBudgets": false,
+  "actualMainInput": "docs/rfcs/WP-16/0077-main-workbench-product-composition.md",
+  "deliveryMode": "FOUR_COMPLETE_SUBSYSTEM_OUTCOMES_NOT_MORE_MICRO_PHASES",
+  "minimumWorkDuration": null,
+  "deliverablesPerOwner": 4,
+  "goalCoversWholeSubsystem": true
+}
