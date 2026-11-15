@@ -1,0 +1,91 @@
+{
+  "agent": "B",
+  "branch": "codex/g1-runtime",
+  "wave": 31,
+  "fixedBaseline": "fbc933166758f446ba8907ce93795d04d34d11d7",
+  "source": {
+    "merge": "2f06e31a Merge origin/main (8deda18d) into codex/g1-runtime",
+    "main": "8deda18d",
+    "I_attach_channel": "4d85cc3 subtree merged and byte-identical in B; I HEAD 96965ab6 adds optional sink-responder/refusals files that B deliberately does not import (packet: their absence does not revive old findings)",
+    "B_changed_paths": [
+      "apps/runner/src/runner-link-client.ts",
+      "tests/native-acceptance/signal-guard.mjs",
+      "tests/native-acceptance/b28-signal.mjs",
+      "tests/native-acceptance/b27-sigkill.mjs",
+      "tests/native-acceptance/b27-chain.mjs"
+    ],
+    "tar": "NONE - B produces source only; no installed tar, no user-instance restart"
+  },
+  "dirtyPreserved": [
+    "reports/releases/wave11-admission/runtime.json",
+    "reports/releases/wave12-admission/runtime.json",
+    "tests/native-acceptance/b16-real-begin.mjs (untracked)"
+  ],
+  "cluster": {
+    "B1_spawnIntentTool": {
+      "status": "IMPLEMENTED + RUNNABLE CONSUMER",
+      "implementation": "tests/native-acceptance/signal-guard.mjs: spawnOwned()/adoptSpawn() capture the SPAWNER intent (executable + ordered argv + declared root/config/operation tokens + complete child plan) and return an opaque handle; a private registry keys handleId -> frozen record; verify() re-reads /bin/ps and requires exact uid/start/ppid/full-argv match with the intent; verifyResources() checks the declared child set on EVERY signal; signalOwned/escalate have no skip flag; ps failure is UNKNOWN and confirmExit never reports it as exit; ps/pgrep/kill/spawn are injectable so pure controls never touch a live process.",
+      "consumer": "RunnerLink now exposes spawnIntent (executable + ordered argv) for tools that must adopt a Runner it spawned; b27-sigkill/b27-chain adopt exactly those intents; b28-signal drives the tool with mocked spawn/ps/pgrep/kill and one limited live fixture.",
+      "positive": "B31-SIGNAL-SPAWN-INTENT-POSITIVE: exactly one kill for the owned pid, ps read twice (registration + fresh verify); B31-SIGNAL-LIVE-OWN-POSITIVE: live spawn-intent matched /bin/ps, killed once, GONE.",
+      "negative": "second direct child with identical argv: 0 kill calls; partial observed argv: argv mismatch, 0 kills; root/config/op not tokens of the spawn argv: refused before registration; uid+start recycled: refused, 0 kills; missing child plan / unreadable child set: refused, 0 kills; copied handle / retargeted record: unknown_handle, 0 kills; ps_failed: UNKNOWN retained, not exited; mock escalation: exactly TERM then fresh KILL.",
+      "commands": [
+        "node tests/native-acceptance/b28-signal.mjs -> exit 0, 11 cases 10 PASS / 0 FAIL / 1 NOT_TESTED (native scope)",
+        "node tests/native-acceptance/b27-sigkill.mjs -> exit 0, 7 PASS / 0 FAIL / 1 NOT_TESTED",
+        "node tests/native-acceptance/b27-chain.mjs -> exit 0, 4 PASS / 0 FAIL / 1 NOT_TESTED"
+      ]
+    },
+    "B2_originalRegistrationAttachedEntry": {
+      "status": "NOT_REACHED",
+      "detail": "B needs a real original ProductExecution/RunningAttempt entry point that loads A's immutable registration and hands the already-registered Runner to an attached client. No such main port exists in this checkout and B does not own it; no replacement Work/attempt/Runner/credential was created."
+    },
+    "B3_threeCallbacksOriginalStoreBroker": {
+      "status": "PARTIAL (fixture lane only)",
+      "detail": "the remote lease proves the fact callback path (b30-transport-owner: remote serves 3 facts, old stdio 0) but the original A durable ACK ingress, immutable payload Store and main/Broker native guard are not wired, and a native-write callback was not observed on the codex-fake-approval lane. No synthetic receipt/empty participant is used as evidence."
+    },
+    "B4_sameRunnerDualClientHandover": {
+      "status": "NOT_REACHED",
+      "detail": "fixture-lane lease handover exists in b27-chain (A dies by verified spawn-intent SIGKILL, successor serves the same attempt), but the original question/version/native-target handover with client B on the same original Work is not implemented."
+    },
+    "B5_B8_package2": {
+      "status": "NOT_REACHED",
+      "detail": "package 2 (safe crash -> original check/currentCandidate/manual accept on the same original Work) is not implemented; ordinary delivery 5 PASS remains an ordinary positive control and is not labeled recovery."
+    },
+    "B9_B12_package3": {
+      "status": "NOT_REACHED",
+      "detail": "package 3 (original 2/4-slot scheduler true release, cancellation, UNKNOWN retention, persistent reopen and release handover) is not implemented."
+    }
+  },
+  "regressionEvidence": {
+    "root_tsc": "npx tsc --noEmit -p tsconfig.json -> exit 0",
+    "direct_strict": "npx tsc -p tests/native-acceptance/tsconfig.direct.json -> exit 0",
+    "runner_tests": "node --test --test-force-exit apps/runner/test/*.test.ts -> exit 0, 137 pass / 0 fail",
+    "b30_transport_owner": "2 PASS / 0 FAIL / 1 NT (remote takeover: old stdio 0)",
+    "b28_cas": "7 PASS / 0 FAIL / 1 NT",
+    "b28_budget": "4 PASS / 0 FAIL / 1 NT (2KiB / 161 facts / 135540-byte five chunks retained)"
+  },
+  "scope": {
+    "modelTurns": 0,
+    "nativeTurns": 0,
+    "cap4UnknownUnspendable": true,
+    "noNew": "no candidate table, ledger, second coordinator/lifecycle, migration, shared schema or main-owned file change",
+    "twelveOutcomes": {
+      "B1": "IMPLEMENTED",
+      "B2": "NOT_REACHED",
+      "B3": "PARTIAL",
+      "B4": "NOT_REACHED",
+      "B5": "NOT_REACHED",
+      "B6": "NOT_REACHED",
+      "B7": "NOT_REACHED",
+      "B8": "NOT_REACHED",
+      "B9": "NOT_REACHED",
+      "B10": "NOT_REACHED",
+      "B11": "NOT_REACHED",
+      "B12": "NOT_REACHED"
+    }
+  },
+  "remaining": [
+    "B2 needs the main-owned original RunningAttempt/attached entry port; B publishes the spawn-intent tool and attach fixture consumer now",
+    "B3/B4 need original A Store/Broker wiring and the native-write callback on the same attempt",
+    "B5-B12 need the original crash/recovery chain and the original scheduler"
+  ]
+}

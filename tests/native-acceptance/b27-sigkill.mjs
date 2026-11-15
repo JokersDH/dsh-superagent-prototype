@@ -15,7 +15,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { CaseLog, writeReport } from './harness.mjs'
-import { born, capture, confirmExit, observe, signalOwned } from './signal-guard.mjs'
+import { adoptSpawn, confirmExit, observe, signalOwned } from './signal-guard.mjs'
 const CHILD_ENTRY = fileURLToPath(new URL('./b27-coordinator-child.mjs', import.meta.url))
 import { RunnerLink } from '../../apps/runner/src/runner-link-client.ts'
 import { makeAttemptSpec, makeCommand } from '../../packages/testing/src/index.ts'
@@ -41,9 +41,9 @@ const runChild = (mode, registration) => new Promise(resolve => {
     childA = child
     setTimeout(() => {
       // Safe tooling: capture the complete birth identity, then signal only after a FRESH verification.
-      // Exact spawn arguments, registered from the probe's own spawn: no substring ownership.
-      const captured = born(child.pid, { exactArgs: [CHILD_ENTRY], expectedChildren: [] })
-      const sent = captured.ok ? signalOwned(captured.record, 'SIGKILL') : { sent: false, refused: true, unknown: captured.unknown }
+      // The probe's own spawn intent (executable + ordered argv), not a ps snapshot or pgrep link.
+      const captured = adoptSpawn(child.pid, { executable: process.execPath, argv: [process.execPath, CHILD_ENTRY], expectedChildren: [] })
+      const sent = captured.ok ? signalOwned(captured.handle, 'SIGKILL') : { sent: false, refused: true, unknown: captured.unknown }
       writeFileSync(join(root, 'kill-proof.json'), JSON.stringify({ captured: captured.ok, sent }, null, 2))
     }, 1200)
   }

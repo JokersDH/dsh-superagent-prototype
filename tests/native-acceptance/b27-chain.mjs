@@ -12,7 +12,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { CaseLog, writeReport } from './harness.mjs'
-import { born, capture, observe, signalOwned } from './signal-guard.mjs'
+import { adoptSpawn, observe, signalOwned } from './signal-guard.mjs'
 import { RunnerLink } from '../../apps/runner/src/runner-link-client.ts'
 import { makeAttemptSpec, makeCommand } from '../../packages/testing/src/index.ts'
 import { endpointDirectory } from '../../apps/runner/src/recovery-endpoint.ts'
@@ -80,9 +80,9 @@ try {
   log.begin('B27-CHAIN-KILL-A-MID-FLIGHT', 'A is killed by SIGKILL while it owns the lease', 'controlled_process')
   const pidA = first.pid
   // Kill through the safe tool: capture A's complete birth identity, then signal once it is re-verified.
-  // B10: exact spawn arguments registered from our own spawn; no substring/PID-only ownership.
-  const aCaptured = born(pidA, { exactArgs: [CHILD], expectedChildren: [] })
-  const aSent = aCaptured.ok ? signalOwned(aCaptured.record, 'SIGKILL') : { sent: false, refused: true, unknown: aCaptured.unknown }
+  // The probe's own spawn intent (executable + ordered argv); nothing is derived from the pid.
+  const aCaptured = adoptSpawn(pidA, { executable: process.execPath, argv: [process.execPath, CHILD], expectedChildren: [] })
+  const aSent = aCaptured.ok ? signalOwned(aCaptured.handle, 'SIGKILL') : { sent: false, refused: true, unknown: aCaptured.unknown }
   let diedBy = null
   for (let index = 0; index < 100 && diedBy === null; index += 1) {
     const observed = observe(pidA)
@@ -141,8 +141,8 @@ try {
 } finally {
   for (const child of children) {
     // Cleanup goes through the same tool, so even our own leftovers are identity-checked before a signal.
-    const captured = born(child.pid, { exactArgs: [CHILD], expectedChildren: [] })
-    if (captured.ok) signalOwned(captured.record, 'SIGKILL')
+    const captured = adoptSpawn(child.pid, { executable: process.execPath, argv: [process.execPath, CHILD], expectedChildren: [] })
+    if (captured.ok) signalOwned(captured.handle, 'SIGKILL')
   }
   try { await runner?.close() } catch {}
   delete process.env.PA_RUNNER_RECOVERY_ROOT

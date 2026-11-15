@@ -1,177 +1,197 @@
 #!/usr/bin/env node
 /**
- * Wave-29 B5/B6: exact ownership before any signal.
+ * Wave-31 B1: spawn-intent authority, not a ps snapshot.
  *
- * A process is only signalled when a record that was REGISTERED by the spawner still matches a fresh
- * observation of the complete birth identity: pid, uid, start time, parent pid, full argv, and the exact
- * root/config/operation arguments that the original spawn declared. Matching is exact-token, never a
- * substring or a sibling prefix. `ps` returning "No such process" is the only way to say GONE; any
- * unreadable/parse/permission failure is UNKNOWN, and UNKNOWN is never treated as exited and never
- * triggers cleanup. Before the FIRST signal the declared child set is checked, and every escalation is
- * verified again.
+ * A pid is never ownership. Ownership starts at the spawner: `spawnOwned` (or `adoptSpawn` for a child
+ * the caller spawned elsewhere) records the immutable spawn intent (executable + ordered argv + the
+ * declared root/config/operation and the complete child resource plan) and returns an opaque handle.
+ * Every verification re-reads the live process and compares it with THAT intent: full argv must match
+ * token-for-token, uid/start/ppid must match, and the whole declared child set must match. A copied,
+ * edited, partial-argv or unregistered record has no authority. ps failure is UNKNOWN, never exit.
+ *
+ * Dependencies (spawn/ps/kill) are injectable so the pure controls never touch a live process.
  */
-import { spawnSync } from 'node:child_process'
+import { randomUUID } from 'node:crypto'
+import { spawn as realSpawn, spawnSync } from 'node:child_process'
 
 const PS_FIELDS = '-o pid=,uid=,ppid=,lstart=,command='
-/** Immutable birth registry: the caller's record must still equal what the probe registered. */
+
+const realDeps = {
+  spawn: realSpawn,
+  ps: (pid) => {
+    const result = spawnSync('/bin/ps', [PS_FIELDS, '-p', String(pid)], { encoding: 'utf8' })
+    const stdout = (result.stdout ?? '').trim()
+    const stderr = String(result.stderr ?? '')
+    if (result.error) return { state: 'unknown', reason: 'ps_error', detail: String(result.error.message ?? result.error) }
+    if (result.status !== 0) {
+      if (/no such process|no matching process|nonexistent/i.test(stderr)) return { state: 'gone', reason: 'no_such_process' }
+      if (stdout.length === 0 && stderr.trim().length === 0) return { state: 'gone', reason: 'silent_absence' }
+      return { state: 'unknown', reason: 'ps_failed', detail: stderr.trim().slice(0, 200) }
+    }
+    if (stdout.length === 0) return { state: 'gone', reason: 'empty_output' }
+    const match = /^(\d+)\s+(\d+)\s+(\d+)\s+(\w{3}\s+\w{3}\s+\d+\s+\d{2}:\d{2}:\d{2}\s+\d{4})\s+(.*)$/.exec(stdout)
+    if (!match) return { state: 'unknown', reason: 'unparseable', raw: stdout.slice(0, 200) }
+    return { state: 'live', pid: Number(match[1]), uid: Number(match[2]), ppid: Number(match[3]), start: match[4], argv: match[5] }
+  },
+  pgrep: (pid) => {
+    const result = spawnSync('pgrep', ['-P', String(pid)], { encoding: 'utf8' })
+    if (result.error) return { state: 'unknown', reason: 'children_unreadable' }
+    const stdout = String(result.stdout ?? '').trim()
+    if (result.status === 1 && stdout.length === 0) return { state: 'ok', children: [] }
+    if (result.status !== 0) return { state: 'unknown', reason: 'children_unreadable' }
+    return { state: 'ok', children: stdout.split('\n').map(line => Number(line.trim())).filter(Number.isSafeInteger) }
+  },
+  kill: (pid, signal) => process.kill(pid, signal),
+}
+
+let deps = { ...realDeps }
+/** Test-only injection; production callers never re-configure the tool. */
+export function configureSignalGuard(overrides = {}) {
+  deps = { ...realDeps, ...overrides }
+}
+export function resetSignalGuard() { deps = { ...realDeps } }
+
+/** Opaque handle registry: the handle id (not the record) is the capability. */
 const registry = new Map()
-const registryKey = record => `${record.pid}:${record.start}`
 const deepFreeze = value => { if (value && typeof value === 'object') { Object.freeze(value); for (const key of Object.keys(value)) deepFreeze(value[key]) } return value }
-
-const NO_SUCH = [/no such process/i, /no matching process/i, /nonexistent/i]
-
-/** Observe one pid. `state` is 'live' | 'gone' | 'unknown'; only 'gone' is proof of exit. */
-export function observe(pid) {
-  if (!Number.isSafeInteger(pid) || pid <= 0) return { state: 'unknown', reason: 'invalid_pid', alive: false }
-  const result = spawnSync('/bin/ps', [PS_FIELDS, '-p', String(pid)], { encoding: 'utf8' })
-  const stdout = (result.stdout ?? '').trim()
-  const stderr = String(result.stderr ?? '')
-  if (result.error) return { state: 'unknown', reason: 'ps_error', detail: String(result.error.message ?? result.error), alive: false }
-  if (result.status !== 0) {
-    if (NO_SUCH.some(pattern => pattern.test(stderr))) return { state: 'gone', reason: 'no_such_process', alive: false }
-    // macOS `ps -p <dead pid>` exits 1 with NO output at all: that silence is the "no such process"
-    // signal. Any stderr text (too large, permission, bad option) stays UNKNOWN instead of gone.
-    if (stdout.length === 0 && stderr.trim().length === 0) return { state: 'gone', reason: 'silent_absence', alive: false }
-    return { state: 'unknown', reason: 'ps_failed', detail: stderr.trim().slice(0, 200), alive: false }
-  }
-  if (stdout.length === 0) return { state: 'gone', reason: 'empty_output', alive: false }
-  const match = /^(\d+)\s+(\d+)\s+(\d+)\s+(\w{3}\s+\w{3}\s+\d+\s+\d{2}:\d{2}:\d{2}\s+\d{4})\s+(.*)$/.exec(stdout)
-  if (!match) return { state: 'unknown', reason: 'unparseable', raw: stdout.slice(0, 200), alive: false }
-  return { state: 'live', pid: Number(match[1]), uid: Number(match[2]), ppid: Number(match[3]), start: match[4], argv: match[5], alive: true }
-}
-
-/** Tokens of an observed command line, used for exact argument matching. */
 const tokens = argv => argv.split(/\s+/).filter(Boolean)
-/** Direct children of THIS probe: a readable pid that is not our child is never "owned". */
-function isDirectChild(pid) {
-  const result = spawnSync('pgrep', ['-P', String(process.pid)], { encoding: 'utf8' })
-  if (result.status !== 0 || !String(result.stdout ?? '').trim()) return false
-  return String(result.stdout).trim().split('\n').map(line => Number(line.trim())).includes(pid)
+const sameTokens = (a, b) => a.length === b.length && a.every((token, index) => token === b[index])
+
+function snapshot(pid) {
+  const live = deps.ps(pid)
+  if (!live || typeof live !== 'object') return { state: 'unknown', reason: 'ps_failed' }
+  return live
 }
 
-/**
- * Register the birth identity of a process THIS probe spawned. The caller must supply the exact argv
- * arguments it spawned with; nothing about the pid alone is ownership.
- */
-export function born(pid, expectations = {}) {
-  const live = observe(pid)
+function registerIntent(pid, intent) {
+  const plan = intent.expectedChildren
+  if (!Array.isArray(plan)) return { ok: false, unknown: 'no_resource_plan' }
+  const live = snapshot(pid)
   if (live.state !== 'live') return { ok: false, unknown: live.reason ?? live.state, live }
-  // Only a process THIS probe spawned is a candidate: a readable pid from anywhere else is not ownership.
-  if (!isDirectChild(live.pid)) return { ok: false, unknown: 'not_a_probe_child', live }
-  // Full argv proof is mandatory: no empty/exactArgs-omitted birth may skip it.
-  if (typeof live.argv !== 'string' || live.argv.trim().length === 0) return { ok: false, unknown: 'no_full_argv', live }
-  const exactArgs = [...(expectations.exactArgs ?? [])]
-  if (exactArgs.length === 0) return { ok: false, unknown: 'no_exact_args', live }
-  const liveTokens = new Set(tokens(live.argv))
-  for (const arg of exactArgs) if (!liveTokens.has(arg)) return { ok: false, unknown: `arg_not_observed:${arg}`, live }
-  // The complete resource plan is a REQUIRED part of the birth, never an optional late check.
-  if (!Array.isArray(expectations.expectedChildren)) return { ok: false, unknown: 'no_resource_plan', live }
-  const record = {
-    kind: 'probe-born',
+  const intended = tokens(intent.argv.join(' '))
+  if (intended.length === 0) return { ok: false, unknown: 'no_spawn_argv' }
+  const observed = tokens(live.argv ?? '')
+  // Full ordered argv: a partial prefix, a sibling command or a single node token is not this spawn.
+  if (!sameTokens(observed, intended)) return { ok: false, unknown: 'argv_mismatch', observed, intended }
+  const record = deepFreeze({
+    kind: 'probe-spawn',
     pid: live.pid, uid: live.uid, ppid: live.ppid, start: live.start, argv: live.argv,
-    exactArgs,
-    markers: [...(expectations.markers ?? [])],
-    expectedChildren: [...expectations.expectedChildren],
+    argvTokens: intended,
+    executable: intent.executable,
+    root: intent.root ?? null, config: intent.config ?? null, operation: intent.operation ?? null,
+    expectedChildren: [...plan],
     capturedAt: new Date().toISOString(),
+  })
+  const handleId = randomUUID()
+  registry.set(handleId, { record: record, deps: deps })
+  return { ok: true, handle: Object.freeze({ handleId, record }), record }
+}
+
+/** Spawn a process this probe owns and register its immutable spawn intent. */
+export function spawnOwned(executable, args, intent = {}) {
+  const child = deps.spawn(executable, args, intent.spawnOptions ?? { stdio: ['ignore', 'pipe', 'pipe'] })
+  if (!child || !Number.isSafeInteger(child.pid)) return { ok: false, unknown: 'spawn_failed', child }
+  const argv = [executable, ...args]
+  const registered = registerIntent(child.pid, { executable, argv, ...intent })
+  return { ...registered, child, argv }
+}
+
+/** Adopt a child the caller spawned itself, using the caller's spawn intent (never a ps-derived one). */
+export function adoptSpawn(childOrPid, intent) {
+  let pid = Number.isSafeInteger(childOrPid) ? childOrPid : childOrPid?.pid
+  if (!Number.isSafeInteger(pid) || pid <= 0) return { ok: false, unknown: 'invalid_pid' }
+  const executable = intent?.executable
+  const argv = intent?.argv
+  if (typeof executable !== 'string' || executable.length === 0) return { ok: false, unknown: 'no_spawn_executable' }
+  if (!Array.isArray(argv) || argv.length === 0) return { ok: false, unknown: 'no_spawn_argv' }
+  if (argv[0] !== executable) return { ok: false, unknown: 'argv_executable_disagree' }
+  // root/config/operation are captured from the spawn intent and must be tokens OF that intent; they are
+  // never re-derived from the process being checked.
+  for (const [name, value] of [['root', intent.root], ['config', intent.config], ['operation', intent.operation]]) {
+    if (value !== undefined && value !== null && !argv.includes(value)) return { ok: false, unknown: `spawn_${name}_not_in_argv` }
   }
-  deepFreeze(record)
-  registry.set(registryKey(record), record)
-  return { ok: true, record }
+  return registerIntent(pid, { ...intent, executable, argv })
 }
 
-/** Back-compat alias: capture is only a registration of a probe-born pid. */
-export function capture(pid, expectations = {}) { return born(pid, expectations) }
+/** Back-compat alias used by existing harnesses: adopt, never discover. */
+export function born(pid, intent) { return adoptSpawn(pid, intent) }
 
-function childPids(pid) {
-  // BSD ps has no --ppid; pgrep -P is the exact parent filter. Exit 1 with no output means "no
-  // children" (which is a real, exact answer), anything else is unreadable.
-  const result = spawnSync('pgrep', ['-P', String(pid)], { encoding: 'utf8' })
-  if (result.error) return { state: 'unknown', reason: 'children_unreadable' }
-  const stdout = String(result.stdout ?? '').trim()
-  if (result.status === 1 && stdout.length === 0) return { state: 'ok', children: [] }
-  if (result.status !== 0) return { state: 'unknown', reason: 'children_unreadable' }
-  const children = stdout.split('\n').map(line => Number(line.trim())).filter(Number.isSafeInteger)
-  return { state: 'ok', children }
+function lookup(handle) {
+  if (!handle || typeof handle.handleId !== 'string') return { ok: false, unknown: 'no_handle' }
+  const entry = registry.get(handle.handleId)
+  if (!entry || entry.record !== handle.record) return { ok: false, unknown: 'unknown_handle' }
+  if (entry.deps !== deps) return { ok: false, unknown: 'handle_from_other_tool' }
+  return { ok: true, record: entry.record }
 }
 
-/** Verify a record against a fresh observation, including exact declared arguments. */
-export function verify(record) {
-  if (!record || !Number.isSafeInteger(record.pid)) return { ok: false, unknown: 'no_record' }
-  if (typeof record.start !== 'string' || record.start.length === 0) return { ok: false, unknown: 'no_start' }
-  if (record.pid <= 0) return { ok: false, unknown: 'invalid_pid' }
-  // The caller may hold the record, but it is not the authority: a mutated/re-registered record is refused
-  // before any observation, so editing pid/birth cannot retarget an original handle onto a foreign pid.
-  const registered = registry.get(registryKey(record))
-  if (!registered || registered !== record) return { ok: false, unknown: 'unregistered_or_mutated' }
-  const live = observe(record.pid)
+/** Read-only observation. UNKNOWN is distinct from gone; `alive` is false for both by construction. */
+export function observe(pid) {
+  const live = snapshot(pid)
+  return { ...live, alive: live.state === 'live' }
+}
+
+/** Re-read the live process and compare it with the registered spawn intent. */
+export function verify(handle) {
+  const owned = lookup(handle)
+  if (!owned.ok) return { ok: false, unknown: owned.unknown }
+  const record = owned.record
+  const live = snapshot(record.pid)
   if (live.state === 'unknown') return { ok: false, unknown: live.reason ?? 'unreadable', live }
   if (live.state === 'gone') return { ok: false, unknown: 'already_gone', live }
   const mismatches = []
   if (live.uid !== record.uid) mismatches.push('uid')
   if (live.start !== record.start) mismatches.push('start')
   if (live.ppid !== record.ppid) mismatches.push('ppid')
-  if (record.argv && live.argv !== record.argv) mismatches.push('argv')
-  const liveTokens = tokens(live.argv ?? '')
-  const liveSet = new Set(liveTokens)
-  for (const arg of record.exactArgs ?? []) {
-    // Exact token equality only: a root /srv/app must never match /srv/app-old or /srv/app/child.
-    if (!liveSet.has(arg)) mismatches.push(`arg:${arg}`)
-  }
-  for (const marker of record.markers ?? []) if (!(live.argv ?? '').includes(marker)) mismatches.push(`marker:${marker}`)
+  if (!sameTokens(tokens(live.argv ?? ''), record.argvTokens)) mismatches.push('argv')
   return { ok: mismatches.length === 0, mismatches, live }
 }
 
-/**
- * Full resource precheck for the FIRST signal: the live child set must be exactly the declared one.
- * A missing declaration is not permission to signal; it is a refusal to proceed.
- */
-export function verifyResources(record) {
-  if (!record || !Array.isArray(record.expectedChildren)) return { ok: false, unknown: 'no_resource_plan' }
-  if (!registry.has(registryKey(record)) || registry.get(registryKey(record)) !== record) return { ok: false, unknown: 'unregistered_or_mutated' }
-  const observed = childPids(record.pid)
+/** The declared child set must match on EVERY signal, not only the first. */
+export function verifyResources(handle) {
+  const owned = lookup(handle)
+  if (!owned.ok) return { ok: false, unknown: owned.unknown }
+  const observed = deps.pgrep(owned.record.pid)
   if (observed.state !== 'ok') return { ok: false, unknown: observed.reason ?? 'children_unreadable' }
-  const declared = [...record.expectedChildren].sort((a, b) => a - b)
+  const declared = [...owned.record.expectedChildren].sort((a, b) => a - b)
   const actual = [...observed.children].sort((a, b) => a - b)
   const ok = declared.length === actual.length && declared.every((pid, index) => pid === actual[index])
   return ok ? { ok: true, children: actual } : { ok: false, mismatches: [`children:${actual.join(',')}`], children: actual }
 }
 
-/** Signal ONLY after fresh verification (and the resource precheck for the first signal). */
-export function signalOwned(record, signal = 'SIGKILL') {
-  const check = verify(record)
+/** Signal ONLY after fresh spawn-intent + resource verification. */
+export function signalOwned(handle, signal = 'SIGKILL') {
+  const check = verify(handle)
   if (!check.ok) return { sent: false, refused: true, unknown: check.unknown ?? null, mismatches: check.mismatches ?? [], live: check.live ?? null }
-  // The full resource plan is verified for EVERY signal, not only the first: there is no `first` flag
-  // that a caller can leave false to skip it.
-  const resources = verifyResources(record)
+  const resources = verifyResources(handle)
   if (!resources.ok) return { sent: false, refused: true, unknown: resources.unknown ?? 'resource_mismatch', mismatches: resources.mismatches ?? [], resources }
-  try { process.kill(record.pid, signal) } catch (error) {
-    const code = String(error?.code ?? error)
-    // ESRCH after a fresh live observation is still an unknown transition, not a successful signal.
-    return { sent: false, refused: false, unknown: code }
-  }
-  return { sent: true, pid: record.pid, signal }
+  try { deps.kill(check.live.pid, signal) } catch (error) { return { sent: false, refused: false, unknown: String(error?.code ?? error) } }
+  return { sent: true, pid: check.live.pid, signal }
 }
 
-/** Wait for the exact pid to be GONE. UNKNOWN at the deadline is not an exit. */
+/** Wait for GONE. UNKNOWN at the deadline is retained, never reported as exit. */
 export async function confirmExit(pid, timeoutMs = 5000) {
   const deadline = Date.now() + timeoutMs
-  let last = observe(pid)
+  let last = snapshot(pid)
   while (Date.now() < deadline) {
-    last = observe(pid)
+    last = snapshot(pid)
     if (last.state === 'gone') return { exited: true, observedAt: new Date().toISOString() }
     await new Promise(resolve => setTimeout(resolve, 25))
   }
-  if (last.state === 'gone') return { exited: true, observedAt: new Date().toISOString() }
-  return { exited: false, unknown: last.state === 'unknown' ? (last.reason ?? 'unreadable') : 'still_readable', live: last.state === 'live' ? last : null }
+  return last.state === 'gone'
+    ? { exited: true, observedAt: new Date().toISOString() }
+    : { exited: false, unknown: last.state === 'unknown' ? (last.reason ?? 'unreadable') : 'still_readable', live: last.state === 'live' ? last : null }
 }
 
-/** TERM, a FRESH verification, then KILL only if the same identity is still the one running. */
-export async function escalate(record, { termWaitMs = 1500 } = {}) {
-  const term = signalOwned(record, 'SIGTERM')
-  if (!term.sent) return { term, kill: null, exit: term.refused ? { exited: false, retained: term.unknown ?? 'refused' } : { exited: false, unknown: term.unknown } }
-  const first = await confirmExit(record.pid, termWaitMs)
+/** TERM, fresh spawn-intent check, then KILL only if the same intent still matches. */
+export async function escalate(handle, { termWaitMs = 1500 } = {}) {
+  const term = signalOwned(handle, 'SIGTERM')
+  if (!term.sent) return { term, kill: null, exit: { exited: false, retained: term.unknown ?? 'refused' } }
+  const first = await confirmExit(term.pid, termWaitMs)
   if (first.exited) return { term, kill: null, exit: first }
-  const kill = signalOwned(record, 'SIGKILL')
-  const second = kill.sent ? await confirmExit(record.pid, 5000) : { exited: false, unknown: kill.unknown ?? 'refused' }
+  const kill = signalOwned(handle, 'SIGKILL')
+  const second = kill.sent ? await confirmExit(kill.pid, 5000) : { exited: false, unknown: kill.unknown ?? 'refused' }
   return { term, kill, exit: second }
 }
+
+/** Diagnostics only: how many live handles this tool retains. */
+export const registrySize = () => registry.size

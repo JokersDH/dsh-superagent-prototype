@@ -39,6 +39,11 @@ export type SpawnedRunner = {
   pid: number
   stateRoot: string
   journalPath: string
+  /**
+   * The immutable spawn intent captured at spawn time (executable + ordered argv). Signal tools use this
+   * instead of a ps snapshot or a pgrep parent link; nothing about the pid alone is authority.
+   */
+  spawnIntent: { executable: string; argv: string[] }
   /** Send a command; the return value is the Runner's accepted id, not the native effect. */
   command(command: RunnerCommand): Promise<void>
   /** Resolve with the served exit when the attempt ends. */
@@ -229,6 +234,7 @@ export class RunnerLink {
       pid: child.pid ?? -1,
       stateRoot,
       journalPath,
+      spawnIntent: { executable: this.#options.executable, argv: [this.#options.executable, this.#options.entry, ...(this.#options.args ?? [])] },
       receipts,
       progress,
       command: async command => {
