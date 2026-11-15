@@ -111,7 +111,8 @@ const longReadiness = readiness({
 const longConversationTitle = '把本机执行器的连接状态、项目导入和对话入口整理成一次可审阅的试用准备检查，并保留原始授权边界'
 const baseRecipe = {
   version: '1', source: 'project-recipes' as const, projectId: 'project-atlas', scopeNote: 'src/ · 现有检查',
-  status: 'draft' as const, missingInputs: [], checks: [{ id: 'check-unit', required: true, declared: true }],
+  status: 'draft' as const, missingInputs: [], scope: null,
+  checks: [{ id: 'check-unit', required: true, declared: true }],
   profiles: [{ id: 'profile-codex-local', required: true }],
   provenance: { manifest: 'package.json', declaredRoot: '.', note: '只读项目声明' },
   limitations: [], authority: 'none' as const,
@@ -122,6 +123,18 @@ const recipes: readonly TrialRecipeSuggestion[] = [
     missingInputs: [{ field: 'project', label: '项目根目录' }] },
   { ...baseRecipe, id: 'recipe-unsupported', status: 'unsupported', title: '未知的 monorepo 布局', goalPreview: '该布局尚未支持。' },
   { ...baseRecipe, id: 'recipe-wrong-project', projectId: 'project-notes', title: '属于其他项目的草案', goalPreview: '不应出现在当前项目。' },
+  { ...baseRecipe, id: 'recipe-unknown-source', source: 'unknown', title: '来源未知的草案', goalPreview: '来源没有声明。' },
+  { ...baseRecipe, id: 'recipe-no-project', projectId: null, title: '未声明项目的草案', goalPreview: '不知道属于哪个项目。' },
+]
+const recipeScopeCases: readonly TrialRecipeSuggestion[] = [
+  { ...baseRecipe, id: 'recipe-scope-valid', title: '范围与项目一致的草案', goalPreview: '范围只使用项目现有原子。',
+    scope: { allowedPaths: ['src/'], excludedPaths: [], externalActions: [] } },
+  { ...baseRecipe, id: 'recipe-wide-scope', title: '范围超出当前项目的草案', goalPreview: '范围声明到了项目之外。',
+    scope: { allowedPaths: ['.'], excludedPaths: [], externalActions: [] } },
+  { ...baseRecipe, id: 'recipe-contradiction', title: '检查声明矛盾的草案', goalPreview: '检查声明与项目不符。',
+    checks: [{ id: 'check-unit', required: true, declared: false }] },
+  { ...baseRecipe, id: 'recipe-unbound-profile', profiles: [{ id: 'profile-other', required: true }],
+    title: '执行器未绑定的草案', goalPreview: '执行器不在当前项目。' },
   { ...baseRecipe, id: 'recipe-long', title: '一个非常长的草案标题用于检查中文与 English mixed identifiers 在没有空格时也不会溢出容器或覆盖相邻状态标签',
     goalPreview: '在已有 Node 检查上补充声明，并保持原始命令与授权范围不变。'.repeat(12),
     scopeNote: '根目录/一个没有空格的很长路径/another-long-segment-without-spaces/package.json' },
@@ -163,7 +176,8 @@ const wrongProjectInsights: TrialInsightsView = {
 export const trialStates = [
   'configured', 'unconfigured', 'blocked', 'needs-project', 'no-projects', 'fixture', 'unknown', 'readonly',
   'noreadiness', 'loading', 'unavailable', 'error', 'long', 'insights-empty', 'insights-unscoped', 'insights-wrong-project',
-  'insights-truncated', 'insights-partial', 'recipes', 'recipes-loading', 'recipes-error',
+  'insights-truncated', 'insights-partial', 'recipes', 'recipes-scope', 'recipes-all-projects',
+  'recipes-loading', 'recipes-error', 'insights-window', 'insights-window-mismatch', 'insights-loading',
 ] as const
 export type TrialHarnessState = (typeof trialStates)[number]
 
@@ -176,6 +190,9 @@ export interface TrialHarnessProps {
   readonly activeProjectId?: string | undefined
   readonly activeConversationTitle?: string | undefined
   readonly insights?: TrialInsightsView | undefined
+  readonly insightWindow?: 7 | 30 | undefined
+  readonly insightsLoading?: boolean | undefined
+  readonly insightsError?: string | undefined
   readonly recipes?: readonly TrialRecipeSuggestion[] | undefined
   readonly recipesLoading?: boolean | undefined
   readonly recipesError?: string | undefined
@@ -234,6 +251,24 @@ export function trialHarnessProps(state: TrialHarnessState): TrialHarnessProps {
     }
     case 'recipes': return {
       readiness: readiness(), configuration: configured, activeProjectId: 'project-atlas', recipes,
+    }
+    case 'recipes-scope': return {
+      readiness: readiness(), configuration: configured, activeProjectId: 'project-atlas', recipes: recipeScopeCases,
+    }
+    case 'recipes-all-projects': return {
+      readiness: readiness(), configuration: configured, recipes: [recipes[0]!],
+    }
+    case 'insights-window': return {
+      readiness: readiness(), configuration: configured, activeProjectId: 'project-atlas',
+      insights: { ...longInsights, days: 7 }, insightWindow: 7,
+    }
+    case 'insights-window-mismatch': return {
+      readiness: readiness(), configuration: configured, activeProjectId: 'project-atlas',
+      insights: { ...longInsights, days: 7 }, insightWindow: 30,
+    }
+    case 'insights-loading': return {
+      readiness: readiness(), configuration: configured, activeProjectId: 'project-atlas',
+      insights: { ...longInsights, days: 7 }, insightWindow: 7, insightsLoading: true,
     }
     case 'recipes-loading': return {
       readiness: readiness(), configuration: configured, activeProjectId: 'project-atlas', recipesLoading: true,

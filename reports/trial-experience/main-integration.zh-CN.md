@@ -26,37 +26,39 @@ const [recipesError, setRecipesError] = useState<string>()
   recipes={recipeSuggestions}
   recipesLoading={recipesLoading}
   recipesError={recipesError}
-  onPrepareRecipe={suggestion => openWorkDraft(suggestion.goalPreview, suggestion.projectId ?? projectFilter)}
+  onPrepareRecipe={draft => {
+    // Re-read current configuration/facts first, then prefill the original NewWorkForm with all fields:
+    // draft.goal / draft.projectId / draft.scope / draft.criteria / draft.profileId
+    // The user still confirms in the original form; do not dispatch directly.
+  }}
 />
 ```
 
-- `TrialRecipeSuggestion` 来自 `./trial/index.ts`（`recipes.ts`），是**只读展示输入**；J/main 负责把 `packages/project-recipes` 的草案映射进来。
-- `onPrepareRecipe` 不是第五个导航动作，也不发 HTTP；它只把草案数据交给 main 的原委托表单。main 可决定只填目标/项目，检查与执行器仍用原表单默认值；**不得**由 F 自动加检查、加权限或提交。
-- F 会按当前项目过滤（其他项目的草案不显示），并对缺输入、未注册检查、未准入执行器、非 `authority:none` 的草案禁用“准备草案”。
-- 同一草案 300ms 内重复点击只回调一次；用户已编辑原表单后是否覆盖由 main 决定。
+- `TrialRecipeSuggestion` / `TrialRecipeDraft` 来自 `./trial/index.ts`（`recipes.ts`）。草案是**只读展示输入**，由 J/main 映射。
+- 适用性按当前配置项目判断：项目存在且被选中、草案属于该项目、检查在项目默认验收标准且已注册、执行器绑定到该项目且已准入、声明的范围原子已在项目范围内（不把前缀当权限）。
+- `onPrepareRecipe(draft)` 不是第五个导航动作，也不发 HTTP；`draft` 已含 goal/scope/criteria/profileId，main 必须用当前配置重新核验后再预填原表单。F 不自动加检查、加权限或提交。
+- F 显示所有声明（含 foreign/unknown/缺失），但只对合格草案启用按钮；同一草案 300ms 内重复点击只回调一次。用户取消或编辑后是否被新草案覆盖由 main 决定。
 
-### 2.2 可信观察摘要（G）
+### 2.2 真实观察（main 已实现，F 为消费者）
 
-当前 main 不传 `insights`，观察区不显示。接入时最小形状：
+main 的 `useUsageObservation` 已读取 `GET /v1/insights`（当前固定 7 天、当前项目），并把 `UsageObservation` 直接传给 `insights`；它与 F 的 `TrialInsightsView` 结构兼容（`windowLabel/coverage/coverageState/scope/sampleCount/unknownCount/metrics/layer/unit/limitations`）。
 
-```ts
-{
-  status: 'ready' | 'insufficient_data' | 'unavailable',
-  scope: { projectIds: string[], aggregation: 'single_project'|'declared_multi_project'|'cross_project', label?: string },
-  windowLabel: string,
-  coverage: string,
-  coverageState?: 'complete'|'partial'|'unknown',
-  truncated?: boolean,
-  sources?: { known: number|null, unknown: number|null },
-  sampleCount: number|null,
-  unknownCount?: number|null,
-  metrics: { id, label, value: string|null, unit?, currency?, layer?: 'observed'|'controlled'|'native'|'operator'|'unknown', sampleCount?: number|null, detail? }[],
-  limitations: string[]
-}
+F 新增的可选窗口/状态输入（main 决定是否接）：
+
+```tsx
+<TrialWorkspace
+  insights={usageView}
+  insightWindow={usageDays}                 // 7 | 30，与 insights.days 不一致时 F 先隐藏旧窗口数字
+  onSelectInsightWindow={setUsageDays}      // 只回调，不发请求；main 重新读取
+  insightsLoading={usage.loading}           // 读取中提示；同一窗口保留现有行
+  insightsError={usage.error}               // 脱敏错误 + 可选重试
+  onReloadInsights={usage.reload}
+/>
 ```
 
-- 缺 `scope`/`windowLabel`/`coverage`、范围不含当前项目、`truncated` 且宣称 complete、`status` 非 ready，都会隐藏指标并说明原因；F 不补 0、不合计币种/层。
-- 旧 compact G projection 不能直接当兼容输入；main 在 Node 侧用授权 public DTO 重新限定范围/窗口/覆盖后再映射。
+- 要支持 30 天，main 把 `useUsageObservation` 的 `days: 7` 改成可选 state 并在变更时重读；F 不直接调用 HTTP。
+- F 的准入门仍然生效：缺 scope/window/coverage、范围不含当前项目、`truncated` 却宣称 complete、窗口不一致，都隐藏指标并说明原因；F 不补 0、不合计币种/层。
+- `UsageObservation` 的 `details/unit/layer/sampleCount` 原样展示；`null` 保持未知。
 
 ## 3. 建议（不阻塞）
 
@@ -81,17 +83,17 @@ index.ts  TrialWorkspace.tsx  useTrialReadiness.ts  trial-view.ts  insights.ts  
 
 ```sh
 cd apps/console
-node --test test/trial/*.case.ts        # 16 项：状态/actions/准入/配方/文案
+node --test test/trial/*.case.ts        # 18 项：状态/actions/准入/配方/文案
 npx tsc -p tsconfig.json --noEmit
 npx tsc -p e2e/trial/tsconfig.json --noEmit
-node e2e/trial/run-all.mjs              # 10 套件，全部 exit 0
+node e2e/trial/run-all.mjs              # 10 套件，全部 exit 0（含两项目日常与 7 天观察回归）
 ```
 
-main 自有真实 App 浏览器测试在本包改动后重跑 8/8 PASS（pageerrors 0、POST 0、model 0）。
+main 自有真实 App 浏览器测试在本包改动后重跑 8/8 PASS；main 的真实观察浏览器测试 6/6 PASS（含项目范围、late、503/404）。
 
 ## 6. 明确未达
 
-- main 尚未接入 `recipes`/`insights`；默认产品不显示这两段。
+- main 已接入真实 7 天观察；`recipes` 仍未接入，默认不显示。30 天窗口与加载/错误 props 需要 main 扩展其观察 hook。
 - J/G 模块未进入本仓库默认产品；F 只有 typed consumer、fixtures 与校验。
 - 真实 vendor/model/native 0；`app-daily-flow` 使用 controlled fixture（固定 scratch 写入），不是原生或安装包证明。
 - 非 Chromium、人工屏幕阅读器、真实服务端会话中途过期未测。

@@ -1,85 +1,142 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import type { TrialRecipeSuggestion } from '../../src/trial/recipes.ts'
-import {
-  trialRecipeContext, trialRecipeOutcome, trialRecipeSuggestionsForProject,
-} from '../../src/trial/recipes.ts'
+import type { TrialRecipeContext, TrialRecipeContextProject, TrialRecipeSuggestion } from '../../src/trial/recipes.ts'
+import { trialRecipeOutcome } from '../../src/trial/recipes.ts'
 
+const project: TrialRecipeContextProject = {
+  id: 'project-atlas', displayName: '流程测试项目', dispatchAllowed: true, profileIds: ['profile-codex-local'],
+  checkRefs: ['check-unit'],
+  scope: { projectId: 'project-atlas', allowedPaths: ['src/'], excludedPaths: [], externalActions: [] },
+  criteria: [{ id: 'criterion-1', description: '单元检查通过', kind: 'machine', required: true, checkDefinitionRef: 'check-unit' }],
+  defaultProfileId: 'profile-codex-local',
+}
+const context = (over: Partial<TrialRecipeContext> = {}): TrialRecipeContext => ({
+  projectId: 'project-atlas', projects: [project], registeredChecks: ['check-unit'],
+  profiles: [{ id: 'profile-codex-local', kind: 'native', dispatchAllowed: true }], ...over,
+})
 const suggestion = (over: Partial<TrialRecipeSuggestion> = {}): TrialRecipeSuggestion => ({
   id: 'recipe-1', version: '1', source: 'project-recipes', projectId: 'project-atlas',
-  title: '补充单元检查声明', goalPreview: '在现有检查上补充说明，不改变命令。', scopeNote: 'src/',
+  title: '补充单元检查声明', goalPreview: '在现有检查上补充说明，不改变命令。', scopeNote: 'src/', scope: null,
   status: 'draft', missingInputs: [], checks: [{ id: 'check-unit', required: true, declared: true }],
   profiles: [{ id: 'profile-codex-local', required: true }],
   provenance: { manifest: 'package.json', declaredRoot: '.', note: '只读项目声明' },
   limitations: [], authority: 'none', ...over,
 })
-const context = (over: Partial<ReturnType<typeof trialRecipeContext>> = {}) => ({
-  projectId: 'project-atlas', registeredChecks: ['check-unit'],
-  profiles: [{ id: 'profile-codex-local', kind: 'native' as const, dispatchAllowed: true }], ...over,
+
+test('a draft is applicable only for a configured current project with its own check/profile refs', () => {
+  const outcome = trialRecipeOutcome(suggestion(), context())
+  assert.equal(outcome.applicable, true)
+  assert.deepEqual(outcome.reasons, [])
+  assert.deepEqual(outcome.checks, [{ id: 'check-unit', required: true, state: 'available' }])
+  assert.deepEqual(outcome.profiles, [{ id: 'profile-codex-local', state: 'available' }])
+  assert.ok(outcome.draft)
+  assert.equal(outcome.draft.projectId, 'project-atlas')
+  assert.equal(outcome.draft.profileId, 'profile-codex-local')
+  assert.equal(outcome.draft.scope.allowedPaths[0], 'src/')
+  assert.ok(outcome.draft.criteria.length === 1)
+  assert.equal(outcome.draft.criteria[0]?.kind === 'machine' ? outcome.draft.criteria[0].checkDefinitionRef : undefined, 'check-unit')
+  assert.equal(outcome.draft.authority, 'none')
+  assert.equal(outcome.draft.source, 'project-recipes')
+
+  const foreign = trialRecipeOutcome(suggestion({ projectId: 'project-other' }), context())
+  assert.equal(foreign.applicable, false)
+  assert.match(foreign.reasons.join(' '), /不属于当前项目/)
+  assert.equal(foreign.draft, undefined)
+
+  const allProjects = trialRecipeOutcome(suggestion(), context({ projectId: undefined }))
+  assert.equal(allProjects.applicable, false)
+  assert.match(allProjects.reasons.join(' '), /请先选择一个项目/)
+
+  const deleted = trialRecipeOutcome(suggestion(), context({ projectId: 'project-deleted' }))
+  assert.equal(deleted.applicable, false)
+  assert.match(deleted.reasons.join(' '), /不在配置中/)
 })
 
-test('a declared draft is applicable only against the current project and existing inputs', () => {
-  const valid = trialRecipeOutcome(suggestion(), context())
-  assert.equal(valid.applicable, true)
-  assert.deepEqual(valid.reasons, [])
-  assert.equal(valid.statusLabel, '草案')
-  assert.deepEqual(valid.checks, [{ id: 'check-unit', required: true, state: 'available' }])
-  assert.deepEqual(valid.profiles, [{ id: 'profile-codex-local', state: 'available' }])
+test('unknown source and undeclared project are explanation only', () => {
+  const unknown = trialRecipeOutcome(suggestion({ source: 'unknown' }), context())
+  assert.equal(unknown.applicable, false)
+  assert.match(unknown.reasons.join(' '), /来源未知/)
 
-  const wrongProject = trialRecipeOutcome(suggestion({ projectId: 'project-other' }), context())
-  assert.equal(wrongProject.applicable, false)
-  assert.match(wrongProject.reasons.join(' '), /不属于当前项目/)
-  assert.equal(wrongProject.statusLabel, '草案', 'the declaration status is not silently relabelled')
+  const undeclared = trialRecipeOutcome(suggestion({ projectId: null }), context())
+  assert.equal(undeclared.applicable, false)
+  assert.match(undeclared.reasons.join(' '), /未指明所属项目/)
 
-  const missingProject = trialRecipeOutcome(suggestion({ projectId: null }), context())
-  assert.equal(missingProject.applicable, false)
-  assert.match(missingProject.reasons.join(' '), /未指明所属项目/)
+  const forged = trialRecipeOutcome(suggestion({ authority: 'granted' as unknown as 'none' }), context())
+  assert.equal(forged.applicable, false)
+  assert.match(forged.reasons.join(' '), /只读草案/)
 })
 
-test('needs_input, unsupported and missing configuration inputs block preparation with reasons', () => {
+test('check applicability uses the project criteria, not the global registry alone', () => {
+  const notInProject = trialRecipeOutcome(suggestion({ checks: [{ id: 'check-other', required: true, declared: true }] }),
+    context({ registeredChecks: ['check-unit', 'check-other'] }))
+  assert.equal(notInProject.applicable, false)
+  assert.match(notInProject.reasons.join(' '), /当前项目未包含检查：check-other/)
+
+  const notRegistered = trialRecipeOutcome(suggestion(), context({ registeredChecks: [] }))
+  assert.equal(notRegistered.applicable, false)
+  assert.match(notRegistered.reasons.join(' '), /当前配置未注册检查：check-unit/)
+
+  const contradiction = trialRecipeOutcome(suggestion({ checks: [{ id: 'check-unit', required: true, declared: false }] }), context())
+  assert.equal(contradiction.applicable, false)
+  assert.match(contradiction.reasons.join(' '), /声明与项目检查矛盾/)
+})
+
+test('profile applicability uses project.profileIds, then registry admission', () => {
+  const notBound = trialRecipeOutcome(suggestion(), context({
+    projects: [{ ...project, profileIds: [] }],
+  }))
+  assert.equal(notBound.applicable, false)
+  assert.match(notBound.reasons.join(' '), /当前项目未绑定执行器：profile-codex-local/)
+
+  const blocked = trialRecipeOutcome(suggestion(), context({
+    profiles: [{ id: 'profile-codex-local', kind: 'native', dispatchAllowed: false }],
+  }))
+  assert.equal(blocked.applicable, false)
+  assert.match(blocked.reasons.join(' '), /执行器未准入：profile-codex-local/)
+
+  const missing = trialRecipeOutcome(suggestion(), context({ profiles: [] }))
+  assert.equal(missing.applicable, false)
+  assert.match(missing.reasons.join(' '), /当前配置没有执行器：profile-codex-local/)
+
+  const defaulted = trialRecipeOutcome(suggestion({ profiles: [] }), context())
+  assert.equal(defaulted.applicable, true)
+  assert.equal(defaulted.draft?.profileId, 'profile-codex-local')
+})
+
+test('scope atoms must already belong to the project; prefixes are not permission', () => {
+  const inside = trialRecipeOutcome(suggestion({ scope: { allowedPaths: ['src/'], excludedPaths: [], externalActions: [] } }), context())
+  assert.equal(inside.applicable, true)
+  const outside = trialRecipeOutcome(suggestion({ scope: { allowedPaths: ['.'], excludedPaths: [], externalActions: [] } }), context())
+  assert.equal(outside.applicable, false)
+  assert.match(outside.reasons.join(' '), /范围原子不在当前项目范围内/)
+  assert.equal(outside.draft, undefined)
+  const prefixed = trialRecipeOutcome(suggestion({ scope: { allowedPaths: ['src/app/'], excludedPaths: [], externalActions: [] } }), context())
+  assert.equal(prefixed.applicable, false, 'a child prefix is not treated as the declared atom')
+})
+
+test('needs_input, unsupported and form limits block preparation', () => {
   const needsInput = trialRecipeOutcome(suggestion({ status: 'needs_input', missingInputs: [{ field: 'root', label: '项目根目录' }] }), context())
   assert.equal(needsInput.applicable, false)
-  assert.equal(needsInput.statusLabel, '需要输入')
   assert.match(needsInput.reasons.join(' '), /缺少：项目根目录/)
 
   const unsupported = trialRecipeOutcome(suggestion({ status: 'unsupported' }), context())
   assert.equal(unsupported.applicable, false)
   assert.match(unsupported.reasons.join(' '), /不受支持/)
 
-  const missingCheck = trialRecipeOutcome(suggestion({ checks: [{ id: 'check-missing', required: true, declared: true }] }), context())
-  assert.equal(missingCheck.applicable, false)
-  assert.equal(missingCheck.checks[0]?.state, 'missing')
-  assert.match(missingCheck.reasons.join(' '), /未注册检查/)
-
-  const blockedProfile = trialRecipeOutcome(suggestion(), context({ profiles: [{ id: 'profile-codex-local', kind: 'native', dispatchAllowed: false }] }))
-  assert.equal(blockedProfile.applicable, false)
-  assert.equal(blockedProfile.profiles[0]?.state, 'blocked')
-  assert.match(blockedProfile.reasons.join(' '), /未准入/)
-
-  const absentProfile = trialRecipeOutcome(suggestion({ profiles: [{ id: 'profile-unknown', required: true }] }), context())
-  assert.equal(absentProfile.applicable, false)
-  assert.match(absentProfile.reasons.join(' '), /没有执行器/)
-})
-
-test('a suggestion is never trusted as an authority or a command', () => {
-  const forged = suggestion({ authority: 'granted' as unknown as 'none' })
-  const outcome = trialRecipeOutcome(forged, context())
-  assert.equal(outcome.applicable, false)
-  assert.match(outcome.reasons.join(' '), /只读草案/)
   const emptyGoal = trialRecipeOutcome(suggestion({ goalPreview: '   ' }), context())
   assert.equal(emptyGoal.applicable, false)
   assert.match(emptyGoal.reasons.join(' '), /缺少目标预览/)
+
+  const oversized = trialRecipeOutcome(suggestion({ goalPreview: 'x'.repeat(16385) }), context())
+  assert.equal(oversized.applicable, false)
+  assert.match(oversized.reasons.join(' '), /超出原委托表单上限/)
 })
 
-test('untrusted long text is bounded for display and never becomes markup', () => {
-  const long = trialRecipeOutcome(suggestion({ goalPreview: '<img src=x onerror=alert(1)>'.repeat(40) }), context())
-  assert.equal(long.goalPreview.length, 601)
-  assert.ok(long.goalPreview.endsWith('…'))
-  assert.equal(long.applicable, true, 'a long goal does not change applicability')
-})
-
-test('suggestions for other projects are not presented for the current project', () => {
-  const list = [suggestion({ id: 'current' }), suggestion({ id: 'foreign', projectId: 'project-other' }), suggestion({ id: 'undeclared', projectId: null })]
-  assert.deepEqual(trialRecipeSuggestionsForProject(list, 'project-atlas').map(item => item.id), ['current', 'undeclared'])
-  assert.equal(trialRecipeSuggestionsForProject(list, undefined).length, 3)
+test('untrusted long text is bounded for display but the draft keeps the original goal', () => {
+  const text = '<img src=x onerror=alert(1)>'.repeat(40)
+  const outcome = trialRecipeOutcome(suggestion({ goalPreview: text }), context())
+  assert.equal(outcome.applicable, true)
+  assert.equal(outcome.goalPreview.length, 601)
+  assert.ok(outcome.goalPreview.endsWith('…'))
+  assert.equal(outcome.draft?.goal, text)
 })

@@ -8,10 +8,11 @@ export {
 } from './trial-view.ts'
 export type { TrialAction, TrialActionsInput, TrialProjectValue, TrialStatusStrip, TrialStatusValue, TrialTone } from './trial-view.ts'
 export { trialInsightsAdmission, trialInsightsCount, trialInsightsScopeLabel } from './insights.ts'
-export { trialRecipeContext, trialRecipeOutcome, trialRecipeSuggestionsForProject } from './recipes.ts'
+export { trialRecipeContext, trialRecipeOutcome } from './recipes.ts'
 export type {
-  TrialRecipeCheckRef, TrialRecipeCheckView, TrialRecipeContext, TrialRecipeMissingInput, TrialRecipeOutcome,
-  TrialRecipeProfileRef, TrialRecipeProfileView, TrialRecipeStatus, TrialRecipeSuggestion,
+  TrialRecipeCheckRef, TrialRecipeCheckView, TrialRecipeContext, TrialRecipeContextProject, TrialRecipeCriterion,
+  TrialRecipeDraft, TrialRecipeMissingInput, TrialRecipeOutcome, TrialRecipeProfileRef, TrialRecipeProfileView,
+  TrialRecipeProject, TrialRecipeScopeAtoms, TrialRecipeStatus, TrialRecipeSuggestion,
 } from './recipes.ts'
 export type {
   TrialInsightsAdmission, TrialInsightsLayer, TrialInsightsMetric, TrialInsightsScope, TrialInsightsView,

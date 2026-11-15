@@ -32,6 +32,9 @@ export interface TrialInsightsScope {
 
 export interface TrialInsightsView {
   readonly status: 'ready' | 'insufficient_data' | 'unavailable'
+  /** Main's selected window (7/30 days) when supplied by the observation endpoint. */
+  readonly days?: 7 | 30
+  readonly timezone?: string
   /** Human-readable observation window, e.g. "11月1日–11月14日". Required to show measurements. */
   readonly windowLabel?: string
   /** Human-readable coverage statement, e.g. "complete" or "partial: 3 of 5 sources". Required to show measurements. */
@@ -71,11 +74,13 @@ export function trialInsightsScopeLabel(value: TrialInsightsView): string | unde
  * Decide whether the optional report may show measurements. Any missing scope/window/coverage keeps the
  * rows hidden and names the missing declaration instead of implying a complete project-wide result.
  */
-export function trialInsightsAdmission(value: TrialInsightsView, activeProjectId?: string): TrialInsightsAdmission {
+export function trialInsightsAdmission(value: TrialInsightsView, activeProjectId?: string, selectedWindow?: 7 | 30): TrialInsightsAdmission {
   if (value.status === 'insufficient_data')
     return { admitted: false, rows: [], message: '样本不足，暂不展示效率结论。' }
   if (value.status === 'unavailable')
     return { admitted: false, rows: [], message: '当前没有可用的观察数据。' }
+  if (selectedWindow !== undefined && value.days !== undefined && value.days !== selectedWindow)
+    return { admitted: false, rows: [], message: `正在读取所选窗口（${selectedWindow} 天）…` }
   if (value.scope === undefined)
     return { admitted: false, rows: [], message: '缺少观测范围说明，暂不展示指标。' }
   if (value.scope.projectIds.length === 0)

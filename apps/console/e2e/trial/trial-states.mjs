@@ -319,17 +319,23 @@ try {
 
   await step('RECIPES-PREVIEW', async () => {
     await open('state=recipes')
-    assert(await page.locator('.trial-recipe').count() === 4, 'only current/undeclared projects are presented')
-    assert(await page.locator('.trial-recipe-title').filter({ hasText: '属于其他项目的草案' }).count() === 0, 'a foreign project draft is not displayed')
+    assert(await page.locator('.trial-recipe').count() === 6, 'all declared suggestions are explained, including foreign ones')
     const valid = page.locator('.trial-recipe').filter({ hasText: '补充单元检查声明' })
     await valid.getByRole('button', { name: '准备草案', exact: true }).waitFor()
-    assert(await valid.getByRole('button', { name: '准备草案', exact: true }).isEnabled(), 'a valid draft can be prepared')
-    const needs = page.locator('.trial-recipe').filter({ hasText: '缺少项目信息' })
-    assert(await needs.getByRole('button', { name: '准备草案', exact: true }).isDisabled(), 'missing input blocks preparation')
-    assert((await needs.innerText()).includes('缺少：项目根目录'), 'the missing input is named')
-    const unsupported = page.locator('.trial-recipe').filter({ hasText: '未知的 monorepo 布局' })
-    assert(await unsupported.getByRole('button', { name: '准备草案', exact: true }).isDisabled(), 'unsupported declaration is blocked')
-    assert((await unsupported.innerText()).includes('不受支持'), 'the unsupported reason is shown')
+    assert(await valid.getByRole('button', { name: '准备草案', exact: true }).isEnabled(), 'a draft valid for the current project can be prepared')
+    const fields = await valid.locator('.trial-recipe-fields').innerText()
+    assert(fields.includes('流程测试项目') && fields.includes('src/') && fields.includes('Codex 本机') && fields.includes('check-unit'), `the full prefill fields are previewed: ${fields}`)
+    for (const [title, reason] of [
+      ['缺少项目信息', '缺少：项目根目录'],
+      ['未知的 monorepo 布局', '不受支持'],
+      ['属于其他项目的草案', '不属于当前项目'],
+      ['来源未知的草案', '来源未知'],
+      ['未声明项目的草案', '未指明所属项目'],
+    ]) {
+      const row = page.locator('.trial-recipe').filter({ hasText: title })
+      assert(await row.getByRole('button', { name: '准备草案', exact: true }).isDisabled(), `${title} is disabled`)
+      assert((await row.innerText()).includes(reason), `${title} explains ${reason}`)
+    }
     const violations = await layoutAudit(page)
     assert(violations.length === 0, `recipe layout violations: ${violations.join('; ')}`)
     await valid.getByRole('button', { name: '准备草案', exact: true }).focus()
@@ -339,10 +345,55 @@ try {
     await page.waitForTimeout(80)
     const prepared = await page.evaluate(() => window.__TRIAL_RECIPES__ ?? [])
     assert(prepared.length === 1 && prepared[0] === 'recipe-valid', `one preparation per activation: ${JSON.stringify(prepared)}`)
+    const draft = await page.evaluate(() => window.__TRIAL_RECIPE_DRAFT__)
+    assert(draft.suggestionId === 'recipe-valid' && draft.projectId === 'project-atlas', 'the draft keeps the suggestion and project identity')
+    assert(draft.profileId === 'profile-codex-local' && draft.criteria[0].checkDefinitionRef === 'check-unit', 'the draft carries the project profile and criterion')
+    assert(draft.scope.allowedPaths[0] === 'src/' && draft.authority === 'none', 'the draft carries the project scope atoms and no authority')
     assert(await page.locator('.trial-recipe').filter({ hasText: '补充单元检查声明' }).getByRole('button', { name: '准备草案' }).evaluate(element => element === document.activeElement), 'focus stays on the prepared draft')
     assert((await requests()).length === 0, 'preparing a draft performs no transport request')
     await page.locator('.trial-view').screenshot({ path: join(screenshots, 'recipes.png') })
-  }, 'recipe drafts show applicability/missing inputs and prepare only through an explicit callback')
+  }, 'recipe drafts show full prefill fields and prepare only through an explicit callback')
+
+  await step('RECIPES-SCOPE-AND-ROLES', async () => {
+    await open('state=recipes-scope')
+    const valid = page.locator('.trial-recipe').filter({ hasText: '范围与项目一致的草案' })
+    assert(await valid.getByRole('button', { name: '准备草案', exact: true }).isEnabled(), 'declared atoms equal to the project atoms are applicable')
+    const wide = page.locator('.trial-recipe').filter({ hasText: '范围超出当前项目的草案' })
+    assert(await wide.getByRole('button', { name: '准备草案', exact: true }).isDisabled(), 'a wider scope is not applicable')
+    assert((await wide.innerText()).includes('范围原子不在当前项目范围内'), 'the scope refusal is explicit')
+    const contradiction = page.locator('.trial-recipe').filter({ hasText: '检查声明矛盾的草案' })
+    assert((await contradiction.innerText()).includes('声明与项目检查矛盾'), 'declared=false contradiction is explicit')
+    const unbound = page.locator('.trial-recipe').filter({ hasText: '执行器未绑定的草案' })
+    assert((await unbound.innerText()).includes('当前项目未绑定执行器'), 'project-local profile binding is checked')
+    const violations = await layoutAudit(page)
+    assert(violations.length === 0, `recipe scope layout violations: ${violations.join('; ')}`)
+    await page.locator('.trial-view').screenshot({ path: join(screenshots, 'recipes-scope.png') })
+  }, 'project-local scope/check/profile rules gate preparation')
+
+  await step('RECIPES-ALL-PROJECTS', async () => {
+    await open('state=recipes-all-projects')
+    const row = page.locator('.trial-recipe').first()
+    assert(await row.getByRole('button', { name: '准备草案', exact: true }).isDisabled(), 'the all-projects view cannot prepare a project draft')
+    assert((await row.innerText()).includes('请先选择一个项目'), 'the refusal explains the missing project')
+  }, 'an all-projects view never treats a suggestion as applicable')
+
+  await step('INSIGHTS-WINDOW', async () => {
+    await open('state=insights-window')
+    const group = page.getByRole('group', { name: '观察窗口', exact: true })
+    await group.waitFor()
+    assert(await group.getByRole('button', { name: '7 天', exact: true }).getAttribute('aria-pressed') === 'true', 'the selected window is announced')
+    await group.getByRole('button', { name: '30 天', exact: true }).click()
+    await page.waitForTimeout(80)
+    assert((await page.evaluate(() => window.__TRIAL_WINDOWS__ ?? [])).join(',') === '30', 'selecting a window only calls the main callback')
+    assert((await requests()).length === 0, 'window selection performs no direct request')
+    await open('state=insights-window-mismatch')
+    assert((await page.locator('.trial-insights').innerText()).includes('正在读取所选窗口（30 天）'), 'a mismatched window hides the old rows')
+    assert(await page.locator('.trial-insight-row').count() === 0, 'no old-window metric row remains visible')
+    await open('state=insights-loading')
+    assert((await page.locator('.trial-insights').innerText()).includes('正在读取使用观察'), 'loading is announced')
+    assert(await page.locator('.trial-insight-row').count() === 3, 'a same-window refresh keeps the current rows')
+    await page.locator('.trial-view').screenshot({ path: join(screenshots, 'insights-window.png') })
+  }, '7/30-day selection is delegated to main and stale-window values are hidden')
 
   await step('RECIPES-LOADING-AND-ERROR', async () => {
     await open('state=recipes-loading')
@@ -426,7 +477,7 @@ try {
     const mobilePage = await mobile.newPage()
     const mobileErrors = []
     mobilePage.on('pageerror', error => mobileErrors.push(error.message))
-    for (const state of ['configured', 'unconfigured', 'blocked', 'unknown', 'readonly', 'long', 'insights-unscoped', 'insights-wrong-project', 'insights-partial', 'recipes', 'recipes-error']) {
+    for (const state of ['configured', 'unconfigured', 'blocked', 'unknown', 'readonly', 'long', 'insights-unscoped', 'insights-wrong-project', 'insights-partial', 'recipes', 'recipes-scope', 'recipes-all-projects', 'recipes-error', 'insights-window']) {
       await mobilePage.goto(`${base}/e2e/trial/harness.html?state=${state}`, { waitUntil: 'networkidle' })
       await mobilePage.waitForSelector('.trial-view')
       const overflow = await mobilePage.evaluate(() => ({ page: document.documentElement.scrollWidth, client: document.documentElement.clientWidth }))

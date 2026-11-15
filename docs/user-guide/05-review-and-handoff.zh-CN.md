@@ -27,9 +27,9 @@
 交接的是**范围与证据**，不是账号或数据：
 
 - 仓库与分支：`codex/g4-trial-experience`（F 自有路径）。
-- 状态记录：`reports/trial-experience/wave27-status.json`（source、endpoints、视口、命令、未测范围）。
+- 状态记录：`reports/trial-experience/wave28-status.json`（source、endpoints、视口、命令、未测范围、source/controlled/installed 分层）。
 - 集成说明：`reports/trial-experience/main-integration.zh-CN.md`（main 接线与 props 语义）。
-- 证据：`apps/console/e2e/trial/report-*.json` 与 `screenshots/`；真实两项目日常委托/问答/证据/接受见 `report-daily-flow.json`。
+- 证据：`apps/console/e2e/trial/report-*.json` 与 `screenshots/`；真实两项目日常委托/问答/证据/接受/重开见 `report-daily-flow.json`；真实 7 天观察由 main 的 `tests/integration/usage-observation-browser.mjs` 独立覆盖。
 - 用户文档：本目录。
 
 不要交接：`bootstrap.key`、`api.key`、模型 key、`model.json`、`.assistant-settings.json`、SQLite、原生 profile、`.local-state` 副本。
@@ -50,6 +50,8 @@ pnpm start                  # 记录终端打印的地址
 4. 若执行器可用，完成一个最小委托并审阅；若不可用，明确记录“未达”，不要改用固定流程冒充原生。
 5. 打开“试用准备”，核对当前项目/会话、状态条与四类动作；来回后确认草稿仍在。
 6. 分别在两个项目完成一次受控委托，核对问题、验证、证据与接受；固定流程结果不要写成原生交付。
+7. 刷新页面后确认已交付工作与证据仍在；未发送的内存草稿不会被伪造保留。
+8. 打开试用准备查看当前项目的 7 天观察；切换项目后核对范围，未知/partial 不要读成完整。
 
 ## 6. 证据的边界
 

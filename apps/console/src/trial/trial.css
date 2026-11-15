@@ -492,6 +492,53 @@
   font-size: 12px;
 }
 
+.trial-insight-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.trial-insight-controls button {
+  min-height: 34px;
+  padding: 5px 11px;
+  border-color: var(--line);
+  background: #fff;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.trial-insight-controls button.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
+.trial-recipe-fields {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 3px 10px;
+  margin: 8px 0 0;
+}
+
+.trial-recipe-fields > div {
+  display: contents;
+}
+
+.trial-recipe-fields dt {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.trial-recipe-fields dd {
+  min-width: 0;
+  color: var(--ink);
+  font-size: 11px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
 .trial-insights {
   padding: 18px 0 6px;
   border-top: 1px solid var(--line);

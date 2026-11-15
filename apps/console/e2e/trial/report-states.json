@@ -5,7 +5,7 @@
     "1440x900",
     "390x844"
   ],
-  "generatedAt": "2026-11-14T09:32:38.483Z",
+  "generatedAt": "2026-11-15T02:05:39.299Z",
   "results": [
     {
       "id": "CONFIGURED",
@@ -22,145 +22,163 @@
     {
       "id": "BLOCKED",
       "status": "PASS",
-      "ms": 653,
+      "ms": 644,
       "detail": "execution blockage names the reason instead of a bare red error"
     },
     {
       "id": "NEEDS-PROJECT",
       "status": "PASS",
-      "ms": 647,
+      "ms": 642,
       "detail": "a missing project is actionable and does not claim readiness"
     },
     {
       "id": "NO-PROJECTS",
       "status": "PASS",
-      "ms": 649,
+      "ms": 625,
       "detail": "an empty project set is an actionable state, not a blank panel"
     },
     {
       "id": "FIXTURE",
       "status": "PASS",
-      "ms": 709,
+      "ms": 641,
       "detail": "controlled fixture path is never mistaken for native readiness"
     },
     {
       "id": "UNKNOWN",
       "status": "PASS",
-      "ms": 688,
+      "ms": 627,
       "detail": "unknown stays unknown and never turns green"
     },
     {
       "id": "READONLY",
       "status": "PASS",
-      "ms": 645,
+      "ms": 626,
       "detail": "recovery read-only keeps readable navigation and hides approval/write entries"
     },
     {
       "id": "NOREDINESS",
       "status": "PASS",
-      "ms": 682,
+      "ms": 626,
       "detail": "an unread readiness is not guessed from other data"
     },
     {
       "id": "LOADING",
       "status": "PASS",
-      "ms": 650,
+      "ms": 643,
       "detail": "first load announces progress and blocks no navigation"
     },
     {
       "id": "UNAVAILABLE",
       "status": "PASS",
-      "ms": 634,
+      "ms": 625,
       "detail": "an old backend degrades explicitly"
     },
     {
       "id": "ERROR-AND-RETRY",
       "status": "PASS",
-      "ms": 865,
+      "ms": 809,
       "detail": "retry re-reads status without clearing valid data or sending a command"
     },
     {
       "id": "LONG-CONTENT",
       "status": "PASS",
-      "ms": 651,
+      "ms": 633,
       "detail": "long Chinese/English content wraps without horizontal overflow"
     },
     {
       "id": "VISUAL-AUDIT",
       "status": "PASS",
-      "ms": 2344,
+      "ms": 2290,
       "detail": "geometry, overflow, contrast, radii, shadows and semantic dot colours are verified programmatically"
     },
     {
       "id": "INSIGHTS-EMPTY",
       "status": "PASS",
-      "ms": 632,
+      "ms": 643,
       "detail": "optional insights cannot invent efficiency numbers"
     },
     {
       "id": "INSIGHTS-UNSCOPED",
       "status": "PASS",
-      "ms": 634,
+      "ms": 625,
       "detail": "ready-looking metrics without a declared scope are not shown"
     },
     {
       "id": "INSIGHTS-WRONG-PROJECT",
       "status": "PASS",
-      "ms": 633,
+      "ms": 667,
       "detail": "a summary for another project cannot be read as the current project result"
     },
     {
       "id": "INSIGHTS-TRUNCATED-AND-PARTIAL",
       "status": "PASS",
-      "ms": 1217,
+      "ms": 1283,
       "detail": "truncated complete metrics are refused while declared partial metrics remain visible"
     },
     {
       "id": "RECIPES-PREVIEW",
       "status": "PASS",
-      "ms": 812,
-      "detail": "recipe drafts show applicability/missing inputs and prepare only through an explicit callback"
+      "ms": 886,
+      "detail": "recipe drafts show full prefill fields and prepare only through an explicit callback"
+    },
+    {
+      "id": "RECIPES-SCOPE-AND-ROLES",
+      "status": "PASS",
+      "ms": 646,
+      "detail": "project-local scope/check/profile rules gate preparation"
+    },
+    {
+      "id": "RECIPES-ALL-PROJECTS",
+      "status": "PASS",
+      "ms": 583,
+      "detail": "an all-projects view never treats a suggestion as applicable"
+    },
+    {
+      "id": "INSIGHTS-WINDOW",
+      "status": "PASS",
+      "ms": 1848,
+      "detail": "7/30-day selection is delegated to main and stale-window values are hidden"
     },
     {
       "id": "RECIPES-LOADING-AND-ERROR",
       "status": "PASS",
-      "ms": 1196,
+      "ms": 1207,
       "detail": "recipe loading/failure keep the workspace usable and show no stale rows"
     },
     {
       "id": "NAVIGATION-CALLBACKS",
       "status": "PASS",
-      "ms": 2662,
+      "ms": 2653,
       "detail": "each of the four navigation names is reachable and recorded once"
     },
     {
       "id": "DOUBLE-CLICK-GUARD",
       "status": "PASS",
-      "ms": 1262,
+      "ms": 1258,
       "detail": "rapid duplicate activation does not duplicate navigation"
     },
     {
       "id": "KEYBOARD",
       "status": "PASS",
-      "ms": 1380,
+      "ms": 1359,
       "detail": "the main journey is operable by keyboard with visible focus and names"
     },
     {
       "id": "MOBILE",
       "status": "PASS",
-      "ms": 7130,
+      "ms": 9944,
       "detail": "narrow viewport keeps every action reachable without horizontal overflow"
     },
     {
       "id": "STALE-RESPONSE",
       "status": "PASS",
-      "ms": 935,
+      "ms": 969,
       "detail": "out-of-order responses keep the newest identity"
     },
     {
       "id": "UNMOUNT-IN-FLIGHT",
       "status": "PASS",
-      "ms": 866,
+      "ms": 882,
       "detail": "a response after unmount updates no state"
     },
     {

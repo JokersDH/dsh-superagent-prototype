@@ -209,6 +209,27 @@ try {
     await page.screenshot({ path: join(screenshots, 'daily-two-projects.png') })
   }, 'the second project keeps its own conversation, draft and delivery')
 
+  await step('RELOAD-AND-EXISTING-HISTORY', async () => {
+    await page.reload({ waitUntil: 'networkidle' })
+    await page.locator('.conversation-surface').waitFor()
+    await selectConversation('Alpha 日常会话', 'conv-alpha-daily')
+    check(await page.locator('.work-card').filter({ hasText: 'Alpha：固定流程问答与交付' }).count() === 1, 'the Alpha work survives reload exactly once')
+    await page.locator('.work-card').filter({ hasText: 'Alpha：固定流程问答与交付' }).click()
+    await page.locator('.detail .phase').filter({ hasText: '已交付' }).waitFor()
+    check(await page.locator('.artifacts li').count() === 4, 'delivery evidence survives reload')
+    await selectConversation('Beta 日常会话', 'conv-beta-daily')
+    await page.locator('.work-card').filter({ hasText: 'Beta：固定流程交付' }).waitFor()
+    check(await page.locator('.work-card').filter({ hasText: 'Beta：固定流程交付' }).count() === 1, 'the Beta work survives reload exactly once')
+    await openTrial()
+    const facts = await trial().locator('.trial-facts').innerText()
+    check(facts.includes('全部项目'), 'reload resets the project filter to all projects')
+    check(await trial().locator('.trial-project').count() === 2, 'both projects remain in the trial view after reload')
+    await page.locator('.project-filter .chip').filter({ hasText: '项目 Beta' }).click()
+    await page.waitForFunction(() => document.querySelector('.trial-fact dd')?.textContent?.includes('项目 Beta'))
+    await backToConversation()
+    check(await page.locator('.composer textarea').inputValue() === '', 'an unsent in-memory draft is not fabricated after a full reload')
+  }, 'reload keeps delivered history/evidence and honest project identity; drafts are not invented')
+
   await step('NO-MODEL-NO-UNEXPECTED-POSTS', async () => {
     check(modelCalls === 0, 'no model call was made')
     const unexpected = posts.filter(path => path !== '/v1/commands' && path !== '/v1/session' &&

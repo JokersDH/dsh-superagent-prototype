@@ -16,41 +16,47 @@
   "posts": [
     "/v1/commands",
     "/v1/commands",
-    "/v1/works/2739ab69482a38cf3bb3c447a5c7cf51/review-activity",
+    "/v1/works/aa73da598ce730ab30f1b7ee08857bc9/review-activity",
     "/v1/commands",
-    "/v1/works/2739ab69482a38cf3bb3c447a5c7cf51/review-activity",
+    "/v1/works/aa73da598ce730ab30f1b7ee08857bc9/review-activity",
     "/v1/commands",
-    "/v1/works/beb5f301832264a77ffcbe455bf0d89d/review-activity",
+    "/v1/works/0a265fdd6b4d0e25b55e4493bf79b424/review-activity",
     "/v1/commands",
-    "/v1/works/beb5f301832264a77ffcbe455bf0d89d/review-activity"
+    "/v1/works/0a265fdd6b4d0e25b55e4493bf79b424/review-activity"
   ],
   "modelCalls": 0,
   "reviewActivityConflicts": 2,
-  "generatedAt": "2026-11-14T09:33:02.943Z",
+  "generatedAt": "2026-11-15T02:06:08.275Z",
   "results": [
     {
       "id": "ALPHA-QUESTION-VERIFY-EVIDENCE-ACCEPT",
       "status": "PASS",
-      "ms": 2491,
+      "ms": 2305,
       "detail": "Alpha delegation, native question, answer, PASS verification, evidence and acceptance"
     },
     {
       "id": "ALPHA-TRIAL-IDENTITY",
       "status": "PASS",
-      "ms": 116,
+      "ms": 147,
       "detail": "the trial view shows the Alpha project, conversation and fixture execution honestly"
     },
     {
       "id": "BETA-DRAFT-AND-DELIVERY",
       "status": "PASS",
-      "ms": 2160,
+      "ms": 1979,
       "detail": "Beta delegation runs the pass fixture through verification and acceptance"
     },
     {
       "id": "BETA-TRIAL-AND-DRAFT-PRESERVED",
       "status": "PASS",
-      "ms": 117,
+      "ms": 115,
       "detail": "the second project keeps its own conversation, draft and delivery"
+    },
+    {
+      "id": "RELOAD-AND-EXISTING-HISTORY",
+      "status": "PASS",
+      "ms": 1108,
+      "detail": "reload keeps delivered history/evidence and honest project identity; drafts are not invented"
     },
     {
       "id": "NO-MODEL-NO-UNEXPECTED-POSTS",

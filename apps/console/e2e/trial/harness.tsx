@@ -30,6 +30,8 @@ declare global {
     __TRIAL_DISABLED_READS__?: number
     __TRIAL_AUTH_READS__?: number
     __TRIAL_RECIPES__?: string[]
+    __TRIAL_RECIPE_DRAFT__?: unknown
+    __TRIAL_WINDOWS__?: number[]
     __TRIAL_SAME_READS__?: number
   }
 }
@@ -44,6 +46,7 @@ window.__TRIAL_B_READS__ = 0
 window.__TRIAL_INLINE_READS__ = 0
 window.__TRIAL_DISABLED_READS__ = 0
 window.__TRIAL_RECIPES__ = []
+window.__TRIAL_WINDOWS__ = []
 const nativeFetch = window.fetch.bind(window)
 window.fetch = ((input: RequestInfo | URL, init?: RequestInit) => {
   requests.push(typeof input === 'string' ? input : input instanceof URL ? input.href : input.url)
@@ -88,9 +91,14 @@ function PropsHarness({ state }: { readonly state: TrialHarnessState }) {
         recipes={props.recipes}
         recipesLoading={props.recipesLoading}
         recipesError={props.recipesError}
-        onPrepareRecipe={suggestion => {
-          window.__TRIAL_RECIPES__?.push(suggestion.id)
-          writeLog(`recipe: ${suggestion.id}`)
+        insightWindow={props.insightWindow}
+        insightsLoading={props.insightsLoading}
+        insightsError={props.insightsError}
+        onSelectInsightWindow={props.insightWindow === undefined ? undefined : days => { window.__TRIAL_WINDOWS__?.push(days) }}
+        onPrepareRecipe={draft => {
+          window.__TRIAL_RECIPES__?.push(draft.suggestionId)
+          window.__TRIAL_RECIPE_DRAFT__ = draft
+          writeLog(`recipe: ${draft.suggestionId}`)
         }}
         onAction={record}
         onReload={() => {

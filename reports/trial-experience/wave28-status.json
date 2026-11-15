@@ -1,0 +1,140 @@
+{
+  "schemaVersion": 4,
+  "owner": "F",
+  "wave": "product-wave-28",
+  "goal": "project-local recipe applicability, real two-project daily delivery, main real 7/30-day observation consumer, precision UI and complete handoff",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-f",
+  "branch": "codex/g4-trial-experience",
+  "baseMain": "ea82d8f",
+  "mergedMain": "ea82d8f",
+  "mergeCommit": "53a66a3",
+  "fixedStart": "2a862525894b89cdfe17b4ea84862624447ee609",
+  "mainAppSource": "623cccb254c3324e91e99d1c3afb82b46ef703ab",
+  "mainObservationSource": "18f892d",
+  "finalSourceCommit": null,
+  "state": "DELIVERED_WITH_DECLARED_DEPENDENCIES",
+  "layers": {
+    "source": "DELIVERED (component, tests, docs, status)",
+    "controlled": "DELIVERED for two-project fixture daily flow and controlled observation fixtures",
+    "installed": "NOT_TESTED (D/E exact tar/bundle)",
+    "native": "0 turns",
+    "value": "no efficiency/cost claim",
+    "activation": "not applicable"
+  },
+  "sixResults": {
+    "R1_F4": "project-local suggestion applicability: configured current project, profileIds/defaultCriteria/check refs, source, atoms",
+    "R2_F8": "two-project real App conversation/delegation/question/verification/evidence/human acceptance + reload history",
+    "R3_F12": "J suggestion -> read-only full-field preview -> prepare draft callback -> main original form confirmation",
+    "R4_F16": "main real GET /v1/insights 7-day project/window/partial/unknown/layer/currency consumer; optional 7/30 control",
+    "R5_F20": "precision workbench, mobile/keyboard/error, local token consistency",
+    "R6_F24": "current guide, package handoff, wave28 status/report"
+  },
+  "phases": {
+    "F1": "DELIVERED unknown source/foreign/deleted/all-projects only explain",
+    "F2": "DELIVERED project-local check/profile rules incl declared=false contradiction",
+    "F3": "DELIVERED aligned to main 18f GET /v1/insights and UsageObservation fields",
+    "F4": "DELIVERED first result",
+    "F5": "DELIVERED two-project controlled delegation/Q&A/verification/evidence/acceptance",
+    "F6": "DELIVERED context identity and reload/history honesty",
+    "F7": "DELIVERED readonly/legacy/error paths preserved",
+    "F8": "DELIVERED second result",
+    "F9": "DELIVERED J suggestion input with project/atoms/checks/profiles",
+    "F10": "DELIVERED prepare callback carries full draft; main revalidates and confirms",
+    "F11": "DELIVERED missing input/scope/profile/check states",
+    "F12": "DELIVERED third result",
+    "F13": "DELIVERED 7/30 window props/callback; stale window hidden",
+    "F14": "DELIVERED partial/unknown/sample/layer/currency display",
+    "F15": "DELIVERED observation remains inside trial; no fake drill-down",
+    "F16": "DELIVERED fourth result",
+    "F17": "DELIVERED local trial CSS tokens, compact headers/buttons/wrapping",
+    "F18": "DELIVERED desktop/mobile/keyboard/long/error audit",
+    "F19": "DELIVERED old endpoint/error/reopen/late behavior",
+    "F20": "DELIVERED fifth result",
+    "F21": "DELIVERED current user guide",
+    "F22": "DELIVERED source-level package handoff; installed NOT_REACHED",
+    "F23": "DELIVERED stable props/callback compatibility (boolean readiness retained)",
+    "F24": "DELIVERED sixth result and status"
+  },
+  "recipes": {
+    "applicability": "current project must exist and be selected; suggestion project matches; checks in project defaultCriteria and globally registered; profiles bound to project and admitted; declared atoms already inside project atoms; no prefix interpretation",
+    "refusals": ["unknown source", "foreign/undeclared/deleted project", "all-projects view", "needs_input", "unsupported", "unregistered/uncontained check", "declared=false contradiction", "unbound/blocked/missing profile", "wider scope atoms", "empty/oversized goal"],
+    "draft": "TrialRecipeDraft carries suggestionId/version/projectId/goal/scope/criteria/profileId/source/authority=none; main revalidates and prefills original form",
+    "callback": "onPrepareRecipe(draft); no HTTP/model/command; 300ms duplicate guard"
+  },
+  "insights": {
+    "source": "main GET /v1/insights (18f) via useUsageObservation, currently 7 days and current project",
+    "display": "windowLabel/coverage/coverageState/scope/sampleCount/unknownCount/metrics(unit,currency,layer,sampleCount,detail)/limitations",
+    "gate": "scope.projects non-empty and includes current project; window/coverage required; truncated complete refused; selected window mismatch hides rows; unknown stays null",
+    "windowControl": "optional insightWindow + onSelectInsightWindow (7/30) callback; main re-reads; loading/error/reload props"
+  },
+  "evidence": {
+    "runner": "node e2e/trial/run-all.mjs",
+    "suites": [
+      { "id": "unit", "exit": 0, "result": "18 PASS (11 state + 7 recipe)" },
+      { "id": "typecheck-app", "exit": 0 },
+      { "id": "typecheck-e2e", "exit": 0 },
+      { "id": "build", "exit": 0 },
+      { "id": "hook-async", "exit": 0, "result": "7/7" },
+      { "id": "browser-states", "exit": 0, "result": "30/30" },
+      { "id": "http-journey", "exit": 0, "result": "6/6" },
+      { "id": "app-targets", "exit": 0, "result": "6/6" },
+      { "id": "app-two-projects", "exit": 0, "result": "8/8" },
+      { "id": "app-daily-flow", "exit": 0, "result": "6/6" }
+    ],
+    "runAll": "10/10 suites exit 0",
+    "mainApp": "tests/integration/trial-workbench-browser.mjs 8/8 PASS",
+    "mainObservation": "tests/integration/usage-observation-browser.mjs 6/6 PASS (project scope, late response, 503/404)",
+    "dailyFlow": {
+      "projects": ["项目 Alpha", "项目 Beta"],
+      "profiles": ["profile-fixture-question", "profile-fixture-pass"],
+      "conversations": ["conv-alpha-daily", "conv-beta-daily"],
+      "posts": 9,
+      "reviewActivityConflicts": 2,
+      "modelCalls": 0,
+      "acceptedWorks": 2,
+      "reloadHistoryChecked": true,
+      "draftPreservedInApp": true,
+      "draftNotFabricatedAfterReload": true
+    },
+    "viewports": ["1440x900", "390x844"],
+    "browser": "Chromium (Playwright 1.65)",
+    "visualGate": "programmatic overlap/clip/overflow/control-size/radius/shadow/font/contrast; session cannot consume images, no F pixel verdict",
+    "screenshots": "apps/console/e2e/trial/screenshots/"
+  },
+  "handoff": {
+    "runtimeSources": [
+      "apps/console/src/trial/index.ts",
+      "apps/console/src/trial/TrialWorkspace.tsx",
+      "apps/console/src/trial/useTrialReadiness.ts",
+      "apps/console/src/trial/trial-view.ts",
+      "apps/console/src/trial/insights.ts",
+      "apps/console/src/trial/recipes.ts",
+      "apps/console/src/trial/trial.css"
+    ],
+    "mustNotPackage": ["apps/console/e2e/trial/**", "apps/console/test/trial/**", "harness", "fixtures", "screenshots", "temporary state"],
+    "dependencies": "existing React 18, lucide-react, @personal-agent/contracts; type-only ../transport.ts and ../configuration-labels.ts; no dependency/lock change; CSS imported by component",
+    "docs": ["reports/trial-experience/main-integration.zh-CN.md", "docs/user-guide/"]
+  },
+  "modelNativeTurns": 0,
+  "preserved": {
+    "userServicesChanged": 0,
+    "stateProfileTarLedgerTouched": false,
+    "privateTempRoots": "created under /tmp and removed",
+    "unrelatedCredentialsRead": false
+  },
+  "notTested": [
+    "real vendor model or native Codex execution (0 turns)",
+    "J project-recipes module integration in the default product",
+    "30-day real observation path in main (F provides the control/callback only)",
+    "installed distribution artifact acceptance (E/D scope)",
+    "manual screen-reader walkthrough, non-Chromium browsers, 200% zoom, forced colors",
+    "real server-side mid-session auth expiry (controlled rejection only)"
+  ],
+  "dependencies": [
+    "main may pass recipe suggestions and prefill the original form from TrialRecipeDraft",
+    "main decides whether to expose 30-day window and loading/error props for insights",
+    "E independently verifies the same artifact; F does not self-admit release",
+    "J owns recipe data; F does not register checks or execute"
+  ],
+  "notes": "Historical wave25-27 statuses retained. No root/App/transport/CSS/contracts edits. Two review-activity 409 telemetry conflicts remain main-owned and did not affect work/evidence/acceptance."
+}
