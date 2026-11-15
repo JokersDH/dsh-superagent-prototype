@@ -15,6 +15,14 @@ export type RecoveryEndpointOptions = {
   resources: () => RunnerResourceState[]
   state: () => 'serving' | 'terminated' | 'unknown'
   cancel: (command: Extract<RunnerCommand, { kind: 'cancel' }>) => Promise<void>
+  /** Durable business facts this Runner already recorded, for attach replay. */
+  facts?: (since: number, maxBytes: number) => Promise<{ frames: unknown[]; next: number; done: boolean }>
+  payload?: (ref: string, offset: number, length: number) => Promise<{ total: number; digest: string; base64: string }>
+  channelState?: (producer: unknown) => Promise<{ generation: number }>
+  channelNext?: (producer: unknown, leaseId: string, expectedGeneration: number) => Promise<{ generation: number; request: unknown } | null>
+  channelReply?: (producer: unknown, reply: unknown, leaseId: string) => Promise<{ accepted: boolean; generation: number }>
+  /** Business command intake for an attached client; applied to the same attempt and child. */
+  command?: (command: RunnerCommand) => Promise<void>
   now?: () => string
 }
 export const CREDENTIAL_FILE = 'runner.credential'
@@ -62,6 +70,12 @@ export async function serveRecoveryEndpoint(options: RecoveryEndpointOptions): P
       await options.cancel(command)
       return state()
     },
+    ...(options.facts ? { facts: options.facts } : {}),
+    ...(options.payload ? { payload: options.payload } : {}),
+    ...(options.channelState ? { channelState: options.channelState } : {}),
+    ...(options.channelNext ? { channelNext: options.channelNext } : {}),
+    ...(options.channelReply ? { channelReply: options.channelReply } : {}),
+    ...(options.command ? { command: async (command) => { await options.command!(command); return state() } } : {}),
   })
   return {
     socketPath,
@@ -80,14 +94,16 @@ export async function serveRecoveryEndpoint(options: RecoveryEndpointOptions): P
       closed = true
       admission = 'closed'
       await server.close()
-      if (shortDirectories.delete(options.directory)) {
-        try {
-          unlinkSync(credentialPath)
-          rmdirSync(options.directory)
-        } catch (error) {
-          if (!['ENOENT', 'ENOTEMPTY'].includes((error as NodeJS.ErrnoException).code ?? '')) throw error
-        }
+      // A closed endpoint returns EVERY resource it created. The socket file and the credential used to
+      // survive a normal close, so a stopped Runner left both behind; only the short-path case cleaned up.
+      const ignoreMissing = (error: unknown): void => {
+        const code = (error as NodeJS.ErrnoException).code ?? ''
+        if (!['ENOENT', 'ENOTEMPTY'].includes(code)) throw error
       }
+      shortDirectories.delete(options.directory)
+      try { unlinkSync(socketPath) } catch (error) { ignoreMissing(error) }
+      try { unlinkSync(credentialPath) } catch (error) { ignoreMissing(error) }
+      try { rmdirSync(options.directory) } catch (error) { ignoreMissing(error) }
     },
   }
 }

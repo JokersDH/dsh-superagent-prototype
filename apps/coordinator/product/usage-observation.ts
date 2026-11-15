@@ -1,7 +1,8 @@
 import { performance } from 'node:perf_hooks'
+import { createHash } from 'node:crypto'
 import { ApplicationFault } from '@personal-agent/application'
-import { UsageObservationQuerySchema, UsageObservationSchema, WorkEvidenceSchema, IdSchema } from '@personal-agent/contracts'
-import type { UsageObservation, UsageObservationQuery, WorkEvidence } from '@personal-agent/contracts'
+import { UsageObservationQuerySchema, UsageObservationSchema, UsageObservationDownloadSchema, WorkEvidenceSchema, IdSchema } from '@personal-agent/contracts'
+import type { UsageObservation, UsageObservationQuery, UsageObservationDownload, WorkEvidence } from '@personal-agent/contracts'
 import type { MetricRow, UsageInsightsSummary } from '@personal-agent/usage-insights'
 
 export interface UsageObservationReaders {
@@ -27,6 +28,17 @@ export class ProductUsageObservation {
   private readonly readers: UsageObservationReaders
   private readonly now: () => string
   constructor(readers: UsageObservationReaders, now = () => new Date().toISOString()) { this.readers = readers; this.now = now }
+
+  async download(raw: UsageObservationQuery): Promise<UsageObservationDownload> {
+    const observation = await this.read(raw)
+    if (observation.status === 'unavailable' || !observation.summaryId)
+      throw new ApplicationFault('unsupported_capability', 'No authorized observation is available to export', 'none')
+    const { buildDisplayExport } = await import('@personal-agent/usage-insights')
+    const { text } = buildDisplayExport(observation, { maxRows: 32, maxBytes: 65536 })
+    return UsageObservationDownloadSchema.parse({ protocol: 'usage-observation-download/1', observation,
+      fileName: `observation-${observation.days}d-${observation.summaryId.slice(0, 12)}.json`, mediaType: 'application/json',
+      text, sha256: createHash('sha256').update(text).digest('hex') })
+  }
 
   async read(raw: UsageObservationQuery): Promise<UsageObservation> {
     const query = UsageObservationQuerySchema.parse(raw), observedAt = this.now(), days = query.days ?? 7, timezone = query.timezone ?? 'UTC'
