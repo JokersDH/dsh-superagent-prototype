@@ -1,0 +1,135 @@
+{
+  "protocol": "wave30-recipes-insights-admission/1",
+  "date": "2026-11-15",
+  "baselineMain": "fb3d671d2797367b6365119e6bc627bece16a2ff",
+  "candidates": {
+    "G": {
+      "id": "G",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-g",
+      "branch": "codex/g4-usage-insights",
+      "head": "e7aec80e1c613d427cf550bf927d3d04776d33e2",
+      "dirty": "",
+      "log": "e7aec80e docs(usage-insights): publish wave29 status and the digest-bearing export sample\ncd51fbe5 docs(usage-insights): record the export contract and the real /v1/insights endpoint",
+      "evidencePath": "reports/usage-insights/wave29-status.json",
+      "status": {
+        "keys": [
+          "protocol",
+          "agent",
+          "branch",
+          "worktree",
+          "origin",
+          "fixedStart",
+          "syncedMain",
+          "generatedAt",
+          "goal",
+          "ownedPaths",
+          "checkpointCommits",
+          "finalCommit",
+          "actualInterface",
+          "phases",
+          "results",
+          "measured",
+          "notReached",
+          "limitations",
+          "boundaries",
+          "verification"
+        ]
+      }
+    },
+    "J": {
+      "id": "J",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-j",
+      "branch": "codex/g5-project-recipes",
+      "head": "bd027a4450e43dde09d5b18b4659e5028664d911",
+      "dirty": "",
+      "log": "bd027a44 docs(project-recipes): publish wave29 semantics and main consumer state\n85b255a2 feat(project-recipes): separate content from observation time and harden reads",
+      "evidencePath": "reports/project-recipes/wave29-status.json",
+      "status": {
+        "keys": [
+          "protocol",
+          "owner",
+          "date",
+          "branch",
+          "worktree",
+          "baseline",
+          "mergedOriginMain",
+          "packet",
+          "consumesMainContract",
+          "layers",
+          "evidence",
+          "stages",
+          "results",
+          "consumerState",
+          "handoff",
+          "notReached",
+          "limits",
+          "ownership"
+        ]
+      }
+    }
+  },
+  "checks": [
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-j",
+      "command": "node --test packages/project-recipes/test/*.case.ts",
+      "exitCode": 0,
+      "passed": 67
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-j",
+      "command": "node --test tools/project-recipes/test/*.case.ts",
+      "exitCode": 0,
+      "passed": 26
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-j",
+      "command": "./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.json --noEmit",
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-g",
+      "command": "node --test packages/usage-insights/test/export.case.ts packages/usage-insights/test/insights-route.case.ts packages/usage-insights/test/consumer.case.ts",
+      "exitCode": 0,
+      "passed": 31
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-g",
+      "command": "./node_modules/.bin/tsc -p packages/usage-insights/tsconfig.json --noEmit",
+      "exitCode": 0
+    }
+  ],
+  "admittedScopes": {
+    "J": "Stable content/observation-time separation and stronger inode/size/postread-mtime checks; current main5 real recipe integrations pass with updated source. Runtime observer/CLI still same implementation.",
+    "G": "Pure bounded sanitized export determinism/rows/bytes/layercurrency/null and actual GETinsights/consumer cases pass. No new default main export endpoint has been imported or falsely claimed."
+  },
+  "findings": [
+    {
+      "id": "J30-FUTURE-FACTS-REUSE",
+      "priority": "P2_GENERIC_CURRENT_INPUT_API",
+      "file": "packages/project-recipes/src/preview.ts",
+      "problem": "assertDraftCurrent checks max-age but not observedMs>nowMs. A real legal draft made at NOW and same-content current facts observedAt2099-01-01 are accepted by previewInputs(...,now=NOW).",
+      "positive": "Same-content fresh re-observation remains reusable, changed content/stale cases already correctly refuse.",
+      "boundary": "Main generates facts observedAt on the server for each actual preview; no external facts/now HTTP input. Not a demonstrated current product permission bypass.",
+      "requiredOutcome": "Current-input helper explicitly rejects future/invalid clock and malformed/unsupported configuration, preserve content-vs-observation identity and actual current-source consumers; no new grant or ledger."
+    }
+  ],
+  "mainIntegration": {
+    "source": "f9bd5bc211a8b2f62ba25e930587885e3b221ff2",
+    "jSource": "bd027a4450e43dde09d5b18b4659e5028664d911",
+    "jSourceFilesUpdated": 5,
+    "mainUsesFactsContentDigest": true,
+    "mainPassesServerNowToPreview": true,
+    "fRestrictedSuggestionsMappedFromSameServerFields": true,
+    "gNewExportImported": false,
+    "newExternalDependencies": 0,
+    "sharedSchemasChanged": false
+  },
+  "preservation": {
+    "candidateWorkingTreesEdited": false,
+    "realVendorSends": 0,
+    "realModelTurns": 0,
+    "nativeTurnStarts": 0,
+    "oldTwelveServicesTouched": false,
+    "allOwnExecSessionsCompleted": true
+  }
+}

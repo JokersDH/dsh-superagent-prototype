@@ -65,6 +65,49 @@ try {
     await page.waitForFunction(() => [...document.querySelectorAll('.new-work button')].some(button => button.textContent.includes('应用草稿') && !button.disabled))
   }
   const apply = async () => { await preview(); await form.getByRole('button', { name: '应用草稿', exact: true }).click(); await form.getByText('草稿已应用', { exact: true }).waitFor() }
+  await check('CURRENT-PROJECT-WORKBENCH-SUGGESTIONS-OPEN-THE-ORIGINAL-FORM-WITHOUT-CREATING', async () => {
+    const before = store.events.cursor()
+    await page.getByRole('group', { name: '按项目筛选' }).getByRole('button', { name: '项目 Alpha', exact: true }).click()
+    await page.getByRole('button', { name: '试用准备', exact: true }).click()
+    const trial = page.getByRole('region', { name: '试用准备', exact: true })
+    const suggestion = trial.locator('.trial-recipe').filter({ has: page.getByText('有限范围变更', { exact: true }) })
+    await suggestion.getByRole('button', { name: '打开原表单模板', exact: true }).waitFor()
+    assert.equal(await trial.locator('.trial-recipe').count(), 3)
+    assert.equal(commands.length, 0); assert.equal(store.events.cursor(), before)
+    await suggestion.getByRole('button', { name: '打开原表单模板', exact: true }).click(); await form.waitFor()
+    assert.equal(await form.getByRole('combobox', { name: '项目', exact: true }).inputValue(), records[0].id)
+    assert.equal(await form.getByRole('combobox', { name: '任务模板', exact: true }).inputValue(), 'scoped_change')
+    assert.equal(await form.getByRole('button', { name: '创建委托', exact: true }).isDisabled(), true)
+    assert.equal(commands.length, 0); assert.equal(store.events.cursor(), before)
+    await form.getByRole('button', { name: '取消', exact: true }).click()
+  })
+  await check('PROJECT-SUGGESTIONS-IGNORE-LATE-PREVIEWS-FROM-THE-PREVIOUS-PROJECT', async () => {
+    await page.getByRole('button', { name: '试用准备', exact: true }).click()
+    const choose = index => page.getByRole('group', { name: '按项目筛选' })
+      .getByRole('button', { name: index ? '项目 Beta' : '项目 Alpha', exact: true }).click()
+    const trial = page.getByRole('region', { name: '试用准备', exact: true })
+    await choose(1); await trial.locator('.trial-recipe').first().waitFor()
+    let capturedResolve, release
+    const captured = new Promise(resolve => { capturedResolve = resolve }), gate = new Promise(resolve => { release = resolve })
+    await page.route('**/recipes/preview', async route => {
+      if (route.request().postDataJSON().projectId !== records[0].id) return route.continue()
+      const response = await route.fetch(), body = await response.json(); capturedResolve(); await gate
+      body.title = 'stale-project-canary'
+      try { await route.fulfill({ response, json: body }) } catch { /* The superseded previews are intentionally aborted. */ }
+    })
+    let timer
+    try {
+      await choose(0)
+      await Promise.race([captured, new Promise((_, reject) => { timer = setTimeout(() => reject(new Error('Previous project preview not captured')), 10000) })])
+      assert.equal(await trial.locator('.trial-recipe').count(), 0)
+      await choose(1); await trial.locator('.trial-recipe').first().waitFor()
+      release(); await page.waitForTimeout(200)
+      assert.doesNotMatch(await trial.textContent(), /stale-project-canary/)
+      assert.match(await trial.locator('.trial-recipe').first().textContent(), /Beta/)
+      assert.equal(commands.length, 0)
+    } finally { clearTimeout(timer); release(); await page.unroute('**/recipes/preview') }
+    await page.getByRole('button', { name: '主对话视图', exact: true }).click()
+  })
   await check('PREVIEW-AND-APPLY-ONLY-PREFILL-ORIGINAL-FORM', async () => {
     const before = store.events.cursor(); await open(); await apply()
     assert.equal(commands.length, 0); assert.equal(store.events.cursor(), before)
@@ -155,12 +198,26 @@ try {
       assert.equal(await form.evaluate(element => element.scrollWidth > element.clientWidth + 1), false)
       if (!process.argv.includes('--no-capture')) await page.screenshot({ path: join(output, `${name}.png`), fullPage: true, animations: 'disabled' })
     }
+    await form.getByRole('button', { name: '取消', exact: true }).click()
+    await page.getByRole('button', { name: '试用准备', exact: true }).click()
+    const trial = page.getByRole('region', { name: '试用准备', exact: true })
+    await trial.getByRole('heading', { name: '配方草案', exact: true }).waitFor()
+    for (const [name, width, height] of [['desktop', 1440, 1000], ['mobile', 390, 844]]) {
+      await page.setViewportSize({ width, height }); await page.evaluate(() => document.fonts.ready)
+      await trial.getByRole('heading', { name: '配方草案', exact: true }).scrollIntoViewIfNeeded()
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false)
+      assert.equal(await trial.evaluate(element => element.scrollWidth > element.clientWidth + 1), false)
+      assert.equal(await trial.getByRole('button', { name: '打开原表单模板', exact: true }).count(), 3)
+      assert.equal(await trial.locator('.trial-recipe-fields').first().evaluate(element => getComputedStyle(element).display), 'grid')
+      assert.equal(await trial.locator('.trial-metric-value').first().evaluate(element => getComputedStyle(element).whiteSpace), 'nowrap')
+      if (!process.argv.includes('--no-capture')) await page.screenshot({ path: join(output, `workbench-${name}.png`), fullPage: true, animations: 'disabled' })
+    }
     assert.deepEqual(errors, [])
   })
 } finally {
   await browser?.close(); await vite.close(); api.closeAllConnections(); await new Promise(resolve => api.close(resolve))
   await product.close(); store.close(); rmSync(root, { recursive: true, force: true })
-  const report = { status: cases.length === 6 ? 'PASS_ACTUAL_PROJECT_RECIPE_WORKFLOW' : 'FAIL',
+  const report = { status: cases.length === 8 ? 'PASS_ACTUAL_PROJECT_RECIPE_WORKFLOW' : 'FAIL',
     sourceCommit: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
     sourceWorktreeClean: execFileSync('git', ['status', '--porcelain', '--', 'apps', 'packages', 'tests/integration/project-recipes*'], { encoding: 'utf8' }).trim() === '',
     cases, errors, previewPosts, unknownAfterRecorded, commands: commands.map(value => ({ kind: value.kind, commandId: value.commandId })), acceptedWorks: acceptedWorks.length,
