@@ -65,8 +65,8 @@
       "summary": "Functional mode closure with old personal scope preserved."
     },
     "d9": {
-      "status": "PASS_WITH_INSTALLED_J_LIMIT",
-      "summary": "Main 0073 J source browser 6/6; package includes J dist and API; installed J UI not rerun."
+      "status": "PARTIAL",
+      "summary": "Source J browser with registered roots 6/6 and package J dist/API present; installed fixture preview returns unavailable (no registered metadata root) with authorization none, so installed draft/apply positive remains NOT_REACHED."
     },
     "d10": {
       "status": "PASS",
@@ -115,9 +115,9 @@
     "portable": 5
   },
   "notDone": [
-    "installed J UI end-to-end",
     "E successor independent verdict",
-    "B/private/target"
+    "B/private/target",
+    "installed J draft/apply positive with registered project root"
   ],
   "limits": [
     "zero real vendor/model/native turns",

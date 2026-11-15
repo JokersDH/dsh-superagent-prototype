@@ -1,0 +1,55 @@
+{
+  "protocol": "wave29-installed-j/1",
+  "status": "PARTIAL",
+  "api": {
+    "previewStatus": "unavailable",
+    "input": {
+      "projectId": "project-atlas",
+      "kind": "scoped_change",
+      "allowedPaths": [
+        "src/"
+      ],
+      "profileId": "profile-fixture-pass"
+    },
+    "title": "有限范围变更",
+    "issues": [
+      {
+        "code": "project_root_unavailable",
+        "message": "该项目尚未提供已登记的元数据根目录。"
+      }
+    ],
+    "authorization": "none"
+  },
+  "sourceIntegration": {
+    "status": "PASS_ACTUAL_PROJECT_RECIPE_WORKFLOW",
+    "cases": [
+      {
+        "id": "PREVIEW-AND-APPLY-ONLY-PREFILL-ORIGINAL-FORM",
+        "status": "PASS"
+      },
+      {
+        "id": "CHANGED-FACTS-REFUSE-EXPLICIT-CREATION-UNTIL-REAPPLIED",
+        "status": "PASS"
+      },
+      {
+        "id": "SELECTION-AND-CONFIG-CHANGES-CANNOT-KEEP-HIDDEN-OLD-ATOMS",
+        "status": "PASS"
+      },
+      {
+        "id": "ERROR-AND-LEGACY-ABSENCE-KEEP-MANUAL-DELEGATION-AVAILABLE",
+        "status": "PASS"
+      },
+      {
+        "id": "TWO-EXPLICIT-TEMPLATE-WORKS-REACH-ORIGINAL-CANDIDATE-AND-MANUAL-ACCEPT",
+        "status": "PASS"
+      },
+      {
+        "id": "DESKTOP-MOBILE-TEMPLATE-CONTROLS-AND-TEXT-FIT",
+        "status": "PASS"
+      }
+    ],
+    "previewPosts": 13,
+    "acceptedWorks": 2
+  },
+  "limitation": "Installed fixture project has no registered metadata root, so preview is unavailable rather than draft; source integration with registered roots passes 6/6. No installed J draft/apply/create positive yet."
+}

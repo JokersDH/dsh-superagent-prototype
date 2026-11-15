@@ -4,5 +4,5 @@
 1ba/67abd 与 ce64 旧候选保留。
 
 必跑：`fixture-mode.json`（restored fixture fixture/recovery_readonly、normal fixture fixture/normal + lazy assistant，六类 pure argv）、`installed-trial-workbench.json` 8/8、`readiness.json`、personal/same-store/multi/matrix/noexec/samebase/upgrade-artifact/data/backup/portable。
-J：安装包含 `packages/project-recipes/dist` 与 coordinator API；源级 J browser 6/6（`project-recipes-source.json`），installed J UI 未重跑，E 需独立判定。
+J：安装包含 `packages/project-recipes/dist` 与 coordinator API；源级 J browser 6/6（`project-recipes-source.json`），安装包 J API 实测：fixture project 无登记元数据根时返回 `status=unavailable`、`authorization=none`、零业务写入；source 级登记根 6/6。installed J draft/apply positive 仍 NOT_REACHED，E 需独立判定。
 未达：installed J 端到端、E successor independent verdict、B/private/target、真实供应商。
