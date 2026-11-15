@@ -52,6 +52,8 @@ export type MetadataRefusalCode =
   | 'not_regular_file'
   | 'too_large'
   | 'budget_exceeded'
+  | 'replaced'
+  | 'changed_during_read'
   | 'unreadable'
   | 'invalid_json'
   | 'not_object'
@@ -132,6 +134,9 @@ function readBounded(root: string, name: MetadataName, maxBytes: number, budget:
   try {
     const opened = fstatSync(fd)
     if (!opened.isFile()) throw new MetadataRefused('not_regular_file', name, 'metadata entry is not a regular file')
+    // The path was inspected immediately before opening; a different inode means it was swapped.
+    if (opened.dev !== stats.dev || opened.ino !== stats.ino) throw new MetadataRefused('replaced', name, 'metadata entry was replaced while being opened')
+    if (opened.size !== stats.size) throw new MetadataRefused('changed_during_read', name, 'metadata entry changed size while being opened')
     if (opened.size > maxBytes) throw new MetadataRefused('too_large', name, `${name} exceeds ${maxBytes} bytes`)
     if (budget.bytes + opened.size > limits.maxTotalBytes)
       throw new MetadataRefused('budget_exceeded', name, 'total metadata byte budget exhausted')
@@ -142,6 +147,10 @@ function readBounded(root: string, name: MetadataName, maxBytes: number, budget:
       if (read <= 0) throw new MetadataRefused('unreadable', name, 'file shrank while being read')
       offset += read
     }
+    // A rewrite during the read must not be reported as a complete observation.
+    const settled = fstatSync(fd)
+    if (settled.size !== opened.size || settled.mtimeMs !== opened.mtimeMs)
+      throw new MetadataRefused('changed_during_read', name, 'metadata entry changed while being read')
     budget.bytes += opened.size
     // The parent must still be the authorized root: no path swap between probe and read.
     if (realpathSync(dirname(join(root, name))) !== root) throw new MetadataRefused('root_missing', name, 'root changed while being read')
@@ -166,6 +175,8 @@ export function readJsonFile(path: string, maxBytes = 2 * 1024 * 1024): unknown 
   const fd = openSync(absolute, constants.O_RDONLY | (constants.O_NOFOLLOW ?? 0))
   try {
     const opened = fstatSync(fd)
+    if (opened.dev !== stats.dev || opened.ino !== stats.ino) throw new MetadataRefused('replaced', basename(absolute), 'file was replaced while being opened')
+    if (opened.size !== stats.size) throw new MetadataRefused('changed_during_read', basename(absolute), 'file changed size while being opened')
     const buffer = Buffer.alloc(opened.size)
     let offset = 0
     while (offset < opened.size) {
@@ -173,6 +184,9 @@ export function readJsonFile(path: string, maxBytes = 2 * 1024 * 1024): unknown 
       if (read <= 0) throw new MetadataRefused('unreadable', basename(absolute), 'file shrank while being read')
       offset += read
     }
+    const settled = fstatSync(fd)
+    if (settled.size !== opened.size || settled.mtimeMs !== opened.mtimeMs)
+      throw new MetadataRefused('changed_during_read', basename(absolute), 'file changed while being read')
     try {
       return JSON.parse(buffer.toString('utf8')) as unknown
     } catch {

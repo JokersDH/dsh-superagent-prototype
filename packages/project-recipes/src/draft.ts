@@ -80,7 +80,10 @@ export const RecipeProvenanceSchema = z.strictObject({
   }),
   facts: z.strictObject({
     protocol: z.literal(PROJECT_FACTS_PROTOCOL),
+    /** Digest of the whole observation, including `observedAt`. */
     digest: DigestSchema,
+    /** Digest of the stable content only; a fresh observation of identical bytes keeps this value. */
+    contentDigest: DigestSchema,
     observedAt: TimestampSchema,
     provider: z.string().trim().min(1).max(160),
     source: z.enum(['injected', 'authorized_metadata']),

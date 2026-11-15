@@ -13,6 +13,8 @@
  */
 import { z } from 'zod'
 import { DigestSchema, IdSchema, TimestampSchema } from '@personal-agent/contracts'
+import type { Json } from '@personal-agent/contracts'
+import { canonicalDigest } from '@personal-agent/contracts/canonical'
 
 export const PROJECT_FACTS_PROTOCOL = 'project-facts/1' as const
 
@@ -101,3 +103,19 @@ export const ProjectFactsSchema = z
 export type ProjectFacts = z.infer<typeof ProjectFactsSchema>
 export type FactsProvenance = z.infer<typeof FactsProvenanceSchema>
 export type FactsManager = z.infer<typeof FactsManagerSchema>
+
+/**
+ * The stable content of an observation: everything except this run's `observedAt`.
+ *
+ * Two reads of unchanged bytes produce the same content digest even though their timestamps differ,
+ * which is what lets a consumer compare an applied draft with a fresh observation. The timestamp
+ * itself stays in provenance, is bounded by the freshness rule, and is never an authorization.
+ */
+export function factsContentOf(facts: ProjectFacts): Omit<ProjectFacts, 'observedAt'> {
+  const { observedAt: _observedAt, ...content } = facts
+  return content
+}
+
+export function factsContentDigest(facts: ProjectFacts): string {
+  return canonicalDigest(factsContentOf(facts) as unknown as Json)
+}
