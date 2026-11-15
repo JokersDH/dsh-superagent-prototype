@@ -79,5 +79,12 @@
     "B6: prove the three callbacks against original A ingress/Store/main Guard through the selected module",
     "B9-B16: original-A recovery, bounded SIGKILL, product-lane candidate/manual accept via ProductCompletion",
     "B17-B20: 2/4 slot matrix with control re-entry and complete resources"
-  ]
+  ],
+  "b5_signalTool": {
+    "status": "TOOL IN PLACE AND PURE CONTROLS PASS; live kills now route through it",
+    "tool": "tests/native-acceptance/signal-guard.mjs (observe/capture/verify/signalOwned/confirmExit/escalate)",
+    "controls": "tests/native-acceptance/b28-signal.mjs 7 PASS / 0 FAIL: own positive; foreign root/config markers refused with zero signals; recycled start refused; null/no-start record refused; already-exited pid stays unknown; TERM-ignoring child escalated only after a fresh check; a record naming another pid refused (no discovery beyond the record)",
+    "liveUse": "b27-sigkill and b27-chain now capture the child birth identity and signal through signalOwned; the runner-liveness checks use observe() instead of kill-0",
+    "stillOpen": "the fixtures are our own children; a real product process is not signalled this round, and unknown material is retained rather than cleaned up"
+  }
 }

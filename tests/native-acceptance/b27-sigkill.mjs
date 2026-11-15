@@ -15,6 +15,8 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { CaseLog, writeReport } from './harness.mjs'
+import { capture, confirmExit, observe, signalOwned } from './signal-guard.mjs'
+const CHILD_ENTRY = fileURLToPath(new URL('./b27-coordinator-child.mjs', import.meta.url))
 import { RunnerLink } from '../../apps/runner/src/runner-link-client.ts'
 import { makeAttemptSpec, makeCommand } from '../../packages/testing/src/index.ts'
 import { endpointDirectory } from '../../apps/runner/src/recovery-endpoint.ts'
@@ -35,7 +37,15 @@ const runChild = (mode, registration) => new Promise(resolve => {
   child.stdout.on('data', chunk => { out += chunk })
   child.stderr.on('data', () => {})
   child.on('exit', (code, signal) => resolve({ pid: child.pid, code, signal, report: (() => { try { return JSON.parse(out.trim().split('\n').pop()) } catch { return null } })() }))
-  if (mode === 'probe') { childA = child; setTimeout(() => { try { process.kill(child.pid, 'SIGKILL') } catch {} }, 1200) }
+  if (mode === 'probe') {
+    childA = child
+    setTimeout(() => {
+      // Safe tooling: capture the complete birth identity, then signal only after a FRESH verification.
+      const captured = capture(child.pid, { markers: [CHILD_ENTRY] })
+      const sent = captured.ok ? signalOwned(captured.record, 'SIGKILL') : { sent: false, refused: true, unknown: captured.unknown }
+      writeFileSync(join(root, 'kill-proof.json'), JSON.stringify({ captured: captured.ok, sent }, null, 2))
+    }, 1200)
+  }
   else childB = child
 })
 try {
@@ -82,7 +92,7 @@ try {
   else log.fail(`coordinator A read nothing usable: ${JSON.stringify(aReport)}`)
 
   log.begin('B27-SIGKILL-COORDINATOR-A-DIED', 'A was killed by SIGKILL and the Runner survived', 'controlled_process')
-  const runnerStill = (() => { try { process.kill(runnerPid, 0); return true } catch { return false } })()
+  const runnerStill = observe(runnerPid).alive
   log.evidence({ coordinatorPid: a.pid, killedBy: a.signal, runnerPid, runnerStill })
   if (a.signal === 'SIGKILL' && runnerStill) log.pass(`coordinator pid ${a.pid} died by SIGKILL while Runner pid ${runnerPid} kept running`)
   else log.fail(`the kill window is not what was claimed: ${JSON.stringify({ signal: a.signal, runnerStill })}`)

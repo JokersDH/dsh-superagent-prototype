@@ -12,6 +12,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { CaseLog, writeReport } from './harness.mjs'
+import { capture, observe, signalOwned } from './signal-guard.mjs'
 import { RunnerLink } from '../../apps/runner/src/runner-link-client.ts'
 import { makeAttemptSpec, makeCommand } from '../../packages/testing/src/index.ts'
 import { endpointDirectory } from '../../apps/runner/src/recovery-endpoint.ts'
@@ -78,14 +79,16 @@ try {
 
   log.begin('B27-CHAIN-KILL-A-MID-FLIGHT', 'A is killed by SIGKILL while it owns the lease', 'controlled_process')
   const pidA = first.pid
-  try { process.kill(pidA, 'SIGKILL') } catch {}
+  // Kill through the safe tool: capture A's complete birth identity, then signal once it is re-verified.
+  const aCaptured = capture(pidA, { markers: [CHILD] })
+  const aSent = aCaptured.ok ? signalOwned(aCaptured.record, 'SIGKILL') : { sent: false, refused: true, unknown: aCaptured.unknown }
   let diedBy = null
   for (let index = 0; index < 100 && diedBy === null; index += 1) {
-    try { process.kill(pidA, 0) } catch { diedBy = 'SIGKILL' }
+    if (!observe(pidA).alive) diedBy = aSent.sent ? 'SIGKILL' : 'unknown_exit'
     if (diedBy === null) await new Promise(resolve => setTimeout(resolve, 20))
   }
-  const runnerAlive = (() => { try { process.kill(runnerPid, 0); return true } catch { return false } })()
-  log.evidence({ pidA, diedBy, runnerPid, runnerAlive })
+  const runnerAlive = observe(runnerPid).alive
+  log.evidence({ pidA, diedBy, sent: aSent.sent, refused: aSent.refused ?? false, markers: aCaptured.ok ? aCaptured.record.markers : null, runnerPid, runnerAlive })
   if (diedBy === 'SIGKILL' && runnerAlive) log.pass(`coordinator ${pidA} died by SIGKILL while Runner ${runnerPid} kept running`)
   else log.fail(`the kill window is not what was claimed: ${JSON.stringify({ diedBy, runnerAlive })}`)
 
@@ -128,7 +131,11 @@ try {
   log.begin('B27-SCOPE-NOT-NATIVE', 'fixture lane; installed Codex not executed', 'controlled_process')
   log.notTested('no installed agent executed and no gateway contacted')
 } finally {
-  for (const child of children) { try { process.kill(child.pid, 'SIGKILL') } catch {} }
+  for (const child of children) {
+    // Cleanup goes through the same tool, so even our own leftovers are identity-checked before a signal.
+    const captured = capture(child.pid, { markers: [CHILD] })
+    if (captured.ok) signalOwned(captured.record, 'SIGKILL')
+  }
   try { await runner?.close() } catch {}
   delete process.env.PA_RUNNER_RECOVERY_ROOT
   delete process.env.PA_RUNNER_RECEIVER_LOG
