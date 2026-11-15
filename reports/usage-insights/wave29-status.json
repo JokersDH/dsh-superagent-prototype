@@ -1,0 +1,166 @@
+{
+  "protocol": "wave29-usage-insights-status/1",
+  "agent": "G",
+  "branch": "codex/g4-usage-insights",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-g",
+  "origin": "https://github.com/JokersDH/dsh-superagent-prototype.git",
+  "fixedStart": "c5e428a2",
+  "syncedMain": "79525b6",
+  "generatedAt": "2026-11-15T05:27:14Z",
+  "goal": {
+    "statement": "Verify and support the product's actual observation path — GET /v1/insights over authorized readers — keep source-vs-row coverage and layer/currency/unknown semantics honest, and ship a bounded sanitized export with a stable row identity.",
+    "tokenBudget": "none",
+    "vendorModelNativeTurns": 0,
+    "blockedPilot": "E original 24turn/200000token/USD5 single-in-flight pilot remains BLOCKED; G did not reset, top up, refund, replace samples or research pricing/recipes.",
+    "notReDispatched": [
+      "nested atomic record cap (closed wave-27)",
+      "permanent A→B→A work-mapping tombstone (closed wave-27)",
+      "the authorized coordinator reader and its DTO (delivered wave-28)"
+    ]
+  },
+  "ownedPaths": ["packages/usage-insights/", "tools/usage-insights/", "reports/usage-insights/"],
+  "checkpointCommits": ["45f7b96e", "2adbfb43", "af27b048"],
+  "finalCommit": "the commit that introduces this file",
+  "actualInterface": {
+    "endpoint": "GET /v1/insights?projectId?&days=7|30&timezone?",
+    "auth": "Bearer local API token; missing credential 401, foreign project 403",
+    "queryValidation": "days must be 7 or 30; timezone must be IANA; duplicate query parameters and unknown parameters are refused (400)",
+    "response": "usage-observation/1 (schema-validated, authorization none); a response whose scope/days/timezone contradicts the request is refused (503)",
+    "reader": "ProductUsageObservation over authorized projectIds/listWorks/workEvidence with independent 50 works / 10000 nested records / 2 MiB / 2 s",
+    "app": "useUsageObservation reads only inside the trial view when authenticated; TrialWorkspace renders the DTO directly",
+    "display": "header sampleCount = enumerated works; each row keeps its own sample/layer/unit; current attention is not part of the DTO"
+  },
+  "phases": [
+    { "id": "G1", "status": "done", "result": "pinned the real /v1/insights request/response, the authorized reader, the server analysis call and the F DTO; the stale usage-observation HTTP path is removed from G's docs and status", "evidence": ["packages/usage-insights/test/insights-route.case.ts", "tools/usage-insights/README.md"] },
+    { "id": "G2", "status": "done", "result": "server/display contract verified: Node analysis, crypto and collection stay on the server; the served document is the schema-validated display DTO", "evidence": ["packages/usage-insights/test/insights-route.case.ts", "packages/usage-insights/test/package-consumer.case.ts"] },
+    { "id": "G3", "status": "done", "result": "header sample counts enumerated works while rows keep their own sample counts; scope/window come from the verified request; unknownCount is null without a consistent basis", "evidence": ["packages/usage-insights/test/insights-route.case.ts"] },
+    { "id": "G4", "status": "done", "result": "first runnable result: real /v1/insights → server analysis → display consumer, with route positives and negatives", "evidence": ["45f7b96e"] },
+    { "id": "G5", "status": "done", "result": "two-project controlled source through public entries (create work, native question, answer, verification, acceptance, review activity), 0 real model/native", "evidence": ["tools/usage-insights/probe/observe-two-projects.mjs"] },
+    { "id": "G6", "status": "done", "result": "7/30 windows verified through the route and the reader: exact length, half-open boundary, same facts inside both windows", "evidence": ["packages/usage-insights/test/insights-route.case.ts", "packages/usage-insights/test/main-consumer.case.ts"] },
+    { "id": "G7", "status": "done", "result": "loss and repeat behaviour unchanged: repeated reads agree, missing/truncated/cursor-changed sources stay partial, a bad source never becomes a complete empty set", "evidence": ["packages/usage-insights/test/main-consumer.case.ts"] },
+    { "id": "G8", "status": "done", "result": "second runnable result: the same two-project source through the route and the reader with 7/30 windows, repeated reads and honest missing-history behaviour", "evidence": ["af27b048"] },
+    { "id": "G9", "status": "done", "result": "source enumeration coverage is separate from row coverage; bounded or rejected enumeration never becomes a complete zero", "evidence": ["packages/usage-insights/test/main-consumer.case.ts", "packages/usage-insights/src/analyze.ts"] },
+    { "id": "G10", "status": "done", "result": "review.activeMs stays a partial visibility proxy in both the DTO and the report even when the source is complete; per-row counts are preserved", "evidence": ["packages/usage-insights/test/report-semantics.case.ts", "packages/usage-insights/test/main-consumer.case.ts"] },
+    { "id": "G11", "status": "done", "result": "usage components stay unknown when unrecorded; queue time only from a real queued/dispatched pair; no price lookup or zero filling", "evidence": ["packages/usage-insights/test/report-semantics.case.ts", "packages/usage-insights/test/analyze.case.ts"] },
+    { "id": "G12", "status": "done", "result": "third runnable result: source enumeration, row partial and usage/time semantics with real display/report cases", "evidence": ["2adbfb43"] },
+    { "id": "G13", "status": "done", "result": "row identity is a stable metric+layer+currency key; repeated reads and window switches keep the same rows and order; counts render as bare numbers with unit separate", "evidence": ["packages/usage-insights/test/insights-route.case.ts", "packages/usage-insights/test/export.case.ts"] },
+    { "id": "G14", "status": "done", "result": "currencies and layers never merge in the export or the report; readiness/configuration stay outside execution, quality and cost", "evidence": ["packages/usage-insights/test/export.case.ts", "packages/usage-insights/test/report-semantics.case.ts"] },
+    { "id": "G15", "status": "done", "result": "bounded sanitized export: input digest/summary id/window/scope/source coverage/row coverage/metric/layer/unit/currency/sample/unknown, explicit row and byte truncation, refusal when the envelope cannot fit", "evidence": ["packages/usage-insights/src/export.ts", "packages/usage-insights/test/export.case.ts"] },
+    { "id": "G16", "status": "done", "result": "fourth runnable result: stable rows and a usable export with the same values as the display projection", "evidence": ["2adbfb43", "reports/usage-insights/probe/two-project-20261114T074222.export.json"] },
+    { "id": "G17", "status": "done", "result": "CLI keeps explicit source/dist selection (a stale build is never analysed), read-only loopback/file adapters, digest pin and exclusive output; export follows the same rules", "evidence": ["tools/usage-insights/lib/module-entry.mjs", "tools/usage-insights/test/cli.case.mjs"] },
+    { "id": "G18", "status": "done", "result": "reports and exports stay sanitized: canary in raw detail, collection diagnostics, private paths and tokens never appear; hostile text is escaped; 0600 exclusive", "evidence": ["tools/usage-insights/test/cli.case.mjs", "packages/usage-insights/test/export.case.ts"] },
+    { "id": "G19", "status": "done", "result": "the App boundary is verified from G's side: the console never imports the Node package, admission refuses a foreign/missing declaration, and the route serves only the display DTO", "evidence": ["packages/usage-insights/test/package-consumer.case.ts", "packages/usage-insights/test/insights-route.case.ts"] },
+    { "id": "G20", "status": "done", "result": "fifth runnable result: daily CLI (collect/analyze/report/verify/export), privacy boundaries and the real presentation path", "evidence": ["af27b048"] },
+    { "id": "G21", "status": "not_reached", "blockedBy": "no exact tar carries this wave's G/J/main source and its build/closure; D's 1ba predates this round's templates and has no E installed verdict", "result": "package handoff recorded accurately: D's 1ba tar (SHA 504dfdc1ceb191828d3836017cc47d9d0023dc27cc1291e6caf28e08aafcfb9e, 20333302 bytes, 6778 entries) contains the statistics module but not this round's J templates; the older 1cd has no statistics entry; ce64 keeps its own scope. No source result is attached to those packages.", "evidence": ["reports/releases/wave29-admission/README.zh-CN.md", "reports/releases/wave29-integration/README.zh-CN.md"] },
+    { "id": "G22", "status": "done", "result": "bounded new-risk regression: the export row cap truncates a 210-currency observation at 200 rows with stable ordering, the byte cap and envelope refusal are covered, and the earlier nested/tombstone/coordinator decks still pass", "evidence": ["packages/usage-insights/test/export.case.ts", "packages/usage-insights/test/bounds.case.ts"] },
+    { "id": "G23", "status": "done", "result": "docs updated for GET /v1/insights, 7/30 windows, source-vs-row coverage, metric id/currency/unknown, export bounds and the Node/browser boundary; stale route wording removed", "evidence": ["packages/usage-insights/README.md", "tools/usage-insights/README.md", "reports/usage-insights/README.md"] },
+    { "id": "G24", "status": "done", "result": "this status file", "evidence": ["reports/usage-insights/wave29-status.json"] }
+  ],
+  "results": [
+    { "id": "G1-G4", "title": "Real /v1/insights route and display consumer verified", "publishedCommit": "45f7b96e", "runnable": true,
+      "commands": ["node --test packages/usage-insights/test/*.case.ts"],
+      "testsAtCheckpoint": { "package": 112, "tool": 42, "result": "pass" } },
+    { "id": "G5-G8", "title": "Same two-project source through the route and the reader, 7 and 30 days", "publishedCommit": "af27b048", "runnable": true,
+      "commands": ["node tools/usage-insights/probe/observe-two-projects.mjs"],
+      "testsAtCheckpoint": { "package": 118, "tool": 45, "probe": "pass", "result": "pass" } },
+    { "id": "G9-G12", "title": "Source-vs-row coverage, usage and time semantics", "publishedCommit": "2adbfb43", "runnable": true,
+      "commands": ["node tools/usage-insights/cli.mjs report --input /abs/bundle.json --out /abs/new-report.md"],
+      "testsAtCheckpoint": { "package": 118, "tool": 42, "result": "pass" } },
+    { "id": "G13-G16", "title": "Stable row identity and bounded sanitized export", "publishedCommit": "2adbfb43", "runnable": true,
+      "commands": ["node tools/usage-insights/cli.mjs export --input /abs/bundle.json --out /abs/export.json --max-rows 200"],
+      "testsAtCheckpoint": { "package": 118, "tool": 42, "result": "pass" } },
+    { "id": "G17-G20", "title": "Daily CLI, privacy boundaries and real presentation", "publishedCommit": "af27b048", "runnable": true,
+      "commands": ["node tools/usage-insights/cli.mjs verify --input /abs/bundle.json --expect-digest <sha256>"],
+      "testsAtCheckpoint": { "package": 118, "tool": 45, "result": "pass" } },
+    { "id": "G21-G24", "title": "Package honesty, bounded regression, docs and handoff", "publishedCommit": "branch head (this commit)", "runnable": true,
+      "commands": ["node --test packages/usage-insights/test/*.case.ts", "node --test tools/usage-insights/test/*.case.mjs", "node tools/usage-insights/probe/observe-two-projects.mjs"],
+      "testsAtCheckpoint": { "package": 119, "tool": 45, "probe": "pass", "result": "pass" } }
+  ],
+  "measured": {
+    "route": {
+      "endpoint": "GET /v1/insights?days=7&timezone=UTC",
+      "status": 200,
+      "asserted": ["usage-observation/1 schema", "authorization none", "scope declared_multi_project", "header sample 2 = enumerated works", "outcome row sample 1", "questions row value 2", "unknown usage null", "no work identity in the payload"],
+      "refusals": { "noBearer": 401, "foreignProject": 403, "days14orAbc": 400, "invalidTimezone": 400, "duplicateProjectId": 400, "unknownParameter": 400, "responseScopeMismatch": 503, "readerNotConnected": 422 }
+    },
+    "observation": {
+      "bundle": "reports/usage-insights/probe/two-project-20261114T074222.bundle.json",
+      "report": "reports/usage-insights/probe/two-project-20261114T074222.report.md",
+      "export": "reports/usage-insights/probe/two-project-20261114T074222.export.json",
+      "inputDigest": "95400df5276e0ac5daf896e75a5650e4bc3b9b3efef48a3f1a37d9bfb5ebe766",
+      "summaryId": "aa7636b2c9ec4643045845925aae9cffbd48b0fd7ebc53e7a61faf551b2bd045",
+      "projects": ["project-arcade", "project-beacon"],
+      "scopeAggregation": "declared_multi_project",
+      "coverage": { "outcomes": "complete", "workEvidence": "complete", "attention": "complete", "overall": "complete" },
+      "rows": 12,
+      "exportBytes": 5869,
+      "truncated": false,
+      "values": { "outcomes.count": 2, "outcomes.accepted": 2, "interventions.questions": 2, "interventions.answers": 2, "interventions.acceptances": 2, "interventions.total": 6, "review.readyToAcceptanceMs": 799, "review.activeMs": 700, "execution.durationMs": null, "usage.inputTokens": null, "usage.outputTokens": null, "queue.waitMs": null },
+      "rowReasons": { "execution.durationMs": "timing_missing", "queue.waitMs": "endpoint_missing", "usage.inputTokens": "insufficient_data", "usage.outputTokens": "insufficient_data", "review.activeMs": "partial (visibility proxy)" }
+    },
+    "rowSemantics": [
+      "A row's coverage describes how completely that metric's source was enumerated; it does not promise a value. usage.inputTokens is coverage complete and still null with reason insufficient_data, which is not zero.",
+      "Row identity is metricId + layer + currency, so one metric can appear once per layer and once per currency and never merged. Counts print as bare numbers with the unit reported separately.",
+      "Absent components are reported per row (timing_missing, endpoint_missing, insufficient_data, no_observations); nothing is filled in from a price table, a subscription assumption or another row.",
+      "review.activeMs is a partial UI-visibility proxy even when the whole source enumerates completely; it is not human working time."
+    ],
+    "mainFindings": [
+      "The coordinator's header coverageState folds any partial row into partial, so a completely enumerated source is served as partial. G keeps source coverage and row coverage separate in its own projection; main may prefer the header to describe enumeration only. Reported in wave28 and still observable at c5e428a2; G did not change main.",
+      "The coordinator builds display metric ids as metricId@layer@currency and leaves a trailing separator when the currency is empty (e.g. outcomes.count@controlled@), while G's row ids stop at the last present segment (outcomes.count@controlled). Consumers keyed on the exact string differ; G tolerates both by prefix matching in its own cases and does not edit the DTO."
+    ],
+    "negatives": {
+      "route": ["missing bearer", "foreign project", "invalid days", "invalid timezone", "duplicate parameter", "unknown parameter", "scope mismatch", "reader not connected", "readonly startup still serves"],
+      "export": ["row bound truncates explicitly", "byte bound truncates explicitly", "impossible budget refused without a file", "existing file refused", "canary/raw detail never exported", "recorded bytes equal the written size"],
+      "row": ["stable unique rowId across repeated reads and window switch", "count renders as a bare number", "one row per layer and per currency", "partial proxy row next to a complete source"]
+    },
+    "packages": {
+      "1ba": "D tar SHA 504dfdc1ceb191828d3836017cc47d9d0023dc27cc1291e6caf28e08aafcfb9e, 20333302 bytes, 6778 entries: contains statistics, not this round's J templates, no E installed verdict",
+      "1cd": "older package without the statistics/observation entry",
+      "ce64": "earlier ordinary installed scope, kept as its own subject"
+    }
+  },
+  "notReached": [
+    "actual_native execution data: NOT_TESTED — the controlled fixture driver ran; no vendor model or native turn was performed",
+    "operator production instance: NOT_ATTEMPTED — main's reader is the production path and G did not read a user instance",
+    "real operator baseline: none supplied; no comparison or benefit figure is produced",
+    "installed package with an observation entry and an E verdict: not available this round; 1ba contains statistics but has no installed verdict and no J templates",
+    "long-running stability and cross-machine performance: out of scope"
+  ],
+  "limitations": [
+    "All numbers are observations of recorded facts. Nothing here proves saved hours, efficiency gains, causality or quality.",
+    "review.activeMs is a partial UI-visibility proxy, never human working time.",
+    "Interaction metrics are product-record counts and carry no evidence layer.",
+    "Unknown usage and cost stay unknown; currencies are never combined and prices are not looked up.",
+    "The coordinator formats decimals to one fraction digit; G's rows keep up to three and agree within 0.05.",
+    "A bundle keeps product record detail and diagnostic text and is a private 0600 input; reports and exports are sanitized."
+  ],
+  "boundaries": {
+    "noSqlOrPrivateDb": true,
+    "noRuntimeHttpUiChanges": true,
+    "noSecondCollector": true,
+    "noSecondLedger": true,
+    "noModelOrNativeCalls": true,
+    "noRootLockOrContractsChanges": true,
+    "noEAssertionsChanged": true,
+    "noBrowserNodeImports": true,
+    "userServicesPreserved": "twelve 5180/8796 … 5191/8807 instances and all state/profile/tar/ledger left untouched"
+  },
+  "verification": {
+    "commands": [
+      "packages/usage-insights/node_modules/.bin/tsc -p packages/usage-insights/tsconfig.json",
+      "packages/usage-insights/node_modules/.bin/tsc -p packages/usage-insights/tsconfig.build.json",
+      "packages/contracts/node_modules/.bin/tsc -p packages/contracts/tsconfig.build.json",
+      "node --test packages/usage-insights/test/*.case.ts",
+      "node --test tools/usage-insights/test/*.case.mjs",
+      "node tools/usage-insights/probe/observe-two-projects.mjs"
+    ],
+    "results": {
+      "typecheck": "pass",
+      "build": "pass",
+      "packageTests": { "total": 119, "pass": 119, "fail": 0 },
+      "toolTests": { "total": 45, "pass": 45, "fail": 0 },
+      "probe": "pass (all assertions, exit 0)"
+    },
+    "staticChecksConfer": "no runtime, native or release admission"
+  }
+}
