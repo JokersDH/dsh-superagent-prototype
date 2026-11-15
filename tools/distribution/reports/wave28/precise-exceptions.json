@@ -1,6 +1,6 @@
 {
   "protocol": "wave28-precise-restore-exceptions/1",
-  "status": "MANUAL_PROOF_PASS_INSTALLED_DRIVER_BLOCKED",
+  "status": "PASS_INSTALLED_DUAL_FORMAT",
   "cTool": {
     "path": "/Users/hh/Desktop/joker/superagent-agent-c/packages/context/tools/wave27-target-proof.mjs",
     "sha256": "2801906e4c7aa029c8e0011d2ed2c2e01fd80ec7870be4dabffc4b771b90689b"
@@ -39,10 +39,35 @@
     }
   },
   "installedDriver": {
-    "status": "BLOCKED",
-    "code": "target_subject_mismatch",
-    "message": "restore source root mapping differs from the independent expectation",
-    "detail": "C personal-review-driver canonicalizes source root to /private while restore-report records /var/folders; manual C wave27 proof with exact /var path passes."
+    "status": "PASS",
+    "v1": {
+      "format": "v1",
+      "status": "verified-flow",
+      "targetProof": "ok",
+      "verification": "ok",
+      "artifactCoverage": "independent",
+      "sources": "verified",
+      "history": 1,
+      "assertions": 21
+    },
+    "v2": {
+      "format": "v2",
+      "status": "verified-flow",
+      "targetProof": "ok",
+      "verification": "ok",
+      "artifactCoverage": "independent",
+      "sources": "verified",
+      "history": 1,
+      "assertions": 21
+    },
+    "drift": {
+      "status": "failed",
+      "code": "target_subject_mismatch",
+      "proofStatus": "blocked",
+      "message": "restored row content differs from the restore report",
+      "bodyReturned": false
+    },
+    "note": "C driver accepts --target-source-root and --target-artifacts; exact /var source root avoids canonical /private mismatch."
   },
   "conclusion": "A/C precise FTS/event/artifact exceptions are closed in the manual wave27 proof: foreign FTS row, foreign event_log row and artifact byte mutation all blocked before content. Installed package driver still needs C root normalization fix."
 }

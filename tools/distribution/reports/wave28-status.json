@@ -103,8 +103,8 @@
       "summary": "C wave27 precise proof with A workflow-content/2: baseline ok/independent; foreign FTS row, foreign event_log row and artifact byte mutation all mismatch/blocked before content. A/C whole-family exceptions are now closed in manual proof."
     },
     "d18": {
-      "status": "PASS_WITH_INSTALLED_DRIVER_BLOCK",
-      "summary": "Same package v2 precise target proof via C personal-review-driver is blocked by C source-root normalization (/private vs /var/folders), not by target content; manual proof with exact path passes."
+      "status": "PASS",
+      "summary": "Installed package C driver precise dual-format chain: v1 and v2 both verified-flow with target proof ok/independent, source verified, history1, 21 assertions, verified stop; v1 target-only message drift rejected as target_subject_mismatch before content."
     }
   },
   "testLayers": {
@@ -127,7 +127,6 @@
     "J recipe composition",
     "E successor independent verdict",
     "B/private/target",
-    "C driver source-root normalization for installed precise proof",
     "J recipe composition",
     "E successor independent verdict",
     "B/private/target"
@@ -142,8 +141,9 @@
     "tools/distribution/recipes/wave28-e-acceptance.zh-CN.md"
   ],
   "preciseExceptions": {
-    "status": "PASS_MANUAL",
+    "status": "PASS_INSTALLED_DUAL_FORMAT",
     "report": "tools/distribution/reports/wave28/precise-exceptions.json",
-    "installedDriver": "BLOCKED_C_ROOT_NORMALIZATION"
+    "manual": "FTS/event/artifact mutations blocked",
+    "installedDriver": "v1/v2 verified-flow, drift blocked"
   }
 }
