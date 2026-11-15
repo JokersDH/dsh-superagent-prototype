@@ -1,0 +1,67 @@
+{
+  "protocol": "wave28-startup-mode-consistency/1",
+  "status": "PASS",
+  "cases": {
+    "restoredNoReview": {
+      "startStatus": "RUNNING",
+      "instance": {
+        "mode": "personal",
+        "startupMode": "recovery_readonly",
+        "apiArgv": [
+          "--startup-mode",
+          "recovery_readonly",
+          "--assistant",
+          "--discussion-only"
+        ],
+        "launcherPid": 62648,
+        "apiPid": 62673,
+        "processStart": "Sun Nov 15 09:52:11 2026",
+        "apiProcessStart": "Sun Nov 15 09:52:12 2026"
+      },
+      "stopStatus": "STOPPED",
+      "stopped": true,
+      "recordRemoved": true,
+      "stopHealth": {
+        "status": "ok",
+        "mode": "personal",
+        "startupMode": "recovery_readonly",
+        "access": "local-development"
+      }
+    },
+    "normalDiscussion": {
+      "startStatus": "RUNNING",
+      "instance": {
+        "mode": "personal",
+        "startupMode": "normal",
+        "apiArgv": [
+          "--startup-mode",
+          "normal",
+          "--assistant",
+          "--discussion-only"
+        ],
+        "launcherPid": 65202,
+        "apiPid": 65225,
+        "processStart": "Sun Nov 15 09:53:09 2026",
+        "apiProcessStart": "Sun Nov 15 09:53:10 2026"
+      },
+      "stopStatus": "STOPPED",
+      "stopped": true,
+      "recordRemoved": true,
+      "stopHealth": {
+        "status": "ok",
+        "mode": "personal",
+        "access": "local-development"
+      }
+    }
+  },
+  "pureArgv": "startup-mode-argv.json",
+  "fixed": [
+    "recovery_readonly always gets --assistant --discussion-only even without review file",
+    "fixture no longer gets --assistant/--native",
+    "health.mode mismatch is rejected before RUNNING record"
+  ],
+  "limitations": [
+    "fixture actual start not re-run this round; argv pure control covers it",
+    "no native executor/model turn"
+  ]
+}

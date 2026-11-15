@@ -77,19 +77,18 @@ export function daemonArgv({ installRoot, apiPort, state, consoleURL, mode, acce
   ]
   // Recovery read-only never starts a native executor or a model provider, and we do not ask for
   // them either: the marker still forces read-only even if a caller passes normal/native/assistant.
-  if (startupMode !== 'recovery_readonly') {
+  if (startupMode === 'recovery_readonly') {
+    // A restored state is always a personal read-only discussion, with or without an explicit review
+    // file. Omitting --assistant/--discussion-only here made demo.ts fall back to fixture while the
+    // launcher still recorded personal; keep argv, record and health consistent instead.
+    argv.push('--assistant', '--discussion-only')
+    if (reviewRestoredScope !== null) argv.push('--review-restored-scope', reviewRestoredScope)
+  } else if (mode === 'personal') {
+    // No-executor personal startup is an explicit discussion-only mode; it never silently becomes
+    // the controlled fixture and never asks for a native executor.
     argv.push('--assistant')
-    if (mode === 'personal') {
-      // No-executor personal startup is an explicit discussion-only mode from main M1; it never
-      // silently becomes the controlled fixture and never asks for a native executor.
-      if (discussionOnly) argv.push('--discussion-only')
-      else argv.push('--native')
-    }
-  } else if (reviewRestoredScope !== null) {
-    // Main requires an explicitly requested personal restored startup to consume the review config.
-    // This is still recovery_readonly; the flag only enables read-only historical review, never an
-    // executor, queue replay or target. The launcher never discovers a config by itself.
-    argv.push('--assistant', '--discussion-only', '--review-restored-scope', reviewRestoredScope)
+    if (discussionOnly) argv.push('--discussion-only')
+    else argv.push('--native')
   }
   if (access === 'local-development') argv.push('--local-access')
   return argv
