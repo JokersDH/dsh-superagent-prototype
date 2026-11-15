@@ -1,0 +1,130 @@
+{
+  "protocol": "trial-operations/wave31-h1/1",
+  "generatedAt": "2026-11-15T15:28:17.496Z",
+  "command": "node tests/operational-soak/procguard/produce3.mjs --out <new-private-root>",
+  "exitCode": 0,
+  "sources": {
+    "tests/operational-soak/procguard/guard3.mjs": "6f35a8c204d01eace800b11086642552d43221e25e3b5fa209425e1729c67f70",
+    "tests/operational-soak/procguard/produce3.mjs": "dbb0500073ea2b6b870a7bdc953717ace2db19f376838bb12779e6af7866fe42",
+    "tests/operational-soak/procguard/guard3.case.mjs": "f3d8dde7cc7031bb336676673abccdc6dc8b00d7ea0a423c450c6344f91b6725",
+    "reports/trial-operations/wave31/procguard/mock.json": "af48c9a2663281e31705328c1daffbf96e5eea4daa292e40026608f92a5bd17a",
+    "reports/trial-operations/wave31/procguard/failure.json": "441161e77e1db4b589caea8a0f3d86d9f1bb5541f720fd0c97d0e7a752abf5e5",
+    "reports/trial-operations/wave31/procguard/report.json": "d9236feeb811834497608c61daf1027ca8173881f10c16e32c8104f34360a3b3"
+  },
+  "defectClosed": {
+    "id": "wave31-p1-incomplete-birth-raw-kill",
+    "was": "incomplete birth or UNKNOWN observation unconditionally called child.kill(SIGKILL)",
+    "now": "no raw child.kill; material retained with reason and signalSent=false; complete mocked birth signals only through registered handle and kill injection"
+  },
+  "fullIntent": {
+    "executable": "node",
+    "separateLaunchArgv": true,
+    "exactRootConfigOperation": true,
+    "privateImmutableFacts": true
+  },
+  "mock": {
+    "ok": true,
+    "checks": 17,
+    "spawns": 0,
+    "signals": 0,
+    "ps": 0
+  },
+  "failure": {
+    "ok": true,
+    "cases": [
+      {
+        "id": "observation_unknown",
+        "reason": "observation_unknown",
+        "childKill": 0,
+        "processKill": 0,
+        "spawns": 1,
+        "childExitCode": null
+      },
+      {
+        "id": "birth_report_missing",
+        "reason": "birth_report_missing",
+        "childKill": 0,
+        "processKill": 0,
+        "spawns": 1,
+        "childExitCode": null
+      },
+      {
+        "id": "identity_mismatch",
+        "reason": "identity_mismatch",
+        "childKill": 0,
+        "processKill": 0,
+        "spawns": 1,
+        "childExitCode": null
+      }
+    ],
+    "childKillCalls": 0,
+    "processKillCalls": 0
+  },
+  "live": {
+    "status": "LIVE_OK",
+    "checks": [
+      {
+        "id": "born_normal",
+        "ok": true
+      },
+      {
+        "id": "returned_observation_is_copy",
+        "ok": true
+      },
+      {
+        "id": "caller_mutation_does_not_retarget",
+        "ok": true
+      },
+      {
+        "id": "pure_controls",
+        "ok": true
+      },
+      {
+        "id": "unknown_wait_not_gone",
+        "ok": true
+      },
+      {
+        "id": "first_signal_plan_verified",
+        "ok": true
+      },
+      {
+        "id": "normal_term_gone",
+        "ok": true
+      },
+      {
+        "id": "stubborn_survived_term",
+        "ok": true
+      },
+      {
+        "id": "stubborn_kill_gone",
+        "ok": true
+      }
+    ],
+    "signals": [
+      {
+        "target": "normal",
+        "step": "TERM",
+        "sent": true,
+        "pid": 71776
+      },
+      {
+        "target": "stubborn",
+        "step": "TERM",
+        "sent": true,
+        "pid": 71785
+      },
+      {
+        "target": "stubborn",
+        "step": "KILL",
+        "sent": true,
+        "pid": 71785
+      }
+    ],
+    "observedPid": 71776
+  },
+  "limits": [
+    "single own probe process only; no Runner/daemon/product lifecycle",
+    "no global discovery, no foreign pid, no signal before mock and failure controls",
+    "UNKNOWN material retained; no cleanup claim"
+  ]
+}

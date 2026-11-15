@@ -1,0 +1,46 @@
+{
+  "ok": true,
+  "cases": [
+    {
+      "id": "observation_unknown",
+      "expected": "observation_unknown",
+      "retainedReason": "observation_unknown",
+      "retainedPid": 424242,
+      "retainedSignalSent": false,
+      "spawns": 1,
+      "childKillCalls": 0,
+      "processKillCalls": 0,
+      "childExitCode": null,
+      "root": "/tmp/h-w31-guard3/case-jnIlHu",
+      "ok": true
+    },
+    {
+      "id": "birth_report_missing",
+      "expected": "birth_report_missing",
+      "retainedReason": "birth_report_missing",
+      "retainedPid": 424242,
+      "retainedSignalSent": false,
+      "spawns": 1,
+      "childKillCalls": 0,
+      "processKillCalls": 0,
+      "childExitCode": null,
+      "root": "/tmp/h-w31-guard3/case-FuS1cb",
+      "ok": true
+    },
+    {
+      "id": "identity_mismatch",
+      "expected": "identity_mismatch",
+      "retainedReason": "identity_mismatch",
+      "retainedPid": 424242,
+      "retainedSignalSent": false,
+      "spawns": 1,
+      "childKillCalls": 0,
+      "processKillCalls": 0,
+      "childExitCode": null,
+      "root": "/tmp/h-w31-guard3/case-XLUbpW",
+      "ok": true
+    }
+  ],
+  "childKillCalls": 0,
+  "processKillCalls": 0
+}

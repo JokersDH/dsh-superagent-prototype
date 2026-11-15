@@ -6,7 +6,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { homeDir, redactValue } from '../../../tools/trial-kit/lib/redact.mjs'
-import { mockSuite, spawnOwnProbe, signalFresh, waitGone, pureControls, describeHandle, observeProcess } from './guard3.mjs'
+import { mockSuite, failureControls, spawnOwnProbe, signalFresh, waitGone, pureControls, describeHandle, observeProcess } from './guard3.mjs'
 
 const args = process.argv.slice(2)
 const outIndex = args.indexOf('--out')
@@ -16,7 +16,7 @@ const live = !args.includes('--no-live')
 mkdirSync(out, { mode: 0o700 })
 const write = (name, value) => writeFileSync(join(out, name), `${JSON.stringify(redactValue(value, { home: homeDir() }), null, 2)}\n`, { mode: 0o600, flag: 'wx' })
 
-const report = { tool: 'trial-kit/guard3', wave: 30, live, mock: null, liveChecks: [], signals: [], errors: [], status: 'RUNNING' }
+const report = { tool: 'trial-kit/guard3', wave: 31, live, mock: null, failure: null, liveChecks: [], signals: [], errors: [], status: 'RUNNING' }
 const mock = mockSuite()
 report.mock = mock
 write('mock.json', mock)
@@ -24,6 +24,14 @@ if (!mock.ok) {
   report.status = 'REFUSED_MOCK'
   write('report.json', report)
   console.error('guard3 mock suite failed'); process.exit(2)
+}
+const failure = await failureControls({ baseRoot: out })
+report.failure = failure
+write('failure.json', failure)
+if (!failure.ok || failure.childKillCalls !== 0 || failure.processKillCalls !== 0) {
+  report.status = 'REFUSED_FAILURE_CONTROLS'
+  write('report.json', report)
+  console.error('guard3 failure controls failed'); process.exit(2)
 }
 if (!live) {
   report.status = 'MOCK_ONLY_OK'

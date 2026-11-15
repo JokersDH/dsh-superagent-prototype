@@ -1,0 +1,815 @@
+{
+  "protocol": "trial-operations-status/1",
+  "wave": "product-wave-31",
+  "owner": "H",
+  "branch": "codex/g4-trial-operations",
+  "base": "55766f412bde0a4bf3b7b2569e8ae9c5b4c5f3ec",
+  "mergedMain": "928e3ce4",
+  "currentH": "PENDING_COMMIT",
+  "updatedAt": "2026-11-15T15:57:37.225Z",
+  "goal": {
+    "established": true,
+    "tokenBudget": null,
+    "packages": 3,
+    "outcomes": 12,
+    "continueAfterCheckpoint": true
+  },
+  "ownedPaths": [
+    "tools/trial-kit/",
+    "tests/operational-soak/",
+    "docs/internal-trial/",
+    "reports/trial-operations/"
+  ],
+  "sources": {
+    "H": {
+      "fixedBase": "55766f412bde0a4bf3b7b2569e8ae9c5b4c5f3ec",
+      "merge": "928e3ce4"
+    },
+    "B": {
+      "commit": "fbc933166758f446ba8907ce93795d04d34d11d7",
+      "branch": "codex/g1-runtime"
+    },
+    "I": {
+      "commit": "4bce0673388f22952513b5e530381f7a95e7a794",
+      "branch": "codex/g5-coordinator-channel"
+    },
+    "main": {
+      "checkpoint": "303b2c6a",
+      "mergeObserved": "928e3ce4",
+      "binding": "928e3ce4c8cca15263d81ffcfd79134ae23ecd61"
+    },
+    "R1": {
+      "name": "wave30-target-8296720",
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "buildId": "8296720d8a25f38c",
+      "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "closure": "3fa4b84a05421d67ba870caf5da6249deb45272d47fd0a2425f630e9a01b53c1"
+    },
+    "R2": {
+      "name": "wave31-target-4dcd28f",
+      "tarSha256": "405ecd02fcbf288bac0855e17911ec4035521b54fe27d81fa0b28feaf5addcc6",
+      "buildId": "4dcd28f758bbb265",
+      "source": "c0a1f8975232b6397dfaf92d31ac5682df2dab36",
+      "closure": "9352b0dcb4390e118ed897449d4c792f0f77a66b149483554e21bf466344d18c",
+      "note": "successor freeze after 303b2c6a; not relabelled R1"
+    }
+  },
+  "packages": {
+    "package1": {
+      "outcomes": [
+        "H1",
+        "H2",
+        "H3",
+        "H4"
+      ],
+      "status": "CHECKPOINT_SOURCE_PUBLISHED"
+    },
+    "package2": {
+      "outcomes": [
+        "H5",
+        "H6",
+        "H7",
+        "H8"
+      ],
+      "status": "CHECKPOINT_SOURCE_PUBLISHED_WITH_NOT_REACHED"
+    },
+    "package3": {
+      "outcomes": [
+        "H9",
+        "H10",
+        "H11",
+        "H12"
+      ],
+      "status": "CHECKPOINT_SOURCE_PUBLISHED_WITH_NOT_REACHED"
+    }
+  },
+  "outcomes": {
+    "H1": {
+      "status": "COMPLETE",
+      "source": [
+        "tests/operational-soak/procguard/guard3.mjs",
+        "tests/operational-soak/procguard/produce3.mjs",
+        "tests/operational-soak/procguard/guard3.case.mjs"
+      ],
+      "command": "node tests/operational-soak/procguard/produce3.mjs --out <new-root>",
+      "exit": 0,
+      "defectClosed": {
+        "id": "wave31-p1-incomplete-birth-raw-kill",
+        "was": "incomplete birth or UNKNOWN observation unconditionally called child.kill(SIGKILL)",
+        "now": "no raw child.kill; material retained with reason and signalSent=false; complete mocked birth signals only through registered handle and kill injection"
+      },
+      "mock": {
+        "ok": true,
+        "checks": 17,
+        "spawns": 0,
+        "signals": 0,
+        "ps": 0
+      },
+      "failure": {
+        "ok": true,
+        "cases": [
+          {
+            "id": "observation_unknown",
+            "reason": "observation_unknown",
+            "childKill": 0,
+            "processKill": 0,
+            "spawns": 1,
+            "childExitCode": null
+          },
+          {
+            "id": "birth_report_missing",
+            "reason": "birth_report_missing",
+            "childKill": 0,
+            "processKill": 0,
+            "spawns": 1,
+            "childExitCode": null
+          },
+          {
+            "id": "identity_mismatch",
+            "reason": "identity_mismatch",
+            "childKill": 0,
+            "processKill": 0,
+            "spawns": 1,
+            "childExitCode": null
+          }
+        ],
+        "childKillCalls": 0,
+        "processKillCalls": 0
+      },
+      "live": {
+        "status": "LIVE_OK",
+        "checks": [
+          {
+            "id": "born_normal",
+            "ok": true
+          },
+          {
+            "id": "returned_observation_is_copy",
+            "ok": true
+          },
+          {
+            "id": "caller_mutation_does_not_retarget",
+            "ok": true
+          },
+          {
+            "id": "pure_controls",
+            "ok": true
+          },
+          {
+            "id": "unknown_wait_not_gone",
+            "ok": true
+          },
+          {
+            "id": "first_signal_plan_verified",
+            "ok": true
+          },
+          {
+            "id": "normal_term_gone",
+            "ok": true
+          },
+          {
+            "id": "stubborn_survived_term",
+            "ok": true
+          },
+          {
+            "id": "stubborn_kill_gone",
+            "ok": true
+          }
+        ],
+        "signals": [
+          {
+            "target": "normal",
+            "step": "TERM",
+            "sent": true,
+            "pid": 71776
+          },
+          {
+            "target": "stubborn",
+            "step": "TERM",
+            "sent": true,
+            "pid": 71785
+          },
+          {
+            "target": "stubborn",
+            "step": "KILL",
+            "sent": true,
+            "pid": 71785
+          }
+        ],
+        "observedPid": 71776
+      },
+      "evidence": "reports/trial-operations/wave31/procguard/evidence.json"
+    },
+    "H2": {
+      "status": "COMPLETE_WITH_NOT_REACHED",
+      "source": [
+        "tests/operational-soak/selected/source2.mjs",
+        "tests/operational-soak/selected/i-consumer2.mjs",
+        "tests/operational-soak/selected/b-service-consumer2.mjs",
+        "tests/operational-soak/selected/produce2.mjs"
+      ],
+      "command": "node tests/operational-soak/selected/produce2.mjs --i-commit 4bce067 --b-commit fbc9331",
+      "exit": 0,
+      "checks": {
+        "source": {
+          "sourcesOk": true,
+          "sourcesUnchanged": true,
+          "materializedUnchanged": true,
+          "iChecks": true,
+          "bChecks": true,
+          "bSinkGuardClosed": true,
+          "zeroModel": true,
+          "zeroSignals": true
+        },
+        "i": {
+          "fact": true,
+          "ackFailed": true,
+          "payload": true,
+          "writeAllow": true,
+          "writeDeny": true,
+          "freshIntentFixed": true,
+          "queueNamespace": true,
+          "timeoutPrune": true,
+          "generation": true,
+          "oldLease": true,
+          "capacity": true,
+          "close": true
+        },
+        "b": {
+          "factThreeFrames": true,
+          "duplicateReceipt": true,
+          "payloadRead": true,
+          "externalAllow": true,
+          "externalDeny": true,
+          "sinkMissingGuardRefused": true,
+          "sinkDenyRefused": true,
+          "sinkAllowFresh": true
+        }
+      },
+      "evidence": "reports/trial-operations/wave31/selected-current/report.json",
+      "notReached": [
+        "main NativeProductAttempt beforeNativeWrite actual guard join",
+        "same-Runner product route",
+        "B SIGKILL recovery"
+      ]
+    },
+    "H3": {
+      "status": "PARTIAL_B_JOIN_NOT_REACHED",
+      "source": [
+        "tests/operational-soak/selected/same-store-join2.mjs",
+        "tests/operational-soak/selected/produce-join2.mjs",
+        "tests/operational-soak/selected/join.case.mjs"
+      ],
+      "command": "node tests/operational-soak/selected/produce-join2.mjs --out <new-root>",
+      "exit": 0,
+      "checks": {
+        "ownSubjectAccepted": true,
+        "factDurable": true,
+        "originalWorkReadable": true,
+        "originalQuestionReadable": true,
+        "originalAnswerReadable": true,
+        "originalCommandReadable": true,
+        "foreignWorkRefused": true,
+        "foreignAttemptRefused": true,
+        "foreignSourceRefused": true,
+        "invalidVersionRefused": true,
+        "zeroForeignWrites": true
+      },
+      "original": {
+        "workId": "94012e1a1c7265c033f285a944656a04",
+        "questionId": "d1046d923223c0769ce0af4ada400ad8",
+        "answerId": "0c4da78469ec2ca5857439d4cfb1837a",
+        "commandId": "recovery-command-2",
+        "attemptId": "attempt-b9c8ceb7-769a-4155-ac30-f65ca19e32e9",
+        "contract": {
+          "workId": "94012e1a1c7265c033f285a944656a04",
+          "revision": 1,
+          "digest": "4d7f353c47e01fa098cc3254630cc65c19ba132f9c64362da6e5e5c98e67b78a"
+        }
+      },
+      "bCallbackJoin": "NOT_REACHED: current B serveRunner fixture facts are not ingested as this original question/answer; no B same-run callback join was executed.",
+      "businessIngressJoin": "NOT_REACHED: the durable fact above is an original receiver check on the same Store, not the original answer command path.",
+      "evidence": "reports/trial-operations/wave31/join/report.json"
+    },
+    "H4": {
+      "status": "COMPLETE_ORDINARY",
+      "source": [
+        "tests/operational-soak/delivery/consumer.mjs",
+        "tests/operational-soak/delivery/produce.mjs"
+      ],
+      "command": "node tests/operational-soak/delivery/produce.mjs --out <new-root>",
+      "exit": 0,
+      "checks": {
+        "normalAnswered": true,
+        "normalCandidate": true,
+        "normalAccepted": true,
+        "wrongCandidateRefused": true,
+        "delivered": true,
+        "workViewIdentity": true,
+        "duplicateAcceptIdempotent": true,
+        "slots2": true,
+        "slots4": true,
+        "answerReplayIdempotent": true,
+        "answerConflictRejected": true,
+        "beginReplayIdempotent": true
+      },
+      "normal": {
+        "workId": "0a3c3213f00cdcd181ab8db13dca1894",
+        "questionId": "c94235d9f0fac5b153d0ea20c74ae2e8",
+        "candidate": {
+          "ticketId": "348a89209c1fc1a5ad223b09b86ebef9",
+          "assignmentId": "bac96a58172f227713c7111b4cd4b96b",
+          "contract": {
+            "workId": "0a3c3213f00cdcd181ab8db13dca1894",
+            "revision": 1,
+            "digest": "4d7f353c47e01fa098cc3254630cc65c19ba132f9c64362da6e5e5c98e67b78a"
+          },
+          "candidateGeneration": 3
+        },
+        "accepted": "recorded",
+        "phase": "delivered",
+        "artifacts": 4
+      },
+      "evidence": "reports/trial-operations/wave31/delivery/delivery.json"
+    },
+    "H5": {
+      "status": "PARTIAL_B_RECOVERY_NOT_REACHED",
+      "source": [
+        "tests/operational-soak/recovery/normal-child.mjs",
+        "tests/operational-soak/recovery/successor-read.mjs",
+        "tests/operational-soak/recovery/successor2.mjs",
+        "tests/operational-soak/recovery/produce-successor2.mjs"
+      ],
+      "command": "node tests/operational-soak/recovery/produce-successor2.mjs --out <new-root>",
+      "exit": 0,
+      "checks": {
+        "producerExit0": true,
+        "producerPidGone": true,
+        "successorDifferentPid": true,
+        "successorExit0": true,
+        "sameWorkQuestionAnswer": true,
+        "nativeApplied": true,
+        "sameStoreOriginalTuple": true,
+        "wrongWorkRefused": true,
+        "missingStateRefused": true,
+        "noSignalSent": true
+      },
+      "producerPid": 62493,
+      "successorPid": 62898,
+      "original": {
+        "pid": 62493,
+        "workId": "94012e1a1c7265c033f285a944656a04",
+        "questionId": "b4488cd86bae38b2e1a689dde6edc43b",
+        "answerId": "0c4da78469ec2ca5857439d4cfb1837a",
+        "commandId": "recovery-command-2",
+        "attemptId": "attempt-20be5546-4440-4c50-9e31-e7654b3868cd",
+        "delivery": "native_applied"
+      },
+      "bRecovery": "NOT_REACHED: this is an independent new process reading the original Store, not a B coordinator recovery or Runner continuation.",
+      "evidence": "reports/trial-operations/wave31/successor/report.json"
+    },
+    "H6": {
+      "status": "PARTIAL_B_CRASH_WINDOWS_NOT_REACHED",
+      "source": [
+        "tests/operational-soak/delivery/windows2.mjs",
+        "tests/operational-soak/delivery/windows2.case.mjs"
+      ],
+      "command": "windows2.runAckWindows on original A Store",
+      "exit": 0,
+      "checks": {
+        "beginNotAccepted": true,
+        "answerNotAccepted": true,
+        "receiverUnknown": true,
+        "factDurable": true,
+        "conflictRefused": true,
+        "answerWrittenNotTerminal": true,
+        "lateDuplicateNoResend": true,
+        "terminalNative": true,
+        "missingDeliveryUnknown": true,
+        "zeroResend": true
+      },
+      "windowCount": 8,
+      "notReached": [
+        "actual B coordinator SIGKILL -> new process original A/question/answer/ACK recovery",
+        "same original Work recovered candidate/accept/delivered after a real rebind",
+        "live FD/socket/queue physical quiescence (H1 guard covers only own probes)"
+      ],
+      "evidence": "reports/trial-operations/wave31/windows/windows.json"
+    },
+    "H7": {
+      "status": "PARTIAL_B_24_SLOTS_NOT_REACHED",
+      "source": [
+        "tests/operational-soak/delivery/resources2.mjs",
+        "tests/operational-soak/delivery/consumer.mjs"
+      ],
+      "command": "resources2.evaluateResourceLedger + delivery slots 2/4",
+      "exit": 0,
+      "ledger": {
+        "full": {
+          "quiescent": true,
+          "complete": true,
+          "counts": {
+            "total": 9,
+            "ended": 9,
+            "live": 0,
+            "unknown": 0,
+            "missingEvidence": 0
+          },
+          "unknown": [],
+          "live": [],
+          "missingEvidence": [],
+          "badKind": [],
+          "duplicates": false,
+          "moduleClosed": true,
+          "parentPidGone": true,
+          "reason": "all_known_resources_ended",
+          "closeIsQuiescence": false
+        },
+        "unknown": {
+          "quiescent": false,
+          "complete": true,
+          "counts": {
+            "total": 9,
+            "ended": 8,
+            "live": 0,
+            "unknown": 1,
+            "missingEvidence": 0
+          },
+          "unknown": [
+            {
+              "kind": "socket",
+              "id": "fixture-socket"
+            }
+          ],
+          "live": [],
+          "missingEvidence": [],
+          "badKind": [],
+          "duplicates": false,
+          "moduleClosed": true,
+          "parentPidGone": true,
+          "reason": "unknown_resource",
+          "closeIsQuiescence": false
+        },
+        "live": {
+          "quiescent": false,
+          "complete": true,
+          "counts": {
+            "total": 9,
+            "ended": 8,
+            "live": 1,
+            "unknown": 0,
+            "missingEvidence": 0
+          },
+          "unknown": [],
+          "live": [
+            {
+              "kind": "fd",
+              "id": "fixture-fd"
+            }
+          ],
+          "missingEvidence": [],
+          "badKind": [],
+          "duplicates": false,
+          "moduleClosed": true,
+          "parentPidGone": true,
+          "reason": "live_resource",
+          "closeIsQuiescence": false
+        },
+        "no-evidence": {
+          "quiescent": false,
+          "complete": true,
+          "counts": {
+            "total": 9,
+            "ended": 9,
+            "live": 0,
+            "unknown": 0,
+            "missingEvidence": 1
+          },
+          "unknown": [],
+          "live": [],
+          "missingEvidence": [
+            {
+              "kind": "timer",
+              "id": "fixture-timer"
+            }
+          ],
+          "badKind": [],
+          "duplicates": false,
+          "moduleClosed": true,
+          "parentPidGone": true,
+          "reason": "ended_without_evidence",
+          "closeIsQuiescence": false
+        },
+        "module-only": {
+          "quiescent": false,
+          "complete": true,
+          "counts": {
+            "total": 0,
+            "ended": 0,
+            "live": 0,
+            "unknown": 0,
+            "missingEvidence": 0
+          },
+          "unknown": [],
+          "live": [],
+          "missingEvidence": [],
+          "badKind": [],
+          "duplicates": false,
+          "moduleClosed": true,
+          "parentPidGone": true,
+          "reason": "empty_set",
+          "closeIsQuiescence": false
+        }
+      },
+      "slots": {
+        "2": {
+          "works": 2,
+          "delivered": 2,
+          "workViewIdsMatch": true,
+          "artifactCounts": [
+            4,
+            4
+          ],
+          "resourceStatuses": [
+            "quiescent",
+            "quiescent"
+          ],
+          "beginFrames": 2,
+          "uniqueAttemptIds": null,
+          "queueDue": 0,
+          "slotCapObserved": "not_configurable_in_fixture",
+          "attemptIdentityNote": "begin frame count is observed; the receipt projection carries no attemptId, so unique attempt identity is unknown"
+        },
+        "4": {
+          "works": 4,
+          "delivered": 4,
+          "workViewIdsMatch": true,
+          "artifactCounts": [
+            4,
+            4,
+            4,
+            4
+          ],
+          "resourceStatuses": [
+            "quiescent",
+            "quiescent",
+            "quiescent",
+            "quiescent"
+          ],
+          "beginFrames": 4,
+          "uniqueAttemptIds": null,
+          "queueDue": 0,
+          "slotCapObserved": "not_configurable_in_fixture",
+          "attemptIdentityNote": "begin frame count is observed; the receipt projection carries no attemptId, so unique attempt identity is unknown"
+        }
+      },
+      "note": "controlled 2/4 works delivered with quiescent resourceStatus; native slot cap/resource set not configurable",
+      "evidence": "reports/trial-operations/wave31/windows/windows.json"
+    },
+    "H8": {
+      "status": "PARTIAL_RECOVERED_NOT_REACHED",
+      "source": [
+        "tests/operational-soak/delivery/consumer.mjs"
+      ],
+      "command": "node tests/operational-soak/delivery/produce.mjs --out <new-root>",
+      "exit": 0,
+      "ordinary": {
+        "normalAnswered": true,
+        "normalCandidate": true,
+        "normalAccepted": true,
+        "wrongCandidateRefused": true,
+        "delivered": true,
+        "workViewIdentity": true,
+        "duplicateAcceptIdempotent": true,
+        "slots2": true,
+        "slots4": true,
+        "answerReplayIdempotent": true,
+        "answerConflictRejected": true,
+        "beginReplayIdempotent": true
+      },
+      "candidateGeneration": 3,
+      "artifacts": 4,
+      "notReached": [
+        "native vendor execution / native compatibility",
+        "recovered Work candidate/accept after a real B/I channel rebind",
+        "native 2/4 slot resource set (no slot-cap configuration in this fixture)"
+      ],
+      "evidence": "reports/trial-operations/wave31/delivery/delivery.json"
+    },
+    "H9": {
+      "status": "COMPLETE_READONLY_R1_R2",
+      "source": [
+        "tools/trial-kit/bin/trial-preflight.mjs",
+        "tools/trial-kit/bin/trial-machinecheck.mjs"
+      ],
+      "R1": {
+        "preflight": {
+          "exit": 1,
+          "result": "DEGRADED",
+          "pass": 32,
+          "unknown": 1,
+          "fail": 0
+        },
+        "machinecheck": {
+          "exit": 1,
+          "result": "DEGRADED",
+          "pass": 46,
+          "unknown": 3,
+          "fail": 0
+        },
+        "restore": "OK_WITH_NOT_REACHED"
+      },
+      "R2": {
+        "preflight": {
+          "exit": 1,
+          "result": "DEGRADED",
+          "pass": 32,
+          "unknown": 1,
+          "fail": 0
+        },
+        "machinecheck": {
+          "exit": 1,
+          "result": "DEGRADED",
+          "pass": 46,
+          "unknown": 3,
+          "fail": 0
+        },
+        "restore": "OK_WITH_NOT_REACHED"
+      },
+      "negative": [
+        "wrong sha REFUSED exit2",
+        "wrong build REFUSED exit2",
+        "wrong source REFUSED exit2"
+      ],
+      "evidence": "reports/trial-operations/wave31/package/ and package-r2/"
+    },
+    "H10": {
+      "status": "PARTIAL_CONTENT_SSE_NOT_REACHED",
+      "source": [
+        "tests/operational-soak/package/readonly2.mjs",
+        "tests/operational-soak/package/produce-readonly2.mjs"
+      ],
+      "command": "node tests/operational-soak/package/produce-readonly2.mjs --tar <R1>",
+      "exit": 0,
+      "checks": {
+        "statusAStopped": true,
+        "statusBStopped": true,
+        "rootsIsolated": true,
+        "noCrossRoot": true,
+        "recoveryAProtocol": true,
+        "recoveryBProtocol": true,
+        "markerAbsentNotAuthority": true,
+        "queueNeverReplayed": true,
+        "distinctRootsRecovery": true,
+        "noTaskStarted": true
+      },
+      "commandExits": {
+        "statusA": 2,
+        "statusB": 2,
+        "recoveryA": 0,
+        "recoveryB": 0
+      },
+      "contentRead": "NOT_REACHED: no started product HTTP/readonly content endpoint was used.",
+      "sse": "NOT_REACHED: no package SSE entry was started; the bounded fixture soak is separately labelled and is not a package endpoint.",
+      "evidence": "reports/trial-operations/wave31/readonly/report.json"
+    },
+    "H11": {
+      "status": "PARTIAL_REVIEW_STARTUP_NOT_REACHED",
+      "source": [
+        "tests/operational-soak/package/backup-restore2.mjs",
+        "tests/operational-soak/package/produce-restore2.mjs"
+      ],
+      "command": "node tests/operational-soak/package/produce-restore2.mjs --tar <R1|R2>",
+      "exit": 0,
+      "R1": {
+        "status": "OK_WITH_NOT_REACHED",
+        "readback": {
+          "work": "94012e1a1c7265c033f285a944656a04",
+          "question": "5884eab99e65001f13853a4f9c1e3a89",
+          "questionVersion": 2,
+          "answer": "5884eab99e65001f13853a4f9c1e3a89",
+          "delivery": "native_applied",
+          "command": "recorded"
+        },
+        "statuses": {
+          "backup": "CREATED",
+          "verify": "VERIFIED",
+          "restore": "RESTORED",
+          "secondRestore": "BLOCKED",
+          "emptyBackup": "BLOCKED"
+        }
+      },
+      "R2": {
+        "status": "OK_WITH_NOT_REACHED",
+        "readback": {
+          "work": "94012e1a1c7265c033f285a944656a04",
+          "question": "75534347e8b8033eea94c1060a722e1f",
+          "questionVersion": 2,
+          "answer": "75534347e8b8033eea94c1060a722e1f",
+          "delivery": "native_applied",
+          "command": "recorded"
+        },
+        "statuses": {
+          "backup": "CREATED",
+          "verify": "VERIFIED",
+          "restore": "RESTORED",
+          "secondRestore": "BLOCKED",
+          "emptyBackup": "BLOCKED"
+        }
+      },
+      "reviewStartup": "NOT_REACHED",
+      "evidence": "reports/trial-operations/wave31/restore/ and package-r2/restore/"
+    },
+    "H12": {
+      "status": "COMPLETE_SUPPORT_PACKAGE",
+      "source": [
+        "docs/internal-trial/README.zh-CN.md",
+        "tools/trial-kit/"
+      ],
+      "command": "trial-soak 5s + trial-verify-run",
+      "exit": 0,
+      "soak": {
+        "status": "COMPLETED_WITH_OBSERVED_DEFECT",
+        "connections": null,
+        "events": null,
+        "failures": null,
+        "cleanup": {
+          "closed": true,
+          "activeSockets": 0,
+          "activeConnections": 0
+        }
+      },
+      "scope": "fixture only; not package daemon, not 48h/30d, not E required",
+      "evidence": "reports/trial-operations/wave31/soak-5s/"
+    }
+  },
+  "remaining": [
+    "B actual same-Runner/product callback join into the original question/answer ingress",
+    "B coordinator SIGKILL -> original A question/answer/ACK in a new process, with Runner continuation",
+    "recovered same-Work verification/candidate/manual acceptance after a real rebind",
+    "native 2/4 slot cap/resource set and product scheduler release",
+    "package-started HTTP readonly content and SSE entry (R1/R2 only status/recovery-status/CLI)",
+    "explicit review-restored startup/REUSED path in R1/R2",
+    "vendor/native/installed release acceptance; E remains independent"
+  ],
+  "usage": {
+    "modelCalls": 0,
+    "vendorTurns": 0,
+    "nativeTurns": 0,
+    "tokenBudget": null,
+    "userServices": "5180/8796..5191/8807 untouched",
+    "globalDiscovery": false,
+    "foreignSignals": 0
+  },
+  "errors": [
+    {
+      "id": "normal-chain-under-reports-timeout",
+      "observed": "produce-join2 and earlier wave30 original producer timed out when --out was inside reports/; same code passes under /tmp",
+      "workaround": "produced join/successor/restore under /tmp new roots and copied only JSON evidence",
+      "sourceChanged": false
+    },
+    {
+      "id": "concurrent-suite-timeout",
+      "observed": "default-concurrency run hit 240s test timeouts for package restore, recovery third case, and selected current; these are slow integration tests contending under load",
+      "rerun": "each file passed individually (restore 6.3s, recovery 5.8s, current 13.7s)",
+      "sourceChanged": false
+    }
+  ],
+  "hashes": {
+    "reports/trial-operations/wave31/procguard/evidence.json": "83e633f89ea84c70e77544c329a657946eb6dfd037f464093b71391ab098f869",
+    "reports/trial-operations/wave31/selected-current/report.json": "e2f8b48e6068313927d70c03fba08b802f27f2d54445d450bc6f13e9f2295729",
+    "reports/trial-operations/wave31/join/report.json": "b74f5267584646a9b918d9ae1a728324e86a7297db6e9963464f207cdd6d5489",
+    "reports/trial-operations/wave31/successor/report.json": "9a1e811b328e2c86d7698a561243b9fe3c59ac763497e39ef36ee06e4d33602f",
+    "reports/trial-operations/wave31/delivery/delivery.json": "cdac7ed8849f771adc5b42f8de13cbb993edabeb50d1346b3c01d7dd57e4a8dd",
+    "reports/trial-operations/wave31/windows/windows.json": "5f88d12d7264e9751cfdb5e4c415e9e3dc122495cd5bfe1f0f9c79ecd693c048",
+    "reports/trial-operations/wave31/package/preflight/preflight-report.json": "c4bc208190d73ac0ff6f803abb0efda7fce7af7a15c02d56716df029e8090ac4",
+    "reports/trial-operations/wave31/package-r2/preflight/preflight-report.json": "88628772cfc68c8e54b5263be5a9b85dd68304815d3174c2389a2a7f84d9d160",
+    "reports/trial-operations/wave31/restore/report.json": "43c96af4d3c601e1b72e4a440a3376eee7a7f3576055d4b9548050119ff50100",
+    "reports/trial-operations/wave31/package-r2/restore/report.json": "6e6c43b481adf0e075578bc36a76a26dfb8a90d2e2f558552d474a9686f89a81",
+    "reports/trial-operations/wave31/readonly/report.json": "599c0c81d9bf7edd8722ecbdfa1c548bced43f9142e7dc95f11a324682e0b06a"
+  },
+  "tests": {
+    "individual": [
+      {
+        "command": "node --test guard3.case.mjs",
+        "passed": 7,
+        "failed": 0
+      },
+      {
+        "command": "node --test join.case.mjs successor.case.mjs readonly.case.mjs restore.case.mjs",
+        "passed": 4,
+        "failed": 0
+      },
+      {
+        "command": "node --test windows2.case.mjs delivery.case.mjs current.case.mjs original.case.mjs recovery.case.mjs channel.case.mjs",
+        "passed": 14,
+        "failed": 0
+      }
+    ],
+    "concurrentAttempt": {
+      "command": "node --test (11 case files, default concurrency)",
+      "result": "timeouts in package/restore, recovery third case, selected/current under load; each passed individually immediately after",
+      "hidden": false
+    }
+  }
+}

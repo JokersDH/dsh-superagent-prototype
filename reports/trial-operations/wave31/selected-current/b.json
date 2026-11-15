@@ -1,0 +1,186 @@
+{
+  "protocol": "selected-b-current-consumer/2",
+  "surface": "current committed B serveRunner with current I attach-channel (materialized) and mandatory sink guard",
+  "executor": "deterministic fixture driver",
+  "modelCalls": 0,
+  "vendorTurns": 0,
+  "signalsSent": 0,
+  "normal": {
+    "mode": "allow",
+    "counts": {
+      "factFrames": 3,
+      "payloadReadFrames": 4,
+      "writeIntentFrames": 1,
+      "receipts": 2,
+      "ackFailed": 1,
+      "externalGuardCalls": 1,
+      "externalDenied": 0,
+      "sinkHookResolved": 0,
+      "sinkHookRejected": 0,
+      "sinkGuardCalls": 0
+    },
+    "observed": {
+      "payload": {
+        "kind": "coordinator-payload/1",
+        "items": [
+          1,
+          2,
+          3
+        ]
+      },
+      "ackFailure": "coordinator refused fact fact-ack-failed-wave29: fixture_receiver_refused",
+      "duplicateSameSeq": true,
+      "admitted": true,
+      "deniedReason": null
+    },
+    "frames": [
+      "ready",
+      "payload-read",
+      "payload-read",
+      "fact",
+      "receipt",
+      "payload-read",
+      "fact",
+      "receipt",
+      "payload-read",
+      "fact",
+      "progress",
+      "native-write-intent",
+      "exited"
+    ]
+  },
+  "deny": {
+    "mode": "deny",
+    "counts": {
+      "factFrames": 3,
+      "payloadReadFrames": 4,
+      "writeIntentFrames": 1,
+      "receipts": 2,
+      "ackFailed": 1,
+      "externalGuardCalls": 1,
+      "externalDenied": 1,
+      "sinkHookResolved": 0,
+      "sinkHookRejected": 0,
+      "sinkGuardCalls": 0
+    },
+    "observed": {
+      "payload": {
+        "kind": "coordinator-payload/1",
+        "items": [
+          1,
+          2,
+          3
+        ]
+      },
+      "ackFailure": "coordinator refused fact fact-ack-failed-wave29: fixture_receiver_refused",
+      "duplicateSameSeq": true,
+      "admitted": false,
+      "deniedReason": "native write denied for cmd-answer"
+    },
+    "frames": [
+      "ready",
+      "payload-read",
+      "payload-read",
+      "fact",
+      "receipt",
+      "payload-read",
+      "fact",
+      "receipt",
+      "payload-read",
+      "fact",
+      "progress",
+      "native-write-intent",
+      "exited"
+    ]
+  },
+  "sinkMissing": {
+    "mode": "sink-missing",
+    "counts": {
+      "factFrames": 0,
+      "payloadReadFrames": 0,
+      "writeIntentFrames": 0,
+      "receipts": 0,
+      "ackFailed": 0,
+      "externalGuardCalls": 0,
+      "externalDenied": 0,
+      "sinkHookResolved": 0,
+      "sinkHookRejected": 1,
+      "sinkGuardCalls": 0
+    },
+    "observed": {
+      "payload": null,
+      "ackFailure": null,
+      "duplicateSameSeq": null,
+      "admitted": null,
+      "deniedReason": "native write denied for cmd-answer"
+    },
+    "frames": [
+      "ready",
+      "exited"
+    ]
+  },
+  "sinkDeny": {
+    "mode": "sink-deny",
+    "counts": {
+      "factFrames": 0,
+      "payloadReadFrames": 0,
+      "writeIntentFrames": 0,
+      "receipts": 0,
+      "ackFailed": 0,
+      "externalGuardCalls": 0,
+      "externalDenied": 0,
+      "sinkHookResolved": 0,
+      "sinkHookRejected": 1,
+      "sinkGuardCalls": 1
+    },
+    "observed": {
+      "payload": null,
+      "ackFailure": null,
+      "duplicateSameSeq": null,
+      "admitted": null,
+      "deniedReason": "native write denied for cmd-answer"
+    },
+    "frames": [
+      "ready",
+      "exited"
+    ]
+  },
+  "sinkAllow": {
+    "mode": "sink-allow",
+    "counts": {
+      "factFrames": 0,
+      "payloadReadFrames": 0,
+      "writeIntentFrames": 0,
+      "receipts": 0,
+      "ackFailed": 0,
+      "externalGuardCalls": 0,
+      "externalDenied": 0,
+      "sinkHookResolved": 2,
+      "sinkHookRejected": 0,
+      "sinkGuardCalls": 2
+    },
+    "observed": {
+      "payload": null,
+      "ackFailure": null,
+      "duplicateSameSeq": null,
+      "admitted": null,
+      "deniedReason": null
+    },
+    "frames": [
+      "ready",
+      "exited"
+    ]
+  },
+  "checks": {
+    "factThreeFrames": true,
+    "duplicateReceipt": true,
+    "payloadRead": true,
+    "externalAllow": true,
+    "externalDeny": true,
+    "sinkMissingGuardRefused": true,
+    "sinkDenyRefused": true,
+    "sinkAllowFresh": true
+  },
+  "findings": [],
+  "historical": "wave29 observed the sink-only auto-allow on the older B commit; current B refuses missing/deny/throw and asks the fresh guard per intent."
+}

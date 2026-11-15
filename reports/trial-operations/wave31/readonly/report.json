@@ -1,0 +1,24 @@
+{
+  "status": "OK_WITH_NOT_REACHED",
+  "failed": [],
+  "checks": {
+    "statusAStopped": true,
+    "statusBStopped": true,
+    "rootsIsolated": true,
+    "noCrossRoot": true,
+    "recoveryAProtocol": true,
+    "recoveryBProtocol": true,
+    "markerAbsentNotAuthority": true,
+    "queueNeverReplayed": true,
+    "distinctRootsRecovery": true,
+    "noTaskStarted": true
+  },
+  "commandExits": {
+    "statusA": 2,
+    "statusB": 2,
+    "recoveryA": 0,
+    "recoveryB": 0
+  },
+  "contentRead": "NOT_REACHED: no started product HTTP/readonly content endpoint was used.",
+  "sse": "NOT_REACHED: no package SSE entry was started; the bounded fixture soak is separately labelled and is not a package endpoint."
+}

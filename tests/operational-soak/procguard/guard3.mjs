@@ -8,7 +8,7 @@
  * TERM/KILL re-reads the whole identity. `ps` failures remain UNKNOWN and never mean gone.
  */
 import { spawn, spawnSync } from 'node:child_process'
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 const PS = '/bin/ps'
@@ -53,9 +53,16 @@ function clone(value) { return structuredClone(value) }
 export function compareRecord3(record, observed) {
   const issues = []
   if (record === null || typeof record !== 'object') return { ok: false, issues: ['record_missing'] }
-  for (const field of ['pid', 'ppid', 'uid', 'start', 'command', 'root', 'config', 'operation'])
+  for (const field of ['pid', 'ppid', 'uid', 'start', 'command', 'root', 'config', 'operation', 'executable'])
     if (record[field] === undefined || record[field] === null) issues.push(`record_${field}_missing`)
   if (!Array.isArray(record.argv) || record.argv.length === 0) issues.push('record_argv_missing')
+  if (record.launch === undefined || record.launch === null) issues.push('record_launch_missing')
+  else {
+    if (record.launch.executable !== record.executable) issues.push('launch_executable_mismatch')
+    if (!Array.isArray(record.launch.argv) || record.launch.argv.length < 2 || record.launch.argv[0] !== record.executable) issues.push('launch_argv_missing')
+    else if (record.launch.argv.length !== record.argv.length + 1 || !record.argv.every((value, index) => value === record.launch.argv[index + 1])) issues.push('launch_argv_mismatch')
+    if (record.launch.cwd === undefined || record.launch.cwd === null) issues.push('launch_cwd_missing')
+  }
   if (record.birth === undefined || record.birth === null) issues.push('record_birth_missing')
   if (record.birth?.source !== 'child_report+ps+spawn') issues.push('birth_source_invalid')
   if (record.plan === undefined || record.plan === null) issues.push('record_plan_missing')
@@ -78,7 +85,10 @@ export function compareRecord3(record, observed) {
   return { ok: issues.length === 0, issues }
 }
 
-export async function spawnOwnProbe({ root, operation, ignoreTerm = false }) {
+export async function spawnOwnProbe({
+  root, operation, ignoreTerm = false,
+  spawnImpl = spawn, observer = observeProcess, killImpl = process.kill, birthTimeoutMs = 3000,
+}) {
   const probeDir = join(root, 'probe')
   mkdirSync(probeDir, { recursive: true, mode: 0o700 })
   const script = join(probeDir, 'probe.mjs')
@@ -93,24 +103,35 @@ export async function spawnOwnProbe({ root, operation, ignoreTerm = false }) {
     + `setInterval(() => {}, 1000);\n`
   writeFileSync(script, body, { mode: 0o600 })
   const argv = [script, '--root', probeDir, '--config', config, '--operation', operation]
-  const child = spawn(process.execPath, argv, { stdio: 'ignore' })
-  const deadline = Date.now() + 3000
+  const child = spawnImpl(process.execPath, argv, { stdio: 'ignore' })
+  const launchedAt = new Date().toISOString()
+  const deadline = Date.now() + birthTimeoutMs
   let observed = null
   let birth = null
   while (Date.now() < deadline) {
-    observed = observeProcess(child.pid)
+    observed = observer(child.pid)
     if (observed.state === 'alive' && existsSync(ready) && existsSync(birthPath)) {
       try { birth = JSON.parse(readFileSync(birthPath, 'utf8')); break } catch { birth = null }
     }
     await new Promise((resolvePromise) => setTimeout(resolvePromise, 20))
   }
+  const retained = (reason) => ({
+    reason, pid: child.pid, root: probeDir, executable: process.execPath,
+    argv: [process.execPath, ...argv], config, operation, observed, birth, launchedAt,
+    birthPath, readyPath: ready, signalSent: false,
+    note: 'birth identity is incomplete or unreadable; material is retained and no signal is sent',
+  })
   if (observed === null || observed.state !== 'alive' || birth === null) {
-    try { child.kill('SIGKILL') } catch { /* own spawn may already be gone */ }
-    throw new Error(`Own probe birth was not complete: ${JSON.stringify({ observed, birth })}`)
+    // No raw child.kill here: without a complete verified birth we have no authority to signal.
+    const error = new Error(`Own probe birth was not complete: ${JSON.stringify({ observed, birth })}`)
+    error.retained = retained(observed === null ? 'observation_missing' : observed.state === 'unknown' ? 'observation_unknown' : birth === null ? 'birth_report_missing' : 'observation_not_alive')
+    throw error
   }
   const facts = deepFreeze({
     pid: child.pid, ppid: process.pid, uid: process.getuid?.() ?? null, start: observed.start,
     command: observed.command, root: probeDir, config, operation,
+    executable: process.execPath,
+    launch: deepFreeze({ executable: process.execPath, argv: deepFreeze([process.execPath, ...argv]), cwd: process.cwd(), operation, root: probeDir, config, launchedAt }),
     argv: deepFreeze([...argv]),
     birth: deepFreeze({ source: 'child_report+ps+spawn', argv: birth.argv, pid: birth.pid, ppid: birth.ppid, uid: birth.uid, cwd: birth.cwd, root: probeDir, config, operation }),
     resources: deepFreeze([{ kind: 'own_probe', pid: child.pid, start: observed.start, uid: observed.uid ?? (process.getuid?.() ?? null), root: probeDir, config, operation }]),
@@ -118,7 +139,11 @@ export async function spawnOwnProbe({ root, operation, ignoreTerm = false }) {
     birthObservedAt: new Date().toISOString(),
   })
   const compare = compareRecord3(facts, observed)
-  if (!compare.ok) throw new Error(`Own probe identity failed at birth: ${JSON.stringify(compare)}`)
+  if (!compare.ok) {
+    const error = new Error(`Own probe identity failed at birth: ${JSON.stringify(compare)}`)
+    error.retained = { ...retained('identity_mismatch'), issues: compare.issues }
+    throw error
+  }
   const handle = Object.freeze(Object.create(null))
   REGISTRY.set(handle, { facts, child })
   return { handle, observation: clone(facts) }
@@ -129,7 +154,7 @@ export async function spawnOwnProbe({ root, operation, ignoreTerm = false }) {
  * observation. The full resource plan is checked on every signal; `dryRun` performs the same checks
  * without sending, which is how pure controls stay at zero real signals.
  */
-export function signalFresh({ handle, signal, observer = observeProcess, allowSignals = true, dryRun = false }) {
+export function signalFresh({ handle, signal, observer = observeProcess, allowSignals = true, dryRun = false, killImpl = process.kill }) {
   if (allowSignals !== true) return { sent: false, refused: 'signals_disabled', issues: [] }
   const entry = handle !== null && typeof handle === 'object' ? REGISTRY.get(handle) : undefined
   if (entry === undefined) return { sent: false, refused: 'not_registered', issues: ['birth_not_registered'] }
@@ -141,7 +166,7 @@ export function signalFresh({ handle, signal, observer = observeProcess, allowSi
   if (!compare.ok) return { sent: false, refused: observed.state === 'unknown' ? 'unknown_observation' : 'identity_not_fresh', issues: compare.issues, observed }
   if (dryRun === true) return { sent: false, dryRun: true, wouldSignal: { pid: facts.pid, start: facts.start, operation: facts.operation } }
   try {
-    process.kill(facts.pid, signal)
+    killImpl(facts.pid, signal)
     return { sent: true, signal, target: { pid: facts.pid, start: facts.start }, observedAt: new Date().toISOString() }
   } catch (error) {
     return { sent: false, refused: String(error?.code ?? error), issues: [] }
@@ -192,6 +217,8 @@ export function pureControls(handle) {
     missing_argv: clone(facts),
     missing_plan: clone(facts),
     missing_resources: clone(facts),
+    missing_launch: clone(facts),
+    mutated_launch: clone(facts),
     foreign_uid: clone(facts),
     recycled_start: clone(facts),
     sibling_pid: clone(facts),
@@ -201,6 +228,8 @@ export function pureControls(handle) {
   variants.missing_plan.plan = { complete: false, resourceCount: 0, verified: 'forged' }
   variants.missing_resources.resources = []
   variants.missing_resources.plan = { complete: false, resourceCount: 0, verified: 'forged' }
+  delete variants.missing_launch.launch
+  variants.mutated_launch.launch.argv = ['/bin/false']
   variants.foreign_uid.uid = facts.uid + 1
   variants.recycled_start.start = 'Mon Jan  1 00:00:00 2001'
   variants.sibling_pid.pid = facts.pid + 1
@@ -222,11 +251,57 @@ export function pureControls(handle) {
  * Zero-spawn, zero-signal logic suite. It proves the comparison/ownership rules on synthetic facts and
  * never calls spawn, process.kill or /bin/ps. Live checks only run after every mock check passes.
  */
+
+/**
+ * Pure failure-path controls: no real spawn and no real signal. A fake child records both
+ * `child.kill()` and the injected kill implementation, so a spawn-side fallback cannot hide.
+ */
+export async function failureControls({ baseRoot }) {
+  const cases = []
+  const run = async ({ id, writeBirth, observed, expected }) => {
+    const root = mkdtempSync(join(baseRoot, 'case-'))
+    const spy = { childKill: 0, processKill: 0, spawns: 0 }
+    const child = { pid: 424242, exitCode: null, signalCode: null, kill() { spy.childKill += 1 } }
+    const spawnImpl = (_executable, argv) => {
+      spy.spawns += 1
+      if (writeBirth) {
+        const rootArg = argv[argv.indexOf('--root') + 1]
+        const config = argv[argv.indexOf('--config') + 1]
+        writeFileSync(`${rootArg}/birth.json`, JSON.stringify({ argv, pid: 424242, ppid: process.pid, uid: process.getuid?.() ?? null, cwd: process.cwd() }))
+        writeFileSync(`${rootArg}/ready`, 'ready')
+        writeFileSync(`${rootArg}/config.json`, JSON.stringify({ operation: argv[argv.indexOf('--operation') + 1], owned: true }))
+      }
+      return child
+    }
+    let retained = null
+    try {
+      await spawnOwnProbe({ root, operation: `h1-${id}`, spawnImpl, observer: () => observed, killImpl: () => { spy.processKill += 1 }, birthTimeoutMs: 40 })
+    } catch (error) {
+      retained = error.retained ?? { reason: 'missing_retained' }
+    }
+    cases.push({
+      id, expected, retainedReason: retained?.reason ?? null, retainedPid: retained?.pid ?? null,
+      retainedSignalSent: retained?.signalSent ?? null, spawns: spy.spawns,
+      childKillCalls: spy.childKill, processKillCalls: spy.processKill,
+      childExitCode: child.exitCode, root,
+      ok: retained?.reason === expected && spy.childKill === 0 && spy.processKill === 0 && child.exitCode === null,
+    })
+    // The fake child never existed as an OS process, so the temp directory is safe to remove.
+    rmSync(root, { recursive: true, force: true })
+  }
+  await run({ id: 'observation_unknown', writeBirth: false, observed: { state: 'unknown', reason: 'ps_failed' }, expected: 'observation_unknown' })
+  await run({ id: 'birth_report_missing', writeBirth: false, observed: { state: 'alive', pid: 424242, ppid: process.pid, uid: process.getuid?.() ?? null, start: 'Sun Nov 15 10:00:00 2026', command: 'node fake' }, expected: 'birth_report_missing' })
+  await run({ id: 'identity_mismatch', writeBirth: true, observed: { state: 'alive', pid: 424242, ppid: 1, uid: process.getuid?.() ?? null, start: 'Sun Nov 15 10:00:00 2026', command: 'node fake' }, expected: 'identity_mismatch' })
+  return { ok: cases.every((entry) => entry.ok), cases, childKillCalls: cases.reduce((sum, entry) => sum + entry.childKillCalls, 0), processKillCalls: cases.reduce((sum, entry) => sum + entry.processKillCalls, 0) }
+}
+
 export function mockSuite() {
   const argv = ['/tmp/own/probe/probe.mjs', '--root', '/tmp/own/probe', '--config', '/tmp/own/probe/config.json', '--operation', 'own-op']
   const facts = deepFreeze({
     pid: 501, ppid: 1, uid: 501, start: 'Sun Nov 15 10:00:00 2026', command: `/usr/bin/node ${argv.join(' ')}`,
     root: '/tmp/own/probe', config: '/tmp/own/probe/config.json', operation: 'own-op', argv: deepFreeze([...argv]),
+    executable: '/usr/bin/node',
+    launch: deepFreeze({ executable: '/usr/bin/node', argv: deepFreeze(['/usr/bin/node', ...argv]), cwd: '/tmp/own', operation: 'own-op', root: '/tmp/own/probe', config: '/tmp/own/probe/config.json', launchedAt: '2026-11-15T10:00:00.000Z' }),
     birth: deepFreeze({ source: 'child_report+ps+spawn', argv: [...argv], pid: 501, ppid: 1, uid: 501, cwd: '/tmp/own', root: '/tmp/own/probe', config: '/tmp/own/probe/config.json', operation: 'own-op' }),
     resources: deepFreeze([{ kind: 'own_probe', pid: 501, start: 'Sun Nov 15 10:00:00 2026', uid: 501, root: '/tmp/own/probe', config: '/tmp/own/probe/config.json', operation: 'own-op' }]),
     plan: deepFreeze({ complete: true, resourceCount: 1, children: 1, verified: 'birth' }),

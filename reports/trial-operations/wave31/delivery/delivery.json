@@ -1,0 +1,119 @@
+{
+  "protocol": "delivery-consumer/1",
+  "surface": "original controlled ProductRuntime/Application/QuestionBroker/A Store/Verifier/ProductCompletion",
+  "executor": "controlled_fixture (fixed local Node check)",
+  "modelCalls": 0,
+  "vendorTurns": 0,
+  "signalsSent": 0,
+  "normal": {
+    "workId": "0a3c3213f00cdcd181ab8db13dca1894",
+    "workViewId": "0a3c3213f00cdcd181ab8db13dca1894",
+    "phaseBeforeAccept": "needs_user",
+    "phaseAfterAccept": "delivered",
+    "questionId": "c94235d9f0fac5b153d0ea20c74ae2e8",
+    "questionVersion": 1,
+    "targetAttemptId": "attempt-20d274ea-cb1c-466d-a78e-6c93b5560587",
+    "answerDelivery": "native_applied",
+    "currentCandidate": {
+      "ticketId": "348a89209c1fc1a5ad223b09b86ebef9",
+      "assignmentId": "bac96a58172f227713c7111b4cd4b96b",
+      "contract": {
+        "workId": "0a3c3213f00cdcd181ab8db13dca1894",
+        "revision": 1,
+        "digest": "4d7f353c47e01fa098cc3254630cc65c19ba132f9c64362da6e5e5c98e67b78a"
+      },
+      "candidateGeneration": 3
+    },
+    "acceptedStatus": "recorded",
+    "wrongCandidateStatus": "rejected",
+    "wrongCandidateError": "verification_failed",
+    "artifactIds": [
+      "b452dd33cf7d517a61ba0560701647272400531e6c36bc310fd2f9772d7612e8",
+      "1822672fb21520769ab626ab4ff94bfe4563373368f291baefc4b31fec8ed7c5",
+      "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+      "4d33a25b8fe7b742cc88522f5ea52e3b26ca63bcd3ffb90b685d89cac901ab05"
+    ],
+    "artifactCount": 4,
+    "resourceStatus": "quiescent",
+    "beginFrames": 1,
+    "answerFrames": 1,
+    "queueDue": 0,
+    "answerReceiptStatus": "recorded",
+    "answerReplaySame": true,
+    "answerConflictStatus": "rejected",
+    "answerConflictError": "question_expired"
+  },
+  "doubleAccept": {
+    "first": "recorded",
+    "second": "recorded",
+    "sameReceipt": true
+  },
+  "slots": {
+    "2": {
+      "works": 2,
+      "delivered": 2,
+      "workViewIdsMatch": true,
+      "artifactCounts": [
+        4,
+        4
+      ],
+      "resourceStatuses": [
+        "quiescent",
+        "quiescent"
+      ],
+      "beginFrames": 2,
+      "uniqueAttemptIds": null,
+      "queueDue": 0,
+      "slotCapObserved": "not_configurable_in_fixture",
+      "attemptIdentityNote": "begin frame count is observed; the receipt projection carries no attemptId, so unique attempt identity is unknown"
+    },
+    "4": {
+      "works": 4,
+      "delivered": 4,
+      "workViewIdsMatch": true,
+      "artifactCounts": [
+        4,
+        4,
+        4,
+        4
+      ],
+      "resourceStatuses": [
+        "quiescent",
+        "quiescent",
+        "quiescent",
+        "quiescent"
+      ],
+      "beginFrames": 4,
+      "uniqueAttemptIds": null,
+      "queueDue": 0,
+      "slotCapObserved": "not_configurable_in_fixture",
+      "attemptIdentityNote": "begin frame count is observed; the receipt projection carries no attemptId, so unique attempt identity is unknown"
+    }
+  },
+  "notReached": [
+    "native vendor execution / native compatibility",
+    "recovered Work candidate/accept after a real B/I channel rebind",
+    "native 2/4 slot resource set (no slot-cap configuration in this fixture)"
+  ],
+  "beginReplay": {
+    "first": "recorded",
+    "second": "recorded",
+    "sameReceipt": true,
+    "workCount": 1,
+    "sameWork": true
+  },
+  "checks": {
+    "normalAnswered": true,
+    "normalCandidate": true,
+    "normalAccepted": true,
+    "wrongCandidateRefused": true,
+    "delivered": true,
+    "workViewIdentity": true,
+    "duplicateAcceptIdempotent": true,
+    "slots2": true,
+    "slots4": true,
+    "answerReplayIdempotent": true,
+    "answerConflictRejected": true,
+    "beginReplayIdempotent": true
+  }
+}

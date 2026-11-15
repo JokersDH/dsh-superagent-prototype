@@ -127,3 +127,17 @@ node tools/trial-kit/bin/trial-soak.mjs --scenario mixed --duration-seconds 600 
 ## 6. 交给验收
 
 H 的材料是原始观测。E 会按自己的 required 断言独立核验；不要把本手册的 `OK`/`DEGRADED` 当作发布结论。材料目录保持只读引用，不要覆盖历史运行。
+
+## 3d. wave-31 独立原证据、包内 backup/restore 与 R1/R2
+
+- **安全工具（H1）**：`procguard/guard3.mjs` 的出生失败路径不再调用 `child.kill(SIGKILL)`。`failure.json` 记录 `observation_unknown` / `birth_report_missing` / `identity_mismatch` 三种失败，`childKillCalls=0`、`processKillCalls=0`，probe 材料保留且 `signalSent=false`。完整出生才允许经注册 handle 和可注入 kill 发送；每次 signal 前 fresh 全身份。
+- **当前消费者（H2）**：`selected/produce2.mjs` 绑定 B `fbc933166758` / I `4bce0673388f` / main 0080，当前 I 12/12、B 8/8；旧 sink bug 只保留历史，不再是绿色条件。H 不使用 main 的 NativeProductAttempt 真实 guard，因此 main guard join 仍标 NOT_REACHED。
+- **原 Store（H3）**：`selected/produce-join2.mjs` 用同一原 Application/QuestionBroker/A Store 产生 Work/question/answer，并在同一 Store 做事实 subject 校验与 durable receipt；foreign work/attempt/source/version 全部写前拒绝。真实 B 三回调写入该 question/answer 仍 NOT_REACHED。
+- **普通交付（H4）**：`delivery/produce.mjs` 的 normal 问题→native_applied→registered check→currentCandidate→显式 accept→delivered 4 artifacts 是 ordinary 基线；错 candidate 被 `verification_failed` 拒绝；recovered 不等于这条基线。
+- **新进程读回（H5）**：`recovery/produce-successor2.mjs` 由子进程 A 生成原 Work 并退出，子进程 B 读取同一 `state.sqlite` 的同一 IDs；旧 PID 已退出、B PID 不同。它不是 B coordinator/Runner 恢复。
+- **ACK/资源（H6/H7）**：`delivery/windows2.mjs` 用原 A facts/answers/deliveries 判定 durable/written/UNKNOWN，所有窗口不重发；`delivery/resources2.mjs` 只有 9 类资源全部有 end evidence 才 quiescent，`module.close`/parent gone 单独不算。B 实际崩溃窗口与 2/4 native slot 仍 NOT_REACHED。
+- **精确包（H9）**：R1 `8296720`（tar `04926739…87543`，source `82ee5b8f`）预检 32 PASS/1 UNKNOWN，绑定 machinecheck 46 PASS/3 UNKNOWN/0 FAIL。R2 `4dcd28f`（tar `405ecd02…addcc6`，source `c0a1f897`）同样 32 PASS/1 UNKNOWN 与 46/3/0；R2 是 303b2c6a 后继冻结，不是把旧包改 label。
+- **同包 backup/restore（H11）**：`package/produce-restore2.mjs` 在 R1 与 R2 包内执行 `backup → verify-backup → restore` 到新根，再用原 A public readers 读到同一 Work/question/answer/native_applied；再次 restore 同目标 `BLOCKED target_not_empty`，缺 bundle 与空 state 均拒绝。`review-restored` 启动/REUSED 路径 NOT_REACHED。
+- **只读/多根（H10）**：`package/produce-readonly2.mjs` 在两个新私有根运行包内 `status`/`recovery-status`，根隔离、STOPPED、marker absent 不等于授权、queue never；包内实际 HTTP/SSE 内容入口未启动，标 NOT_REACHED。5 秒 fixture soak 只作独立 SSE 工具观察，不是包 daemon。
+
+所有材料在 `reports/trial-operations/wave31/`；R1/R2 结论分列。H 观察不是 E required、安装准入、native 兼容或 release 结论。

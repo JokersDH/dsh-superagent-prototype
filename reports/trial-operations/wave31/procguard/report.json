@@ -1,0 +1,375 @@
+{
+  "tool": "trial-kit/guard3",
+  "wave": 31,
+  "live": true,
+  "mock": {
+    "ok": true,
+    "checks": [
+      {
+        "id": "mock_frozen_birth_facts",
+        "ok": true
+      },
+      {
+        "id": "mock_defensive_copy_is_distinct",
+        "ok": true
+      },
+      {
+        "id": "mock_external_mutation_does_not_change_facts",
+        "ok": true
+      },
+      {
+        "id": "mock_own_positive",
+        "ok": true
+      },
+      {
+        "id": "mock_foreign_pid_refused",
+        "ok": true
+      },
+      {
+        "id": "mock_foreign_uid_refused",
+        "ok": true
+      },
+      {
+        "id": "mock_recycled_start_refused",
+        "ok": true
+      },
+      {
+        "id": "mock_sibling_root_refused",
+        "ok": true
+      },
+      {
+        "id": "mock_sibling_operation_refused",
+        "ok": true
+      },
+      {
+        "id": "mock_missing_birth_refused",
+        "ok": true
+      },
+      {
+        "id": "mock_missing_argv_refused",
+        "ok": true
+      },
+      {
+        "id": "mock_birth_argv_mismatch_refused",
+        "ok": true
+      },
+      {
+        "id": "mock_missing_plan_refused",
+        "ok": true
+      },
+      {
+        "id": "mock_missing_resources_refused",
+        "ok": true
+      },
+      {
+        "id": "mock_argv_change_refused",
+        "ok": true
+      },
+      {
+        "id": "mock_ps_fixture_alive",
+        "ok": true
+      },
+      {
+        "id": "mock_ps_fixture_gone_only_on_not_found",
+        "ok": true
+      }
+    ],
+    "spawns": 0,
+    "signals": 0,
+    "ps": 0
+  },
+  "failure": {
+    "ok": true,
+    "cases": [
+      {
+        "id": "observation_unknown",
+        "expected": "observation_unknown",
+        "retainedReason": "observation_unknown",
+        "retainedPid": 424242,
+        "retainedSignalSent": false,
+        "spawns": 1,
+        "childKillCalls": 0,
+        "processKillCalls": 0,
+        "childExitCode": null,
+        "root": "/tmp/h-w31-guard3/case-jnIlHu",
+        "ok": true
+      },
+      {
+        "id": "birth_report_missing",
+        "expected": "birth_report_missing",
+        "retainedReason": "birth_report_missing",
+        "retainedPid": 424242,
+        "retainedSignalSent": false,
+        "spawns": 1,
+        "childKillCalls": 0,
+        "processKillCalls": 0,
+        "childExitCode": null,
+        "root": "/tmp/h-w31-guard3/case-FuS1cb",
+        "ok": true
+      },
+      {
+        "id": "identity_mismatch",
+        "expected": "identity_mismatch",
+        "retainedReason": "identity_mismatch",
+        "retainedPid": 424242,
+        "retainedSignalSent": false,
+        "spawns": 1,
+        "childKillCalls": 0,
+        "processKillCalls": 0,
+        "childExitCode": null,
+        "root": "/tmp/h-w31-guard3/case-XLUbpW",
+        "ok": true
+      }
+    ],
+    "childKillCalls": 0,
+    "processKillCalls": 0
+  },
+  "liveChecks": [
+    {
+      "id": "born_normal",
+      "ok": true,
+      "observation": {
+        "pid": 71776,
+        "ppid": 71774,
+        "uid": 501,
+        "start": "Sun Nov 15 23:27:55 2026",
+        "command": "~/.nvm/versions/node/v24.21.0/bin/node /tmp/h-w31-guard3/own/normal/probe/probe.mjs --root /tmp/h-w31-guard3/own/normal/probe --config /tmp/h-w31-guard3/own/normal/probe/config.json --operation h30-normal",
+        "root": "/tmp/h-w31-guard3/own/normal/probe",
+        "config": "/tmp/h-w31-guard3/own/normal/probe/config.json",
+        "operation": "h30-normal",
+        "executable": "~/.nvm/versions/node/v24.21.0/bin/node",
+        "launch": {
+          "executable": "~/.nvm/versions/node/v24.21.0/bin/node",
+          "argv": [
+            "~/.nvm/versions/node/v24.21.0/bin/node",
+            "/tmp/h-w31-guard3/own/normal/probe/probe.mjs",
+            "--root",
+            "/tmp/h-w31-guard3/own/normal/probe",
+            "--config",
+            "/tmp/h-w31-guard3/own/normal/probe/config.json",
+            "--operation",
+            "h30-normal"
+          ],
+          "cwd": "~/Desktop/joker/superagent-agent-h",
+          "operation": "h30-normal",
+          "root": "/tmp/h-w31-guard3/own/normal/probe",
+          "config": "/tmp/h-w31-guard3/own/normal/probe/config.json",
+          "launchedAt": "2026-11-15T15:27:55.956Z"
+        },
+        "argv": [
+          "/tmp/h-w31-guard3/own/normal/probe/probe.mjs",
+          "--root",
+          "/tmp/h-w31-guard3/own/normal/probe",
+          "--config",
+          "/tmp/h-w31-guard3/own/normal/probe/config.json",
+          "--operation",
+          "h30-normal"
+        ],
+        "birth": {
+          "source": "child_report+ps+spawn",
+          "argv": [
+            "/tmp/h-w31-guard3/own/normal/probe/probe.mjs",
+            "--root",
+            "/tmp/h-w31-guard3/own/normal/probe",
+            "--config",
+            "/tmp/h-w31-guard3/own/normal/probe/config.json",
+            "--operation",
+            "h30-normal"
+          ],
+          "pid": 71776,
+          "ppid": 71774,
+          "uid": 501,
+          "cwd": "~/Desktop/joker/superagent-agent-h",
+          "root": "/tmp/h-w31-guard3/own/normal/probe",
+          "config": "/tmp/h-w31-guard3/own/normal/probe/config.json",
+          "operation": "h30-normal"
+        },
+        "resources": [
+          {
+            "kind": "own_probe",
+            "pid": 71776,
+            "start": "Sun Nov 15 23:27:55 2026",
+            "uid": 501,
+            "root": "/tmp/h-w31-guard3/own/normal/probe",
+            "config": "/tmp/h-w31-guard3/own/normal/probe/config.json",
+            "operation": "h30-normal"
+          }
+        ],
+        "plan": {
+          "complete": true,
+          "resourceCount": 1,
+          "children": 1,
+          "verified": "birth"
+        },
+        "birthObservedAt": "2026-11-15T15:27:55.984Z"
+      },
+      "registered": true
+    },
+    {
+      "id": "returned_observation_is_copy",
+      "ok": true
+    },
+    {
+      "id": "caller_mutation_does_not_retarget",
+      "ok": true
+    },
+    {
+      "id": "pure_controls",
+      "controls": [
+        {
+          "id": "own_handle",
+          "ok": true
+        },
+        {
+          "id": "returned_observation_is_copy",
+          "ok": true
+        },
+        {
+          "id": "dry_run_targets_original_pid",
+          "ok": true
+        },
+        {
+          "id": "plain_observation_rejected",
+          "result": {
+            "sent": false,
+            "refused": "not_registered",
+            "issues": [
+              "birth_not_registered"
+            ]
+          },
+          "expect": "not_registered"
+        },
+        {
+          "id": "copied_handle_rejected",
+          "result": {
+            "sent": false,
+            "refused": "not_registered",
+            "issues": [
+              "birth_not_registered"
+            ]
+          },
+          "expect": "not_registered"
+        },
+        {
+          "id": "ps_unknown_refused",
+          "result": {
+            "sent": false,
+            "refused": "unknown_observation",
+            "issues": [
+              "observed_unknown"
+            ],
+            "observed": {
+              "state": "unknown",
+              "reason": "ps_failed"
+            }
+          },
+          "expect": "unknown_observation"
+        },
+        {
+          "id": "ps_unknown_not_gone",
+          "ok": true
+        },
+        {
+          "id": "missing_birth",
+          "ok": true
+        },
+        {
+          "id": "missing_argv",
+          "ok": true
+        },
+        {
+          "id": "missing_plan",
+          "ok": true
+        },
+        {
+          "id": "missing_resources",
+          "ok": true
+        },
+        {
+          "id": "missing_launch",
+          "ok": true
+        },
+        {
+          "id": "mutated_launch",
+          "ok": true
+        },
+        {
+          "id": "foreign_uid",
+          "ok": true
+        },
+        {
+          "id": "recycled_start",
+          "ok": true
+        },
+        {
+          "id": "sibling_pid",
+          "ok": true
+        }
+      ],
+      "ok": true
+    },
+    {
+      "id": "unknown_wait_not_gone",
+      "ok": true
+    },
+    {
+      "id": "first_signal_plan_verified",
+      "ok": true
+    },
+    {
+      "id": "normal_term_gone",
+      "ok": true
+    },
+    {
+      "id": "stubborn_survived_term",
+      "ok": true
+    },
+    {
+      "id": "stubborn_kill_gone",
+      "ok": true
+    }
+  ],
+  "signals": [
+    {
+      "target": "normal",
+      "step": "TERM",
+      "result": {
+        "sent": true,
+        "signal": "SIGTERM",
+        "target": {
+          "pid": 71776,
+          "start": "Sun Nov 15 23:27:55 2026"
+        },
+        "observedAt": "2026-11-15T15:27:55.996Z"
+      }
+    },
+    {
+      "target": "stubborn",
+      "step": "TERM",
+      "result": {
+        "sent": true,
+        "signal": "SIGTERM",
+        "target": {
+          "pid": 71785,
+          "start": "Sun Nov 15 23:27:56 2026"
+        },
+        "observedAt": "2026-11-15T15:27:56.049Z"
+      }
+    },
+    {
+      "target": "stubborn",
+      "step": "KILL",
+      "result": {
+        "sent": true,
+        "signal": "SIGKILL",
+        "target": {
+          "pid": 71785,
+          "start": "Sun Nov 15 23:27:56 2026"
+        },
+        "observedAt": "2026-11-15T15:27:56.177Z"
+      }
+    }
+  ],
+  "errors": [],
+  "status": "LIVE_OK"
+}

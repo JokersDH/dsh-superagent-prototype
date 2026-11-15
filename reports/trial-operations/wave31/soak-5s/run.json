@@ -1,0 +1,175 @@
+{
+  "protocol": "trial-soak/1",
+  "startedAt": "2026-11-15T15:28:34.368Z",
+  "endedAt": "2026-11-15T15:28:39.372Z",
+  "elapsedMs": 5004,
+  "wallElapsedSeconds": 5,
+  "requestedDurationSeconds": 5,
+  "stoppedBy": "duration",
+  "status": "COMPLETED_WITH_OBSERVED_DEFECT",
+  "scenario": {
+    "scenario": "mixed",
+    "defect": "truncate",
+    "expectedDefectObservation": "sse_disconnect",
+    "defectObserved": true,
+    "config": {
+      "pollMs": 200,
+      "sseIntervalMs": 200,
+      "reconnectBackoffMs": 100,
+      "sseIdleTimeoutMs": 5000,
+      "reopenSeconds": 2,
+      "sampleMs": 1000,
+      "maxRequests": 100000,
+      "maxSseEvents": 100000,
+      "maxReconnects": 2000,
+      "maxErrors": 50,
+      "pollTimeoutMs": 500
+    }
+  },
+  "fixture": {
+    "url": "http://127.0.0.1:57084",
+    "port": 57084,
+    "defect": "truncate",
+    "stats": {
+      "connections": 37,
+      "activeConnections": 0,
+      "maxConcurrentConnections": 2,
+      "readinessRequests": 27,
+      "readinessBytes": 15849,
+      "readinessStatuses": {
+        "200": 27
+      },
+      "sseConnections": 10,
+      "sseEvents": 30,
+      "sseBytes": 3360,
+      "sseClosed": 10
+    }
+  },
+  "counters": {
+    "pollRequests": 27,
+    "pollOk": 27,
+    "pollFailed": 0,
+    "latencyMs": {
+      "count": 27,
+      "p50": 0.68,
+      "p95": 1.52,
+      "max": 5.97
+    },
+    "httpStatuses": {
+      "200": 27
+    },
+    "sseConnections": 10,
+    "sseEvents": 20,
+    "sseBytes": 2240,
+    "sseFailedConnections": 0,
+    "duplicates": 0,
+    "gaps": 0,
+    "reconnects": 10,
+    "reopens": 2,
+    "samples": 6,
+    "lastEventAt": "2026-11-15T15:28:39.128Z"
+  },
+  "failures": {
+    "total": 10,
+    "counts": {
+      "sse:disconnect:error": 10
+    },
+    "samples": [
+      {
+        "at": "2026-11-15T15:28:34.785Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-15T15:28:35.290Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-15T15:28:35.795Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-15T15:28:36.302Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-15T15:28:36.805Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-15T15:28:37.311Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-15T15:28:37.814Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-15T15:28:38.319Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-15T15:28:38.823Z",
+        "kind": "sse:disconnect:error"
+      },
+      {
+        "at": "2026-11-15T15:28:39.328Z",
+        "kind": "sse:disconnect:error"
+      }
+    ]
+  },
+  "samples": {
+    "path": "samples.ndjson",
+    "count": 6,
+    "sha256": "b2c0e8af80bfc844f06d66bc3b6e01fb17032eb22929a2409ce197361b5f5bfa",
+    "bytes": 1623
+  },
+  "cleanup": {
+    "closed": true,
+    "activeSockets": 0,
+    "activeConnections": 0
+  },
+  "consistency": {
+    "ok": true,
+    "issues": [],
+    "lastSampleElapsedMs": 5003
+  },
+  "unknowns": [
+    "client reopen is a new HTTP/SSE connection, not daemon process recovery",
+    "provider/queue/old-request behaviour is not observable from this fixture and is not claimed",
+    "server-side handler timing is not separately instrumented; client latency is reported",
+    "resource samples cover this process and the fixture server only, never another user process"
+  ],
+  "resume": {
+    "arguments": [
+      "node tools/trial-kit/bin/trial-soak.mjs",
+      "--scenario mixed",
+      "--duration-seconds 5",
+      "--poll-ms 200",
+      "--sse-interval-ms 200",
+      "--reconnect-backoff-ms 100",
+      "--reopen-seconds 2",
+      "--sample-ms 1000",
+      "--max-errors 50",
+      "--failure-mode truncate",
+      "--out <NEW-OUT>"
+    ],
+    "note": "replace <NEW-OUT>; the same duration and failure mode are required for comparability",
+    "line": "node tools/trial-kit/bin/trial-soak.mjs --scenario mixed --duration-seconds 5 --poll-ms 200 --sse-interval-ms 200 --reconnect-backoff-ms 100 --reopen-seconds 2 --sample-ms 1000 --max-errors 50 --failure-mode truncate --out <NEW-OUT>"
+  },
+  "tool": {
+    "name": "trial-kit",
+    "version": "0.1.0",
+    "command": "soak"
+  },
+  "outputRoot": "reports/trial-operations/wave31/soak-5s",
+  "measurementScope": {
+    "measured": "one finite fixture scenario of 5s (actual 5s)",
+    "notMeasured": [
+      "24h/48h soak",
+      "daemon recovery",
+      "provider/queue stability",
+      "other machines",
+      "real model/native execution"
+    ]
+  }
+}

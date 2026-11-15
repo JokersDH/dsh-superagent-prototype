@@ -1,0 +1,113 @@
+{
+  "protocol": "package-readonly-multiroot/1",
+  "surface": "immutable package status/recovery-status on two private roots",
+  "commandExits": {
+    "statusA": 2,
+    "statusB": 2,
+    "recoveryA": 0,
+    "recoveryB": 0
+  },
+  "roots": {
+    "a": {
+      "install": "/tmp/h-w31-readonly/package/install/app",
+      "config": "/tmp/h-w31-readonly/roots/root-a/config",
+      "data": "/tmp/h-w31-readonly/roots/root-a/data",
+      "cache": "/tmp/h-w31-readonly/roots/root-a/cache",
+      "logs": "/tmp/h-w31-readonly/roots/root-a/logs",
+      "workspace": "/tmp/h-w31-readonly/roots/root-a/workspace"
+    },
+    "b": {
+      "install": "/tmp/h-w31-readonly/package/install/app",
+      "config": "/tmp/h-w31-readonly/roots/root-b/config",
+      "data": "/tmp/h-w31-readonly/roots/root-b/data",
+      "cache": "/tmp/h-w31-readonly/roots/root-b/cache",
+      "logs": "/tmp/h-w31-readonly/roots/root-b/logs",
+      "workspace": "/tmp/h-w31-readonly/roots/root-b/workspace"
+    }
+  },
+  "observations": {
+    "statusA": {
+      "status": "STOPPED",
+      "installRoot": "/tmp/h-w31-readonly/package/install/app",
+      "roots": {
+        "install": "/tmp/h-w31-readonly/package/install/app",
+        "config": "/tmp/h-w31-readonly/roots/root-a/config",
+        "data": "/tmp/h-w31-readonly/roots/root-a/data",
+        "cache": "/tmp/h-w31-readonly/roots/root-a/cache",
+        "logs": "/tmp/h-w31-readonly/roots/root-a/logs",
+        "workspace": "/tmp/h-w31-readonly/roots/root-a/workspace"
+      }
+    },
+    "statusB": {
+      "status": "STOPPED",
+      "installRoot": "/tmp/h-w31-readonly/package/install/app",
+      "roots": {
+        "install": "/tmp/h-w31-readonly/package/install/app",
+        "config": "/tmp/h-w31-readonly/roots/root-b/config",
+        "data": "/tmp/h-w31-readonly/roots/root-b/data",
+        "cache": "/tmp/h-w31-readonly/roots/root-b/cache",
+        "logs": "/tmp/h-w31-readonly/roots/root-b/logs",
+        "workspace": "/tmp/h-w31-readonly/roots/root-b/workspace"
+      }
+    },
+    "recoveryA": {
+      "protocol": "personal-recovery-status/1",
+      "checkedAt": "2026-11-15T15:27:34.893Z",
+      "stateName": "data",
+      "markerPresent": false,
+      "markerValid": false,
+      "markerPath": "/tmp/h-w31-readonly/roots/root-a/data/restore-report.json",
+      "startupMode": "normal",
+      "pendingRebind": [],
+      "requiresRevalidation": [],
+      "queueReplay": "never",
+      "markerPreserved": false,
+      "authorization": {
+        "status": "NOT_REQUIRED",
+        "owner": null,
+        "reason": "No restore marker; normal startup authorization applies."
+      },
+      "limitations": [
+        "Local projection only: this does not prove the writer is stopped, does not start the daemon and does not consume any queue.",
+        "New-work authorization requires the main inspect/prepare/commit interface; blocked rather than bypassed when absent."
+      ]
+    },
+    "recoveryB": {
+      "protocol": "personal-recovery-status/1",
+      "checkedAt": "2026-11-15T15:27:35.033Z",
+      "stateName": "data",
+      "markerPresent": false,
+      "markerValid": false,
+      "markerPath": "/tmp/h-w31-readonly/roots/root-b/data/restore-report.json",
+      "startupMode": "normal",
+      "pendingRebind": [],
+      "requiresRevalidation": [],
+      "queueReplay": "never",
+      "markerPreserved": false,
+      "authorization": {
+        "status": "NOT_REQUIRED",
+        "owner": null,
+        "reason": "No restore marker; normal startup authorization applies."
+      },
+      "limitations": [
+        "Local projection only: this does not prove the writer is stopped, does not start the daemon and does not consume any queue.",
+        "New-work authorization requires the main inspect/prepare/commit interface; blocked rather than bypassed when absent."
+      ]
+    }
+  },
+  "checks": {
+    "statusAStopped": true,
+    "statusBStopped": true,
+    "rootsIsolated": true,
+    "noCrossRoot": true,
+    "recoveryAProtocol": true,
+    "recoveryBProtocol": true,
+    "markerAbsentNotAuthority": true,
+    "queueNeverReplayed": true,
+    "distinctRootsRecovery": true,
+    "noTaskStarted": true
+  },
+  "contentRead": "NOT_REACHED: no started product HTTP/readonly content endpoint was used.",
+  "sse": "NOT_REACHED: no package SSE entry was started; the bounded fixture soak is separately labelled and is not a package endpoint.",
+  "authorization": "status/recovery-status are configuration observations, not a permission, native or release verdict."
+}

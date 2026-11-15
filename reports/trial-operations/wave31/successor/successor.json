@@ -1,0 +1,53 @@
+{
+  "protocol": "successor-readback/1",
+  "surface": "two OS processes over one original A ProductStore; no B coordinator/Runner",
+  "producer": {
+    "pid": 62493,
+    "exit": 0,
+    "observationAfterExit": {
+      "state": "unknown",
+      "reason": "ps_failed",
+      "status": 1
+    }
+  },
+  "successor": {
+    "pid": 62898,
+    "exit": 0,
+    "readback": {
+      "pid": 62898,
+      "ok": true,
+      "workId": "94012e1a1c7265c033f285a944656a04",
+      "questionId": "b4488cd86bae38b2e1a689dde6edc43b",
+      "questionVersion": 2,
+      "answerQuestionId": "b4488cd86bae38b2e1a689dde6edc43b",
+      "delivery": "native_applied"
+    }
+  },
+  "original": {
+    "pid": 62493,
+    "workId": "94012e1a1c7265c033f285a944656a04",
+    "questionId": "b4488cd86bae38b2e1a689dde6edc43b",
+    "answerId": "0c4da78469ec2ca5857439d4cfb1837a",
+    "commandId": "recovery-command-2",
+    "attemptId": "attempt-20be5546-4440-4c50-9e31-e7654b3868cd",
+    "delivery": "native_applied"
+  },
+  "checks": {
+    "producerExit0": true,
+    "producerPidGone": true,
+    "successorDifferentPid": true,
+    "successorExit0": true,
+    "sameWorkQuestionAnswer": true,
+    "nativeApplied": true,
+    "sameStoreOriginalTuple": true,
+    "wrongWorkRefused": true,
+    "missingStateRefused": true,
+    "noSignalSent": true
+  },
+  "bRecovery": "NOT_REACHED: this is an independent new process reading the original Store, not a B coordinator recovery or Runner continuation.",
+  "limits": [
+    "no old Runner process was alive",
+    "no coordinator SIGKILL/business answer recovery",
+    "no global process/socket discovery"
+  ]
+}
