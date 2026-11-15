@@ -95,22 +95,6 @@ export function argvHasExactPath(command, path) {
 
 function recordPath(config) { return join(config, 'instance.json') }
 
-/** Every live process whose parent is this pid, with independent uid/start/argv facts. */
-export function knownChildren(parentPid) {
-  if (!Number.isSafeInteger(parentPid) || parentPid <= 0) return []
-  let text
-  try { text = String(execFileSync('ps', ['-ax', '-o', 'pid=,ppid=,uid=,lstart=,args='], { encoding: 'utf8' })) } catch { return [] }
-  const children = []
-  for (const line of text.split('\n')) {
-    const match = line.trim().match(/^(\d+)\s+(\d+)\s+(\d+)\s+(.+?)\s{2,}(.*)$/u)
-    if (!match) continue
-    const [, pid, ppid, uid, start, command] = match
-    if (Number(ppid) !== parentPid) continue
-    children.push({ pid: Number(pid), ppid: Number(ppid), uid: Number(uid), start: start.trim(), command })
-  }
-  return children
-}
-
 export function readRecord(config) {
   const path = recordPath(config)
   if (!existsSync(path)) return { present: false }
@@ -174,7 +158,7 @@ export function startOwned(root, {
  * 3. `proofSignal` (only when explicitly allowed) signals one pid at a time and re-reads the start
  *    identity immediately before each TERM/KILL; every attempt is recorded.
  */
-export async function stopOwned(root, { mockFile, birth = null, packageStop = true, proofSignal = false, equivalentProof = false, timeoutMs = 30_000 } = {}) {
+export async function stopOwned(root, { mockFile, birth = null, resources = null, packageStop = true, proofSignal = false, equivalentProof = false, timeoutMs = 30_000 } = {}) {
   const finish = value => { trace(`stop ${root.state} -> clean=${value.clean} reason=${value.reason ?? null} blocked=${JSON.stringify(value.blocked ?? null).slice(0, 160)} pkg=${value.packageStop?.json?.status ?? null}`); return value }
   const { install, config, state } = root
   const result = { install, state, config, attempts: [], signals: [], packageStop: null, record: null, clean: false, retained: false }
@@ -194,6 +178,7 @@ export async function stopOwned(root, { mockFile, birth = null, packageStop = tr
         result.packageStopSawNoRecord = true
         result.birthAlive = { pid: lived.pid, start: lived.start, uid: lived.uid }
         if (!proofSignal && !equivalentProof) { result.retained = true; result.reason = 'record_missing_known_birth'; return finish(result) }
+        return finish(await stopKnownSet(root, { birth, resources, result }))
       } else {
         result.clean = true
         return finish(result)
@@ -223,26 +208,16 @@ export async function stopOwned(root, { mockFile, birth = null, packageStop = tr
       return finish(result)
     }
     const lived = liveIdentity(birth.pid)
-    if (!lived.alive) {
-      // A known birth that has already exited, with no record and no children, is a legitimate exit.
-      const children = knownChildren(birth.pid)
-      result.source = 'birth'
-      result.legitimateExit = true
-      result.observedChildren = children.length
-      if (children.length === 0) { result.clean = true; return finish(result) }
-      result.retained = true
-      result.reason = 'orphan_children_after_exit'
-      result.children = children.map(item => ({ pid: item.pid, uid: item.uid, command: item.command.slice(0, 120) }))
-      return finish(result)
-    }
-    if (lived.start !== birth.start || lived.uid !== process.getuid?.()) {
+    if (lived.alive && (lived.start !== birth.start || lived.uid !== process.getuid?.())) {
       result.retained = true
       result.reason = 'birth_identity_mismatch'
       result.birthAlive = { pid: birth.pid, expectedStart: birth.start, observedStart: lived.start ?? null }
       return finish(result)
     }
+    // No discovery and no default cleanup: only the caller's complete immutable set can authorize a
+    // signal; an incomplete or unobservable set is retained as UNKNOWN.
     if (!proofSignal && !equivalentProof) { result.retained = true; result.reason = 'record_missing_known_birth'; return finish(result) }
-    return finish(await stopKnownBirth(root, { birth, payloadInstall: existsSync(join(install, 'app')) ? join(install, 'app') : install, result }))
+    return finish(await stopKnownSet(root, { birth, resources, result }))
   }
   if (record.error || !value || typeof value !== 'object') {
     result.retained = true
@@ -352,61 +327,60 @@ export async function stopOwned(root, { mockFile, birth = null, packageStop = tr
 }
 
 /**
- * Stops a known birth (and its verified children) when no instance record exists yet.
- *
- * The birth facts are the caller's own spawn; the children are discovered by parent pid. Every pid is
- * verified (start, uid, exact argv root) before the first signal, and again immediately before each
- * TERM/KILL. A mismatched birth or any unverifiable child retains the whole set without signalling.
+ * Stops a known set only when the caller supplies the complete, immutable resource facts of this exact
+ * spawn (launcher birth + every child with pid/start/uid/argv). There is no process discovery here:
+ * an incomplete or unobservable collection is UNKNOWN and retained, and nothing is signalled.
  */
-async function stopKnownBirth(root, { birth, payloadInstall, result }) {
-  const { install, state } = root
-  const launcher = liveIdentity(birth.pid)
-  const children = knownChildren(birth.pid).map(child => ({ ...child, live: liveIdentity(child.pid) }))
-  const argvInstall = argvHasPathPrefix(launcher.command ?? '', payloadInstall)
-  const argvState = argvHasExactPath(launcher.command ?? '', state)
-  const launchOk = launcher.alive && launcher.start === birth.start && launcher.uid === process.getuid?.() &&
-    argvInstall && (argvState || birth.state === state)
-  const childFacts = children.map(child => ({
-    pid: child.pid, start: child.start, uid: child.uid, alive: child.live.alive,
-    argvInstall: argvHasPathPrefix(child.command ?? '', payloadInstall),
-    argvState: argvHasExactPath(child.command ?? '', state),
-  }))
-  result.preflight = [{ label: 'launcher', pid: birth.pid, birthOk: launchOk, start: launcher.start ?? null, uid: launcher.uid ?? null,
-    argvInstall, argvState }, ...childFacts.map(item => ({ label: 'child', ...item }))]
-  result.source = 'birth'
-  if (!launchOk) { result.retained = true; result.reason = 'birth_identity_mismatch'; return result }
-  const unknownChild = childFacts.find(item => item.alive && (!item.argvInstall || !item.argvState || item.uid !== process.getuid?.()))
-  if (unknownChild) {
+async function stopKnownSet(root, { birth, resources, result }) {
+  const { install, config, state } = root
+  const payloadInstall = existsSync(join(install, 'app')) ? join(install, 'app') : install
+  if (!Array.isArray(resources) || resources.length === 0) {
     result.retained = true
-    result.reason = 'unknown_child_scope'
-    result.children = childFacts
+    result.reason = 'resources_unverified'
     return result
   }
-  const targets = [{ pid: birth.pid, expected: birth.start, label: 'launcher' },
-    ...childFacts.filter(item => item.alive).map(item => ({ pid: item.pid, expected: item.start, label: 'child' }))]
-  for (const target of targets) {
+  const birthMatches = birth !== null && birth !== undefined && birth.pid === resources[0]?.pid &&
+    birth.start === resources[0]?.start && birth.state === state && birth.config === config && birth.install === install
+  result.source = 'known_set'
+  result.resources = resources.map(item => ({ pid: item.pid, start: item.start, parentPid: item.parentPid ?? null }))
+  result.preflight = resources.map(item => {
+    const live = liveIdentity(item.pid)
+    return { pid: item.pid, expectedStart: item.start ?? null, uid: live.uid ?? null, alive: live.alive,
+      startOk: live.start === item.start, uidOk: live.uid === process.getuid?.(),
+      argvInstall: argvHasPathPrefix(live.command ?? '', payloadInstall),
+      argvState: argvHasExactPath(live.command ?? '', state),
+      parentOk: item.parentPid === undefined || item.parentPid === null ? true : live.ppid === item.parentPid }
+  })
+  if (!birthMatches) { result.retained = true; result.reason = 'birth_set_mismatch'; return result }
+  const bad = result.preflight.find(item => item.alive && (!item.startOk || !item.uidOk || !item.argvInstall || !item.argvState || !item.parentOk))
+  if (bad) { result.retained = true; result.reason = 'resource_scope_mismatch'; result.blocked = bad; return result }
+  const alive = result.preflight.filter(item => item.alive)
+  if (alive.length === 0) { result.clean = true; result.legitimateExit = true; return result }
+  for (const target of alive) {
     const fresh = liveIdentity(target.pid)
-    const ok = fresh.alive && fresh.start === target.expected && fresh.uid === process.getuid?.() &&
-      argvHasPathPrefix(fresh.command ?? '', payloadInstall)
-    const attempt = { label: target.label, pid: target.pid, expectedStart: target.expected, freshStart: fresh.start ?? null,
-      uid: fresh.uid ?? null, argvInstall: argvHasPathPrefix(fresh.command ?? '', payloadInstall), signalled: null }
+    const ok = fresh.alive && fresh.start === target.expectedStart && fresh.uid === process.getuid?.() &&
+      argvHasPathPrefix(fresh.command ?? '', payloadInstall) && argvHasExactPath(fresh.command ?? '', state)
+    const attempt = { label: 'resource', pid: target.pid, expectedStart: target.expectedStart, freshStart: fresh.start ?? null,
+      uid: fresh.uid ?? null, signalled: null }
     if (!ok) { attempt.signalled = false; result.signals.push(attempt); result.retained = true; result.reason = 'fresh_identity_changed'; return result }
     try { process.kill(target.pid, 'SIGTERM'); attempt.signalled = 'SIGTERM' } catch { attempt.signalled = false }
     result.signals.push(attempt)
   }
   await new Promise(resolvePromise => setTimeout(resolvePromise, 700))
-  for (const target of targets) {
+  for (const target of alive) {
     const after = liveIdentity(target.pid)
     if (!after.alive) continue
-    const ok = after.start === target.expected && after.uid === process.getuid?.() && argvHasPathPrefix(after.command ?? '', payloadInstall)
-    const attempt = { label: target.label, pid: target.pid, expectedStart: target.expected, freshStart: after.start ?? null,
-      uid: after.uid ?? null, argvInstall: argvHasPathPrefix(after.command ?? '', payloadInstall), signalled: null }
+    const ok = after.start === target.expectedStart && after.uid === process.getuid?.() &&
+      argvHasPathPrefix(after.command ?? '', payloadInstall) && argvHasExactPath(after.command ?? '', state)
+    const attempt = { label: 'resource', pid: target.pid, expectedStart: target.expectedStart, freshStart: after.start ?? null,
+      uid: after.uid ?? null, signalled: null }
     if (!ok) { attempt.signalled = false; result.signals.push(attempt); result.retained = true; result.reason = 'fresh_identity_changed_after_term'; return result }
     try { process.kill(target.pid, 'SIGKILL'); attempt.signalled = 'SIGKILL' } catch { attempt.signalled = false }
     result.signals.push(attempt)
   }
   await new Promise(resolvePromise => setTimeout(resolvePromise, 400))
-  const survivors = targets.map(target => liveIdentity(target.pid)).filter(item => item.alive)
+  // Independent post-stop observation of the fixed pre-stop set; the record is never re-read here.
+  const survivors = result.resources.map(item => liveIdentity(item.pid)).filter(item => item.alive)
   result.aliveAfter = survivors
   result.clean = survivors.length === 0
   if (!result.clean) { result.retained = true; result.reason = 'survivors_after_signal' }

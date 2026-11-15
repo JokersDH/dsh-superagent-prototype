@@ -223,8 +223,10 @@ export async function runLifecycle() {
         const identity = liveIdentity(sleeper.pid)
         writeSyntheticRecord(root, recordFor(root, { pid: sleeper.pid, start: identity.start }))
         const birthRecord = birthFor(root, { pid: sleeper.pid, start: identity.start, uid: identity.uid })
-        first = await stopOwned(root, { packageStop: false, proofSignal: true, birth: birthRecord })
-        second = await stopOwned(root, { packageStop: false, proofSignal: true, birth: birthRecord })
+        first = await stopOwned(root, { packageStop: false, proofSignal: true, birth: birthRecord,
+          resources: [{ pid: sleeper.pid, start: identity.start, parentPid: null }] })
+        // A repeat with nothing registered to stop is a no-op; it does not claim an unobserved set.
+        second = await stopOwned(root, { packageStop: false, proofSignal: false })
         released = releaseRoot(root, first)
         evidence.lifecycleIdempotent = { first: { clean: first.clean, signals: first.signals },
           second: { clean: second.clean, signalled: (second.signals ?? []).length }, released, rootAfter: existsSync(root.own) }
@@ -296,14 +298,15 @@ export async function runLifecycle() {
         refused = await stopOwned(root, { packageStop: false, proofSignal: false, birth })
         released = releaseRoot(root, refused)
         const aliveAfterRefusal = liveIdentity(sleeper.pid).alive
-        stopped = await stopOwned(root, { packageStop: false, proofSignal: true, birth })
+        const resources = [{ pid: birth.pid, start: birth.start, parentPid: null }]
+        stopped = await stopOwned(root, { packageStop: false, proofSignal: true, birth, resources })
         evidence.lifecycleNoRecord = { refused: { clean: refused.clean, reason: refused.reason, retained: refused.retained },
           released: released.removed, aliveAfterRefusal,
           stopped: { clean: stopped.clean, source: stopped.source, signals: stopped.signals, aliveAfter: stopped.aliveAfter ?? [] } }
       } finally { try { sleeper.child.kill('SIGKILL') } catch { /* gone */ } rmSync(root.own, { recursive: true, force: true }) }
       assert('NOREC_REFUSED_CLEAN', refused?.clean !== true && refused?.retained === true && refused.reason === 'record_missing_known_birth', JSON.stringify(refused))
       assert('NOREC_NOT_RELEASED', released?.removed === false && evidence.lifecycleNoRecord.aliveAfterRefusal === true, JSON.stringify(released))
-      assert('NOREC_BIRTH_PROOF_CLEAN', stopped?.clean === true && stopped.source === 'birth' && (stopped.signals ?? []).length > 0 &&
+      assert('NOREC_BIRTH_PROOF_CLEAN', stopped?.clean === true && stopped.source === 'known_set' && (stopped.signals ?? []).length > 0 &&
         (stopped.signals ?? []).every(item => item.signalled === 'SIGTERM'), JSON.stringify(stopped?.signals))
     }))
 
@@ -317,13 +320,14 @@ export async function runLifecycle() {
         const birth = { pid: sleeper.pid, start: identity.start, uid: identity.uid, state: root.state, config: root.config, install: root.install }
         sleeper.child.kill('SIGKILL')
         for (let attempt = 0; attempt < 40 && liveIdentity(sleeper.pid).alive; attempt += 1) await new Promise(r => setTimeout(r, 50))
-        stopped = await stopOwned(root, { packageStop: false, proofSignal: true, birth })
+        const resources = [{ pid: birth.pid, start: birth.start, parentPid: null }]
+        stopped = await stopOwned(root, { packageStop: false, proofSignal: true, birth, resources })
         evidence.lifecycleNoRecordExit = { clean: stopped.clean, reason: stopped.reason ?? null, legitimateExit: stopped.legitimateExit ?? null,
           signals: stopped.signals, observedChildren: stopped.observedChildren ?? null }
       } finally { rmSync(root.own, { recursive: true, force: true }) }
       assert('NOEXIT_CLEAN', stopped?.clean === true && stopped.legitimateExit === true, JSON.stringify(stopped))
       assert('NOEXIT_NO_SIGNAL', (stopped?.signals ?? []).length === 0, JSON.stringify(stopped?.signals))
-      assert('NOEXIT_NO_CHILDREN', stopped?.observedChildren === 0, String(stopped?.observedChildren))
+      assert('NOEXIT_SET_OBSERVED', Array.isArray(stopped?.resources) && stopped.resources.length === 1, JSON.stringify(stopped?.resources))
     }))
 
   cases.push(await runCase({ ...define('E1-LIFECYCLE-NO-RECORD-REUSE', 'A birth whose pid was reused by another process is retained without a signal'), evidence: {} },
@@ -334,7 +338,8 @@ export async function runLifecycle() {
       try {
         const identity = liveIdentity(sleeper.pid)
         const birth = { pid: sleeper.pid, start: 'Wed Jan  1 00:00:00 2020', uid: identity.uid, state: root.state, config: root.config, install: root.install }
-        stopped = await stopOwned(root, { packageStop: false, proofSignal: true, birth })
+        const resources = [{ pid: birth.pid, start: birth.start, parentPid: null }]
+        stopped = await stopOwned(root, { packageStop: false, proofSignal: true, birth, resources })
         evidence.lifecycleNoRecordReuse = { clean: stopped.clean, reason: stopped.reason, signals: stopped.signals,
           birthAlive: stopped.birthAlive ?? null, alive: liveIdentity(sleeper.pid).alive }
       } finally { try { sleeper.child.kill('SIGKILL') } catch { /* gone */ } rmSync(root.own, { recursive: true, force: true }) }
@@ -353,13 +358,74 @@ export async function runLifecycle() {
         const birth = { pid: sleeper.pid, start: identity.start, uid: identity.uid, state: root.state, config: root.config, install: root.install }
         mkdirSync(join(root.install, 'bin'), { recursive: true })
         writeFileSync(join(root.install, 'bin/pa'), '#!/bin/sh\nprintf \'%s\\n\' \'{"status":"STOPPED"}\'\nexit 0\n', { mode: 0o755 })
-        stopped = await stopOwned(root, { birth, packageStop: true, equivalentProof: true })
+        const resources = [{ pid: birth.pid, start: birth.start, parentPid: null }]
+        stopped = await stopOwned(root, { birth, resources, packageStop: true, equivalentProof: true })
         evidence.lifecycleStopNoRecord = { clean: stopped.clean, reason: stopped.reason ?? null, sawNoRecord: stopped.packageStopSawNoRecord ?? null,
           signals: stopped.signals, source: stopped.source ?? null, alive: liveIdentity(sleeper.pid).alive }
       } finally { try { sleeper.child.kill('SIGKILL') } catch { /* gone */ } rmSync(root.own, { recursive: true, force: true }) }
-      assert('STOPNOREC_NOT_ACCEPTED', evidence.lifecycleStopNoRecord.sawNoRecord === true && stopped?.source === 'birth', JSON.stringify(stopped))
+      assert('STOPNOREC_NOT_ACCEPTED', evidence.lifecycleStopNoRecord.sawNoRecord === true && stopped?.source === 'known_set', JSON.stringify(stopped))
       assert('STOPNOREC_CLEAN_WITH_PROOF', stopped?.clean === true && (stopped.signals ?? []).length > 0, JSON.stringify(stopped?.signals))
       assert('STOPNOREC_ALIVE_BEFORE_PROOF', evidence.lifecycleStopNoRecord.alive === false, 'process should be gone after the verified proof')
+    }))
+
+  cases.push(await runCase({ ...define('E1-LIFECYCLE-NO-RECORD-UNVERIFIED', 'A forced no-record proof without a complete immutable resource set is retained, not cleaned'), evidence: {} },
+    async ({ assert, evidence }) => {
+      const root = privateRoot('pa-e-life-nounverified-')
+      const sleeper = spawnSleeper(root)
+      let stopped, released
+      try {
+        const identity = liveIdentity(sleeper.pid)
+        const birth = { pid: sleeper.pid, start: identity.start, uid: identity.uid, state: root.state, config: root.config, install: root.install }
+        stopped = await stopOwned(root, { packageStop: false, proofSignal: true, birth, resources: null })
+        released = releaseRoot(root, stopped)
+        evidence.lifecycleNoRecordUnverified = { clean: stopped.clean, reason: stopped.reason, retained: stopped.retained,
+          signals: stopped.signals, released: released.removed, alive: liveIdentity(sleeper.pid).alive }
+      } finally { try { sleeper.child.kill('SIGKILL') } catch { /* gone */ } rmSync(root.own, { recursive: true, force: true }) }
+      assert('NOUNV_REFUSED', stopped?.clean !== true && stopped?.retained === true && stopped.reason === 'resources_unverified', JSON.stringify(stopped))
+      assert('NOUNV_NO_SIGNAL', (stopped?.signals ?? []).length === 0, JSON.stringify(stopped?.signals))
+      assert('NOUNV_NOT_RELEASED', released?.removed === false && evidence.lifecycleNoRecordUnverified.alive === true, JSON.stringify(released))
+    }))
+
+  cases.push(await runCase({ ...define('E1-LIFECYCLE-SET-MISMATCH', 'A resource set with a wrong start, uid or parent is refused before any signal'), evidence: {} },
+    async ({ assert, evidence }) => {
+      const root = privateRoot('pa-e-life-setmismatch-')
+      const sleeper = spawnSleeper(root)
+      const child = spawnSleeper(root, { name: 'api' })
+      let stopped
+      try {
+        const identity = liveIdentity(sleeper.pid)
+        const childIdentity = liveIdentity(child.pid)
+        const birth = { pid: sleeper.pid, start: identity.start, uid: identity.uid, state: root.state, config: root.config, install: root.install }
+        // The child's recorded start and parent are wrong: the set is not the spawn's own.
+        const resources = [{ pid: sleeper.pid, start: identity.start, parentPid: null },
+          { pid: child.pid, start: 'Wed Jan  1 00:00:00 2020', parentPid: 999999 }]
+        stopped = await stopOwned(root, { packageStop: false, proofSignal: true, birth, resources })
+        evidence.lifecycleSetMismatch = { reason: stopped.reason, blocked: stopped.blocked ?? null, signals: stopped.signals,
+          alive: [liveIdentity(sleeper.pid).alive, liveIdentity(child.pid).alive], childStart: childIdentity.start }
+      } finally { try { sleeper.child.kill('SIGKILL') } catch { /* gone */ } try { child.child.kill('SIGKILL') } catch { /* gone */ }
+        rmSync(root.own, { recursive: true, force: true }) }
+      assert('SETMISMATCH_REFUSED', stopped?.retained === true && stopped.reason === 'resource_scope_mismatch', JSON.stringify(stopped?.blocked))
+      assert('SETMISMATCH_NO_SIGNAL', (stopped?.signals ?? []).length === 0, JSON.stringify(stopped?.signals))
+      assert('SETMISMATCH_ALL_ALIVE', evidence.lifecycleSetMismatch.alive.every(Boolean), JSON.stringify(evidence.lifecycleSetMismatch.alive))
+    }))
+
+  cases.push(await runCase({ ...define('E1-LIFECYCLE-BIRTH-CONFIG', 'A birth from another config cannot authorize cleanup of the requested root'), evidence: {} },
+    async ({ assert, evidence }) => {
+      const rootA = privateRoot('pa-e-life-cfgA-')
+      const rootB = privateRoot('pa-e-life-cfgB-')
+      const sleeper = spawnSleeper(rootA)
+      let stopped
+      try {
+        const identity = liveIdentity(sleeper.pid)
+        const birth = { pid: sleeper.pid, start: identity.start, uid: identity.uid, state: rootA.state, config: rootA.config, install: rootA.install }
+        const resources = [{ pid: sleeper.pid, start: identity.start, parentPid: null }]
+        stopped = await stopOwned(rootB, { packageStop: false, proofSignal: true, birth, resources })
+        evidence.lifecycleBirthConfig = { reason: stopped.reason, signals: stopped.signals, alive: liveIdentity(sleeper.pid).alive,
+          birthConfig: rootA.config, requestedConfig: rootB.config }
+      } finally { try { sleeper.child.kill('SIGKILL') } catch { /* gone */ } rmSync(rootA.own, { recursive: true, force: true }); rmSync(rootB.own, { recursive: true, force: true }) }
+      assert('BIRTHCFG_REFUSED', stopped?.retained === true && stopped.reason === 'birth_set_mismatch', JSON.stringify(stopped))
+      assert('BIRTHCFG_NO_SIGNAL', (stopped?.signals ?? []).length === 0, JSON.stringify(stopped?.signals))
+      assert('BIRTHCFG_ALIVE', evidence.lifecycleBirthConfig.alive === true, JSON.stringify(evidence.lifecycleBirthConfig))
     }))
 
   return { cases, artifacts: {} }

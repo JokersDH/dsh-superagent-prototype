@@ -50,6 +50,14 @@ async function fetchJson(url, { headers = {}, method = 'GET', body } = {}) {
   return { status: response.status, body: parsed }
 }
 
+async function countRows(path, table) {
+  try {
+    const { DatabaseSync } = await import('node:sqlite')
+    const db = new DatabaseSync(path, { readOnly: true })
+    try { return Number(db.prepare(`SELECT count(*) AS c FROM ${table}`).get()?.c ?? 0) } finally { db.close() }
+  } catch { return null }
+}
+
 const sourceCapability = (install, needles) => {
   const read = relative => { try { return readFileSync(join(install, 'app', relative), 'utf8') } catch { return '' } }
   const app = read('apps/coordinator/http/app.ts')
@@ -128,14 +136,75 @@ export async function runUserSurfaces() {
 
   const recipeRoute = capability?.['recipes/preview'] === true
   if (recipeRoute) {
-    cases.push(notTested({ id: 'E6-RECIPE-PREVIEW', title: 'The packaged product previews a project recipe, applies it to the original form and requires an explicit create',
-      layer: LAYERS.INSTALLED, evidence: { recipePreview: { subject: frozenArtifactSubject(target), capability } } },
-      'NOT_REACHED: this package serves a recipes route, but the independent preview->apply->create browser and HTTP chain has not been recorded for these exact bytes.'))
+    cases.push(await runCase({ id: 'E6-RECIPE-PREVIEW', title: 'The packaged product previews a project recipe read-only, echoes the exact selection and writes no Work',
+      layer: LAYERS.INSTALLED, limitations: [
+        'Preview only: the apply/edit/create chain is browser work and is not claimed here; a preview digest is not a command token.',
+      ], evidence: {} }, async ({ assert, evidence }) => {
+      assert('RECIPE_PROVISIONED', live !== null, failure ?? 'no observation')
+      if (!live) return
+      const api = live.value.instance.apiURL
+      const key = readFileSync(join(root.state, 'api.key'), 'utf8').trim()
+      const auth = { authorization: `Bearer ${key}`, 'content-type': 'application/json' }
+      const configuration = await (await fetch(`${api}/v1/configuration`, { headers: auth })).json()
+      const project = configuration.projects.find(item => item.discussionOnly) ?? configuration.projects[0]
+      const profileId = project.profileIds?.[0] ?? project.defaultProfileId ?? configuration.profiles?.[0]?.id
+      const atom = (project.scope?.allowedPaths ?? []).find(value => value !== '.' && !value.startsWith('..')) ?? 'src/'
+      const worksBefore = await countRows(join(root.state, 'state.sqlite'), 'works')
+      const bodies = { projectId: project.id, kind: 'regression_fix', allowedPaths: [atom], profileId }
+      const url = `${api}/v1/projects/${encodeURIComponent(project.id)}/recipes/preview`
+      const post = (body, { headers = auth, query = '' } = {}) => fetch(`${url}${query}`, { method: 'POST', headers, body: JSON.stringify(body) })
+        .then(async response => {
+          const text = await response.text()
+          let parsed = null
+          try { parsed = JSON.parse(text) } catch { /* not json */ }
+          return { status: response.status, body: parsed, text: text.slice(0, 300) }
+        })
+      const draft = await post(bodies)
+      const query = await post(bodies, { query: '?x=1' })
+      const mismatch = await post({ ...bodies, projectId: 'project-other' })
+      const duplicate = await post({ ...bodies, allowedPaths: [atom, atom] })
+      const badKind = await post({ ...bodies, kind: 'unknown_kind' })
+      // A valid bearer is a CLI client and is not origin-bound; the cross-site refusal applies to the
+      // no-bearer local-development entry.
+      const crossSite = await post(bodies, { headers: { 'content-type': 'application/json', 'sec-fetch-site': 'cross-site' } })
+      const badBearer = await post(bodies, { headers: { authorization: `Bearer ${'0'.repeat(64)}`, 'content-type': 'application/json' } })
+      const noJson = await fetch(url, { method: 'POST', headers: { authorization: `Bearer ${key}`, 'content-type': 'text/plain' }, body: '{}' })
+      const worksAfter = await countRows(join(root.state, 'state.sqlite'), 'works')
+      const body = draft.body ?? {}
+      const fields = body.fields ?? null
+      const issues = []
+      if (body.protocol !== 'project-recipe-preview/1') issues.push('protocol')
+      if (!['draft', 'needs_input', 'unsupported', 'unavailable'].includes(body.status)) issues.push('status')
+      if (body.authorization !== 'none') issues.push('authorization')
+      if (JSON.stringify(body.input) !== JSON.stringify(bodies)) issues.push('input_echo')
+      if (fields) {
+        if (fields.projectId !== project.id || fields.profileId !== profileId) issues.push('field_identity')
+        if (fields.scope?.projectId !== project.id) issues.push('field_scope_project')
+        if (JSON.stringify(fields.scope?.allowedPaths) !== JSON.stringify([atom])) issues.push('field_atoms')
+        if (typeof fields.goal !== 'string' || fields.goal.trim().length === 0) issues.push('field_goal')
+        if (!/^[a-f0-9]{64}$/u.test(String(body.factsDigest ?? '')) || !/^[a-f0-9]{64}$/u.test(String(body.catalogDigest ?? ''))) issues.push('digests')
+      } else if (!Array.isArray(body.issues) || body.issues.length === 0) issues.push('no_issues_for_non_draft')
+      evidence.recipePreview = { subject: frozenArtifactSubject(target), mode: 'personal', capability, projectId: project.id, profileId, atom,
+        status: body.status ?? null, fields: fields ? { projectId: fields.projectId, profileId: fields.profileId, goalLength: fields.goal.length,
+          atoms: fields.scope?.allowedPaths ?? null, criteria: fields.criteria?.length ?? null } : null,
+        digests: { facts: body.factsDigest ?? null, catalog: body.catalogDigest ?? null },
+        authorization: body.authorization ?? null, issues,
+        negatives: { query: query.status, mismatch: mismatch.status, duplicate: duplicate.status, badKind: badKind.status,
+          crossSite: crossSite.status, badBearer: badBearer.status, noJson: noJson.status },
+        worksBefore, worksAfter, draftResponse: { status: draft.status, text: draft.text } }
+      assert('RECIPE_PREVIEW_200', draft.status === 200 && issues.length === 0, JSON.stringify({ status: draft.status, issues, body: body.status }))
+      assert('RECIPE_PREVIEW_NO_QUERY', query.status === 400, String(query.status))
+      assert('RECIPE_PREVIEW_PROJECT_BOUND', mismatch.status === 400 && duplicate.status === 400 && badKind.status === 400,
+        JSON.stringify({ mismatch: mismatch.status, duplicate: duplicate.status, kind: badKind.status }))
+      assert('RECIPE_PREVIEW_AUTH', crossSite.status === 403 && badBearer.status === 401 && noJson.status === 400,
+        JSON.stringify({ crossSite: crossSite.status, badBearer: badBearer.status, noJson: noJson.status }))
+      assert('RECIPE_PREVIEW_NO_WORK_WRITE', worksBefore === worksAfter, JSON.stringify({ worksBefore, worksAfter }))
+    }))
   } else {
-    cases.push(notTested({ id: 'E6-RECIPE-PREVIEW', title: 'The packaged product previews a project recipe, applies it to the original form and requires an explicit create',
+    cases.push(notTested({ id: 'E6-RECIPE-PREVIEW', title: 'The packaged product previews a project recipe read-only, echoes the exact selection and writes no Work',
       layer: LAYERS.INSTALLED, evidence: { recipePreview: { subject: frozenArtifactSubject(target), capability,
         mainSourcePresent: (() => { try { return readFileSync('apps/coordinator/http/app.ts', 'utf8').includes('recipes/preview') } catch { return null } })() } } },
-      'NOT_REACHED: the frozen 1ba package predates the 0073 recipe preview route (its HTTP entry has no recipes/preview). Main already serves it in source, but an installed claim needs a successor frozen package; the route is not inferred from a newer checkout.'))
+      'NOT_REACHED: the frozen package has no recipes/preview route in its HTTP entry; an installed claim needs a successor frozen package.'))
   }
 
   if (live) {

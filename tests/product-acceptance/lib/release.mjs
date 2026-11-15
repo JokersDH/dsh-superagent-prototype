@@ -488,6 +488,29 @@ export function stopFunctionalIssues(value) {
   }
   return issues
 }
+/** The recipe preview is read-only, echoes the exact selection and never writes a Work. */
+export function recipePreviewIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (!value.subject || !HEX64(String(value.subject.tarSha256 ?? ''))) issues.push('subject')
+  if (value.capability?.['recipes/preview'] !== true) issues.push('capability')
+  if (!['draft', 'needs_input', 'unsupported', 'unavailable'].includes(value.status)) issues.push('status')
+  if (value.authorization !== 'none') issues.push('authorization')
+  if (value.status === 'draft') {
+    const fields = value.fields ?? {}
+    if (!fields.projectId || fields.projectId !== value.projectId) issues.push('field_project')
+    if (!fields.profileId || fields.profileId !== value.profileId) issues.push('field_profile')
+    if (!Array.isArray(fields.atoms) || fields.atoms.length !== 1 || fields.atoms[0] !== value.atom) issues.push('field_atoms')
+    if (!(fields.goalLength >= 1)) issues.push('field_goal')
+    if (!HEX64(String(value.digests?.facts ?? '')) || !HEX64(String(value.digests?.catalog ?? ''))) issues.push('digests')
+  } else if (!Array.isArray(value.issues) || value.issues.length === 0) issues.push('issues')
+  if (!Array.isArray(value.issues) || value.issues.length > 0) issues.push('unexpected_issues')
+  const negatives = value.negatives ?? {}
+  if (negatives.query !== 400 || negatives.mismatch !== 400 || negatives.duplicate !== 400 || negatives.badKind !== 400) issues.push('request_negatives')
+  if (negatives.crossSite !== 403 || negatives.badBearer !== 401 || negatives.noJson !== 400) issues.push('auth_negatives')
+  if (value.worksBefore !== value.worksAfter) issues.push('work_written')
+  return issues
+}
 export function packagedStopIssues(value) {
   if (!value || typeof value !== 'object') return ['missing']
   const issues = []
@@ -508,6 +531,36 @@ export function packagedStopIssues(value) {
 }
 /** A record may not lend another state's birth to the launcher. */
 /** A known birth without a record is UNKNOWN until a verified proof stops it. */
+/** A forced no-record proof without the spawn's complete immutable set is retained. */
+export function lifecycleNoRecordUnverifiedIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (value.clean === true || value.retained !== true || value.reason !== 'resources_unverified') issues.push('reason')
+  if (!Array.isArray(value.signals) || value.signals.length !== 0) issues.push('signalled')
+  if (value.released !== false) issues.push('released')
+  if (value.alive !== true) issues.push('killed')
+  return issues
+}
+/** A set with wrong start/uid/parent refuses the whole set before any signal. */
+export function lifecycleSetMismatchIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (value.reason !== 'resource_scope_mismatch') issues.push('reason')
+  if (!value.blocked || (value.blocked.startOk !== false && value.blocked.parentOk !== false)) issues.push('blocked')
+  if (!Array.isArray(value.signals) || value.signals.length !== 0) issues.push('signalled')
+  if (!Array.isArray(value.alive) || value.alive.length !== 2 || !value.alive.every(Boolean)) issues.push('killed')
+  return issues
+}
+/** A birth from another config cannot authorize cleanup. */
+export function lifecycleBirthConfigIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (value.reason !== 'birth_set_mismatch') issues.push('reason')
+  if (!Array.isArray(value.signals) || value.signals.length !== 0) issues.push('signalled')
+  if (value.alive !== true) issues.push('killed')
+  if (value.birthConfig === value.requestedConfig) issues.push('same_config')
+  return issues
+}
 export function lifecycleNoRecordIssues(value) {
   if (!value || typeof value !== 'object') return ['missing']
   const issues = []
@@ -1368,7 +1421,8 @@ export function evaluateRelease({
         item.evidence?.workflowFormats?.subject ?? item.evidence?.personalReview?.subject ??
         item.evidence?.restoredReviewRefusals?.subject ?? item.evidence?.reviewReuse?.subject ??
         item.evidence?.scopeDiagnostics?.subject ?? item.evidence?.readiness?.subject ?? item.evidence?.trialUi?.subject ??
-        item.evidence?.supportMaterial?.subject ?? item.evidence?.packagedStop?.subject ?? item.evidence?.insights?.subject
+        item.evidence?.supportMaterial?.subject ?? item.evidence?.packagedStop?.subject ?? item.evidence?.insights?.subject ??
+        item.evidence?.recipePreview?.subject
       if (!subject || typeof subject !== 'object') {
         failures.push(fail('subject_missing', `Case ${id} has no frozen artifact subject`, id))
         continue
@@ -1428,7 +1482,8 @@ export function evaluateRelease({
           failures.push(fail('evidence_history_invalid', `Evidence history ${issue}`, entry.id))
       }
       for (const [key, fn] of [['contextUse', contextUseIssues], ['sse', contextSseIssues], ['guards', contextGuardIssues], ['sourceConfirm', sourceConfirmIssues], ['sourceConfirmRefusal', sourceConfirmRefusalIssues], ['candidateFlow', candidateFlowIssues], ['history', contextHistoryIssues], ['sources', contextSourcesIssues], ['contextUi', contextUiIssues], ['concurrency', concurrencyIssues], ['schemaMigration', schemaMigrationIssues], ['legacyMigration', legacyMigrationIssues], ['frozenScope', frozenScopeIssues], ['ownershipCopy', ownershipCopyIssues], ['ownershipMocks', ownershipMocksIssues], ['installedCandidates', installedCandidatesIssues], ['secondRoot', secondRootIssues], ['workflowFormats', workflowFormatsIssues], ['personalReview', personalReviewIssues], ['restoredReviewRefusals', restoredReviewRefusalsIssues], ['reviewReuse', reviewReuseIssues], ['scopeDiagnostics', scopeDiagnosticsIssues], ['readiness', readinessIssues], ['trialUi', trialUiIssues],
-      ['packagedStop', packagedStopIssues], ['stopFunctional', stopFunctionalIssues], ['lifecycleOwn', lifecycleOwnIssues], ['lifecycleNoRecord', lifecycleNoRecordIssues], ['lifecycleNoRecordExit', lifecycleNoRecordExitIssues],
+      ['recipePreview', recipePreviewIssues], ['packagedStop', packagedStopIssues], ['stopFunctional', stopFunctionalIssues], ['lifecycleOwn', lifecycleOwnIssues], ['lifecycleNoRecordUnverified', lifecycleNoRecordUnverifiedIssues], ['lifecycleSetMismatch', lifecycleSetMismatchIssues],
+      ['lifecycleBirthConfig', lifecycleBirthConfigIssues], ['lifecycleNoRecord', lifecycleNoRecordIssues], ['lifecycleNoRecordExit', lifecycleNoRecordExitIssues],
       ['lifecycleNoRecordReuse', lifecycleNoRecordReuseIssues], ['lifecycleStopNoRecord', lifecycleStopNoRecordIssues], ['lifecycleBirthRoot', lifecycleBirthRootIssues], ['lifecycleChildScope', lifecycleChildScopeIssues], ['lifecycleWrongStart', lifecycleWrongStartIssues], ['lifecycleSibling', lifecycleSiblingIssues],
       ['lifecycleForeignChild', lifecycleForeignChildIssues], ['lifecycleMixedUnknown', lifecycleMixedUnknownIssues],
       ['lifecycleStartWindow', lifecycleStartWindowIssues], ['lifecycleRefusedStop', lifecycleRefusedStopIssues],

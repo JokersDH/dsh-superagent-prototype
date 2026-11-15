@@ -583,6 +583,12 @@ const evidenceFor = (key) => {
       return { desktop: { horizontalOverflow: false } }
     case 'catalog':
       return { conversations: 3, archived: 1 }
+    case 'lifecycleNoRecordUnverified':
+      return { clean: false, reason: 'resources_unverified', retained: true, signals: [], released: false, alive: true }
+    case 'lifecycleSetMismatch':
+      return { reason: 'resource_scope_mismatch', blocked: { pid: 2, startOk: false, parentOk: false }, signals: [], alive: [true, true], childStart: 'b' }
+    case 'lifecycleBirthConfig':
+      return { reason: 'birth_set_mismatch', signals: [], alive: true, birthConfig: '/tmp/a/config', requestedConfig: '/tmp/b/config' }
     case 'lifecycleNoRecord':
       return { refused: { clean: false, retained: true, reason: 'record_missing_known_birth' }, released: false, aliveAfterRefusal: true,
         stopped: { clean: true, source: 'birth', signals: [{ label: 'launcher', signalled: 'SIGTERM' }], aliveAfter: [] } }
@@ -602,8 +608,10 @@ const evidenceFor = (key) => {
     case 'stopFunctional':
       return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
         proofFallbackUsed: false,
-        normal: { status: 'RUNNING', packageStatus: 'STOPPED', recordPresent: false, resourcesAlive: [false, false] },
-        restored: { status: 'RUNNING', packageStatus: 'STOPPED', recordPresent: false, resourcesAlive: [false, false] } }
+        normal: { status: 'RUNNING', packageStatus: 'STOPPED', recordPresent: false,
+          before: { resources: [{ pid: 1, start: 's', parentPid: null }] }, after: [{ pid: 1, expectedStart: 's', alive: false, sameIdentity: false }] },
+        restored: { status: 'RUNNING', packageStatus: 'STOPPED', recordPresent: false,
+          before: { resources: [{ pid: 2, start: 's', parentPid: null }] }, after: [{ pid: 2, expectedStart: 's', alive: false, sameIdentity: false }] } }
     case 'lifecycleOwn':
       return { birth: { pid: 10, start: 'a', argvExact: true }, signals: [{ label: 'launcher', pid: 10, signalled: 'SIGTERM' }],
         aliveAfter: [], clean: true, released: { removed: true }, rootAfter: false }
@@ -633,7 +641,11 @@ const evidenceFor = (key) => {
         packagedMarker: { entry: 'index.js', hasIdentity: false }, mainSourcePresent: true, mainSourceIdentity: true }
     case 'recipePreview':
       return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
-        capability: { '/v1/insights': true, 'recipes/preview': false }, mainSourcePresent: true }
+        capability: { '/v1/insights': true, 'recipes/preview': true }, projectId: 'project-1', profileId: 'profile-1', atom: 'src/',
+        status: 'draft', authorization: 'none', fields: { projectId: 'project-1', profileId: 'profile-1', atoms: ['src/'], goalLength: 12 },
+        digests: { facts: DIGEST, catalog: DIGEST }, issues: [],
+        negatives: { query: 400, mismatch: 400, duplicate: 400, badKind: 400, crossSite: 403, badBearer: 401, noJson: 400 },
+        worksBefore: 1, worksAfter: 1 }
     case 'targetDrift':
       return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
         appended: true, verify: { status: 'ok', verified: 'ok' }, consumerContentBinding: 'NOT_AVAILABLE_IN_MAIN', reason: 'integrity-only' }

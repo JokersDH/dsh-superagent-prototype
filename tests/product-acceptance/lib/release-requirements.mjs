@@ -86,6 +86,9 @@ export const SAFETY_CASES = [
  * window, a refused packaged stop, and idempotent repeat.
  */
 SAFETY_CASES.push(
+  case_('E1-LIFECYCLE-NO-RECORD-UNVERIFIED', { layers: [LAYERS.READONLY], evidence: ['lifecycleNoRecordUnverified'] }),
+  case_('E1-LIFECYCLE-SET-MISMATCH', { layers: [LAYERS.READONLY], evidence: ['lifecycleSetMismatch'] }),
+  case_('E1-LIFECYCLE-BIRTH-CONFIG', { layers: [LAYERS.READONLY], evidence: ['lifecycleBirthConfig'] }),
   case_('E1-LIFECYCLE-NO-RECORD-BIRTH', { layers: [LAYERS.READONLY], evidence: ['lifecycleNoRecord'] }),
   case_('E1-LIFECYCLE-NO-RECORD-EXIT', { layers: [LAYERS.READONLY], evidence: ['lifecycleNoRecordExit'] }),
   case_('E1-LIFECYCLE-NO-RECORD-REUSE', { layers: [LAYERS.READONLY], evidence: ['lifecycleNoRecordReuse'] }),
@@ -188,7 +191,7 @@ export const INSTALL_CASES = [
   case_('E9-COORDINATOR-CHANNEL-CONTRACT', { layers: [LAYERS.READONLY] }),
   case_('E17-SUPPORT-MATERIAL', { layers: [LAYERS.INSTALLED], evidence: ['supportMaterial'] }),
   case_('E9-INSIGHTS-HTTP', { layers: [LAYERS.INSTALLED] }),
-  { id: 'E6-RECIPE-PREVIEW', required: false, layers: [LAYERS.INSTALLED], evidence: ['recipePreview'] },
+  case_('E6-RECIPE-PREVIEW', { layers: [LAYERS.INSTALLED], evidence: ['recipePreview'] }),
   // Tracked gaps: installed F identity fields and a wired G summary need successor frozen bytes.
   { id: 'E11-TRIAL-IDENTITY-FIELDS', required: false, layers: [LAYERS.INSTALLED], evidence: ['trialIdentity'] },
   { id: 'E13-G-SCOPED-SUMMARY', required: false, layers: [LAYERS.INSTALLED], evidence: ['gSummary'] },

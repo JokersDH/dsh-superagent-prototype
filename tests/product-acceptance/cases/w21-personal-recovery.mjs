@@ -682,29 +682,49 @@ export async function runPersonalReview() {
     cases.push(await runCase({ ...define('E5-STOP-FUNCTIONAL', 'The packaged launcher stops both a normal and a restored discussion-only instance by itself, without an equivalent-proof fallback'),
       evidence: {} }, async ({ assert, evidence }) => {
       const { install, restored, config, mock } = observed
-      const directStop = (state, ports) => {
-        const started = startPackage(install, { state, config, port: ports[0], apiPort: ports[1], mockFile: mock.file })
-        return started
+      const directStop = (state, ports) => startPackage(install, { state, config, port: ports[0], apiPort: ports[1], mockFile: mock.file })
+      // The pre-stop set is fixed before the signal: recorded pids plus their independent live facts.
+      const captureResources = () => {
+        const record = readRecord(config)
+        const value = record.value ?? {}
+        const pids = [value.pid, value.apiPid, value.consolePid].filter(Number.isSafeInteger)
+        const seen = new Set()
+        const resources = []
+        for (const pid of pids) {
+          if (seen.has(pid)) continue
+          seen.add(pid)
+          const live = liveIdentity(pid)
+          if (!live.alive) continue
+          resources.push({ label: pid === value.pid ? 'launcher' : 'child', pid, start: live.start, uid: live.uid,
+            parentPid: pid === value.pid ? null : value.pid, argv: (live.command ?? '').slice(0, 300) })
+        }
+        return { present: record.present, mode: value.mode ?? null, startupMode: value.startupMode ?? null,
+          state: value.state ?? null, install: value.install ?? null, resources }
+      }
+      const observeResources = resources => resources.map(item => {
+        const live = liveIdentity(item.pid)
+        return { pid: item.pid, expectedStart: item.start, alive: live.alive, start: live.start ?? null,
+          sameIdentity: live.alive && live.start === item.start }
+      })
+      const observe = async started => {
+        const value = await started.value
+        if (value.status !== 'RUNNING') return { status: value.status, packageStatus: null, health: null, before: null, after: null, record: readRecord(config).present }
+        const health = await fetch(`${value.instance.apiURL}/v1/health`, { signal: AbortSignal.timeout(5_000) }).then(item => item.json()).catch(() => null)
+        const before = captureResources()
+        const stopped = runStop(started)
+        const json = parseJson(stopped.stdout) ?? null
+        await new Promise(resolvePromise => setTimeout(resolvePromise, 800))
+        const after = observeResources(before.resources)
+        const record = readRecord(config)
+        return { status: value.status, mode: value.instance?.mode ?? null, startupMode: value.instance?.startupMode ?? null,
+          health: health ? { mode: health.mode, startupMode: health.startupMode ?? 'normal' } : null,
+          packageStatus: json?.status ?? null, packageCode: json?.code ?? null, exit: stopped.status,
+          before, after, recordPresent: record.present, recordMode: record.value?.mode ?? null }
       }
       const runStop = started => spawnSync(join(install, 'bin/pa'), ['stop', '--json'], {
         cwd: join(install, '..'), encoding: 'utf8', timeout: 40_000,
         env: { ...process.env, PA_NODE: process.execPath, PA_MODEL_CONFIG: mock.file, PA_CONFIG_ROOT: config, PA_DATA_ROOT: started.birth.state },
       })
-      const observe = async started => {
-        const value = await started.value
-        if (value.status !== 'RUNNING') return { status: value.status, packageStatus: null, health: null, resources: null, record: readRecord(config).present }
-        const health = await fetch(`${value.instance.apiURL}/v1/health`, { signal: AbortSignal.timeout(5_000) }).then(item => item.json()).catch(() => null)
-        const stopped = runStop(started)
-        const json = parseJson(stopped.stdout) ?? null
-        await new Promise(resolvePromise => setTimeout(resolvePromise, 800))
-        const record = readRecord(config)
-        const pids = [record.value?.pid, record.value?.apiPid, record.value?.consolePid].filter(Number.isSafeInteger)
-        const alive = pids.map(pid => { try { process.kill(pid, 0); return true } catch { return false } })
-        return { status: value.status, mode: value.instance?.mode ?? null, startupMode: value.instance?.startupMode ?? null,
-          health: health ? { mode: health.mode, startupMode: health.startupMode ?? 'normal' } : null,
-          packageStatus: json?.status ?? null, packageCode: json?.code ?? null, exit: stopped.status,
-          resourcesAlive: alive, recordPresent: record.present, recordMode: record.value?.mode ?? null }
-      }
       let normal = null, restoredStop = null
       try {
         const [p1, a1] = [await freePort(), await freePort()]
@@ -720,8 +740,12 @@ export async function runPersonalReview() {
         await stopOwned(install, { state: restored, config, mockFile: mock.file })
       }
       const functional = value => value?.packageStatus === 'STOPPED' || value?.packageStatus === 'STOPPED_ORPHAN'
-      const cleaned = value => functional(value) && value.recordPresent === false && (value.resourcesAlive ?? []).every(item => item === false)
-      evidence.stopFunctional = { subject: frozenArtifactSubject(target), normal, restored: restoredStop,
+      // Quiescence comes from re-observing the fixed pre-stop pids and starts, never from an empty array
+      // derived after the record was deleted.
+      const cleaned = value => functional(value) && value.recordPresent === false && Array.isArray(value.before?.resources) &&
+        value.before.resources.length > 0 && Array.isArray(value.after) && value.after.length === value.before.resources.length &&
+        value.after.every(item => item.alive === false || item.sameIdentity === false)
+      evidence.stopFunctional = { subject: frozenArtifactSubject(target), normal, restored: restoredStop, resourcePolicy: 'fixed pre-stop pid/start set, independently re-observed after stop',
         detectorCase: 'E8-PACKAGED-STOP-CONSISTENCY records the refusal; this case is the product functional requirement',
         proofFallbackUsed: false }
       assert('STOP_FUNCTIONAL_NORMAL', cleaned(normal), JSON.stringify(normal))
