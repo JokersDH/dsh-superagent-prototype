@@ -187,6 +187,9 @@ importers:
       '@personal-agent/orchestrator-core':
         specifier: workspace:*
         version: link:../../packages/orchestrator-core
+      '@personal-agent/project-recipes':
+        specifier: workspace:*
+        version: link:../../packages/project-recipes
       '@personal-agent/proposals':
         specifier: workspace:*
         version: link:../../packages/proposals
@@ -445,6 +448,22 @@ importers:
       '@types/better-sqlite3':
         specifier: ^7.6.12
         version: 7.6.13
+      '@types/node':
+        specifier: 24.10.0
+        version: 24.10.0
+      typescript:
+        specifier: 6.0.3
+        version: 6.0.3
+
+  packages/project-recipes:
+    dependencies:
+      '@personal-agent/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
+    devDependencies:
       '@types/node':
         specifier: 24.10.0
         version: 24.10.0
