@@ -6,7 +6,7 @@ import { AssistantDecisionStore, DecisionError, DecisionGovernance, captureDecis
 import type { DecisionActor, DecisionSource } from '../src/index.ts'
 
 const NOW = '2026-11-16T00:00:00.000Z'
-const scope = (projectId = 'project-1'): Scope => ({ projectId, allowedPaths: ['src'], excludedPaths: [], externalActions: [] })
+const scope = (projectId = 'project-1'): Scope => ({ projectId, allowedPaths: ['src'], excludedPaths: ['.git'], externalActions: [] })
 const actor = (projectId = 'project-1'): DecisionActor => ({ actorRef: 'user-1', projectId, grantScope: scope(projectId) })
 const message = (id: string, projectId = 'project-1', textDigest = 'a'.repeat(64)): DecisionSource => ({
   messageId: id, conversationId: `conv-${projectId}`, projectId, role: 'user', provenance: 'trusted_user',
@@ -91,6 +91,43 @@ void test('a current decision snapshot is bounded, project-scoped and revalidate
   const tamperResult = await revalidateDecisionSnapshot(governance, tampered, { projectId: 'project-1', now: new Date(NOW) })
   assert.equal(tamperResult.valid, false)
   assert.equal(tamperResult.code !== undefined, true)
+
+  // Nested scope/array and item objects are truly frozen, not only the outer object.
+  const frozenSnapshot = await captureDecisionSnapshot(governance, { projectId: 'project-1', now: new Date(NOW) })
+  assert.equal(Object.isFrozen(frozenSnapshot), true)
+  assert.equal(Object.isFrozen(frozenSnapshot.decisions), true)
+  const firstDecision = frozenSnapshot.decisions[0]!
+  assert.equal(Object.isFrozen(firstDecision), true)
+  assert.equal(Object.isFrozen(firstDecision.scope), true)
+  assert.equal(Object.isFrozen(firstDecision.scope.allowedPaths), true)
+  assert.throws(() => (firstDecision.scope.allowedPaths as string[]).push('elsewhere'), TypeError)
+
+  // A forged scope (wider allowedPaths or dropped exclusions) is bound to the trusted record and refused.
+  const wider = { ...frozenSnapshot, decisions: frozenSnapshot.decisions.map((decision) => ({
+    ...decision, scope: { ...decision.scope, allowedPaths: [...decision.scope.allowedPaths, 'elsewhere'] } })) }
+  assert.equal((await revalidateDecisionSnapshot(governance, wider, { projectId: 'project-1', now: new Date(NOW) })).code, 'content_changed')
+  const noExclusions = { ...frozenSnapshot, decisions: frozenSnapshot.decisions.map((decision) => ({
+    ...decision, scope: { ...decision.scope, excludedPaths: [] } })) }
+  assert.equal((await revalidateDecisionSnapshot(governance, noExclusions, { projectId: 'project-1', now: new Date(NOW) })).code, 'content_changed')
+  const changedSource = { ...frozenSnapshot, decisions: frozenSnapshot.decisions.map((decision) => ({ ...decision, sourceMessageId: 'msg-2x' })) }
+  assert.equal((await revalidateDecisionSnapshot(governance, changedSource, { projectId: 'project-1', now: new Date(NOW) })).code, 'content_changed')
+  const changedTime = { ...frozenSnapshot, decisions: frozenSnapshot.decisions.map((decision) => ({ ...decision, recordedAt: '2026-11-15T00:00:00.000Z' })) }
+  assert.equal((await revalidateDecisionSnapshot(governance, changedTime, { projectId: 'project-1', now: new Date(NOW) })).code, 'content_changed')
+
+  // Malformed protocols, extra keys, duplicate ids and bad times are invalid snapshots, not any-typed data.
+  for (const malformed of [
+    { ...frozenSnapshot, protocol: 'decision-context-snapshot/2' },
+    { ...frozenSnapshot, authorization: 'grant' },
+    { ...frozenSnapshot, extra: true },
+    { ...frozenSnapshot, capturedAt: 'not-a-time' },
+    { ...frozenSnapshot, decisions: [frozenSnapshot.decisions[0], frozenSnapshot.decisions[0]] },
+    { ...frozenSnapshot, decisions: [{ ...frozenSnapshot.decisions[0], version: 0 }] },
+  ]) assert.equal((await revalidateDecisionSnapshot(governance, malformed as never, { projectId: 'project-1' })).code, 'invalid_snapshot')
+  await assert.rejects(() => captureDecisionSnapshot(governance, { projectId: 'project-1', max: 0 }), (error: { code?: string }) => error.code === 'invalid_scope')
+  await assert.rejects(() => captureDecisionSnapshot(governance, { projectId: 'project-1', max: Number.NaN }), (error: { code?: string }) => error.code === 'invalid_scope')
+  await assert.rejects(() => captureDecisionSnapshot(governance, { projectId: 'project-1', selectedDecisionIds: ['d1', 'd1'] }), (error: { code?: string }) => error.code === 'conflict')
+  await assert.rejects(() => captureDecisionSnapshot(governance, { projectId: 'project-1', now: new Date(Number.NaN) }), (error: { code?: string }) => error.code === 'invalid_scope')
+  await assert.rejects(() => captureDecisionSnapshot(governance, { projectId: 'project-b', selectedDecisionIds: ['d1'] }), (error: { code?: string }) => error.code === 'not_found')
   advance(1000)
 })
 
