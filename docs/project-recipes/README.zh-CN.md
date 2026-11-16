@@ -352,7 +352,8 @@ const { facts, report } = rebindRegisteredProject({
 
 - `unbound`：当前没有该项目的已登记 root → 只能先走原项目设置/登记流程，**不猜路径**。
 - `reidentified`：项目换了身份（搬目录后重新登记会产生新 project id，main 的 registry id 由路径摘要生成）→ 报告给出 `previousProjectId` 与元数据差异供迁移核对，但**旧建议不能复用**，需按新项目重新生成。
-- `current`：内容摘要相同（观察时间可以不同）→ 可沿用已生成建议，仍以原确认流程为准。
+- `current`：内容摘要相同（观察时间可以不同）→ 可沿用已生成建议，仍以原确认流程为准；**根身份由调用方（main）核对**，报告不推断迁移完成。
+- 同一内容、不同 project id → `reidentified` 且 `changes` 为空，仍明确「旧建议不能复用」，不因「无差异」就宣称迁移成功。
 - `changed`：列出字段级变化（manager/lock/workspace/scripts…），旧草稿由 `previewInputs` 判定为 `stale_inputs`，需用当前配置重新生成。
 - 报告只含 digest/时间/字段名/脱敏 note，没有绝对 root、metadata 正文、凭据或授权；`authorization` 恒 `none`。
 
@@ -373,11 +374,30 @@ node tools/project-recipes/cli.ts --previous-facts /tmp/old-facts.json \
 import { describeProjectRecipes } from '@personal-agent/project-recipes'
 const described = describeProjectRecipes()
 // { protocol: 'project-recipes-module/1', version, catalog: { id, version, digest },
-//   kinds, protocols: { facts, draft, fields, observer, rebind }, issueCodes,
-//   previewErrorCodes, configurationProtocols, authority: 'none' }
+//   kinds, protocols: { facts, draft, fields, observer, rebind }, capabilities,
+//   issueCodes, previewErrorCodes, configurationProtocols, authority: 'none' }
 ```
 
-D 冻结一个包、E 验一个精确 tar 时，可比较 source 与安装产物里的这份描述：contracts 协议、catalog 摘要、issue/error 词表一致才算同一版本。描述里没有路径、凭据或授权字段；`version` 与 `package.json` 由测试绑定。
+D 冻结一个包、E 验一个精确 tar 时，可比较 source 与安装产物里的这份描述：contracts 协议、catalog 摘要、issue/error 词表一致才算同一版本。`capabilities` 让消费者在接线前判断可选能力（如旧包缺 `rebind` 时不要调用），普通预览/手动委托不受影响。描述里没有路径、凭据或授权字段；`version` 与 `package.json` 由测试绑定。CLI 也可直接输出：`node tools/project-recipes/cli.ts --describe`。
+
+## 7.7 结构化重验原因（main/F 可直接渲染）
+
+`draftCurrency(draft, current)` 给出 `{ current, reasons, observationComplete }`，每种原因一个稳定 code，调用方不必解析文案：
+
+| code | 含义 |
+| --- | --- |
+| `configuration_unsupported_version` | 配置协议不受支持 |
+| `configuration_invalid` | 配置未通过公开 schema |
+| `configuration_changed` | 配置 revision 变化 |
+| `project_removed` | 当前配置已不含该项目 |
+| `facts_invalid` | 当前事实无法解析 |
+| `facts_changed` | 事实内容变化（稳定内容摘要） |
+| `facts_future` | 观察时间在未来 |
+| `facts_expired` | 观察超过保留期限 |
+| `expiry_passed` | 项目授权已过期 |
+| `clock_invalid` | `now`/`maxFactsAgeMs` 非法 |
+
+`observationComplete: false` 表示当前观察本身有 `missing`/`omissions`，内容未变也不宣称「完整」。`assertDraftCurrent` 仍按既有错误契约抛 `stale_inputs`（含 `staleInputs`）或 `invalid_clock`，两者共用同一政策。
 
 ## 8. 兼容、版本与分发
 
@@ -431,7 +451,7 @@ pnpm --dir packages/contracts build
 
 # 纯库
 ./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.json
-node --test packages/project-recipes/test/*.case.ts     # 85 tests
+node --test packages/project-recipes/test/*.case.ts     # 98 tests
 ./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.build.json
 
 # CLI 与真实 Application 消费者（后者需要产品包构建）

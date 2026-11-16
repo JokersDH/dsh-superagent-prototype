@@ -2,7 +2,8 @@
 
 工作树 `/Users/hh/Desktop/joker/superagent-agent-j`，分支 `codex/g5-project-recipes`。
 
-- 当前（wave-33）机读状态：[wave33-status.json](wave33-status.json)
+- 当前（wave-34）机读状态：[wave34-status.json](wave34-status.json)
+- 历史（wave-33）：[wave33-status.json](wave33-status.json)
 - 历史（wave-32）：[wave32-status.json](wave32-status.json)
 - 历史（wave-31）：[wave31-status.json](wave31-status.json)
 - 历史（wave-30）：[wave30-status.json](wave30-status.json)
@@ -12,7 +13,57 @@
 
 ---
 
-# wave-33（2026-11-16）
+# wave-34（2026-11-16）
+
+起点 `f6a1bf59`，合并 `origin/main`（`6b306514`，合并为 `d8aca213`；含 `23d5a98e` 的原回调与 support 下载）后执行两个连续工程包、每包三个完整成果。
+
+## 包一：日常项目到原交付
+
+| 成果 | 证据 |
+| --- | --- |
+| 普通 Node/npm/pnpm 声明适用性 | 三形态 × 三 kind；缺 atom → `needs_input`、未知项目 → `forbidden`；缺锁文件给可行动 note，不推断命令；脚本只是名字数据 |
+| 两原项目完整交付与失败回路 | `two-project-delivery.case.ts`（preview→create→check/candidate→ready→accept→delivered→artifact bytes→reopen）＋ `fail-recovery.case.ts`（缺失 atom 改正后交付；同 commandId 换 body 冲突；配置 revision 变化后旧 apply 失效并重读；A/B 切换互不串用） |
+| 可解释重验 | `draftCurrency()` 的封闭 reason code（配置版本/schema/revision/项目移除、facts 无效/变化/未来/过期、expiry、clock）＋ `observationComplete`；`assertDraftCurrent` 共用同一政策 |
+
+真实负例都先有合法正向再证拒绝：候选未就绪前不接受、跨项目候选拒绝、**合法 accept 之后**同一候选才是 stale；检查 FAIL 的 oracle 在受控 fixture 下不可达，未冒充已测（E/main 拥有真实 oracle）。
+
+## 包二：迁移、重开与同版本交付
+
+- **重识别**：同 id 新 root 内容变 → `changed`；同内容新 root → `current` 且报告明确「根身份由调用方核对」；不同 id 同内容 → `reidentified` 且 changes 为空、旧建议不可复用；无 root → `unbound`；越权根 → 错误而非 unbound。
+- **非空恢复后重新登记**：`restore-continuity.case.ts` 关闭并重开同一非空 state → 旧 Work/候选/全部 artifact 字节按原 project id 可核；把搬迁树登记为新 id → 新项目获得自己的 draft，旧 draft 跨 id 直接 `stale`，rebind 报 `reidentified`。真实 A/D 备份恢复字节属外部，未冒充。
+- **同版本交接**：`describeProjectRecipes()` 增加 `capabilities`（`match`/`preview-fields`/`observe`/`rebind`/`describe`），旧包缺能力可被消费者识别；CLI `--describe` 输出同一描述。
+
+## 实际验证
+
+| 命令 | exit | 结果 |
+| --- | --- | --- |
+| `./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.json` | 0 | strict |
+| `node --test packages/project-recipes/test/*.case.ts` | 0 | 98 tests / 98 pass |
+| `./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.build.json` | 0 | dist |
+| `./node_modules/.bin/tsc -p tools/project-recipes/tsconfig.json` | 0 | strict |
+| `node --test tools/project-recipes/test/*.case.ts` | 0 | 43 tests / 43 pass |
+| `node --test tests/integration/project-recipes.case.mjs` | 0 | main 真实链路 5/5 |
+| `node tests/integration/project-recipes-browser.mjs reports/project-recipes/wave34-browser` | 0 | 9/9，clean source `ab9eef2d`，2 个人工接受 |
+| `node agent-tasks/product-wave-34/verify.mjs` | 0 | 静态派工校验 |
+| `npm pack --dry-run` | 0 | 42 files / 50,270 B |
+
+合并 main 后必须重跑 `pnpm -r --workspace-concurrency=2 run build`，否则旧 contracts dist 缺新导出会让 main 导入失败（构建产物过期，不是模板回归）。
+
+## 已进 main / 仅候选 / 安装
+
+- 已在 main：wave-30 J 五源、0073/0077 预览与原表单、`23d5a98e` 原回调/support（main-owned）、发行构建列表含 `project-recipes`。
+- 仅候选：`rebind.ts`、`module.ts` 的 capabilities 与 `--describe`、`draftCurrency` 结构化原因、三个新消费者测试。
+- 未安装：R1 829（`82ee5b8f` / `8296720d8a25f38c` / tar `04926739…`）原样保留；R2 后继 source `ab9eef2d` + dist + pack 列表，**tar/ZIP 未创建**。
+
+分层：source/controlled PASS；installed NOT_REACHED；native 0；recovered NOT_REACHED；value 不声称。
+
+## 余项
+
+main 重导入 `rebind.ts`/`module.ts`/`preview.ts`/`match.ts`；D 在整合运行字节确定后冻结后继；E 绑定同一 tar；A/D 真实备份恢复 cohort 与 E 独立断言不在本包。
+
+---
+
+# 历史：wave-33（2026-11-16）
 
 起点 `0c67e3b7`，合并 `origin/main`（wave-33 派工 `e05ee8d8`，合并为 `7d6d099c`；含 `fc38bf65` 的登记 runner port 与工作台消费者）后执行三个完整成果。
 
