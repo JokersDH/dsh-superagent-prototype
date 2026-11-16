@@ -76,7 +76,8 @@ verify only
   --expect-digest <sha256>    Refuse when the bundle bytes do not match the pinned digest
   --dto <file>                Verify a served usage-observation/1 document instead of a bundle
   --package <absolute tar>    Also inspect a release archive and name the build and any missing capability
-  --install <absolute dir>    Also inspect the running installation (manifest + installed files) for identity
+  --install <absolute dir>    Also inspect the installation (manifest + installed files) for identity
+  --running-root <abs dir>    A process start root supplied by main/D; compared, never discovered
   --out <absolute path>       Write the support report to a new 0600 file instead of stdout
   --format json|markdown      Report format for verify (default json)
 
@@ -144,7 +145,7 @@ const SPECS = {
   verify: {
     input: flag(), 'max-input-bytes': flag(), 'max-records': flag(), 'max-works': flag(), 'max-pages': flag(),
     'expect-digest': flag(), dto: flag(), format: flag(), package: flag(), out: flag(), 'max-archive-bytes': flag(),
-    install: flag(),
+    install: flag(), 'running-root': flag(),
   },
   package: {
     tar: flag(), 'expect-sha256': flag(), 'expect-build': flag(), expect: flag(), 'max-archive-bytes': flag(),
@@ -394,18 +395,33 @@ async function commandVerify(options, io) {
         browserTrigger: inspected.browserTrigger, missing: inspected.absent, archiveSha256: inspected.archive.sha256,
       })
     }
+    let runtime = null
     if (options.install !== undefined) {
       const installRoot = requiredString(options.install, 'install')
       if (!isAbsolute(installRoot)) throw new UsageError('--install must be an absolute path')
+      const runningRoot = options['running-root'] === undefined ? undefined
+        : requiredString(options['running-root'], 'running-root')
+      if (runningRoot !== undefined && !isAbsolute(runningRoot)) throw new UsageError('--running-root must be an absolute path')
       let identity
       try {
-        identity = insights.inspectRuntimeIdentity({ installRoot })
+        identity = insights.inspectRuntimeIdentity({
+          installRoot,
+          ...(runningRoot === undefined ? {} : { running: { root: runningRoot } }),
+        })
       } catch (error) {
         if (error?.name === 'RuntimeIdentityFault') throw new UsageInsightsError('source_unavailable', error.message)
         throw error
       }
       origin = identity.origin
-      io.stderr(`install=${identity.manifest.state} layout=${identity.layout} identity=${origin?.identitySource ?? 'unknown'} capabilities=${identity.capabilities === null ? 'unknown' : Object.entries(identity.capabilities).filter(([, present]) => present).map(([name]) => name).join(',') || 'none'}${identity.differences.length ? ` differences=${identity.differences.length}` : ''}\n`)
+      runtime = { layout: identity.layout, evidence: identity.evidence,
+        manifest: { state: identity.manifest.state, buildId: identity.manifest.buildId,
+          sourceCommit: identity.manifest.sourceCommit, declaredFiles: identity.manifest.declaredFiles },
+        inventory: { state: identity.inventory.state, mode: identity.inventory.mode,
+          listed: identity.inventory.listed, hashed: identity.inventory.hashed,
+          mismatches: identity.inventory.mismatches.length },
+        capabilities: identity.capabilities, running: identity.running, unknown: identity.unknown,
+        differences: identity.differences }
+      io.stderr(`install=${identity.manifest.state} layout=${identity.layout} evidence=${identity.evidence} inventory=${identity.inventory.state}/${identity.inventory.hashed} identity=${origin?.identitySource ?? 'unknown'} capabilities=${identity.capabilities === null ? 'unknown' : Object.entries(identity.capabilities).filter(([, present]) => present).map(([name]) => name).join(',') || 'none'}${identity.differences.length ? ` differences=${identity.differences.length}` : ''}${identity.inventory.mismatches.length ? ` mismatches=${identity.inventory.mismatches.length}` : ''}\n`)
     }
     let read
     try {
@@ -422,7 +438,7 @@ async function commandVerify(options, io) {
       ? insights.renderSupportReport(report)
       : `${JSON.stringify({ ...report, documentKind: read.documentKind, verification: read.verification,
           contractValid: read.contractValid, digestCheck: read.digest, conservation: read.conservation,
-          file: { bytes: served.bytes, sha256: served.digest } }, null, 2)}\n`
+          file: { bytes: served.bytes, sha256: served.digest }, ...(runtime === null ? {} : { runtime }) }, null, 2)}\n`
     if (options.out !== undefined) {
       const written = writeExclusive(requiredString(options.out, 'out'), body)
       io.stdout(`wrote ${basename(written)} (${Buffer.byteLength(body)} bytes) format=${format}\n`)
@@ -435,6 +451,12 @@ async function commandVerify(options, io) {
     // A document that is not contract-valid (an older shape, or one that fails the product contract)
     // is reported as partial: the summary is useful, but nothing about it is fully verified.
     if (read.contractValid === false) return EXIT.partial
+    // A manifest claim that was not checked against the installed files is not proof that this is
+    // what is running; the summary is useful, but it is not a verified identity.
+    if (runtime !== null && runtime.evidence === 'self_declared') {
+      io.stderr('unverified_identity: the manifest is self-declared (inventory not verified); not evidence of the running installation\n')
+      return EXIT.partial
+    }
     return report.status === 'ready' ? EXIT.ok : report.status === 'insufficient_data' ? EXIT.insufficient : EXIT.unavailable
   }
   const bundle = readBundle(requiredString(options.input, 'input'), maxBytes)
