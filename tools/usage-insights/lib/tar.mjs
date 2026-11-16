@@ -51,15 +51,20 @@ export function readArchive(path, options = {}) {
   if (!stat.isFile()) throw new ArchiveError('unreadable', 'The archive must be a regular file')
   if (stat.size > maxBytes) throw new ArchiveError('too_large', `The archive is ${stat.size} bytes, above the ${maxBytes}-byte budget`)
   const compressed = readFileSync(path)
+  // The budget bounds the archive on disk. Inflating is bounded separately (a release tar compresses
+  // several times over), so a small archive is never refused for inflating past its own file size,
+  // and a decompression bomb is still cut off.
+  const maxInflatedBytes = Math.min(Math.max(maxBytes * 8, 64 * 1024 * 1024), 2 * 1024 * 1024 * 1024)
   let buffer
   if (compressed.length > 2 && compressed[0] === 0x1f && compressed[1] === 0x8b) {
     try {
-      buffer = gunzipSync(compressed, { maxOutputLength: maxBytes })
+      buffer = gunzipSync(compressed, { maxOutputLength: maxInflatedBytes })
     } catch {
-      throw new ArchiveError('unreadable', 'The archive could not be inflated within the byte budget')
+      throw new ArchiveError('unreadable', `The archive could not be inflated within the ${maxInflatedBytes}-byte budget`)
     }
   } else buffer = compressed
-  if (buffer.length > maxBytes) throw new ArchiveError('too_large', 'The inflated archive is above the byte budget')
+  if (buffer.length > maxInflatedBytes)
+    throw new ArchiveError('too_large', `The inflated archive is ${buffer.length} bytes, above the ${maxInflatedBytes}-byte budget`)
 
   const entries = []
   let offset = 0

@@ -134,8 +134,11 @@ test('a package with the download chain reports all three capabilities', () => {
   assert.deepEqual(report.capabilities, { pageObservation: true, numericExport: true, displayDownload: true })
   assert.deepEqual(report.absent, [])
   assert.equal(report.coordinator.downloadRoute, 1)
-  assert.equal(report.coordinator.downloadMethod, 1)
-  assert.equal(report.console.downloadInterface, 1)
+  // Either the protocol literal or the contract symbol is enough evidence of the download path.
+  assert.equal(report.coordinator.downloadContract >= 1, true)
+  assert.equal(report.console.layout, 'source')
+  assert.equal(report.console.interfacePresent, true)
+  assert.equal(report.browserTrigger, 'present')
 })
 
 test('an archive that does not match the declared identity is refused', () => {
@@ -179,3 +182,55 @@ test('the report never extracts, installs or executes anything', () => {
 })
 
 const readdirSafe = directory => readdirSync(directory).sort()
+
+const serverFiles = (consoleEntries) => ({
+  'install/install.json': install(),
+  'install/app/packages/usage-insights/package.json': JSON.stringify({
+    name: '@personal-agent/usage-insights', version: '0.1.0', exports: { '.': { import: './dist/index.js' } },
+  }),
+  'install/app/packages/usage-insights/dist/index.js': 'export { analyzeUsageInsights, buildInsightExport, buildDisplayExport }\n',
+  'install/app/apps/coordinator/http/app.ts': "app.get('/v1/insights', h)\napp.get('/v1/insights/export', h)\n",
+  'install/app/apps/coordinator/product/usage-observation.ts': "const p = 'usage-observation-download/1'; UsageObservationDownload\n",
+  ...consoleEntries,
+})
+
+test('a built console bundle is inspected instead of a missing source file', () => {
+  // The released package ships only `dist/assets/*.js`; reading `src/transport.ts` made a real
+  // capability look absent. The layout and the bundle reference are now reported together.
+  const withBundle = workspace(serverFiles({
+    'install/app/apps/console/dist/assets/index-abc123.js': 'const t={downloadUsageObservation:q=>q};fetch("/v1/insights/export")\n',
+  }))
+  const report = JSON.parse(run(['package', '--tar', withBundle.path, '--json']).stdout)
+  assert.equal(report.console.layout, 'bundle')
+  assert.equal(report.browserTrigger, 'present')
+  assert.deepEqual(report.capabilities, { pageObservation: true, numericExport: true, displayDownload: true })
+
+  const withoutReference = workspace(serverFiles({
+    'install/app/apps/console/dist/assets/index-abc123.js': 'const t={observation:q=>q};fetch("/v1/insights")\n',
+  }))
+  const refused = JSON.parse(run(['package', '--tar', withoutReference.path, '--json']).stdout)
+  assert.equal(refused.console.layout, 'bundle')
+  assert.equal(refused.browserTrigger, 'absent')
+  assert.equal(refused.capabilities.displayDownload, false, 'a user cannot trigger an export the page does not offer')
+
+  // No console at all: the server side decides and the browser trigger stays unverifiable.
+  const noConsole = workspace(serverFiles({}))
+  const unknown = JSON.parse(run(['package', '--tar', noConsole.path, '--json']).stdout)
+  assert.equal(unknown.console.layout, 'absent')
+  assert.equal(unknown.browserTrigger, 'unverifiable')
+  assert.equal(unknown.capabilities.displayDownload, true)
+})
+
+test('the archive budget is checked against the real file size', () => {
+  const files = serverFiles({
+    'install/app/apps/console/dist/assets/index-big.js': `${'x'.repeat(2048)}downloadUsageObservation\n`,
+  })
+  const { path } = workspace(files)
+  const size = readFileSync(path).length
+  const refused = run(['package', '--tar', path, '--max-archive-bytes', String(size - 1)])
+  assert.equal(refused.status, 5, 'a budget below the real archive size refuses before scanning')
+  assert.match(refused.stderr, /above the/)
+  const accepted = JSON.parse(run(['package', '--tar', path, '--json', '--max-archive-bytes', String(size)]).stdout)
+  assert.equal(accepted.console.layout, 'bundle')
+  assert.equal(accepted.capabilities.displayDownload, true)
+})
