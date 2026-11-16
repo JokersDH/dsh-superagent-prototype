@@ -86,7 +86,10 @@ export async function runCohortRecovery() {
       innerTarSha256: result?.inner?.tarSha256 ?? null, innerTarBytes: result?.inner?.tarBytes ?? null,
       digestsMatch: extracted.digests.installManifest === result?.inner?.installManifestSha256 &&
         extracted.digests.runtime === result?.runtime?.sha256 && extracted.digests.license === result?.runtime?.licenseSha256,
-      manifestProtocol: extracted.manifest.protocol }
+      manifestProtocol: extracted.manifest.protocol,
+      runtime: { version: extracted.manifest.runtime?.version ?? null, abi: extracted.manifest.runtime?.abi ?? null,
+        platform: extracted.manifest.runtime?.platform ?? null, arch: extracted.manifest.runtime?.arch ?? null,
+        sha256: extracted.manifest.runtime?.sha256 ?? null, licenseSha256: extracted.manifest.runtime?.licenseSha256 ?? null } }
     const tarSha = result?.inner?.tarSha256 ?? null
     evidence.install = { buildId: extracted.manifest?.inner?.buildId ?? null, source: extracted.manifest?.inner?.source ?? null,
       tarSha256: tarSha, tarBytes: result?.inner?.tarBytes ?? null, schema: extracted.manifest?.inner?.schema ?? null,
