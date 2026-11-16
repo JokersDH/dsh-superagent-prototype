@@ -37,6 +37,9 @@ export interface TrialWorkspaceProps {
   readonly insightsDownloading?: boolean | undefined
   readonly insightsDownloadError?: string | undefined
   readonly support?: TrialSupportInfo | undefined
+  readonly onDownloadSupport?: (() => void) | undefined
+  readonly supportDownloading?: boolean | undefined
+  readonly supportDownloadError?: string | undefined
   readonly recipes?: readonly TrialRecipeSuggestion[] | undefined
   readonly recipesLoading?: boolean | undefined
   readonly recipesError?: string | undefined
@@ -99,7 +102,8 @@ export function TrialWorkspace({
   readiness, loading = false, error, unavailable = false, configuration, activeProjectId,
   activeConversationTitle, insights, insightWindow, onSelectInsightWindow, insightsLoading = false,
   insightsError, onReloadInsights, onDownloadInsights, insightsDownloading = false, insightsDownloadError,
-  support, recipes, recipesLoading = false, recipesError, onReloadRecipes, onOpenRecipe,
+  support, onDownloadSupport, supportDownloading = false, supportDownloadError,
+  recipes, recipesLoading = false, recipesError, onReloadRecipes, onOpenRecipe,
   onAction, onReload, headingLevel = 2, className,
 }: TrialWorkspaceProps) {
   const base = useId()
@@ -488,6 +492,12 @@ export function TrialWorkspace({
 
         <details className="trial-support" aria-labelledby={supportId}>
           <summary id={supportId}>支持与诊断</summary>
+          {onDownloadSupport !== undefined && <button type="button" className="icon-button" title="导出当前范围的诊断摘要"
+            aria-label="导出诊断摘要" disabled={supportDownloading} aria-busy={supportDownloading} onClick={onDownloadSupport}>
+            <Download size={16} aria-hidden="true" />
+          </button>}
+          {supportDownloading && <p className="trial-muted" role="status">正在导出诊断摘要…</p>}
+          {supportDownloadError && <p className="trial-muted" role="alert">{supportDownloadError}</p>}
           <dl className="trial-support-rows">
             {supportRows.map(row => (
               <div key={row.label} className="trial-fact">

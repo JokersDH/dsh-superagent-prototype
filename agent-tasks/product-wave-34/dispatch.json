@@ -1,0 +1,803 @@
+{
+  "protocol": "whole-product-engineering-dispatch/3",
+  "wave": "product-wave-34",
+  "date": "2026-11-16",
+  "status": "PLANNED_NOT_EXECUTED_BY_EXTERNAL_AGENTS",
+  "priority": "COMPLETE_SCHEME_B_ENGINEERING_WITH_CONTINUOUS_REAL_CONSUMERS",
+  "externalAgentCount": 10,
+  "totalOwnersIncludingMain": 11,
+  "completeOutcomesPerOwner": 6,
+  "wholeGoalPerOwner": true,
+  "continueAfterSourceHandoff": true,
+  "independentQueueRequired": true,
+  "microPhaseExpansion": false,
+  "calendarDeadline": null,
+  "tokenBudgetAdded": false,
+  "normalCadence": true,
+  "baseline": "e05ee8d8164a010abf87e0f389382a3f94de2257",
+  "mainRuntimeSource": "23d5a98e6e75a3b0fb08168431260a9935cf5674",
+  "actualMainInput": "docs/rfcs/WP-16/0086-main-native-callbacks-and-support-consumer.md",
+  "sharedInputBoundary": "docs/rfcs/WP-16/0087-wave-34-reviewed-architecture.md",
+  "sharedProgram": "docs/rfcs/WP-16/0088-wave-34-two-package-engineering-program.md",
+  "scope": {
+    "cac": "DEFERRED_EXCLUDED",
+    "temporaryZipSprint": false,
+    "packaging": "Integrated engineering subsystem and final handoff",
+    "originalLifecycleOnly": true,
+    "noNewDriverThisProgram": true
+  },
+  "newModelAllowance": 0,
+  "nativeModelsStartedByDispatch": 0,
+  "externalPromptsSent": false,
+  "newUserThreads": 0,
+  "newWorktrees": 0,
+  "releaseApproved": false,
+  "completionEstimateChangedByTaskCount": false,
+  "preservedServicePairs": [
+    [
+      5180,
+      8796
+    ],
+    [
+      5181,
+      8797
+    ],
+    [
+      5182,
+      8798
+    ],
+    [
+      5183,
+      8799
+    ],
+    [
+      5184,
+      8800
+    ],
+    [
+      5185,
+      8801
+    ],
+    [
+      5186,
+      8802
+    ],
+    [
+      5187,
+      8803
+    ],
+    [
+      5188,
+      8804
+    ],
+    [
+      5189,
+      8805
+    ],
+    [
+      5190,
+      8806
+    ],
+    [
+      5191,
+      8807
+    ]
+  ],
+  "roles": {
+    "A": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "branch": "codex/g2-workspaces-verification",
+      "candidate": "6bbbea3875305f09b8efb3fd54bc3a9a806b23b5",
+      "packet": "agent-tasks/product-wave-34/agent-a-data.zh-CN.md",
+      "ownedPaths": [
+        "packages/storage/",
+        "packages/workflows/"
+      ],
+      "evidencePath": "packages/workflows/reports/wave34-status.json",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "wholeOutcome": "让同一安装实例上的两个原项目完整使用并重开保留Work/合同/候选/产物/回执，不靠换fixture项目或新Work补洞。",
+      "outcomes": [
+        "成果 A1：所有历史集合都有界且可继续",
+        "成果 A2：Principal、Scope 与 Cursor 绑定的实际消费者",
+        "成果 A3：Canonical 历史、来源与原 Artifact 内容闭环",
+        "成果 A4：非空 V1/V2 恢复保留原语义",
+        "成果 A5：数据规模、兼容与故障后的 Same-Work Readback",
+        "成果 A6：Main/F/C 可操作的生产数据交付"
+      ],
+      "wholeGoalCoversOutcomes": true,
+      "packages": [
+        {
+          "id": "engineering-1",
+          "outcomeIndexes": [
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "id": "engineering-2",
+          "outcomeIndexes": [
+            3,
+            4,
+            5
+          ]
+        }
+      ]
+    },
+    "B": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "branch": "codex/g1-runtime",
+      "candidate": "617349851c1fcef7debf0409849b7c8d19d25d47",
+      "packet": "agent-tasks/product-wave-34/agent-b-runtime.zh-CN.md",
+      "ownedPaths": [
+        "packages/execution/",
+        "packages/catalog/",
+        "packages/policy-preparation/",
+        "packages/driver-kit/",
+        "packages/testing/",
+        "packages/drivers/",
+        "apps/runner/",
+        "tests/native-acceptance/"
+      ],
+      "evidencePath": "tests/native-acceptance/reports/wave34-status.json",
+      "grantId": "wave03-b-native",
+      "historicalLimit": 4,
+      "remaining": "UNKNOWN_NOT_SPENDABLE",
+      "resetLedger": false,
+      "newFeasibilityInvestigations": 0,
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "excludedOwnedPaths": [
+        "apps/runner/src/attach-channel/",
+        "apps/runner/test/attach-channel/"
+      ],
+      "wholeOutcome": "在原Product/Store/Application/QuestionBroker中完整实现本机执行、原生问题/控制、同原Work故障恢复到候选/检查/人工接受和原两/四槽资源归还。",
+      "outcomes": [
+        "B1 原 spawner provenance 与完整受控资源工具",
+        "B2 原 Application/Store/QuestionBroker 三回调完整采用",
+        "B3 原命令账本与受限 feed/cancel 控制闭环",
+        "B4 同原 Work 中断到验证、候选与人工接受",
+        "B5 原 scheduler 2/4 槽与完整资源归还",
+        "B6 原状态重启、兼容与完整工程交接"
+      ],
+      "wholeGoalCoversOutcomes": true,
+      "packages": [
+        {
+          "id": "engineering-1",
+          "outcomeIndexes": [
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "id": "engineering-2",
+          "outcomeIndexes": [
+            3,
+            4,
+            5
+          ]
+        }
+      ]
+    },
+    "C": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "branch": "codex/g3-assistant-context",
+      "candidate": "ecac059dc8c6e0365acd20dccc12ff6d77ca5caa",
+      "packet": "agent-tasks/product-wave-34/agent-c-context.zh-CN.md",
+      "ownedPaths": [
+        "packages/context/",
+        "packages/proposals/",
+        "packages/knowledge/",
+        "packages/routing/"
+      ],
+      "evidencePath": "packages/context/reports/wave34-status.json",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "wholeOutcome": "让用户在同一个普通安装实例里选择真实项目资料、确认提案或明确决定，并在重开后查看原来源。",
+      "outcomes": [
+        "成果 C1：完整可验证的当前决定 Snapshot",
+        "成果 C2：有界 Capture 与显式选择的生产消费者",
+        "成果 C3：原新工作 Prepare、Assert 与明确确认",
+        "成果 C4：原上下文与明确决定的完整治理流程",
+        "成果 C5：安全草稿持久化与两项目普通重开",
+        "成果 C6：实际 API、兼容与操作交付"
+      ],
+      "wholeGoalCoversOutcomes": true,
+      "packages": [
+        {
+          "id": "engineering-1",
+          "outcomeIndexes": [
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "id": "engineering-2",
+          "outcomeIndexes": [
+            3,
+            4,
+            5
+          ]
+        }
+      ]
+    },
+    "D": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-d",
+      "branch": "codex/g3-local-distribution",
+      "candidate": "7b8022e6c8f02bc2701a8df8d0a6a97dc6b56422",
+      "packet": "agent-tasks/product-wave-34/agent-d-delivery.zh-CN.md",
+      "ownedPaths": [
+        "apps/launcher/",
+        "tools/distribution/",
+        "packages/portability/"
+      ],
+      "evidencePath": "tools/distribution/reports/wave34-status.json",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "wholeOutcome": "随整体工程并行交付可重复构建、安装、启停、升级/回滚、非空备份迁移恢复和支持能力，在选定集成版本上形成可本机使用、可分享同事的准确安装交付。",
+      "outcomes": [
+        "成果 D1：真实普通配置与原 CLI 生命周期",
+        "成果 D2：同 cohort 非空业务反复备份、搬根与只读读取",
+        "成果 D3：非空升级到真实回退或诚实保留的原操作",
+        "成果 D4：可搬迁 Mac ARM 发行与同事使用现实",
+        "成果 D5：唯一 manifest/source closure 与支持事实",
+        "成果 D6：锁定 W33 的完整 E 交接与必要后继"
+      ],
+      "wholeGoalCoversOutcomes": true,
+      "packages": [
+        {
+          "id": "engineering-1",
+          "outcomeIndexes": [
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "id": "engineering-2",
+          "outcomeIndexes": [
+            3,
+            4,
+            5
+          ]
+        }
+      ]
+    },
+    "E": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-e",
+      "branch": "codex/g3-product-acceptance",
+      "candidate": "cc2f5facc5e1576b35c8227526e0358b4f590d00",
+      "packet": "agent-tasks/product-wave-34/agent-e-acceptance.zh-CN.md",
+      "ownedPaths": [
+        "tests/product-acceptance/"
+      ],
+      "evidencePath": "tests/product-acceptance/reports/wave34-status.json",
+      "grantId": "wave05-independent-review-pilot-01",
+      "maxNativeTurnStarts": 24,
+      "maxAuthorTurnStarts": 8,
+      "maxReviewTurnStarts": 16,
+      "maxBillableTokens": 200000,
+      "maxCostUSD": 5,
+      "maxInFlight": 1,
+      "resetLedger": false,
+      "unknownCostIsZero": false,
+      "cliFallbackAllowed": false,
+      "executionPolicy": "BLOCKED_CURRENT_RECIPE_NO_SEND_THIS_WAVE",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "wholeOutcome": "独立验证整体产品的原项目正常工作、原生控制、故障恢复、重开、数据与准确安装流程，按证据层给结论，不以临时可启动ZIP替代工程完整性。",
+      "outcomes": [
+        "成果 E1：caller finally 的完整资源与材料保留",
+        "成果 E2：所有 cohort 的完整资源映射与最终 oracle",
+        "成果 E3：两个原项目的真实 scoped旅程与重开",
+        "成果 E4：actual outer ZIP 的当前产品安装与再启",
+        "成果 E5：同 cohort 非空恢复、升级与回退字节证明",
+        "成果 E6：整体 tier、独立 negative与完整可消费交接"
+      ],
+      "wholeGoalCoversOutcomes": true,
+      "packages": [
+        {
+          "id": "engineering-1",
+          "outcomeIndexes": [
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "id": "engineering-2",
+          "outcomeIndexes": [
+            3,
+            4,
+            5
+          ]
+        }
+      ]
+    },
+    "F": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-f",
+      "branch": "codex/g4-trial-experience",
+      "preparedFrom": "fdb3f160b1d867f7167fb034d96a5c13bd16cdfb",
+      "packet": "agent-tasks/product-wave-34/agent-f-experience.zh-CN.md",
+      "ownedPaths": [
+        "apps/console/src/trial/",
+        "apps/console/test/trial/",
+        "apps/console/e2e/trial/",
+        "docs/user-guide/",
+        "reports/trial-experience/"
+      ],
+      "evidencePath": "reports/trial-experience/wave34-status.json",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "implementationStatus": "SOURCE_EXISTS_CONTINUE_COMPLETE_CAPABILITY",
+      "candidate": "69e14a08ff7e8135b2ac1a15cd5809397b792411",
+      "wholeOutcome": "在现有精密浅色工作台中完成首次使用、执行器/模型状态、明确委托到交付和错误恢复的完整体验。",
+      "outcomes": [
+        "成果 F1：两个项目多个原工作的完整日常流程",
+        "成果 F2：首次使用与安全的模型连接表单",
+        "成果 F3：错误、身份与草稿保持的完整恢复体验",
+        "成果 F4：A/C 历史与来源的实际浏览体验",
+        "成果 F5：真实支持数据与可复现反馈",
+        "成果 F6：无障碍、移动、WebKit 与实际 App 性能"
+      ],
+      "wholeGoalCoversOutcomes": true,
+      "packages": [
+        {
+          "id": "engineering-1",
+          "outcomeIndexes": [
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "id": "engineering-2",
+          "outcomeIndexes": [
+            3,
+            4,
+            5
+          ]
+        }
+      ]
+    },
+    "G": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-g",
+      "branch": "codex/g4-usage-insights",
+      "preparedFrom": "fdb3f160b1d867f7167fb034d96a5c13bd16cdfb",
+      "packet": "agent-tasks/product-wave-34/agent-g-insights.zh-CN.md",
+      "ownedPaths": [
+        "packages/usage-insights/",
+        "tools/usage-insights/",
+        "reports/usage-insights/"
+      ],
+      "evidencePath": "reports/usage-insights/wave34-status.json",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "implementationStatus": "SOURCE_EXISTS_CONTINUE_COMPLETE_CAPABILITY",
+      "candidate": "76467c33db3ec068d0521997a4511c2fbf9c9de1",
+      "wholeOutcome": "让用户能导出同一范围的可信观察和无秘密支持信息，帮助快速反馈真实试用问题。",
+      "outcomes": [
+        "成果一：完整生产观察语义与数据边界",
+        "成果二：诊断文件的完整可信边界",
+        "成果三：当前运行身份与支持摘要的有证据组合",
+        "成果四：一次完整问题反馈到定位与修复验证",
+        "成果五：人工等待和审阅观察的可解释结果",
+        "成果六：观察子系统长期兼容与可维护交付"
+      ],
+      "wholeGoalCoversOutcomes": true,
+      "packages": [
+        {
+          "id": "engineering-1",
+          "outcomeIndexes": [
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "id": "engineering-2",
+          "outcomeIndexes": [
+            3,
+            4,
+            5
+          ]
+        }
+      ]
+    },
+    "H": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-h",
+      "branch": "codex/g4-trial-operations",
+      "preparedFrom": "fdb3f160b1d867f7167fb034d96a5c13bd16cdfb",
+      "packet": "agent-tasks/product-wave-34/agent-h-trial-operations.zh-CN.md",
+      "ownedPaths": [
+        "tools/trial-kit/",
+        "tests/operational-soak/",
+        "docs/internal-trial/",
+        "reports/trial-operations/"
+      ],
+      "evidencePath": "reports/trial-operations/wave34-status.json",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "implementationStatus": "SOURCE_EXISTS_CONTINUE_COMPLETE_CAPABILITY",
+      "candidate": "4549d0cb704ddd9ee6c7d043a37143ff04114a89",
+      "wholeOutcome": "提供贯穿完整产品的有界试用、运行/故障支持和现场保留工具，独立消费原B/I/main真实端口与最终准确包，减少来回交互。",
+      "outcomes": [
+        "H1 当前 exact source 的完整原消费者",
+        "H2 真正可接受状态与完整交付操作消费者",
+        "H3 同一原 run 的问答、回执与物理资源证据",
+        "H4 非空持久重开、恢复与升级连续性",
+        "H5 Field diagnostics、source 与支持材料闭合",
+        "H6 实际 cohort 使用证据与 E 独立交接"
+      ],
+      "wholeGoalCoversOutcomes": true,
+      "packages": [
+        {
+          "id": "engineering-1",
+          "outcomeIndexes": [
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "id": "engineering-2",
+          "outcomeIndexes": [
+            3,
+            4,
+            5
+          ]
+        }
+      ]
+    },
+    "I": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-i",
+      "branch": "codex/g5-coordinator-channel",
+      "preparedFrom": "967dc0c677333ec307c215c0ed67e838b5487d92",
+      "packet": "agent-tasks/product-wave-34/agent-i-coordinator-channel.zh-CN.md",
+      "ownedPaths": [
+        "apps/runner/src/attach-channel/",
+        "apps/runner/test/attach-channel/",
+        "docs/runtime-channel/",
+        "reports/runtime-channel/"
+      ],
+      "evidencePath": "reports/runtime-channel/wave34-status.json",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "implementationStatus": "SOURCE_EXISTS_CONTINUE_COMPLETE_CAPABILITY",
+      "candidate": "4b84127d3eada7078a23108d7ecbf88f2dbdc4ca",
+      "wholeOutcome": "在原B/Main消费者中把事实、payload、写前授权和terminal/detach语义完整跑通，避免通信层迟到效果。",
+      "outcomes": [
+        "I1 唯一 channel 的实际三回调原方法采用",
+        "I2 原 fresh guard 的 void/throw/晚调用语义",
+        "I3 既有 RPC 与原 command authority 的兼容交接",
+        "I4 临时 detach 与 terminal 的完整实际继任",
+        "I5 namespace、backpressure 与有界压力诊断",
+        "I6 与 B/main/H 的同原 run 物理及持久交接"
+      ],
+      "wholeGoalCoversOutcomes": true,
+      "packages": [
+        {
+          "id": "engineering-1",
+          "outcomeIndexes": [
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "id": "engineering-2",
+          "outcomeIndexes": [
+            3,
+            4,
+            5
+          ]
+        }
+      ]
+    },
+    "J": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-j",
+      "branch": "codex/g5-project-recipes",
+      "preparedFrom": "967dc0c677333ec307c215c0ed67e838b5487d92",
+      "packet": "agent-tasks/product-wave-34/agent-j-project-recipes.zh-CN.md",
+      "ownedPaths": [
+        "packages/project-recipes/",
+        "tools/project-recipes/",
+        "docs/project-recipes/",
+        "reports/project-recipes/"
+      ],
+      "evidencePath": "reports/project-recipes/wave34-status.json",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "implementationStatus": "SOURCE_EXISTS_CONTINUE_COMPLETE_CAPABILITY",
+      "candidate": "f6a1bf59db7461772661e51d1ac05702788004c0",
+      "wholeOutcome": "让首批用户导入普通Node/npm/pnpm项目后，得到真实可应用的模板字段，并完成原项目的明确交付流程。",
+      "outcomes": [
+        "成果一：普通Node/npm/pnpm项目声明的完整生产适用性",
+        "成果二：两个原项目完整日常交付与失败回路",
+        "成果三：当前配置/元数据变化下的可解释重验",
+        "成果四：有当前登记依据的项目重识别产品",
+        "成果五：非空恢复后的重新登记与原历史连续性",
+        "成果六：项目能力模块的可维护发行与同事交接"
+      ],
+      "wholeGoalCoversOutcomes": true,
+      "packages": [
+        {
+          "id": "engineering-1",
+          "outcomeIndexes": [
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "id": "engineering-2",
+          "outcomeIndexes": [
+            3,
+            4,
+            5
+          ]
+        }
+      ]
+    },
+    "main": {
+      "workdir": "/Users/hh/Desktop/joker/superagent",
+      "branch": "codex/g2-execution-integration",
+      "packet": "agent-tasks/product-wave-34/main.zh-CN.md",
+      "ownedPaths": [
+        "packages/contracts/",
+        "packages/application/",
+        "packages/questions/",
+        "apps/coordinator/",
+        "apps/console/",
+        "agent-tasks/product-wave-34/",
+        "tools/bootstrap/",
+        "docs/rfcs/WP-16/"
+      ],
+      "evidencePath": "reports/releases/wave34-integration/status.json",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "excludedOwnedPaths": [
+        "apps/console/src/trial/",
+        "apps/console/test/trial/",
+        "apps/console/e2e/trial/"
+      ],
+      "candidate": "23d5a98e6e75a3b0fb08168431260a9935cf5674",
+      "outcomes": [
+        "成果一：原Broker三回调与当前租约控制接线",
+        "成果二：同原Work故障续接到可信交付",
+        "成果三：原Work可用的完整历史与来源体验",
+        "成果四：当前决定和项目重识别进入原确认流程",
+        "成果五：本机配置、支持与错误恢复的完整体验",
+        "成果六：同一工程版本的独立日常交付与可维护发行"
+      ],
+      "wholeGoalCoversOutcomes": true,
+      "packages": [
+        {
+          "id": "engineering-1",
+          "outcomeIndexes": [
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "id": "engineering-2",
+          "outcomeIndexes": [
+            3,
+            4,
+            5
+          ]
+        }
+      ]
+    }
+  },
+  "admissionReports": {
+    "inventory": "reports/releases/wave34-admission/workspaces.json",
+    "dataExperience": "reports/releases/wave34-admission/data-experience.json",
+    "runtime": "reports/releases/wave34-admission/runtime-channel.json",
+    "delivery": "reports/releases/wave34-admission/delivery.json",
+    "recipesInsights": "reports/releases/wave34-admission/recipes-insights.json"
+  },
+  "providedInputs": {
+    "mainRegisteredOriginalPort": true,
+    "mainActualAttachedStoreCases": 4,
+    "mainOriginalNativeFreshGuardUnchanged": true,
+    "mainFDefaultConsumers": true,
+    "mainRecipeRetryThreeReadonlyPreviews": true,
+    "mainRecipeBrowser": 9,
+    "mainObservationBrowser": 13,
+    "BCallerReferenceBodyClosed": true,
+    "BNumericPidAndHandleCopyClosed": true,
+    "HLaunchCommandClosed": true,
+    "CToolUnknownCoverageClosed": true,
+    "CSourceDraftAndStrictAdmitted": false,
+    "BForgedSpawnShapeAdmitted": false,
+    "originalApplicationBrokerRecoveredDelivery": false,
+    "originalSchedulerTwoFourSlots": false,
+    "knownW32PackageStaticVerified": true,
+    "knownW32IndependentEAccepted": false
+  },
+  "knownCohort": {
+    "name": "W33 fixed fc38",
+    "source": "048f0184606202b0b39e7426b7747f3fe57541c1",
+    "buildId": "f880e5bc9c6c1c57",
+    "tarSha256": "ee45c92c7c5a8f2caa0449572b14bf97175b0392f1fd92c6f89d7a19464604e8",
+    "tarBytes": 20547728,
+    "zipSha256": "46e01c8c7b79818d19e019f6d2208ad54c5c9538674218f85455434eff8207f9",
+    "zipBytes": 63481603,
+    "innerManifestEntries": 6867,
+    "closure": 192,
+    "staticVerified": true,
+    "EIndependent": false,
+    "containsFc38": true,
+    "containsNew23d5a98e": false
+  },
+  "checkpoints": {
+    "M-original-callbacks": {
+      "owner": "main",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "M-default-support": {
+      "owner": "main",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "M-existing-workbench": {
+      "owner": "main",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "B-proven-spawn-authority": {
+      "owner": "B",
+      "dependsOn": []
+    },
+    "B-authorized-controls": {
+      "owner": "B",
+      "dependsOn": [
+        "M-original-callbacks"
+      ]
+    },
+    "I-original-callback-consumer": {
+      "owner": "I",
+      "dependsOn": [
+        "M-original-callbacks"
+      ]
+    },
+    "B-original-runtime-adoption": {
+      "owner": "B",
+      "dependsOn": [
+        "B-authorized-controls",
+        "I-original-callback-consumer"
+      ]
+    },
+    "M-original-recovered-consumer": {
+      "owner": "main",
+      "dependsOn": [
+        "B-original-runtime-adoption"
+      ]
+    },
+    "B-original-crash-to-accept": {
+      "owner": "B",
+      "dependsOn": [
+        "M-original-recovered-consumer",
+        "B-proven-spawn-authority"
+      ]
+    },
+    "B-original-two-four-slots": {
+      "owner": "B",
+      "dependsOn": [
+        "B-original-crash-to-accept"
+      ]
+    },
+    "H-current-field-consumer": {
+      "owner": "H",
+      "dependsOn": [
+        "M-original-callbacks"
+      ]
+    },
+    "A-history-reader": {
+      "owner": "A",
+      "dependsOn": []
+    },
+    "A-original-byte-history": {
+      "owner": "A",
+      "dependsOn": [
+        "A-history-reader"
+      ]
+    },
+    "C-current-decision-snapshot": {
+      "owner": "C",
+      "dependsOn": []
+    },
+    "M-decision-work-consumer": {
+      "owner": "main",
+      "dependsOn": [
+        "C-current-decision-snapshot"
+      ]
+    },
+    "F-daily-original-workflow": {
+      "owner": "F",
+      "dependsOn": [
+        "M-existing-workbench"
+      ]
+    },
+    "J-two-original-projects": {
+      "owner": "J",
+      "dependsOn": []
+    },
+    "J-current-reidentification": {
+      "owner": "J",
+      "dependsOn": []
+    },
+    "M-reidentification-consumer": {
+      "owner": "main",
+      "dependsOn": [
+        "J-current-reidentification"
+      ]
+    },
+    "G-default-support-refinement": {
+      "owner": "G",
+      "dependsOn": [
+        "M-default-support"
+      ]
+    },
+    "M-private-model-config": {
+      "owner": "main",
+      "dependsOn": []
+    },
+    "F-first-use-config": {
+      "owner": "F",
+      "dependsOn": [
+        "M-private-model-config"
+      ]
+    },
+    "D-existing-W33-fixed": {
+      "owner": "D",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "E-strict-resource-and-journey-oracle": {
+      "owner": "E",
+      "dependsOn": []
+    },
+    "E-fixed-W33-verdict": {
+      "owner": "E",
+      "dependsOn": [
+        "D-existing-W33-fixed",
+        "E-strict-resource-and-journey-oracle"
+      ]
+    },
+    "D-nonempty-lifecycle": {
+      "owner": "D",
+      "dependsOn": []
+    },
+    "D-selected-successor-freeze": {
+      "owner": "D",
+      "dependsOn": [
+        "M-default-support"
+      ]
+    },
+    "E-selected-cohort-verdict": {
+      "owner": "E",
+      "dependsOn": [
+        "D-selected-successor-freeze",
+        "E-strict-resource-and-journey-oracle"
+      ]
+    },
+    "E-two-project-journey": {
+      "owner": "E",
+      "dependsOn": [
+        "E-strict-resource-and-journey-oracle",
+        "J-two-original-projects",
+        "F-daily-original-workflow"
+      ]
+    },
+    "G-feedback-consumer": {
+      "owner": "G",
+      "dependsOn": [
+        "M-default-support"
+      ]
+    },
+    "H-support-field": {
+      "owner": "H",
+      "dependsOn": [
+        "M-default-support"
+      ]
+    }
+  },
+  "continuousPackagesPerOwner": 2,
+  "completeOutcomesPerPackage": 3
+}
