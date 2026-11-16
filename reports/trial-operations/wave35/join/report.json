@@ -1,0 +1,31 @@
+{
+  "status": "OK_WITH_NOT_REACHED",
+  "failed": [],
+  "original": {
+    "workId": "94012e1a1c7265c033f285a944656a04",
+    "questionId": "c500fbb925a2f1e26384df979fbe80ff",
+    "answerId": "0c4da78469ec2ca5857439d4cfb1837a",
+    "commandId": "recovery-command-2",
+    "attemptId": "attempt-a66edba5-22e4-4d73-8c23-06cd60bd499b",
+    "contract": {
+      "workId": "94012e1a1c7265c033f285a944656a04",
+      "revision": 1,
+      "digest": "4d7f353c47e01fa098cc3254630cc65c19ba132f9c64362da6e5e5c98e67b78a"
+    }
+  },
+  "checks": {
+    "ownSubjectAccepted": true,
+    "factDurable": true,
+    "originalWorkReadable": true,
+    "originalQuestionReadable": true,
+    "originalAnswerReadable": true,
+    "originalCommandReadable": true,
+    "foreignWorkRefused": true,
+    "foreignAttemptRefused": true,
+    "foreignSourceRefused": true,
+    "invalidVersionRefused": true,
+    "zeroForeignWrites": true
+  },
+  "bCallbackJoin": "NOT_REACHED: current B serveRunner fixture facts are not ingested as this original question/answer; no B same-run callback join was executed.",
+  "businessIngressJoin": "NOT_REACHED: the durable fact above is an original receiver check on the same Store, not the original answer command path."
+}

@@ -1,0 +1,159 @@
+{
+  "protocol": "selected-i-current-consumer/1",
+  "surface": "current committed I CoordinatorChannelModule (materialized exact commit)",
+  "modelCalls": 0,
+  "vendorTurns": 0,
+  "signalsSent": 0,
+  "cases": [
+    {
+      "id": "I-fact",
+      "accepted": true,
+      "duplicate": false,
+      "settled": {
+        "state": "resolved",
+        "value": {
+          "factId": "fact-w29-1",
+          "persisted": true,
+          "seq": 7
+        },
+        "code": null,
+        "reason": null
+      }
+    },
+    {
+      "id": "I-ack-failed",
+      "settled": {
+        "state": "rejected",
+        "code": "protocol_error",
+        "reason": "fact_ack_failed"
+      }
+    },
+    {
+      "id": "I-payload",
+      "wrong": false,
+      "settled": {
+        "state": "resolved",
+        "value": {
+          "right": true
+        },
+        "code": null,
+        "reason": null
+      }
+    },
+    {
+      "id": "I-write-allow",
+      "frameId": "intent-0774f85c-1",
+      "settled": {
+        "state": "resolved",
+        "code": null,
+        "reason": null
+      }
+    },
+    {
+      "id": "I-write-deny",
+      "settled": {
+        "state": "rejected",
+        "code": null,
+        "reason": "native_write_denied"
+      }
+    },
+    {
+      "id": "I-fresh-intent",
+      "firstFrameId": "intent-32162334-1",
+      "secondFrameId": "intent-32162334-2",
+      "distinctFrameIds": true,
+      "replayAccepted": false,
+      "firstSettled": "resolved",
+      "secondAfterReplay": "pending",
+      "secondResolvedByOwn": true,
+      "fixed": true
+    },
+    {
+      "id": "I-queue-namespace",
+      "fact": {
+        "state": "resolved",
+        "value": {
+          "factId": "payload-1",
+          "persisted": true,
+          "seq": 1
+        },
+        "code": null,
+        "reason": null
+      },
+      "payloadStillPending": true,
+      "payload": {
+        "state": "resolved",
+        "value": {
+          "ok": true
+        },
+        "code": null,
+        "reason": null
+      }
+    },
+    {
+      "id": "I-timeout-prune",
+      "settled": {
+        "state": "rejected",
+        "code": "timeout",
+        "reason": "request_timeout"
+      },
+      "pendingFacts": 0,
+      "timerLikePending": 0,
+      "late": false
+    },
+    {
+      "id": "I-generation",
+      "first": 1,
+      "second": 2,
+      "stale": "stale_connection",
+      "oldReply": false
+    },
+    {
+      "id": "I-old-lease",
+      "settled": {
+        "state": "resolved",
+        "value": {
+          "ok": true
+        },
+        "code": null,
+        "reason": null
+      },
+      "generation": 2
+    },
+    {
+      "id": "I-capacity",
+      "first": {
+        "state": "pending",
+        "code": null,
+        "reason": null
+      },
+      "second": {
+        "state": "rejected",
+        "code": "capacity",
+        "reason": "pending_facts"
+      }
+    },
+    {
+      "id": "I-close",
+      "settled": {
+        "state": "rejected",
+        "code": "indeterminate",
+        "reason": "module_closed_during_write"
+      }
+    }
+  ],
+  "checks": {
+    "fact": true,
+    "ackFailed": true,
+    "payload": true,
+    "writeAllow": true,
+    "writeDeny": true,
+    "freshIntentFixed": true,
+    "queueNamespace": true,
+    "timeoutPrune": true,
+    "generation": true,
+    "oldLease": true,
+    "capacity": true,
+    "close": true
+  }
+}

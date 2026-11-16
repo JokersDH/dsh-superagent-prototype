@@ -1,0 +1,48 @@
+{
+  "status": "OK_WITH_NOT_REACHED",
+  "failed": [],
+  "producer": {
+    "pid": 45330,
+    "exit": 0,
+    "observationAfterExit": {
+      "state": "unknown",
+      "reason": "ps_failed",
+      "status": 1
+    }
+  },
+  "successor": {
+    "pid": 45650,
+    "exit": 0,
+    "readback": {
+      "pid": 45650,
+      "ok": true,
+      "workId": "94012e1a1c7265c033f285a944656a04",
+      "questionId": "c04a22dd4fcd17ced7c626f3ccd97178",
+      "questionVersion": 2,
+      "answerQuestionId": "c04a22dd4fcd17ced7c626f3ccd97178",
+      "delivery": "native_applied"
+    }
+  },
+  "original": {
+    "pid": 45330,
+    "workId": "94012e1a1c7265c033f285a944656a04",
+    "questionId": "c04a22dd4fcd17ced7c626f3ccd97178",
+    "answerId": "0c4da78469ec2ca5857439d4cfb1837a",
+    "commandId": "recovery-command-2",
+    "attemptId": "attempt-354dfe30-71b9-4954-9f71-1ee35b20c263",
+    "delivery": "native_applied"
+  },
+  "checks": {
+    "producerExit0": true,
+    "producerPidGone": true,
+    "successorDifferentPid": true,
+    "successorExit0": true,
+    "sameWorkQuestionAnswer": true,
+    "nativeApplied": true,
+    "sameStoreOriginalTuple": true,
+    "wrongWorkRefused": true,
+    "missingStateRefused": true,
+    "noSignalSent": true
+  },
+  "bRecovery": "NOT_REACHED: this is an independent new process reading the original Store, not a B coordinator recovery or Runner continuation."
+}

@@ -1,0 +1,97 @@
+{
+  "protocol": "wave35-cohort-handoff/1",
+  "humanProvided": false,
+  "cohortLabel": "controlled_automated_only",
+  "package": {
+    "name": "wave33-target-f880e5b",
+    "tarSha256": "ee45c92c7c5a8f2caa0449572b14bf97175b0392f1fd92c6f89d7a19464604e8",
+    "buildId": "f880e5bc9c6c1c57",
+    "source": "048f0184606202b0b39e7426b7747f3fe57541c1",
+    "outerZipSha256": "46e01c8c7b79818d19e019f6d2208ad54c5c9538674218f85455434eff8207f9"
+  },
+  "journey": [
+    {
+      "step": "first-run",
+      "actor": "automated",
+      "status": "PASS"
+    },
+    {
+      "step": "start fixture discussion-only",
+      "actor": "automated",
+      "status": "PASS"
+    },
+    {
+      "step": "readiness/health/console/SSE",
+      "actor": "automated",
+      "status": "PASS"
+    },
+    {
+      "step": "create controlled Work",
+      "actor": "automated",
+      "status": "PASS",
+      "workId": "ca73397f13d97d6e419d8a4ca76cb205"
+    },
+    {
+      "step": "wait actions.available accept_candidate",
+      "actor": "automated",
+      "status": "PASS",
+      "observations": true
+    },
+    {
+      "step": "explicit accept",
+      "actor": "automated",
+      "status": "PASS"
+    },
+    {
+      "step": "delivered",
+      "actor": "automated",
+      "status": "PASS"
+    },
+    {
+      "step": "restart same Work reopen",
+      "actor": "automated",
+      "status": "PASS"
+    },
+    {
+      "step": "stop own instance",
+      "actor": "automated",
+      "status": "PASS"
+    },
+    {
+      "step": "nonempty backup/verify/second-root restore",
+      "actor": "automated",
+      "status": "OK_WITH_NOT_REACHED",
+      "workId": "94012e1a1c7265c033f285a944656a04"
+    }
+  ],
+  "humanFeedback": "NOT_PROVIDED",
+  "value": "NOT_MEASURED",
+  "field": {
+    "result": "DEGRADED",
+    "counts": {
+      "pass": 46,
+      "warn": 0,
+      "unknown": 3,
+      "fail": 0
+    },
+    "knownIssues": [
+      "host_sqlite_unknown",
+      "readiness_no_package_identity",
+      "support_not_supplied",
+      "doctor_warn:executor_codex",
+      "instance_stopped"
+    ]
+  },
+  "limits": [
+    "No human trial, interview or work-time measurement was provided.",
+    "Controlled fixture only; no vendor/model/native turn.",
+    "H is not E; E must run its own oracle on this tuple."
+  ],
+  "eHandoff": {
+    "subject": "W33 f880 inner ee45/outer 46e",
+    "requires": [
+      "E independent W33 verdict",
+      "actual native/installed/recovery scope"
+    ]
+  }
+}

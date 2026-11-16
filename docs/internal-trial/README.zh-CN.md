@@ -166,3 +166,12 @@ H 的材料是原始观测。E 会按自己的 required 断言独立核验；不
 - W33 包内非空 backup→verify→restore 到第二根通过，原 Work `94012e1a…`/question/answer/native_applied 可读；再次 restore 同目标 BLOCKED。review-restored 启动/REUSED 未测。
 - 同原 run 的 B application/Broker 恢复、SIGKILL、native 2/4 槽仍 NOT_REACHED；H 提供原 Store join、新进程读回、ACK 8 窗口与资源台账作为独立事实，不替代 B。
 - 实际 human cohort 未提供；当前只有 controlled 自动试用，不生成访谈/收益结论。E 仍是唯一 oracle。
+
+## 3h. wave-35 当前源、模型连接、W33 f880 与 controlled cohort
+
+- 当前 exact source：B `843cf35f`、I `93373489`、main `8cd709ca`（模型配置 4cde5883 + launcher 后继）。H 当前 B/I consumer I 12/12、B 8/8；main model provider 由 H 独立 source consumer 复验，保存只写 0600 私有文件、目录 0700、无 model/network 请求。
+- H3 模型连接错误：未配置、http 未勾选、短 key、symlink、0755 目录全部拒绝；合法保存 status 不含 apiKey；同 base 累积模型、换 base 重置模型。它只是连接/身份输入，不授 agent/执行/target 权限。
+- W33 包仍为 `wave33-target-f880e5b`（tar `ee45c92c…`，build `f880e5bc…`，source `048f0184`）；main `8cd709ca` 的模型 GUI/launcher 未进入该包，不能称 W33 含当前模型配置功能。
+- W33 包内受控 Work `ca73397f…` 等待 `actions.available` 后 accept/delivered，重启重开 delivered；非空 restore 原 Work `94012e1a…` native_applied。review-restored/升级连续仍未测。
+- 当前 cohort 只有 controlled 自动旅程（10 步），humanProvided=false、humanFeedback=NOT_PROVIDED、value=NOT_MEASURED；E 独立 W33 verdict 未交。
+- field-kit W33 结果 46 PASS/3 UNKNOWN/0 FAIL，source consumer exit0；UNKNOWN/known issues 保留，不填 PASS。

@@ -1,0 +1,541 @@
+{
+  "protocol": "trial-operations-status/1",
+  "wave": "product-wave-35",
+  "owner": "H",
+  "branch": "codex/g4-trial-operations",
+  "base": "6dc9d26e61a25e14662ef5a38d27d5ead85d49c1",
+  "mergedMain": "98bdb4a4",
+  "currentH": "PENDING_COMMIT",
+  "updatedAt": "2026-11-16T15:11:28.115Z",
+  "goal": {
+    "wholeGoal": true,
+    "packages": 3,
+    "outcomes": 9,
+    "tokenBudget": null,
+    "deadline": null,
+    "sourceReady": true,
+    "complete": false
+  },
+  "ownedPaths": [
+    "tools/trial-kit/",
+    "tests/operational-soak/",
+    "docs/internal-trial/",
+    "reports/trial-operations/"
+  ],
+  "dirty": {
+    "H": "wave35 source/evidence pending this commit; history preserved",
+    "B": [
+      "reports/releases/wave11-admission/runtime.json",
+      "reports/releases/wave12-admission/runtime.json",
+      "tests/native-acceptance/b16-real-begin.mjs (untracked)"
+    ],
+    "note": "B dirty not consumed; B843 is subject"
+  },
+  "sources": {
+    "H": {
+      "base": "6dc9d26e",
+      "merge": "98bdb4a4"
+    },
+    "B": {
+      "commit": "843cf35f4f366e74d13a372bdb08ced085f031cc",
+      "branch": "codex/g1-runtime"
+    },
+    "I": {
+      "commit": "9337348926277315fe43a0127549184d166e1d98",
+      "branch": "codex/g5-coordinator-channel"
+    },
+    "main": {
+      "commit": "8cd709ca",
+      "modelConfigSource": "4cde5883",
+      "merge": "98bdb4a4",
+      "note": "model GUI/launcher source delivered; no new frozen package"
+    },
+    "package": {
+      "name": "wave33-target-f880e5b",
+      "tarSha256": "ee45c92c7c5a8f2caa0449572b14bf97175b0392f1fd92c6f89d7a19464604e8",
+      "buildId": "f880e5bc9c6c1c57",
+      "source": "048f0184606202b0b39e7426b7747f3fe57541c1",
+      "closure": "1c39d4c7aaa848f342f456008fe42fabc16c78d0c48f22cdca45c8fbf1e9388a",
+      "outerZipSha256": "46e01c8c7b79818d19e019f6d2208ad54c5c9538674218f85455434eff8207f9",
+      "outerConsumed": false,
+      "currentMainIncluded": false,
+      "note": "W33 fixed inner; main8cd model config not in this package"
+    }
+  },
+  "integratedInMain": {
+    "H": false,
+    "B": false,
+    "I": false,
+    "modelConfig": "source in main8cd, not installed package"
+  },
+  "outcomes": {
+    "H1_currentExactConsumer": {
+      "status": "COMPLETE_SOURCE",
+      "source": [
+        "tests/operational-soak/selected/produce2.mjs",
+        "tests/operational-soak/selected/source2.mjs",
+        "tests/operational-soak/selected/i-consumer2.mjs",
+        "tests/operational-soak/selected/b-service-consumer2.mjs"
+      ],
+      "command": "produce2 --i-commit 933734 --b-commit 843cf",
+      "exit": 0,
+      "result": {
+        "source": {
+          "sourcesOk": true,
+          "sourcesUnchanged": true,
+          "materializedUnchanged": true,
+          "iChecks": true,
+          "bChecks": true,
+          "bSinkGuardClosed": true,
+          "zeroModel": true,
+          "zeroSignals": true
+        },
+        "i": {
+          "fact": true,
+          "ackFailed": true,
+          "payload": true,
+          "writeAllow": true,
+          "writeDeny": true,
+          "freshIntentFixed": true,
+          "queueNamespace": true,
+          "timeoutPrune": true,
+          "generation": true,
+          "oldLease": true,
+          "capacity": true,
+          "close": true
+        },
+        "b": {
+          "factThreeFrames": true,
+          "duplicateReceipt": true,
+          "payloadRead": true,
+          "externalAllow": true,
+          "externalDeny": true,
+          "sinkMissingGuardRefused": true,
+          "sinkDenyRefused": true,
+          "sinkAllowFresh": true
+        }
+      },
+      "notReached": [
+        "same-Runner dual client as a real process handover on a product/B route",
+        "SIGKILL original Work/question recovery; no product/B SIGKILL executed",
+        "recovered candidate/accept; B ordinary5PASS is not recovery",
+        "real product readonly/SSE target and vendor/native"
+      ],
+      "evidence": "reports/trial-operations/wave35/selected-current/"
+    },
+    "H2_acceptDelivery": {
+      "status": "COMPLETE",
+      "source": [
+        "tools/trial-kit/lib/accept-gate.mjs",
+        "tests/operational-soak/package/lifecycle2.mjs",
+        "tests/operational-soak/package/accept-gate.case.mjs"
+      ],
+      "command": "node --test accept-gate.case.mjs",
+      "exit": 0,
+      "tests": 4,
+      "installed": {
+        "buildId": "f880e5bc9c6c1c57",
+        "workId": "ca73397f13d97d6e419d8a4ca76cb205",
+        "candidateSeen": true,
+        "gateObserved": true,
+        "acceptRecorded": true,
+        "delivered": true,
+        "reopened": "delivered"
+      },
+      "negative": "candidate with available=[] then later accept is waited; timeout/failed/foreign candidate covered; stale accept executed in source delivery",
+      "evidence": "reports/trial-operations/wave35/package-f880/lifecycle/"
+    },
+    "H3_modelConnectionJourney": {
+      "status": "COMPLETE_SOURCE_ERRORS",
+      "source": [
+        "tests/operational-soak/model/connection2.mjs",
+        "tests/operational-soak/model/connection.case.mjs"
+      ],
+      "command": "node --test connection.case.mjs",
+      "exit": 0,
+      "checks": {
+        "initiallyNotConfigured": true,
+        "invalidHttpRefused": true,
+        "invalidKeyRefused": true,
+        "validConfigured": true,
+        "privateFile0600": true,
+        "privateDir0700": true,
+        "apiKeyNotExposed": true,
+        "sameBaseAccumulatesModels": true,
+        "differentBaseResetsModels": true,
+        "symlinkRefused": true,
+        "visibleDirectoryRefused": true,
+        "noModelRequest": true
+      },
+      "errors": {
+        "invalidHttp": "ZodError",
+        "invalidKey": "ZodError",
+        "symlink": "configuration_invalid",
+        "visibleDirectory": "configuration_invalid"
+      },
+      "networkFetches": 0,
+      "installedUI": "NOT_REACHED: main6App/15backend source tests not re-executed by H; W33 package predates model GUI",
+      "evidence": "reports/trial-operations/wave35/model-connection/"
+    },
+    "H4_sameRunCallbacks": {
+      "status": "PARTIAL_B_ORIGINAL_RUN_NOT_REACHED",
+      "source": [
+        "tests/operational-soak/selected/same-store-join2.mjs"
+      ],
+      "join": {
+        "status": "OK_WITH_NOT_REACHED",
+        "original": {
+          "workId": "94012e1a1c7265c033f285a944656a04",
+          "questionId": "c500fbb925a2f1e26384df979fbe80ff",
+          "answerId": "0c4da78469ec2ca5857439d4cfb1837a",
+          "commandId": "recovery-command-2",
+          "attemptId": "attempt-a66edba5-22e4-4d73-8c23-06cd60bd499b",
+          "contract": {
+            "workId": "94012e1a1c7265c033f285a944656a04",
+            "revision": 1,
+            "digest": "4d7f353c47e01fa098cc3254630cc65c19ba132f9c64362da6e5e5c98e67b78a"
+          }
+        },
+        "bCallbackJoin": "NOT_REACHED: current B serveRunner fixture facts are not ingested as this original question/answer; no B same-run callback join was executed."
+      },
+      "mainNativeCallbacks": {
+        "test": "tests/integration/native-attach-callbacks.case.mjs",
+        "passed": 11,
+        "failed": 0,
+        "scope": "main-owned original callback/Store/guard tests; not H consumer or full Broker"
+      },
+      "notReached": [
+        "actual B original Application/QuestionBroker same-Run callback join",
+        "original question/answer delivery through B registered port"
+      ],
+      "evidence": "reports/trial-operations/wave35/join/"
+    },
+    "H5_interruptAckResources": {
+      "status": "PARTIAL_B_ORIGINAL_RUN_NOT_REACHED",
+      "source": [
+        "tests/operational-soak/delivery/windows2.mjs",
+        "tests/operational-soak/delivery/resources2.mjs",
+        "tests/operational-soak/recovery/successor2.mjs"
+      ],
+      "windows": {
+        "count": 8,
+        "checks": {
+          "beginNotAccepted": true,
+          "answerNotAccepted": true,
+          "receiverUnknown": true,
+          "factDurable": true,
+          "conflictRefused": true,
+          "answerWrittenNotTerminal": true,
+          "lateDuplicateNoResend": true,
+          "terminalNative": true,
+          "missingDeliveryUnknown": true,
+          "zeroResend": true
+        },
+        "ledgerFull": true
+      },
+      "successor": {
+        "status": "OK_WITH_NOT_REACHED"
+      },
+      "externalResources": {
+        "packagePid": 41644,
+        "apiPid": 41655,
+        "stop": "STOPPED",
+        "stillAlive": true
+      },
+      "notReached": [
+        "real B beforewrite/ACK-loss window under original coordinator",
+        "true original process/child/socket/fd/quiescence set"
+      ],
+      "evidence": "reports/trial-operations/wave35/{windows,successor}/"
+    },
+    "H6_recoveredCandidateSlots": {
+      "status": "PARTIAL_COMPONENT_AND_NOT_REACHED",
+      "source": [
+        "tests/operational-soak/delivery/consumer.mjs"
+      ],
+      "ordinary": {
+        "workId": "0a3c3213f00cdcd181ab8db13dca1894",
+        "questionId": "ca986774b97d5be4250c71e5d6d7b953",
+        "candidateGeneration": 3,
+        "accepted": "recorded",
+        "delivered": "delivered",
+        "artifacts": 4,
+        "checks": {
+          "normalAnswered": true,
+          "normalCandidate": true,
+          "normalAccepted": true,
+          "wrongCandidateRefused": true,
+          "delivered": true,
+          "workViewIdentity": true,
+          "duplicateAcceptIdempotent": true,
+          "slots2": true,
+          "slots4": true,
+          "answerReplayIdempotent": true,
+          "answerConflictRejected": true,
+          "beginReplayIdempotent": true
+        },
+        "slots": {
+          "2": {
+            "works": 2,
+            "delivered": 2,
+            "workViewIdsMatch": true,
+            "artifactCounts": [
+              4,
+              4
+            ],
+            "resourceStatuses": [
+              "quiescent",
+              "quiescent"
+            ],
+            "beginFrames": 2,
+            "uniqueAttemptIds": null,
+            "queueDue": 0,
+            "slotCapObserved": "not_configurable_in_fixture",
+            "attemptIdentityNote": "begin frame count is observed; the receipt projection carries no attemptId, so unique attempt identity is unknown"
+          },
+          "4": {
+            "works": 4,
+            "delivered": 4,
+            "workViewIdsMatch": true,
+            "artifactCounts": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "resourceStatuses": [
+              "quiescent",
+              "quiescent",
+              "quiescent",
+              "quiescent"
+            ],
+            "beginFrames": 4,
+            "uniqueAttemptIds": null,
+            "queueDue": 0,
+            "slotCapObserved": "not_configurable_in_fixture",
+            "attemptIdentityNote": "begin frame count is observed; the receipt projection carries no attemptId, so unique attempt identity is unknown"
+          }
+        }
+      },
+      "notReached": [
+        "recovered same-Work candidate/accept after real B rebind",
+        "original scheduler 2/4 fifth-item wait/release and resource set"
+      ],
+      "note": "ordinary 2/4 controlled works are component scope, not original scheduler",
+      "evidence": "reports/trial-operations/wave35/delivery/"
+    },
+    "H7_nonemptyPersistent": {
+      "status": "COMPLETE_INSTALLED_REOPEN_REVIEW_UPGRADE_NOT_REACHED",
+      "source": [
+        "tests/operational-soak/package/lifecycle2.mjs",
+        "tests/operational-soak/package/backup-restore2.mjs",
+        "tests/operational-soak/package/produce-restore2.mjs"
+      ],
+      "lifecycle": {
+        "status": "OK",
+        "buildId": "f880e5bc9c6c1c57",
+        "workId": "ca73397f13d97d6e419d8a4ca76cb205",
+        "phase": "delivered",
+        "reopened": "delivered",
+        "checks": {
+          "firstRunOk": true,
+          "startRunning": true,
+          "sameOwnInstance": true,
+          "readinessModeFixture": true,
+          "readinessAuthorizationNone": true,
+          "healthOk": true,
+          "consoleServed": true,
+          "sseConnected": true,
+          "snapshotVisible": true,
+          "configurationVisible": true,
+          "installedWorkCreated": true,
+          "installedCandidateSeen": true,
+          "staleCandidateRejected": true,
+          "installedAcceptGateObserved": true,
+          "installedAcceptRecorded": true,
+          "installedDelivered": true,
+          "reusedSamePid": true,
+          "reviewOnFixtureRefused": true,
+          "stoppedOwnInstance": true,
+          "stoppedStatus": true,
+          "stoppedNotServing": true,
+          "reopenedSameWork": true,
+          "noHSignal": true
+        }
+      },
+      "restore": {
+        "status": "OK_WITH_NOT_REACHED",
+        "ids": {
+          "work": "94012e1a1c7265c033f285a944656a04",
+          "question": "47c79ca7ee329a0b1dde665b861cf91a",
+          "questionVersion": 2,
+          "answer": "47c79ca7ee329a0b1dde665b861cf91a",
+          "delivery": "native_applied",
+          "command": "recorded"
+        },
+        "statuses": {
+          "backup": "CREATED",
+          "verify": "VERIFIED",
+          "restore": "RESTORED",
+          "secondRestore": "BLOCKED",
+          "emptyBackup": "BLOCKED"
+        }
+      },
+      "notReached": [
+        "review-restored startup/REUSED",
+        "upgrade continuity and old-registry permission inference"
+      ],
+      "evidence": "reports/trial-operations/wave35/package-f880/"
+    },
+    "H8_fieldPackage": {
+      "status": "COMPLETE_TOOL_W33",
+      "source": [
+        "tools/trial-kit/bin/trial-field-kit.mjs",
+        "tools/trial-kit/lib/field-kit.mjs",
+        "tests/operational-soak/package/field-kit.case.mjs"
+      ],
+      "command": "trial-field-kit --tar f880 --source-consumer",
+      "exit": 1,
+      "result": {
+        "field": "DEGRADED",
+        "counts": {
+          "pass": 46,
+          "warn": 0,
+          "unknown": 3,
+          "fail": 0
+        },
+        "sourceConsumerExit": 0,
+        "knownIssues": [
+          "host_sqlite_unknown",
+          "readiness_no_package_identity",
+          "support_not_supplied",
+          "doctor_warn:executor_codex",
+          "instance_stopped"
+        ],
+        "layers": {
+          "installed": "exact tar preflight + package help/status/doctor in private roots",
+          "source": "current I/B source consumer, in-process only",
+          "fixture": "readiness fixture (not a package daemon)",
+          "recovery": "NOT_REACHED in this kit",
+          "native": "NOT_MEASURED"
+        }
+      },
+      "note": "W33 package only; main8cd model config is source-only",
+      "evidence": "reports/trial-operations/wave35/field-f880/"
+    },
+    "H9_cohortE": {
+      "status": "PARTIAL_CONTROLLED_COHORT_ONLY",
+      "source": [
+        "reports/trial-operations/wave35/cohort/cohort.json",
+        "reports/trial-operations/wave35/package-f880/lifecycle/"
+      ],
+      "cohort": {
+        "humanProvided": false,
+        "label": "controlled_automated_only",
+        "journeySteps": 10,
+        "humanFeedback": "NOT_PROVIDED",
+        "value": "NOT_MEASURED"
+      },
+      "eHandoff": {
+        "subject": "W33 f880 inner ee45/outer 46e",
+        "requires": [
+          "E independent W33 verdict",
+          "actual native/installed/recovery scope"
+        ]
+      },
+      "notReached": [
+        "human trial/feedback/value",
+        "E independent W33 f880 verdict"
+      ],
+      "evidence": "reports/trial-operations/wave35/cohort/"
+    }
+  },
+  "tests": {
+    "wave35": [
+      {
+        "file": "accept-gate.case.mjs",
+        "passed": 4,
+        "failed": 0
+      },
+      {
+        "file": "connection.case.mjs",
+        "passed": 1,
+        "failed": 0
+      },
+      {
+        "file": "join.case.mjs",
+        "passed": 1,
+        "failed": 0
+      },
+      {
+        "file": "successor.case.mjs",
+        "passed": 1,
+        "failed": 0
+      },
+      {
+        "file": "windows2.case.mjs",
+        "passed": 3,
+        "failed": 0
+      },
+      {
+        "file": "delivery.case.mjs",
+        "passed": 1,
+        "failed": 0
+      }
+    ],
+    "total": {
+      "passed": 11,
+      "failed": 0
+    },
+    "mainNativeObserved": {
+      "passed": 11,
+      "failed": 0
+    }
+  },
+  "remaining": [
+    "human cohort/feedback/value",
+    "B original Application/QuestionBroker same-Run callback and ACK-loss window",
+    "recovered same-Work accept and original scheduler 2/4 slot release",
+    "main attachPort actual ProductExecution consumer beyond main tests",
+    "review-restored and upgrade continuity",
+    "E independent W33 f880 verdict, native/installed release",
+    "main8cd model GUI not in W33 package; D successor not frozen",
+    "H/B/I candidate source not merged into main"
+  ],
+  "usage": {
+    "modelCalls": 0,
+    "vendorTurns": 0,
+    "nativeTurns": 0,
+    "tokenBudget": null,
+    "humanMessages": 0,
+    "userServices": "5180/8796..5191/8807 untouched",
+    "ownProbeSignals": 0,
+    "packageInstances": "private /tmp roots stopped by package own-path",
+    "globalDiscovery": false,
+    "foreignSignals": 0
+  },
+  "errors": [
+    {
+      "id": "contracts-dist-stale",
+      "status": "fixed test setup",
+      "detail": "contracts build required for current main model-provider imports; generated dist only"
+    },
+    {
+      "id": "premature-accept",
+      "status": "fixed",
+      "detail": "accept-gate waits for actions.available; W33 candidate+empty then accept is covered"
+    }
+  ],
+  "hashes": {
+    "reports/trial-operations/wave35/selected-current/report.json": "7caf4707ae3cd2e06180d875333252a65dc759cf25483330c8f33c8eb6244301",
+    "reports/trial-operations/wave35/model-connection/report.json": "c40b27dce2ca79926e5cd3da17396a0c18f6718c709a7e191ef977873cf0dcad",
+    "reports/trial-operations/wave35/package-f880/lifecycle/report.json": "fbc4a00c91ad480fc845898833fab3864c564d8042c40fc613be93914cf88885",
+    "reports/trial-operations/wave35/package-f880/restore/report.json": "03c2b27fe3be3ba52ae06169e45cabf81183a067b67fa48b3bab35dcdb22d392",
+    "reports/trial-operations/wave35/field-f880/support-summary.json": "7860b7b58eeccd3d94c4cb3a96e44d7369b465464bdec040ddf51a7e9880e8fb",
+    "reports/trial-operations/wave35/join/report.json": "2a43b22646504c73d3a6443d6c2be9f410f182f4e78eb1ccaba12da2ff6360b4",
+    "reports/trial-operations/wave35/successor/report.json": "5aa40de52d8a389ab42cacf8be1237f9ca6c936d7ea2e7e559866c5fb0ea5d89",
+    "reports/trial-operations/wave35/windows/windows.json": "69be6eaa82da327f202600c7eb8d68e036150d771eb57f817334683466f563be",
+    "reports/trial-operations/wave35/delivery/delivery.json": "951d5159d1d3e591e3ee3992a4e73ac168974aafc1eb79521cca9a61250e0806",
+    "reports/trial-operations/wave35/cohort/cohort.json": "adee6a5f9eb8655f594b2fb1cc39c3e7fbdba9290e0873d37e3865e31e6bad22"
+  }
+}

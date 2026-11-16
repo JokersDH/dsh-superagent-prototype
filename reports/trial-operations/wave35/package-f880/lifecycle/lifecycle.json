@@ -1,0 +1,244 @@
+{
+  "protocol": "package-lifecycle/1",
+  "surface": "immutable package first-run/start/status/recovery-status/stop + readiness/health/console/SSE",
+  "expectedBuild": "f880e5bc9c6c1c57",
+  "packageRoot": "/tmp/h-w35-life/package/install/app",
+  "roots": {
+    "config": "/tmp/h-w35-life/lifecycle/config",
+    "data": "/tmp/h-w35-life/lifecycle/data",
+    "cache": "/tmp/h-w35-life/lifecycle/cache",
+    "logs": "/tmp/h-w35-life/lifecycle/logs",
+    "workspace": "/tmp/h-w35-life/lifecycle/workspace"
+  },
+  "ports": {
+    "console": 57171,
+    "api": 57172
+  },
+  "instance": {
+    "protocol": "personal-product-instance/1",
+    "pid": 41644,
+    "processStart": "Mon Nov 16 23:07:11 2026",
+    "apiPid": 41655,
+    "consolePid": 41644,
+    "apiURL": "http://127.0.0.1:57172",
+    "consoleURL": "http://127.0.0.1:57171",
+    "state": "/private/tmp/h-w35-life/lifecycle/data",
+    "install": "/private/tmp/h-w35-life/package/install/app",
+    "buildId": "f880e5bc9c6c1c57",
+    "mode": "fixture",
+    "access": "local-development",
+    "startupMode": "normal",
+    "launcherArgv": [
+      "~/.nvm/versions/node/v24.21.0/bin/node",
+      "/tmp/h-w35-life/package/install/app/apps/launcher/bin/pa.mjs",
+      "start",
+      "--fixture",
+      "--discussion-only",
+      "--port",
+      "57171",
+      "--api-port",
+      "57172",
+      "--install",
+      "/tmp/h-w35-life/package/install/app",
+      "--config-root",
+      "/tmp/h-w35-life/lifecycle/config",
+      "--data-root",
+      "/tmp/h-w35-life/lifecycle/data",
+      "--cache-root",
+      "/tmp/h-w35-life/lifecycle/cache",
+      "--logs-root",
+      "/tmp/h-w35-life/lifecycle/logs",
+      "--workspace-root",
+      "/tmp/h-w35-life/lifecycle/workspace",
+      "--json"
+    ],
+    "launcherCwd": "~/Desktop/joker/superagent-agent-h",
+    "apiArgv": [
+      "~/.nvm/versions/node/v24.21.0/bin/node",
+      "/private/tmp/h-w35-life/package/install/app/apps/coordinator/product/demo.ts",
+      "--port",
+      "57172",
+      "--state",
+      "/private/tmp/h-w35-life/lifecycle/data",
+      "--console-origin",
+      "http://127.0.0.1:57171",
+      "--startup-mode",
+      "normal",
+      "--assistant",
+      "--local-access"
+    ],
+    "apiProcessStart": "Mon Nov 16 23:07:11 2026",
+    "apiUid": 501,
+    "startedAt": "2026-11-16T15:07:12.138Z",
+    "configRoot": "/tmp/h-w35-life/lifecycle/config"
+  },
+  "commandExits": {
+    "firstRun": 0,
+    "start": 0,
+    "status": 0,
+    "restart": 0,
+    "restartStatus": 0,
+    "reviewNegative": 2,
+    "stop": 0,
+    "afterStop": 2
+  },
+  "installedWork": {
+    "createStatus": 200,
+    "createBody": {
+      "commandId": "h32-installed-work-1",
+      "workId": "ca73397f13d97d6e419d8a4ca76cb205",
+      "seq": 6,
+      "status": "recorded"
+    },
+    "workId": "ca73397f13d97d6e419d8a4ca76cb205",
+    "acceptAttempted": true,
+    "staleStatus": 200,
+    "staleBody": {
+      "commandId": "h32-installed-stale-1",
+      "seq": 52,
+      "status": "rejected",
+      "error": {
+        "code": "verification_failed",
+        "message": "Trusted artifact review is unavailable",
+        "retry": "user_action"
+      }
+    },
+    "acceptStatus": 200,
+    "acceptBody": {
+      "commandId": "h32-installed-accept-1",
+      "workId": "ca73397f13d97d6e419d8a4ca76cb205",
+      "seq": 51,
+      "status": "recorded"
+    },
+    "final": {
+      "phase": "delivered",
+      "artifactIds": [
+        "4c161365de75f6e81055fe6a6b0bcfad5f03419c951ad37a78a7b5d66c7beb7d",
+        "57f2162bd14e3cc029b4cd1c23a5bbe9768b8e669db1fb878123d106fb580506",
+        "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+        "e7a433656ff39f14a94a83070a6e5b6453002805df536dd3601afe163999e682"
+      ],
+      "resourceStatus": "quiescent",
+      "available": [
+        "continue_work"
+      ]
+    },
+    "reopened": {
+      "phase": "delivered",
+      "workId": "ca73397f13d97d6e419d8a4ca76cb205",
+      "artifactIds": [
+        "4c161365de75f6e81055fe6a6b0bcfad5f03419c951ad37a78a7b5d66c7beb7d",
+        "57f2162bd14e3cc029b4cd1c23a5bbe9768b8e669db1fb878123d106fb580506",
+        "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+        "e7a433656ff39f14a94a83070a6e5b6453002805df536dd3601afe163999e682"
+      ]
+    }
+  },
+  "statuses": {
+    "firstRun": "OK",
+    "start": "STARTED",
+    "status": "RUNNING",
+    "restart": "REUSED_OR_RUNNING",
+    "reviewNegative": "BLOCKED",
+    "stop": "STOPPED",
+    "afterStop": "STOPPED"
+  },
+  "readiness": {
+    "status": 200,
+    "contentType": "application/json",
+    "body": {
+      "protocol": "trial-readiness/1",
+      "observedAt": "2026-11-16T15:07:15.530Z",
+      "configurationRevision": "1c957869b8a7e716df3791f67a4336e893fe93863df16002f56fdd1898e00544",
+      "mode": "fixture",
+      "startupMode": "normal",
+      "discussion": "not_configured",
+      "execution": {
+        "state": "available",
+        "kind": "controlled_fixture"
+      },
+      "development": "fixture_only",
+      "projects": {
+        "development": 1,
+        "discussion": 0,
+        "dispatchable": 1
+      },
+      "profiles": {
+        "native": 0,
+        "controlled": 4,
+        "admittedNative": 0,
+        "admittedControlled": 4
+      },
+      "capabilities": {
+        "contextHistory": true,
+        "contextSources": true,
+        "decisions": true,
+        "proposals": true
+      },
+      "authorization": "none"
+    },
+    "bytes": 584
+  },
+  "health": {
+    "status": 200,
+    "contentType": "application/json",
+    "body": {
+      "status": "ok",
+      "mode": "fixture",
+      "access": "local-development"
+    },
+    "bytes": 61
+  },
+  "consolePage": {
+    "status": 200,
+    "bytes": 447
+  },
+  "sse": {
+    "status": 200,
+    "contentType": "text/event-stream",
+    "events": 0,
+    "bytes": 0,
+    "endedBy": "bounded_abort_or_stream"
+  },
+  "snapshot": {
+    "status": 200,
+    "contentType": "application/json",
+    "body": {
+      "cursor": 0,
+      "works": [],
+      "questions": []
+    },
+    "bytes": 38
+  },
+  "checks": {
+    "firstRunOk": true,
+    "startRunning": true,
+    "sameOwnInstance": true,
+    "readinessModeFixture": true,
+    "readinessAuthorizationNone": true,
+    "healthOk": true,
+    "consoleServed": true,
+    "sseConnected": true,
+    "snapshotVisible": true,
+    "configurationVisible": true,
+    "installedWorkCreated": true,
+    "installedCandidateSeen": true,
+    "staleCandidateRejected": true,
+    "installedAcceptGateObserved": true,
+    "installedAcceptRecorded": true,
+    "installedDelivered": true,
+    "reusedSamePid": true,
+    "reviewOnFixtureRefused": true,
+    "stoppedOwnInstance": true,
+    "stoppedStatus": true,
+    "stoppedNotServing": true,
+    "reopenedSameWork": true,
+    "noHSignal": true
+  },
+  "limits": [
+    "fixture/discussion-only, no model or native turn",
+    "private fake codex is used only for first-run detection",
+    "H sends no signal; stop is the package verified own-path",
+    "SSE is bounded to 1200ms and may emit zero events"
+  ]
+}
