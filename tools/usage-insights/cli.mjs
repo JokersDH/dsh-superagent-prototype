@@ -75,6 +75,8 @@ export options
 verify only
   --expect-digest <sha256>    Refuse when the bundle bytes do not match the pinned digest
   --dto <file>                Verify a served usage-observation/1 document instead of a bundle
+  --package <absolute tar>    Also inspect a release archive and name the build and any missing capability
+  --out <absolute path>       Write the support report to a new 0600 file instead of stdout
   --format json|markdown      Report format for verify (default json)
 
 package only
@@ -140,7 +142,7 @@ const SPECS = {
   },
   verify: {
     input: flag(), 'max-input-bytes': flag(), 'max-records': flag(), 'max-works': flag(), 'max-pages': flag(),
-    'expect-digest': flag(), dto: flag(), format: flag(),
+    'expect-digest': flag(), dto: flag(), format: flag(), package: flag(), out: flag(), 'max-archive-bytes': flag(),
   },
   package: {
     tar: flag(), 'expect-sha256': flag(), 'expect-build': flag(), expect: flag(), 'max-archive-bytes': flag(),
@@ -373,19 +375,46 @@ async function commandVerify(options, io) {
     // A served document is metadata-verified only: its values are formatted strings, and treating
     // them as numbers here would invent precision the coordinator never recorded.
     const served = readBundle(requiredString(options.dto, 'dto'), maxBytes)
-    let summary
+    let origin = null
+    if (options.package !== undefined) {
+      const tarPath = requiredString(options.package, 'package')
+      if (!isAbsolute(tarPath)) throw new UsageError('--package must be an absolute path')
+      let inspected
+      try {
+        inspected = inspectArchive(tarPath, { maxBytes: positiveInteger(options['max-archive-bytes'], 'max-archive-bytes', 512 * 1024 * 1024) })
+      } catch (error) {
+        if (error?.name === 'ArchiveError') throw new UsageInsightsError('source_unavailable', error.message)
+        throw error
+      }
+      origin = {
+        kind: 'package',
+        buildId: inspected.manifest?.buildId ?? null,
+        sourceCommit: inspected.manifest?.sourceCommit ?? null,
+        archiveSha256: inspected.archive.sha256,
+        capabilities: inspected.capabilities,
+        browserTrigger: inspected.browserTrigger,
+        missing: inspected.absent,
+      }
+    }
+    let report
     try {
-      summary = insights.describeDisplayDocument(served.value)
+      report = insights.buildSupportReport({ observation: served.value, origin })
     } catch (error) {
       if (error?.name === 'SupportFault') throw new UsageInsightsError('source_unavailable', error.message)
       throw error
     }
     const format = options.format ?? 'json'
     if (!['json', 'markdown'].includes(format)) throw new UsageError('--format must be json or markdown for verify')
-    io.stdout(format === 'markdown' ? insights.renderSupportSummary(summary) : `${JSON.stringify({ ...summary, bytes: served.bytes, digest: served.digest }, null, 2)}\n`)
-    const status = summary.status === 'ready' ? 'complete' : summary.status === 'insufficient_data' ? 'insufficient_data' : 'unavailable'
-    io.stderr(`status=${status} coverage=${summary.coverageState} rows=${summary.counts.rows} unknown=${summary.counts.unknown} display-only\n`)
-    return summary.status === 'ready' ? EXIT.ok : summary.status === 'insufficient_data' ? EXIT.insufficient : EXIT.unavailable
+    const body = format === 'markdown'
+      ? insights.renderSupportReport(report)
+      : `${JSON.stringify({ ...report, bytes: served.bytes, digest: served.digest }, null, 2)}\n`
+    if (options.out !== undefined) {
+      const written = writeExclusive(requiredString(options.out, 'out'), body)
+      io.stdout(`wrote ${basename(written)} (${Buffer.byteLength(body)} bytes) format=${format}\n`)
+    } else io.stdout(body)
+    const status = report.status === 'ready' ? 'complete' : report.status === 'insufficient_data' ? 'insufficient_data' : 'unavailable'
+    io.stderr(`status=${status} coverage=${report.coverageState} rows=${report.counts.rows} unknown=${report.counts.unknown} export=${report.exportCapability} display-only\n`)
+    return report.status === 'ready' ? EXIT.ok : report.status === 'insufficient_data' ? EXIT.insufficient : EXIT.unavailable
   }
   const bundle = readBundle(requiredString(options.input, 'input'), maxBytes)
   // A pinned digest turns "the file I analysed earlier" into a checkable identity.

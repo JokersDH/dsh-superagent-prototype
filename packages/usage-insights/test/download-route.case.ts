@@ -54,7 +54,7 @@ const readers = (projectIds: string[] = ['one', 'two']) => ({
 })
 
 /** A real app whose observation and download read the same controlled readers. */
-function app(options: { clock?: { value: string }; projectIds?: string[]; download?: boolean; wrap?: (value: unknown) => unknown } = {}) {
+function app(options: { clock?: { value: string }; projectIds?: string[]; download?: boolean; wrap?: (value: unknown) => unknown; startupMode?: 'normal' | 'recovery_readonly' } = {}) {
   const clock = options.clock ?? { value: AT }
   const observation = new ProductUsageObservation(readers(options.projectIds), () => clock.value)
   return createLocalHttpApp({
@@ -64,6 +64,7 @@ function app(options: { clock?: { value: string }; projectIds?: string[]; downlo
     bootstrapToken: 'f'.repeat(64),
     allowedOrigins: ['http://127.0.0.1:4700'],
     mode: 'personal',
+    ...(options.startupMode ? { startupMode: options.startupMode } : {}),
     read: {
       usageObservation: (query: Parameters<typeof observation.read>[0]) => observation.read(query),
       ...(options.download === false ? {} : {
@@ -231,4 +232,15 @@ test('a bounding byte budget truncates explicitly and main\'s contract accepts o
   assert.equal(UsageObservationDownloadSchema.safeParse(envelope).success, false)
   assert.equal(document.truncation.bytes, Buffer.byteLength(text))
   assert.equal(DisplayExportDocumentSchema.safeParse(JSON.parse(text)).success, true)
+})
+
+test('a readonly startup still serves the export, and the page remains usable', { skip }, async () => {
+  const value = app({ startupMode: 'recovery_readonly' })
+  const page = await get(value, '/v1/insights?days=7')
+  assert.equal(page.status, 200, 'the page is readable in readonly startup')
+  const response = await get(value, '/v1/insights/export?days=7')
+  assert.equal(response.status, 200, 'the download is available in readonly startup')
+  const download = UsageObservationDownloadSchema.parse(await (response.json() as Promise<unknown>))
+  assert.equal(download.sha256, sha(download.text))
+  assert.equal(download.observation.status, 'ready')
 })
