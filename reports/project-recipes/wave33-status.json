@@ -1,0 +1,288 @@
+{
+  "protocol": "project-recipes-wave33-status/1",
+  "owner": "J",
+  "date": "2026-11-16",
+  "branch": "codex/g5-project-recipes",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-j",
+  "baseline": "0c67e3b79c0a6425e657740b1187b18532448c29",
+  "mergedOriginMain": "e05ee8d8 merged as 7d6d099c; includes fc38bf65 (registered runner port + workbench consumers)",
+  "dirty": {
+    "state": "clean at runtime source 5cd59215",
+    "note": "Only owned paths were touched; no reset, no state clearing, no new checkout; reports/docs committed separately."
+  },
+  "goal": "Three complete outcomes: production project declaration with three-kind applicability, two real original projects through the original delivery consumer, and post-migration re-identification with a same-version hand-off.",
+  "outcomes": [
+    {
+      "id": "O1",
+      "title": "production project declaration and three-kind applicability",
+      "status": "PASS_CONTROLLED",
+      "implementation": [
+        "packages/project-recipes/src/module.ts (describeProjectRecipes)",
+        "tools/project-recipes/cli.ts (private 0600 exclusive output; migration reports writable)",
+        "existing match/scope/observe/facts/preview modules unchanged in semantics"
+      ],
+      "actualConsumer": {
+        "entry": "apps/coordinator/product/project-recipes.ts -> POST /v1/projects/:id/recipes/preview; original NewWorkForm",
+        "state": "IN_MAIN",
+        "evidence": "tools/project-recipes/test/first-user.case.ts, tests/integration/project-recipes.case.mjs"
+      },
+      "positive": [
+        "plain Node, npm single package and pnpm single package each get drafts for regression_fix, scoped_change and verification_followup",
+        "draft fields keep the project-local profile, criteria and declared atoms; create_work is recorded by the original Application"
+      ],
+      "independentNegative": [
+        "an undeclared atom ('test/' when only 'src/' is declared) is needs_input with fields null",
+        "a project that was never imported is forbidden, never substituted by another project",
+        "malformed limits/clock/configuration and future/stale facts remain refused (wave-30/31 regressions)"
+      ],
+      "commands": [
+        {
+          "command": "./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.json",
+          "exit": 0
+        },
+        {
+          "command": "node --test packages/project-recipes/test/*.case.ts",
+          "exit": 0,
+          "tests": 85,
+          "pass": 85
+        },
+        {
+          "command": "./node_modules/.bin/tsc -p tools/project-recipes/tsconfig.json",
+          "exit": 0
+        },
+        {
+          "command": "node --test tools/project-recipes/test/*.case.ts",
+          "exit": 0,
+          "tests": 38,
+          "pass": 38
+        }
+      ],
+      "remaining": [
+        "rebind/reidentified is still candidate-only (origin/main has no rebind.ts); main integration is one call over its own rootFor"
+      ]
+    },
+    {
+      "id": "O2",
+      "title": "two real original projects through the original product delivery",
+      "status": "PASS_CONTROLLED",
+      "implementation": [
+        "tools/project-recipes/test/two-project-delivery.case.ts",
+        "tools/project-recipes/test/project-fixtures.ts (shared real-root fixtures)"
+      ],
+      "actualConsumer": {
+        "entry": "createProductRuntime -> original Application/Store/check/currentCandidate/manualaccept; product fixture attempt writes the product output",
+        "state": "IN_MAIN (consumer classes untouched by J)",
+        "evidence": "two independent roots (npm and pnpm single packages) with their own registry ids and scopes"
+      },
+      "positive": [
+        "preview -> create_work -> product fixture attempt -> currentCandidate ready -> explicit manual accept -> phase delivered",
+        "after delivery every artifact byte is readable through the store and the work belongs to the original project id",
+        "closing and reopening the same state shows the delivered work and its artifacts again"
+      ],
+      "independentNegative": [
+        "before readiness accept is not offered; an early attempt is rejected for that reason (not reported as stale)",
+        "a candidate belonging to the other project is rejected on this work",
+        "only after a legal accept does replaying the same candidate get a stale refusal"
+      ],
+      "commands": [
+        {
+          "command": "node --test tools/project-recipes/test/two-project-delivery.case.ts",
+          "exit": 0,
+          "tests": 1,
+          "pass": 1,
+          "observed": "delivered two works, artifacts readable, reopen verified"
+        },
+        {
+          "command": "node --test tests/integration/project-recipes.case.mjs",
+          "exit": 0,
+          "tests": 5,
+          "pass": 5
+        },
+        {
+          "command": "node tests/integration/project-recipes-browser.mjs reports/project-recipes/wave33-browser",
+          "exit": 0,
+          "cases": 9,
+          "pass": 9,
+          "sourceCommit": "5cd59215",
+          "sourceWorktreeClean": true,
+          "acceptedWorks": 2
+        }
+      ],
+      "remaining": [
+        "controlled fixture protocol only: real vendor/model/native turns remain 0",
+        "B/I recovered business and the original 2/4-slot return are out of this block and NOT_REACHED; no fixture registry or new normal work substitutes them"
+      ]
+    },
+    {
+      "id": "O3",
+      "title": "post-migration current facts re-identification and same-version hand-off",
+      "status": "PASS_CANDIDATE_ONLY",
+      "implementation": [
+        "packages/project-recipes/src/rebind.ts (current/changed/unbound/reidentified)",
+        "packages/project-recipes/src/module.ts (describeProjectRecipes)",
+        "tools/project-recipes/cli.ts --previous-facts with private 0600 exclusive report output"
+      ],
+      "actualConsumer": {
+        "entry": "main's own registered root mapping passed as { rootFor } (one call); CLI for operators",
+        "state": "CANDIDATE_ONLY (rebind.ts is not in origin/main)",
+        "evidence": "tools/project-recipes/test/first-user.case.ts (registry mapping + reidentified), tools/project-recipes/test/rebind-cli.case.ts, packages/project-recipes/test/rebind.case.ts"
+      },
+      "positive": [
+        "same id pointed at a new root reports changed with field-level differences; the old draft is stale and the new tree still yields a suggestion",
+        "a moved project re-registered under a new id reports reidentified with previousProjectId and the diff, and the new identity gets its own draft",
+        "describeProjectRecipes() gives D/E one comparable description (contracts, catalog digest, vocabularies, version)"
+      ],
+      "independentNegative": [
+        "no registered root is unbound (exit 3), never a guessed path",
+        "a malformed previous observation or invalid clock is refused (exit 5)",
+        "the report never carries an absolute root, credential or grant; it is not an authorization"
+      ],
+      "commands": [
+        {
+          "command": "node --test packages/project-recipes/test/rebind.case.ts",
+          "exit": 0,
+          "tests": 7,
+          "pass": 7
+        },
+        {
+          "command": "node --test packages/project-recipes/test/module.case.ts",
+          "exit": 0,
+          "tests": 3,
+          "pass": 3
+        },
+        {
+          "command": "node --test tools/project-recipes/test/rebind-cli.case.ts",
+          "exit": 0,
+          "tests": 5,
+          "pass": 5
+        },
+        {
+          "command": "npm pack --dry-run",
+          "exit": 0,
+          "observed": "42 files / 48,781 bytes"
+        }
+      ],
+      "remaining": [
+        "main re-import of rebind.ts/index.ts/module.ts, then D freeze and E installed verdict on one exact tar",
+        "unknown language/workspace/version stay needs_input/unsupported; no universal project framework"
+      ]
+    }
+  ],
+  "evidence": {
+    "package": {
+      "typecheckExit": 0,
+      "tests": 85,
+      "pass": 85,
+      "fail": 0,
+      "buildExit": 0
+    },
+    "tools": {
+      "typecheckExit": 0,
+      "tests": 38,
+      "pass": 38,
+      "fail": 0
+    },
+    "exampleExit": 0,
+    "mainIntegration": {
+      "command": "node --test tests/integration/project-recipes.case.mjs",
+      "exit": 0,
+      "tests": 5,
+      "pass": 5
+    },
+    "mainBrowser": {
+      "command": "node tests/integration/project-recipes-browser.mjs reports/project-recipes/wave33-browser",
+      "exit": 0,
+      "cases": 9,
+      "pass": 9,
+      "sourceCommit": "5cd59215",
+      "sourceWorktreeClean": true,
+      "acceptedWorks": 2
+    },
+    "packDryRun": {
+      "files": 42,
+      "bytes": 48781
+    },
+    "wave33Verifier": "agent-tasks/product-wave-33 has no verify.mjs; dispatch.json is the static plan"
+  },
+  "integration": {
+    "alreadyInMain": [
+      "wave-30 J five sources (facts/freshness/budget/omissions) and the 0073/0077 preview + original form consumer",
+      "fc38bf65 registered runner port + F recipe/support work (main-owned, not modified by J)",
+      "tools/distribution/build.mjs lists project-recipes"
+    ],
+    "candidateOnly": [
+      "rebind.ts with reidentified semantics",
+      "module.ts describeProjectRecipes",
+      "CLI --previous-facts private report output",
+      "two-project-delivery and first-user tests"
+    ],
+    "minimalMainIntegration": "rebindRegisteredProject({ previous, observedAt, roots: { rootFor: id => readers.rootFor(id) } }) inside main's existing readers; no new wire, table or permission"
+  },
+  "packageIdentity": {
+    "R1": {
+      "status": "PINNED_UNMODIFIED_REFERENCE",
+      "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "build": "8296720d8a25f38c",
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "bytes": 20481470,
+      "entries": 6849,
+      "installedByJ": false
+    },
+    "R2": {
+      "status": "SOURCE_READY_TAR_NOT_CREATED",
+      "runtimeSource": "5cd59215",
+      "pack": {
+        "files": 42,
+        "bytes": 48781
+      }
+    },
+    "installed": false,
+    "zip": "not created (no temporary ZIP sprint this round)"
+  },
+  "layers": {
+    "source": "PASS (85 library / 38 tools / strict / build / example)",
+    "controlled": "PASS (two real roots through preview/create/check/candidate/accept/artifacts/reopen; main 5 integration + 9 browser cases)",
+    "installed": "NOT_REACHED (no tar/ZIP built, installed or verified)",
+    "native": "NOT_APPLICABLE (real vendor/model/native turns 0; fixture attempt only)",
+    "recovered": "NOT_REACHED (B/I same-Work recovery and 2/4-slot return are outside this block; no substitute)",
+    "value": "NOT_CLAIMED"
+  },
+  "remaining": [
+    "main re-import of the three new/changed package files, then real App/F consumption of rebind",
+    "D successor build/freeze including contracts -> project-recipes, then E installed verdict on one exact tar",
+    "E independent product assertions unchanged; F presentation verification unchanged",
+    "real model/native/recovery paths and value claims stay out of scope"
+  ],
+  "minimalDependencies": [
+    "main: re-import rebind.ts, index.ts and module.ts; keep root/HTTP/App ownership",
+    "D: build order contracts -> project-recipes and include the package in the runtime closure",
+    "E: bind the exact R1 829 tuple for R1, or the frozen R2 successor tar otherwise"
+  ],
+  "limits": {
+    "realModelTurns": 0,
+    "nativeTurns": 0,
+    "vendorCalls": 0,
+    "dependencyInstalls": 0,
+    "executedProjectCommands": 0,
+    "checkRegistrations": 0,
+    "sqlWrites": 0,
+    "executionLifecycles": 0,
+    "userServicesTouched": 0,
+    "newWorktreesCreated": 0
+  },
+  "ownership": {
+    "owned": [
+      "packages/project-recipes/",
+      "tools/project-recipes/",
+      "docs/project-recipes/",
+      "reports/project-recipes/"
+    ],
+    "untouchedByDesign": [
+      "pnpm-lock.yaml",
+      "root package.json",
+      "packages/contracts/",
+      "apps/",
+      "A/B/C/D/E/F/G/H/I paths"
+    ]
+  }
+}

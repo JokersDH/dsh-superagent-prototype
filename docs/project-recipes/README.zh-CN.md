@@ -61,6 +61,7 @@ fixture 与 native 的区分由配置决定，本模块不参与判定，但保�
 3. **应用与编辑**：只有 `draft` 可应用；应用只预填 goal/scope/criteria/profile，用户仍可编辑 goal；未应用的模板不能创建。
 4. **明确创建**：创建前 main 会重新读取同一 preview，比较配置 revision、facts 内容摘要、catalog 与字段；变化要求重新应用。之后发送原 `create_work`，由原 Application 再校验 scope/criteria/profile，再走原检查/候选/人工接受。
 5. **迁移/重绑**：搬目录或重新登记后，用 `--previous-facts` 或 `rebindRegisteredProject` 对比旧观察；身份变化（新 id）报 `reidentified`，只给迁移差异、不复用旧建议。
+6. **交付与重开**：`tools/project-recipes/test/two-project-delivery.case.ts` 在真实组合上跑完两个独立原项目的 preview→create→原检查/候选→明确 accept→delivered，并验证候选就绪前不接受、跨项目候选被拒、同一候选重复接受为 stale；接受后 Work/候选/全部 artifact 字节可读，关闭重开同一 state 后仍可核。
 
 限制：只支持 Node/npm/pnpm 单包与显式声明的 monorepo 原子；不安装依赖、不执行 scripts/版本命令、不自动注册检查、不猜成员/父目录；未知语言或布局保持 `unsupported`/`needs_input`。
 
@@ -362,7 +363,21 @@ node tools/project-recipes/cli.ts --previous-facts /tmp/old-facts.json \
   --root /path/to/new/project --project project-alpha --now 2026-11-15T00:00:00.000Z
 ```
 
-退出码：`current`/`changed` → 0；`unbound`（未登记/根不存在）→ 3；`reidentified`（身份已变化，仅供迁移核对）或输入被拒绝 → 5；参数冲突 → 2。该模式不接受 `--facts/--kind/--paths/--output`，避免把迁移对比混成生成或写入。
+退出码：`current`/`changed` → 0；`unbound`（未登记/根不存在）→ 3；`reidentified`（身份已变化，仅供迁移核对）或输入被拒绝 → 5；参数冲突 → 2。该模式不接受 `--facts/--kind/--paths`，避免把迁移对比混成生成。
+
+`--output` 在两种模式下都只创建新文件（`O_EXCL`，权限 0600），已存在或不可写即拒绝，绝不覆盖；报告仍同时输出到 stdout。
+
+## 7.6 同一版本交接（D/E 绑定）
+
+```ts
+import { describeProjectRecipes } from '@personal-agent/project-recipes'
+const described = describeProjectRecipes()
+// { protocol: 'project-recipes-module/1', version, catalog: { id, version, digest },
+//   kinds, protocols: { facts, draft, fields, observer, rebind }, issueCodes,
+//   previewErrorCodes, configurationProtocols, authority: 'none' }
+```
+
+D 冻结一个包、E 验一个精确 tar 时，可比较 source 与安装产物里的这份描述：contracts 协议、catalog 摘要、issue/error 词表一致才算同一版本。描述里没有路径、凭据或授权字段；`version` 与 `package.json` 由测试绑定。
 
 ## 8. 兼容、版本与分发
 
@@ -416,7 +431,7 @@ pnpm --dir packages/contracts build
 
 # 纯库
 ./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.json
-node --test packages/project-recipes/test/*.case.ts     # 82 tests
+node --test packages/project-recipes/test/*.case.ts     # 85 tests
 ./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.build.json
 
 # CLI 与真实 Application 消费者（后者需要产品包构建）

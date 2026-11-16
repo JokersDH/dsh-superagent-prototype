@@ -2,7 +2,8 @@
 
 工作树 `/Users/hh/Desktop/joker/superagent-agent-j`，分支 `codex/g5-project-recipes`。
 
-- 当前（wave-32）机读状态：[wave32-status.json](wave32-status.json)
+- 当前（wave-33）机读状态：[wave33-status.json](wave33-status.json)
+- 历史（wave-32）：[wave32-status.json](wave32-status.json)
 - 历史（wave-31）：[wave31-status.json](wave31-status.json)
 - 历史（wave-30）：[wave30-status.json](wave30-status.json)
 - 历史（wave-29）：[wave29-status.json](wave29-status.json)
@@ -11,7 +12,64 @@
 
 ---
 
-# wave-32（2026-11-16）
+# wave-33（2026-11-16）
+
+起点 `0c67e3b7`，合并 `origin/main`（wave-33 派工 `e05ee8d8`，合并为 `7d6d099c`；含 `fc38bf65` 的登记 runner port 与工作台消费者）后执行三个完整成果。
+
+## 1. 成果一：生产项目声明与三类委托
+
+- 既有 main 入口（registry → preview → 原表单 → `create_work`）未重做；`first-user.case.ts` 证明纯 Node/npm/pnpm 三形态 × 三 kind 全部 draft，且每个项目一次原 `create_work` recorded。
+- 负例：未声明 atom → `needs_input`（`fields: null`）；从未导入的项目 → `forbidden`，不借别的项目凑可用。
+- CLI 输出收紧：draft 与迁移报告的新文件都是 **0600 + O_EXCL**，已存在/不可写即拒绝，绝不覆盖；迁移模式现在也支持 `--output`。
+- `rebind`/`reidentified` 仍**仅候选**（origin/main 无 `rebind.ts`），main 接入只需一次调用：`rebindRegisteredProject({ previous, observedAt, roots: { rootFor: id => readers.rootFor(id) } })`。
+
+## 2. 成果二：两个原项目的原产品交付
+
+`two-project-delivery.case.ts`（真实 `createProductRuntime`，npm + pnpm 两个独立根、各自 registry id 与 scope）：
+
+- preview → `create_work` → 产品自有 fixture 尝试 → `check`/`currentCandidate` 就绪 → **ready 之后**才 `accept_candidate` → `delivered`。
+- 交付后 Work 属于原 project id，全部 artifact 字节经 store 可读；关闭并重开同一 state 后仍能复核 delivered Work 与 artifact。
+- 负例顺序诚实：候选就绪前根本不提供 accept（早试被拒，不算 stale）；跨项目候选被拒；**合法 accept 之后**再重放同一候选才是 stale 拒绝。
+- 分层：controlled fixture 协议；真实 vendor/model/native 仍 0；B/I 原恢复与 2/4 槽归还不属于本块，保持 NOT_REACHED，未用 fixture registry 或新 Work 替代。
+
+## 3. 成果三：迁移重识别与同一版本交接
+
+- `reidentified`（搬目录后新 id）给 `previousProjectId` 与字段差异，旧建议不复用；同 id 换 root 为 `changed`，旧草稿 `stale_inputs`；无登记根为 `unbound`，不猜路径。
+- 新增 `describeProjectRecipes()`：contracts/catalog 摘要/issue 与 preview 错误词表/版本的可比较描述，供 D 冻结与 E 绑定同一 tar；描述里没有路径、凭据或授权。
+- CLI `--previous-facts` 报告可写新文件（0600、不覆盖）。
+
+## 4. 实际验证
+
+| 命令 | exit | 结果 |
+| --- | --- | --- |
+| `./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.json` | 0 | strict |
+| `node --test packages/project-recipes/test/*.case.ts` | 0 | 85 tests / 85 pass |
+| `./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.build.json` | 0 | dist |
+| `./node_modules/.bin/tsc -p tools/project-recipes/tsconfig.json` | 0 | strict |
+| `node --test tools/project-recipes/test/*.case.ts` | 0 | 38 tests / 38 pass |
+| `node --test tools/project-recipes/test/two-project-delivery.case.ts` | 0 | 两项目交付/产物/重开/负例全过 |
+| `node --test tests/integration/project-recipes.case.mjs` | 0 | main 真实链路 5/5 |
+| `node tests/integration/project-recipes-browser.mjs reports/project-recipes/wave33-browser` | 0 | 9/9，clean source `5cd59215`，2 个人工接受 |
+| `npm pack --dry-run` | 0 | 42 files / 48,781 B |
+
+## 5. 已进 main / 仅候选 / 安装
+
+| 项 | 状态 |
+| --- | --- |
+| wave-30 J 五源、0073/0077 预览与原表单、发行构建列表含 `project-recipes` | 已在 main |
+| `rebind.ts`、`module.ts`、CLI `--previous-facts`/私有输出、两个消费者测试 | **仅候选** |
+| R1 829（`82ee5b8f` / `8296720d8a25f38c` / tar `04926739…`） | 未修改、未安装 |
+| R2 后继 | source `5cd59215` + dist + pack 列表；**tar/ZIP 未创建** |
+
+分层：source/controlled PASS；installed NOT_REACHED；native 0；recovered NOT_REACHED；value 不声称。
+
+## 6. 余项
+
+main 重导入 `rebind.ts`/`index.ts`/`module.ts`；D 按 contracts → project-recipes 构建并冻结后继；E 对 R1 用 829 精确 tuple、对 R2 用 D 冻结的同一 tar；F 呈现与 E 独立断言不在本包。
+
+---
+
+# 历史：wave-32（2026-11-16）
 
 起点 `b25bf228`，合并 `origin/main`（wave-32 派工 `58b4e4c8`，合并为 `345fb72c`；含 `b72e935d`/`1498b07a` 的打包工作）后执行 `agent-tasks/product-wave-32/agent-j-project-recipes.zh-CN.md` 的整块结果：**普通 Node/npm/pnpm 项目导入后拿到可应用模板字段并走完原交付流程**。
 
