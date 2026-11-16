@@ -82,7 +82,8 @@ export async function runOuterZip() {
     evidence.zip.innerTarBytes = result?.inner?.tarBytes ?? null
     evidence.zip.installManifestSha256 = result?.inner?.installManifestSha256 ?? null
     evidence.zip.runtime = result?.runtime ? { version: result.runtime.version, abi: result.runtime.abi, sha256: result.runtime.sha256,
-      licenseSha256: result.runtime.licenseSha256, bytes: result.runtime.bytes } : null
+      licenseSha256: result.runtime.licenseSha256, bytes: result.runtime.bytes,
+      platform: result.runtime.platform ?? null, arch: result.runtime.arch ?? null } : null
 
     home = privateHome()
     const extracted = extractOuterZip(zipValue, home)
@@ -183,7 +184,7 @@ export async function runOuterZip() {
     })()
     evidence.runtimeNode = { version: execFileSync(join(root, 'runtime/bin/node'), ['--version'], { encoding: 'utf8' }).trim(),
       abi: execFileSync(join(root, 'runtime/bin/node'), ['-p', 'process.versions.modules'], { encoding: 'utf8' }).trim() }
-    evidence.zip.subject = { source: evidence.zip.source, buildId: evidence.zip.buildId, schema,
+    evidence.subject = { source: evidence.zip.source, buildId: evidence.zip.buildId, schema,
       tarSha256: evidence.zip.innerTarSha256, tarBytes: evidence.zip.innerTarBytes,
       platform: evidence.zip.runtime?.platform ?? null, arch: evidence.zip.runtime?.arch ?? null, abi: evidence.zip.runtime?.abi ?? null }
   } catch (error) { failure = String(error?.message ?? error).slice(0, 600) }

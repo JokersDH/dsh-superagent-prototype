@@ -98,15 +98,8 @@ export async function runCohortRecovery() {
 
     const first = launcher(install, ['first-run', '--json'], { env: { PA_CONFIG_ROOT: root.config, PA_DATA_ROOT: root.state }, nodePath })
     if (first.status !== 0) throw new Error(`first-run ${first.status}: ${first.stderr}`)
-    const schema = (() => {
-      try {
-        const db = new DatabaseSync(join(root.state, 'state.sqlite'), { readOnly: true })
-        try { return Number(db.prepare("select value from schema_meta where key='product_schema'").get()?.value ?? 0) } finally { db.close() }
-      } catch { return null }
-    })()
-    evidence.subject = { source: evidence.zip.source, buildId: evidence.zip.buildId, schema,
-      tarSha256: evidence.zip.innerTarSha256, tarBytes: evidence.zip.innerTarBytes,
-      platform: evidence.zip.runtime?.platform ?? null, arch: evidence.zip.runtime?.arch ?? null, abi: evidence.zip.runtime?.abi ?? null }
+    // The installed product schema is created by the first real daemon start, not by first-run.
+    let installedSchema = null
 
     mock = await candidateModel()
     mark('seed fixture delivery')
@@ -117,6 +110,15 @@ export async function runCohortRecovery() {
     const seedClient = new LocalProductClient({ baseURL: seedValue.instance.apiURL, stateDir: seedValue.instance.state, timeoutMs: 25_000 })
     await waitRunning(seedClient)
     const configuration = await seedClient.configuration()
+    installedSchema = (() => {
+      try {
+        const db = new DatabaseSync(join(root.state, 'state.sqlite'), { readOnly: true })
+        try { return Number(db.prepare("select value from schema_meta where key='product_schema'").get()?.value ?? 0) } finally { db.close() }
+      } catch { return null }
+    })()
+    evidence.subject = { source: evidence.zip.source, buildId: evidence.zip.buildId, schema: installedSchema,
+      tarSha256: evidence.zip.innerTarSha256, tarBytes: evidence.zip.innerTarBytes,
+      platform: evidence.zip.runtime?.platform ?? null, arch: evidence.zip.runtime?.arch ?? null, abi: evidence.zip.runtime?.abi ?? null }
     const project = configuration.projects.find(item => item.dispatchAllowed)
     if (!project) throw new Error('no dispatchable fixture project')
     const created = await seedClient.dispatch({ commandId: 'w33-rec-work', conversationId: 'conv-w33-rec', kind: 'create_work',

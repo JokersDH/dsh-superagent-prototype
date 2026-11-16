@@ -1,25 +1,25 @@
 {
   "control": "wrongstart",
   "reason": "unknown_live_resource",
-  "at": "2026-11-16T08:21:02.243Z",
-  "root": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-KZtyeZ",
+  "at": "2026-11-16T08:37:51.630Z",
+  "root": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-7yrons",
   "scope": {
-    "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-KZtyeZ/install",
-    "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-KZtyeZ/state",
-    "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-KZtyeZ/config"
+    "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-7yrons/install",
+    "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-7yrons/state",
+    "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-7yrons/config"
   },
   "record": {
-    "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-KZtyeZ/config/instance.json",
-    "sha256": "5706605d615626834811a5f41d03e0a8d5f819dbe478c4cbc5ce46077a4c4e42",
+    "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-7yrons/config/instance.json",
+    "sha256": "a1e2273d037eb85a8c6327767b7d9def81e521e52eb8a40725d3c38db2c09612",
     "bytes": 543,
     "value": {
       "protocol": "pa-instance/1",
-      "pid": 90478,
+      "pid": 50090,
       "processStart": "Wed Jan  1 00:00:00 2020",
-      "apiPid": 90478,
+      "apiPid": 50090,
       "apiProcessStart": "Wed Jan  1 00:00:00 2020",
-      "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-KZtyeZ/state",
-      "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-KZtyeZ/install",
+      "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-7yrons/state",
+      "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-7yrons/install",
       "apiURL": "http://127.0.0.1:1",
       "consoleURL": "http://127.0.0.1:2",
       "buildId": "probe",
@@ -30,18 +30,18 @@
   },
   "material": {
     "reason": "unknown_live_resource",
-    "root": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-KZtyeZ",
-    "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-KZtyeZ/install",
-    "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-KZtyeZ/config",
-    "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-KZtyeZ/state",
+    "root": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-7yrons",
+    "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-7yrons/install",
+    "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-7yrons/config",
+    "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-7yrons/state",
     "record": {
-      "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-KZtyeZ/config/instance.json",
-      "sha256": "5706605d615626834811a5f41d03e0a8d5f819dbe478c4cbc5ce46077a4c4e42",
+      "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-start-7yrons/config/instance.json",
+      "sha256": "a1e2273d037eb85a8c6327767b7d9def81e521e52eb8a40725d3c38db2c09612",
       "bytes": 543,
       "error": null
     },
     "files": [],
-    "retainedAt": "2026-11-16T08:21:02.243Z",
+    "retainedAt": "2026-11-16T08:37:51.630Z",
     "deleted": false
   },
   "extra": {}

@@ -1,19 +1,27 @@
 {
-  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T08-20-58-579Z",
-  "tier": "harness-only",
-  "status": "PASS",
+  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T08-37-48-097Z",
+  "tier": "controlled-product-workflow",
+  "status": "FAIL",
   "source": {
-    "commit": "8efa079f999a73bf0f8ea7a4d586e735032107d7",
+    "commit": "de1002803d37bb855af456dde100e82603f1c8c9",
     "dirty": true
   },
-  "checkedAt": "2026-11-16T08:21:12.986Z",
+  "checkedAt": "2026-11-16T08:45:52.978Z",
   "counts": {
-    "PASS": 201,
+    "PASS": 306,
     "FAIL": 0,
     "SKIPPED": 0,
-    "NOT_TESTED": 0,
+    "NOT_TESTED": 20,
     "BLOCKED": 0,
     "UNKNOWN": 0
   },
-  "failureCodes": []
+  "failureCodes": [
+    "source_dirty",
+    "subject_missing",
+    "subject_mismatch",
+    "subject_mismatch",
+    "subject_mismatch",
+    "subject_mismatch",
+    "subject_mismatch"
+  ]
 }
