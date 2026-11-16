@@ -1,0 +1,143 @@
+{
+  "protocol": "wave32-status/1",
+  "owner": "agent-d",
+  "branch": "codex/g3-local-distribution",
+  "source": "e8348a864d7d192589e72b8099475520f841b1e5",
+  "runtimeSource": "main 58b4e4c8",
+  "dirtyAtBuild": false,
+  "state": "COMPLETE_ENGINEERING_PACKAGE_CANDIDATE",
+  "inner": {
+    "protocol": "wave32-frozen-manifest/1",
+    "release": "W32",
+    "runtimeSource": "main 58b4e4c8 (b72e935d terminal lease,1498b07a guide)",
+    "buildCheckout": "e8348a864d7d192589e72b8099475520f841b1e5",
+    "source": "e8348a864d7d192589e72b8099475520f841b1e5",
+    "buildId": "88eb8c69b0671171",
+    "tarSha256": "65c386d108d385c1e8463de33b801a1865925d5dd752a7b82a0c57974b8453ac",
+    "tarBytes": 20543106,
+    "files": 6866,
+    "tarEntries": 7423,
+    "closure": "209/209",
+    "outer": {
+      "zip": "/Users/hh/Desktop/joker/pa-artifacts/wave32-preview-88eb8c6/PersonalAgent-Preview-88eb8c6.zip",
+      "zipSha256": "0a46cd3620e00154ea13e7286dcc73e40ffad4df4522f2339e229ffcb027bc06",
+      "zipBytes": 63475809,
+      "manifestSha256": "c93e3450561bbb2f669fdf3c4429e8df8c36e74d03f1b3d65f329b4abe10765f",
+      "archiveEntries": 7434,
+      "runtime": {
+        "version": "24.21.0",
+        "sha256": "e4b5a3af0e05c75de2eae013904145f40fe7fc2a6e6f17510128bf45cca4e79b"
+      }
+    },
+    "environment": {
+      "node": "24.21.0",
+      "abi": "137",
+      "platform": "darwin",
+      "arch": "arm64",
+      "sqlite": "3.53.4",
+      "productSchema": 18
+    }
+  },
+  "outer": {
+    "zip": "/Users/hh/Desktop/joker/pa-artifacts/wave32-preview-88eb8c6/PersonalAgent-Preview-88eb8c6.zip",
+    "zipSha256": "0a46cd3620e00154ea13e7286dcc73e40ffad4df4522f2339e229ffcb027bc06",
+    "zipBytes": 63475809,
+    "manifestSha256": "c93e3450561bbb2f669fdf3c4429e8df8c36e74d03f1b3d65f329b4abe10765f",
+    "archiveEntries": 7434,
+    "runtime": {
+      "version": "24.21.0",
+      "sha256": "e4b5a3af0e05c75de2eae013904145f40fe7fc2a6e6f17510128bf45cca4e79b"
+    }
+  },
+  "commands": [
+    {
+      "cmd": "node tools/distribution/build.mjs --install-root . --config-root /tmp/w32cfg --output /tmp/w32dev/install --json",
+      "exit": 0
+    },
+    {
+      "cmd": "node tools/distribution/freeze-install.mjs --install /tmp/w32dev/install --artifact-dir pa-artifacts/wave32-target --name wave32-target-88eb8c6",
+      "exit": 0
+    },
+    {
+      "cmd": "node tools/bootstrap/package-personal-preview.mjs --output ... --tar ... --sha256 ... --bytes ...",
+      "exit": 0
+    },
+    {
+      "cmd": "node tools/bootstrap/verify-personal-preview.mjs --zip ... --expect-source ... --expect-build-id ... --expect-zip-sha256 ...",
+      "exit": 0,
+      "result": "VERIFIED_STATIC"
+    },
+    {
+      "cmd": "Start.command --discussion-only --port 58400 --api-port 58401 (HOME=/tmp/w32-home)",
+      "exit": 0,
+      "result": "RUNNING/health ok"
+    },
+    {
+      "cmd": "Stop.command",
+      "exit": 0,
+      "result": "STOPPED/recordRemoved"
+    },
+    {
+      "cmd": "pa backup --json --out ...",
+      "exit": 0,
+      "result": "CREATED"
+    },
+    {
+      "cmd": "pa restore --json --bundle ... --to ...",
+      "exit": 0,
+      "result": "RESTORED"
+    },
+    {
+      "cmd": "node tools/distribution/verify-upgrade-artifact.mjs --baseline R2 --target W32",
+      "exit": 0,
+      "result": "7/7 incl rollback no data loss"
+    },
+    {
+      "cmd": "support-bundle",
+      "exit": 0,
+      "result": "PASS 0600"
+    }
+  ],
+  "actualConsumers": [
+    "main tools/bootstrap package-personal-preview.mjs (unique outer packager)",
+    "outer Start/Stop/Settings/personal-preview-launcher using bundled Node and original pa",
+    "original pa backup/restore/upgrade/rollback",
+    "installed App window/export/J/F"
+  ],
+  "integrated": {
+    "inMain": [
+      "tools/bootstrap packager/launcher/verifier and original pa lifecycle"
+    ],
+    "candidateOnly": [
+      "D wave32 inner build/tar",
+      "outer ZIP",
+      "D reports/support tools"
+    ]
+  },
+  "positives": [
+    "outer static verified",
+    "cold isolated HOME start/stop",
+    "health",
+    "window13/J6/F8",
+    "nonempty backup/restore readonly",
+    "R2→W32 upgrade+rollback",
+    "portable/noexec/support"
+  ],
+  "negatives": [
+    "outer verifier rejects unsigned/mutated/zip mismatch",
+    "upgrade rollback test preserves data; no old-snapshot overwrite claim",
+    "support refuses overwrite"
+  ],
+  "remaining": [
+    "E independent verdict for outer ZIP/new inner",
+    "native/private/target/value/cross-machine/48h",
+    "signed/notarized distribution",
+    "CAC excluded"
+  ],
+  "limitations": [
+    "zero real vendor/model/native turns",
+    "same-machine Apple Silicon only",
+    "status STOPPED exits 2 by original CLI semantic",
+    "no migration of author/user state into package"
+  ]
+}

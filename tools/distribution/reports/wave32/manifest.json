@@ -1,0 +1,32 @@
+{
+  "protocol": "wave32-frozen-manifest/1",
+  "release": "W32",
+  "runtimeSource": "main 58b4e4c8 (b72e935d terminal lease,1498b07a guide)",
+  "buildCheckout": "e8348a864d7d192589e72b8099475520f841b1e5",
+  "source": "e8348a864d7d192589e72b8099475520f841b1e5",
+  "buildId": "88eb8c69b0671171",
+  "tarSha256": "65c386d108d385c1e8463de33b801a1865925d5dd752a7b82a0c57974b8453ac",
+  "tarBytes": 20543106,
+  "files": 6866,
+  "tarEntries": 7423,
+  "closure": "209/209",
+  "outer": {
+    "zip": "/Users/hh/Desktop/joker/pa-artifacts/wave32-preview-88eb8c6/PersonalAgent-Preview-88eb8c6.zip",
+    "zipSha256": "0a46cd3620e00154ea13e7286dcc73e40ffad4df4522f2339e229ffcb027bc06",
+    "zipBytes": 63475809,
+    "manifestSha256": "c93e3450561bbb2f669fdf3c4429e8df8c36e74d03f1b3d65f329b4abe10765f",
+    "archiveEntries": 7434,
+    "runtime": {
+      "version": "24.21.0",
+      "sha256": "e4b5a3af0e05c75de2eae013904145f40fe7fc2a6e6f17510128bf45cca4e79b"
+    }
+  },
+  "environment": {
+    "node": "24.21.0",
+    "abi": "137",
+    "platform": "darwin",
+    "arch": "arm64",
+    "sqlite": "3.53.4",
+    "productSchema": 18
+  }
+}

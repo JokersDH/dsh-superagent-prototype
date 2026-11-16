@@ -1,0 +1,48 @@
+{
+  "protocol": "personal-agent-preview-verification/1",
+  "status": "VERIFIED_STATIC",
+  "manifestSha256": "c93e3450561bbb2f669fdf3c4429e8df8c36e74d03f1b3d65f329b4abe10765f",
+  "source": "e8348a864d7d192589e72b8099475520f841b1e5",
+  "buildId": "88eb8c69b0671171",
+  "predecessor": false,
+  "outer": {
+    "entries": 6874,
+    "regularFiles": 6851,
+    "internalLinks": 23,
+    "bytes": 192478145
+  },
+  "inner": {
+    "entries": 6866,
+    "regularFiles": 6843,
+    "internalLinks": 23,
+    "manifestSha256": "0f22678f74a2a3a5a7530dcdfc8fe58d051061108b15e123c6ad03e6b2f2bd71",
+    "originalTarSha256": "65c386d108d385c1e8463de33b801a1865925d5dd752a7b82a0c57974b8453ac",
+    "originalTarBytes": 20543106
+  },
+  "runtime": {
+    "version": "24.21.0",
+    "abi": "137",
+    "arch": "arm64",
+    "sha256": "e4b5a3af0e05c75de2eae013904145f40fe7fc2a6e6f17510128bf45cca4e79b",
+    "licenseSha256": "5888dbb9a1d2b18f2c3e6c5f6af1b39de658372b402a0577b002777f14c62ace"
+  },
+  "commandTemplatesExact": true,
+  "reviewedLauncherSha256": "8de31c59d8c9afe90d6464a9b9208d3757a57e76ea49d7af20e473b90360c5dc",
+  "userDataPathsAndKnownCredentialFormsChecked": true,
+  "limitation": "Static integrity, pinned entry/runtime bytes and manifest consistency only. Original tar identity is recorded, not re-derived from an expanded directory. No package code, runtime version probe, service, model or native task was executed. This is not a signature, release approval or functional startup verdict.",
+  "servicesStarted": 0,
+  "modelNativeTurns": 0,
+  "signals": 0,
+  "releaseApproved": false,
+  "archive": {
+    "sha256": "0a46cd3620e00154ea13e7286dcc73e40ffad4df4522f2339e229ffcb027bc06",
+    "bytes": 63475809,
+    "root": "PersonalAgent-Preview-88eb8c6",
+    "entries": 7434,
+    "expandedBytes": 194116963,
+    "crcChecked": true
+  },
+  "externallyExpectedSource": "e8348a864d7d192589e72b8099475520f841b1e5",
+  "externallyExpectedBuildId": "88eb8c69b0671171",
+  "externallyExpectedArchiveHash": "0a46cd3620e00154ea13e7286dcc73e40ffad4df4522f2339e229ffcb027bc06"
+}
