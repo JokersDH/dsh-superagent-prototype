@@ -59,10 +59,10 @@ try {
   const clientB = attachRunnerAttempt({ endpoint: registered, producer: context, leaseId: 'lease-attach-b', callbacks: { fact: async fact => { factIdsB.push(fact.factId); seq += 1; return { factId: fact.factId, persisted: true, seq } }, nativeWrite: async () => ({ allowed: false, reason: 'fixture has no native target' }) } })
   const runB = clientB.run({ pollMs: 15, deadlineMs: 10000 })
   for (let index = 0; index < 200 && clientB.generation <= clientA.generation; index += 1) await seconds(10)
-  // The original answer/delivery keep their ids and advance the same attempt; B serves whatever the
-  // Runner raises afterwards, on this same process and session.
-  await runner.command(makeCommand('answer', { id: 'cmd-attach-answer', nativeBindingRef: 'binding-attach', answerRef: 'answer-attach' })).catch(() => undefined)
-  await runner.command(makeCommand('deliver', { id: 'cmd-attach-deliver', inputRef: 'input-attach' })).catch(() => undefined)
+  // The original answer/delivery keep their ids and are fed through the ATTACHED caller's feed transport
+  // (the original command intake), not through a second lifecycle.
+  await clientB.feed(makeCommand('answer', { id: 'cmd-attach-answer', nativeBindingRef: 'binding-attach', answerRef: 'answer-attach' })).catch(() => undefined)
+  await clientB.feed(makeCommand('deliver', { id: 'cmd-attach-deliver', inputRef: 'input-attach' })).catch(() => undefined)
   for (let index = 0; index < 500 && clientB.served.facts === 0; index += 1) await seconds(10)
   log.evidence({ served: clientB.served, factIdsB, stdioFacts: stdioFacts.length, attempt: spec.attemptId, generation: clientB.generation })
   if (clientB.generation > clientA.generation && clientB.served.facts >= 1 && stdioFacts.length === 0) log.pass(`client B bound generation ${clientB.generation} and served ${clientB.served.facts} callback(s) on attempt ${spec.attemptId} with original fact ids; stdio sink 0`)

@@ -23,15 +23,19 @@
   ],
   "outcomes": {
     "birth_and_original_three_callbacks": {
-      "status": "PARTIAL (unforgeable birth COMPLETE; original Store/native-guard callbacks proven through main's real consumer; original Application/QuestionBroker authority still preseeded)",
+      "status": "PARTIAL (unforgeable birth COMPLETE; three callback kinds proven through main's real Store ingress/payload/native guard; original Application-created Work/QuestionBroker authority still NOT_REACHED)",
       "birth": "adoptSpawn accepts ONLY a real ChildProcess (instanceof) and derives intent from its own spawnfile/spawnargs; a plain object with copied spawn metadata -> not_a_child_process, a numeric pid -> numeric_pid_not_accepted, a copied/edited handle -> unknown_handle, and the tool's own spawn refuses a root/config/op token it did not issue. Complete child plan checked on every signal; UNKNOWN retained.",
       "callbacks": "main-owned tests/integration/attached-port.case.mjs consumes B's attachRunnerAttempt with a real ProductStore ingress + stored immutable payload + controlled nativeWrite guard: 4/4 PASS. It proves the Store payload/receipt identity for allow and deny decisions and refuses a foreign fact before any authoritative receipt or write admission.",
       "commands": [
         "node tests/native-acceptance/b28-signal.mjs -> exit 0, 10 PASS/0 FAIL/1 NOT_TESTED",
         "node tests/native-acceptance/b27-sigkill.mjs -> exit 0, 7/0/1",
         "node tests/native-acceptance/b27-chain.mjs -> exit 0, 4/0/1",
-        "node --test tests/integration/attached-port.case.mjs -> exit 0, 4/4"
-      ]
+        "node --test tests/integration/attached-port.case.mjs -> exit 0, 4/4",
+        "node --test apps/runner/test/attached-caller-native.test.ts -> exit 0, 3/3",
+        "node tests/native-acceptance/b31-attached-consumer.mjs -> exit 0, 3/0/1"
+      ],
+      "caller_native_rule": "packages/execution/src/attached-attempt.ts exports resolveNativeDecision: the caller guard is awaited and only an explicit {allowed:true} authorizes; void, denial, throw and a missing guard all become allowed:false. Verified by apps/runner/test/attached-caller-native.test.ts 3/3 (awaited, not cached).",
+      "feed": "AttachedAttempt.feed()/cancel() delegate to the original command/cancel transports on the SAME attempt (no new lifecycle). b31 now feeds the original answer/delivery commands through client B's feed and still serves the original fact on the same attempt (3 PASS/0 FAIL/1 NT)."
     },
     "same_work_interrupt_to_delivery": {
       "status": "NOT_REACHED",
@@ -47,13 +51,13 @@
   "verification": {
     "root_tsc": "exit 0",
     "attached_tsc": "exit 0",
-    "runner_tests": "147 pass / 0 fail",
+    "runner_tests": "150 pass / 0 fail (includes the new fail-closed guard test)",
     "attached_port_case": "4 pass / 0 fail",
     "b33_slots": "7/0",
     "b28_signal": "10/0/1",
     "b27_sigkill": "7/0/1",
     "b27_chain": "4/0/1",
-    "b31_attach": "3/0/1",
+    "b31_attach": "3/0/1 (feed transport + dual client)",
     "b32_late": "3/0/1"
   },
   "scope": {
@@ -67,5 +71,6 @@
       "real vendor/model/native turn",
       "installed product"
     ]
-  }
+  },
+  "changed_paths_note": "packages/execution/src/attempt-slots.ts, packages/execution/src/attached-attempt.ts, apps/runner/test/attached-caller-native.test.ts, tests/native-acceptance/b31-attached-consumer.mjs, b33-slots.mjs, signal-guard/b28-signal"
 }
