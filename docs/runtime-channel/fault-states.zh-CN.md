@@ -9,6 +9,7 @@
 | **lease 替换**（合法继任） | 新连接显式 CAS `expectedGeneration` 绑定 | 保留原 id/引用，向新 lease 重发，窗口不刷新 | 立即 `indeterminate`，不迁移 | 旧 lease 的 next/reply 被拒（structural fence） |
 | **临时 detach**（attempt 仍 running） | 连接消失，但没有终态 finish | 保留，等待重接 | `indeterminate` | 旧连接 0 效果；新连接可继续 |
 | **terminal close**（服务终态） | driver 结束或 `shutdown` → main `finish()` 调 `attach.close()` | 以 `closed` 拒绝 | 以 `indeterminate` 拒绝 | next → `stale_connection/channel_closed`；reply → 409 `stale_lease`；0 效果 |
+| **input EOF**（不是 shutdown） | 只关闭 stdin/输入，无协议 shutdown 帧 | 保持 pending/unknown | 保持 pending | 不产生 `exited`、不伪造 ACK；需显式 terminal 才结算 |
 
 实测（main `b72e935d` 的 terminal fence）：
 

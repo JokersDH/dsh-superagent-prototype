@@ -54,7 +54,7 @@ Native Driver ──facts/payloads──▶ AttemptIO
 
 ```bash
 cd apps/runner
-node --test --test-timeout=60000 test/attach-channel/*.test.ts     # 147/147
+node --test --test-timeout=60000 test/attach-channel/*.test.ts     # 159/159
 node_modules/.bin/tsc -p apps/runner/src/attach-channel/tsconfig.json
 ```
 
@@ -76,6 +76,11 @@ node_modules/.bin/tsc -p apps/runner/src/attach-channel/tsconfig.json
 | `actual-main-port-consumer.test.ts` | main `AttachedAttemptPort` + `attachRunnerAttempt` + 真实 Store ingress/payload/guard | 4 例 |
 | `actual-caller-succession.test.ts` | 两个真实 caller 的继任、未决写 indeterminate、terminal closed | 3 例 |
 | `actual-pressure-diagnostics.test.ts` | 慢 Store、typed ack-failure、64 饱和恢复、四端点隔离 | 4 例 |
+| `actual-native-callbacks.test.ts` | 原 class `recordFact`/`readPayload`/`nativeWriteDecision` 作为回调 | 3 例 |
+| `actual-guard-and-command.test.ts` | void/throw/late guard 分层、命令传输与 callback generation 独立 | 3 例 |
+| `actual-native-succession.test.ts` | 原方法 caller 继任、terminal vs EOF | 2 例 |
+| `actual-native-pressure.test.ts` | 原 sink 慢/拒绝、缺失 local payload、64 饱和 | 3 例 |
+| `actual-run-handoff.test.ts` | 同 run handoff 记录（原 ID/receipt/nonce/资源/scope） | 1 例 |
 
 ## 5. 错误处理示例
 
@@ -131,6 +136,38 @@ await attached.run({ pollMs: 25, deadlineMs })   // 或 pollOnce()
 - `payload` 回调收到的是 `reference`，返回值必须是**原 JSON body**；journal descriptor/chunk 是另一条协议。
 - `nativeWrite` 缺省即拒绝；回调内部异常会转成 ack-failure，不会伪造 receipt/allow。
 - 拒绝由 `NativeWriteDenied` 表示；用 `instanceof` 判定或 `toAttachFailure` 归一为 `native_write_denied`。错误对象字段形状保持原样，main 现有 consumer 的观测字符串不变。
+
+## 5.0b 原 class 方法（`attachCallbacks` 的实现）
+
+main `23d5a98e` 把原 stdio 闭包提成 `NativeProductAttempt` 的方法，`RunningAttempt.attachCallbacks` 只是它们的薄包装：
+
+| 方法 | 语义 | 拒绝示例 |
+| --- | --- | --- |
+| `recordFact(incoming, localPayloadStore, prepared)` | 校验 attempt/source → 原 immutable payload 复制与身份一致 → 原注册 → 原 sink 回执 → policy-prepared | foreign source、payload 身份变化、sink 拒绝 |
+| `readPayload(reference)` | 原 immutable payload 读取（环境计划前会 register 并核 current） | 未知引用、current 失效 |
+| `beforeNativeWrite(command)` | 原 current + product-command 精确摘要 + live answerWrites 一次性准入；**成功为 void** | 未索引、无 admission、错 body、current 变化、admission 抛错 |
+| `nativeWriteDecision(command)` | 仅在上面的守卫成功后返回 `{allowed:true}`，否则 false | 同上 |
+
+**分层规则**：`beforeNativeWrite` 的 void 成功只有在显式 wrapper（main 的 decision）里才变成 `{allowed:true}`；通信层收到裸 void 回调时必须视为**没有允许**（实测为主叫方 typed 拒绝，driver 零写）。错误对象形状保持不变（`NativeWriteDenied` 用 `instanceof`/`toAttachFailure` 判定），以免改变 main 现有消费者的观测字符串。
+
+**运行方式（测试/受控）**：`attachCallbacks` 只在 `launch()` 后返回，而 `launch()` 会 spawn 原生 Runner。I 的消费者因此直接构造同一个类，并把 in-process 服务已注册的 endpoint 注入为 post-registration 状态（等价于 `launch()` 已建立的状态），**不 spawn、不 launch**；生产接线仍由 main/B 负责。
+
+## 5.0c 同 run handoff 记录
+
+`actual-run-handoff.test.ts` 产出的 `RunHandoffRecord` 形状：
+
+```
+attempt {ticketId, assignmentId, attemptId, fenceEpoch, contractDigest}
+producer {source, runnerIdentityRef}
+leaseGenerations [1, 2]
+facts [{factId, receiptSeq, storeRowSeq}]
+payloads [{reference, readByOriginal}]
+intents [{nonce, commandId, decision, guardCalls}]
+resources {channelServed{facts,payloads,nativeWrites,errors,refused}, storeFacts, sinkCalls}
+scope {applicationWork:NOT_REACHED, questionBroker:NOT_REACHED, native:NOT_TESTED, recoveredCandidate:NOT_REACHED, slotRelease:NOT_REACHED, installed:NOT_INSTALLED}
+```
+
+核对点：`receiptSeq === storeRowSeq`、`nonce !== commandId`、generation 单调、guard 每意图一次；记录只陈述已观测事实，不给候选/接受/物理结论。
 
 ## 5.1 terminal 与 detach
 

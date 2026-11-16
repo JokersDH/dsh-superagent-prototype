@@ -186,6 +186,14 @@ export async function startService(t: TestContext, options: ServiceOptions = {})
     payloadReads,
     done,
     send,
+    /** Close the input side only (EOF), without a protocol shutdown frame. */
+    inputEnd: () => {
+      try {
+        input.end()
+      } catch {
+        // already ended
+      }
+    },
     boot,
     command,
     waitEndpoint,
