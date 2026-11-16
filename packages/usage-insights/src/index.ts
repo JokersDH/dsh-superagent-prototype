@@ -107,3 +107,6 @@ export {
   observedOutcomeCount, toInsightConsumerView,
 } from './facing.ts'
 export type { ConsumerViewOptions, InsightConsumerLayer, InsightConsumerMetric, InsightConsumerScope, InsightConsumerView } from './facing.ts'
+export { buildSupportReport } from './support.ts'
+export type { SupportReport } from './support.ts'
+export { buildSupportFile, readSupportDocument, readSupportFile, supportLabels } from './support-port.ts'

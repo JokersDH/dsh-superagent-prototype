@@ -1,0 +1,971 @@
+{
+  "$defs": {
+    "UsageSupportDownload": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "bytes": {
+          "maximum": 65536,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "fileName": {
+          "pattern": "^support-(7|30)d-([a-f0-9]{12}|no-snapshot)-[A-Za-z0-9._-]{1,64}\\.json$",
+          "type": "string"
+        },
+        "mediaType": {
+          "const": "application/json",
+          "type": "string"
+        },
+        "protocol": {
+          "const": "usage-support-download/1",
+          "type": "string"
+        },
+        "report": {
+          "additionalProperties": false,
+          "properties": {
+            "authorization": {
+              "const": "none",
+              "type": "string"
+            },
+            "counts": {
+              "additionalProperties": false,
+              "properties": {
+                "rows": {
+                  "maximum": 9007199254740991,
+                  "minimum": -9007199254740991,
+                  "type": "integer"
+                },
+                "sampleCount": {
+                  "anyOf": [
+                    {
+                      "maximum": 9007199254740991,
+                      "minimum": -9007199254740991,
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "unknown": {
+                  "maximum": 9007199254740991,
+                  "minimum": -9007199254740991,
+                  "type": "integer"
+                },
+                "withValue": {
+                  "maximum": 9007199254740991,
+                  "minimum": -9007199254740991,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "rows",
+                "withValue",
+                "unknown",
+                "sampleCount"
+              ],
+              "type": "object"
+            },
+            "coverage": {
+              "enum": [
+                "完整覆盖",
+                "部分覆盖",
+                "未声明"
+              ],
+              "type": "string"
+            },
+            "coverageState": {
+              "enum": [
+                "complete",
+                "partial",
+                "unknown"
+              ],
+              "type": "string"
+            },
+            "days": {
+              "anyOf": [
+                {
+                  "const": 7,
+                  "type": "number"
+                },
+                {
+                  "const": 30,
+                  "type": "number"
+                }
+              ]
+            },
+            "documentKind": {
+              "const": "observation",
+              "type": "string"
+            },
+            "evidence": {
+              "additionalProperties": false,
+              "properties": {
+                "absentFacts": {
+                  "items": {
+                    "pattern": "^(?:\\d+ row\\(s\\) have no observed value|the observation is partial|coverage is unknown|the observation is unavailable|the header sample count is not established)$",
+                    "type": "string"
+                  },
+                  "maxItems": 5,
+                  "type": "array"
+                },
+                "coverageState": {
+                  "enum": [
+                    "complete",
+                    "partial",
+                    "unknown"
+                  ],
+                  "type": "string"
+                },
+                "partial": {
+                  "type": "boolean"
+                },
+                "rowsWithValue": {
+                  "maximum": 9007199254740991,
+                  "minimum": -9007199254740991,
+                  "type": "integer"
+                },
+                "rowsWithoutValue": {
+                  "maximum": 9007199254740991,
+                  "minimum": -9007199254740991,
+                  "type": "integer"
+                },
+                "sampleCount": {
+                  "anyOf": [
+                    {
+                      "maximum": 9007199254740991,
+                      "minimum": -9007199254740991,
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "coverageState",
+                "rowsWithValue",
+                "rowsWithoutValue",
+                "sampleCount",
+                "partial",
+                "absentFacts"
+              ],
+              "type": "object"
+            },
+            "exportCapability": {
+              "enum": [
+                "present",
+                "absent",
+                "unverified"
+              ],
+              "type": "string"
+            },
+            "limitations": {
+              "items": {
+                "enum": [
+                  "部分指标没有可核对值。",
+                  "当前观察不完整。",
+                  "当前范围未提供观察。"
+                ],
+                "type": "string"
+              },
+              "maxItems": 3,
+              "type": "array"
+            },
+            "note": {
+              "const": "Display document: the served values are formatted strings. This summary carries metadata only; it is not a numeric analysis result.",
+              "type": "string"
+            },
+            "numericValues": {
+              "const": false,
+              "type": "boolean"
+            },
+            "observationProtocol": {
+              "const": "usage-observation/1",
+              "type": "string"
+            },
+            "observedAt": {
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+              "type": "string"
+            },
+            "origin": {
+              "anyOf": [
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "archiveSha256": {
+                      "anyOf": [
+                        {
+                          "pattern": "^[a-f0-9]{64}$",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "browserTrigger": {
+                      "anyOf": [
+                        {
+                          "enum": [
+                            "present",
+                            "absent",
+                            "unverifiable"
+                          ],
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "buildId": {
+                      "anyOf": [
+                        {
+                          "pattern": "^[A-Za-z0-9._-]{1,64}$",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "capabilities": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "displayDownload": {
+                              "type": "boolean"
+                            },
+                            "numericExport": {
+                              "type": "boolean"
+                            },
+                            "pageObservation": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "pageObservation",
+                            "numericExport",
+                            "displayDownload"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "identitySource": {
+                      "anyOf": [
+                        {
+                          "enum": [
+                            "install-manifest",
+                            "incomplete-manifest",
+                            "archive-only"
+                          ],
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "kind": {
+                      "enum": [
+                        "package",
+                        "runtime",
+                        "unknown"
+                      ],
+                      "type": "string"
+                    },
+                    "missing": {
+                      "items": {
+                        "enum": [
+                          "pageObservation",
+                          "numericExport",
+                          "displayDownload"
+                        ],
+                        "type": "string"
+                      },
+                      "maxItems": 3,
+                      "type": "array"
+                    },
+                    "sourceCommit": {
+                      "anyOf": [
+                        {
+                          "pattern": "^[a-f0-9]{40}$",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "identitySource",
+                    "buildId",
+                    "sourceCommit",
+                    "archiveSha256",
+                    "capabilities",
+                    "browserTrigger",
+                    "missing"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "protocol": {
+              "const": "usage-insights-support-summary/1",
+              "type": "string"
+            },
+            "rows": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "hasValue": {
+                    "type": "boolean"
+                  },
+                  "layer": {
+                    "enum": [
+                      "observed",
+                      "controlled",
+                      "native",
+                      "operator",
+                      "unknown"
+                    ],
+                    "type": "string"
+                  },
+                  "rowId": {
+                    "maxLength": 160,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "sampleCount": {
+                    "anyOf": [
+                      {
+                        "maximum": 9007199254740991,
+                        "minimum": -9007199254740991,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "unit": {
+                    "maxLength": 16,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "rowId",
+                  "layer",
+                  "unit",
+                  "hasValue",
+                  "sampleCount"
+                ],
+                "type": "object"
+              },
+              "maxItems": 32,
+              "type": "array"
+            },
+            "scope": {
+              "additionalProperties": false,
+              "properties": {
+                "aggregation": {
+                  "enum": [
+                    "single_project",
+                    "declared_multi_project",
+                    "cross_project"
+                  ],
+                  "type": "string"
+                },
+                "label": {
+                  "maxLength": 128,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "projectIds": {
+                  "items": {
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                    "type": "string"
+                  },
+                  "maxItems": 32,
+                  "readOnly": true,
+                  "type": "array"
+                }
+              },
+              "required": [
+                "projectIds",
+                "aggregation",
+                "label"
+              ],
+              "type": "object"
+            },
+            "status": {
+              "enum": [
+                "ready",
+                "insufficient_data",
+                "unavailable"
+              ],
+              "type": "string"
+            },
+            "summaryId": {
+              "anyOf": [
+                {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "timezone": {
+              "maxLength": 64,
+              "minLength": 1,
+              "type": "string"
+            },
+            "window": {
+              "additionalProperties": false,
+              "properties": {
+                "from": {
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                  "type": "string"
+                },
+                "to": {
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "from",
+                "to"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "protocol",
+            "observationProtocol",
+            "documentKind",
+            "status",
+            "summaryId",
+            "observedAt",
+            "days",
+            "timezone",
+            "window",
+            "scope",
+            "coverage",
+            "coverageState",
+            "counts",
+            "rows",
+            "limitations",
+            "numericValues",
+            "note",
+            "authorization",
+            "origin",
+            "evidence",
+            "exportCapability"
+          ],
+          "type": "object"
+        },
+        "sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "text": {
+          "maxLength": 65536,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "protocol",
+        "report",
+        "fileName",
+        "mediaType",
+        "text",
+        "bytes",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "UsageSupportReport": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "authorization": {
+          "const": "none",
+          "type": "string"
+        },
+        "counts": {
+          "additionalProperties": false,
+          "properties": {
+            "rows": {
+              "maximum": 9007199254740991,
+              "minimum": -9007199254740991,
+              "type": "integer"
+            },
+            "sampleCount": {
+              "anyOf": [
+                {
+                  "maximum": 9007199254740991,
+                  "minimum": -9007199254740991,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "unknown": {
+              "maximum": 9007199254740991,
+              "minimum": -9007199254740991,
+              "type": "integer"
+            },
+            "withValue": {
+              "maximum": 9007199254740991,
+              "minimum": -9007199254740991,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "rows",
+            "withValue",
+            "unknown",
+            "sampleCount"
+          ],
+          "type": "object"
+        },
+        "coverage": {
+          "enum": [
+            "完整覆盖",
+            "部分覆盖",
+            "未声明"
+          ],
+          "type": "string"
+        },
+        "coverageState": {
+          "enum": [
+            "complete",
+            "partial",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "days": {
+          "anyOf": [
+            {
+              "const": 7,
+              "type": "number"
+            },
+            {
+              "const": 30,
+              "type": "number"
+            }
+          ]
+        },
+        "documentKind": {
+          "const": "observation",
+          "type": "string"
+        },
+        "evidence": {
+          "additionalProperties": false,
+          "properties": {
+            "absentFacts": {
+              "items": {
+                "pattern": "^(?:\\d+ row\\(s\\) have no observed value|the observation is partial|coverage is unknown|the observation is unavailable|the header sample count is not established)$",
+                "type": "string"
+              },
+              "maxItems": 5,
+              "type": "array"
+            },
+            "coverageState": {
+              "enum": [
+                "complete",
+                "partial",
+                "unknown"
+              ],
+              "type": "string"
+            },
+            "partial": {
+              "type": "boolean"
+            },
+            "rowsWithValue": {
+              "maximum": 9007199254740991,
+              "minimum": -9007199254740991,
+              "type": "integer"
+            },
+            "rowsWithoutValue": {
+              "maximum": 9007199254740991,
+              "minimum": -9007199254740991,
+              "type": "integer"
+            },
+            "sampleCount": {
+              "anyOf": [
+                {
+                  "maximum": 9007199254740991,
+                  "minimum": -9007199254740991,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "coverageState",
+            "rowsWithValue",
+            "rowsWithoutValue",
+            "sampleCount",
+            "partial",
+            "absentFacts"
+          ],
+          "type": "object"
+        },
+        "exportCapability": {
+          "enum": [
+            "present",
+            "absent",
+            "unverified"
+          ],
+          "type": "string"
+        },
+        "limitations": {
+          "items": {
+            "enum": [
+              "部分指标没有可核对值。",
+              "当前观察不完整。",
+              "当前范围未提供观察。"
+            ],
+            "type": "string"
+          },
+          "maxItems": 3,
+          "type": "array"
+        },
+        "note": {
+          "const": "Display document: the served values are formatted strings. This summary carries metadata only; it is not a numeric analysis result.",
+          "type": "string"
+        },
+        "numericValues": {
+          "const": false,
+          "type": "boolean"
+        },
+        "observationProtocol": {
+          "const": "usage-observation/1",
+          "type": "string"
+        },
+        "observedAt": {
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+          "type": "string"
+        },
+        "origin": {
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "archiveSha256": {
+                  "anyOf": [
+                    {
+                      "pattern": "^[a-f0-9]{64}$",
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "browserTrigger": {
+                  "anyOf": [
+                    {
+                      "enum": [
+                        "present",
+                        "absent",
+                        "unverifiable"
+                      ],
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "buildId": {
+                  "anyOf": [
+                    {
+                      "pattern": "^[A-Za-z0-9._-]{1,64}$",
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "capabilities": {
+                  "anyOf": [
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "displayDownload": {
+                          "type": "boolean"
+                        },
+                        "numericExport": {
+                          "type": "boolean"
+                        },
+                        "pageObservation": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "pageObservation",
+                        "numericExport",
+                        "displayDownload"
+                      ],
+                      "type": "object"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "identitySource": {
+                  "anyOf": [
+                    {
+                      "enum": [
+                        "install-manifest",
+                        "incomplete-manifest",
+                        "archive-only"
+                      ],
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "kind": {
+                  "enum": [
+                    "package",
+                    "runtime",
+                    "unknown"
+                  ],
+                  "type": "string"
+                },
+                "missing": {
+                  "items": {
+                    "enum": [
+                      "pageObservation",
+                      "numericExport",
+                      "displayDownload"
+                    ],
+                    "type": "string"
+                  },
+                  "maxItems": 3,
+                  "type": "array"
+                },
+                "sourceCommit": {
+                  "anyOf": [
+                    {
+                      "pattern": "^[a-f0-9]{40}$",
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "kind",
+                "identitySource",
+                "buildId",
+                "sourceCommit",
+                "archiveSha256",
+                "capabilities",
+                "browserTrigger",
+                "missing"
+              ],
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "protocol": {
+          "const": "usage-insights-support-summary/1",
+          "type": "string"
+        },
+        "rows": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "hasValue": {
+                "type": "boolean"
+              },
+              "layer": {
+                "enum": [
+                  "observed",
+                  "controlled",
+                  "native",
+                  "operator",
+                  "unknown"
+                ],
+                "type": "string"
+              },
+              "rowId": {
+                "maxLength": 160,
+                "minLength": 1,
+                "type": "string"
+              },
+              "sampleCount": {
+                "anyOf": [
+                  {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "unit": {
+                "maxLength": 16,
+                "type": "string"
+              }
+            },
+            "required": [
+              "rowId",
+              "layer",
+              "unit",
+              "hasValue",
+              "sampleCount"
+            ],
+            "type": "object"
+          },
+          "maxItems": 32,
+          "type": "array"
+        },
+        "scope": {
+          "additionalProperties": false,
+          "properties": {
+            "aggregation": {
+              "enum": [
+                "single_project",
+                "declared_multi_project",
+                "cross_project"
+              ],
+              "type": "string"
+            },
+            "label": {
+              "maxLength": 128,
+              "minLength": 1,
+              "type": "string"
+            },
+            "projectIds": {
+              "items": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                "type": "string"
+              },
+              "maxItems": 32,
+              "readOnly": true,
+              "type": "array"
+            }
+          },
+          "required": [
+            "projectIds",
+            "aggregation",
+            "label"
+          ],
+          "type": "object"
+        },
+        "status": {
+          "enum": [
+            "ready",
+            "insufficient_data",
+            "unavailable"
+          ],
+          "type": "string"
+        },
+        "summaryId": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "timezone": {
+          "maxLength": 64,
+          "minLength": 1,
+          "type": "string"
+        },
+        "window": {
+          "additionalProperties": false,
+          "properties": {
+            "from": {
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+              "type": "string"
+            },
+            "to": {
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "from",
+            "to"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "protocol",
+        "observationProtocol",
+        "documentKind",
+        "status",
+        "summaryId",
+        "observedAt",
+        "days",
+        "timezone",
+        "window",
+        "scope",
+        "coverage",
+        "coverageState",
+        "counts",
+        "rows",
+        "limitations",
+        "numericValues",
+        "note",
+        "authorization",
+        "origin",
+        "evidence",
+        "exportCapability"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:personal-agent:usage-support:1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}
