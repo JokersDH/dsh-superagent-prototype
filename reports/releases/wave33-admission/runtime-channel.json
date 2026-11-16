@@ -1,0 +1,236 @@
+{
+  "protocol": "wave33-runtime-channel-admission/1",
+  "date": "2026-11-16",
+  "status": "OLD_PAYLOAD_NUMERIC_PID_HANDLE_COPY_AND_H_COMMAND_CASES_CLOSED_INTERNAL_MAIN_PORT_ADMITTED_RECOVERY_PRODUCT_NOT_REACHED_B_SPAWN_PROVENANCE_RESIDUAL",
+  "scope": "Accept latest wave32 runtime/channel/support sources and provide the minimum safe main integration. No new task package, unsafe fault run, model/native turn, global discovery or candidate source/assertion/lock edit.",
+  "fixedCandidates": {
+    "B": {
+      "root": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "source": "f4a99ce1fa1ac822659d734196733990d8fa3a2e",
+      "branch": "codex/g1-runtime",
+      "dirtyPreserved": [
+        "reports/releases/wave11-admission/runtime.json",
+        "reports/releases/wave12-admission/runtime.json",
+        "tests/native-acceptance/b16-real-begin.mjs (untracked)"
+      ]
+    },
+    "H": {
+      "root": "/Users/hh/Desktop/joker/superagent-agent-h",
+      "source": "0cc2db471dd2f40954300104a8c60e2853cc507b",
+      "branch": "codex/g4-trial-operations",
+      "dirty": []
+    },
+    "I": {
+      "root": "/Users/hh/Desktop/joker/superagent-agent-i",
+      "source": "44d5390582d5a236c066b4fa7f2064e9d56e2633",
+      "branch": "codex/g5-coordinator-channel",
+      "dirty": []
+    }
+  },
+  "main": {
+    "headAtReviewStart": "58b4e4c804291cf414c91a76b4b784a917d2dfba",
+    "terminalRuntimeBlob": "0201f38396f4d3b23039de1c72ae189e2206488d",
+    "terminalFinding": "CLOSED_BY_PRIOR_MAIN_FIX; not reassigned or reopened",
+    "sourceAtStart": "Earlier seven-file communication closure and terminal close are already in main. New B attached caller and optional internal port were absent at the start.",
+    "workingTreeIntegrationDuringReview": {
+      "owner": "main, not this review agent",
+      "nativeAttemptBlob": "2707b67c7098959414266920b937c4090b961d07",
+      "attachedCallerBlob": "5a2f8731f61ca1e8cbb3a13c0d38b96a47ec322d",
+      "contractsBlob": "bc7c0dc7ae944a6dd31cd903d1dffe454f881f39",
+      "testBlob": "61bb1929ce8f218065a5140fd041b647c2e17a9a",
+      "nativeExposure": "After existing register(), preparation ready and current() check, require existing endpoint and return structuredClone({registration:endpoint,producer:this.producer}) as optional RunningAttempt.attachPort.",
+      "authority": "Node-internal data only; no HTTP DTO, no new registration, no command creation, no auto attach/start and no change to original current-command digest/live answer write guard.",
+      "productRecovery": "This supplies the previously missing main registration data port. It is not an attached ProductExecution/QuestionBroker consumer or a proof of business recovery."
+    }
+  },
+  "closedPriorFindings": [
+    {
+      "id": "B32-ATTACHED-PAYLOAD-REFERENCE-AND-VALUE-MISMATCH",
+      "status": "CLOSED_IN_ACTUAL_MAIN_SERVICE_NEW_CALLER_CONSUMER",
+      "detail": "The callback now receives payload-read.reference and returns the original JSON body as value. The separate journal chunk protocol is not substituted. Actual main service + B caller + real Store ingress allowed/denied/missing-guard probes pass, then a main-only repository integration test passes4/4."
+    },
+    {
+      "id": "B32-NUMERIC-PID-ADOPTION-STILL-NOT-SPAWN-ORIGIN",
+      "status": "CLOSED_FOR_NUMERIC_PID_INPUT_RESIDUAL_OBJECT_PROVENANCE_BELOW",
+      "detail": "The exact previous numeric PID plus complete copied argv counterexample now refuses numeric_pid_not_accepted with zero mocked signals. Full independent spawn-origin admission is still not established because a plain object with copied spawn metadata is accepted."
+    },
+    {
+      "id": "B32-COPIED-HANDLE-RETAINS-AUTHORITY",
+      "status": "CLOSED_EXACT_LITERAL_COPY_CASE",
+      "detail": "lookup now requires the exact registered handle object. A literal {...originalHandle} using unchanged handleId and record refuses unknown_handle and signals zero."
+    },
+    {
+      "id": "H32-LAUNCH-COMMAND-NOT-COMPARED",
+      "status": "CLOSED_INDEPENDENT_COMPLETE_COMMAND_NEGATIVE",
+      "detail": "The independent executable/ordered argv launch command is compared before registration and fresh signaling. Same PID/UID/PPID/start plus valid birth but a wholly different observed script/root/config/operation now refuses identity_mismatch with launch_command_mismatch and zero signals. Correct full command still permits the intended mocked signal."
+    },
+    {
+      "id": "H31-INCOMPLETE-BIRTH-CLEANUP-SIGNAL",
+      "status": "REMAINS_CLOSED",
+      "detail": "UNKNOWN/no birth retains material with signalSent=false; child.kill and process.kill spies remain0."
+    },
+    {
+      "id": "MAIN32-TERMINAL-REMOTE-LEASE-STILL-SETTLES",
+      "status": "ALREADY_CLOSED_IN_MAIN58_SOURCE",
+      "detail": "Prior main finish() closes the public attach channel, refuses terminal rebind and settles fact/payload closed and native intent indeterminate. I's new terminal/detach consumers consume that existing fix. Do not redispatch the repair or treat B's redundant guard/cache as a required production replacement."
+    }
+  ],
+  "checks": [
+    {
+      "command": "node /tmp/pa-wave32-signal-pure.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "probeMetadata": "Updated exact B/H wave33 subjects before execution; historical filename is not reused historical output",
+      "exitCode": 1,
+      "passed": 8,
+      "failed": 1,
+      "scope": "Actual latest B/H helpers, fully injected spawn/ps/pgrep/kill; only exact private mock birth files. All process operations are mocks.",
+      "realProcessSpawns": 0,
+      "realSignals": 0,
+      "psOrDiscovery": 0,
+      "observed": {
+        "originalBSpawnPositive": "PASS",
+        "oldNumericPID": "refused, no_handle after numeric_pid_not_accepted, zero mock signals",
+        "literalCopiedBHandle": "refused unknown_handle, zero mock signals",
+        "changedBArgvOrUNKNOWN": "refused and not exited",
+        "HUnknownBirth": "retained observation_unknown, childKill0/processKill0",
+        "HOriginalCompleteCommand": "PASS positive; copied handle refused",
+        "HForeignCompleteCommand": "refused identity_mismatch/launch_command_mismatch, zero signals",
+        "unspawnedPlainMetadataObject": "FAIL: registered true with no spawn calls; mocked SIGKILL to45102"
+      }
+    },
+    {
+      "command": "node /tmp/pa-wave33-attached-three-callbacks.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "exitCode": 0,
+      "passed": 3,
+      "failed": 0,
+      "subjects": "main58 service + Bf4a caller + I44d real Store ingress fixture helper",
+      "scope": "Actual in-process service/auth endpoint, real ProductStore/createStoredRuntimeIngress with preseeded ticket/binding; explicit controlled native decision, not original Application/QuestionBroker/NativeProductAttempt recovery",
+      "observed": {
+        "eachScenario": "Original reference/body, one durable fact with receipt seq equal to original Store row2, one native intent, old stdio callbacks0",
+        "allow": { "guardCalls": 1, "modeledEffects": 1 },
+        "deny": { "guardCalls": 1, "modeledEffects": 0 },
+        "missingGuard": { "guardCalls": 0, "modeledEffects": 0 }
+      }
+    },
+    {
+      "command": "node --test --test-timeout=6000 tests/integration/attached-port.case.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "exitCode": 0,
+      "passed": 4,
+      "failed": 0,
+      "cancelled": 0,
+      "testBlob": "61bb1929ce8f218065a5140fd041b647c2e17a9a",
+      "scope": "Persisted repository test consumes only current main sources and actual Store/ingress; no candidate imports, no child/native process or signals. Same seeded-component and controlled-decision scope is stated in its header.",
+      "cases": [
+        "Original reference/body/durable Store receipt preserved, controlled allow produces one modeled effect",
+        "Controlled deny produces zero modeled effects",
+        "Missing native guard produces zero modeled effects",
+        "Foreign fact refused before authoritative Store row, callback receipt or native admission; guard0/effect0"
+      ],
+      "notProven": "No original Application-created Work/question/answer/native_applied, coordinator crash, recovered check/currentCandidate/manualaccept or product slot release"
+    },
+    {
+      "command": "pnpm exec tsc -p /tmp/pa-wave33-main-attached-consumer.tsconfig.json",
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "exitCode": 0,
+      "scope": "Strict + exactOptional on actual current main NativeProductAttempt and a typed consumer using main RunningAttempt.attachPort, main original FactSink, storedAttemptPayloads and beforeNativeWrite callback. First candidate-import version also passed; final run imports only main integration sources.",
+      "mainGuardAdapter": "For a later activated consumer, convert original void/throw guard to decision with try await original guard => allowed true; catch => allowed false. Do not infer allowance from registration or an existing fact sink."
+    },
+    {
+      "command": "node --test --test-timeout=8000 tests/operational-soak/procguard/guard3.case.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-h",
+      "exitCode": 0,
+      "passed": 7,
+      "failed": 0,
+      "scope": "Submitted pure own-probe comparison/failure controls only, no live procguard"
+    },
+    {
+      "command": "node --test --test-timeout=12000 apps/runner/test/attach-channel/actual-transport-integration.test.ts apps/runner/test/attach-channel/actual-reattach.test.ts",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-i",
+      "exitCode": 0,
+      "passed": 4,
+      "failed": 0,
+      "scope": "Actual in-process service/auth endpoint, valid reattach, pending intent indeterminate, old connection fenced, journal paging/chunk read and unmatched ACK correlation. Controlled callback receipts are communication evidence, not original Work/QuestionBroker recovery."
+    }
+  ],
+  "findings": [
+    {
+      "id": "B33-CHILD-PROCESS-SHAPE-IS-NOT-SPAWN-PROVENANCE",
+      "priority": 1,
+      "file": "/Users/hh/Desktop/joker/superagent-agent-b/tests/native-acceptance/signal-guard.mjs",
+      "line": 100,
+      "alsoLines": [66, 117],
+      "scope": "B signal acceptance tools only; not a production native answer guard or public application bypass",
+      "detail": "Numeric PID and copied handle cases are now fixed, but adoptSpawn treats any ordinary object with pid/spawnfile/spawnargs as the original ChildProcess. A pure fixture with no spawn calls passes an unspawned plain object carrying a foreign-parent PID and copied full metadata; registration succeeds and signalOwned sends mocked SIGKILL. Original spawn metadata must have independent provenance, not only matching field names.",
+      "independentCounterexample": { "fakeSpawnCalls": 0, "foreignParent": 999, "registered": true, "mockSignalTarget": 45102, "mockSignal": "SIGKILL" },
+      "repairDirection": "Keep exact-handle identity and numeric PID refusal, but admit external children only through original private spawner provenance, not JSON-shaped spawn metadata. Test a plain object with exact live argv and parent/start/UID against an original independently recorded own child positive.",
+      "runtimeImpact": "Do not admit unsafe live crash/procguard matrices on this helper from these tests. This residual does not block the separately proven Node-only attached registration port or ordinary main functionality."
+    }
+  ],
+  "minimalSourceClosure": {
+    "newCaller": {
+      "path": "packages/execution/src/attached-attempt.ts",
+      "candidateAndMainWorkingBlob": "5a2f8731f61ca1e8cbb3a13c0d38b96a47ec322d",
+      "dependencies": "Existing recovery-transport.ts and existing contracts/schema types; no DriverKit review, send-admission, diagnostics, new budget module or new channel implementation"
+    },
+    "optionalPortContract": {
+      "candidatePath": "packages/execution/src/contracts.ts",
+      "candidateBlob": "dfcd506b934cfbc82896d87c18671255f5af96d2",
+      "mainCompatibleBlob": "bc7c0dc7ae944a6dd31cd903d1dffe454f881f39",
+      "reasonForMainVariant": "Main reuses existing RuntimeProducer instead of duplicating its structural members; optional RunningAttempt.attachPort preserves existing callers"
+    },
+    "mainComposition": {
+      "path": "apps/coordinator/product/native-attempt.ts",
+      "workingBlob": "2707b67c7098959414266920b937c4090b961d07",
+      "placement": "Return optional cloned original registration/producer only after register+ready+current and explicit endpoint presence",
+      "rfcCorrection": "Candidate RFC's this.handle.attachPort snippet does not match the class: no this.handle exists. The reviewed actual main change correctly adds attachPort to the existing returned RunningAttempt object."
+    },
+    "index": "No change needed: main packages/execution/src/index.ts already export*contracts, so the new type is visible. Direct import of the caller is sufficient. Do not copy B index's unrelated resource-facts exports/dependency.",
+    "doNotMergeForThisOutcome": [
+      "B runner-service channelGeneration cache and redundant closed/businessClosed reply guard; original main terminal fix is already closed and remains authoritative",
+      "B RunnerLink spawnIntent diagnostic field as a prerequisite for the Node attach data port",
+      "B/H signal test helpers or live scripts",
+      "DriverKit review-sender/send-admission/runtime-diagnostics or budget/ledger paths",
+      "Historical acceptance/report branches wholesale"
+    ],
+    "admission": "The optional internal data port and caller callback contract are source-admitted for controlled main use. Auto activation, original Broker fresh callback composition, same Work recovery and installed/native/release evidence remain separate."
+  },
+  "actualProductStatus": {
+    "internalMainPort": "SOURCE_READY_AND_NOW_COMPOSED_IN_REVIEWED_MAIN_WORKTREE; it no longer has to wait for a missing registration data port",
+    "threeCallbackModulePath": "ACTUAL_MAIN_CONTROLLED_POSITIVE_AND_NEGATIVE_PASS",
+    "originalApplicationStoreQuestionBrokerSameWork": "NOT_REACHED: seeded real ingress and explicit decision callback are not an original Application-created Work with the original QuestionBroker permission/answer delivery",
+    "sameRunnerCoordinatorCrashSuccessor": "NOT_REACHED; no live SIGKILL or new process recovery was run or admitted here",
+    "originalAnswerNativeAppliedAckWindows": "NOT_REACHED for recovered same Work",
+    "sameRecoveredCheckCandidateManualAccept": "NOT_REACHED; ordinary candidate/acceptance remains its earlier valid scope",
+    "originalTwoFourSlotRelease": "NOT_REACHED; four channel probes and ordinary multiple Work delivery do not prove product capacity/fifth-item waiting/UNKNOWN resource retention/release",
+    "HInstalledSupport": "New H checklist/field-kit/lifecycle support is useful independent support scope, not final D/E installed release. H itself reports installed artifact review acceptance BLOCKED and distinguishes source controlled acceptance.",
+    "scopeOfMainNativeExposure": "Only source/type inspection validates the real NativeProductAttempt return placement; no NativeProductAttempt.launch was executed because it would spawn a native Runner. The new integration test deliberately uses actual service with a scripted Driver and a locally constructed original endpoint registration."
+  },
+  "handoffImplications": [
+    "Publish the reviewed main optional port/caller so B can consume real original registration data; do not repeat the old missing-port dependency claim after this source is available.",
+    "The next substantial runtime outcome is activation through original ProductExecution/Store/QuestionBroker with unchanged fresh guard, then one same-original-Work continuation to registered verification/currentCandidate/explicit acceptance. The current interface alone is not that outcome.",
+    "Keep original scheduler2/4-slot/full resources and exact-package D/E acceptance as measured product outcomes. No new task package or live/model budget is created by this report."
+  ],
+  "preservation": {
+    "candidateSourceAssertionsLocksEdited": 0,
+    "mainProductionEditsByThisReview": 0,
+    "mainProductionIntegrationOwner": "parent main agent; independently read/typechecked here",
+    "newFilesByThisReview": [
+      "tests/integration/attached-port.case.mjs (explicitly requested after initial read-only assignment)",
+      "reports/releases/wave33-admission/runtime-channel.json"
+    ],
+    "newTaskPackages": 0,
+    "realOSChildSpawns": 0,
+    "realSignals": 0,
+    "nativeOrModelTurns": 0,
+    "unsafeLiveProcguardOrSIGKILL": false,
+    "globalProcessSocketDiscovery": false,
+    "persistentServicesStarted": 0,
+    "userServiceOperations": 0,
+    "twelveExistingServicePairs": "5180/8796 through5191/8807 preserved",
+    "dirtyStateLedgerBudget": "Original B dirty files and all state/profile/tar/history/ledgers preserved; B UNKNOWN cap4 and E BLOCKED pilot unchanged",
+    "artifactBoundary": "No tar bytes frozen or certified by this review. D/E must bind later runtime bytes independently; old R1/R2 or a temporary outer ZIP cannot be relabelled to include this integration.",
+    "completionClaims": "No completion percentage raised from test counts or planned stages; only actual source and measured consumer scope are admitted"
+  }
+}

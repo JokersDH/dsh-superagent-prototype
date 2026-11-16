@@ -73,7 +73,8 @@ test('all original exclusions must be preserved; extra exclusions narrow safely'
 
   const extra = trialRecipeOutcome(suggestion({ scope: { allowedPaths: ['src/'], excludedPaths: ['.git', 'node_modules'], externalActions: [] } }),
     context({ projects: [withExclusions] }))
-  assert.equal(extra.applicable, true, 'adding exclusions is narrower and allowed')
+  assert.equal(extra.applicable, false, 'an extra exclusion cannot be carried through the restricted selection')
+  assert.match(extra.reasons.join(' '), /追加排除项无法通过受限选择保留/)
 
   const widerAllowed = trialRecipeOutcome(suggestion({ scope: { allowedPaths: ['src/', 'test/'], excludedPaths: ['.git'], externalActions: [] } }),
     context({ projects: [withExclusions] }))
@@ -94,6 +95,13 @@ test('the restricted selection must stay inside the project atoms/profile and ma
   const empty = trialRecipeOutcome(suggestion({ preview: { kind: 'scoped_change', allowedPaths: [], profileId: 'profile-codex-local' } }), context())
   assert.equal(empty.applicable, false)
   assert.match(empty.reasons.join(' '), /未包含有效的范围原子/)
+
+  const declaredMismatch = trialRecipeOutcome(suggestion({
+    scope: { allowedPaths: ['src/'], excludedPaths: [], externalActions: [] },
+    preview: { kind: 'scoped_change', allowedPaths: ['test/'], profileId: 'profile-codex-local' },
+  }), context({ projects: [{ ...project, scope: { ...project.scope, allowedPaths: ['src/', 'test/'] } }] }))
+  assert.equal(declaredMismatch.applicable, false, 'preview atoms must stay inside the declared scope')
+  assert.match(declaredMismatch.reasons.join(' '), /模板选择范围超出声明范围/)
 
   const missing = trialRecipeOutcome(suggestion({ preview: null }), context())
   assert.equal(missing.applicable, false)
