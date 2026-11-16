@@ -1,0 +1,65 @@
+{
+  "role": "A",
+  "package": ["packages/storage", "packages/workflows"],
+  "branch": "codex/g2-workspaces-verification",
+  "fixedBaseline": "a9ae5cd1",
+  "mergedMain": "e05ee8d8",
+  "mergeCommit": "8c85afc8",
+  "testedSourceCommit": "41b1e9a",
+  "dirty": false,
+  "productSchema": 18,
+  "newMigrationThisWave": null,
+  "modelOrNativeTurns": 0,
+  "status": "SOURCE_READY",
+  "wholeProductComplete": false,
+  "mainIntegration": "candidate branch only; A continuation port not yet wired into main/C HTTP/UI",
+  "installed": null,
+  "identities": {
+    "r1": {"source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2", "build": "8296720d8a25f38c", "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543", "installed": false},
+    "r2": {"source": "303b2c6a", "tarSha256": null, "installed": false},
+    "outerZip": null
+  },
+  "commands": [
+    {"command": "node --test ... wave32-persistent-two-project.case.ts wave33-continuation.case.ts", "cwd": "packages/workflows", "exit": 0, "result": "14 pass / 0 fail", "evidence": "wave33-node.txt"},
+    {"command": "npx tsx --test packages/workflows/test/*.case.ts", "exit": 0, "result": "125 pass / 0 fail", "evidence": "wave33-workflow-tests.txt"},
+    {"command": "npx tsx --test packages/storage/test/*.case.ts", "exit": 0, "result": "88 pass / 0 fail", "evidence": "wave33-storage-tests.txt"},
+    {"command": "npx tsc --noEmit -p packages/storage", "exit": 0, "result": "strict ok", "evidence": "wave33-strict-storage.txt"},
+    {"command": "npx tsc --noEmit -p packages/workflows", "exit": 0, "result": "strict ok", "evidence": "wave33-strict-workflows.txt"},
+    {"command": "npx tsc -p packages/storage/tsconfig.build.json", "exit": 0, "result": "build ok", "evidence": "wave33-build-storage.txt"},
+    {"command": "npx tsc -p packages/workflows/tsconfig.build.json", "exit": 0, "result": "build ok", "evidence": "wave33-build-workflows.txt"},
+    {"command": "npx tsc --noEmit -p apps/coordinator/tsconfig.product.json", "exit": 0, "result": "main product strict ok", "evidence": "wave33-product-strict.txt"},
+    {"command": "node tests/integration/project-recipes.case.mjs", "exit": 0, "result": "5 pass / 0 fail", "evidence": "wave33-project-recipes.txt"},
+    {"command": "node tests/integration/usage-observation.case.mjs", "exit": 0, "result": "8 pass / 0 fail", "evidence": "wave33-main-completion.txt"}
+  ],
+  "outcomes": [
+    {"id": "W33-A1", "status": "PASS_SOURCE", "name": "production bounded history continuation",
+      "implementation": ["packages/storage/src/workflows.ts", "packages/workflows/src/ports.ts", "packages/storage/src/index.ts"],
+      "consumer": "A typed ReadIndexPort; ready for main/C HTTP/UI wiring",
+      "positive": "keyset cursor over reviews/verifications/acceptances/contracts/attempts; 50+50+20 unique rows for 120 source rows; available/returned/coverage; limit 0; ties by ID",
+      "negative": "foreign project/work/collection, malformed/expired cursor, bad canonical records and caller/source truncation remain explicit; no events/acceptance/queue/model delta",
+      "evidence": ["wave33-continuation.txt", "wave33-node.txt"]},
+    {"id": "W33-A2", "status": "PARTIAL", "name": "main-compatible real history consumer",
+      "implementation": ["packages/workflows/src/ports.ts", "wave33-data-api.md"],
+      "consumer": "C wave30/wave31 capped history readers and main strict product consumer; new continuation not yet wired",
+      "positive": "existing WorkIndex/Completion/evidence calls remain compatible; C reads original IDs and source truncation honestly",
+      "negative": "C still uses capped arrays/local offset; main HTTP cursor signing/principal gate/UI is not implemented by A and is NOT_REACHED",
+      "evidence": ["wave33-two-project.txt", "wave33-main-completion.txt", "wave33-product-strict.txt"]},
+    {"id": "W33-A3", "status": "PASS_SOURCE", "name": "non-empty recovery, artifact bytes and original-ID reopen",
+      "implementation": ["packages/workflows/test/wave32-persistent-two-project.case.ts", "packages/workflows/test/fixtures/wave33-project-reader.mjs"],
+      "consumer": "current main product runtime plus C completion reader and new-PID artifact reader",
+      "positive": "two original projects complete through original Work/check/currentCandidate/manualaccept; Store/product reopen reads distinct Work/contract/review/verification/artifact digests, receipts, artifact bytes and held queue; v1/v2 source restore proof remains",
+      "negative": "artifact bytes are re-hashed, not just metadata; missing/replaced content, wrong project/cursor/old contracts and target drift remain rejected; installed package/native recovery not claimed",
+      "evidence": ["wave33-two-project.txt", "wave33-dual.txt"]}
+  ],
+  "remaining": [
+    "main/C HTTP/UI continuation wiring with cursor signing and principal/Scope gate",
+    "D/E installed same-instance restart with R1 or a frozen R2 successor",
+    "B/I live native recovery and original Work fault takeover",
+    "F extraction/UI and E final installed verdict; CAC excluded"
+  ],
+  "preserved": [
+    "twelve services 5180-5191 / 8796-8807 and all state/profile/tar/ledger/dirty/runs",
+    "R1 829RC / R2 source / ce64/1ba/1cd boundaries",
+    "old capped WorkIndex/Completion APIs as compatibility regression"
+  ]
+}
