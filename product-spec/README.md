@@ -2,6 +2,8 @@
 
 版本：`B-1.0-draft` · 2026-11-07 · 状态：可用于拆分实施，须先通过 G0。本文档集是本产品的当前设计基线；不是已实现产品的说明书。
 
+2026-11-16工程续交：[Wave34双工程包](../agent-tasks/product-wave-34/README.zh-CN.md)及[本轮验收](../reports/releases/wave34-admission/README.zh-CN.md)。每位六个完整成果，main持续接入实际消费者；原架构基线保留，当前功能/证据以产品总览和0086–0088为准。
+
 **2026-11-16当前范围修订：用户明确将CAC留待后续独立实验。当前完整方案B不包含CAC接入或CAC专属协作，不占当前实现、排期、验收及完成度分母，不阻塞本期交付。以下原设计、G6及历史任务保留作未来参考，不自动启动；当前范围与进度以[产品总览](../docs/product/STATUS.zh-CN.md)为准。**
 
 交付仓库：[JokersDH/dsh-superagent-prototype](https://github.com/JokersDH/dsh-superagent-prototype)。代码位置和两个额外 Agent 的开工入口见根 [START-HERE](../START-HERE.zh-CN.md)；新产品直接落在本仓根 packages/apps/tools。

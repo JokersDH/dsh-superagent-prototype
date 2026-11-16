@@ -1,0 +1,23 @@
+{
+  "status": "PASS_ENGINEERING_DISPATCH_STATIC_ONLY",
+  "externalAgents": 10,
+  "ownersIncludingMain": 11,
+  "continuousPackagesPerOwner": 2,
+  "completeOutcomesPerOwner": 6,
+  "plannedOutcomes": 66,
+  "acyclic": true,
+  "checkpoints": 31,
+  "ownershipDisjoint": true,
+  "preservedCandidateBranchesChecked": 11,
+  "localLinks": 95,
+  "runtimeSource": "23d5a98e6e75a3b0fb08168431260a9935cf5674",
+  "callbackConsumerPublished": true,
+  "defaultSupportConsumer": true,
+  "originalWorkRecoveryStillRequired": true,
+  "fixedW33NotRefrozen": true,
+  "cacExcluded": true,
+  "budgetUnchanged": true,
+  "runtimeTestsStarted": 0,
+  "nativeTurnStarts": 0,
+  "releaseApproved": false
+}
