@@ -1,0 +1,89 @@
+{
+  "protocol": "parallel-development-workspaces/1",
+  "date": "2026-11-16",
+  "repository": "https://github.com/JokersDH/dsh-superagent-prototype",
+  "mainRuntimeSource": "8cd709ca57acb0ba8064e2ec3cc98f4369a46c60",
+  "createdNewWorktrees": 0,
+  "createdUserThreads": false,
+  "externalPromptsSent": false,
+  "copyUserState": false,
+  "roles": {
+    "A": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "branch": "codex/g2-workspaces-verification",
+      "packet": "agent-tasks/product-wave-35/agent-a-data.zh-CN.md",
+      "newlyPrepared": false,
+      "startup": "Preserve dirty/history/state, fetch and merge origin/main. Continue one whole subsystem goal over three engineering packages and nine complete outcomes; publish runnable source early and continue integration/independent queue without per-fix waiting."
+    },
+    "B": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "branch": "codex/g1-runtime",
+      "packet": "agent-tasks/product-wave-35/agent-b-runtime.zh-CN.md",
+      "newlyPrepared": false,
+      "startup": "Preserve dirty/history/state, fetch and merge origin/main. Continue one whole subsystem goal over three engineering packages and nine complete outcomes; publish runnable source early and continue integration/independent queue without per-fix waiting."
+    },
+    "C": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "branch": "codex/g3-assistant-context",
+      "packet": "agent-tasks/product-wave-35/agent-c-context.zh-CN.md",
+      "newlyPrepared": false,
+      "startup": "Preserve dirty/history/state, fetch and merge origin/main. Continue one whole subsystem goal over three engineering packages and nine complete outcomes; publish runnable source early and continue integration/independent queue without per-fix waiting."
+    },
+    "D": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-d",
+      "branch": "codex/g3-local-distribution",
+      "packet": "agent-tasks/product-wave-35/agent-d-delivery.zh-CN.md",
+      "newlyPrepared": false,
+      "startup": "Preserve dirty/history/state, fetch and merge origin/main. Continue one whole subsystem goal over three engineering packages and nine complete outcomes; publish runnable source early and continue integration/independent queue without per-fix waiting."
+    },
+    "E": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-e",
+      "branch": "codex/g3-product-acceptance",
+      "packet": "agent-tasks/product-wave-35/agent-e-acceptance.zh-CN.md",
+      "newlyPrepared": false,
+      "startup": "Preserve dirty/history/state, fetch and merge origin/main. Continue one whole subsystem goal over three engineering packages and nine complete outcomes; publish runnable source early and continue integration/independent queue without per-fix waiting."
+    },
+    "F": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-f",
+      "branch": "codex/g4-trial-experience",
+      "packet": "agent-tasks/product-wave-35/agent-f-experience.zh-CN.md",
+      "newlyPrepared": false,
+      "startup": "Preserve dirty/history/state, fetch and merge origin/main. Continue one whole subsystem goal over three engineering packages and nine complete outcomes; publish runnable source early and continue integration/independent queue without per-fix waiting."
+    },
+    "G": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-g",
+      "branch": "codex/g4-usage-insights",
+      "packet": "agent-tasks/product-wave-35/agent-g-insights.zh-CN.md",
+      "newlyPrepared": false,
+      "startup": "Preserve dirty/history/state, fetch and merge origin/main. Continue one whole subsystem goal over three engineering packages and nine complete outcomes; publish runnable source early and continue integration/independent queue without per-fix waiting."
+    },
+    "H": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-h",
+      "branch": "codex/g4-trial-operations",
+      "packet": "agent-tasks/product-wave-35/agent-h-trial-operations.zh-CN.md",
+      "newlyPrepared": false,
+      "startup": "Preserve dirty/history/state, fetch and merge origin/main. Continue one whole subsystem goal over three engineering packages and nine complete outcomes; publish runnable source early and continue integration/independent queue without per-fix waiting."
+    },
+    "I": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-i",
+      "branch": "codex/g5-coordinator-channel",
+      "packet": "agent-tasks/product-wave-35/agent-i-coordinator-channel.zh-CN.md",
+      "newlyPrepared": false,
+      "startup": "Preserve dirty/history/state, fetch and merge origin/main. Continue one whole subsystem goal over three engineering packages and nine complete outcomes; publish runnable source early and continue integration/independent queue without per-fix waiting."
+    },
+    "J": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-j",
+      "branch": "codex/g5-project-recipes",
+      "packet": "agent-tasks/product-wave-35/agent-j-project-recipes.zh-CN.md",
+      "newlyPrepared": false,
+      "startup": "Preserve dirty/history/state, fetch and merge origin/main. Continue one whole subsystem goal over three engineering packages and nine complete outcomes; publish runnable source early and continue integration/independent queue without per-fix waiting."
+    },
+    "main": {
+      "workdir": "/Users/hh/Desktop/joker/superagent",
+      "branch": "codex/g2-execution-integration",
+      "packet": "agent-tasks/product-wave-35/main.zh-CN.md",
+      "newlyPrepared": false,
+      "startup": "Preserve dirty/history/state, fetch and merge origin/main. Continue one whole subsystem goal over three engineering packages and nine complete outcomes; publish runnable source early and continue integration/independent queue without per-fix waiting."
+    }
+  }
+}

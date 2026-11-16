@@ -1,0 +1,68 @@
+{
+  "protocol": "main-product-integration/35",
+  "date": "2026-11-16",
+  "source": "8cd709ca57acb0ba8064e2ec3cc98f4369a46c60",
+  "modelProductSource": "4cde58832f2287a26e2f65a4a30ed01b5cb9f56c",
+  "modelBrowserSource": "c544781bf470eb97cc7aedbba860952da8e3b05a",
+  "sourceDeltasOutsideAppPackages": [
+    "tests/integration/model-connection-browser.mjs",
+    "tools/bootstrap/personal-preview-launcher.mjs",
+    "tests/integration/personal-preview-directory.case.mjs"
+  ],
+  "checks": {
+    "modelConfigurationHTTP": 5,
+    "originalModelProvider": 10,
+    "modelTransport": 1,
+    "privateDirectoryPure": 3,
+    "contracts": 241,
+    "generatedReproducible": true,
+    "consoleStrict": 0,
+    "coordinatorStrict": 0,
+    "consoleBuild": 0,
+    "runnerFrozenHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d"
+  },
+  "browserReport": "reports/releases/wave35-integration/recipes-browser/browser-report.json",
+  "observationReport": "reports/releases/wave35-integration/observation-browser/browser-report.json",
+  "modelBrowserReport": "reports/releases/wave35-integration/model-browser-final/browser-report.json",
+  "initialModelBrowserReport": "reports/releases/wave35-integration/model-browser/browser-report.json",
+  "modelConfiguration": {
+    "actualPrivateProvider": true,
+    "actualAuthenticatedPOST": true,
+    "actualApp": true,
+    "savesSendModelRequests": false,
+    "browserStorageSecret": false,
+    "explicitHTTPConsent": true,
+    "configuredIsNotValidatedConnection": true,
+    "staleIdentityRefused": true,
+    "strictModeResolved": true
+  },
+  "launcher": {
+    "source": "8cd709ca57acb0ba8064e2ec3cc98f4369a46c60",
+    "creationRaceFixed": true,
+    "EEXISTRevalidatesPrivateDirectory": true,
+    "packaged": false
+  },
+  "newDependencies": 0,
+  "newMigrations": 0,
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "candidateWorktreesEdited": false,
+  "newTarCreated": false,
+  "newPersistentServiceStarted": false,
+  "userTwelveServicesTouched": false,
+  "fullOriginalWorkRecovery": false,
+  "actualNativeAdmission": false,
+  "independentCurrentRuntimeInstalledAdmission": false,
+  "valueBenefitAdmission": false,
+  "releaseApproved": false,
+  "completionEstimateChanged": false,
+  "notes": [
+    "F Form/helper imported and repaired in main; only model CSS slice integrated, candidate trees unmodified.",
+    "Independent real React StrictMode/identity controls repaired; actual App uses real PrivateModelProvider and test-only credentials.",
+    "Initial invalid cross-package Zod input surfaced503; new route safeParse emits fixed invalid_request400 and final controls pass.",
+    "First screenshots did not show the full mobile save button; test-only c544 scrolls and asserts it above navigation, second bounded capture passes without product edit.",
+    "Initial duplicate generator import/row was removed before source commit; final generated check and frozen hash pass.",
+    "Console bundle684.12KB advisory and existing CSS detector advisories retained;16px input is intentional mobile sizing.",
+    "No B raw control, signal tools, new slot queue, A/C assertions or G unverified identity helper imported."
+  ]
+}
