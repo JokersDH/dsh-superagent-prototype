@@ -1,0 +1,219 @@
+{
+  "protocol": "wave32-data-experience-admission/1",
+  "date": "2026-11-16",
+  "status": "OLD_SOURCE_TRUNCATION_CLOSED_NEW_SOURCE_ONLY_UNKNOWN_COVERAGE_P2",
+  "scope": "Acceptance of completed wave31 A/C/F deliveries. Fixed candidate HEADs and dirty state first, then finite relevant source/controlled tests, direct actual-component static rendering and read-only exact artifact inspection. No new dispatch or candidate changes.",
+  "observedMain": "8deda18dd249c53f21a79b37b4683eebea9910c5",
+  "mainRuntimeSource": "303b2c6a974856661c21d0617bd710ebe87374d1",
+  "fixedSources": {
+    "A": "02dc4aa889bdf3e5832808133916ff43b22e49f3",
+    "C": "84b9376d9e0dd2ccb4d85d1017cf2ad5fe6b0fc0",
+    "F": "328ffb1ca3718ff03cb0e0ebddfc60b790272b51"
+  },
+  "dirtyBeforeAndAfter": {
+    "A": [],
+    "C": ["pnpm-lock.yaml"],
+    "F": [],
+    "mainExistingUntrackedPreserved": ["new-start.err", "new-start.json", "old-onnew.err", "old-onnew.json", "old-start2.json"],
+    "cLockNumstat": "3 additions / 0 deletions, unchanged by this audit",
+    "cLockSha256": "3b4127d55e2e37f73b398cf04ac798a0678357dc2fdd7b5c558fa310094bb041"
+  },
+  "sourceDigests": {
+    "A:packages/storage/src/workflows.ts": "074d75ad1ef57235aa96410167779aae406279189d7b05cb2de5e8277576cce4",
+    "C:packages/context/tools/wave31-completion-history.mjs": "e8e87d7b905fea6d594dc0ab01a0106c7565a942cb4b7efb7524dbb919bf9d99",
+    "F:apps/console/src/trial/TrialWorkspace.tsx": "9203212c732a7b35a42ca2e8a8fd6296005012dccc817deb007dfffe2009767e"
+  },
+  "executed": [
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-a/packages/workflows",
+      "command": "node --test test/acceptance.case.ts",
+      "exitCode": 0,
+      "passed": 7,
+      "failed": 0,
+      "scope": "Real temporary ProductStore acceptance/outcome/UoW, exact historical binding/current-link separation, strict canonical/shape classification, source51 verification rows -> returned50/truncated with available51, and original cross-process C completion consumer."
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "command": "./node_modules/.bin/tsc --noEmit -p packages/storage/tsconfig.json",
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "command": "./node_modules/.bin/tsc --noEmit -p packages/workflows/tsconfig.json",
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "command": "node --test --test-concurrency=1 packages/knowledge/test/main-personal-history-coverage.case.ts packages/knowledge/test/main-personal-history-paging.case.ts",
+      "exitCode": 0,
+      "passed": 2,
+      "failed": 0,
+      "durationMs": 14192,
+      "scope": "Actual wave31 CLI -> selected A source ProductStore over original controlled Work data. Complete source/local limit0/offset; source cap after51 extra verification records preserves truncated_source and null unknown total; multi-attempt local pages retain both original reviews after current epoch changes. Original current HTTP evidence/context/frozen-source and foreign-project refusal use the same data.",
+      "fixtureBoundary": "The helper starts a finite loopback fixed-response candidate-model fixture plus controlled scratch executor, not a real vendor model or installed native agent. The source runtime and fixture are closed by the test. No persistent product service or live fault signal was started by the audit."
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "command": "./node_modules/.bin/tsc --noEmit -p packages/knowledge/tsconfig.json",
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-f/apps/console",
+      "command": "node --test test/trial/trial-view.case.ts test/trial/recipes.case.ts",
+      "exitCode": 0,
+      "passed": 20,
+      "failed": 0,
+      "scope": "Honest readiness/mode/actions, readonly guards, unknown/scope/window/truncation, declared-scope/restricted-preview/exclusion coherence and bounded failure text."
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-f",
+      "command": "./node_modules/.bin/tsc --noEmit -p apps/console/tsconfig.json",
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-f",
+      "command": "Inline node --input-type=module: TypeScript in-memory TSX load hook, CSS empty-module hook, ReactDOMServer.renderToStaticMarkup of the exact current TrialWorkspace",
+      "exitCode": 0,
+      "actualComponent": "apps/console/src/trial/TrialWorkspace.tsx",
+      "renderedStates": 3,
+      "scope": "No export callback hides the button; downloading renders disabled button and role=status; failure renders alert/retry while support labels remain explicit and currency is retained. Rendering invokes no action/download callback.",
+      "serverStarts": 0,
+      "browserStarts": 0,
+      "callbackInvocations": 0,
+      "limitations": "Static rendering verifies the real component's states, not browser click/focus/layout, file download, installed UI or full daily user journey. Candidate-submitted browser evidence is read separately and not relabelled as rerun evidence."
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "command": "Inline node --input-type=module: parse exact wave31-completion-history.mjs with TypeScript AST, extract windowOf initializer, evaluate it in a fresh VM with sourceState=unknown",
+      "exitCode": 1,
+      "status": "FAIL_UNKNOWN_COVERAGE_MARKED_COMPLETE",
+      "scope": "Pure independent control of the candidate's exact function; no file/database/model/service access during evaluation. See C32 finding."
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "command": "Inline Node SHA256/stat plus bounded tar -tzf/-xOf of exact R2 storage source and structured console JS sourcemap",
+      "exitCode": 0,
+      "scope": "Read-only artifact byte inspection. No extraction to an install, package command, process start or release oracle execution."
+    }
+  ],
+  "previousFindingsClosed": [
+    {
+      "id": "C31-HISTORY-WRAPPER-DROPS-UPSTREAM-TRUNCATION",
+      "status": "CLOSED_IN_WAVE31_SUCCESSOR_SOURCE_CONSUMER",
+      "file": "packages/context/tools/wave31-completion-history.mjs",
+      "implementation": "The successor explicitly reads A completion.coverage/limits, marks truncated_source, keeps unknown available totals null, distinguishes local truncation and only emits a next local offset for a complete source.",
+      "independentEvidence": "A exact51->50 source test and C actual A-backed coverage/paging tests pass. Increasing the local limit to1000/5000 or using limit0 does not turn a source-truncated collection complete. The older wave30 CLI is retained historical code; it is not the new supported consumer.",
+      "scopeLimit": "This closes the reported source-cap defect for the explicit new CLI with the tested A reader. It does not add a default main history endpoint/UI or package the development tool."
+    },
+    {
+      "id": "A30-HISTORICAL-REVIEW-VALIDITY-DEPENDS-ON-LATEST-BINDING",
+      "status": "CLOSED_RETAINED",
+      "evidence": "A acceptance7 and C multi-attempt control retain the ended original review as historical_attempt after a new current binding; original current acceptance authority remains delegated to ProductCompletion."
+    },
+    {
+      "id": "F30-DECLARED-SCOPE-AND-PREVIEW-SELECTION-CAN-DISAGREE",
+      "status": "CLOSED_RETAINED",
+      "evidence": "Current F pure controls refuse declared-src/preview-test mismatch, omitted required exclusions and additional exclusions that the restricted callback cannot carry. Correct restricted selection remains accepted."
+    }
+  ],
+  "newFindings": [
+    {
+      "id": "C32-MISSING-SOURCE-COVERAGE-RELABELLED-COMPLETE",
+      "priority": "P2_HISTORY_DATA_CORRECTNESS",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-c/packages/context/tools/wave31-completion-history.mjs",
+      "line": 32,
+      "relatedLine": 53,
+      "problem": "The tool deliberately defaults missing completion.coverage to unknown, but windowOf only handles the special sourceState=truncated branch. An unknown source with an empty or fully returned local slice therefore receives state=complete and truncated=false, contrary to its unknown source coverage.",
+      "reproduction": {
+        "method": "Evaluate the exact current windowOf initializer selected by TypeScript AST, without rewriting or editing the candidate function.",
+        "input": { "available": 0, "sourceState": "unknown", "returned": 0, "limit": 64, "offset": 0 },
+        "actual": { "sourceState": "unknown", "state": "complete", "offset": 0, "limit": 64, "returned": 0, "availableKnown": false, "available": null, "localTruncated": false, "truncated": false },
+        "expected": "Unknown source must remain unknown/refused and cannot yield a complete-coverage label. Local completeness is a separate observation."
+      },
+      "positiveControl": "Current A's explicit complete/truncated source and the actual C coverage/paging tests both pass. availableKnown=false and available=null are already preserved in the unknown case, narrowing the impact to the conflicting state/truncated labels.",
+      "authorityAndAdmission": "Candidate CLI only; this tool is absent from current main and inspected R2 package. No demonstrated HTTP permission/current-candidate/acceptance bypass. This finding does not reopen the now-closed explicit source51->50 truncation defect.",
+      "correctionScope": "Preserve unknown/missing coverage independently of local slice completeness before adopting the CLI as a product history consumer; retain actual complete-source and source-truncated controls. No new task package is created by this audit."
+    }
+  ],
+  "actualConsumerAndCompletionAssessment": {
+    "A": {
+      "newSourceChange": "f2679bae adds exact source availability counts to the already-authenticated historical completion reader, with per-ticket50 cap and truthful truncated coverage. Production history/current separation was already closed in the prior audit and remains correct.",
+      "actualConsumer": "A original Store/WorkflowPorts acceptance reader and explicit C CLI in a second Node process over actual controlled Work data.",
+      "notOnlyHelper": true,
+      "notYetMain": "Main storage WorkIndex lacks this new CompletionFacts/history coverage/available contract. A source API and tests cannot be counted as a user-visible main history product yet.",
+      "notWholePackageComplete": "A's own wholePackageComplete=false is accurate. The source reader supplies counts and a capped slice, not a cursor that retrieves history beyond the source cap; default main/F history integration and same-package new history consumer remain separate. A9/A12 are explicitly partial in its report.",
+      "noMigrationNeededForExaminedChange": true
+    },
+    "C": {
+      "newSourceChange": "An explicit A-worktree-backed history CLI and substantive controlled current-source Work/evidence/context/source/audit consumer tests. The CLI is a real callable source consumer rather than a static JSON sample.",
+      "actualConsumer": "wave31-completion-history/1 reads A ProductStore; controlled paging test subsequently reads original current-source evidence, frozen context and source audit HTTP over the same Work.",
+      "notWholeProductComplete": "The CLI's local offset window cannot retrieve records excluded by A's source cap, and its new unknown-coverage P2 remains. C's twelve complete labels and submitted347 suite passes do not establish default history UI/API, installed new history tooling, live original-Work recovery or native compatibility.",
+      "defaultMainOrPackageTool": false,
+      "submittedBroaderTests": "C's additional daily journeys, dual-format R2 readonly recovery and fault tests are acknowledged as submitted controlled/package evidence, but this focused audit reruns only the two history tests and does not promote their report labels into independent installed/release admission."
+    },
+    "F": {
+      "newSourceChange": "Real TrialWorkspace rendering adds disabled reason/downloading status/error retry, observation timestamp, source counts/currency and optional support details. It reuses existing main onDownloadInsights/loading/error callbacks and adds no backend/authorization/collector.",
+      "actualConsumer": "The existing main App/transport/useObservationDownload already supplies the export callback/state. Exact candidate component renders these props correctly in memory; F submitted actual App/controlled browser reports remain separately identified.",
+      "notYetMain": "Main already has functioning scoped observation download, but the new F support/status/retry presentation source is not imported into main8deda/303 runtime or the inspected R2 bundle. The current main App does not supply the optional support labels.",
+      "notWholeProductComplete": "Candidate source/controlled progress is real. It is not an installed verdict or independent visual/browser acceptance of the new F source. No new source correctness issue found in this limited F review; manual accessibility, non-Chromium and long auth-expiry remain unmeasured."
+    }
+  },
+  "exactPackageMaterial": {
+    "path": "/Users/hh/Desktop/joker/pa-artifacts/wave31-target/wave31-target-4dcd28f.tar.gz",
+    "source": "c0a1f8975232b6397dfaf92d31ac5682df2dab36",
+    "buildId": "4dcd28f758bbb265",
+    "sha256": "405ecd02fcbf288bac0855e17911ec4035521b54fe27d81fa0b28feaf5addcc6",
+    "bytes": 20540568,
+    "schema": 18,
+    "node": "24.21.0",
+    "abi": "137",
+    "platform": "darwin-arm64",
+    "readOnlyInspection": {
+      "storageSourceSha256": "1ad051c37cfdeede68bead8c735b1d6927f720a5f3cf8357e510206f25aab961",
+      "storageEqualsCurrentMainSource": true,
+      "aNewCompletionFactsAndAvailableContractPresent": false,
+      "cWave31HistoryToolPackaged": false,
+      "consoleSourceMap": "install/app/apps/console/dist/assets/index-2CheocB2.js.map",
+      "trialWorkspaceSourcesContentEqualsCurrentMain": true,
+      "appSourcesContentEqualsCurrentMain": true,
+      "existingMainExportCallbackPresent": true,
+      "fNewSupportModulePanelPresent": false,
+      "fNewExportDisabledReasonOrStatusPresent": false
+    },
+    "interpretation": "R2 is an actual immutable successor containing the existing main scoped download and prior App composition. It is not the later A/C/F candidate source under review. Absence of those later additions is a temporal integration boundary, not evidence that existing main export or the whole installed product is broken.",
+    "independentInstalledOrReleaseVerdictByThisAudit": false,
+    "independentECurrentVerdict": "Not assessed by this A/C/F subaudit; use the companion same-subject D/E acceptance report rather than copying old ce64/1fba statements from candidate documentation."
+  },
+  "staleDocumentationNotTreatedAsRuntimeDefects": [
+    "F's status says no R2 successor tar existed. The exact4dcd successor now exists and its hash/bytes/content were independently read above; this is a timestamped documentation boundary.",
+    "C/A documentation mentioning E stillce64 and A dirty is not used as the current release/data verdict. A is clean at02dc and the latest E subject is outside this subaudit.",
+    "F's generic older integration guide contains historical main/J/G absence statements. Current main303 already implements authenticated display export, project recipes and7/30; actual source and immutable package bytes control this assessment."
+  ],
+  "productValueAndInnovationScope": {
+    "usableExistingMainCapabilities": [
+      "Actual project-recipe server preview into the original editable Work form and explicit creation, questions, machine checks, current candidate and human acceptance on controlled projects.",
+      "Project/identity/window-bound7/30 observations and explicit fresh display-data export with original authority and unknown/partial semantics.",
+      "Existing source/context/evidence review and explicit decision/proposal workflows, with default main conversation retained."
+    ],
+    "newCandidateContribution": "More trustworthy historical truth/current eligibility/coverage and reusable consumer/support UX. These are reliability and usability improvements, not proof of a breakthrough autonomous agent, independent-review benefit or measured productivity gain.",
+    "notEstablished": ["same-original-Work live crash recovery to accepted delivery", "real vendor/native compatibility by these tests", "private permission/target activation", "long soak", "efficiency or independent-review benefit"],
+    "completionPercentChangedByThisAudit": false,
+    "reason": "Partial source/control/installed tiers cannot be collapsed into a percentage or inferred from twelve outcome labels and test totals. This report supplies scoped evidence for the parent overall assessment."
+  },
+  "preservation": {
+    "realVendorModelCalls": 0,
+    "realNativeTurnStarts": 0,
+    "persistentServicesStarted": 0,
+    "packageInstancesStarted": 0,
+    "manualOrFaultSignals": 0,
+    "userServicesTouched": 0,
+    "globalProcessOrSocketDiscovery": false,
+    "foreignCredentialsRead": false,
+    "candidateSourceAssertionsOrLocksEdited": false,
+    "mainProductionEdited": false,
+    "allExecSessionsCompleted": true,
+    "budgetsLedgersStateProfilesTarsHistoryPreserved": true,
+    "releaseApproved": false,
+    "onlyOutputFile": "reports/releases/wave32-admission/data-experience.json"
+  }
+}

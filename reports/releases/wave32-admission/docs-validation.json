@@ -1,0 +1,13 @@
+{
+  "protocol": "product-documentation-static-check/1",
+  "date": "2026-11-16",
+  "status": "PASS_STATIC_ONLY",
+  "files": 6,
+  "localLinks": 41,
+  "shellBlocksParsedWithoutExecution": 4,
+  "originalWeightsRetained": true,
+  "stableAlphaScore": 76,
+  "fullSchemeBScore": 55.7,
+  "runtimeOrModelStarted": 0,
+  "releaseApproved": false
+}
