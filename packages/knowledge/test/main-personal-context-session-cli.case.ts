@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { execFile } from 'node:child_process'
 import { promisify } from 'node:util'
-import { chmodSync, copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { chmodSync, copyFileSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, symlinkSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { tmpdir } from 'node:os'
@@ -132,18 +132,51 @@ test('a normal instance selects sources, confirms a proposal and records/revokes
     const digestBefore = sourcesBefore.result.result.bundleDigest as string
     assert.match(digestBefore, /^[a-f0-9]{64}$/)
 
+    const beforeRevoke = await run(['preview', '--api', instance.api, '--api-token', apiToken, '--project', projectA,
+      '--conversation', conversationA, '--select', 'decisions'])
+    const beforeCount = (beforeRevoke.result.result.groups as { name: string; used: { files: number } }[])
+      .find((group) => group.name === 'decisions')?.used.files ?? 0
     const revoked = await run(['decide', '--api', instance.api, '--api-token', apiToken, '--project', projectA, '--conversation', conversationA,
       '--revoke', decisionId, '--expected-version', '1'])
     assert.equal(revoked.exit, 0, JSON.stringify(revoked.result))
     const sourcesAfterRevoke = await run(['sources', '--api', instance.api, '--api-token', apiToken, '--message', contextMessage])
     assert.equal(sourcesAfterRevoke.exit, 0, JSON.stringify(sourcesAfterRevoke.result))
     assert.equal(sourcesAfterRevoke.result.result.bundleDigest, digestBefore)
+    const futurePreview = await run(['preview', '--api', instance.api, '--api-token', apiToken, '--project', projectA,
+      '--conversation', conversationA, '--select', 'decisions'])
+    assert.equal(futurePreview.exit, 0, JSON.stringify(futurePreview.result))
+    const decisionGroup = (futurePreview.result.result.groups as { name: string; used: { files: number } }[])
+      .find((group) => group.name === 'decisions')
+    assert.equal((decisionGroup?.used.files ?? 0) < beforeCount, true)
 
     draftFile = join(root, 'context-draft.json')
     const saved = await run(['draft', 'save', '--api', instance.api, '--api-token', apiToken, '--project', projectA,
       '--conversation', conversationA, '--select', 'conversation', '--file', draftFile])
     assert.equal(saved.exit, 0, JSON.stringify(saved.result))
     assert.equal(saved.result.result.authorization, 'none')
+    assert.equal(statSync(draftFile).mode & 0o777, 0o600)
+    draftRequestId = (JSON.parse(readFileSync(draftFile, 'utf8')) as { requestId: string }).requestId
+
+    // Safe create/update policy: absent file -> 0600; own 0600 may be replaced; public, symlink and
+    // oversized/invalid drafts are refused without touching the target.
+    const publicDraft = join(root, 'context-draft-public.json')
+    writeFileSync(publicDraft, 'keep-me', { mode: 0o644 })
+    const refusedPublic = await run(['draft', 'save', '--api', instance.api, '--api-token', apiToken, '--project', projectA,
+      '--conversation', conversationA, '--select', 'conversation', '--file', publicDraft])
+    assert.equal(refusedPublic.exit, 3, JSON.stringify(refusedPublic.result))
+    assert.equal(readFileSync(publicDraft, 'utf8'), 'keep-me')
+    const symlinkTarget = join(root, 'context-draft-target.json')
+    const symlinkPath = join(root, 'context-draft-link.json')
+    writeFileSync(symlinkTarget, JSON.stringify({ protocol: 'assistant-context-draft/1' }), { mode: 0o600 })
+    symlinkSync(symlinkTarget, symlinkPath)
+    const refusedSymlink = await run(['draft', 'save', '--api', instance.api, '--api-token', apiToken, '--project', projectA,
+      '--conversation', conversationA, '--select', 'conversation', '--file', symlinkPath])
+    assert.equal(refusedSymlink.exit, 3, JSON.stringify(refusedSymlink.result))
+    assert.equal(JSON.parse(readFileSync(symlinkTarget, 'utf8')).protocol, 'assistant-context-draft/1')
+    assert.equal(lstatSync(symlinkPath).isSymbolicLink(), true)
+    const updated = await run(['draft', 'save', '--api', instance.api, '--api-token', apiToken, '--project', projectA,
+      '--conversation', conversationA, '--select', 'conversation', '--file', draftFile])
+    assert.equal(updated.exit, 0, JSON.stringify(updated.result))
     assert.equal(statSync(draftFile).mode & 0o777, 0o600)
     draftRequestId = (JSON.parse(readFileSync(draftFile, 'utf8')) as { requestId: string }).requestId
 
@@ -182,6 +215,20 @@ test('a normal instance selects sources, confirms a proposal and records/revokes
     writeFileSync(forged, JSON.stringify({ protocol: 'assistant-context-draft/1', projectId: projectA }), { mode: 0o600 })
     const forgedDraft = await run(['draft', 'load', '--api', reopened.api, '--api-token', apiToken, '--file', forged])
     assert.equal(forgedDraft.exit, 3, JSON.stringify(forgedDraft.result))
+    const invalidExpiry = join(root, 'context-draft-invalid-expiry.json')
+    writeFileSync(invalidExpiry, JSON.stringify({ ...JSON.parse(readFileSync(draftFile, 'utf8')), expiresAt: 'not-a-date' }), { mode: 0o600 })
+    const refusedExpiry = await run(['draft', 'load', '--api', reopened.api, '--api-token', apiToken, '--file', invalidExpiry])
+    assert.equal(refusedExpiry.exit, 3, JSON.stringify(refusedExpiry.result))
+    const expired = join(root, 'context-draft-expired.json')
+    writeFileSync(expired, JSON.stringify({ ...JSON.parse(readFileSync(draftFile, 'utf8')), expiresAt: '2020-01-01T00:00:00.000Z' }), { mode: 0o600 })
+    const expiredDraft = await run(['draft', 'load', '--api', reopened.api, '--api-token', apiToken, '--file', expired])
+    assert.equal(expiredDraft.exit, 0, JSON.stringify(expiredDraft.result))
+    assert.equal(expiredDraft.result.result.usable, false)
+    assert.equal(expiredDraft.result.result.stale, true)
+    const oversized = join(root, 'context-draft-oversized.json')
+    writeFileSync(oversized, 'x'.repeat(70 * 1024), { mode: 0o600 })
+    const refusedSize = await run(['draft', 'load', '--api', reopened.api, '--api-token', apiToken, '--file', oversized])
+    assert.equal(refusedSize.exit, 3, JSON.stringify(refusedSize.result))
     const again = await run(['sources', '--api', reopened.api, '--api-token', apiToken, '--message', contextMessage])
     assert.equal(sources.result.result.bundleDigest, again.result.result.bundleDigest)
     assert.equal(sources.result.result.sources.length >= 1, true)

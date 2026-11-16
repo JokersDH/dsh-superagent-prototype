@@ -13,7 +13,8 @@ import { parseArgs } from 'node:util'
 import { createHash, randomBytes } from 'node:crypto'
 import { join, isAbsolute } from 'node:path'
 import { pathToFileURL } from 'node:url'
-import { readFileSync, writeFileSync, statSync } from 'node:fs'
+import { closeSync, fsyncSync, lstatSync, openSync, readFileSync, renameSync, unlinkSync, writeSync } from 'node:fs'
+import { basename, dirname, join as joinPath } from 'node:path'
 
 const command = process.argv[2]
 const { values, positionals } = parseArgs({ args: process.argv.slice(3), allowPositionals: true, options: {
@@ -73,6 +74,71 @@ const sourcesOf = (value) => (value.sources ?? []).map((source) => ({
 const newCommandId = (prefix) => values['command-id'] ?? `${prefix}-${randomBytes(8).toString('hex')}`
 const messageIdOf = (commandId) => createHash('sha256').update(JSON.stringify(['message', commandId])).digest('hex').slice(0, 32)
 const stop = () => process.exit(process.exitCode ?? 0)
+const MAX_DRAFT_BYTES = 64 * 1024
+const DRAFT_PROTOCOL = 'assistant-context-draft/1'
+const ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/
+const digestPattern = /^[a-f0-9]{64}$/
+const draftFailure = (code, message) => Object.assign(new Error(message), { code })
+function privateOwner(info) { return typeof process.getuid !== 'function' || info.uid === process.getuid() }
+function inspectDraftPath(file) {
+  let info
+  try { info = lstatSync(file) } catch (error) { if (error?.code === 'ENOENT') return undefined; throw draftFailure('draft_unreadable', `Draft cannot be inspected: ${String(error?.message ?? error)}`) }
+  if (info.isSymbolicLink()) throw draftFailure('draft_symlink', 'A draft file must not be a symbolic link')
+  if (!info.isFile()) throw draftFailure('draft_not_regular', 'A draft path must be an ordinary file')
+  if (!privateOwner(info)) throw draftFailure('draft_owner', 'A draft file must belong to the current user')
+  if ((info.mode & 0o777) !== 0o600) throw draftFailure('draft_permissions', 'A draft file must be owner-private (0600)')
+  if (info.size <= 0 || info.size > MAX_DRAFT_BYTES) throw draftFailure('draft_size', `A draft file must be 1..${MAX_DRAFT_BYTES} bytes`)
+  return info
+}
+function readPrivateDraft(file) {
+  inspectDraftPath(file)
+  let raw
+  try { raw = readFileSync(file, 'utf8') } catch (error) { throw draftFailure('draft_unreadable', `Draft cannot be read: ${String(error?.message ?? error)}`) }
+  let parsed
+  try { parsed = JSON.parse(raw) } catch { throw draftFailure('draft_invalid', 'Draft is not valid JSON') }
+  if (parsed?.protocol !== DRAFT_PROTOCOL) throw draftFailure('draft_invalid', `Draft protocol must be ${DRAFT_PROTOCOL}`)
+  if (typeof parsed.projectId !== 'string' || !ID_PATTERN.test(parsed.projectId)) throw draftFailure('draft_invalid', 'Draft projectId is invalid')
+  if (typeof parsed.conversationId !== 'string' || !ID_PATTERN.test(parsed.conversationId)) throw draftFailure('draft_invalid', 'Draft conversationId is invalid')
+  if (!Array.isArray(parsed.selections) || parsed.selections.length < 1 || parsed.selections.length > 5 ||
+    new Set(parsed.selections).size !== parsed.selections.length ||
+    !parsed.selections.every((value) => ['work', 'decisions', 'project', 'conversation', 'artifacts'].includes(value)))
+    throw draftFailure('draft_invalid', 'Draft selections are invalid')
+  if (typeof parsed.requestId !== 'string' || parsed.requestId.length < 1 || parsed.requestId.length > 256)
+    throw draftFailure('draft_invalid', 'Draft requestId is invalid')
+  if (typeof parsed.observedAt !== 'string' || !Number.isFinite(Date.parse(parsed.observedAt)))
+    throw draftFailure('draft_invalid_time', 'Draft observedAt is not a valid timestamp')
+  if (typeof parsed.expiresAt !== 'string' || !Number.isFinite(Date.parse(parsed.expiresAt)))
+    throw draftFailure('draft_invalid_expiry', 'Draft expiresAt is not a valid timestamp')
+  if (parsed.sources !== undefined) {
+    if (!Array.isArray(parsed.sources) || parsed.sources.length > 64 ||
+      !parsed.sources.every((source) => source && typeof source.sourceId === 'string' &&
+        typeof source.path === 'string' && typeof source.sourceDigest === 'string' && digestPattern.test(source.sourceDigest)))
+      throw draftFailure('draft_invalid', 'Draft sources are invalid')
+  }
+  return parsed
+}
+function writePrivateDraft(file, draft) {
+  const existed = inspectDraftPath(file) !== undefined
+  const directory = dirname(file)
+  const temp = joinPath(directory, `.${basename(file)}.${randomBytes(6).toString('hex')}.tmp`)
+  const fd = openSync(temp, 'wx', 0o600)
+  try {
+    writeSync(fd, JSON.stringify(draft, null, 2) + String.fromCharCode(10))
+    fsyncSync(fd)
+  } finally { closeSync(fd) }
+  try {
+    // A final pre-rename snapshot keeps the policy explicit; the rename itself replaces the path
+    // atomically and can never follow a symlink target.
+    inspectDraftPath(file)
+    renameSync(temp, file)
+  } catch (error) {
+    try { unlinkSync(temp) } catch { /* private temporary file already gone */ }
+    throw error
+  }
+  const after = lstatSync(file)
+  if (!after.isFile() || after.isSymbolicLink() || (after.mode & 0o777) !== 0o600)
+    throw draftFailure('draft_write_policy', 'Draft write left an unexpected file type or mode')
+}
 
 try {
   if (command === 'preview') {
@@ -138,29 +204,31 @@ try {
   } else if (command === 'draft') {
     if (!values.file) { usage('--file is required for draft'); stop() }
     if (!isAbsolute(values.file)) { usage('--file must be absolute'); stop() }
-    if (positionals[0] === 'load') {
-      let parsed, mode
-      try { mode = statSync(values.file).mode & 0o777; parsed = JSON.parse(readFileSync(values.file, 'utf8')) }
-      catch (error) { failure('draft_unreadable', `Draft is not readable: ${String(error?.message ?? error)}`); stop() }
-      if (mode !== 0o600) { refused(0, { error: { code: 'draft_permissions', message: 'A draft file must be owner-private (0600)' } }); stop() }
-      if (parsed?.protocol !== 'assistant-context-draft/1' || typeof parsed.expiresAt !== 'string' || typeof parsed.projectId !== 'string')
-        { refused(0, { error: { code: 'draft_invalid', message: 'Draft does not carry the expected preview fields' } }); stop() }
-      const stale = Date.parse(parsed.expiresAt) <= Date.now()
-      out({ status: 'ok', operation: 'draft-load', result: { ...parsed, usable: !stale, stale, authorization: 'none' } })
-    } else {
-      if (!need('project', 'conversation')) stop()
-      const selections = (values.select ?? 'conversation').split(',').map((value) => value.trim()).filter(Boolean)
-      const body = await request('/v1/context/preview', { method: 'POST', body: JSON.stringify({
-        projectId: values.project, conversationId: values.conversation, selections,
-        ...(values.work ? { workId: values.work } : {}), budget: { maxFiles: 32, maxBytes: 65536, maxTokens: 16000 } }) })
-      if (!body) stop()
-      const draft = { protocol: 'assistant-context-draft/1', authorization: 'none', projectId: values.project,
-        conversationId: values.conversation, selections, requestId: body.requestId, observedAt: body.observedAt,
-        expiresAt: body.expiresAt, status: body.status, sources: sourcesOf(body).map((source) => ({
-          sourceId: source.sourceId, path: source.path, sourceDigest: source.sourceDigest })) }
-      writeFileSync(values.file, JSON.stringify(draft, null, 2) + String.fromCharCode(10), { mode: 0o600, flag: 'w' })
-      out({ status: 'ok', operation: 'draft-save', result: { file: values.file, expiresAt: draft.expiresAt,
-        status: draft.status, sources: draft.sources.length, authorization: 'none' } })
+    try {
+      if (positionals[0] === 'load') {
+        const parsed = readPrivateDraft(values.file)
+        const stale = Date.parse(parsed.expiresAt) <= Date.now()
+        out({ status: 'ok', operation: 'draft-load', result: { ...parsed, usable: !stale, stale, authorization: 'none' } })
+      } else if (positionals[0] === undefined || positionals[0] === 'save') {
+        if (!need('project', 'conversation')) stop()
+        const selections = (values.select ?? 'conversation').split(',').map((value) => value.trim()).filter(Boolean)
+        const body = await request('/v1/context/preview', { method: 'POST', body: JSON.stringify({
+          projectId: values.project, conversationId: values.conversation, selections,
+          ...(values.work ? { workId: values.work } : {}), budget: { maxFiles: 32, maxBytes: 65536, maxTokens: 16000 } }) })
+        if (!body) stop()
+        const draft = { protocol: DRAFT_PROTOCOL, authorization: 'none', projectId: values.project,
+          conversationId: values.conversation, selections, requestId: body.requestId, observedAt: body.observedAt,
+          expiresAt: body.expiresAt, status: body.status, sources: sourcesOf(body).map((source) => ({
+            sourceId: source.sourceId, path: source.path, sourceDigest: source.sourceDigest })) }
+        writePrivateDraft(values.file, draft)
+        out({ status: 'ok', operation: 'draft-save', result: { file: values.file, expiresAt: draft.expiresAt,
+          status: draft.status, sources: draft.sources.length, authorization: 'none' } })
+      } else {
+        usage('draft subcommands: save | load')
+      }
+    } catch (error) {
+      if (String(error?.code ?? '').startsWith('draft_')) { refused(0, { error: { code: error.code, message: String(error.message) } }); stop() }
+      throw error
     }
   } else if (command === 'send') {
     if (!need('project', 'conversation', 'content')) stop()
