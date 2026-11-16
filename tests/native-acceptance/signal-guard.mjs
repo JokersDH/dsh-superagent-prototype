@@ -12,7 +12,7 @@
  * Dependencies (spawn/ps/kill) are injectable so the pure controls never touch a live process.
  */
 import { randomUUID } from 'node:crypto'
-import { spawn as realSpawn, spawnSync } from 'node:child_process'
+import { ChildProcess, spawn as realSpawn, spawnSync } from 'node:child_process'
 
 const PS_FIELDS = '-o pid=,uid=,ppid=,lstart=,command='
 
@@ -92,8 +92,14 @@ function registerIntent(pid, intent) {
 export function spawnOwned(executable, args, intent = {}) {
   const child = deps.spawn(executable, args, intent.spawnOptions ?? { stdio: ['ignore', 'pipe', 'pipe'] })
   if (!child || !Number.isSafeInteger(child.pid)) return { ok: false, unknown: 'spawn_failed', child }
-  const registered = adoptSpawn(child, intent)
-  return { ...registered, child, argv: [executable, ...args] }
+  // spawnOwned performed this spawn itself, so it registers the intent it just issued; it never needs
+  // to re-adopt its own child. Adoption from callers is the guarded path below.
+  const argv = [executable, ...args]
+  for (const [name, value] of [['root', intent.root], ['config', intent.config], ['operation', intent.operation]]) {
+    if (value !== undefined && value !== null && !argv.includes(value)) return { ok: false, unknown: `spawn_${name}_not_in_argv`, child }
+  }
+  const registered = registerIntent(child.pid, { executable, argv, ...intent })
+  return { ...registered, child, argv }
 }
 
 /** Adopt a child the caller spawned itself, using the caller's spawn intent (never a ps-derived one). */
@@ -101,6 +107,9 @@ export function adoptSpawn(childOrPid, intent = {}) {
   // A numeric pid is NEVER ownership: the caller must hand over the original ChildProcess object whose
   // spawnfile/spawnargs are the process's own spawn metadata. ps-copied strings and bare pids are refused.
   if (!childOrPid || typeof childOrPid !== 'object') return { ok: false, unknown: 'numeric_pid_not_accepted' }
+  // A plain object with copied spawnfile/spawnargs is NOT the original ChildProcess: the spawn metadata
+  // must belong to a real child object this process created.
+  if (!(childOrPid instanceof ChildProcess)) return { ok: false, unknown: 'not_a_child_process' }
   const pid = childOrPid.pid
   if (!Number.isSafeInteger(pid) || pid <= 0) return { ok: false, unknown: 'invalid_pid' }
   const executable = childOrPid.spawnfile

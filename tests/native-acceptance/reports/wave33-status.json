@@ -1,0 +1,71 @@
+{
+  "agent": "B",
+  "branch": "codex/g1-runtime",
+  "wave": 33,
+  "source": {
+    "B_merge_head": "735193ea",
+    "main_merged": "fc38bf65 line (origin/main merged; merge commit 735193ea)",
+    "main_attach_port": "apps/coordinator/product/native-attempt.ts returns a structuredClone of the original endpoint/producer as RunningAttempt.attachPort only after original register/policyready/current; Node-internal, no public DTO/wire/credential",
+    "conflict_resolution": "packages/execution/src/contracts.ts conflict resolved to main's authoritative AttachedAttemptPort {registration, producer: RuntimeProducer}; B attach caller is compatible with it",
+    "changed_paths": [
+      "packages/execution/src/contracts.ts (merge resolution)",
+      "packages/execution/src/attempt-slots.ts",
+      "tests/native-acceptance/signal-guard.mjs",
+      "tests/native-acceptance/b28-signal.mjs",
+      "tests/native-acceptance/b33-slots.mjs"
+    ],
+    "tar": "NONE - source only; no installed tar/ZIP, no user-instance restart"
+  },
+  "dirtyPreserved": [
+    "reports/releases/wave11-admission/runtime.json",
+    "reports/releases/wave12-admission/runtime.json",
+    "tests/native-acceptance/b16-real-begin.mjs (untracked)"
+  ],
+  "outcomes": {
+    "birth_and_original_three_callbacks": {
+      "status": "PARTIAL (unforgeable birth COMPLETE; original Store/native-guard callbacks proven through main's real consumer; original Application/QuestionBroker authority still preseeded)",
+      "birth": "adoptSpawn accepts ONLY a real ChildProcess (instanceof) and derives intent from its own spawnfile/spawnargs; a plain object with copied spawn metadata -> not_a_child_process, a numeric pid -> numeric_pid_not_accepted, a copied/edited handle -> unknown_handle, and the tool's own spawn refuses a root/config/op token it did not issue. Complete child plan checked on every signal; UNKNOWN retained.",
+      "callbacks": "main-owned tests/integration/attached-port.case.mjs consumes B's attachRunnerAttempt with a real ProductStore ingress + stored immutable payload + controlled nativeWrite guard: 4/4 PASS. It proves the Store payload/receipt identity for allow and deny decisions and refuses a foreign fact before any authoritative receipt or write admission.",
+      "commands": [
+        "node tests/native-acceptance/b28-signal.mjs -> exit 0, 10 PASS/0 FAIL/1 NOT_TESTED",
+        "node tests/native-acceptance/b27-sigkill.mjs -> exit 0, 7/0/1",
+        "node tests/native-acceptance/b27-chain.mjs -> exit 0, 4/0/1",
+        "node --test tests/integration/attached-port.case.mjs -> exit 0, 4/4"
+      ]
+    },
+    "same_work_interrupt_to_delivery": {
+      "status": "NOT_REACHED",
+      "detail": "No original Application/QuestionBroker completion path is wired to the attached consumer in this checkout: main's attached-port fixture seeds a ticket and its completionPolicy throws, so it cannot reach candidate/check/manualaccept/delivered. B did not create a new Work, fixture registry or synthetic acceptance to stand in. B's fixture-lane handover (b31: A->B on the same Runner/attempt, old lease refused, stdio 0) is transport evidence only."
+    },
+    "two_and_four_slot_scheduler": {
+      "status": "PARTIAL (B-owned slot accounting COMPLETE against real ProductStore bindings; main scheduler composition pending)",
+      "implementation": "packages/execution/src/attempt-slots.ts: start at the original 2 slots, queue bounded work, open to 4, release ONLY on confirmed quiescence (indeterminate retains and still occupies capacity), cancel queued attempts without claiming a running slot, restore accounting from the ORIGINAL Store binding states (ended->released, active->running, stopping->indeterminate, duplicates counted once), refuse duplicate/shrink/overflow.",
+      "consumer": "tests/native-acceptance/b33-slots.mjs uses real ProductStore tickets/bindings (read back from the Store, not a local array) and runs 7 PASS/0 FAIL: 2-then-queue, confirmed release promotes, unknown retains, 2->4 open with shrink refused, queued cancel, restart restore, duplicate/queue-full/empty-id refusal.",
+      "remaining": "main's product scheduler must compose this accounting around its own start/stop authority; it is not yet the default path and no original slot release is claimed."
+    }
+  },
+  "verification": {
+    "root_tsc": "exit 0",
+    "attached_tsc": "exit 0",
+    "runner_tests": "147 pass / 0 fail",
+    "attached_port_case": "4 pass / 0 fail",
+    "b33_slots": "7/0",
+    "b28_signal": "10/0/1",
+    "b27_sigkill": "7/0/1",
+    "b27_chain": "4/0/1",
+    "b31_attach": "3/0/1",
+    "b32_late": "3/0/1"
+  },
+  "scope": {
+    "modelTurns": 0,
+    "nativeTurns": 0,
+    "cap4UnknownUnspendable": true,
+    "noNew": "no candidate table/ledger/second coordinator/migration/shared schema/HTTP/App/transport/main-owned edit; no new Driver/CAC/desktop/auto-accept/writer racing/DAG/second lifecycle",
+    "notClaimed": [
+      "full same-Work recovered delivery",
+      "original 2/4 scheduler slot release",
+      "real vendor/model/native turn",
+      "installed product"
+    ]
+  }
+}

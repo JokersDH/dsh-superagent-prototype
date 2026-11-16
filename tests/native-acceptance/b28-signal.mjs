@@ -61,7 +61,7 @@ try {
     const forged = adoptSpawn(impostor, { expectedChildren: [] })
     const forgedSent = forged.ok ? signalOwned(forged.handle, 'SIGKILL') : { sent: false, refused: true, unknown: forged.unknown }
     log.evidence({ refusedNoHandle: noHandle.refused, forged: forgedSent })
-    if (noHandle.refused && !forged.ok && forged.unknown === 'numeric_pid_not_accepted' && world.kills.length === 0) log.pass('a bare pid for a second direct child with identical argv was refused (numeric_pid_not_accepted) with zero kill calls')
+    if (noHandle.refused && !forged.ok && (forged.unknown === 'numeric_pid_not_accepted' || forged.unknown === 'not_a_child_process') && world.kills.length === 0) log.pass('a bare pid (and a plain object) for a second direct child with identical argv was refused with zero kill calls')
     else log.fail(`an unregistered sibling was signalled: ${JSON.stringify({ noHandle, forged, kills: world.kills })}`)
   }
 
@@ -79,12 +79,14 @@ try {
   log.begin('B31-SIGNAL-METADATA-REFUSED', 'root/config/operation must be tokens of the spawn intent', 'pure_mock')
   {
     const world = mockWorld()
-    world.add(4200, [process.execPath, '--root=/tmp/w31-other'])
-    const foreignChild = { pid: 4200, spawnfile: process.execPath, spawnargs: [process.execPath, '--root=/tmp/w31-other'] }
-    const wrongRoot = adoptSpawn(foreignChild, { root: '--root=/tmp/w31-root', expectedChildren: [] })
-    log.evidence({ wrongRoot: wrongRoot.ok ? null : wrongRoot.unknown })
-    if (!wrongRoot.ok && wrongRoot.unknown === 'spawn_root_not_in_argv' && world.kills.length === 0) log.pass('declaring a root that is not a token of the spawn argv was refused before registration')
-    else log.fail(`inconsistent spawn metadata was accepted: ${JSON.stringify(wrongRoot)}`)
+    // A plain object carrying copied spawn metadata is refused outright (wave-33 finding).
+    const copiedChild = { pid: 4200, spawnfile: process.execPath, spawnargs: [process.execPath, '--root=/tmp/w31-other'] }
+    const copiedAdopt = adoptSpawn(copiedChild, { expectedChildren: [] })
+    // Even the tool's own spawn refuses a metadata token that is not in the argv it issued.
+    const wrongRoot = spawnOwned(process.execPath, ['--root=/tmp/w31-root'], { root: '--root=/tmp/w31-other', expectedChildren: [] })
+    log.evidence({ copiedAdopt: copiedAdopt.ok ? null : copiedAdopt.unknown, wrongRoot: wrongRoot.ok ? null : wrongRoot.unknown })
+    if (!copiedAdopt.ok && copiedAdopt.unknown === 'not_a_child_process' && !wrongRoot.ok && wrongRoot.unknown === 'spawn_root_not_in_argv' && world.kills.length === 0) log.pass('a plain object with copied spawn metadata was refused (not_a_child_process) and a root outside the issued argv was refused before registration')
+    else log.fail(`inconsistent spawn metadata was accepted: ${JSON.stringify({ copiedAdopt, wrongRoot })}`)
   }
 
   log.begin('B31-SIGNAL-IDENTITY-UID-START', 'uid/start changes end ownership', 'pure_mock')
