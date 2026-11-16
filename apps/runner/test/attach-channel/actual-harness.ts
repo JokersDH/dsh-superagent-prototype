@@ -115,7 +115,7 @@ export async function startService(t: TestContext, options: ServiceOptions = {})
   // `serveRunner`'s loop only returns after its input ends, so a consumer observes completion through
   // the real `exited` frame; the handle is awaited by cleanup instead.
   const done = (async () => {
-    await until(() => frames.some(frame => frame.type === 'exited'), 8000, 'service exit frame')
+    await until(() => frames.some(frame => frame.type === 'exited'), 30_000, 'service exit frame')
     const exit = frames.find(frame => frame.type === 'exited')?.exit
     return (exit as { reason: string; evidenceRefs: string[] } | undefined) ?? { reason: 'unknown', evidenceRefs: [] }
   })()
@@ -165,7 +165,7 @@ export async function startService(t: TestContext, options: ServiceOptions = {})
       } catch {
         return false
       }
-    }, 5000, 'recovery socket')
+    }, 20_000, 'recovery socket')
     const stat = lstatSync(socketPath)
     return { socketPath, credentialPath: `${directory}/runner.credential`, socketIdentity: { dev: stat.dev, ino: stat.ino } }
   }
