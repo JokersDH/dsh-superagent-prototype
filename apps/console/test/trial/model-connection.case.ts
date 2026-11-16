@@ -11,7 +11,7 @@ test('a complete configuration becomes only a transient draft', () => {
   const result = trialModelConnectionDraft(base, enabled)
   assert.equal(result.ok, true)
   if (!result.ok) return
-  assert.deepEqual(result.draft, base)
+  assert.deepEqual(result.draft, { ...base, allowInsecureHttp: false })
 })
 
 test('values are trimmed without changing the secret semantics', () => {
@@ -45,14 +45,22 @@ test('missing, malformed and overlong endpoint fields are refused', () => {
   }
 })
 
-test('remote plain HTTP and embedded credentials are refused', () => {
+test('plain HTTP needs an explicit opt-in and embedded credentials/query/hash are refused', () => {
   const remote = trialModelConnectionDraft({ ...base, endpoint: 'http://api.example.test/v1' }, enabled)
   assert.equal(remote.ok, false)
   if (!remote.ok && remote.failure.kind === 'invalid') assert.equal(remote.failure.field, 'endpoint')
   const credentials = trialModelConnectionDraft({ ...base, endpoint: 'https://user:pass@api.example.test/v1' }, enabled)
   assert.equal(credentials.ok, false)
   const loopback = trialModelConnectionDraft({ ...base, endpoint: 'http://127.0.0.1:8080/v1' }, enabled)
-  assert.equal(loopback.ok, true)
+  assert.equal(loopback.ok, false)
+  const opted = trialModelConnectionDraft({ ...base, endpoint: 'http://127.0.0.1:8080/v1', allowInsecureHttp: true }, enabled)
+  assert.equal(opted.ok, true)
+  const query = trialModelConnectionDraft({ ...base, endpoint: 'https://api.example.test/v1?x=1' }, enabled)
+  assert.equal(query.ok, false)
+  const fragment = trialModelConnectionDraft({ ...base, endpoint: 'https://api.example.test/v1#x' }, enabled)
+  assert.equal(fragment.ok, false)
+  const embedded = trialModelConnectionDraft({ ...base, endpoint: 'https://api.example.test/v1', model: 'sk-local-example' }, enabled)
+  assert.equal(embedded.ok, false)
 })
 
 test('model and secret fields are bounded and newlines are removed from the key', () => {

@@ -73,7 +73,7 @@ try {
     assert(await page.getByLabel('模型名称').count() === 1, 'model field exists')
     assert(await page.getByLabel('API Key', { exact: true }).getAttribute('type') === 'password', 'key uses a password input')
     assert(await page.getByLabel('API Key', { exact: true }).getAttribute('autocomplete') === 'new-password', 'key is not autofilled')
-    assert((await page.locator('.trial-model-key-note').innerText()).includes('不写入浏览器存储'), 'the transient secret rule is stated')
+    assert((await page.locator('.trial-model-key-note').innerText()).includes('不会回显'), 'the transient secret rule is stated')
   }, 'controlled form fields')
 
   await step('NO-PREMATURE-SIDE-EFFECT', async () => {
@@ -87,7 +87,7 @@ try {
   }, 'no storage/url/fetch before submit')
 
   await step('SUBMIT-CLEARS-AND-CALLS-ONCE', async () => {
-    await page.getByRole('button', { name: '连接模型' }).click()
+    await page.getByRole('button', { name: '保存配置' }).click()
     await page.waitForSelector('.trial-model-status')
     const recorded = await calls()
     assert(recorded.length === 1, 'one explicit submit calls one callback')
@@ -97,13 +97,13 @@ try {
     assert(!audit.text.includes(secret) && !audit.url.includes(secret), 'submitted key is not page text or URL')
     assert(audit.local === 0 && audit.session === 0, 'submit writes no browser storage')
     assert((await page.evaluate(() => window.__TRIAL_REQUESTS__ ?? [])).length === 0, 'submit makes no direct fetch')
-    assert((await page.locator('.trial-model-status').innerText()).includes('主程序确认'), 'connection feedback names the main confirmation')
+    assert((await page.locator('.trial-model-status').innerText()).includes('连接已由主程序确认'), 'connection feedback names the main confirmation')
   }, 'transient key lifecycle')
 
   await step('LEAKY-FEEDBACK-IS-REFUSED', async () => {
     await open('outcome=leak')
     await fill()
-    await page.getByRole('button', { name: '连接模型' }).click()
+    await page.getByRole('button', { name: '保存配置' }).click()
     await page.waitForSelector('.trial-model-failure')
     const alert = await page.locator('.trial-model-failure').innerText()
     assert(!alert.includes(secret), 'feedback never echoes the submitted key')
@@ -115,14 +115,75 @@ try {
   await step('FAILED-CONNECTION-KEEPS-EDITABLE-FORM', async () => {
     await open('outcome=failed')
     await fill()
-    await page.getByRole('button', { name: '连接模型' }).click()
+    await page.getByRole('button', { name: '保存配置' }).click()
     await page.waitForSelector('.trial-model-failure')
     assert((await page.locator('.trial-model-failure').innerText()).includes('端点拒绝连接'), 'safe provider feedback is shown')
     assert(await page.getByLabel('模型名称').isEditable(), 'the form remains editable after failure')
     await page.getByLabel('API Key', { exact: true }).fill(secret)
-    await page.getByRole('button', { name: '连接模型' }).click()
+    await page.getByRole('button', { name: '保存配置' }).click()
     assert((await calls()).length === 2, 'a second explicit submit is allowed without duplicates')
   }, 'failure remains recoverable')
+
+  await step('SAVED-IS-NOT-CONNECTION', async () => {
+    await open('outcome=saved')
+    await fill()
+    await page.getByRole('button', { name: '保存配置' }).click()
+    await page.waitForSelector('.trial-model-status')
+    assert((await page.locator('.trial-model-status').innerText()).includes('已保存到本机'), 'saved is explicit about local persistence')
+    assert(!(await page.locator('.trial-model-status').innerText()).includes('连接已'), 'saved is not presented as a verified provider connection')
+  }, 'saved vs connected')
+
+  await step('HTTP-REQUIRES-OPT-IN', async () => {
+    await open('outcome=connected')
+    await page.getByLabel('模型端点').fill('http://127.0.0.1:8080/v1')
+    await page.getByLabel('模型名称').fill('reasoner')
+    await page.getByLabel('API Key', { exact: true }).fill(secret)
+    await page.getByRole('button', { name: '保存配置' }).click()
+    await page.waitForSelector('.trial-model-failure')
+    assert((await page.locator('.trial-model-failure').innerText()).includes('明确允许未加密传输'), 'plain HTTP is refused without opt-in')
+    assert((await calls()).length === 0, 'refused HTTP never reaches main')
+    const optIn = page.getByRole('checkbox', { name: '允许未加密的 HTTP（密钥会随请求发送）' })
+    assert(await optIn.count() === 1, 'the explicit HTTP control is shown')
+    await optIn.check()
+    await page.getByLabel('API Key', { exact: true }).fill(secret)
+    await page.getByRole('button', { name: '保存配置' }).click()
+    await page.waitForSelector('.trial-model-status')
+    const recorded = await calls()
+    assert(recorded.length === 1 && recorded[0].allowInsecureHttp === true, 'explicit opt-in is carried to main')
+    assert(recorded[0].apiKey === secret, 'main receives the transient key after explicit HTTP choice')
+  }, 'explicit insecure transport')
+
+  await step('DOUBLE-CLICK-SAVES-ONCE', async () => {
+    await open('outcome=slow')
+    await fill()
+    const button = page.getByRole('button', { name: '保存配置' })
+    await button.click()
+    await button.click({ force: true }).catch(() => undefined)
+    await page.waitForSelector('.trial-model-status', { timeout: 5000 })
+    assert((await calls()).length === 1, 'a second click while saving does not send a second request')
+    assert(await page.getByLabel('API Key', { exact: true }).inputValue() === '', 'the key is cleared while saving')
+  }, 'duplicate submit guard')
+
+  await step('LATE-RESULT-AFTER-IDENTITY-CHANGE', async () => {
+    await open('outcome=slow')
+    await fill()
+    await page.getByRole('button', { name: '保存配置' }).click()
+    await page.locator('[data-harness="switch"]').click()
+    await page.waitForFunction(() => [...document.querySelectorAll('.trial-model-field input')].every(input => input.value === ''))
+    await page.waitForTimeout(1400)
+    assert(await page.locator('.trial-model-status').count() === 0, 'a late old-identity result is not shown on the new identity')
+    assert(await page.locator('.trial-model-failure').count() === 0, 'a late old-identity failure is not shown on the new identity')
+    assert((await calls()).length === 1, 'identity switch does not resend the old secret')
+  }, 'stale result isolation')
+
+  await step('UNSUPPORTED-OLD-SERVICE', async () => {
+    await open('outcome=unsupported')
+    await fill()
+    await page.getByRole('button', { name: '保存配置' }).click()
+    await page.waitForSelector('.trial-model-failure')
+    assert((await page.locator('.trial-model-failure').innerText()).includes('当前服务不支持网页配置'), 'old-service fallback is explicit')
+    assert(await page.getByLabel('模型端点').isEditable(), 'the original fields remain editable for a manual fallback')
+  }, 'unsupported capability')
 
   await step('IDENTITY-CHANGE-CLEARS-SECRET', async () => {
     await open('outcome=connected')
@@ -172,7 +233,7 @@ try {
     }
     assert(order[0] === '模型名称', 'Tab reaches the model name')
     assert(order[1] === 'API Key', 'Tab reaches the key')
-    assert(order[2] === '连接模型', 'Tab reaches the submit action')
+    assert(order[2].includes('保存配置'), `Tab reaches the submit action: ${order.join(' > ')}`)
   }, 'bounded keyboard path')
 
   await step('MOBILE-NO-OVERFLOW', async () => {

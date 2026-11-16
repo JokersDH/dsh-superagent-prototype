@@ -1,14 +1,14 @@
 {
   "subject": "trial experience suites (controlled fixtures / isolated services; not a release verdict)",
-  "generatedAt": "2026-11-16T12:01:43.190Z",
+  "generatedAt": "2026-11-16T15:25:28.630Z",
   "results": [
     {
       "id": "unit-mapping",
-      "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node --test test/trial/trial-view.case.ts test/trial/recipes.case.ts test/trial/model-connection.case.ts test/trial/history-source.case.ts",
+      "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node --test test/trial/trial-view.case.ts test/trial/recipes.case.ts test/trial/model-connection.case.ts test/trial/history-source.case.ts test/trial/work-review.case.ts",
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 120000,
-      "ms": 200
+      "ms": 223
     },
     {
       "id": "typecheck-app",
@@ -16,7 +16,7 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 240000,
-      "ms": 2950
+      "ms": 2653
     },
     {
       "id": "typecheck-e2e",
@@ -24,7 +24,7 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 240000,
-      "ms": 2570
+      "ms": 2128
     },
     {
       "id": "build",
@@ -32,7 +32,7 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 240000,
-      "ms": 618
+      "ms": 492
     },
     {
       "id": "hook-async",
@@ -40,7 +40,7 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 420000,
-      "ms": 5990
+      "ms": 6040
     },
     {
       "id": "browser-states",
@@ -48,7 +48,7 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 420000,
-      "ms": 45322
+      "ms": 46802
     },
     {
       "id": "model-connection",
@@ -56,7 +56,7 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 420000,
-      "ms": 6460
+      "ms": 12694
     },
     {
       "id": "history-source",
@@ -64,7 +64,15 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 420000,
-      "ms": 4456
+      "ms": 4486
+    },
+    {
+      "id": "work-review",
+      "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node e2e/trial/work-review.mjs",
+      "exitCode": 0,
+      "signal": null,
+      "timeoutMs": 420000,
+      "ms": 2696
     },
     {
       "id": "http-journey",
@@ -72,7 +80,7 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 420000,
-      "ms": 3306
+      "ms": 3447
     },
     {
       "id": "app-targets",
@@ -80,7 +88,7 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 420000,
-      "ms": 8306
+      "ms": 7677
     },
     {
       "id": "app-two-projects",
@@ -88,7 +96,7 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 420000,
-      "ms": 2693
+      "ms": 2701
     },
     {
       "id": "app-daily-flow",
@@ -96,7 +104,7 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 600000,
-      "ms": 10664
+      "ms": 10567
     }
   ],
   "failed": []

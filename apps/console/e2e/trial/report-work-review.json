@@ -1,0 +1,55 @@
+{
+  "subject": "trial work history/decision reference/review evidence (controlled DTOs, read-only, not a release verdict)",
+  "generatedAt": "2026-11-16T15:25:04.216Z",
+  "results": [
+    {
+      "id": "WORK-HISTORY-NON-EMPTY",
+      "status": "PASS",
+      "ms": 685,
+      "detail": "non-empty work history"
+    },
+    {
+      "id": "WORK-HISTORY-CONTINUATION",
+      "status": "PASS",
+      "ms": 19,
+      "detail": "continuation"
+    },
+    {
+      "id": "DECISION-CURRENT-AND-REFUSED",
+      "status": "PASS",
+      "ms": 60,
+      "detail": "decision reference eligibility"
+    },
+    {
+      "id": "REVIEW-EVIDENCE-ACCEPTANCE",
+      "status": "PASS",
+      "ms": 1,
+      "detail": "acceptance summary"
+    },
+    {
+      "id": "MACHINE-FAILURE-IS-EXPLICIT",
+      "status": "PASS",
+      "ms": 47,
+      "detail": "machine failure"
+    },
+    {
+      "id": "KEYBOARD-AND-MOBILE",
+      "status": "PASS",
+      "ms": 703,
+      "detail": "keyboard and 390px"
+    },
+    {
+      "id": "FORCED-COLORS",
+      "status": "PASS",
+      "ms": 601,
+      "detail": "forced-colors rendering"
+    },
+    {
+      "id": "NO-UNEXPECTED-ERRORS",
+      "status": "PASS",
+      "ms": 0,
+      "detail": "browser errors"
+    }
+  ],
+  "failures": []
+}

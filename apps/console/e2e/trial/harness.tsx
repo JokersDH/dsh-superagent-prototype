@@ -13,6 +13,7 @@ import { TrialWorkspace } from '../../src/trial/TrialWorkspace.tsx'
 import { TrialModelConnectionForm } from '../../src/trial/ModelConnectionForm.tsx'
 import { HistorySourcePanel } from '../../src/trial/HistorySourcePanel.tsx'
 import { trialHistoryMerge } from '../../src/trial/history-source.ts'
+import { DecisionReferencePanel, ReviewEvidencePanel, WorkHistoryPanel } from '../../src/trial/WorkReviewPanels.tsx'
 import { useTrialReadiness } from '../../src/trial/useTrialReadiness.ts'
 import type { TrialHarnessState } from './fixtures.ts'
 import { trialHarnessProps, trialProbePair, trialStates } from './fixtures.ts'
@@ -38,6 +39,8 @@ declare global {
     __TRIAL_EXPORTS__?: number
     __TRIAL_RECIPE_RELOADS__?: number
     __TRIAL_SAME_READS__?: number
+    __TRIAL_DECISION_SELECT__?: string[]
+    __TRIAL_WORK_HISTORY_LOADS__?: number
     __TRIAL_MODEL_CALLS__?: { endpoint: string; model: string; apiKey: string }[]
   }
 }
@@ -56,6 +59,8 @@ window.__TRIAL_WINDOWS__ = []
 window.__TRIAL_EXPORTS__ = 0
 window.__TRIAL_RECIPE_RELOADS__ = 0
 window.__TRIAL_MODEL_CALLS__ = []
+window.__TRIAL_DECISION_SELECT__ = []
+window.__TRIAL_WORK_HISTORY_LOADS__ = 0
 const nativeFetch = window.fetch.bind(window)
 window.fetch = ((input: RequestInfo | URL, init?: RequestInit) => {
   requests.push(typeof input === 'string' ? input : input instanceof URL ? input.href : input.url)
@@ -405,6 +410,8 @@ function ModelFormHarness() {
           if (outcome === 'slow') await new Promise(resolve => setTimeout(resolve, 1200))
           if (outcome === 'leak') return { status: 'failed', message: `provider rejected ${draft.apiKey} at /Users/private/key` }
           if (outcome === 'failed') return { status: 'failed', message: '端点拒绝连接，请检查密钥。' }
+          if (outcome === 'unsupported') return { status: 'unsupported', message: '当前服务不支持网页配置。' }
+          if (outcome === 'saved') return { status: 'saved' }
           return { status: 'connected', message: '连接已由主程序确认。' }
         }} /> : <p data-unmounted="true">unmounted</p>}
     </HarnessFrame>
@@ -487,6 +494,56 @@ function HistoryHarness() {
   )
 }
 
+function ReviewHarness() {
+  const contract = { workId: 'work-1', revision: 2, digest: 'a'.repeat(64), scope: { projectId: 'project-atlas', allowedPaths: ['src/'], excludedPaths: [], externalActions: [] } }
+  const work = {
+    work: { id: 'work-1', projectId: 'project-atlas', conversationId: 'conv-alpha', title: '交付检查', createdAt: '2026-11-16T00:00:00.000Z' },
+    contract, links: [], phase: 'delivered', coreSnapshotRef: 'core', openQuestionIds: [], artifactIds: ['artifact-1', 'artifact-2'],
+    resourceStatus: 'quiescent', evidenceRefs: [],
+    actions: { dispatchHold: { paused: false, revision: 0 }, currentCandidate: { ticketId: 'ticket-1', assignmentId: 'assignment-1', contract, candidateGeneration: 1 },
+      currentVerificationId: 'verify-1', available: ['accept_candidate'] },
+  } as unknown as import('@personal-agent/contracts').WorkView
+  const [entries, setEntries] = useState([
+    { at: '2026-11-16T00:01:00.000Z', kind: 'work.created', sourceRef: 'ref-1', detail: {} },
+    { at: '2026-11-16T00:02:00.000Z', kind: 'verification.recorded', sourceRef: 'ref-2', detail: { revision: 2 } },
+  ])
+  const [historyPage, setHistoryPage] = useState({ protocol: 'work-evidence-history/1' as const, workId: 'work-1', contract,
+    observedAt: '2026-11-16T00:10:00.000Z', entries, hasMore: true, nextCursor: 'cursor-1', window: 'caller_limit' as const, sourcesCapped: [] })
+  const [failure, setFailure] = useState(false)
+  const verification = { protocol: 'work-verification/1', workId: 'work-1', state: failure ? 'blocked' : 'finished',
+    ...(failure ? { failure: { id: 'failure-1', code: 'verification_failed', failureCount: 2 } } : { verificationId: 'verify-1' }),
+    retryAvailable: failure, ...(failure ? {} : {}) } as unknown as import('@personal-agent/contracts').WorkVerificationStatus
+  const evidence = { protocol: 'work-evidence/1', workId: 'work-1', projection: 'recorded', entries: [], outcomes: [], truncated: false } as unknown as import('@personal-agent/contracts').WorkEvidence
+  const decisions = { protocol: 'decision-catalog/1', decisions: [
+    { record: { decision: { id: 'decision-1', version: 1, content: '采用标准检查', authorityRef: 'auth', scope: { projectId: 'project-atlas', allowedPaths: ['src/'], excludedPaths: [], externalActions: [] } },
+      sourceMessageId: 'msg-1', sourceTextDigest: 'b'.repeat(64), conversationId: 'conv-alpha', actorRef: 'user', recordedAt: '2026-11-16T00:00:00.000Z' }, sourceState: 'current', status: 'recorded' },
+    { record: { decision: { id: 'decision-2', version: 2, content: '旧检查已替代', authorityRef: 'auth', scope: { projectId: 'project-atlas', allowedPaths: ['src/'], excludedPaths: [], externalActions: [] } },
+      sourceMessageId: 'msg-2', sourceTextDigest: 'c'.repeat(64), conversationId: 'conv-alpha', actorRef: 'user', recordedAt: '2026-11-16T00:00:00.000Z' }, sourceState: 'stale', status: 'superseded' },
+  ], hasMore: false } as unknown as import('@personal-agent/contracts').DecisionPage
+  return (
+    <HarnessFrame controls={(
+      <>
+        <button type="button" data-harness="load-history" onClick={() => {
+          const next = { ...historyPage, entries: [...entries, { at: '2026-11-16T00:03:00.000Z', kind: 'acceptance.recorded', sourceRef: 'ref-3', detail: {} }], hasMore: false }
+          delete (next as { nextCursor?: string }).nextCursor
+          setEntries(next.entries); setHistoryPage(next); window.__TRIAL_WORK_HISTORY_LOADS__ = (window.__TRIAL_WORK_HISTORY_LOADS__ ?? 0) + 1
+        }}>较早记录</button>
+        <button type="button" data-harness="fail-verification" onClick={() => setFailure(value => !value)}>切换机器失败</button>
+      </>
+    )}>
+      <WorkHistoryPanel history={historyPage} scope={{ workId: 'work-1', revision: 2 }} onLoadMore={() => {
+        const nextEntries = [...entries, { at: '2026-11-16T00:03:00.000Z', kind: 'acceptance.recorded', sourceRef: 'ref-3', detail: {} }]
+        const next = { ...historyPage, entries: nextEntries, hasMore: false }
+        delete (next as { nextCursor?: string }).nextCursor
+        setEntries(nextEntries); setHistoryPage(next); window.__TRIAL_WORK_HISTORY_LOADS__ = (window.__TRIAL_WORK_HISTORY_LOADS__ ?? 0) + 1
+      }} onOpenWork={() => writeLog('open-work')} />
+      <DecisionReferencePanel page={decisions} projectId="project-atlas" now={Date.parse('2026-11-16T01:00:00.000Z')}
+        onSelect={id => { window.__TRIAL_DECISION_SELECT__?.push(id); writeLog(`decision: ${id}`) }} />
+      <ReviewEvidencePanel work={work} verification={verification} evidence={evidence} onOpenWork={() => writeLog('open-review-work')} />
+    </HarnessFrame>
+  )
+}
+
 function App() {
   const params = new URLSearchParams(window.location.search)
   const mode = params.get('mode') ?? 'props'
@@ -502,6 +559,7 @@ function App() {
   if (mode === 'auth-expiry') return <AuthExpiryHarness />
   if (mode === 'model-form') return <ModelFormHarness />
   if (mode === 'history') return <HistoryHarness />
+  if (mode === 'review') return <ReviewHarness />
   return <PropsHarness state={state} />
 }
 

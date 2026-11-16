@@ -1,0 +1,301 @@
+{
+  "schemaVersion": 11,
+  "owner": "F",
+  "wave": "product-wave-35",
+  "goal": "one whole goal over three continuous engineering packages: (1) multi-project/multi-Work daily flow, integrated model configuration lifecycle, error/identity/draft recovery; (2) original Work history/source, decision references, evidence and manual review; (3) real support feedback, mobile/keyboard/WebKit/perf quality and default-product handoff",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-f",
+  "branch": "codex/g4-trial-experience",
+  "fixedStart": "d03a7872",
+  "baseMain": "5860da13",
+  "mergedMain": "5860da13",
+  "mergeCommit": "f8edaf5c",
+  "mergeNote": "fetch/merge origin/main exit 0 after resolving only add/add conflicts in ModelConnectionForm.tsx and model-connection.ts by inheriting main's integrated/StrictMode/HTTP-opt-in/saved version; no reset/clean",
+  "mainInputs": {
+    "modelConfiguration": "main 4cde5883 + 8cd709ca: original ModelPanel -> typed transport -> authenticated POST /v1/assistant/connection -> PrivateModelProvider private write; merged here",
+    "callbacksSupport": "main 23d5a98e callbacks and support GET/download remain",
+    "unrelated": "no B raw feed/cancel, no native/recovery admission, no installation upgrade"
+  },
+  "state": "THREE_PACKAGES_SOURCE_AND_ACTUAL_MAIN_DELIVERED_FOR_MOST_OUTCOMES; WHOLE_GOAL_NOT_COMPLETE: F4 is HELD on A's public completion-history DTO (F WorkHistoryPanel is a candidate), and WebKit/200%/screen-reader remain untested. F-owned WorkHistory/DecisionReference/ReviewEvidence panels are not mounted by main App; main's existing actual viewers were independently exercised.",
+  "source": {
+    "inheritedFromMain": [
+      "apps/console/src/trial/ModelConnectionForm.tsx (main StrictMode/generation/identity/HTTP opt-in/saved fixes)",
+      "apps/console/src/trial/model-connection.ts (allowInsecureHttp/query-hash/key-in-label refusals)"
+    ],
+    "newThisWave": [
+      "apps/console/src/trial/work-review.ts",
+      "apps/console/src/trial/WorkReviewPanels.tsx",
+      "apps/console/test/trial/work-review.case.ts",
+      "apps/console/e2e/trial/work-review.mjs",
+      "reports/trial-experience/wave35-webkit.json"
+    ],
+    "changedThisWave": [
+      "apps/console/e2e/trial/harness.tsx (review mode; model saved/unsupported/HTTP/late cases)",
+      "apps/console/e2e/trial/model-connection.mjs (17 integrated-form checks)",
+      "apps/console/e2e/trial/run-all.mjs (13 suites)",
+      "apps/console/test/trial/model-connection.case.ts (main HTTP opt-in/query/hash contract)",
+      "apps/console/src/trial/trial.css (review panel styles)",
+      "apps/console/src/trial/index.ts (exports)",
+      "docs/user-guide/README.zh-CN.md",
+      "docs/user-guide/01-start-and-configure.zh-CN.md",
+      "docs/user-guide/05-review-and-handoff.zh-CN.md"
+    ]
+  },
+  "outcomes": {
+    "F1": {
+      "status": "DELIVERED_ACTUAL_CONTROLLED",
+      "production": "multi-project/multi-conversation/multi-Work App flow; pending question, machine FAIL, current candidate, accepted/delivered and unknown remain distinct",
+      "consumer": "actual App controlled Product/Broker/SQLite/HTTP runtime (report-daily-flow.json)",
+      "positiveNegative": "10/10: Alpha question/verify/accept, Beta draft/delivery/draft preserved, MULTI-WORK-STATES, recipe retry, daily views return, reload history, mobile keyboard, no hidden model/POST",
+      "evidence": [
+        "apps/console/e2e/trial/report-daily-flow.json"
+      ]
+    },
+    "F2": {
+      "status": "DELIVERED_ACTUAL_MAIN",
+      "production": "main-integrated ModelConnectionForm in the original ModelPanel: endpoint/model/password key, explicit save, authenticated HTTP POST to the original private provider, HTTP opt-in, saved/connected/failed/unsupported, StrictMode/identity/late-result/double-submit fixes",
+      "consumer": "actual App StrictMode/HTTP/Product/private provider; F harness edge lifecycle",
+      "positiveNegative": "F unit 9/9 incl. HTTP opt-in/query/hash/key-in-label; F browser 17/17 incl. saved!=connected, HTTP opt-in, double click, late identity result, unsupported, secret clearing; main model browser 6 cases PASS with 0 model requests/saves separated",
+      "evidence": [
+        "apps/console/e2e/trial/report-model-connection.json",
+        "/tmp/f35-model-browser.log (main report)"
+      ],
+      "limits": "private-server persistence is configuration; not a provider connection test, native admission, installation or recovery"
+    },
+    "F3": {
+      "status": "DELIVERED_ACTUAL_CONTROLLED",
+      "production": "identity-keyed readiness/insights/history/support plus model form generation/unmount/identity isolation; stale error/result never overwrites the current scope",
+      "consumer": "actual App daily/async/identity and model form",
+      "positiveNegative": "stale response, same-transport identity, inline identity, disabled, auth-expiry, unmount-in-flight, model late identity result, reload draft preservation; no duplicate business command",
+      "evidence": [
+        "apps/console/e2e/trial/report-async.json",
+        "apps/console/e2e/trial/report-daily-flow.json",
+        "apps/console/e2e/trial/report-model-connection.json"
+      ]
+    },
+    "F4": {
+      "status": "PARTIAL_HELD_ON_A_COMPLETION_HISTORY",
+      "production": "F-owned WorkHistoryPanel + admission/merge rules for original Work contract, events, coverage window, sources-capped and live continuation; distinct from message ContextHistory",
+      "actualCounterpart": "main WorkEvidencePanel actual App evidence/history browser passes (8 cases, includes machine FAIL and readonly history)",
+      "positiveNegative": "F unit 10/10 and browser 8/8: non-empty/foreign work/stale contract/duplicate/continuation, coverage window; actual main evidence browser exit 0",
+      "held": "A's public completion-history DTO is not integrated/available to F; ContextHistory and WorkEvidenceHistory are not relabeled as A completion-history. F panel is not mounted in main App.",
+      "evidence": [
+        "apps/console/e2e/trial/report-work-review.json",
+        "/tmp/f35-evidence-workbench-browser.log"
+      ]
+    },
+    "F5": {
+      "status": "DELIVERED_ACTUAL_MAIN_DECISIONS_CANDIDATE_F_PANEL",
+      "production": "F-owned DecisionReferencePanel shows current/history version, recorded/revoked/superseded/expired, source state, Scope and confirmation preview; only current recorded non-expired decisions are selectable as references",
+      "consumer": "main actual DecisionWorkspace (preview -> explicit record/revoke -> catalog) passes 4 actual browser cases; F panel is a candidate for trial/new-work integration",
+      "positiveNegative": "F unit decisions incl. foreign project/bad cursor/revoked/superseded/expired/missing/stale; F browser selectable vs disabled and no-grant copy; main decision browser exit 0",
+      "limits": "selection is a reference; preview/token does not apply a decision or grant execution",
+      "evidence": [
+        "apps/console/e2e/trial/report-work-review.json",
+        "/tmp/f35-decision-workbench-browser.log"
+      ]
+    },
+    "F6": {
+      "status": "DELIVERED_ACTUAL_MAIN_EVIDENCE_CANDIDATE_F_PANEL",
+      "production": "F-owned ReviewEvidencePanel shows phase, verification, current candidate/verification IDs, artifacts, acceptance, projection, machine failure/blockers; never offers the accept command",
+      "consumer": "main WorkEvidencePanel/delivery artifacts/manual accept in actual App; main evidence browser 8 cases PASS; daily flow actual accept",
+      "positiveNegative": "F unit foreign/stale/failure/accepted/unobserved; F browser machine failure makes accept unavailable, current finished check shows only an advisory accept hint; main evidence browser exit 0",
+      "limits": "patch/artifact download and acceptance remain original main commands; F panel is not mounted in App",
+      "evidence": [
+        "apps/console/e2e/trial/report-work-review.json",
+        "/tmp/f35-evidence-workbench-browser.log",
+        "apps/console/e2e/trial/report-daily-flow.json"
+      ]
+    },
+    "F7": {
+      "status": "DELIVERED_ACTUAL_CONTROLLED",
+      "production": "support panel states current scope, included/excluded/sharing boundary, re-read semantics and in-place retry; consumes main support GET/download",
+      "consumer": "actual App scoped support download; main usage-observation browser 13 checks PASS",
+      "positiveNegative": "normal/partial/unknown/error/retry; no auto upload; no secrets/raw paths; support scope visible on mobile",
+      "evidence": [
+        "apps/console/e2e/trial/report-daily-flow.json",
+        "/tmp/f35-usage-observation-browser.log"
+      ]
+    },
+    "F8": {
+      "status": "PARTIAL_CHROMIUM",
+      "production": "fixed-height controls, flat review/history sections, keyboard focus/Tab, 390px and forced-colors rendering; no theme/shell replacement",
+      "consumer": "actual App 390/keyboard + controlled review/history/model harnesses",
+      "positiveNegative": "daily 390/keyboard/support; review 390/forced-colors; model 390; no horizontal overflow/overlap",
+      "notTested": [
+        "WebKit binary missing",
+        "real browser 200% zoom",
+        "screen reader",
+        "long soak/performance benchmark",
+        "installed artifact"
+      ],
+      "evidence": [
+        "apps/console/e2e/trial/report-daily-flow.json",
+        "apps/console/e2e/trial/report-work-review.json",
+        "reports/trial-experience/wave35-webkit.json"
+      ]
+    },
+    "F9": {
+      "status": "NOT_COMPLETE",
+      "production": "docs updated for real save lifecycle, Work evidence/history, decision references and review boundaries; status/handoff records source/controlled/installed/native/recovery/value separately",
+      "gap": "F-owned WorkHistory/DecisionReference/ReviewEvidence panels are not mounted by main; F4 A completion-history DTO is still absent; WebKit/200%/reader untested. Therefore 'all nine in the default product' is not claimed.",
+      "evidence": [
+        "docs/user-guide/README.zh-CN.md",
+        "reports/trial-experience/wave35-status.json"
+      ]
+    }
+  },
+  "commands": [
+    {
+      "id": "unit",
+      "command": "node --test test/trial/*.case.ts",
+      "exit": 0,
+      "summary": "49/49"
+    },
+    {
+      "id": "run-all",
+      "command": "node apps/console/e2e/trial/run-all.mjs",
+      "exit": 0,
+      "summary": "13/13 suites"
+    },
+    {
+      "id": "model-browser",
+      "command": "node apps/console/e2e/trial/model-connection.mjs",
+      "exit": 0,
+      "summary": "17/17"
+    },
+    {
+      "id": "work-review-browser",
+      "command": "node apps/console/e2e/trial/work-review.mjs",
+      "exit": 0,
+      "summary": "8/8"
+    },
+    {
+      "id": "daily-flow",
+      "command": "node apps/console/e2e/trial/app-daily-flow.mjs",
+      "exit": 0,
+      "summary": "10/10"
+    },
+    {
+      "id": "typecheck-app",
+      "command": "npx tsc -p apps/console/tsconfig.json --noEmit",
+      "exit": 0
+    },
+    {
+      "id": "typecheck-e2e",
+      "command": "npx tsc -p apps/console/e2e/trial/tsconfig.json --noEmit",
+      "exit": 0
+    },
+    {
+      "id": "build",
+      "command": "npx vite build",
+      "exit": 0,
+      "note": "existing >500kB chunk advisory retained"
+    },
+    {
+      "id": "main-model",
+      "command": "node tests/integration/model-connection-browser.mjs",
+      "exit": 0,
+      "summary": "6 actual StrictMode/HTTP cases PASS; 0 model requests"
+    },
+    {
+      "id": "main-trial",
+      "command": "node tests/integration/trial-workbench-browser.mjs",
+      "exit": 0
+    },
+    {
+      "id": "main-usage",
+      "command": "node tests/integration/usage-observation-browser.mjs",
+      "exit": 0
+    },
+    {
+      "id": "main-project-recipes",
+      "command": "node tests/integration/project-recipes-browser.mjs",
+      "exit": 0
+    },
+    {
+      "id": "main-context-history",
+      "command": "node tests/integration/context-history-browser.mjs",
+      "exit": 0
+    },
+    {
+      "id": "main-decision",
+      "command": "node tests/integration/decision-workbench-browser.mjs",
+      "exit": 0,
+      "summary": "4 actual cases"
+    },
+    {
+      "id": "main-evidence",
+      "command": "node tests/integration/evidence-workbench-browser.mjs",
+      "exit": 0,
+      "summary": "8 actual cases incl. machine FAIL"
+    },
+    {
+      "id": "webkit-probe",
+      "command": "node - (Playwright webkit.executablePath/launch)",
+      "exit": 0,
+      "summary": "NOT_TESTED: executable missing"
+    }
+  ],
+  "actualObjects": {
+    "dailyProjects": [
+      "项目 Alpha (temporary Git project)",
+      "项目 Beta (temporary Git project)"
+    ],
+    "dailyConversations": [
+      "conv-alpha-daily",
+      "conv-beta-daily"
+    ],
+    "dailyWorks": [
+      "Alpha：固定流程问答与交付",
+      "Beta：固定流程交付",
+      "FAIL work",
+      "pending-question work",
+      "ephemeral IDs in report-daily-flow.json"
+    ],
+    "profiles": [
+      "profile-fixture-question",
+      "profile-fixture-pass"
+    ],
+    "modelTurns": 0,
+    "nativeTurns": 0,
+    "mainModelSourceCommit": "d03a7872 (reported by main test; current merge f8edaf5c)",
+    "posts": "only explicit product commands plus recorded main review-activity conflicts/preview aborts; model request count 0"
+  },
+  "mainMergedVsCandidate": {
+    "mergedMain": "main model GUI/private provider, 23d callbacks/support, original trial/workbench/decision/evidence viewers",
+    "mergedFromF": "previous F model form/history/source candidate + main's StrictMode/identity/HTTP fixes; main model browser and F integration tests pass",
+    "candidate": [
+      "WorkHistoryPanel",
+      "DecisionReferencePanel",
+      "ReviewEvidencePanel",
+      "work-review pure rules"
+    ],
+    "needsMain": [
+      "mount F review panels only if the trial surface needs them, or keep existing actual viewers",
+      "A public completion-history DTO for F4",
+      "WebKit binary for F8"
+    ]
+  },
+  "layers": {
+    "source": "DELIVERED for F1-F3/F5-F8 owned/source slices; F4 F panel source delivered but A completion-history held",
+    "controlled": "DELIVERED (actual App controlled runtime; 13/13 trial suites + main actual browser tests)",
+    "installed": "NOT_TESTED in wave35; W33/W35 installation and E verdict remain separate; this source is not an installed artifact",
+    "native": "0 turns; no Native.launch/vendor model",
+    "recovery": "not claimed; no original Work recovery or 2/4 slot evidence",
+    "value": "no efficiency/benefit claim; review timing/UI activity remain proxies"
+  },
+  "remaining": [
+    "A public completion-history DTO and main wiring for F4's WorkHistoryPanel (or keep main evidence history; do not relabel ContextHistory)",
+    "main decision on mounting F decision/review panels; existing DecisionWorkspace/WorkEvidencePanel already provide actual behavior",
+    "WebKit actual page test, real 200% zoom, screen reader/forced-colors across all screens; only forced-colors on the review harness was exercised",
+    "D/E independent installed/whole-product verdict for the fixed successor; F does not self-admit",
+    "F9 default product closure requires all nine outcomes; currently not claimed"
+  ],
+  "preserved": [
+    "six untracked main-owned screenshots under reports/releases left untouched; tracked main report changes restored after tests",
+    "ten original roots/branches/ownership and all dirty/history/state",
+    "twelve user services 5180-5191/8796-8807 and all state/profile/tar/ledger/runs/five logs",
+    "automatic real vendor/model/native 0; B cap4 UNKNOWN unspent; E blocked pilot unchanged",
+    "no global discovery/substring kill/credential borrowing/real CLI fallback/new Driver/CAC/desktop/auto-accept/second lifecycle"
+  ]
+}

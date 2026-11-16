@@ -1200,3 +1200,213 @@
 .trial-support-error .quiet {
   min-height: 28px;
 }
+
+/* Work review panels: flat sections separated by rules, no nested cards. */
+.trial-work-history,
+.trial-decision-reference,
+.trial-review-evidence {
+  padding: 18px 0 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.trial-work-history-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.trial-work-history-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.trial-work-history-list {
+  display: grid;
+  gap: 1px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+
+.trial-work-history-list li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 12px;
+}
+
+.trial-work-event {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.trial-work-history-list time {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.trial-work-history-list .trial-note {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.trial-work-history-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.trial-decision-list {
+  display: grid;
+  gap: 1px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+
+.trial-decision-row {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  padding: 9px 6px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  text-align: left;
+  color: var(--ink);
+}
+
+.trial-decision-row:hover:not(:disabled) {
+  background: #f6f8f5;
+}
+
+.trial-decision-row[aria-current='true'] {
+  background: #eef5f0;
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.trial-decision-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.trial-decision-content {
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.trial-decision-reason {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--danger);
+  font-size: 11px;
+}
+
+.trial-decision-preview {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+}
+
+.trial-decision-preview p {
+  margin: 6px 0;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+.trial-decision-preview dl {
+  display: grid;
+  gap: 4px;
+  margin: 8px 0;
+}
+
+.trial-decision-preview dl div {
+  display: flex;
+  gap: 8px;
+}
+
+.trial-decision-preview dt {
+  flex: 0 0 68px;
+  color: var(--muted);
+}
+
+.trial-decision-preview dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.trial-review-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px 18px;
+  margin: 10px 0 0;
+}
+
+.trial-review-facts div {
+  min-width: 0;
+}
+
+.trial-review-facts dt {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.trial-review-facts dd {
+  margin: 2px 0 0;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.trial-review-blockers {
+  display: grid;
+  gap: 4px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--danger);
+  font-size: 12px;
+}
+
+.trial-review-blockers li {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+}
+
+.trial-review-body .trial-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  margin-top: 10px;
+}
+
+@media (max-width: 720px) {
+  .trial-work-history-list li {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .trial-work-history-head {
+    flex-wrap: wrap;
+  }
+}
