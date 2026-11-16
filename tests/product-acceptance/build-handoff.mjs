@@ -531,11 +531,42 @@ const oracleMutations = ['E2-MUTATE-E32-EMPTY-AFTER', 'E2-MUTATE-FOREIGN-PID-MIS
   'E2-MUTATE-COHORT-CARDINALITY', 'E2-MUTATE-JOURNEY-PHASE-EXPECTED-START', 'E3-MUTATE-SAME-PROJECT-SCOPED-403',
   'E3-MUTATE-SAME-PROJECT-NO-DRAFT', 'E3-MUTATE-INSIGHTS-WINDOW']
 
-const handoff = `# Agent E 第三十四轮交付交接
+const w35outer = byId.get('E33-OUTER-ZIP')?.evidence?.outerZip ?? null
+const w35outerOp = byId.get('E33-OUTER-ZIP-OPERATION')?.evidence?.outerZipOperation ?? null
+const w35rec = byId.get('E33-COHORT-RECOVERY')?.evidence?.cohortRecovery ?? null
+const w35recOp = byId.get('E33-COHORT-RECOVERY-OPERATION')?.evidence?.cohortRecoveryOperation ?? null
+const w35up = byId.get('E5-COHORT-UPGRADE')?.evidence?.cohortUpgrade ?? null
+const w35journey = byId.get('E5-TWO-PROJECT-TEMPLATE-CREATE')?.evidence?.journey ?? null
+const w35multi = byId.get('E7-MULTI-INSTANCE')?.evidence?.multiInstance ?? null
+const w35caller = ['E1-CALLER-RETAIN-PREVENTS-RELEASE', 'E1-CALLER-COMPLETE-RELEASE', 'E1-CALLER-INCOMPLETE-SET',
+  'E1-CALLER-DUPLICATE-AND-FOREIGN', 'E1-CALLER-EXPECTED-START-MISMATCH', 'E1-CALLER-PARENT-DEAD-CHILD-ALIVE',
+  'E1-CALLER-SIGNAL-REFUSES-STALE-IDENTITY', 'E1-CALLER-SIGNAL-REFUSES-STALE-SET', 'E1-CALLER-RELEASE-DUPLICATE-ROWS',
+  'E1-CALLER-LATE-CHILD', 'E1-CALLER-ASSERT-FAILURE-RETAINS', 'E1-CALLER-NO-FORCE-API', 'E1-CALLER-SOURCE-DISCIPLINE']
+const w35mutations = ['E2-MUTATE-E32-EMPTY-AFTER', 'E2-MUTATE-FOREIGN-PID-MISSING-START', 'E2-MUTATE-RESOURCE-ALIVE',
+  'E2-MUTATE-COHORT-CARDINALITY', 'E2-MUTATE-JOURNEY-PHASE-EXPECTED-START', 'E3-MUTATE-SAME-PROJECT-SCOPED-403',
+  'E3-MUTATE-SAME-PROJECT-NO-DRAFT', 'E3-MUTATE-INSIGHTS-WINDOW', 'E2-MUTATE-OPERATION-DELETED-UNKNOWN',
+  'E2-MUTATE-COHORT-PENDING-MISSING', 'E2-MUTATE-COHORT-EFFECT-DRIFT', 'E2-MUTATE-COHORT-REGISTRY-DRIFT',
+  'E3-MUTATE-SAME-PROJECT-INSIGHTS-403']
+
+const handoff = `# Agent E 第三十五轮交付交接
 
 - 分支 \`${stages.branch}\`，基线 \`${stages.base}\`，检查点 \`${stages.checkpoint}\`，本次证据源 \`${report.source.commit}\`${report.source.dirty ? '（运行时尚有未提交文件，最终提交包含它们）' : '（干净工作树）'}。证据文件随源提交之后的提交一起交付；\`git log\` 的分支头即最终交付提交。
 - 拥有路径：\`tests/product-acceptance/\`。未修改生产实现、root manifest/lock、公共 schema 或迁移。
 - 模型预算：0 个真实模型任务；唯一模型对端是本机 loopback mock。原生执行：0。
+
+## 第三十五轮九成果（三个连续工程包）
+
+| 成果 | 结论 | 依据 |
+| --- | --- | --- |
+| E1 operation 协议 | ${w35caller.every(id => byId.get(id)?.status === 'PASS') ? 'PASS' : 'INCOMPLETE'} | 全 set fresh 后目标 fresh、重复/外来/迟到 child/UNKNOWN 拒绝、1:1 退出映射、assert 先于 release；outer/cohort operation=${w35outerOp?.verdict?.allowed}/${w35recOp?.verdict?.allowed}。 |
+| E2 完整 report 语义 | ${w35mutations.every(id => byId.get(id)?.status === 'PASS') ? 'PASS' : 'INCOMPLETE'} | operation 矛盾、pending 停机前问题、effect/question/answer 行、direct registry、artifact ids、sameProject scoped403 全 report 拒绝。 |
+| E3 原项目日常 | ${byId.get('E5-TWO-PROJECT-TEMPLATE-CREATE')?.status ?? 'MISSING'}；原项目 NOT_REACHED | 两项目 preview/create/candidate/verification accept，composite stale candidate 被拒，重开全字节相等；原项目 applicability 仍 NOT_REACHED。 |
+| E4 outer+模型设置 | ${byId.get('E33-OUTER-ZIP')?.status ?? 'MISSING'}；successor HELD | W33 46e 未配置/已配置/导入/复用/再启/停止；0644 config 在 start 被接受（记录 gap），无 secret 回显；模型保存 successor 需 D 以 4cde5883/8cd709ca 稳定组合冻结，source-only 不重贴 f880。 |
+| E5 非空恢复 | ${byId.get('E33-COHORT-RECOVERY')?.status ?? 'MISSING'} | 全部 bytes/两 Work/pending 前问题/effect 行/registry/错 bearer/422/provider0；停机后 phase 如实记录。 |
+| E6 升级回退 | ${byId.get('E5-COHORT-UPGRADE')?.status ?? 'MISSING'} | E 自测 W32→W33 CONFIRMED + 仅二进制回退；D 新 raw retry exit0 与原 BLOCKED 分开记录。 |
+| E7 多实例 | ${byId.get('E7-MULTI-INSTANCE')?.status ?? 'MISSING'} | 同装两独立 config/state/model 根同时运行、身份/端口/根隔离、停 A 后 B 可服务、doctor DEGRADED 且不泄 key。 |
+| E8 原 Work 恢复 | NOT_REACHED | 缺 main/B/I 实际恢复 consumer；精确 owner 输入已记录，不以 callbacks/slot 替证。 |
+| E9 分层交接 | controlled=${release.status}；alpha=${tierVerdicts['installed-alpha']?.status ?? '?'}；functional=${tierVerdicts['installed-functional']?.status ?? '?'} | legacy R1 与 W33 subset 分列；full-product 仍因 native 拒绝。 |
 
 ## 第三十四轮六成果（两个连续工程包）
 
@@ -1528,6 +1559,70 @@ const wave34Status = {
   finalRun: { command: 'node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record', exitCode: 0, source: report.source },
 }
 writeFileSync(join(reports, 'wave34-status.json'), JSON.stringify(wave34Status, null, 2) + '\n')
+
+const wave35Status = {
+  ...wave34Status,
+  schema: 'product-acceptance-wave35-status/1',
+  taskPackage: 'agent-tasks/product-wave-35/README.zh-CN.md',
+  supersedes: 'wave34-status.json',
+  fixedInputs: {
+    testSource: report.source.commit, testSourceDirty: report.source.dirty,
+    mainInputs: ['23d5a98e original callbacks/support (source only)', '4cde5883 model settings POST/private save (source only)', '8cd709ca launcher directory race fix (source only)'],
+    lockedCohort: wave34Status.fixedInputs.lockedCohort,
+    upgradeBaseline: wave34Status.fixedInputs.upgradeBaseline,
+  },
+  nineOutcomes: [
+    { id: 'E1', title: 'birth→signal→release 完整 operation 协议', status: w35caller.every(id => byId.get(id)?.status === 'PASS') ? 'PASS' : 'INCOMPLETE',
+      cases: w35caller.map(id => ({ id, status: byId.get(id)?.status ?? 'MISSING' })),
+      operation: { outer: w35outerOp, cohort: w35recOp },
+      notes: 'signal preflights the whole immutable set fresh and then the target fresh; duplicates/foreign/late child/unknown refuse; release requires a 1:1 unique exited mapping; product assertions run before the release decision, so a failed assertion retains install/state/HOME.' },
+    { id: 'E2', title: '完整 report 的 scope、资源与业务语义', status: w35mutations.every(id => byId.get(id)?.status === 'PASS') ? 'PASS' : 'INCOMPLETE',
+      mutations: w35mutations.map(id => ({ id, status: byId.get(id)?.status ?? 'MISSING' })),
+      notes: 'operation outcome contradictions, pending pre-stop question, effect/question/answer rows, direct Store registry, artifact ids and sameProject scoped 403 are rejected on the full report, derived from a legal positive by one variable each.' },
+    { id: 'E3', title: '两个原项目的可重复 installed 日常开发', status: byId.get('E5-TWO-PROJECT-TEMPLATE-CREATE')?.status ?? 'MISSING',
+      journey: { sameProject: w35journey?.originalProjectExecution?.sameProject ?? null,
+        acceptReadiness: w35journey?.projects?.map(item => item.acceptReadiness) ?? null,
+        staleAccept: w35journey?.projects?.map(item => item.staleAccept?.status ?? null) ?? null,
+        acceptStaleScope: w35journey?.acceptStaleScope ?? null, scopedInsights: w35journey?.projects?.map(item => [item.insights?.seven, item.insights?.thirty]) ?? null },
+      originalProjectApplicable: byId.get('E32-ORIGINAL-PROJECT-APPLICABLE')?.status ?? 'MISSING',
+      notes: 'both registered projects run preview/create/candidate/verification accept with a composite stale-candidate refusal and full byte-equal reopen; original-project applicability stays NOT_REACHED because the fixture exposes only its own project and personal has no executor. A sameProject claim over a per-project scoped 403 is rejected.' },
+    { id: 'E4', title: '当前 outer 产品与模型设置的真实使用', status: byId.get('E33-OUTER-ZIP')?.status ?? 'MISSING',
+      operator: { operation: w35outerOp, repeatedOpen: w35outer?.negatives?.repeatedOpen ?? null,
+        invalidConfig: w35outer?.negatives?.invalidConfigPerm ?? null, settings: w35outer?.settings ?? null,
+        attempts: w35outer?.phases?.unconfigured?.attempts ?? null },
+      successor: { frozen: false, holds: 'model settings POST/private save consumer (main 4cde5883) and launcher EEXIST fix (8cd709ca) are source-only; an installed conclusion needs a D-frozen successor built from that stable combination', input: 'D successor tar+outer with source >= 4cde5883/8cd709ca, schema and runtime identity recorded' },
+      notes: 'the locked W33 ZIP runs unconfigured/configured/import/reopen with instance reuse, port conflict, status STOPPED and the Settings template contract (GUI HELD). A 0644 model file is accepted at start in this frozen build (recorded gap; Settings validates on edit).' },
+    { id: 'E5', title: '不断增长的非空业务备份与授权恢复', status: byId.get('E33-COHORT-RECOVERY')?.status ?? 'MISSING',
+      recovery: { seedArtifacts: w35rec?.seed?.artifacts?.length ?? null, artifactsEqual: w35rec?.readonly?.artifactsEqual ?? null,
+        pendingBeforeStop: w35rec?.seed?.pending?.beforeStop ?? null, pendingRecorded: w35rec?.readonly?.pending?.questionsRecorded ?? null,
+        queueHeld: w35rec?.readonly?.pending?.held ?? null, directRegistry: w35rec?.directRead?.registry?.length ?? null,
+        unauthorized: w35rec?.readonly?.unauthorized ?? null, wrongToken: w35rec?.readonly?.wrongToken ?? null,
+        business: w35rec?.readonly?.business ?? null, answer: w35rec?.readonly?.answer ?? null,
+        provider: w35rec?.readonly?.providerRequests ?? null },
+      notes: 'the accepted Work with every referenced artifact byte and a recorded pre-stop question are backed up, restored into a new root and read back with identical bytes/history/registry; effect/question/answer rows unchanged, answer/business 422, provider 0. A clean stop withdraws the open question; the restored phase is recorded, not claimed as execution.' },
+    { id: 'E6', title: '非空升级、后写入与原回退的独立结果', status: byId.get('E5-COHORT-UPGRADE')?.status ?? 'MISSING',
+      upgrade: { from: w35up?.upgrade?.from ?? null, to: w35up?.upgrade?.to ?? null, rollback: w35up?.rollback ?? null,
+        postKept: w35up?.probe?.postKept ?? null, dOldBlocked: w35up?.dSubmitted ?? null, dRetry: w35up?.dRetry ?? null },
+      notes: 'E own probe: W32→W33 CONFIRMED, post-upgrade write kept, binary-only rollback to the baseline build. D supplied a separate successful raw retry receipt with exit 0 while the original BLOCKED attempt is preserved; they are recorded separately and neither replaces E’s own result.' },
+    { id: 'E7', title: '同事自己的可维护配置与多实例运行', status: byId.get('E7-MULTI-INSTANCE')?.status ?? 'MISSING',
+      multi: { isolation: w35multi?.isolation ?? null, doctor: w35multi?.doctor ?? null,
+        instances: w35multi ? Object.fromEntries(Object.entries(w35multi.instances ?? {}).map(([key, value]) => [key, { buildId: value.buildId, pid: value.pid, stop: value.stop?.clean ?? null }])) : null },
+      notes: 'two explicit private config/state/model roots on one install run together with distinct pids/ports and stop independently; doctor reports DEGRADED (no real model/executor) without echoing a key. Same machine/user only: not cross-machine or multi-user.' },
+    { id: 'E8', title: '原 Work 恢复与控制消费者的集成验收', status: byId.get('E8-ORIGINAL-WORK-RECOVERY')?.status ?? 'MISSING',
+      originalWorkRecovery: byId.get('E8-ORIGINAL-WORK-RECOVERY')?.evidence?.originalWorkRecovery ?? null,
+      notes: 'NOT_REACHED: main publishes callbacks source but no product consumer resumes an original faulted Work through the original Broker/queue; exact owner inputs are recorded and callbacks/slots/receipt-only rows are not substitutes.' },
+    { id: 'E9', title: 'cohort 分层 tier 与完整工程交接', status: release.status,
+      tiers: { controlled: release.status, installedAlpha: tierVerdicts['installed-alpha']?.status ?? 'MISSING',
+        installedFunctional: tierVerdicts['installed-functional']?.status ?? 'MISSING',
+        localAlpha: tierVerdicts['local-alpha']?.status ?? 'MISSING', fullProduct: tierVerdicts['full-product']?.status ?? 'MISSING',
+        fullProductFailures: [...new Set((tierVerdicts['full-product']?.failures ?? []).map(item => item.code))] },
+      legacy: { measured325: byId.get('E4-INSTALL-ARTIFACT-IDENTITY')?.evidence?.artifact?.tuple?.target ?? null,
+        note: 'legacy R1 cases remain in the 227 aggregate; the W33 subset is named by its own cases and is not relabeled as the whole product. full-product stays refused for missing native evidence.' },
+      notes: 'source/controlled/installed/data/native/recovered/value are separate; no real vendor/model/native send; pilot BLOCKED.' },
+  ],
+  finalRun: { command: 'node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record', exitCode: 0, source: report.source },
+}
+writeFileSync(join(reports, 'wave35-status.json'), JSON.stringify(wave35Status, null, 2) + '\n')
 
 // Historical wave06-32 status files are frozen inputs; wave33 supersedes them.
 

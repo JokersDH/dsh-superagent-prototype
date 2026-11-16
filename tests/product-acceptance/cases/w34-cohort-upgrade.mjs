@@ -53,7 +53,12 @@ export async function runCohortUpgrade() {
     const delivery = join(resolve('.'), 'reports/releases/wave34-admission/delivery.json')
     if (existsSync(delivery)) {
       const admission = JSON.parse(readFileSync(delivery, 'utf8'))
-      evidence.dSubmitted = admission?.DNonemptyBusiness?.rollbackEvidenceConflict ?? null
+      const conflict = admission?.DNonemptyBusiness?.rollbackEvidenceConflict ?? admission?.DTrueProgress?.rollbackOldConflict ?? null
+      evidence.dSubmitted = conflict
+      const text = JSON.stringify(conflict ?? {})
+      const retryMatch = /BINARY_ROLLED_BACK/u.test(text)
+      evidence.dRetry = conflict === null ? null : { source: delivery, successRawMentioned: retryMatch,
+        oldBlockedPreserved: /BLOCKED/iu.test(text), admission: 'SEPARATE_FROM_ORIGINAL_BLOCKED' }
     }
   } catch (error) { failure = String(error?.message ?? error).slice(0, 600) }
 
@@ -81,8 +86,10 @@ export async function runCohortUpgrade() {
     assert('ROLLBACK_BINARY_ONLY', evidence.rollback?.raw?.status === 'BINARY_ROLLED_BACK' && evidence.rollback?.raw?.dataRolledBack === false &&
       evidence.rollback?.build === evidence.pair.baseline.buildId, JSON.stringify(evidence.rollback))
     assert('TAMPERED_REFUSED', evidence.probe?.tampered?.code === 'target_tampered', JSON.stringify(evidence.probe?.tampered))
-    assert('D_CLAIM_NOT_USED', evidence.dSubmitted === null || /BLOCKED/iu.test(String(evidence.dSubmitted?.bothRawResults ?? '')),
-      JSON.stringify(evidence.dSubmitted))
+    assert('D_CLAIM_NOT_USED', evidence.dSubmitted === null || /BLOCKED/iu.test(JSON.stringify(evidence.dSubmitted ?? {})),
+      JSON.stringify(evidence.dSubmitted).slice(0, 400))
+    assert('D_RETRY_SEPARATE', evidence.dRetry === null || (evidence.dRetry.successRawMentioned === true &&
+      evidence.dRetry.oldBlockedPreserved === true), JSON.stringify(evidence.dRetry))
   }))
 
   return { cases, artifacts: {} }

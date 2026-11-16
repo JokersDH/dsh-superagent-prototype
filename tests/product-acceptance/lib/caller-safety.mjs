@@ -11,6 +11,7 @@
  *
  * There is deliberately no `force`, `cleanupAll`, `discover` or `killByPath` entry.
  */
+import { spawnSync } from 'node:child_process'
 import { existsSync, rmSync } from 'node:fs'
 import { liveIdentity, sha256 } from './packaged-instance.mjs'
 
@@ -106,12 +107,49 @@ export function createOperation({ id }) {
     },
     fail(stage, error) { failures.push({ stage, error: String(error?.message ?? error).slice(0, 400) }) },
     observe() { return operation.births.map(observeBirth) },
+    /**
+     * Whole-set freshness: every known birth must be re-observable now. A live process must still match
+     * its start/uid/argv; a dead one is an exited member, not an unknown. Any mismatch blocks every
+     * effect of the operation until a human resolves it.
+     */
+    preflightAll() {
+      const observation = operation.observe()
+      const issues = []
+      for (const row of observation) {
+        if (row.queryOk !== true) issues.push(`query:${row.pid}`)
+        if (row.alive === true && row.sameIdentity !== true) issues.push(`identity:${row.pid}`)
+        if (row.alive === false && row.observedStart !== null) issues.push(`exited_fields:${row.pid}`)
+      }
+      return { ok: issues.length === 0, issues, observation }
+    },
+    /**
+     * Targeted descendant check for the set: a child born after capture is an unknown related
+     * resource. Only known pids are queried (`pgrep -P`), never a global listing.
+     */
+    lateDescendants() {
+      const known = new Set(operation.births.map(item => item.pid))
+      const late = []
+      for (const pid of known) {
+        try {
+          const out = spawnSync('pgrep', ['-P', String(pid)], { encoding: 'utf8', timeout: 5_000 })
+          for (const line of String(out.stdout ?? '').split('\n').map(item => item.trim()).filter(Boolean)) {
+            const child = Number(line)
+            if (Number.isSafeInteger(child) && !known.has(child)) late.push({ parent: pid, pid: child })
+          }
+        } catch { /* no children */ }
+      }
+      return late
+    },
     /** A signal needs the whole set preflighted and this pid's identity re-read immediately before. */
     signal(pid, signal = 'SIGTERM') {
       const entry = births.get(pid)
       if (!entry) return { pid, signalled: null, refused: 'not_owned' }
       if (retained !== null) return { pid, signalled: null, refused: 'operation_unknown' }
       if (!operation.isComplete()) return { pid, signalled: null, refused: 'incomplete_set' }
+      const all = operation.preflightAll()
+      if (all.ok !== true) return { pid, signalled: null, refused: 'set_not_fresh', issues: all.issues }
+      const late = operation.lateDescendants()
+      if (late.length > 0) return { pid, signalled: null, refused: 'late_child', late }
       const fresh = observeBirth(entry)
       if (!fresh.sameIdentity) return { pid, signalled: null, refused: fresh.alive ? 'identity_changed' : 'not_alive', fresh }
       try {
@@ -128,8 +166,13 @@ export function createOperation({ id }) {
      */
     releaseAllowed(observation = operation.observe()) {
       if (retained !== null) return { allowed: false, reason: 'operation_unknown' }
+      const late = operation.lateDescendants()
+      if (late.length > 0) return { allowed: false, reason: 'late_child', late }
       if (!operation.isComplete()) return { allowed: false, reason: 'incomplete_set' }
       if (observation.length !== births.size) return { allowed: false, reason: 'observation_missing' }
+      const observedPids = observation.map(row => row?.pid)
+      if (new Set(observedPids).size !== observation.length) return { allowed: false, reason: 'duplicate_observation' }
+      for (const pid of observedPids) if (!births.has(pid)) return { allowed: false, reason: 'foreign_observation' }
       for (const row of observation) {
         const entry = births.get(row.pid)
         if (!entry) return { allowed: false, reason: 'foreign_observation' }

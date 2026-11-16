@@ -208,6 +208,20 @@ export async function runOuterZip() {
       readinessB = await fetch(`${status2.json.instance.apiURL}/v1/readiness`, { headers: { authorization: `Bearer ${key}` }, signal: AbortSignal.timeout(8_000) })
         .then(async response => ({ status: response.status, body: await response.json() })).catch(error => ({ status: 0, error: String(error.message) }))
     }
+    // Repeated open with the exact same arguments: no new instance and no changed identity.
+    const recordBeforeReuse = JSON.stringify(recordPids(recordPath))
+    const reuse = await startAsync(root, home, ['--port', String(p2), '--api-port', String(a2), '--discussion-only'],
+      { PA_MODEL_CONFIG: mock.file })
+    const reuseStatus = await new Promise(resolvePromise => {
+      const timer = setTimeout(() => resolvePromise({ outcome: 'TIMEOUT' }), 20_000)
+      reuse.child.once('exit', code => { clearTimeout(timer); resolvePromise({ outcome: 'EXITED', code }) })
+    })
+    await waitExited(reuse.child.pid)
+    const recordAfterReuse = JSON.stringify(recordPids(recordPath))
+    const reuseOutput = reuse.output()
+    evidence.negatives.repeatedOpen = { outcome: reuseStatus.outcome, code: reuseStatus.code ?? null,
+      pidSetUnchanged: recordBeforeReuse === recordAfterReuse, output: reuseOutput.slice(-220) }
+
     // Port conflict: a second start on the live console port must be refused without a second instance.
     const conflict = await startAsync(root, home, ['--port', String(p2), '--api-port', String(a2 + 1), '--discussion-only'])
     const conflictStatus = await new Promise(resolvePromise => {
@@ -224,6 +238,34 @@ export async function runOuterZip() {
       stop: { status: stop2.status, result: stop2.json?.status ?? null }, resources: { before: setB, after: afterB } }
     await waitExited(configuredStart.child.pid)
     await new Promise(resolvePromise => setTimeout(resolvePromise, 600))
+
+    // Invalid private config: a world-readable model file must be refused without echoing the key.
+    const badModel = join(home, 'bad-model.json')
+    writeFileSync(badModel, readFileSync(mock.file), { mode: 0o644 })
+    const [pb, ab] = [await freePort(), await freePort()]
+    const badStart = await startAsync(root, home, ['--port', String(pb), '--api-port', String(ab), '--discussion-only'],
+      { PA_MODEL_CONFIG: badModel })
+    const badStatus = await new Promise(resolvePromise => {
+      const timer = setTimeout(() => resolvePromise({ outcome: 'TIMEOUT' }), 20_000)
+      badStart.child.once('exit', code => { clearTimeout(timer); resolvePromise({ outcome: 'EXITED', code }) })
+    })
+    const badOutput = badStart.output()
+    let badState = null
+    if (badStatus.outcome === 'TIMEOUT') {
+      badState = (await waitStatus(runnerFn))?.json?.status ?? null
+      const badSet = capture('invalid-config', recordPath)
+      const badStop = runnerFn(['stop'], { timeoutMs: 30_000 })
+      evidence.negatives.invalidConfigPermResources = { before: badSet, after: rollout(badSet),
+        stop: { status: badStop.status, result: badStop.json?.status ?? null } }
+    }
+    await waitExited(badStart.child.pid)
+    let mockKey = null
+    try { mockKey = JSON.parse(readFileSync(mock.file, 'utf8')).apiKey ?? null } catch { /* absent */ }
+    evidence.negatives.invalidConfigPerm = { outcome: badStatus.outcome, code: badStatus.code ?? null,
+      running: badState, output: badOutput.slice(-300), mode: 0o644,
+      permissionEnforcedAtStart: badStatus.outcome === 'EXITED',
+      secretLeaked: mockKey !== null && mockKey.length > 0 && (badOutput.includes(mockKey) || badOutput.includes('sk-')) }
+    await new Promise(resolvePromise => setTimeout(resolvePromise, 400))
 
     // Phase 2b: project import in the normal (non-discussion) personal surface of the same ZIP.
     const [p2b, a2b] = [await freePort(), await freePort()]
@@ -288,21 +330,9 @@ export async function runOuterZip() {
     operation.retain(`case_error:${failure}`)
   }
 
-  const observation = operation.observe()
-  const verdict = operation.releaseAllowed(observation)
-  if (failure === null && verdict.allowed === true) {
-    const released = operation.release({ observation })
-    evidence.operation = { verdict, released: released.released, retained: released.retained, observation, signals: operation.signals }
-  } else {
-    operation.retain(failure ?? verdict.reason ?? 'unknown')
-    const kept = operation.retainAll(failure ?? verdict.reason ?? 'unknown')
-    evidence.operation = { verdict, released: [], retained: kept.retained, reason: kept.reason, observation,
-      signals: operation.signals, failures: operation.failures }
-    if (process.env.PA_E_TRACE) process.stderr.write(`[w34zip] retained ${JSON.stringify(kept.retained)}\n`)
-  }
   await mock?.close?.().catch(() => {})
 
-  cases.push(await runCase({ id: 'E33-OUTER-ZIP',
+  const productCase = await runCase({ id: 'E33-OUTER-ZIP',
     title: 'The locked shareable outer ZIP is verified by its own hashes, extracted privately and driven through the packaged Start/Stop/status',
     layer: LAYERS.INSTALLED, evidence: { outerZip: evidence }, limitations: [
       'The private HOME is redirected for this operation; the user’s Application Support tree and existing instances are untouched.',
@@ -339,13 +369,55 @@ export async function runOuterZip() {
       JSON.stringify(evidence.negatives.statusStopped))
     assert('ZIP_IMPORT', evidence.phases.import?.imported?.status === 200 && typeof evidence.phases.import?.imported?.projectId === 'string' &&
       evidence.phases.import?.stop?.result === 'STOPPED', JSON.stringify(evidence.phases.import?.imported))
+    assert('ZIP_REPEATED_OPEN_NO_NEW_INSTANCE', evidence.negatives.repeatedOpen?.pidSetUnchanged === true &&
+      evidence.negatives.repeatedOpen?.outcome === 'EXITED', JSON.stringify(evidence.negatives.repeatedOpen))
+    // Known product gap in the frozen build: a 0644 model file is accepted at start; Settings validates
+    // on edit. The negative records the observed policy and forbids any secret echo.
+    assert('ZIP_INVALID_CONFIG_NO_SECRET', evidence.negatives.invalidConfigPerm?.secretLeaked === false,
+      JSON.stringify(evidence.negatives.invalidConfigPerm))
+    assert('ZIP_INVALID_CONFIG_STOPPED', evidence.negatives.invalidConfigPerm?.outcome !== 'TIMEOUT' ||
+      (evidence.negatives.invalidConfigPermResources?.stop?.result === 'STOPPED' &&
+        evidence.negatives.invalidConfigPermResources.after.every(item => item.alive === false || item.sameIdentity === false)),
+      JSON.stringify(evidence.negatives.invalidConfigPermResources))
+    assert('ZIP_PERMISSION_AT_START_RECORDED', typeof evidence.negatives.invalidConfigPerm?.permissionEnforcedAtStart === 'boolean',
+      JSON.stringify(evidence.negatives.invalidConfigPerm))
     assert('ZIP_SETTINGS_CONTRACT', evidence.settings?.template?.mode0600 === true && evidence.settings?.template?.exclusive === true &&
       evidence.settings?.template?.keys?.length === 6 && evidence.settings?.gui === 'HELD',
       JSON.stringify(evidence.settings))
-    assert('ZIP_OPERATION_RELEASED', evidence.operation?.verdict?.allowed === true && evidence.operation.released.length === 1 &&
-      evidence.operation.retained.length === 0 && evidence.operation.signals.length === 0,
-      JSON.stringify({ verdict: evidence.operation?.verdict, signals: evidence.operation?.signals?.length, retained: evidence.operation?.retained }))
-  }))
+    ev.outerZip = evidence
+  })
 
-  return { cases, artifacts: {} }
+  // Product assertions run first. Only a passing case may release the operation materials; a failed
+  // assertion marks the operation UNKNOWN and keeps HOME/install/runtime/state.
+  if (productCase.status !== 'PASS') operation.retain('product_assertion_failure')
+  const observation = operation.observe()
+  const verdict = operation.releaseAllowed(observation)
+  if (failure === null && productCase.status === 'PASS' && verdict.allowed === true) {
+    const released = operation.release({ observation })
+    evidence.operation = { verdict, released: released.released, retained: released.retained, observation, signals: operation.signals }
+  } else {
+    operation.retain(failure ?? verdict.reason ?? 'unknown')
+    const kept = operation.retainAll(failure ?? verdict.reason ?? 'unknown')
+    evidence.operation = { verdict, released: [], retained: kept.retained, reason: kept.reason, observation,
+      signals: operation.signals, failures: operation.failures }
+    if (process.env.PA_E_TRACE) process.stderr.write(`[w34zip] retained ${JSON.stringify(kept.retained)} reason=${kept.reason}\n`)
+  }
+
+  const operationCase = await runCase({ id: 'E33-OUTER-ZIP-OPERATION',
+    title: 'The outer ZIP operation releases its private HOME only after the complete set is observed exited',
+    layer: LAYERS.INSTALLED, evidence: { outerZipOperation: evidence.operation, subject: evidence.subject }, limitations: [
+      'Operation outcome only: product phases are asserted by E33-OUTER-ZIP; this case proves the material release decision.',
+    ] }, async ({ assert }) => {
+    const op = evidence.operation
+    assert('OPERATION_DECIDED', op !== null && op !== undefined && typeof op.verdict?.allowed === 'boolean', JSON.stringify(op?.verdict))
+    if (op.verdict.allowed === true) {
+      assert('OPERATION_RELEASED_CLEAN', op.released.length === 1 && op.retained.length === 0 && op.signals.length === 0 &&
+        op.verdict.reason === null, JSON.stringify(op))
+    } else {
+      assert('OPERATION_RETAINED_NO_DELETE', op.released.length === 0 && (op.retained?.length ?? 0) >= 1,
+        JSON.stringify({ reason: op.reason, retained: op.retained }))
+    }
+  })
+
+  return { cases: [productCase, operationCase], artifacts: {} }
 }

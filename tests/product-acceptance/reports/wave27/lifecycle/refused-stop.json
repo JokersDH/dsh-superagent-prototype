@@ -1,25 +1,25 @@
 {
   "control": "refused-stop",
   "reason": "package_stop_refused",
-  "at": "2026-11-16T13:15:00.810Z",
-  "root": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-refused-XetaXp",
+  "at": "2026-11-16T16:33:48.353Z",
+  "root": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-refused-TZjazf",
   "scope": {
-    "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-refused-XetaXp/install",
-    "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-refused-XetaXp/state",
-    "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-refused-XetaXp/config"
+    "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-refused-TZjazf/install",
+    "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-refused-TZjazf/state",
+    "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-refused-TZjazf/config"
   },
   "record": {
-    "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-refused-XetaXp/config/instance.json",
-    "sha256": "bcfa76682842edec93e80f9f03047c6af9da146cc7067bf21c7e40c72d20f8d5",
-    "bytes": 545,
+    "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-refused-TZjazf/config/instance.json",
+    "sha256": "90c3327d67d5e4b8e380fa34ffc256edfa3c9759d7b2b453fbaa669f557f1e40",
+    "bytes": 547,
     "value": {
       "protocol": "pa-instance/1",
-      "pid": 2353,
-      "processStart": "Mon Nov 16 21:15:00 2026",
-      "apiPid": 2353,
-      "apiProcessStart": "Mon Nov 16 21:15:00 2026",
-      "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-refused-XetaXp/state",
-      "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-refused-XetaXp/install",
+      "pid": 96635,
+      "processStart": "Tue Nov 17 00:33:48 2026",
+      "apiPid": 96635,
+      "apiProcessStart": "Tue Nov 17 00:33:48 2026",
+      "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-refused-TZjazf/state",
+      "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-refused-TZjazf/install",
       "apiURL": "http://127.0.0.1:1",
       "consoleURL": "http://127.0.0.1:2",
       "buildId": "probe",
@@ -30,18 +30,18 @@
   },
   "material": {
     "reason": "package_stop_refused",
-    "root": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-refused-XetaXp",
-    "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-refused-XetaXp/install",
-    "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-refused-XetaXp/config",
-    "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-refused-XetaXp/state",
+    "root": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-refused-TZjazf",
+    "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-refused-TZjazf/install",
+    "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-refused-TZjazf/config",
+    "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-refused-TZjazf/state",
     "record": {
-      "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-refused-XetaXp/config/instance.json",
-      "sha256": "bcfa76682842edec93e80f9f03047c6af9da146cc7067bf21c7e40c72d20f8d5",
-      "bytes": 545,
+      "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-life-refused-TZjazf/config/instance.json",
+      "sha256": "90c3327d67d5e4b8e380fa34ffc256edfa3c9759d7b2b453fbaa669f557f1e40",
+      "bytes": 547,
       "error": null
     },
     "files": [],
-    "retainedAt": "2026-11-16T13:15:00.810Z",
+    "retainedAt": "2026-11-16T16:33:48.353Z",
     "deleted": false
   },
   "extra": {}

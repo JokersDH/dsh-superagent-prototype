@@ -146,7 +146,7 @@ await collect('e3', async () => {
   }
 })
 await collect('e4', async () => {
-  const [stability, wave04, release, install, recoveryPreflight, replyDurability, sourceConfirm, installedRecovery, personalReview, trialUi, inputs, surfaces, journey, zipLifecycle, outerZip, cohortRecovery, cohortUpgrade] = await Promise.all([
+  const [stability, wave04, release, install, recoveryPreflight, replyDurability, sourceConfirm, installedRecovery, personalReview, trialUi, inputs, surfaces, journey, zipLifecycle, outerZip, cohortRecovery, cohortUpgrade, multiInstance, originalRecovery] = await Promise.all([
     import('./cases/e4-stability.mjs'),
     import('./cases/e4-wave04.mjs'),
     import('./cases/e5-release.mjs'),
@@ -164,6 +164,8 @@ await collect('e4', async () => {
     import('./cases/w33-outer-zip.mjs'),
     import('./cases/w33-cohort-recovery.mjs'),
     import('./cases/w34-cohort-upgrade.mjs'),
+    import('./cases/w35-multi-instance.mjs'),
+    import('./cases/w35-original-work-recovery.mjs'),
   ])
   const first = await stability.runE4({
     root,
@@ -187,8 +189,10 @@ await collect('e4', async () => {
   const sixteenth = await outerZip.runOuterZip({ root, runDirectory: run.directory })
   const seventeenth = await cohortRecovery.runCohortRecovery({ root, runDirectory: run.directory })
   const eighteenth = await cohortUpgrade.runCohortUpgrade({ root, runDirectory: run.directory })
+  const nineteenth = await multiInstance.runMultiInstance({ root, runDirectory: run.directory })
+  const twentieth = await originalRecovery.runOriginalWorkRecovery({ root, runDirectory: run.directory })
   return {
-    cases: [...first.cases, ...second.cases, ...third.cases, ...fourth.cases, ...fifth.cases, ...sixth.cases, ...seventh.cases, ...eighth.cases, ...ninth.cases, ...eleventh.cases, ...twelfth.cases, ...thirteenth.cases, ...fourteenth.cases, ...fifteenth.cases, ...sixteenth.cases, ...seventeenth.cases, ...eighteenth.cases],
+    cases: [...first.cases, ...second.cases, ...third.cases, ...fourth.cases, ...fifth.cases, ...sixth.cases, ...seventh.cases, ...eighth.cases, ...ninth.cases, ...eleventh.cases, ...twelfth.cases, ...thirteenth.cases, ...fourteenth.cases, ...fifteenth.cases, ...sixteenth.cases, ...seventeenth.cases, ...eighteenth.cases, ...nineteenth.cases, ...twentieth.cases],
     artifacts: {
       screenshots: [
         ...(first.artifacts?.screenshots ?? []),

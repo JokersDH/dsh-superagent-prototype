@@ -192,7 +192,9 @@ export async function runCohortRecovery() {
       accepted: accepted?.receipt?.status ?? null, artifactIds: artifactIds.length, artifacts,
       messages: page?.messages?.length ?? 0, messageShape, providerRequests: mock.requests.length }
     evidence.pending = { workId: pendingWorkId, receipt: pendingCreated.receipt?.status ?? null,
-      phase: pendingView?.phase ?? null, openQuestionIds: pendingView?.openQuestionIds ?? [],
+      phase: pendingView?.phase ?? null, beforeStop: { phase: pendingView?.phase ?? null,
+        openQuestionIds: pendingView?.openQuestionIds ?? [] },
+      openQuestionIds: pendingView?.openQuestionIds ?? [],
       recordedQuestions: (pendingSnapshot.questions ?? []).map(item => item.id),
       question: pendingQuestion ? { id: pendingQuestion.id, version: pendingQuestion.version } : null }
     if (!artifacts.length) throw new Error('seed produced no artifact bytes')
@@ -328,25 +330,9 @@ export async function runCohortRecovery() {
     operation.retain(`case_error:${failure}`)
   }
 
-  // One teardown: prove the complete set exited, then release the whole material set; otherwise retain.
-  let teardown = null
-  try { teardown = await stopOwned(root, { mockFile: mock?.file, equivalentProof: true }) } catch (error) { teardown = { clean: false, reason: String(error?.message ?? error) } }
-  if (teardown?.clean !== true) operation.retain(`teardown:${teardown?.reason ?? 'unknown'}`)
-  const observation = operation.observe()
-  const verdict = operation.releaseAllowed(observation)
-  if (failure === null && verdict.allowed === true) {
-    const released = operation.release({ observation })
-    evidence.operation = { verdict, released: released.released, retained: [], observation, signals: operation.signals }
-  } else {
-    operation.retain(failure ?? verdict.reason ?? 'unknown')
-    const kept = operation.retainAll(failure ?? verdict.reason ?? 'unknown')
-    evidence.operation = { verdict, released: [], retained: kept.retained, reason: kept.reason, observation,
-      signals: operation.signals, failures: operation.failures }
-    if (process.env.PA_E_TRACE) process.stderr.write(`[w34rec] retained ${JSON.stringify(kept.retained)} reason=${kept.reason}\n`)
-  }
   await mock?.close?.().catch(() => {})
 
-  cases.push(await runCase({ id: 'E33-COHORT-RECOVERY',
+  const productCase = await runCase({ id: 'E33-COHORT-RECOVERY',
     title: 'The locked W33 cohort seeds an accepted Work with every artifact and a held question, backs up, restores and reads the same business facts recovery-readonly',
     layer: LAYERS.INSTALLED, evidence: { cohortRecovery: evidence }, limitations: [
       'The installation is the frozen W33 tar (f880/ee45) extracted privately and started with the frozen CLI; no other build is substituted.',
@@ -405,11 +391,42 @@ export async function runCohortRecovery() {
       evidence.resources?.seed?.after?.every(item => item.alive === false || item.sameIdentity === false) &&
       evidence.resources?.readonly?.after?.every(item => item.alive === false || item.sameIdentity === false),
       JSON.stringify({ seed: evidence.resources?.seed?.stop, readonly: readonly.stop }))
-    assert('RECOVERY_OPERATION_RELEASED', evidence.operation?.verdict?.allowed === true && evidence.operation.released.length === 1 &&
-      evidence.operation.signals.length === 0 && evidence.operation.retained.length === 0,
-      JSON.stringify({ verdict: evidence.operation?.verdict, retained: evidence.operation?.retained, signals: evidence.operation?.signals?.length }))
     ev.cohortRecovery = evidence
-  }))
+  })
 
-  return { cases, artifacts: {} }
+  // Product assertions first; then one teardown and one release decision. A failure keeps everything.
+  let teardown = null
+  try { teardown = await stopOwned(root, { mockFile: mock?.file, equivalentProof: true }) } catch (error) { teardown = { clean: false, reason: String(error?.message ?? error) } }
+  if (teardown?.clean !== true) operation.retain(`teardown:${teardown?.reason ?? 'unknown'}`)
+  if (productCase.status !== 'PASS') operation.retain('product_assertion_failure')
+  const observation = operation.observe()
+  const verdict = operation.releaseAllowed(observation)
+  if (failure === null && productCase.status === 'PASS' && verdict.allowed === true && teardown?.clean === true) {
+    const released = operation.release({ observation })
+    evidence.operation = { verdict, released: released.released, retained: [], observation, signals: operation.signals }
+  } else {
+    operation.retain(failure ?? verdict.reason ?? teardown?.reason ?? 'unknown')
+    const kept = operation.retainAll(failure ?? verdict.reason ?? teardown?.reason ?? 'unknown')
+    evidence.operation = { verdict, released: [], retained: kept.retained, reason: kept.reason, observation,
+      signals: operation.signals, failures: operation.failures }
+    if (process.env.PA_E_TRACE) process.stderr.write(`[w34rec] retained ${JSON.stringify(kept.retained)} reason=${kept.reason}\n`)
+  }
+
+  const operationCase = await runCase({ id: 'E33-COHORT-RECOVERY-OPERATION',
+    title: 'The cohort recovery operation releases install/config/state only after the complete set is observed exited',
+    layer: LAYERS.INSTALLED, evidence: { cohortRecoveryOperation: evidence.operation, subject: evidence.subject }, limitations: [
+      'Operation outcome only: business assertions live in E33-COHORT-RECOVERY; this case proves the release decision.',
+    ] }, async ({ assert }) => {
+    const op = evidence.operation
+    assert('OPERATION_DECIDED', op !== null && op !== undefined && typeof op.verdict?.allowed === 'boolean', JSON.stringify(op?.verdict))
+    if (op.verdict.allowed === true) {
+      assert('OPERATION_RELEASED_CLEAN', op.released.length === 1 && op.retained.length === 0 && op.signals.length === 0 &&
+        op.verdict.reason === null, JSON.stringify(op))
+    } else {
+      assert('OPERATION_RETAINED_NO_DELETE', op.released.length === 0 && (op.retained?.length ?? 0) >= 1,
+        JSON.stringify({ reason: op.reason, retained: op.retained }))
+    }
+  })
+
+  return { cases: [productCase, operationCase], artifacts: {} }
 }

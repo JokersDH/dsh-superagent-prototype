@@ -203,7 +203,11 @@ export const INSTALL_CASES = [
   case_('E33-OUTER-ZIP', { layers: [LAYERS.INSTALLED], evidence: ['outerZip'] }),
   // The cohort case describes the same outer-ZIP inner build as E33-OUTER-ZIP; both are one cohort.
   case_('E33-COHORT-RECOVERY', { layers: [LAYERS.INSTALLED], evidence: ['cohortRecovery'] }),
+  case_('E33-OUTER-ZIP-OPERATION', { layers: [LAYERS.INSTALLED], evidence: ['outerZipOperation'] }),
+  case_('E33-COHORT-RECOVERY-OPERATION', { layers: [LAYERS.INSTALLED], evidence: ['cohortRecoveryOperation'] }),
   case_('E5-COHORT-UPGRADE', { layers: [LAYERS.INSTALLED], evidence: ['cohortUpgrade'] }),
+  case_('E7-MULTI-INSTANCE', { layers: [LAYERS.INSTALLED], evidence: ['multiInstance'] }),
+  { id: 'E8-ORIGINAL-WORK-RECOVERY', required: false, layers: [LAYERS.INSTALLED], evidence: ['originalWorkRecovery'] },
   // Tracked gaps: installed F identity fields and a wired G summary need successor frozen bytes.
   { id: 'E11-TRIAL-IDENTITY-FIELDS', required: false, layers: [LAYERS.INSTALLED], evidence: ['trialIdentity'] },
   { id: 'E13-G-SCOPED-SUMMARY', required: false, layers: [LAYERS.INSTALLED], evidence: ['gSummary'] },

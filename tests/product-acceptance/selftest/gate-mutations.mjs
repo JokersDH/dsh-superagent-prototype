@@ -7,6 +7,8 @@ const COMMIT = 'a'.repeat(40)
 const DIGEST = 'b'.repeat(64)
 const BASELINE = 'c'.repeat(40)
 
+const ZIP_TUPLE = { source: '9'.repeat(40), buildId: 'zip-build', schema: 18, tarSha256: '9'.repeat(64), tarBytes: 2, abi: '137', platform: 'darwin', arch: 'arm64' }
+const CLEAN_OPERATION = { verdict: { allowed: true, reason: null }, released: ['/tmp/private/root'], retained: [], signals: [] }
 const ROW_ARGV = 'node /tmp/private/install/app/apps/launcher/bin/pa.mjs start --port 1 --api-port 2'
 const ROW_ARGV_SHA = 'c'.repeat(64)
 /** One synthetic complete birth row: pid/start/uid/argv digest/root/config/op. */
@@ -671,9 +673,10 @@ const evidenceFor = (key) => {
         projects: [1, 2].map(index => ({ index, displayName: `p${index}`, id: `project-${index}`, executionProjectId: `project-${index}`,
           preview: { status: 200, bodyStatus: 'draft', authorization: 'none', applicable: true, fieldsCount: 3 }, receipt: 'recorded', workId: `work-${index}`,
           phase: 'delivered', accepted: 'recorded', artifacts: 2,
-          acceptReadiness: { available: ['accept_candidate'], candidateId: `candidate-${index}`, verificationId: `verification-${index}`, verificationResults: 3, verificationState: 'pass' },
+          acceptReadiness: { available: ['accept_candidate'], candidateId: `ticket-${index}/assignment-${index}/3`, verificationId: `verification-${index}`, verificationResults: 3, verificationState: 'pass' },
           staleAccept: { status: 'refused', code: 'candidate_unknown' },
-          insights: { open: { seven: 200, thirty: 200, days: [7, 30] } } })) }
+          insights: { seven: 200, thirty: 200, days: [7, 30], projectId: [`project-${index}`, `project-${index}`],
+            window: [{ from: 'a', to: 'b' }, { from: 'c', to: 'd' }], open: { seven: 200, thirty: 200, days: [7, 30] } } })) }
     case 'journeyContext':
       return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
         prepare: 200, send: 200, sendStatus: 'recorded', reply: 'ok', audit: 200, auditBindings: 1, history: 200,
@@ -733,8 +736,23 @@ const evidenceFor = (key) => {
             resources: resourcePair(106, 'outer:import') } },
         settings: { entry: 'Settings.command', gui: 'HELD',
           template: { mode0600: true, exclusive: true, keys: ['baseURL', 'apiKey', 'model', 'allowedModels', 'allowInsecureHttp', 'maxOutputTokens'] } },
+        operation: { verdict: { allowed: true, reason: null }, released: ['/tmp/private/home'], retained: [], signals: [] },
         negatives: { portConflict: { outcome: 'EXITED', code: 1 }, statusStopped: { status: 2, result: 'STOPPED' } } }
     }
+    case 'originalWorkRecovery':
+      return { status: 'NOT_REACHED', reason: 'no product consumer resumes an original Work from a fault',
+        missingInputs: ['original attachRunnerAttempt consumer'], plannedNegatives: ['unknown send no resend'] }
+    case 'multiInstance':
+      return { subject: ZIP_TUPLE, instances: {
+          A: { buildId: 'zip-build', health: true, readiness: { status: 200, discussion: 'configuration_present' }, pid: 101, consoleURL: 'http://127.0.0.1:1', apiURL: 'http://127.0.0.1:2', configRoot: '/tmp/a/config', stateRoot: '/tmp/a/state', stop: { clean: true, after: [{ alive: false, sameIdentity: false }] } },
+          B: { buildId: 'zip-build', health: true, readiness: { status: 200, discussion: 'configuration_present' }, pid: 102, consoleURL: 'http://127.0.0.1:3', apiURL: 'http://127.0.0.1:4', configRoot: '/tmp/b/config', stateRoot: '/tmp/b/state', stop: { clean: true, after: [{ alive: false, sameIdentity: false }] } } },
+        isolation: { distinctPid: true, distinctConsole: true, distinctApi: true, distinctConfig: true, distinctState: true, distinctModel: true, sameInstall: true, bAfterAStop: { health: true, readiness: 200, bPidAlive: true } },
+        doctor: { A: { exit: 1, secretLeaked: false }, B: { exit: 1, secretLeaked: false } },
+        operation: { verdict: { allowed: true, reason: null }, released: ['/tmp/two'], retained: [], signals: [] } }
+    case 'outerZipOperation':
+      return { subject: ZIP_TUPLE, operation: { ...CLEAN_OPERATION } }
+    case 'cohortRecoveryOperation':
+      return { subject: ZIP_TUPLE, operation: { ...CLEAN_OPERATION } }
     case 'cohortUpgrade': {
       const tuple = { source: '9'.repeat(40), buildId: 'zip-build', schema: 18, tarSha256: '9'.repeat(64), tarBytes: 2, abi: '137', platform: 'darwin', arch: 'arm64' }
       const steps = ['bootstrap', 'baseline_start', 'upgrade', 'upgraded_health', 'post_upgrade_write', 'tampered_target', 'rollback_install', 'rollback_start']
@@ -751,14 +769,20 @@ const evidenceFor = (key) => {
       const tuple = { source: '9'.repeat(40), buildId: 'zip-build', schema: 18, tarSha256: '9'.repeat(64), tarBytes: 2, abi: '137', platform: 'darwin', arch: 'arm64' }
       const shape = [{ role: 'user', provenance: 'trusted_user', text: 'goal' }]
       return { subject: tuple, zip: { sumsMatch: true, resultMatch: true, digestsMatch: true },
-        seed: { workId: 'work-1', phase: 'delivered', accepted: 'recorded', artifacts: [{ id: 'a1', sha256: DIGEST, bytes: 1 }],
-          messages: 1, messageShape: shape },
+        operation: { verdict: { allowed: true, reason: null }, released: ['/tmp/private/root'], retained: [], signals: [] },
+        seed: { workId: 'work-1', phase: 'delivered', accepted: 'recorded', artifactIds: 1,
+          artifacts: [{ id: 'a1', sha256: DIGEST, bytes: 1 }], messages: 1, messageShape: shape,
+          pending: { beforeStop: { phase: 'needs_user', openQuestionIds: ['q1'] } } },
         backup: { status: 'CREATED', verify: 'VERIFIED', sha256: DIGEST, counts: { entries: 2, artifacts: 1 }, database: { eventSeq: 1 } },
         restore: { status: 'RESTORED', marker: true, counts: { works: 1, artifacts: 1, messages: 1 },
           recovery: { markerPresent: true, startupMode: 'recovery_readonly', authorization: 'BLOCKED' } },
-        readonly: { startupMode: 'recovery_readonly', work: { phase: 'delivered', artifactsEqual: true },
-          artifactsEqual: true, messages: 1, messagesEqual: true, goalVisible: true, messageShape: shape,
-          business: { status: 422 }, providerRequests: { afterSeed: 1, afterReads: 1 }, stop: { clean: true } },
+        directRead: { available: true, registry: [{ id: 'a1', digest: DIGEST, bytes: 1 }] },
+        readonly: { startupMode: 'recovery_readonly', work: { phase: 'delivered', artifactsEqual: true, artifactIds: ['a1'] },
+          artifactsEqual: true, artifacts: [{ id: 'a1', sha256: DIGEST, bytes: 1 }], messages: 1, messagesEqual: true,
+          goalVisible: true, messageShape: shape,
+          pending: { found: true, recordedBeforeStop: ['q1'], questionsRecorded: 1, held: true },
+          counts: { before: { effect: [{ id: 'e1' }], questions: 1, answers: 0 }, after: { effect: [{ id: 'e1' }], questions: 1, answers: 0 } },
+          answer: { status: 422 }, business: { status: 422 }, providerRequests: { afterSeed: 1, afterReads: 1 }, stop: { clean: true } },
         negatives: { tamperedBundle: { status: 2, result: 'BLOCKED' }, fixtureOnRestored: { status: 'RUNNING', startupMode: 'recovery_readonly', business: 422 } },
         resources: { seed: { stop: { clean: true }, ...resourcePair(104, 'cohort:seed') },
           readonly: resourcePair(105, 'cohort:readonly') } }
@@ -772,7 +796,7 @@ const buildCase = (entry, overrides = {}) => {
   const evidence = Object.fromEntries((entry.evidence ?? []).map((key) => [key, evidenceFor(key)]))
   const nested = ['subject', 'frozenScope', 'currentInstall', 'upgradeFaults', 'ownershipCopy', 'installedContext',
     'backupContextReply', 'ownershipMocks', 'installedCandidates', 'secondRoot', 'installedSourceConfirm', 'installedStability',
-    'outerZip', 'cohortRecovery']
+    'outerZip', 'cohortRecovery', 'outerZipOperation', 'cohortRecoveryOperation', 'multiInstance']
     .some((key) => evidence[key] !== undefined)
   if ((entry.layers ?? []).includes(LAYERS.INSTALLED) && entry.id !== 'E4-INSTALL-ARTIFACT-IDENTITY' && !nested)
     evidence.subject = { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' }
@@ -2511,6 +2535,55 @@ const ROUTING_CASES = [
         findCase(report, 'E5-TWO-PROJECT-TEMPLATE-CREATE').evidence.journey.projects[0].insights.open.days = [7, 31]
         return report
       }, 'journey_invalid'),
+  },
+  {
+    id: 'E2-MUTATE-OPERATION-DELETED-UNKNOWN',
+    title: 'An UNKNOWN operation that still reports deleted materials is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'OP_DEL_UNKNOWN', (report) => {
+        const op = findCase(report, 'E33-OUTER-ZIP').evidence.outerZip.operation
+        op.verdict = { allowed: false, reason: 'resource_alive' }
+        op.released = ['/tmp/private/home']
+        return report
+      }, 'outerZip_invalid'),
+  },
+  {
+    id: 'E2-MUTATE-COHORT-PENDING-MISSING',
+    title: 'A recovery claim without a recorded pre-stop question is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'PEND_MISSING', (report) => {
+        findCase(report, 'E33-COHORT-RECOVERY').evidence.cohortRecovery.readonly.pending.recordedBeforeStop = []
+        return report
+      }, 'cohortRecovery_invalid'),
+  },
+  {
+    id: 'E2-MUTATE-COHORT-EFFECT-DRIFT',
+    title: 'A recovery whose effect rows changed is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'EFFECT_DRIFT', (report) => {
+        const value = findCase(report, 'E33-COHORT-RECOVERY').evidence.cohortRecovery.readonly
+        value.counts.after.effect = [{ id: 'e2' }]
+        return report
+      }, 'cohortRecovery_invalid'),
+  },
+  {
+    id: 'E2-MUTATE-COHORT-REGISTRY-DRIFT',
+    title: 'A direct Store registry that disagrees with the delivered bytes is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'REGISTRY_DRIFT', (report) => {
+        findCase(report, 'E33-COHORT-RECOVERY').evidence.cohortRecovery.directRead.registry[0].digest = '0'.repeat(64)
+        return report
+      }, 'cohortRecovery_invalid'),
+  },
+  {
+    id: 'E3-MUTATE-SAME-PROJECT-INSIGHTS-403',
+    title: 'A sameProject claim whose per-project scoped insights are 403 is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'SAME_PROJECT_INSIGHTS', (report) => {
+        const journey = findCase(report, 'E5-TWO-PROJECT-TEMPLATE-CREATE').evidence.journey
+        journey.projects[0].insights.seven = 403
+        return report
+      }, 'journey_scope_unproven'),
   },
   {
     id: 'E1-MUTATE-HETERO-NO-SUBJECT',

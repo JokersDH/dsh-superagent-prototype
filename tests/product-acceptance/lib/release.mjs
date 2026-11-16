@@ -541,6 +541,19 @@ const deadAfter = after => Array.isArray(after) && after.length >= 1 &&
   after.every(item => item && typeof item === 'object' && Number.isSafeInteger(item.pid) &&
     typeof item.alive === 'boolean' && typeof item.sameIdentity === 'boolean' && !(item.alive === true && item.sameIdentity === true))
 
+/** An operation outcome is either a clean single-material release or a retained unknown, never both. */
+function operationConsistencyIssues(op) {
+  if (!op || typeof op !== 'object' || typeof op.verdict?.allowed !== 'boolean') return ['operation_missing']
+  const issues = []
+  if (op.verdict.allowed === true) {
+    if (!Array.isArray(op.released) || op.released.length !== 1) issues.push('operation_released_count')
+    if (!Array.isArray(op.retained) || op.retained.length !== 0) issues.push('operation_retained_after_release')
+    if (!Array.isArray(op.signals) || op.signals.length !== 0) issues.push('operation_signals_after_release')
+    if (op.verdict.reason !== null && op.verdict.reason !== undefined) issues.push('operation_reason_after_release')
+  } else if (Array.isArray(op.released) && op.released.length > 0) issues.push('operation_deleted_after_unknown')
+  return issues
+}
+
 /** The shareable outer ZIP is verified by its own sidecars and driven through the packaged entries. */
 export function outerZipIssues(value) {
   if (!value || typeof value !== 'object') return ['missing']
@@ -569,6 +582,7 @@ export function outerZipIssues(value) {
   if (reopen.status !== 'RUNNING' || reopen.stop?.result !== 'STOPPED') issues.push('reopen')
   for (const issue of resourceRowsIssues(reopen.resources?.before, reopen.resources?.after)) issues.push(`reopen_${issue}`)
   if (value.negatives?.statusStopped?.status !== 2 || value.negatives?.statusStopped?.result !== 'STOPPED') issues.push('status_stopped')
+  issues.push(...operationConsistencyIssues(value.operation))
   if (value.settings?.template?.mode0600 !== true || value.settings?.template?.exclusive !== true ||
     !(value.settings?.template?.keys?.length === 6)) issues.push('settings_template')
   if (value.phases?.import?.imported?.status !== 200 || !isSubstantive(value.phases?.import?.imported?.projectId) ||
@@ -592,13 +606,32 @@ export function cohortRecoveryIssues(value) {
   if (value.restore?.status !== 'RESTORED' || value.restore?.marker !== true) issues.push('restore')
   const recovery = value.restore?.recovery ?? {}
   if (recovery.markerPresent !== true || recovery.startupMode !== 'recovery_readonly' || recovery.authorization !== 'BLOCKED') issues.push('authorization')
+  issues.push(...operationConsistencyIssues(value.operation))
   const readonly = value.readonly ?? {}
   if (readonly.startupMode !== 'recovery_readonly' || readonly.work?.phase !== 'delivered' || readonly.work?.artifactsEqual !== true) issues.push('readonly_work')
+  const seedIds = (seed.artifacts ?? []).map(item => item.id)
+  if (JSON.stringify(readonly.work?.artifactIds ?? []) !== JSON.stringify(seedIds)) issues.push('work_artifact_ids')
+  if (JSON.stringify(seed.artifacts ?? []) !== JSON.stringify(readonly.artifacts ?? [])) issues.push('artifact_list')
   if (readonly.artifactsEqual !== true) issues.push('artifact_bytes')
   if ((readonly.messages ?? 0) !== (seed.messages ?? -1) || readonly.goalVisible !== true ||
     JSON.stringify(readonly.messageShape) !== JSON.stringify(seed.messageShape)) issues.push('history')
+  const pending = readonly.pending ?? {}
+  if (pending.found !== true || !Array.isArray(pending.recordedBeforeStop) || pending.recordedBeforeStop.length === 0 ||
+    !((pending.questionsRecorded ?? 0) >= pending.recordedBeforeStop.length) || pending.held !== true ||
+    !(seed.pending?.beforeStop?.openQuestionIds?.length >= 1) ||
+    !['needs_user', 'running', 'waiting_answer'].includes(String(seed.pending?.beforeStop?.phase ?? ''))) issues.push('pending')
+  if (readonly.answer?.status !== 422) issues.push('answer_accepted')
+  const counts = readonly.counts ?? {}
+  if (!Array.isArray(counts.before?.effect) || !Array.isArray(counts.after?.effect)) issues.push('effect_unknown')
+  else if (JSON.stringify(counts.before.effect) !== JSON.stringify(counts.after.effect)) issues.push('effect_changed')
+  if (!Number.isInteger(counts.before?.questions) || counts.before.questions !== counts.after?.questions) issues.push('questions_changed')
+  if (!Number.isInteger(counts.before?.answers) || counts.before.answers !== counts.after?.answers) issues.push('answers_changed')
   if (readonly.business?.status !== 422) issues.push('business_write')
   if (readonly.providerRequests?.afterSeed !== readonly.providerRequests?.afterReads) issues.push('provider_called')
+  const direct = value.directRead ?? {}
+  if (direct.available !== true || !Array.isArray(direct.registry)) issues.push('direct_reader')
+  else if (!seed.artifacts.every(item => direct.registry.some(row => row.id === item.id && row.digest === item.sha256 && row.bytes === item.bytes)))
+    issues.push('direct_registry_mismatch')
   const refused = value.negatives?.fixtureOnRestored ?? {}
   if (refused.status === 'RUNNING' && refused.business !== 422 && refused.startupMode !== 'recovery_readonly') issues.push('execution_mode')
   if (value.resources?.seed?.stop?.clean !== true || readonly.stop?.clean !== true) issues.push('stop_incomplete')
@@ -646,7 +679,8 @@ export function journeyIssues(value) {
     if (project.accepted === 'recorded') {
       if (!readiness.available?.includes('accept_candidate') || !isSubstantive(readiness.verificationId) ||
         readiness.verificationState !== 'pass' || !((readiness.verificationResults ?? 0) >= 1)) issues.push(`accept_readiness:${project.index}`)
-      if (project.staleAccept && project.staleAccept.status === 'recorded') issues.push(`stale_accepted:${project.index}`)
+      if (!project.staleAccept) issues.push(`stale_untested:${project.index}`)
+      else if (project.staleAccept.status === 'recorded') issues.push(`stale_accepted:${project.index}`)
     }
     const open = project.insights?.open ?? {}
     if (open.seven !== 200 || open.thirty !== 200 || open.days?.[0] !== 7 || open.days?.[1] !== 30) issues.push(`insights:${project.index}`)
@@ -1710,7 +1744,7 @@ export function evaluateRelease({
         item.evidence?.supportMaterial?.subject ?? item.evidence?.packagedStop?.subject ?? item.evidence?.insights?.subject ??
         item.evidence?.recipePreview?.subject ?? item.evidence?.journey?.subject ?? item.evidence?.journeyContext?.subject ??
         item.evidence?.journeyPhases?.subject ?? item.evidence?.journeyReopen?.subject ?? item.evidence?.zip?.subject ??
-        item.evidence?.outerZip?.subject ?? item.evidence?.cohortRecovery?.subject ?? item.evidence?.cohortUpgrade?.subject
+        item.evidence?.outerZip?.subject ?? item.evidence?.cohortRecovery?.subject ?? item.evidence?.cohortUpgrade?.subject ?? item.evidence?.multiInstance?.subject
       if (!subject || typeof subject !== 'object') {
         failures.push(fail('subject_missing', `Case ${id} has no frozen artifact subject`, id))
         continue
@@ -1744,6 +1778,14 @@ export function evaluateRelease({
     for (const project of journeyEvidence.projects ?? []) {
       if (project.preview?.applicable !== true || !((project.preview?.fieldsCount ?? 0) >= 1))
         failures.push(fail('journey_preview_unproven', `project ${project.index} claims sameProject without an applicable draft with fields`, 'E5-TWO-PROJECT-TEMPLATE-CREATE'))
+      const scoped = project.insights ?? {}
+      if (scoped.seven !== 200 || scoped.thirty !== 200) {
+        failures.push(fail('journey_scope_unproven', `project ${project.index} sameProject needs readable 7/30 scoped insights, got ${scoped.seven}/${scoped.thirty}`, 'E5-TWO-PROJECT-TEMPLATE-CREATE'))
+        continue
+      }
+      if (scoped.days?.[0] !== 7 || scoped.days?.[1] !== 30) failures.push(fail('journey_scope_window', `project ${project.index} scoped window is ${JSON.stringify(scoped.days)}`, 'E5-TWO-PROJECT-TEMPLATE-CREATE'))
+      if (Array.isArray(scoped.projectId) && scoped.projectId.some(value => value !== null && value !== project.id))
+        failures.push(fail('journey_scope_unbound', `project ${project.index} scoped insights are bound to another project`, 'E5-TWO-PROJECT-TEMPLATE-CREATE'))
     }
   }
 

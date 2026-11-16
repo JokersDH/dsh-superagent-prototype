@@ -181,13 +181,79 @@ export async function runCallerSafety() {
       argvSha256: 'b'.repeat(64), root: own, op: 'stale-signal' })
     const signal = op.signal(sleeper.pid, 'SIGTERM')
     const alive = liveIdentity(sleeper.pid).alive
-    assert('STALE_IDENTITY_REFUSED', signal.signalled === null && signal.refused === 'identity_changed', JSON.stringify(signal))
+    assert('STALE_IDENTITY_REFUSED', signal.signalled === null && signal.refused === 'set_not_fresh', JSON.stringify(signal))
     assert('NO_MISGUIDED_SIGNAL', alive === true && op.signals.length === 0, JSON.stringify({ alive, signals: op.signals.length }))
     evidence.callerStale = { signal, signals: op.signals.length }
     const cleanup = createOperation({ id: 'stale-cleanup' })
     cleanup.track(resourceBirth(sleeper.pid, { root: own }))
     cleanup.signal(sleeper.pid, 'SIGTERM')
     await waitGone(sleeper.pid)
+    rmSync(own, { recursive: true, force: true })
+  }))
+
+  cases.push(await runCase(define('E1-CALLER-SIGNAL-REFUSES-STALE-SET'), async ({ assert, evidence }) => {
+    const own = scratch()
+    const op = createOperation({ id: 'stale-set' })
+    const parent = spawnSleeper({ own }, { name: 'set-parent' })
+    const child = spawnSleeper({ own }, { name: 'set-child' })
+    op.track(resourceBirth(parent.pid, { root: own, op: 'stale-set' }))
+    // Structurally complete but with a stale start/argv: the child identity no longer matches.
+    op.track({ pid: child.pid, start: 'Mon Nov 16 01:01:01 2026', uid: 501, argv: '/bin/stale --child',
+      argvSha256: 'd'.repeat(64), root: own, op: 'stale-set' })
+    const signal = op.signal(parent.pid, 'SIGTERM')
+    assert('SET_NOT_FRESH_REFUSED', signal.signalled === null && signal.refused === 'set_not_fresh', JSON.stringify(signal))
+    assert('ZERO_SIGNAL_ON_STALE_SET', op.signals.length === 0 && liveIdentity(parent.pid).alive === true &&
+      liveIdentity(child.pid).alive === true, JSON.stringify({ signals: op.signals.length }))
+    evidence.callerStaleSet = { signal }
+    const cleanup = createOperation({ id: 'stale-set-cleanup' })
+    cleanup.track(resourceBirth(parent.pid, { root: own }))
+    cleanup.track(resourceBirth(child.pid, { root: own }))
+    cleanup.signal(parent.pid, 'SIGTERM')
+    cleanup.signal(child.pid, 'SIGTERM')
+    await waitGone(parent.pid); await waitGone(child.pid)
+    rmSync(own, { recursive: true, force: true })
+  }))
+
+  cases.push(await runCase(define('E1-CALLER-RELEASE-DUPLICATE-ROWS'), async ({ assert, evidence }) => {
+    const own = scratch()
+    const op = createOperation({ id: 'duplicate-post' })
+    const parent = spawnSleeper({ own }, { name: 'dup-parent' })
+    const child = spawnSleeper({ own }, { name: 'dup-child' })
+    op.track(resourceBirth(parent.pid, { root: own, op: 'duplicate-post' }))
+    op.track(resourceBirth(child.pid, { root: own, op: 'duplicate-post' }))
+    const cleanup = createOperation({ id: 'duplicate-post-cleanup' })
+    cleanup.track(resourceBirth(parent.pid, { root: own }))
+    cleanup.track(resourceBirth(child.pid, { root: own }))
+    cleanup.signal(parent.pid, 'SIGTERM'); cleanup.signal(child.pid, 'SIGTERM')
+    await waitGone(parent.pid); await waitGone(child.pid)
+    const rows = op.observe()
+    const duplicated = [rows[0], rows[0]]
+    const verdict = op.releaseAllowed(duplicated)
+    assert('DUPLICATE_ROWS_REFUSED', verdict.allowed === false && verdict.reason === 'duplicate_observation', JSON.stringify(verdict))
+    assert('CLEAN_PAIR_RELEASES', op.releaseAllowed(rows).allowed === true, JSON.stringify(op.releaseAllowed(rows)))
+    evidence.callerDuplicateRows = { verdict }
+    rmSync(own, { recursive: true, force: true })
+  }))
+
+  cases.push(await runCase(define('E1-CALLER-LATE-CHILD'), async ({ assert, evidence }) => {
+    const own = scratch()
+    const op = createOperation({ id: 'late-child' })
+    const script = join(own, 'late-parent.mjs')
+    writeFileSync(script, `import { spawn } from 'node:child_process'\nsetTimeout(() => { const c = spawn(process.execPath, ['-e', 'setTimeout(() => {}, 1500)'], { stdio: 'ignore' }); c.unref() }, 700)\nsetTimeout(() => process.exit(0), 2000)\n`)
+    const parent = spawn(process.execPath, [script], { stdio: 'ignore' })
+    op.track(resourceBirth(parent.pid, { root: own, op: 'late-child' }))
+    await new Promise(resolvePromise => setTimeout(resolvePromise, 1_000))
+    const late = op.lateDescendants()
+    const signal = op.signal(parent.pid, 'SIGTERM')
+    const release = op.releaseAllowed()
+    assert('LATE_CHILD_DETECTED', late.length >= 1, JSON.stringify(late))
+    assert('SIGNAL_REFUSED_LATE_CHILD', signal.signalled === null && signal.refused === 'late_child', JSON.stringify(signal))
+    assert('RELEASE_REFUSED_LATE_CHILD', release.allowed === false && release.reason === 'late_child', JSON.stringify(release))
+    evidence.callerLateChild = { late, signal, release }
+    // Probe-owned scratch cleanup only after recording the refusal: fresh identity read per pid.
+    for (const item of late) { const identity = liveIdentity(item.pid); if (identity.alive) process.kill(item.pid, 'SIGTERM') }
+    await waitGone(parent.pid)
+    for (const item of late) await waitGone(item.pid)
     rmSync(own, { recursive: true, force: true })
   }))
 

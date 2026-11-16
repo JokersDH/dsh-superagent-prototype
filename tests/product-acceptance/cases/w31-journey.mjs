@@ -155,9 +155,9 @@ export async function runJourney() {
     const executionPool = fixtureConfiguration.projects.filter(item => item.dispatchAllowed === true)
     if (executionPool.length === 0) throw new Error('fixture configuration exposes no dispatchable project')
     journey.executionPool = executionPool.map(item => ({ id: item.id, displayName: item.displayName ?? null, profileIds: item.profileIds ?? [] }))
-    // The accept surface carries a verification identity but no candidate object in this build, so a
-    // stale-candidate negative cannot be derived without inventing a second product contract.
-    journey.acceptStaleScope = 'NOT_REACHED: accept_candidate exposes no candidate identity (currentCandidate is null); accept readiness is verification-based and a stale-candidate negative is not expressible'
+    // The candidate is a composite reference (ticket/assignment/contract digest/generation); a stale
+    // variant is derived from the live one on the same still-acceptable state.
+    journey.acceptStaleScope = 'COMPOSITE: stale candidate derived by replacing the contract digest on the current candidate reference'
     journey.originalProjectExecution = {
       sameProject: executionPool.every(item => journey.projects.some(project => project.id === item.id)),
       reason: executionPool.every(item => journey.projects.some(project => project.id === item.id)) ? null
@@ -181,18 +181,20 @@ export async function runJourney() {
       const verification = view?.actions?.currentVerificationId
         ? await fixtureClient.verification(view.actions.currentVerificationId).catch(() => null) : null
       const results = Array.isArray(verification?.results) ? verification.results : null
-      project.acceptReadiness = { available: view?.actions?.available ?? [], candidateId: candidate?.id ?? null,
+      project.acceptReadiness = { available: view?.actions?.available ?? [],
+        candidateId: candidate ? `${candidate.ticketId}/${candidate.assignmentId}/${candidate.candidateGeneration}` : null,
         verificationId: view?.actions?.currentVerificationId ?? null,
         verificationResults: results?.length ?? null,
         verificationState: results && results.length > 0 ? (results.every(item => item.outcome === 'PASS') ? 'pass' : 'fail')
           : (verification?.state ?? null) }
-      // A stale candidate on the same still-acceptable state must be refused; the valid accept follows.
+      // A stale composite candidate on the same still-acceptable state must be refused; the valid accept follows.
       let staleAccept = null
-      if (candidate?.id) {
+      if (candidate?.ticketId) {
+        const staleCandidate = { ...candidate, contract: { ...(candidate.contract ?? {}), digest: '0'.repeat(64) } }
         staleAccept = await fixtureClient.dispatch({ commandId: `w31-accept-stale-${project.index}`, conversationId: `conv-w31-${project.index}`,
-          kind: 'accept_candidate', candidate: { ...candidate, id: `${candidate.id}-stale` } })
-          .then(value => ({ status: value.receipt?.status ?? null, code: null }))
-          .catch(error => ({ status: error.status ?? null, code: error.body?.error?.code ?? error.body?.code ?? null }))
+          kind: 'accept_candidate', candidate: staleCandidate })
+          .then(value => ({ status: value.receipt?.status ?? null, code: null, candidate: staleCandidate }))
+          .catch(error => ({ status: error.status ?? null, code: error.body?.error?.code ?? error.body?.code ?? null, candidate: staleCandidate }))
       }
       const accepted = view?.actions?.available?.includes('accept_candidate')
         ? await fixtureClient.dispatch({ commandId: `w31-accept-${project.index}`, conversationId: `conv-w31-${project.index}`,
