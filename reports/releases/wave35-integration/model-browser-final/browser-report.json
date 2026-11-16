@@ -1,0 +1,39 @@
+{
+  "status": "PASS_ACTUAL_MODEL_CONFIGURATION_APP",
+  "cases": [
+    {
+      "id": "ACTUAL-SETTINGS-SAVES-PRIVATE-CONFIGURATION-IN-STRICTMODE-WITHOUT-MODEL-TURN",
+      "status": "PASS"
+    },
+    {
+      "id": "REOPEN-RETURNS-CURRENT-MODEL-WITHOUT-SECRET",
+      "status": "PASS"
+    },
+    {
+      "id": "REMOTE-HTTP-REQUIRES-EXPLICIT-CONSENT-AND-SAVING-KEEPS-STATUS-CONFIGURED",
+      "status": "PASS"
+    },
+    {
+      "id": "FAILED-OR-LEGACY-SAVE-CLEARS-KEY-AND-KEEPS-CURRENT-CONFIGURATION",
+      "status": "PASS"
+    },
+    {
+      "id": "CLOSING-A-PENDING-FORM-CANNOT-UPDATE-THE-REOPENED-FORM",
+      "status": "PASS"
+    },
+    {
+      "id": "ACTUAL-DESKTOP-MOBILE-CONFIGURATION-FITS-AND-DOES-NOT-DISPATCH-WORK",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "saves": 5,
+  "commands": 0,
+  "eventDelta": 0,
+  "modelRequests": 0,
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "sourceCommit": "c544781bf470eb97cc7aedbba860952da8e3b05a",
+  "sourceWorktreeClean": true,
+  "scope": "Actual StrictMode App/HTTP/Product/private provider and local settings; configuration persistence only, no model turn/installed/native/recovery/value admission"
+}

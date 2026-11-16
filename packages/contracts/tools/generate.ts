@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { CONTRACT_API_MAJOR, CONTRACT_VERSION, wireSchemas } from '../src/schemas.ts';
 import { ApplicationConfigurationSchema, CONFIGURATION_PROTOCOL } from '../src/configuration.ts';
 import { AssistantProviderStatusSchema, AssistantModelSelectionSchema, AssistantSuggestionsSettingSchema, AssistantStreamUpdateSchema } from '../src/assistant.ts';
+import { AssistantConnectionInputSchema } from '../src/assistant-connection.ts';
 import { AssistantCandidatePrepareSchema, AssistantCandidatesSchema } from '../src/assistant-candidates.ts';
 import { ProjectRegistrationInputSchema, WorkLocationSchema, WorkEnvironmentSchema } from '../src/projects.ts';
 import { WorkVerificationStatusSchema, VerificationRetryCommandSchema } from '../src/operations.ts';
@@ -115,6 +116,7 @@ const assistantContextCommandsText = canonical({ $schema: 'https://json-schema.o
 outputs.set('generated/assistant-context-commands.schema.json', assistantContextCommandsText);
 outputs.set('generated/assistant-context-commands.manifest.json', canonical({ protocol: 'assistant-context-command/1', schemaHash: digest(assistantContextCommandsText), sourceHash: digest(readFileSync(resolve(root, 'src/assistant-context.ts'), 'utf8')), runtimeContractSchemaHash: schemaHash, runtimeValidationRequired: true }));
 for (const [name, protocol, source, schemas] of [
+  ['assistant-connection', 'assistant-connection/1', 'assistant-connection.ts', { AssistantConnectionInput: AssistantConnectionInputSchema }],
   ['trial-readiness', 'trial-readiness/1', 'trial-readiness.ts', { TrialReadiness: TrialReadinessSchema }],
   ['usage-observation', 'usage-observation/1', 'usage-observation.ts', { UsageObservationQuery: UsageObservationQuerySchema, UsageObservation: UsageObservationSchema, UsageObservationDownload: UsageObservationDownloadSchema }],
   ['usage-support', 'usage-support-download/1', 'usage-support.ts', { UsageSupportReport: UsageSupportReportSchema, UsageSupportDownload: UsageSupportDownloadSchema }],

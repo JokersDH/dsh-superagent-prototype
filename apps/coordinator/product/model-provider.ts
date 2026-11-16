@@ -5,6 +5,7 @@ import {
   existsSync,
   fsyncSync,
   lstatSync,
+  mkdirSync,
   openSync,
   readFileSync,
   renameSync,
@@ -14,7 +15,8 @@ import {
 import { homedir } from 'node:os'
 import { createHash, randomUUID } from 'node:crypto'
 import { dirname, join } from 'node:path'
-import type { AssistantProviderStatus } from '@personal-agent/contracts'
+import { AssistantConnectionInputSchema } from '@personal-agent/contracts'
+import type { AssistantConnectionInput, AssistantProviderStatus } from '@personal-agent/contracts'
 import type { ReasonerProposal, Scope } from '@personal-agent/contracts'
 import { ASSISTANT_REPLY_TOOL, AssistantSuggestionData } from './assistant-suggestion-data.ts'
 
@@ -149,6 +151,34 @@ export class PrivateModelProvider implements AssistantModelPort {
   setSuggestionsEnabled(enabled: boolean): AssistantProviderStatus {
     this.configuration()
     this.write(`${this.path}.assistant-settings.json`, PreferencesSchema.parse({ protocol: 'assistant-suggestion-settings/1', enabled }))
+    return this.status()
+  }
+  configure(input: AssistantConnectionInput): AssistantProviderStatus {
+    const value = AssistantConnectionInputSchema.parse(input)
+    if (this.busy) throw new ModelProviderError('configuration_busy', '正在回复，请完成后再保存配置。')
+    try {
+      if (lstatSync(this.path).isSymbolicLink())
+        throw new ModelProviderError('configuration_invalid', '模型私有配置不能是符号链接。')
+    } catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error }
+    try {
+      if (lstatSync(this.path).isSymbolicLink()) throw new ModelProviderError('configuration_invalid', '模型私有配置不能是符号链接。')
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error
+    }
+    let previous: ReturnType<PrivateModelProvider['read']> | undefined
+    try { previous = this.read() }
+    catch (error) {
+      if (!(error instanceof ModelProviderError) || error.code !== 'not_configured') throw error
+    }
+    mkdirSync(dirname(this.path), { recursive: true, mode: 0o700 })
+    const directory = lstatSync(dirname(this.path))
+    if (!directory.isDirectory() || directory.isSymbolicLink() || directory.mode & 0o077 ||
+      (process.getuid && directory.uid !== process.getuid()))
+      throw new ModelProviderError('configuration_invalid', '模型私有配置目录的权限或文件类型不正确。')
+    const models = previous?.baseURL === value.baseURL ? [...new Set([...previous.allowedModels, value.model])] : [value.model]
+    if (models.length > 32 || models.some(model => model.includes(value.apiKey)))
+      throw new ModelProviderError('configuration_invalid', '模型列表无法保存，请检查本机配置。')
+    this.write(this.path, ConfigurationSchema.parse({ ...previous, ...value, allowedModels: models }))
     return this.status()
   }
   private write(path: string, value: unknown) {

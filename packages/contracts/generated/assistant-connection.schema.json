@@ -1,0 +1,39 @@
+{
+  "$defs": {
+    "AssistantConnectionInput": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "allowInsecureHttp": {
+          "default": false,
+          "type": "boolean"
+        },
+        "apiKey": {
+          "maxLength": 4096,
+          "minLength": 12,
+          "pattern": "^[\\x21-\\x7e]+$",
+          "type": "string"
+        },
+        "baseURL": {
+          "format": "uri",
+          "maxLength": 512,
+          "type": "string"
+        },
+        "model": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[^\\u0000-\\u001f\\u007f]+$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "baseURL",
+        "model",
+        "apiKey"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:personal-agent:assistant-connection:1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

@@ -7,7 +7,7 @@
 | 项目 | 当前事实 |
 | --- | --- |
 | 仓库 | `https://github.com/JokersDH/dsh-superagent-prototype` |
-| 本文基线 | 2026-11-16；产品运行源码23d5a98e，原回调和默认诊断消费者见0086，原恢复仍单独验 |
+| 本文基线 | 2026-11-16；模型配置4cde5883、launcher8cd709ca；原回调/诊断见0086，新配置见0089，原恢复仍单独验 |
 | 首个用户界面 | React网页工作台；本机CLI负责启停/发行，暂无桌面壳 |
 | 技术栈 | TypeScript、Node24、pnpm workspace、React18/Vite、Hono、Zod、SQLite、Git worktree |
 | 原生执行 | 当前生产路径为Codex app-server；历史准入版本`codex-cli 0.164.0`，新版本需重新验证 |
@@ -41,6 +41,8 @@ flowchart LR
 ```
 
 ## 运行形态
+
+网页模型配置已沿原ModelPanel/typedtransport/认证POST接到原PrivateModelProvider原子私有写；保存不发送模型请求，原后续SDK streaming仍唯一对话调用。F组件在main修复StrictMode/身份迟到后消费，未新增设置中心/模型循环。[0089](../rfcs/WP-16/0089-main-model-configuration-consumer.md)列出契约和边界。
 
 最新接线见[0086](../rfcs/WP-16/0086-main-native-callbacks-and-support-consumer.md)：原NativeProductAttempt三类回调与stdio共用同一guard/载荷/Store；Gmetadata支持已从认证只读GET接到真实App下载。内部回调非公开授权，未知安装身份保持null；这不等于原Work故障恢复已完成。[当前验收边界](../rfcs/WP-16/0087-wave-34-reviewed-architecture.md)另列。
 

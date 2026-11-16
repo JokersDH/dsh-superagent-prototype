@@ -12,6 +12,7 @@ import {
   ApplicationConfigurationSchema,
   AssistantProviderStatusSchema,
   AssistantModelSelectionSchema,
+  AssistantConnectionInputSchema,
   AssistantSuggestionsSettingSchema,
   AssistantCandidatePrepareSchema,
   AssistantCandidatesSchema,
@@ -92,6 +93,7 @@ import type {
   AnswerDelivery,
   ApplicationConfiguration,
   AssistantProviderStatus,
+  AssistantConnectionInput,
   AssistantCandidatePrepare,
   AssistantCandidates,
   AssistantStreamUpdate,
@@ -224,6 +226,7 @@ export interface LocalHttpOptions {
     assistant?(): Promise<AssistantProviderStatus>
     assistantStream?(conversationId: string, signal: AbortSignal): AsyncIterable<AssistantStreamUpdate>
     selectModel?(model: string): Promise<AssistantProviderStatus>
+    configureAssistant?(input: AssistantConnectionInput): Promise<AssistantProviderStatus>
     setAssistantSuggestions?(enabled: boolean): Promise<AssistantProviderStatus>
     replyCandidates?(messageId: string): Promise<AssistantCandidates>
     guide?(): Promise<string>
@@ -769,6 +772,16 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
       throw new ApplicationFault('unsupported_capability', 'Model selection is not configured')
     const input = AssistantModelSelectionSchema.parse(await c.req.json())
     return c.json(AssistantProviderStatusSchema.parse(await options.read.selectModel(input.model)))
+  })
+
+  app.post('/v1/assistant/connection', async c => {
+    if (!c.req.header('content-type')?.startsWith('application/json'))
+      throw new ApplicationFault('invalid_request', 'Model configuration requires JSON', 'none')
+    if (!options.read?.configureAssistant)
+      throw new ApplicationFault('unsupported_capability', 'Model configuration is not connected', 'none')
+    const input = AssistantConnectionInputSchema.safeParse(await c.req.json())
+    if (!input.success) throw new ApplicationFault('invalid_request', '模型配置格式不正确，请检查字段。', 'none')
+    return c.json(AssistantProviderStatusSchema.parse(await options.read.configureAssistant(input.data)))
   })
   app.post('/v1/assistant/suggestions', async c => {
     if (!c.req.header('content-type')?.startsWith('application/json')) throw new ApplicationFault('invalid_request', 'Suggestion settings require JSON')
