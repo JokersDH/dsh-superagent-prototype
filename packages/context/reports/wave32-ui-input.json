@@ -1,0 +1,21 @@
+{
+  "protocol": "wave32-ui-input/1",
+  "owner": "C supplies data/CLI; main/F own App, HTTP and visual composition",
+  "sources": {
+    "preview": ["requestId", "status(sufficient|partial|insufficient)", "trust:'untrusted_data'", "groups", "sources[].{sourceId,path,sourceDigest,bytes,truncated}", "omitted", "issues", "expiresAt", "authorization:'none'"],
+    "draft": ["protocol assistant-context-draft/1", "requestId", "expiresAt", "usable", "stale", "authorization:'none'"],
+    "sources": ["messageId", "bundleDigest", "scope", "sources[].{sourceId,kind,path,sourceDigest}"],
+    "proposal": ["candidateIndex", "payloadDigest", "receiptStatus recorded|rejected"],
+    "decision": ["decisionId", "version", "recorded|superseded|revoked"],
+    "observation": ["days 7|30", "coverageState", "unknownCount", "metrics[].layer", "export sha256"],
+    "readiness": ["authorization:'none'", "startupMode", "discussion"]
+  },
+  "copy": {
+    "sources": "来源是未信任数据；默认只显示路径/摘要，显式操作才展开原文",
+    "draft": "草稿只是预览数据，过期或变化后必须重新预览；不是执行 token",
+    "decision": "撤销/替代后仍可审计，但当前上下文不再引用",
+    "unknown": "unknown/partial 不显示为完整或成功"
+  },
+  "exitCodes": { "0": "ok", "2": "usage", "3": "refused by product (4xx)", "4": "request/parse failure" },
+  "limits": ["no private SQL", "no second confirmation", "no LLM loop", "data proof != execution permission"]
+}

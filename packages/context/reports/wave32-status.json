@@ -1,0 +1,95 @@
+{
+  "protocol": "wave32-status/1",
+  "agent": "C",
+  "branch": "codex/g3-assistant-context",
+  "base": { "mergeCommit": "00744363", "originMain": "58b4e4c8", "rfcs": ["WP-16/0080", "WP-16/0081", "WP-16/0082"] },
+  "wave": 32,
+  "wholeGoal": "ordinary instance: select real project sources, confirm a proposal or explicit decision, and reopen to view the original sources",
+  "sources": {
+    "aHead": "a9ae5cd1cbba773fca8e5ea898e2216a5bb6f1eb",
+    "aWorkflowsDirty": { "path": "packages/storage/src/workflows.ts", "sha256": "074d75ad1ef57235aa96410167779aae406279189d7b05cb2de5e8277576cce4", "onOriginMain": false },
+    "coverageModule": "packages/context/tools/history-coverage.mjs",
+    "historyTool": "packages/context/tools/wave31-completion-history.mjs",
+    "sessionCli": "packages/context/tools/assistant-context-cli.mjs",
+    "cliProtocol": "assistant-context-cli/1",
+    "draftProtocol": "assistant-context-draft/1"
+  },
+  "dirty": ["packages/context/tools/assistant-context-cli.mjs (draft save/load, send)", "packages/context/tools/history-coverage.mjs (new)", "packages/context/tools/wave31-completion-history.mjs (coverage wiring)", "packages/context/test/history-coverage.case.ts", "packages/knowledge/test/main-personal-context-session-cli.case.ts", "docs/reports for wave32"],
+  "outcomes": {
+    "coverage": {
+      "status": "complete-source",
+      "source": "packages/context/tools/history-coverage.mjs + wave31 tool",
+      "consumer": "history CLI/tool over A completion coverage",
+      "command": "pnpm --filter @personal-agent/context test",
+      "exit": 0,
+      "objects": ["sourceState complete|truncated|unknown", "availableKnown", "nextOffset"],
+      "positive": ["complete small history", "truncated source stays truncated_source"],
+      "negative": ["undefined/unknown/partial/COMPLETE never complete", "unknown available null"],
+      "mergedToMain": false,
+      "evidence": "packages/context/reports/wave32-history-coverage.tap"
+    },
+    "historyConsumer": {
+      "status": "complete-source",
+      "source": "wave31-completion-history + history-coverage",
+      "consumer": "same CLI/tool against a running instance's data readers",
+      "command": "pnpm --filter @personal-agent/context test && pnpm --filter @personal-agent/knowledge test",
+      "exit": 0,
+      "objects": ["reviews canonical/currentLink", "coverage states", "window nextOffset"],
+      "positive": ["multi-attempt paging", "source coverage composed"],
+      "negative": ["foreign project missing exit 1", "offset beyond source is not proof of empty"],
+      "mergedToMain": false
+    },
+    "ordinarySession": {
+      "status": "complete-source",
+      "source": "packages/context/tools/assistant-context-cli.mjs",
+      "consumer": "real main HTTP (createLocalHttpApp + fixture provider) in main-personal-context-session-cli",
+      "command": "node --experimental-strip-types --test packages/knowledge/test/main-personal-context-session-cli.case.ts",
+      "exit": 0,
+      "objects": ["preview requestId", "candidate payloadDigest", "confirm_proposal receipt", "context messageId + bundleDigest", "decisionId/version", "draft requestId/expiresAt"],
+      "positive": ["preview sources authorization none", "propose confirm recorded", "send records frozen context", "sources after reopen identical", "draft load after reopen", "record/revoke decision; frozen bytes unchanged"],
+      "negative": ["cross-project preview exit 3", "replayed confirm refused exit 3", "draft mode 0644 exit 3", "forged draft exit 3", "readonly preview/send exit 3 while sources 200"],
+      "mergedToMain": false,
+      "evidence": "packages/context/reports/wave32-session-cli.tap"
+    },
+    "drafts": {
+      "status": "complete-source",
+      "source": "assistant-context-cli draft save|load",
+      "consumer": "same CLI; private 0600 file",
+      "positive": ["saved draft requestId/digest/expiry", "load marks usable/stale"],
+      "negative": ["non-0600 refused", "invalid protocol refused"],
+      "mergedToMain": false
+    },
+    "observations": {
+      "status": "complete-source",
+      "source": "assistant-context-cli observe/status",
+      "consumer": "main /v1/insights and /v1/insights/export",
+      "positive": ["7/30 days display-only export authorization none"],
+      "negative": ["unknown project refused"],
+      "mergedToMain": false
+    }
+  },
+  "suites": {
+    "context": { "tests": 130, "pass": 130, "fail": 0, "tap": "packages/context/reports/wave32-final-context.tap" },
+    "proposals": { "tests": 41, "pass": 41, "fail": 0, "tap": "packages/context/reports/wave32-final-proposals.tap" },
+    "knowledge": { "tests": 134, "pass": 134, "fail": 0, "tap": "packages/context/reports/wave32-final-knowledge.tap" },
+    "routing": { "tests": 44, "pass": 44, "fail": 0, "tap": "packages/context/reports/wave32-final-routing.tap" },
+    "total": { "tests": 349, "pass": 349, "fail": 0 },
+    "typecheck": "pass (context/proposals/knowledge/routing)",
+    "build": "pnpm -r --workspace-concurrency=4 run build exit 0"
+  },
+  "layers": {
+    "source": "C four packages; session CLI consumes main HTTP only",
+    "mainIntegration": "NOT merged: main/F still own App/UI/HTTP packaging",
+    "package": "no new freeze this wave; R2 4dcd28f remains the last accurate artifact and was not installed by C",
+    "native": "0; private/target/native unreached"
+  },
+  "remaining": [
+    "main to integrate or wrap the CLI in the installed App and expose it in UI",
+    "F to render sources/draft/decision states from the same DTOs",
+    "A/main packaged history coverage contract if they accept it",
+    "real-vendor/native, second protocol, CAC, soak remain unreached",
+    "E independent acceptance of the integrated version"
+  ],
+  "preserved": ["pnpm-lock.yaml diff uncommitted", "twelve services 5180-5191/8796-8807", "all state/profile/tar/ledger/dirty/runs", "no control of user instances"],
+  "budgets": { "realVendorModelTurns": 0, "realNativeTurns": 0, "bCap4": "UNKNOWN unspendable", "ePilot": "BLOCKED, not reset/top-up/refund/replaced" }
+}
