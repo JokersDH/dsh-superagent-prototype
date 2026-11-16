@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { execFile } from 'node:child_process'
 import { promisify } from 'node:util'
-import { mkdirSync, mkdtempSync, rmSync } from 'node:fs'
+import { chmodSync, copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { tmpdir } from 'node:os'
@@ -30,8 +30,8 @@ async function run(args: string[]): Promise<{ exit: number | null; result: Recor
     const line = String(outcome.stdout ?? '').trim().split('\n').at(-1) ?? '{}'
     return { exit: 0, result: JSON.parse(line) as Record<string, any> }
   } catch (error) {
-    const candidate = error as { code?: number; stdout?: string }
-    const line = String(candidate.stdout ?? '').trim().split('\n').at(-1) ?? '{}'
+    const candidate = error as { code?: number; stdout?: string; stderr?: string }
+    const line = String(candidate.stdout ?? '').trim().split('\n').at(-1) || JSON.stringify({ status: 'crashed', stderr: String(candidate.stderr ?? '').slice(-800) })
     return { exit: typeof candidate.code === 'number' ? candidate.code : 1, result: JSON.parse(line) as Record<string, any> }
   }
 }
@@ -74,6 +74,8 @@ test('a normal instance selects sources, confirms a proposal and records/revokes
   }
 
   let contextMessage = ''
+  let draftFile = ''
+  let draftRequestId = ''
   const instance = await startInstance()
   try {
     for (const [projectId, conversationId, text] of [[projectA, conversationA, 'A 项目讨论：保留错误码。'], [projectB, conversationB, 'B 项目讨论。']] as const) {
@@ -137,6 +139,23 @@ test('a normal instance selects sources, confirms a proposal and records/revokes
     assert.equal(sourcesAfterRevoke.exit, 0, JSON.stringify(sourcesAfterRevoke.result))
     assert.equal(sourcesAfterRevoke.result.result.bundleDigest, digestBefore)
 
+    draftFile = join(root, 'context-draft.json')
+    const saved = await run(['draft', 'save', '--api', instance.api, '--api-token', apiToken, '--project', projectA,
+      '--conversation', conversationA, '--select', 'conversation', '--file', draftFile])
+    assert.equal(saved.exit, 0, JSON.stringify(saved.result))
+    assert.equal(saved.result.result.authorization, 'none')
+    assert.equal(statSync(draftFile).mode & 0o777, 0o600)
+    draftRequestId = (JSON.parse(readFileSync(draftFile, 'utf8')) as { requestId: string }).requestId
+
+    // A conversation change produces a new preview; the saved draft stays historical data.
+    await instance.product.application.dispatch({ commandId: `${conversationA}-later`, conversationId: conversationA,
+      kind: 'chat', projectId: projectA, text: '之后新增的一条消息。' }, actor)
+    await instance.product.execution.effects.idle('application.assistant.reply')
+    const changed = await run(['preview', '--api', instance.api, '--api-token', apiToken, '--project', projectA,
+      '--conversation', conversationA, '--select', 'conversation'])
+    assert.equal(changed.exit, 0)
+    assert.notEqual(changed.result.result.requestId, draftRequestId)
+
     const history = await run(['history', '--api', instance.api, '--api-token', apiToken, '--work', 'missing-work'])
     assert.equal(history.exit, 3)
     const observe = await run(['observe', '--api', instance.api, '--api-token', apiToken, '--project', projectA, '--days', '7', '--export'])
@@ -149,6 +168,20 @@ test('a normal instance selects sources, confirms a proposal and records/revokes
   try {
     const sources = await run(['sources', '--api', reopened.api, '--api-token', apiToken, '--message', contextMessage])
     assert.equal(sources.exit, 0, JSON.stringify(sources.result))
+    const draft = await run(['draft', 'load', '--api', reopened.api, '--api-token', apiToken, '--file', draftFile])
+    assert.equal(draft.exit, 0, JSON.stringify(draft.result))
+    assert.equal(draft.result.result.requestId, draftRequestId)
+    assert.equal(draft.result.result.authorization, 'none')
+    assert.equal(typeof draft.result.result.usable, 'boolean')
+    const tampered = join(root, 'context-draft-tampered.json')
+    copyFileSync(draftFile, tampered)
+    chmodSync(tampered, 0o644)
+    const refusedDraft = await run(['draft', 'load', '--api', reopened.api, '--api-token', apiToken, '--file', tampered])
+    assert.equal(refusedDraft.exit, 3, JSON.stringify(refusedDraft.result))
+    const forged = join(root, 'context-draft-forged.json')
+    writeFileSync(forged, JSON.stringify({ protocol: 'assistant-context-draft/1', projectId: projectA }), { mode: 0o600 })
+    const forgedDraft = await run(['draft', 'load', '--api', reopened.api, '--api-token', apiToken, '--file', forged])
+    assert.equal(forgedDraft.exit, 3, JSON.stringify(forgedDraft.result))
     const again = await run(['sources', '--api', reopened.api, '--api-token', apiToken, '--message', contextMessage])
     assert.equal(sources.result.result.bundleDigest, again.result.result.bundleDigest)
     assert.equal(sources.result.result.sources.length >= 1, true)

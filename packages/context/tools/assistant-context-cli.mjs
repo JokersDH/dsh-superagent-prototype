@@ -13,15 +13,16 @@ import { parseArgs } from 'node:util'
 import { createHash, randomBytes } from 'node:crypto'
 import { join, isAbsolute } from 'node:path'
 import { pathToFileURL } from 'node:url'
+import { readFileSync, writeFileSync, statSync } from 'node:fs'
 
 const command = process.argv[2]
-const { values } = parseArgs({ args: process.argv.slice(3), allowPositionals: false, options: {
+const { values, positionals } = parseArgs({ args: process.argv.slice(3), allowPositionals: true, options: {
   api: { type: 'string' }, 'api-token': { type: 'string' }, install: { type: 'string' }, state: { type: 'string' },
   project: { type: 'string' }, conversation: { type: 'string' }, message: { type: 'string' }, work: { type: 'string' },
   select: { type: 'string' }, index: { type: 'string' }, 'payload-digest': { type: 'string' },
   content: { type: 'string' }, supersedes: { type: 'string' }, revoke: { type: 'string' }, 'expected-version': { type: 'string' },
   days: { type: 'string' }, timezone: { type: 'string' }, 'command-id': { type: 'string' },
-  limit: { type: 'string' }, cursor: { type: 'string' },
+  limit: { type: 'string' }, cursor: { type: 'string' }, file: { type: 'string' },
   'include-content': { type: 'boolean' }, reject: { type: 'boolean' }, 'prepare-only': { type: 'boolean' }, export: { type: 'boolean' },
   'timeout-ms': { type: 'string' },
 } })
@@ -134,6 +135,33 @@ try {
       if (receipt) out({ status: 'ok', operation: 'record-decision', result: { decisionId: prepared.decision.id,
         version: prepared.decision.version, commandId: receipt.commandId, receiptStatus: receipt.status } })
     }
+  } else if (command === 'draft') {
+    if (!values.file) { usage('--file is required for draft'); stop() }
+    if (!isAbsolute(values.file)) { usage('--file must be absolute'); stop() }
+    if (positionals[0] === 'load') {
+      let parsed, mode
+      try { mode = statSync(values.file).mode & 0o777; parsed = JSON.parse(readFileSync(values.file, 'utf8')) }
+      catch (error) { failure('draft_unreadable', `Draft is not readable: ${String(error?.message ?? error)}`); stop() }
+      if (mode !== 0o600) { refused(0, { error: { code: 'draft_permissions', message: 'A draft file must be owner-private (0600)' } }); stop() }
+      if (parsed?.protocol !== 'assistant-context-draft/1' || typeof parsed.expiresAt !== 'string' || typeof parsed.projectId !== 'string')
+        { refused(0, { error: { code: 'draft_invalid', message: 'Draft does not carry the expected preview fields' } }); stop() }
+      const stale = Date.parse(parsed.expiresAt) <= Date.now()
+      out({ status: 'ok', operation: 'draft-load', result: { ...parsed, usable: !stale, stale, authorization: 'none' } })
+    } else {
+      if (!need('project', 'conversation')) stop()
+      const selections = (values.select ?? 'conversation').split(',').map((value) => value.trim()).filter(Boolean)
+      const body = await request('/v1/context/preview', { method: 'POST', body: JSON.stringify({
+        projectId: values.project, conversationId: values.conversation, selections,
+        ...(values.work ? { workId: values.work } : {}), budget: { maxFiles: 32, maxBytes: 65536, maxTokens: 16000 } }) })
+      if (!body) stop()
+      const draft = { protocol: 'assistant-context-draft/1', authorization: 'none', projectId: values.project,
+        conversationId: values.conversation, selections, requestId: body.requestId, observedAt: body.observedAt,
+        expiresAt: body.expiresAt, status: body.status, sources: sourcesOf(body).map((source) => ({
+          sourceId: source.sourceId, path: source.path, sourceDigest: source.sourceDigest })) }
+      writeFileSync(values.file, JSON.stringify(draft, null, 2) + String.fromCharCode(10), { mode: 0o600, flag: 'w' })
+      out({ status: 'ok', operation: 'draft-save', result: { file: values.file, expiresAt: draft.expiresAt,
+        status: draft.status, sources: draft.sources.length, authorization: 'none' } })
+    }
   } else if (command === 'send') {
     if (!need('project', 'conversation', 'content')) stop()
     const selections = (values.select ?? 'conversation').split(',').map((value) => value.trim()).filter(Boolean)
@@ -187,7 +215,7 @@ try {
     if (readiness) out({ status: 'ok', operation: 'status', result: { mode: health.mode, startupMode: health.startupMode,
       authorization: readiness.authorization, discussion: readiness.discussion, startupAvailable: readiness.startupAvailable } })
   } else {
-    usage('commands: preview | candidates | propose | send | decide | sources | history | observe | status')
+    usage('commands: preview | candidates | propose | send | draft save|load | decide | sources | history | observe | status')
   }
 } catch (error) {
   failure('cli_error', String(error?.message ?? error))
