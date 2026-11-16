@@ -32,7 +32,7 @@ const api = listenLocalHttp(app, 0); await once(api, 'listening')
 const vite = await createServer({ root: resolve('apps/console'), configFile: resolve('apps/console/vite.config.ts'),
   define: { 'import.meta.env.VITE_CONSOLE_MODE': JSON.stringify('http') }, server: { host: '127.0.0.1', port, strictPort: true,
     proxy: { '/v1': { target: `http://127.0.0.1:${api.address().port}`, changeOrigin: true } } } })
-let browser, before, posts = 0, previewPosts = 0, insightReads = 0, exportReads = 0, downloads = 0
+let browser, before, posts = 0, previewPosts = 0, insightReads = 0, exportReads = 0, supportReads = 0, downloads = 0, supportDownloads = 0
 const requestedWindows = []
 const cases = [], errors = []
 const check = async (id, action) => { await action(); cases.push({ id, status: 'PASS' }) }
@@ -52,8 +52,9 @@ try {
   before = store.events.cursor(); await vite.listen(); browser = await chromium.launch()
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, locale: 'zh-CN', timezoneId: 'Asia/Shanghai' })
   page.setDefaultTimeout(10000); page.on('pageerror', error => errors.push(error.message))
-  page.on('download', () => { downloads++ })
+  page.on('download', file => { downloads++; if (file.suggestedFilename().startsWith('support-')) supportDownloads++ })
   page.on('request', request => {
+    if (new URL(request.url()).pathname === '/v1/insights/support') supportReads++
     if (new URL(request.url()).pathname === '/v1/insights/export') exportReads++
     if (new URL(request.url()).pathname === '/v1/insights') {
       insightReads++; requestedWindows.push(Number(new URL(request.url()).searchParams.get('days')))
@@ -144,6 +145,51 @@ try {
     await page.unroute('**/v1/insights?**')
   })
   const exportButton = trial.getByRole('button', { name: '导出当前范围观察', exact: true })
+  const supportButton = trial.getByRole('button', { name: '导出诊断摘要', exact: true })
+  await check('REAL-SUPPORT-DOWNLOAD-IS-SCOPED-METADATA-WITHOUT-METRIC-VALUES', async () => {
+    await trial.locator('.trial-support summary').click()
+    for (const days of [7, 30]) {
+      await selectWindow(days); await questionValue.waitFor()
+      const response = page.waitForResponse(item => new URL(item.url()).pathname === '/v1/insights/support')
+      const downloaded = page.waitForEvent('download'); await supportButton.click()
+      const envelope = await (await response).json(), file = await downloaded
+      const text = readFileSync(await file.path(), 'utf8'), data = JSON.parse(text)
+      assert.equal(text, envelope.text); assert.equal(file.suggestedFilename(), envelope.fileName)
+      assert.equal(createHash('sha256').update(text).digest('hex'), envelope.sha256)
+      assert.equal(Buffer.byteLength(text), envelope.bytes)
+      assert.deepEqual(data.report.scope.projectIds, ['two']); assert.equal(data.report.days, days)
+      assert.equal(data.report.origin, null); assert.equal(data.report.exportCapability, 'unverified')
+      assert.equal(data.report.authorization, 'none'); assert.equal(data.report.numericValues, false)
+      for (const row of data.report.rows) for (const field of ['value', 'formatted', 'label', 'detail']) assert.equal(field in row, false)
+      assert.equal(text.includes(projectRoot), false); assert.equal(text.includes(stateRoot), false)
+      assert.equal(text.includes('Bounded question fixture'), false)
+    }
+  })
+  await check('BAD-SUPPORT-DIGEST-CANNOT-DOWNLOAD-A-FILE', async () => {
+    const count = downloads
+    await page.route('**/v1/insights/support?**', async route => {
+      const response = await route.fetch(), body = await response.json(); body.sha256 = '0'.repeat(64)
+      await route.fulfill({ response, json: body })
+    })
+    await supportButton.click(); await trial.getByText('诊断摘要导出失败，请重新读取后重试。', { exact: true }).waitFor()
+    assert.equal(downloads, count); await page.unroute('**/v1/insights/support?**')
+  })
+  await check('CHANGING-PROJECT-CANCELS-A-PENDING-SUPPORT-FILE', async () => {
+    let capturedResolve, release
+    const captured = new Promise(resolve => { capturedResolve = resolve }), gate = new Promise(resolve => { release = resolve })
+    await page.route('**/v1/insights/support?**', async route => {
+      const response = await route.fetch(); capturedResolve(); await gate
+      try { await route.fulfill({ response }) } catch { /* Superseded requests are aborted. */ }
+    })
+    const count = downloads; let timer
+    try {
+      await supportButton.click()
+      await Promise.race([captured, new Promise((_, reject) => { timer = setTimeout(() => reject(new Error('Support not captured')), 10000) })])
+      await choose('甲项目'); await questionValue.waitFor(); release(); await page.waitForTimeout(200)
+      assert.equal(downloads, count)
+    } finally { clearTimeout(timer); release(); await page.unroute('**/v1/insights/support?**') }
+    await choose('乙项目'); await questionValue.waitFor()
+  })
   await check('REAL-DOWNLOAD-PRESERVES-CURRENT-PROJECT-WINDOW-AND-DISPLAY-VALUES', async () => {
     for (const days of [7, 30]) {
       await selectWindow(days); await questionValue.waitFor(); await exportButton.waitFor()
@@ -234,10 +280,10 @@ try {
   await browser?.close(); await vite.close(); api.closeAllConnections(); await new Promise(resolve => api.close(resolve))
   const eventDelta = before === undefined ? null : store.events.cursor() - before
   await product.close(); store.close(); rmSync(root, { recursive: true, force: true })
-  const report = { status: cases.length === 13 ? 'PASS_ACTUAL_SCOPED_INSIGHTS_APP' : 'FAIL',
+  const report = { status: cases.length === 16 ? 'PASS_ACTUAL_SCOPED_INSIGHTS_APP' : 'FAIL',
     sourceCommit: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
     sourceWorktreeClean: execFileSync('git', ['status', '--porcelain', '--', 'apps', 'packages', 'tests/integration/usage-observation*'], { encoding: 'utf8' }).trim() === '',
-    cases, errors, insightReads, exportReads, downloads, requestedWindows, postRequests: posts, readonlyRecipePreviewPosts: previewPosts,
+    cases, errors, insightReads, exportReads, supportReads, downloads, supportDownloads, requestedWindows, postRequests: posts, readonlyRecipePreviewPosts: previewPosts,
     eventDelta, realModelTurns: 0, nativeTurnStarts: 0,
     scope: 'Actual App/React/Product/Broker/SQLite/HTTP/G Node analyzer, private controlled question fixtures; no installed/native/recovery/benefit admission' }
   writeFileSync(join(output, 'browser-report.json'), JSON.stringify(report, null, 2) + '\n'); console.log(JSON.stringify(report, null, 2))

@@ -8,6 +8,7 @@
  * recovery are NOT_TESTED (see docs/adr/runtime/g1-wp03-report.md).
  */
 import type { AttemptRef, AttemptSpec, CriticalFact, DurableReceipt, RunnerCommand, ServeExit } from '../../contracts/src/types.ts'
+import type { AttachedAttemptCallbacks } from './attached-attempt.ts'
 
 export type RuntimeProducer = { attempt: AttemptRef; runnerIdentityRef: string; source: string }
 
@@ -40,6 +41,8 @@ export interface RunningAttempt {
   stop(deadlineMs: number): Promise<Quiescence>
   /** Available only after the host has registered its original Runner. Node-internal, never a public DTO. */
   readonly attachPort?: AttachedAttemptPort
+  /** Original host callbacks exposed with its registered port; Node-internal, never a public DTO. */
+  readonly attachCallbacks?: AttachedAttemptCallbacks
 }
 
 /** Launches attempts. The real implementation lives in apps/runner; tests inject a fake. */
