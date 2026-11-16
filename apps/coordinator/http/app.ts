@@ -73,6 +73,7 @@ import {
   UsageObservationQuerySchema,
   UsageObservationSchema,
   UsageObservationDownloadSchema,
+  UsageSupportDownloadSchema,
   ProjectRecipePreviewInputSchema,
   ProjectRecipePreviewSchema,
 } from '@personal-agent/contracts'
@@ -135,6 +136,7 @@ import type {
   UsageObservation,
   UsageObservationQuery,
   UsageObservationDownload,
+  UsageSupportDownload,
   ProjectRecipePreviewInput,
   ProjectRecipePreview,
 } from '@personal-agent/contracts'
@@ -207,6 +209,7 @@ export interface LocalHttpOptions {
     projectRecipePreview?(input: ProjectRecipePreviewInput): Promise<ProjectRecipePreview>
     usageObservation?(query: UsageObservationQuery): Promise<UsageObservation>
     usageObservationDownload?(query: UsageObservationQuery): Promise<UsageObservationDownload>
+    usageSupportDownload?(query: UsageObservationQuery): Promise<UsageSupportDownload>
     attention?(query: AttentionQuery): Promise<AttentionPage>
     decisions?(query: DecisionQuery): Promise<DecisionPage>
     recovery?(): Promise<RecoveryInspection>
@@ -463,6 +466,16 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
     if ((query.projectId && (observed.scope.projectIds.length !== 1 || observed.scope.projectIds[0] !== query.projectId)) ||
       observed.days !== (query.days ?? 7) || observed.timezone !== (query.timezone ?? 'UTC'))
       throw new ApplicationFault('storage_unavailable', 'Observation export scope mismatch', 'none')
+    c.header('cache-control', 'no-store')
+    return c.json(value)
+  })
+  app.get('/v1/insights/support', async c => {
+    if (!options.read?.usageSupportDownload) throw new ApplicationFault('unsupported_capability', 'Support download is not connected')
+    const query = observationQuery(c.req), value = UsageSupportDownloadSchema.parse(await options.read.usageSupportDownload(query))
+    const report = value.report
+    if ((query.projectId && (report.scope.projectIds.length !== 1 || report.scope.projectIds[0] !== query.projectId)) ||
+      report.days !== (query.days ?? 7) || report.timezone !== (query.timezone ?? 'UTC'))
+      throw new ApplicationFault('storage_unavailable', 'Support response scope mismatch', 'none')
     c.header('cache-control', 'no-store')
     return c.json(value)
   })

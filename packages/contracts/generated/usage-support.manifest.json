@@ -1,0 +1,7 @@
+{
+  "protocol": "usage-support-download/1",
+  "runtimeContractSchemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
+  "runtimeValidationRequired": true,
+  "schemaHash": "0773badee468d05107fe4b664fee0fed6eddbad2425049caa5e449dbf035fc64",
+  "sourceHash": "661d2863000b4b2b5abe45558dd8836a4b8772de9dac5897e885a27ba358b934"
+}
