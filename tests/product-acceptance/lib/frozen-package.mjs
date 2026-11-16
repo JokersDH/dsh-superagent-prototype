@@ -16,6 +16,10 @@ export const DEFAULT_FROZEN_DIRS = Object.freeze({
   baseline: process.env.PA_E_INSTALL_BASELINE_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave29-target',
   // The subject under test.
   target: process.env.PA_E_INSTALL_TARGET_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave30-target',
+  // The locked wave-33 cohort (inner f880 / tar ee45 / outer 46e): the current product subject.
+  w33: process.env.PA_E_INSTALL_W33_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave33-target',
+  // The immediately preceding cohort (inner 88eb / tar 65c3): same-cohort upgrade baseline.
+  w32: process.env.PA_E_INSTALL_W32_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave32-target',
   // Mock-only failing control for the ownership helper; never a live install baseline.
   control: process.env.PA_E_INSTALL_CONTROL_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave16-target',
   cross: process.env.PA_E_INSTALL_CROSS_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave11-target',

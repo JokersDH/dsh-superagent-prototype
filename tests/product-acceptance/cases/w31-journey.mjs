@@ -4,7 +4,8 @@ import { join } from 'node:path'
 import { runCase, notTested, LAYERS } from '../lib/status.mjs'
 import { LocalProductClient } from '../lib/http-client.mjs'
 import { candidateModel } from '../../../tests/integration/fixtures/assistant-candidate-model.mjs'
-import { extractFrozen, freePort, launcher, liveIdentity, privateRoot, releaseRoot, retainMaterial, startOwned, stopOwned } from '../lib/packaged-instance.mjs'
+import { extractFrozen, freePort, launcher, privateRoot, releaseRoot, retainMaterial, startOwned, stopOwned } from '../lib/packaged-instance.mjs'
+import { captureSet, rollout } from '../lib/caller-safety.mjs'
 import { DEFAULT_FROZEN_DIRS, frozenArtifactSubject, loadFrozenArtifact } from '../lib/frozen-package.mjs'
 
 /**
@@ -46,21 +47,15 @@ async function waitWork(client, workId, predicate, timeoutMs = 45_000) {
   return view
 }
 
-/** The fixed pre-stop set, read from the record before any signal. */
-function fixedSet(config) {
+/** The fixed pre-stop set, read from the record before any signal: pid/start/uid/argv/root/config/op. */
+function fixedSet(config, rootValue, op) {
   const record = JSON.parse(readFileSync(join(config, 'instance.json'), 'utf8'))
   const pids = [...new Set([record.pid, record.apiPid, record.consolePid])].filter(Number.isSafeInteger)
-  return pids.map(pid => {
-    const identity = liveIdentity(pid)
-    return { pid, start: identity.start, uid: identity.uid, parentPid: pid === record.pid ? null : record.pid }
-  })
+  return captureSet(pids, { root: rootValue.install, config, state: rootValue.state, op })
 }
 
 function observe(before) {
-  return before.map(item => {
-    const identity = liveIdentity(item.pid)
-    return { pid: item.pid, expectedStart: item.start, alive: identity.alive, sameIdentity: identity.alive && identity.start === item.start }
-  })
+  return rollout(before)
 }
 
 export async function runJourney() {
@@ -98,6 +93,8 @@ export async function runJourney() {
         projectId: project.id, kind: 'regression_fix', allowedPaths: [atom], profileId: profile.id } })
       journey.projects.push({ index: index + 1, displayName: name, id: project.id, atom, path: dir,
         preview: { status: preview.status, bodyStatus: preview.body?.status ?? null, fields: preview.body?.fields ?? null,
+          fieldsCount: preview.body?.fields && typeof preview.body.fields === 'object' ? Object.keys(preview.body.fields).length : null,
+          fieldsKeys: preview.body?.fields && typeof preview.body.fields === 'object' ? Object.keys(preview.body.fields).sort() : null,
           issues: preview.body?.issues ?? null, authorization: preview.body?.authorization ?? null,
           applicable: preview.body?.status === 'draft' && preview.body?.fields !== null } })
     }
@@ -136,7 +133,7 @@ export async function runJourney() {
       scopeReview: scoped.body?.scopeReview ?? null,
       providerRequests: mock.requests.length }
 
-    const beforeA = fixedSet(root.config)
+    const beforeA = fixedSet(root.config, root, 'journey:A')
     const stopA = await stopOwned(root, { mockFile: mock.file, birth: personal.birth, equivalentProof: true })
     journey.phases.A = { subject: journey.subject, stop: { clean: stopA.clean, package: stopA.packageStop?.json?.status ?? null, reason: stopA.reason ?? null },
       resources: { before: beforeA, after: observe(beforeA) } }
@@ -175,9 +172,25 @@ export async function runJourney() {
       const workId = created.receipt?.workId ?? created.workId
       const view = await waitWork(fixtureClient, workId, item => item.actions.available.includes('accept_candidate') ||
         ['delivered', 'ended', 'uncertain'].includes(item.phase))
+      // Accept readiness is recorded before the accept: the candidate and its verification must already
+      // be available, not inferred from a later delivered phase.
+      const candidate = view?.actions?.currentCandidate ?? null
+      const verification = view?.actions?.currentVerificationId
+        ? await fixtureClient.verification(view.actions.currentVerificationId).catch(() => null) : null
+      project.acceptReadiness = { available: view?.actions?.available ?? [], candidateId: candidate?.id ?? null,
+        verificationId: view?.actions?.currentVerificationId ?? null, verificationState: verification?.state ?? null }
+      // A stale candidate on the same still-acceptable state must be refused; the valid accept follows.
+      let staleAccept = null
+      if (candidate?.id) {
+        staleAccept = await fixtureClient.dispatch({ commandId: `w31-accept-stale-${project.index}`, conversationId: `conv-w31-${project.index}`,
+          kind: 'accept_candidate', candidate: { ...candidate, id: `${candidate.id}-stale` } })
+          .then(value => ({ status: value.receipt?.status ?? null, code: null }))
+          .catch(error => ({ status: error.status ?? null, code: error.body?.error?.code ?? error.body?.code ?? null }))
+      }
       const accepted = view?.actions?.available?.includes('accept_candidate')
         ? await fixtureClient.dispatch({ commandId: `w31-accept-${project.index}`, conversationId: `conv-w31-${project.index}`,
           kind: 'accept_candidate', candidate: view.actions.currentCandidate })
+          .catch(error => ({ receipt: { status: `refused:${error.status ?? 'unknown'}` }, error: error.body ?? null }))
         : null
       const delivered = accepted ? await waitWork(fixtureClient, workId, item => ['delivered', 'ended'].includes(item.phase), 20_000) : view
       const insights7 = await fixtureClient.request(`/v1/insights?days=7&projectId=${encodeURIComponent(project.id)}`)
@@ -187,16 +200,21 @@ export async function runJourney() {
       const open30 = await fixtureClient.request('/v1/insights?days=30')
       Object.assign(project, { executionProjectId: fixtureProject.id, receipt: created.receipt?.status ?? null, workId, phase: delivered?.phase ?? null,
         candidate: view?.actions?.currentCandidate ?? null, accepted: accepted?.receipt?.status ?? null,
+        acceptReadiness: project.acceptReadiness, staleAccept: staleAccept ?? null,
         artifacts: delivered?.artifactIds?.length ?? 0,
         insights: { seven: insights7.status, thirty: insights30.status, days: [insights7.body?.days ?? null, insights30.body?.days ?? null],
           coverage: [insights7.body?.coverageState ?? null, insights30.body?.coverageState ?? null],
           authorization: [insights7.body?.authorization ?? null, insights30.body?.authorization ?? null],
+          projectId: [insights7.body?.projectId ?? null, insights30.body?.projectId ?? null],
+          window: [insights7.body?.window ?? null, insights30.body?.window ?? null],
           open: { seven: open7.status, thirty: open30.status, days: [open7.body?.days ?? null, open30.body?.days ?? null],
-            coverage: [open7.body?.coverageState ?? null, open30.body?.coverageState ?? null] } } })
+            coverage: [open7.body?.coverageState ?? null, open30.body?.coverageState ?? null],
+            projectId: [open7.body?.projectId ?? null, open30.body?.projectId ?? null],
+            window: [open7.body?.window ?? null, open30.body?.window ?? null] } } })
     }
     mark('phase B works accepted')
 
-    const beforeB = fixedSet(root.config)
+    const beforeB = fixedSet(root.config, root, 'journey:B')
     const stopB = await stopOwned(root, { mockFile: mock.file, birth: fixture.birth, equivalentProof: true })
     journey.phases.B = { subject: journey.subject, stop: { clean: stopB.clean, package: stopB.packageStop?.json?.status ?? null, reason: stopB.reason ?? null,
       recordRemoved: stopB.recordRemoved ?? null }, resources: { before: beforeB, after: observe(beforeB) } }
@@ -216,7 +234,7 @@ export async function runJourney() {
           artifacts: work?.artifactIds?.length ?? null, messages: page?.messages?.length ?? null })
       }
       journey.reopen.readiness = (await client.request('/v1/readiness')).status
-      const beforeC = fixedSet(root.config)
+      const beforeC = fixedSet(root.config, root, 'journey:reopen')
       const stopC = await stopOwned(root, { mockFile: mock.file, birth: reopened.birth, equivalentProof: true })
       journey.reopen.stop = { clean: stopC.clean, package: stopC.packageStop?.json?.status ?? null,
         resources: { before: beforeC, after: observe(beforeC) } }

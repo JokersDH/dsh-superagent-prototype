@@ -1,20 +1,23 @@
 import { execFileSync, spawn, spawnSync } from 'node:child_process'
-import { existsSync, readFileSync, rmSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { DatabaseSync } from 'node:sqlite'
 import { dirname, join } from 'node:path'
 import { runCase, LAYERS } from '../lib/status.mjs'
 import { candidateModel } from '../../../tests/integration/fixtures/assistant-candidate-model.mjs'
+import { captureSet, createOperation, resourceBirth, rollout } from '../lib/caller-safety.mjs'
 import { extractOuterZip, launcherEnv, OUTER_ZIP_DIR, OUTER_ZIP_NAME, parseJson, privateHome, verifyOuterZip } from '../lib/outer-zip.mjs'
 import { freePort, liveIdentity } from '../lib/packaged-instance.mjs'
 
 /**
- * Wave-33 outer distribution ZIP.
+ * Wave-34 locked outer distribution ZIP.
  *
- * The candidate is the real shareable ZIP (SHA256SUMS + package-result.json), extracted into a private
- * directory and driven through the package's own Start/Stop/status with the bundled Node. HOME is
- * redirected to a private directory so the user's real Application Support tree is never touched.
+ * The candidate is the fixed shareable ZIP for the current W33 cohort (SHA256SUMS +
+ * package-result.json), extracted into a private HOME and driven through the package's own
+ * Start/Stop/status with the bundled Node. The caller owns one operation: every product process and
+ * the whole private HOME are tracked from birth, and the HOME is deleted only when the complete set
+ * is re-observed exited. A failure, refusal or unknown keeps the entire material set.
  */
-const mark = message => { if (process.env.PA_E_TRACE) process.stderr.write(`[w33zip] ${message}\n`) }
+const mark = message => { if (process.env.PA_E_TRACE) process.stderr.write(`[w34zip] ${message}\n`) }
 
 function runner(root, home) {
   return (args, { timeoutMs = 60_000 } = {}) => {
@@ -44,35 +47,53 @@ async function waitStatus(run, { attempts = 120, wantRunning = true } = {}) {
   return last
 }
 
+async function waitExited(pid, attempts = 80) {
+  for (let index = 0; index < attempts; index += 1) { if (!liveIdentity(pid).alive) return true; await new Promise(resolvePromise => setTimeout(resolvePromise, 50)) }
+  return !liveIdentity(pid).alive
+}
+
 function indexPath(root, home, manifest) {
   return join(home, 'Library/Application Support/PersonalAgent', `Preview-${manifest.inner.buildId}`, 'config/instance.json')
 }
 
-function recordPids(path) {
+const recordPids = path => {
   if (!existsSync(path)) return []
   const record = JSON.parse(readFileSync(path, 'utf8'))
   return [...new Set([record.pid, record.apiPid, record.consolePid])].filter(Number.isSafeInteger)
-    .map(pid => { const identity = liveIdentity(pid)
-      return { pid, start: identity.start, uid: identity.uid, parentPid: pid === record.pid ? null : record.pid } })
-}
-
-function observe(set) {
-  return set.map(item => { const identity = liveIdentity(item.pid)
-    return { pid: item.pid, expectedStart: item.start, alive: identity.alive, sameIdentity: identity.alive && identity.start === item.start } })
 }
 
 export async function runOuterZip() {
   const cases = []
-  const evidence = { zip: { path: join(OUTER_ZIP_DIR, OUTER_ZIP_NAME), sha256: null, bytes: null, source: null, buildId: null, innerTarSha256: null,
+  const zipPath = join(OUTER_ZIP_DIR, OUTER_ZIP_NAME)
+  const evidence = { zip: { path: zipPath, sha256: null, bytes: null, source: null, buildId: null, innerTarSha256: null,
     innerTarBytes: null, installManifestSha256: null, runtime: null, entries: null, secretScan: null },
-    phases: {}, resources: {}, negatives: {} }
+    phases: {}, negatives: {}, operation: null }
   let mock = null, runnerFn = null, home = null, root = null, failure = null
+  const operation = createOperation({ id: 'w34-outer-zip' })
+
+  const track = (label, pid, { state = null, config = null, role = 'product' } = {}) => {
+    try {
+      operation.track(resourceBirth(pid, { root, state, config, op: `outer-zip:${label}`, role }))
+      return true
+    } catch (error) {
+      operation.fail(`track:${label}`, error)
+      operation.retain(`track_failed:${label}`)
+      return false
+    }
+  }
+
+  const capture = (label, recordPath) => {
+    const pids = recordPids(recordPath)
+    const config = dirname(recordPath)
+    const state = join(dirname(recordPath), '..', 'data')
+    for (const pid of pids) track(label, pid, { state, config })
+    return captureSet(pids, { root, config, state, op: `outer-zip:${label}` })
+  }
 
   try {
     const zipValue = verifyOuterZip(OUTER_ZIP_DIR)
-    const digest = zipValue.sha256
     const result = zipValue.result
-    evidence.zip.sha256 = digest
+    evidence.zip.sha256 = zipValue.sha256
     evidence.zip.bytes = zipValue.bytes
     evidence.zip.sumsMatch = zipValue.sumsMatch
     evidence.zip.resultMatch = zipValue.resultMatch
@@ -85,7 +106,8 @@ export async function runOuterZip() {
       licenseSha256: result.runtime.licenseSha256, bytes: result.runtime.bytes,
       platform: result.runtime.platform ?? null, arch: result.runtime.arch ?? null } : null
 
-    home = privateHome()
+    home = privateHome('pa-e-w34-home-')
+    operation.addMaterial(home, 'private-home-install-runtime')
     const extracted = extractOuterZip(zipValue, home)
     root = extracted.root
     const manifest = extracted.manifest
@@ -94,23 +116,24 @@ export async function runOuterZip() {
     evidence.zip.runtimeDigest = extracted.digests.runtime
     evidence.zip.licenseDigest = extracted.digests.license
     evidence.zip.manifestProtocol = manifest.protocol
-    evidence.zip.innerTarSha256 = evidence.zip.innerTarSha256 ?? manifest.inner?.tarSha256 ?? null
+
     const secretScan = spawnSync('grep', ['-rIl', '-E', '(sk-[A-Za-z0-9]{20,}|api[_-]?key["\u0027]?\\s*[:=]\\s*["\u0027][A-Za-z0-9]{16,})', join(root, 'install/app/apps')], { encoding: 'utf8', timeout: 60_000 })
     evidence.zip.secretScan = { status: secretScan.status, hits: String(secretScan.stdout ?? '').split('\n').filter(Boolean).length }
 
     runnerFn = runner(root, home)
     const recordPath = indexPath(root, home, manifest)
 
-    // Phase 1: unconfigured private root, discussion-only start.
+    // Phase 1: unconfigured private root, discussion-only start through the supported Start.command.
     const [p1, a1] = [await freePort(), await freePort()]
     mark('start unconfigured')
     const firstStart = await startAsync(root, home, ['--port', String(p1), '--api-port', String(a1), '--discussion-only'])
+    track('unconfigured:launcher', firstStart.child.pid, { role: 'launcher' })
     const status1 = await waitStatus(runnerFn)
     const firstExit = await Promise.race([
       new Promise(resolvePromise => firstStart.child.once('exit', code => resolvePromise({ code }))),
       new Promise(resolvePromise => setTimeout(() => resolvePromise({ code: 'RUNNING' }), 1_000)),
     ])
-    const setA = recordPids(recordPath)
+    const setA = capture('unconfigured', recordPath)
     let readinessA = null, configurationA = null
     if (status1?.json?.status === 'RUNNING' && status1.json.instance?.apiURL) {
       const api = status1.json.instance.apiURL
@@ -121,7 +144,7 @@ export async function runOuterZip() {
         .then(async response => ({ status: response.status, body: await response.json() })).catch(error => ({ status: 0, error: String(error.message) }))
     }
     const stop1 = runnerFn(['stop'], { timeoutMs: 40_000 })
-    const afterA = observe(setA)
+    const afterA = rollout(setA)
     const schema = (() => {
       try {
         const db = new DatabaseSync(join(dirname(recordPath), '..', 'data', 'state.sqlite'), { readOnly: true })
@@ -135,20 +158,22 @@ export async function runOuterZip() {
       contextAvailable: configurationA?.body?.assistantContextAvailable ?? null,
       stop: { status: stop1.status, result: stop1.json?.status ?? null, code: stop1.json?.code ?? null },
       resources: { before: setA, after: afterA } }
+    await waitExited(firstStart.child.pid)
     await new Promise(resolvePromise => setTimeout(resolvePromise, 600))
 
-    // Phase 2: explicit private model configuration through PA_MODEL_CONFIG with the loopback mock.
+    // Phase 2: existing private model configuration through the supported Start.command.
     mock = await candidateModel()
     const [p2, a2] = [await freePort(), await freePort()]
     mark('start configured')
     const configuredStart = await startAsync(root, home, ['--port', String(p2), '--api-port', String(a2), '--discussion-only'],
       { PA_MODEL_CONFIG: mock.file })
+    track('configured:launcher', configuredStart.child.pid, { role: 'launcher' })
     const status2 = await waitStatus(runnerFn)
     const configuredExit = await Promise.race([
       new Promise(resolvePromise => configuredStart.child.once('exit', code => resolvePromise({ code }))),
       new Promise(resolvePromise => setTimeout(() => resolvePromise({ code: 'RUNNING' }), 1_000)),
     ])
-    const setB = recordPids(recordPath)
+    const setB = capture('configured', recordPath)
     let readinessB = null
     if (status2?.json?.status === 'RUNNING' && status2.json.instance?.apiURL) {
       const key = readFileSync(join(dirname(recordPath), '..', 'data', 'api.key'), 'utf8').trim()
@@ -163,21 +188,29 @@ export async function runOuterZip() {
     })
     evidence.negatives.portConflict = { outcome: conflictStatus.outcome, code: conflictStatus.code ?? null,
       output: conflict.output().slice(-220) }
+    await waitExited(conflict.child.pid)
     const stop2 = runnerFn(['stop'], { timeoutMs: 40_000 })
-    const afterB = observe(setB)
+    const afterB = rollout(setB)
     evidence.phases.configured = { consolePort: p2, apiPort: a2, startExit: configuredExit, status: status2?.json?.status ?? null,
       readiness: readinessB ? { status: readinessB.status, discussion: readinessB.body?.discussion ?? null } : null,
       stop: { status: stop2.status, result: stop2.json?.status ?? null }, resources: { before: setB, after: afterB } }
+    await waitExited(configuredStart.child.pid)
     await new Promise(resolvePromise => setTimeout(resolvePromise, 600))
 
     // Phase 3: reopen through the packaged Start again (same private roots).
     const [p3, a3] = [await freePort(), await freePort()]
     const reopen = await startAsync(root, home, ['--port', String(p3), '--api-port', String(a3), '--discussion-only'])
+    track('reopen:launcher', reopen.child.pid, { role: 'launcher' })
     const status3 = await waitStatus(runnerFn)
-    const setC = recordPids(recordPath)
+    const reopenExit = await Promise.race([
+      new Promise(resolvePromise => reopen.child.once('exit', code => resolvePromise({ code }))),
+      new Promise(resolvePromise => setTimeout(() => resolvePromise({ code: 'RUNNING' }), 1_000)),
+    ])
+    const setC = capture('reopen', recordPath)
     const stop3 = runnerFn(['stop'], { timeoutMs: 40_000 })
-    evidence.phases.reopen = { status: status3?.json?.status ?? null, mode: status3?.json?.instance?.mode ?? null,
-      stop: { status: stop3.status, result: stop3.json?.status ?? null }, resources: { before: setC, after: observe(setC) } }
+    evidence.phases.reopen = { status: status3?.json?.status ?? null, mode: status3?.json?.instance?.mode ?? null, startExit: reopenExit,
+      stop: { status: stop3.status, result: stop3.json?.status ?? null }, resources: { before: setC, after: rollout(setC) } }
+    await waitExited(reopen.child.pid)
     evidence.negatives.statusStopped = (() => {
       const value = runnerFn(['status'], { timeoutMs: 20_000 })
       return { status: value.status, result: value.json?.status ?? null }
@@ -187,15 +220,30 @@ export async function runOuterZip() {
     evidence.subject = { source: evidence.zip.source, buildId: evidence.zip.buildId, schema,
       tarSha256: evidence.zip.innerTarSha256, tarBytes: evidence.zip.innerTarBytes,
       platform: evidence.zip.runtime?.platform ?? null, arch: evidence.zip.runtime?.arch ?? null, abi: evidence.zip.runtime?.abi ?? null }
-  } catch (error) { failure = String(error?.message ?? error).slice(0, 600) }
+  } catch (error) {
+    failure = String(error?.message ?? error).slice(0, 600)
+    operation.fail('case', error)
+    operation.retain(`case_error:${failure}`)
+  }
 
-  if (home) { try { rmSync(home, { recursive: true, force: true }) } catch { /* retained for inspection */ } }
+  const observation = operation.observe()
+  const verdict = operation.releaseAllowed(observation)
+  if (failure === null && verdict.allowed === true) {
+    const released = operation.release({ observation })
+    evidence.operation = { verdict, released: released.released, retained: released.retained, observation, signals: operation.signals }
+  } else {
+    operation.retain(failure ?? verdict.reason ?? 'unknown')
+    const kept = operation.retainAll(failure ?? verdict.reason ?? 'unknown')
+    evidence.operation = { verdict, released: [], retained: kept.retained, reason: kept.reason, observation,
+      signals: operation.signals, failures: operation.failures }
+    if (process.env.PA_E_TRACE) process.stderr.write(`[w34zip] retained ${JSON.stringify(kept.retained)}\n`)
+  }
   await mock?.close?.().catch(() => {})
 
   cases.push(await runCase({ id: 'E33-OUTER-ZIP',
-    title: 'The shareable outer ZIP is verified by its own hashes, extracted privately and driven through the packaged Start/Stop/status',
+    title: 'The locked shareable outer ZIP is verified by its own hashes, extracted privately and driven through the packaged Start/Stop/status',
     layer: LAYERS.INSTALLED, evidence: { outerZip: evidence }, limitations: [
-      'HOME is redirected to a private directory; the user’s Application Support tree and existing instances are untouched.',
+      'The private HOME is redirected for this operation; the user’s Application Support tree and existing instances are untouched.',
       'No vendor model or native run: the configured phase uses a loopback mock through an explicit PA_MODEL_CONFIG.',
       'The bundled weekly preview only exposes discussion/normal modes; fixture execution is not part of this entry.',
     ] }, async ({ assert, evidence: ev }) => {
@@ -227,6 +275,9 @@ export async function runOuterZip() {
       JSON.stringify(evidence.phases.reopen))
     assert('ZIP_STATUS_STOPPED', evidence.negatives.statusStopped?.status === 2 && evidence.negatives.statusStopped?.result === 'STOPPED',
       JSON.stringify(evidence.negatives.statusStopped))
+    assert('ZIP_OPERATION_RELEASED', evidence.operation?.verdict?.allowed === true && evidence.operation.released.length === 1 &&
+      evidence.operation.retained.length === 0 && evidence.operation.signals.length === 0,
+      JSON.stringify({ verdict: evidence.operation?.verdict, signals: evidence.operation?.signals?.length, retained: evidence.operation?.retained }))
   }))
 
   return { cases, artifacts: {} }

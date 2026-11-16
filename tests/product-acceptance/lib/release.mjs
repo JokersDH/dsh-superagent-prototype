@@ -87,6 +87,8 @@ export function installationIssues(installation) {
   return issues
 }
 
+import { resourceRowsIssues } from './caller-safety.mjs'
+
 const HEX64 = (value) => HEX.test(String(value ?? ''))
 
 /** Advice is data: no actor, probability, larger scope or default-path activation is acceptable. */
@@ -517,11 +519,12 @@ export function zipLifecycleIssues(value) {
   const unconfigured = phases.unconfigured ?? {}
   if (unconfigured.readiness?.status !== 200 || unconfigured.contextAvailable !== false ||
     unconfigured.readiness?.body?.discussion === 'configuration_present') issues.push('unconfigured')
-  if (unconfigured.stop?.clean !== true || !Array.isArray(unconfigured.resources?.after) ||
-    unconfigured.resources.after.some(item => item.alive === true && item.sameIdentity === true)) issues.push('unconfigured_stop')
+  if (unconfigured.stop?.clean !== true) issues.push('unconfigured_stop')
+  for (const issue of resourceRowsIssues(unconfigured.resources?.before, unconfigured.resources?.after)) issues.push(`unconfigured_${issue}`)
   const configured = phases.configured ?? {}
   if (configured.readiness?.body?.discussion !== 'configuration_present' || configured.contextAvailable !== true) issues.push('configured')
   if (configured.stop?.clean !== true) issues.push('configured_stop')
+  for (const issue of resourceRowsIssues(configured.resources?.before, configured.resources?.after)) issues.push(`configured_${issue}`)
   if (value.importProject?.status !== 200 || !isSubstantive(value.importProject?.projectId)) issues.push('import')
   if (value.delivery?.receipt !== 'recorded' || value.delivery?.accepted !== 'recorded' ||
     value.delivery?.phase !== 'delivered' || !(value.delivery?.artifacts >= 1)) issues.push('delivery')
@@ -530,6 +533,7 @@ export function zipLifecycleIssues(value) {
   if (reopen.status !== 'RUNNING' || reopen.work?.found !== true || reopen.work?.phase !== 'delivered' ||
     !(reopen.work?.artifacts >= 1) || !((reopen.messages ?? 0) >= 1)) issues.push('reopen')
   if (reopen.stop?.clean !== true) issues.push('reopen_stop')
+  for (const issue of resourceRowsIssues(reopen.resources?.before, reopen.resources?.after)) issues.push(`reopen_${issue}`)
   return issues
 }
 const HEX40 = value => /^[a-f0-9]{40}$/u.test(String(value ?? ''))
@@ -555,14 +559,15 @@ export function outerZipIssues(value) {
   if (unconfigured.status !== 'RUNNING' || unconfigured.readiness?.status !== 200 ||
     unconfigured.readiness?.discussion === 'configuration_present' || unconfigured.contextAvailable !== false) issues.push('unconfigured')
   if (unconfigured.stop?.status !== 0 || unconfigured.stop?.result !== 'STOPPED') issues.push('unconfigured_stop')
-  if (!deadAfter(unconfigured.resources?.after) || unconfigured.resources.after.length !== unconfigured.resources.before?.length) issues.push('unconfigured_resources')
+  for (const issue of resourceRowsIssues(unconfigured.resources?.before, unconfigured.resources?.after)) issues.push(`unconfigured_${issue}`)
   const configured = value.phases?.configured ?? {}
   if (configured.status !== 'RUNNING' || configured.readiness?.discussion !== 'configuration_present') issues.push('configured')
   if (configured.stop?.status !== 0 || configured.stop?.result !== 'STOPPED') issues.push('configured_stop')
-  if (!deadAfter(configured.resources?.after)) issues.push('configured_resources')
+  for (const issue of resourceRowsIssues(configured.resources?.before, configured.resources?.after)) issues.push(`configured_${issue}`)
   if (value.negatives?.portConflict?.outcome !== 'EXITED' || value.negatives?.portConflict?.code === 0) issues.push('port_conflict')
   const reopen = value.phases?.reopen ?? {}
-  if (reopen.status !== 'RUNNING' || reopen.stop?.result !== 'STOPPED' || !deadAfter(reopen.resources?.after)) issues.push('reopen')
+  if (reopen.status !== 'RUNNING' || reopen.stop?.result !== 'STOPPED') issues.push('reopen')
+  for (const issue of resourceRowsIssues(reopen.resources?.before, reopen.resources?.after)) issues.push(`reopen_${issue}`)
   if (value.negatives?.statusStopped?.status !== 2 || value.negatives?.statusStopped?.result !== 'STOPPED') issues.push('status_stopped')
   return issues
 }
@@ -591,8 +596,33 @@ export function cohortRecoveryIssues(value) {
   if (readonly.providerRequests?.afterSeed !== readonly.providerRequests?.afterReads) issues.push('provider_called')
   const refused = value.negatives?.fixtureOnRestored ?? {}
   if (refused.status === 'RUNNING' && refused.business !== 422 && refused.startupMode !== 'recovery_readonly') issues.push('execution_mode')
-  if (value.resources?.seed?.stop?.clean !== true || readonly.stop?.clean !== true ||
-    !deadAfter(value.resources?.seed?.after) || !deadAfter(value.resources?.readonly?.after)) issues.push('stop_incomplete')
+  if (value.resources?.seed?.stop?.clean !== true || readonly.stop?.clean !== true) issues.push('stop_incomplete')
+  for (const issue of resourceRowsIssues(value.resources?.seed?.before, value.resources?.seed?.after)) issues.push(`seed_${issue}`)
+  for (const issue of resourceRowsIssues(value.resources?.readonly?.before, value.resources?.readonly?.after)) issues.push(`readonly_${issue}`)
+  const fixtureResources = value.negatives?.fixtureOnRestored?.resources
+  if (fixtureResources) for (const issue of resourceRowsIssues(fixtureResources.before, fixtureResources.after)) issues.push(`fixture_${issue}`)
+  return issues
+}
+
+const UPGRADE_STEPS = ['bootstrap', 'baseline_start', 'upgrade', 'upgraded_health', 'post_upgrade_write', 'tampered_target', 'rollback_install', 'rollback_start']
+
+/** Same-cohort managed upgrade and binary rollback; D's submitted contradiction is never authority. */
+export function cohortUpgradeIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (!value.subject || !HEX64(String(value.subject.tarSha256 ?? '')) || !HEX40(value.subject.source)) issues.push('subject')
+  const pair = value.pair ?? {}
+  if (!isSubstantive(pair.baseline?.buildId) || !isSubstantive(pair.target?.buildId) || pair.baseline.buildId === pair.target.buildId) issues.push('pair')
+  if (pair.baseline?.schema !== pair.target?.schema) issues.push('schema')
+  if (pair.target?.tarSha256 !== value.subject?.tarSha256) issues.push('subject_pair')
+  const steps = new Map((value.steps ?? []).map(step => [step.id, step.status]))
+  for (const id of UPGRADE_STEPS) if (steps.get(id) !== 'PASS') issues.push(`step:${id}`)
+  if (value.upgrade?.from !== pair.baseline?.buildId || value.upgrade?.to !== pair.target?.buildId) issues.push('upgrade_from_to')
+  if (value.probe?.postKept !== true || value.rollback?.postDataKept !== true) issues.push('post_data')
+  if (value.rollback?.raw?.status !== 'BINARY_ROLLED_BACK' || value.rollback?.raw?.dataRolledBack !== false ||
+    value.rollback?.build !== pair.baseline?.buildId) issues.push('rollback')
+  if (value.probe?.tampered?.code !== 'target_tampered') issues.push('tampered')
+  if (value.dSubmitted !== null && value.dSubmitted !== undefined && !/BLOCKED/iu.test(String(value.dSubmitted?.bothRawResults ?? ''))) issues.push('d_claim')
   return issues
 }
 
@@ -607,8 +637,22 @@ export function journeyIssues(value) {
       issues.push(`preview:${project.index}`)
     if (project.receipt !== 'recorded' || !isSubstantive(project.workId)) issues.push(`create:${project.index}`)
     if (project.accepted !== 'recorded' || project.phase !== 'delivered' || !(project.artifacts >= 1)) issues.push(`accept:${project.index}`)
+    const readiness = project.acceptReadiness ?? {}
+    if (project.accepted === 'recorded') {
+      if (!readiness.available?.includes('accept_candidate') || !isSubstantive(readiness.candidateId) ||
+        !['finished', 'passed'].includes(String(readiness.verificationState ?? ''))) issues.push(`accept_readiness:${project.index}`)
+      if (project.staleAccept && project.staleAccept.status === 'recorded') issues.push(`stale_accepted:${project.index}`)
+    }
     const open = project.insights?.open ?? {}
     if (open.seven !== 200 || open.thirty !== 200 || open.days?.[0] !== 7 || open.days?.[1] !== 30) issues.push(`insights:${project.index}`)
+    const scopedInsights = project.insights ?? {}
+    if (scopedInsights.seven === 200) {
+      if (scopedInsights.days?.[0] !== 7 || scopedInsights.days?.[1] !== 30) issues.push(`insights_days:${project.index}`)
+      if (Array.isArray(scopedInsights.projectId) && scopedInsights.projectId.some(value => value !== null && value !== project.id))
+        issues.push(`insights_project:${project.index}`)
+      if (Array.isArray(scopedInsights.window) && scopedInsights.window.some((value, index) => value !== null && value !== [7, 30][index]))
+        issues.push(`insights_window:${project.index}`)
+    }
     if (!isSubstantive(project.executionProjectId)) issues.push(`execution:${project.index}`)
     // A needs_input preview is only the legal narrowed positive when it is not claimed applicable;
     // an applicable preview must be a real draft with fields.
@@ -652,12 +696,7 @@ export function journeyPhasesIssues(value) {
     const entry = value[phase] ?? {}
     const packaged = entry.stop?.package === 'STOPPED' || entry.stop?.package === 'STOPPED_ORPHAN'
     if (!packaged || entry.stop?.clean !== true) issues.push(`${phase}_stop`)
-    const before = entry.resources?.before, after = entry.resources?.after
-    if (!Array.isArray(before) || before.length === 0) issues.push(`${phase}_set`)
-    else if (!Array.isArray(after) || after.length !== before.length) issues.push(`${phase}_after`)
-    else if (after.some((item, index) => item.pid !== before[index]?.pid || item.expectedStart !== before[index]?.start ||
-      typeof item.alive !== 'boolean' || typeof item.sameIdentity !== 'boolean')) issues.push(`${phase}_after_fields`)
-    else if (after.some(item => item.alive === true && item.sameIdentity === true)) issues.push(`${phase}_alive`)
+    for (const issue of resourceRowsIssues(entry.resources?.before, entry.resources?.after)) issues.push(`${phase}_${issue}`)
   }
   return issues
 }
@@ -674,6 +713,7 @@ export function journeyReopenIssues(value) {
   }
   if (value.readiness !== 200) issues.push('readiness')
   if (value.stop?.clean !== true || (value.stop?.package !== 'STOPPED' && value.stop?.package !== 'STOPPED_ORPHAN')) issues.push('stop')
+  for (const issue of resourceRowsIssues(value.stop?.resources?.before, value.stop?.resources?.after)) issues.push(`stop_${issue}`)
   return issues
 }
 export function recipePreviewIssues(value) {
@@ -1664,7 +1704,7 @@ export function evaluateRelease({
         item.evidence?.supportMaterial?.subject ?? item.evidence?.packagedStop?.subject ?? item.evidence?.insights?.subject ??
         item.evidence?.recipePreview?.subject ?? item.evidence?.journey?.subject ?? item.evidence?.journeyContext?.subject ??
         item.evidence?.journeyPhases?.subject ?? item.evidence?.journeyReopen?.subject ?? item.evidence?.zip?.subject ??
-        item.evidence?.outerZip?.subject ?? item.evidence?.cohortRecovery?.subject
+        item.evidence?.outerZip?.subject ?? item.evidence?.cohortRecovery?.subject ?? item.evidence?.cohortUpgrade?.subject
       if (!subject || typeof subject !== 'object') {
         failures.push(fail('subject_missing', `Case ${id} has no frozen artifact subject`, id))
         continue
@@ -1682,6 +1722,22 @@ export function evaluateRelease({
             failures.push(fail('subject_mismatch', `Case ${id} ${field} matches no admitted cohort`, id))
         }
       }
+    }
+  }
+
+  // An original-project execution claim is only admitted together with a readable scoped observation
+  // of that same project and a complete applicable draft; a same-project label over a scoped 403 is
+  // not evidence.
+  const journeyEvidence = byId.get('E5-TWO-PROJECT-TEMPLATE-CREATE')?.evidence?.journey
+  const journeyContextEvidence = byId.get('E7-JOURNEY-CONTEXT-SOURCE')?.evidence?.journeyContext
+  if (journeyEvidence?.originalProjectExecution?.sameProject === true) {
+    if (journeyContextEvidence?.scoped !== 200)
+      failures.push(fail('journey_scope_unproven', `sameProject requires a readable scoped observation, got ${journeyContextEvidence?.scoped ?? 'absent'}`, 'E5-TWO-PROJECT-TEMPLATE-CREATE'))
+    if (journeyContextEvidence?.projectId && !(journeyEvidence.projects ?? []).some(project => project.id === journeyContextEvidence.projectId))
+      failures.push(fail('journey_scope_unbound', 'scoped observation is not bound to one journey project', 'E7-JOURNEY-CONTEXT-SOURCE'))
+    for (const project of journeyEvidence.projects ?? []) {
+      if (project.preview?.applicable !== true || !((project.preview?.fieldsCount ?? 0) >= 1))
+        failures.push(fail('journey_preview_unproven', `project ${project.index} claims sameProject without an applicable draft with fields`, 'E5-TWO-PROJECT-TEMPLATE-CREATE'))
     }
   }
 
@@ -1733,7 +1789,7 @@ export function evaluateRelease({
           failures.push(fail('evidence_history_invalid', `Evidence history ${issue}`, entry.id))
       }
       for (const [key, fn] of [['contextUse', contextUseIssues], ['sse', contextSseIssues], ['guards', contextGuardIssues], ['sourceConfirm', sourceConfirmIssues], ['sourceConfirmRefusal', sourceConfirmRefusalIssues], ['candidateFlow', candidateFlowIssues], ['history', contextHistoryIssues], ['sources', contextSourcesIssues], ['contextUi', contextUiIssues], ['concurrency', concurrencyIssues], ['schemaMigration', schemaMigrationIssues], ['legacyMigration', legacyMigrationIssues], ['frozenScope', frozenScopeIssues], ['ownershipCopy', ownershipCopyIssues], ['ownershipMocks', ownershipMocksIssues], ['installedCandidates', installedCandidatesIssues], ['secondRoot', secondRootIssues], ['workflowFormats', workflowFormatsIssues], ['personalReview', personalReviewIssues], ['restoredReviewRefusals', restoredReviewRefusalsIssues], ['reviewReuse', reviewReuseIssues], ['scopeDiagnostics', scopeDiagnosticsIssues], ['readiness', readinessIssues], ['trialUi', trialUiIssues],
-      ['zip', zipLifecycleIssues], ['outerZip', outerZipIssues], ['cohortRecovery', cohortRecoveryIssues], ['journey', journeyIssues], ['journeyContext', journeyContextIssues], ['journeyPhases', journeyPhasesIssues], ['journeyReopen', journeyReopenIssues],
+      ['zip', zipLifecycleIssues], ['outerZip', outerZipIssues], ['cohortRecovery', cohortRecoveryIssues], ['cohortUpgrade', cohortUpgradeIssues], ['journey', journeyIssues], ['journeyContext', journeyContextIssues], ['journeyPhases', journeyPhasesIssues], ['journeyReopen', journeyReopenIssues],
       ['recipePreview', recipePreviewIssues], ['packagedStop', packagedStopIssues], ['stopFunctional', stopFunctionalIssues], ['lifecycleOwn', lifecycleOwnIssues], ['lifecycleBirthNoSet', lifecycleBirthNoSetIssues], ['lifecycleStoppedChild', lifecycleStoppedChildIssues], ['lifecycleStoppedNoRecordChild', lifecycleStoppedNoRecordChildIssues],
       ['lifecycleParentGone', lifecycleParentGoneIssues], ['lifecycleNoRecordUnverified', lifecycleNoRecordUnverifiedIssues], ['lifecycleSetMismatch', lifecycleSetMismatchIssues],
       ['lifecycleBirthConfig', lifecycleBirthConfigIssues], ['lifecycleNoRecord', lifecycleNoRecordIssues], ['lifecycleNoRecordExit', lifecycleNoRecordExitIssues],

@@ -3,7 +3,8 @@ import { join } from 'node:path'
 import { runCase, LAYERS } from '../lib/status.mjs'
 import { LocalProductClient } from '../lib/http-client.mjs'
 import { candidateModel } from '../../../tests/integration/fixtures/assistant-candidate-model.mjs'
-import { extractFrozen, freePort, launcher, liveIdentity, privateRoot, releaseRoot, retainMaterial, startOwned, stopOwned } from '../lib/packaged-instance.mjs'
+import { extractFrozen, freePort, launcher, privateRoot, releaseRoot, retainMaterial, startOwned, stopOwned } from '../lib/packaged-instance.mjs'
+import { captureSet, rollout } from '../lib/caller-safety.mjs'
 import { DEFAULT_FROZEN_DIRS, frozenArtifactSubject, loadFrozenArtifact } from '../lib/frozen-package.mjs'
 
 /**
@@ -16,14 +17,12 @@ import { DEFAULT_FROZEN_DIRS, frozenArtifactSubject, loadFrozenArtifact } from '
  */
 const mark = message => { if (process.env.PA_E_TRACE) process.stderr.write(`[w32] ${message}\n`) }
 
-function fixedSet(config) {
+function fixedSet(config, rootValue, op) {
   const record = JSON.parse(readFileSync(join(config, 'instance.json'), 'utf8'))
   const pids = [...new Set([record.pid, record.apiPid, record.consolePid])].filter(Number.isSafeInteger)
-  return pids.map(pid => { const identity = liveIdentity(pid)
-    return { pid, start: identity.start, uid: identity.uid, parentPid: pid === record.pid ? null : record.pid } })
+  return captureSet(pids, { root: rootValue.install, config, state: rootValue.state, op })
 }
-const observe = before => before.map(item => { const identity = liveIdentity(item.pid)
-  return { pid: item.pid, expectedStart: item.start, alive: identity.alive, sameIdentity: identity.alive && identity.start === item.start } })
+const observe = before => rollout(before)
 
 async function startPhase(root, options, attempts = 3) {
   let last = null
@@ -89,7 +88,7 @@ export async function runZip() {
     const clientA = new LocalProductClient({ baseURL: unconfiguredValue.instance.apiURL, stateDir: unconfiguredValue.instance.state, timeoutMs: 20_000 })
     const readinessA = await readiness(clientA)
     const configurationA = await debugCall('configA', () => clientA.configuration())
-    const beforeA = fixedSet(root.config)
+    const beforeA = fixedSet(root.config, root, 'zip:unconfigured')
     const stopA = await stopOwned(root, { mockFile: absentModel, birth: unconfigured.birth, equivalentProof: true })
     zip.phases.unconfigured = { apiUp: upA, mode: unconfiguredValue.instance.mode, startupMode: unconfiguredValue.instance.startupMode ?? 'normal',
       readiness: readinessA, contextAvailable: configurationA.assistantContextAvailable,
@@ -124,7 +123,7 @@ export async function runZip() {
     try { readBack = await clientB.configuration() } catch (error) { readBack = { error: String(error?.message ?? error) } }
     zip.importProject = { status: imported.status, projectId: echoed?.id ?? null,
       echoedProjects: (imported.body?.projects ?? []).length, readBack: Array.isArray(readBack?.projects) ? readBack.projects.length : String(readBack?.error ?? 'absent') }
-    const beforeB = fixedSet(root.config)
+    const beforeB = fixedSet(root.config, root, 'zip:configured')
     const stopB = await stopOwned(root, { mockFile: mock.file, birth: configured.birth, equivalentProof: true })
     zip.phases.configured = { apiUp: upB, mode: configuredValue.instance.mode, readiness: readinessB,
       contextAvailable: configurationB0.assistantContextAvailable,
@@ -168,7 +167,7 @@ export async function runZip() {
     }
     zip.delivery = { receipt: created.receipt?.status ?? null, workId, phase: view?.phase ?? null,
       accepted: accepted?.receipt?.status ?? null, artifacts: view?.artifactIds?.length ?? 0 }
-    const beforeC = fixedSet(root.config)
+    const beforeC = fixedSet(root.config, root, 'zip:delivered')
     const stopC = await stopOwned(root, { mockFile: mock.file, birth: fixture.birth, equivalentProof: true })
     zip.phases.delivered = { stop: { clean: stopC.clean, package: stopC.packageStop?.json?.status ?? null, reason: stopC.reason ?? null },
       resources: { before: beforeC, after: observe(beforeC) } }
@@ -192,7 +191,7 @@ export async function runZip() {
       const page = await clientD.conversation('conv-w32-zip').catch(() => null)
       zip.reopen.work = { id: workId, found: work !== null, phase: work?.phase ?? null, artifacts: work?.artifactIds?.length ?? null }
       zip.reopen.messages = page?.messages?.length ?? null
-      const beforeD = fixedSet(root.config)
+      const beforeD = fixedSet(root.config, root, 'zip:reopen')
       const stopD = await stopOwned(root, { mockFile: mock.file, birth: reopened.birth, equivalentProof: true })
       zip.reopen.stop = { clean: stopD.clean, package: stopD.packageStop?.json?.status ?? null,
         resources: { before: beforeD, after: observe(beforeD) } }

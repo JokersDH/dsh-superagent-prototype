@@ -7,6 +7,20 @@ const COMMIT = 'a'.repeat(40)
 const DIGEST = 'b'.repeat(64)
 const BASELINE = 'c'.repeat(40)
 
+const ROW_ARGV = 'node /tmp/private/install/app/apps/launcher/bin/pa.mjs start --port 1 --api-port 2'
+const ROW_ARGV_SHA = 'c'.repeat(64)
+/** One synthetic complete birth row: pid/start/uid/argv digest/root/config/op. */
+const resourceBefore = (pid, op = 'synthetic') => ({ pid, start: `Mon Nov 16 10:00:0${pid % 10} 2026`, uid: 501,
+  argv: ROW_ARGV, argvSha256: ROW_ARGV_SHA, root: '/tmp/private/install', config: '/tmp/private/config',
+  state: '/tmp/private/state', op, parentPid: null, role: 'product' })
+/** One synthetic independent post row; dead by default with explicit null observation fields. */
+const resourceAfter = (before, { alive = false, sameIdentity = false } = {}) => ({ pid: before.pid,
+  expectedStart: before.start, expectedUid: before.uid, expectedArgvSha256: before.argvSha256,
+  alive, observedStart: alive ? before.start : null, observedUid: alive ? before.uid : null,
+  observedArgvSha256: alive ? before.argvSha256 : null, sameIdentity, query: 'ps', queryOk: true,
+  observation: 'independent-ps' })
+const resourcePair = (pid, op) => { const before = resourceBefore(pid, op); return { before: [before], after: [resourceAfter(before)] } }
+
 const evidenceFor = (key) => {
   switch (key) {
     case 'configurationRevision':
@@ -655,8 +669,10 @@ const evidenceFor = (key) => {
         modes: ['personal:discussion_only', 'fixture:controlled_execution'],
         originalProjectExecution: { sameProject: true, reason: null, executionPool: ['project-1', 'project-2'], originalProjects: ['project-1', 'project-2'] },
         projects: [1, 2].map(index => ({ index, displayName: `p${index}`, id: `project-${index}`, executionProjectId: `project-${index}`,
-          preview: { status: 200, bodyStatus: 'draft', authorization: 'none', applicable: true }, receipt: 'recorded', workId: `work-${index}`,
+          preview: { status: 200, bodyStatus: 'draft', authorization: 'none', applicable: true, fieldsCount: 3 }, receipt: 'recorded', workId: `work-${index}`,
           phase: 'delivered', accepted: 'recorded', artifacts: 2,
+          acceptReadiness: { available: ['accept_candidate'], candidateId: `candidate-${index}`, verificationId: `verification-${index}`, verificationState: 'finished' },
+          staleAccept: { status: 'refused', code: 'candidate_unknown' },
           insights: { open: { seven: 200, thirty: 200, days: [7, 30] } } })) }
     case 'journeyContext':
       return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
@@ -664,24 +680,26 @@ const evidenceFor = (key) => {
         historyRows: 2, sources: 200, sourceRows: 2, scoped: 200, scopedProtocol: 'context-sources/1', scopeReview: { reasons: [], partial: false } }
     case 'journeyPhases':
       return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
-        A: { stop: { clean: true, package: 'STOPPED' }, resources: { before: [{ pid: 1, start: 's' }], after: [{ pid: 1, expectedStart: 's', alive: false, sameIdentity: false }] } },
-        B: { stop: { clean: true, package: 'STOPPED' }, resources: { before: [{ pid: 2, start: 's' }], after: [{ pid: 2, expectedStart: 's', alive: false, sameIdentity: false }] } } }
+        A: { stop: { clean: true, package: 'STOPPED' }, resources: resourcePair(11, 'journey:A') },
+        B: { stop: { clean: true, package: 'STOPPED' }, resources: resourcePair(12, 'journey:B') } }
     case 'zip':
       return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
         stage: 'reopen',
         phases: { firstRun: { status: 0, result: null },
           unconfigured: { readiness: { status: 200, body: { discussion: 'not_configured' } }, contextAvailable: false,
-            stop: { clean: true, package: 'STOPPED' }, resources: { after: [{ alive: false, sameIdentity: false }] } },
-          configured: { readiness: { body: { discussion: 'configuration_present' } }, contextAvailable: true, stop: { clean: true, package: 'STOPPED' } },
+            stop: { clean: true, package: 'STOPPED' }, resources: resourcePair(13, 'zip:unconfigured') },
+          configured: { readiness: { body: { discussion: 'configuration_present' } }, contextAvailable: true, stop: { clean: true, package: 'STOPPED' },
+            resources: resourcePair(14, 'zip:configured') },
           delivered: { stop: { clean: true, package: 'STOPPED' } } },
         importProject: { status: 200, projectId: 'project-imported', echoedProjects: 2, readBack: 2 },
         delivery: { receipt: 'recorded', workId: 'work-1', phase: 'delivered', accepted: 'recorded', artifacts: 2 },
         backup: { status: 'CREATED', verify: 'VERIFIED', sha256: DIGEST },
-        reopen: { status: 'RUNNING', work: { found: true, phase: 'delivered', artifacts: 2 }, messages: 2, stop: { clean: true, package: 'STOPPED' } } }
+        reopen: { status: 'RUNNING', work: { found: true, phase: 'delivered', artifacts: 2 }, messages: 2,
+          stop: { clean: true, package: 'STOPPED' }, resources: resourcePair(15, 'zip:reopen') } }
     case 'journeyReopen':
       return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
         status: 'RUNNING', works: [{ found: true, phase: 'delivered', artifacts: 2, messages: 2 }, { found: true, phase: 'delivered', artifacts: 1, messages: 1 }],
-        readiness: 200, stop: { clean: true, package: 'STOPPED' } }
+        readiness: 200, stop: { clean: true, package: 'STOPPED', resources: resourcePair(16, 'journey:reopen') } }
     case 'recipePreview':
       return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
         capability: { '/v1/insights': true, 'recipes/preview': true }, projectId: 'project-1', profileId: 'profile-1', atom: 'src/',
@@ -698,8 +716,6 @@ const evidenceFor = (key) => {
       // The outer-ZIP inner build is a second, distinct cohort: it must never look like the frozen
       // install target, or a foreign-subject substitution could match it by accident.
       const tuple = { source: '9'.repeat(40), buildId: 'zip-build', schema: 18, tarSha256: '9'.repeat(64), tarBytes: 2, abi: '137', platform: 'darwin', arch: 'arm64' }
-      const dead = (pid) => ({ pid, expectedStart: 'Mon Nov 16 10:00:00 2026', alive: false, sameIdentity: false })
-      const before = (pid) => ({ pid, start: 'Mon Nov 16 10:00:00 2026', uid: 501, parentPid: null })
       return { subject: tuple,
         zip: { path: '/tmp/outer.zip', sha256: DIGEST, bytes: 1, sumsMatch: true, resultMatch: true,
         source: '9'.repeat(40), buildId: 'zip-build', innerTarSha256: '9'.repeat(64), innerTarBytes: 2, installManifestSha256: DIGEST,
@@ -709,16 +725,26 @@ const evidenceFor = (key) => {
         runtimeNode: { version: 'v24.21.0', abi: '137' },
         phases: {
           unconfigured: { status: 'RUNNING', readiness: { status: 200, discussion: 'not_configured' }, contextAvailable: false,
-            stop: { status: 0, result: 'STOPPED' }, resources: { before: [before(101)], after: [dead(101)] } },
+            stop: { status: 0, result: 'STOPPED' }, resources: resourcePair(101, 'outer:unconfigured') },
           configured: { status: 'RUNNING', readiness: { status: 200, discussion: 'configuration_present' },
-            stop: { status: 0, result: 'STOPPED' }, resources: { before: [before(102)], after: [dead(102)] } },
-          reopen: { status: 'RUNNING', stop: { status: 0, result: 'STOPPED' }, resources: { before: [before(103)], after: [dead(103)] } } },
+            stop: { status: 0, result: 'STOPPED' }, resources: resourcePair(102, 'outer:configured') },
+          reopen: { status: 'RUNNING', stop: { status: 0, result: 'STOPPED' }, resources: resourcePair(103, 'outer:reopen') } },
         negatives: { portConflict: { outcome: 'EXITED', code: 1 }, statusStopped: { status: 2, result: 'STOPPED' } } }
+    }
+    case 'cohortUpgrade': {
+      const tuple = { source: '9'.repeat(40), buildId: 'zip-build', schema: 18, tarSha256: '9'.repeat(64), tarBytes: 2, abi: '137', platform: 'darwin', arch: 'arm64' }
+      const steps = ['bootstrap', 'baseline_start', 'upgrade', 'upgraded_health', 'post_upgrade_write', 'tampered_target', 'rollback_install', 'rollback_start']
+        .map(id => ({ id, status: 'PASS' }))
+      return { subject: tuple,
+        pair: { baseline: { buildId: 'prev-build', schema: 18, tarSha256: '8'.repeat(64) },
+          target: { buildId: 'zip-build', schema: 18, tarSha256: '9'.repeat(64) } },
+        steps, upgrade: { from: 'prev-build', to: 'zip-build', status: 'CONFIRMED' },
+        probe: { postKept: true, tampered: { code: 'target_tampered' } },
+        rollback: { raw: { status: 'BINARY_ROLLED_BACK', dataRolledBack: false }, build: 'prev-build', postDataKept: true },
+        dSubmitted: { bothRawResults: 'BLOCKED_unknown_live_resource' } }
     }
     case 'cohortRecovery': {
       const tuple = { source: '9'.repeat(40), buildId: 'zip-build', schema: 18, tarSha256: '9'.repeat(64), tarBytes: 2, abi: '137', platform: 'darwin', arch: 'arm64' }
-      const dead = (pid) => ({ pid, expectedStart: 'Mon Nov 16 10:00:00 2026', alive: false, sameIdentity: false })
-      const before = (pid) => ({ pid, start: 'Mon Nov 16 10:00:00 2026', uid: 501, parentPid: null })
       const shape = [{ role: 'user', provenance: 'trusted_user', text: 'goal' }]
       return { subject: tuple, zip: { sumsMatch: true, resultMatch: true, digestsMatch: true },
         seed: { workId: 'work-1', phase: 'delivered', accepted: 'recorded', artifacts: [{ id: 'a1', sha256: DIGEST, bytes: 1 }],
@@ -730,7 +756,8 @@ const evidenceFor = (key) => {
           artifactBytesEqual: true, messages: 1, messagesEqual: true, goalVisible: true, messageShape: shape,
           business: { status: 422 }, providerRequests: { afterSeed: 1, afterReads: 1 }, stop: { clean: true } },
         negatives: { tamperedBundle: { status: 2, result: 'BLOCKED' }, fixtureOnRestored: { status: 'RUNNING', startupMode: 'recovery_readonly', business: 422 } },
-        resources: { seed: { stop: { clean: true }, after: [dead(104)] }, readonly: { after: [dead(105)] } } }
+        resources: { seed: { stop: { clean: true }, ...resourcePair(104, 'cohort:seed') },
+          readonly: resourcePair(105, 'cohort:readonly') } }
     }
     default:
       throw new Error(`No synthetic evidence for ${key}`)
@@ -2395,6 +2422,91 @@ const ROUTING_CASES = [
         findCase(report, 'E33-COHORT-RECOVERY').evidence.cohortRecovery.resources.readonly.after[0].sameIdentity = true
         return report
       }, 'cohortRecovery_invalid'),
+  },
+  {
+    id: 'E2-MUTATE-E32-EMPTY-AFTER',
+    title: 'The old tar lifecycle cannot satisfy stop with an empty post set',
+    check: ({ assert }) =>
+      rejectWith(assert, 'E32_EMPTY', (report) => {
+        findCase(report, 'E32-ZIP-LIFECYCLE').evidence.zip.phases.unconfigured.resources.after = []
+        return report
+      }, 'zip_invalid'),
+  },
+  {
+    id: 'E2-MUTATE-FOREIGN-PID-MISSING-START',
+    title: 'A foreign pid without start/uid/argv cannot stand in for a captured resource',
+    check: ({ assert }) =>
+      rejectWith(assert, 'FOREIGN42', (report) => {
+        const after = findCase(report, 'E33-OUTER-ZIP').evidence.outerZip.phases.configured.resources.after
+        after[0] = { pid: 42, alive: false, sameIdentity: false }
+        return report
+      }, 'outerZip_invalid'),
+  },
+  {
+    id: 'E2-MUTATE-RESOURCE-ALIVE',
+    title: 'A post row that is still alive is not quiescence',
+    check: ({ assert }) =>
+      rejectWith(assert, 'OUTER_ROW_ALIVE', (report) => {
+        const phase = findCase(report, 'E33-OUTER-ZIP').evidence.outerZip.phases.unconfigured
+        phase.resources.after[0] = { ...phase.resources.after[0], alive: true, sameIdentity: true,
+          observedStart: phase.resources.after[0].expectedStart }
+        return report
+      }, 'outerZip_invalid'),
+  },
+  {
+    id: 'E2-MUTATE-COHORT-CARDINALITY',
+    title: 'A cohort post set with fewer rows than the captured set is not a complete observation',
+    check: ({ assert }) =>
+      rejectWith(assert, 'COHORT_CARDINALITY', (report) => {
+        findCase(report, 'E33-COHORT-RECOVERY').evidence.cohortRecovery.resources.readonly.after.pop()
+        return report
+      }, 'cohortRecovery_invalid'),
+  },
+  {
+    id: 'E2-MUTATE-JOURNEY-PHASE-EXPECTED-START',
+    title: 'A journey phase post row for the wrong start identity is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'JOURNEY_EXPECTED', (report) => {
+        findCase(report, 'E8-JOURNEY-STOP-REOPEN').evidence.journeyPhases.A.resources.after[0].expectedStart = 'Mon Nov 16 00:00:00 2026'
+        return report
+      }, 'journeyPhases_invalid'),
+  },
+  {
+    id: 'E3-MUTATE-SAME-PROJECT-SCOPED-403',
+    title: 'A sameProject claim over a scoped 403 is rejected by the final report oracle',
+    check: ({ assert }) =>
+      rejectWith(assert, 'SAME_PROJECT_403', (report) => {
+        const journey = findCase(report, 'E5-TWO-PROJECT-TEMPLATE-CREATE').evidence.journey
+        journey.originalProjectExecution.sameProject = true
+        for (const project of journey.projects) { project.preview.applicable = true; project.preview.bodyStatus = 'draft'; project.preview.fieldsCount = 3 }
+        const ctx = findCase(report, 'E7-JOURNEY-CONTEXT-SOURCE').evidence.journeyContext
+        ctx.scoped = 403
+        ctx.projectId = journey.projects[0].id
+        return report
+      }, 'journey_scope_unproven'),
+  },
+  {
+    id: 'E3-MUTATE-SAME-PROJECT-NO-DRAFT',
+    title: 'A sameProject claim without an applicable draft with fields is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'SAME_PROJECT_NO_DRAFT', (report) => {
+        const journey = findCase(report, 'E5-TWO-PROJECT-TEMPLATE-CREATE').evidence.journey
+        journey.originalProjectExecution.sameProject = true
+        for (const project of journey.projects) { project.preview.applicable = false; project.preview.bodyStatus = 'needs_input'; project.preview.fieldsCount = 0 }
+        const ctx = findCase(report, 'E7-JOURNEY-CONTEXT-SOURCE').evidence.journeyContext
+        ctx.scoped = 200
+        ctx.projectId = journey.projects[0].id
+        return report
+      }, 'journey_preview_unproven'),
+  },
+  {
+    id: 'E3-MUTATE-INSIGHTS-WINDOW',
+    title: 'An open insights window that is not 7/30 is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'INSIGHTS_WINDOW', (report) => {
+        findCase(report, 'E5-TWO-PROJECT-TEMPLATE-CREATE').evidence.journey.projects[0].insights.open.days = [7, 31]
+        return report
+      }, 'journey_invalid'),
   },
   {
     id: 'E1-MUTATE-HETERO-NO-SUBJECT',

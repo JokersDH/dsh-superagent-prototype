@@ -12,8 +12,8 @@ import { spawnSync } from 'node:child_process'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-export const OUTER_ZIP_DIR = process.env.PA_E_W33_ZIP_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave32-preview-88eb8c6'
-export const OUTER_ZIP_NAME = 'PersonalAgent-Preview-88eb8c6.zip'
+export const OUTER_ZIP_DIR = process.env.PA_E_W34_ZIP_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave33-preview-f880e5b'
+export const OUTER_ZIP_NAME = process.env.PA_E_W34_ZIP_NAME ?? 'PersonalAgent-Preview-f880e5b.zip'
 
 export const sha256 = bytes => createHash('sha256').update(bytes).digest('hex')
 

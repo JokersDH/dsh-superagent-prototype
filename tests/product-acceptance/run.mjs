@@ -75,14 +75,15 @@ async function collect(suite, loader) {
 }
 
 await collect('selftest', async () => {
-  const [base, mutations, wave23, wave24, lifecycle] = await Promise.all([
+  const [base, mutations, wave23, wave24, lifecycle, callerSafety] = await Promise.all([
     import('./selftest/gate.mjs'),
     import('./selftest/gate-mutations.mjs'),
     import('./selftest/wave23-gate.case.mjs'),
     import('./selftest/wave24-gate.case.mjs'),
     import('./cases/w27-lifecycle.mjs'),
+    import('./cases/w34-caller-safety.mjs'),
   ])
-  return [...(await base.gateSelftestCases()), ...(await mutations.gateMutationCases()), ...(await wave23.wave23GateCases()), ...(await wave24.wave24GateCases()), ...(await lifecycle.runLifecycle()).cases]
+  return [...(await base.gateSelftestCases()), ...(await mutations.gateMutationCases()), ...(await wave23.wave23GateCases()), ...(await wave24.wave24GateCases()), ...(await lifecycle.runLifecycle()).cases, ...(await callerSafety.runCallerSafety()).cases]
 })
 await collect('e2', async () => {
   const [daily, wave04, wave05] = await Promise.all([
@@ -145,7 +146,7 @@ await collect('e3', async () => {
   }
 })
 await collect('e4', async () => {
-  const [stability, wave04, release, install, recoveryPreflight, replyDurability, sourceConfirm, installedRecovery, personalReview, trialUi, inputs, surfaces, journey, zipLifecycle, outerZip, cohortRecovery] = await Promise.all([
+  const [stability, wave04, release, install, recoveryPreflight, replyDurability, sourceConfirm, installedRecovery, personalReview, trialUi, inputs, surfaces, journey, zipLifecycle, outerZip, cohortRecovery, cohortUpgrade] = await Promise.all([
     import('./cases/e4-stability.mjs'),
     import('./cases/e4-wave04.mjs'),
     import('./cases/e5-release.mjs'),
@@ -162,6 +163,7 @@ await collect('e4', async () => {
     import('./cases/w32-zip.mjs'),
     import('./cases/w33-outer-zip.mjs'),
     import('./cases/w33-cohort-recovery.mjs'),
+    import('./cases/w34-cohort-upgrade.mjs'),
   ])
   const first = await stability.runE4({
     root,
@@ -184,8 +186,9 @@ await collect('e4', async () => {
   const fifteenth = await zipLifecycle.runZip({ root, runDirectory: run.directory })
   const sixteenth = await outerZip.runOuterZip({ root, runDirectory: run.directory })
   const seventeenth = await cohortRecovery.runCohortRecovery({ root, runDirectory: run.directory })
+  const eighteenth = await cohortUpgrade.runCohortUpgrade({ root, runDirectory: run.directory })
   return {
-    cases: [...first.cases, ...second.cases, ...third.cases, ...fourth.cases, ...fifth.cases, ...sixth.cases, ...seventh.cases, ...eighth.cases, ...ninth.cases, ...eleventh.cases, ...twelfth.cases, ...thirteenth.cases, ...fourteenth.cases, ...fifteenth.cases, ...sixteenth.cases, ...seventeenth.cases],
+    cases: [...first.cases, ...second.cases, ...third.cases, ...fourth.cases, ...fifth.cases, ...sixth.cases, ...seventh.cases, ...eighth.cases, ...ninth.cases, ...eleventh.cases, ...twelfth.cases, ...thirteenth.cases, ...fourteenth.cases, ...fifteenth.cases, ...sixteenth.cases, ...seventeenth.cases, ...eighteenth.cases],
     artifacts: {
       screenshots: [
         ...(first.artifacts?.screenshots ?? []),
