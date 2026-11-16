@@ -11,6 +11,7 @@ import { join } from 'node:path'
 import { test } from 'node:test'
 import {
   PreviewError,
+  MetadataRefused,
   RebindError,
   RebindReportSchema,
   compareProjectFacts,
@@ -165,5 +166,48 @@ test('after a re-bind the previous draft is stale and the new tree drives the ne
       const after = matchRecipe({ facts: rebind.facts, configuration, kind: 'scoped_change', selection: { paths: ['src/'] }, now: NOW })
       assert.equal(after.status, 'draft')
     })
+  })
+})
+
+test('identical content in a different root is current, and the report does not claim the root', () => {
+  withDir((first) => {
+    writeProject(first, pnpmJson, 'pnpm-lock.yaml')
+    const observed = observeProjectMetadata({ root: first, projectId: 'project-alpha', observedAt: '2026-11-14T10:00:00.000Z' }).facts
+    withDir((second) => {
+      writeProject(second, pnpmJson, 'pnpm-lock.yaml')
+      const moved = reobserveProjectFacts({ previous: observed, root: second, observedAt: NOW })
+      assert.equal(moved.report.status, 'current')
+      assert.match(moved.report.notes[0]!, /根身份由调用方/)
+      assert.equal(JSON.stringify(moved.report).includes(second), false)
+    })
+  })
+})
+
+test('a different project id with identical content is reidentified with no field changes', () => {
+  const previous = { ...alphaFacts }
+  const reidentified = compareProjectFacts(previous, { ...alphaFacts, projectId: 'project-other' })
+  assert.equal(reidentified.status, 'reidentified')
+  assert.equal(reidentified.previousProjectId, 'project-alpha')
+  assert.deepEqual(reidentified.changes, [])
+  assert.match(reidentified.notes[0]!, /旧建议不能复用/)
+})
+
+test('an explicitly authorized-root violation is an error, not "unbound"', () => {
+  assert.throws(
+    () => reobserveProjectFacts({ previous: alphaFacts, root: '/', observedAt: NOW }),
+    (error: unknown) => error instanceof MetadataRefused && error.code === 'root_forbidden',
+  )
+})
+
+test('metadata replaced between observations is reported as a change, not a silent pass', () => {
+  withDir((dir) => {
+    writeProject(dir, pnpmJson, 'pnpm-lock.yaml')
+    const before = observeProjectMetadata({ root: dir, projectId: 'project-alpha', observedAt: NOW }).facts
+    writeProject(dir, { ...pnpmJson, packageManager: 'npm@11.6.0' }, 'package-lock.json')
+    rmSync(join(dir, 'pnpm-lock.yaml'), { force: true })
+    const after = reobserveProjectFacts({ previous: before, root: dir, observedAt: NOW })
+    assert.equal(after.report.status, 'changed')
+    assert.ok(after.report.changes.includes('manager'))
+    assert.ok(after.report.changes.includes('lockfile'))
   })
 })

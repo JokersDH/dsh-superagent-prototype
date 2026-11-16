@@ -161,3 +161,9 @@ test('a Node project with no manager declaration is still served, with a note', 
   assert.equal(draft.status, 'draft')
   assert.ok(draft.notes.some((note) => note.includes('packageManager')))
 })
+
+test('a declared manager without a lockfile is served with an actionable note, not a guess', () => {
+  const draft = match('verification_followup', { facts: withFacts({ locks: [] }) })
+  assert.equal(draft.status, 'draft')
+  assert.ok(draft.notes.some((note) => note.includes('锁文件')))
+})

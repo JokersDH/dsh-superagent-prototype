@@ -130,65 +130,127 @@ export interface CurrentInputs {
   readonly maxFactsAgeMs?: number
 }
 
-const parseNow = (value: string | undefined): number => {
-  if (value === undefined) return Date.now()
-  const parsed = Date.parse(value)
-  if (!Number.isFinite(parsed)) throw new PreviewError('invalid_clock', 'now 必须是有效的 ISO 时间')
-  return parsed
+/** Structured, stable reasons a draft is no longer current. A caller renders these; none grants. */
+export const CURRENCY_REASON_CODES = [
+  'configuration_unsupported_version',
+  'configuration_invalid',
+  'configuration_changed',
+  'project_removed',
+  'facts_invalid',
+  'facts_changed',
+  'facts_future',
+  'facts_expired',
+  'expiry_passed',
+  'clock_invalid',
+] as const
+export type CurrencyReasonCode = (typeof CURRENCY_REASON_CODES)[number]
+export type CurrencyField = 'configuration' | 'facts' | 'expiry' | 'clock'
+
+export interface CurrencyReason {
+  readonly code: CurrencyReasonCode
+  readonly field: CurrencyField
 }
 
+export interface DraftCurrency {
+  readonly current: boolean
+  readonly reasons: readonly CurrencyReason[]
+  /** False when the current observation itself has gaps (`missing`/`omissions`). */
+  readonly observationComplete: boolean
+}
+
+const reason = (code: CurrencyReasonCode, field: CurrencyField): CurrencyReason => ({ code, field })
+
 /**
- * Revalidate a draft against the current world.
+ * Decide whether a draft still describes the current world, with one structured reason per cause.
  *
- * - configuration is re-parsed with the public schema: an unsupported version or malformed body is
- *   refused instead of trusting a bare revision string;
- * - facts are compared through the stable content digest, so a fresh read of unchanged bytes stays
- *   valid even though `observedAt` moved;
- * - time is always checked (real clock unless `now` is supplied): an observation in the future or
- *   older than the freshness budget is refused, and so is an expired scope. A timestamp is never an
- *   authorization, and a caller cannot skip these checks by omitting `now`.
+ * The rules are the single policy behind `assertDraftCurrent`:
+ *  - configuration is re-parsed: an unsupported version, a malformed body, a changed revision or a
+ *    removed project are separate reasons;
+ *  - facts are compared by stable content (timestamps excluded), so re-reading unchanged bytes stays
+ *    current while changed content is not;
+ *  - time is always checked against a real clock unless `now` is supplied: an unparseable clock, a
+ *    future observation, an expired observation and an expired scope are distinct reasons.
  */
-export function assertDraftCurrent(draft: ProjectRecipeDraft, current: CurrentInputs): void {
+export function draftCurrency(draft: ProjectRecipeDraft, current: CurrentInputs): DraftCurrency {
   verify(draft)
-  const stale: StaleInput[] = []
+  const reasons: CurrencyReason[] = []
 
   const parsedConfiguration = ApplicationConfigurationSchema.safeParse(current.configuration)
   if (!parsedConfiguration.success) {
     const observed = (current.configuration as { protocol?: unknown } | null | undefined)?.protocol
-    const reason = typeof observed === 'string' && observed !== 'application-configuration/1'
-      ? `配置版本不受支持（${observed}）`
-      : '当前配置无法通过公开 schema'
-    throw new PreviewError('stale_inputs', `${reason}；请按当前配置重新生成`, ['configuration'])
+    reasons.push(
+      typeof observed === 'string' && observed !== 'application-configuration/1'
+        ? reason('configuration_unsupported_version', 'configuration')
+        : reason('configuration_invalid', 'configuration'),
+    )
+  } else {
+    const configuration = parsedConfiguration.data
+    if (configuration.revision !== draft.provenance.configuration.revision) reasons.push(reason('configuration_changed', 'configuration'))
+    if (!configuration.projects.some((entry) => entry.id === draft.projectId)) reasons.push(reason('project_removed', 'configuration'))
   }
-  const configuration = parsedConfiguration.data
-  if (configuration.revision !== draft.provenance.configuration.revision) stale.push('configuration')
-  const project = configuration.projects.find((entry) => entry.id === draft.projectId)
-  if (!project) stale.push('configuration')
 
   const parsedFacts = ProjectFactsSchema.safeParse(current.facts)
-  if (!parsedFacts.success) throw new PreviewError('stale_inputs', '当前项目事实无法解析，请重新观察后生成', ['facts'])
-  if (factsContentDigest(parsedFacts.data) !== draft.provenance.facts.contentDigest) stale.push('facts')
+  if (!parsedFacts.success) {
+    reasons.push(reason('facts_invalid', 'facts'))
+    return { current: false, reasons: Object.freeze(reasons), observationComplete: false }
+  }
+  const facts = parsedFacts.data
+  const observationComplete = facts.missing.length === 0 && facts.omissions.length === 0
+  if (factsContentDigest(facts) !== draft.provenance.facts.contentDigest) reasons.push(reason('facts_changed', 'facts'))
 
-  const nowMs = parseNow(current.now)
+  const nowMs = current.now === undefined ? Date.now() : Date.parse(current.now)
   const maxAge = current.maxFactsAgeMs ?? DEFAULT_REUSE_MAX_FACTS_AGE_MS
-  if (!Number.isSafeInteger(maxAge) || maxAge < 0) throw new PreviewError('invalid_clock', 'maxFactsAgeMs 必须是非负安全整数')
-  const observedMs = Date.parse(parsedFacts.data.observedAt)
-  if (!Number.isFinite(observedMs) || observedMs > nowMs || nowMs - observedMs > maxAge) {
-    if (!stale.includes('facts')) stale.push('facts')
+  if (!Number.isFinite(nowMs) || !Number.isSafeInteger(maxAge) || maxAge < 0) reasons.push(reason('clock_invalid', 'clock'))
+  else {
+    const observedMs = Date.parse(facts.observedAt)
+    if (!Number.isFinite(observedMs)) reasons.push(reason('facts_invalid', 'facts'))
+    else if (observedMs > nowMs) reasons.push(reason('facts_future', 'facts'))
+    else if (nowMs - observedMs > maxAge) reasons.push(reason('facts_expired', 'facts'))
   }
 
+  const project = parsedConfiguration.success ? parsedConfiguration.data.projects.find((entry) => entry.id === draft.projectId) : undefined
   const draftExpiry = draft.status === 'draft' ? draft.scope.expiresAt : undefined
   const expiry = draftExpiry ?? project?.scope.expiresAt
-  if (expiry !== undefined && Date.parse(expiry) <= nowMs && !stale.includes('expiry')) stale.push('expiry')
+  if (expiry !== undefined && Number.isFinite(nowMs) && Date.parse(expiry) <= nowMs) reasons.push(reason('expiry_passed', 'expiry'))
 
-  if (stale.length === 0) return
-  const guidance = stale
-    .map((input) =>
-      input === 'configuration' ? '配置已变化：请按当前配置重新生成'
-        : input === 'expiry' ? '项目授权已过期：请更新配置后再生成'
-          : '项目事实已变化、已过期或时间在未来：请重新观察后生成')
-    .join('；')
-  throw new PreviewError('stale_inputs', `草稿前提已过期（${stale.join(', ')}）：${guidance}`, stale)
+  const unique = reasons.filter((entry, index) => reasons.findIndex((other) => other.code === entry.code) === index)
+  return { current: unique.length === 0, reasons: Object.freeze(unique), observationComplete }
+}
+
+const CURRENCY_TEXT: Record<CurrencyReasonCode, string> = {
+  configuration_unsupported_version: '配置版本不受支持',
+  configuration_invalid: '当前配置无法通过公开 schema',
+  configuration_changed: '配置已变化',
+  project_removed: '当前配置已不再包含该项目',
+  facts_invalid: '当前项目事实无法解析',
+  facts_changed: '项目事实内容已变化',
+  facts_future: '项目事实的观察时间在未来',
+  facts_expired: '项目事实已超过保留期限',
+  expiry_passed: '项目授权已过期',
+  clock_invalid: '时间或保留期限参数无效',
+}
+
+const STALE_FIELD: Record<CurrencyField, StaleInput | undefined> = {
+  configuration: 'configuration',
+  facts: 'facts',
+  expiry: 'expiry',
+  clock: undefined,
+}
+
+/**
+ * Revalidate a draft against the current world; throw when it is not current.
+ *
+ * The structured detail is available from `draftCurrency` — this function keeps the established
+ * error contract (`invalid_clock`, `stale_inputs` with `staleInputs`) for existing consumers.
+ */
+export function assertDraftCurrent(draft: ProjectRecipeDraft, current: CurrentInputs): void {
+  const currency = draftCurrency(draft, current)
+  if (currency.current) return
+  if (currency.reasons.some((entry) => entry.code === 'clock_invalid'))
+    throw new PreviewError('invalid_clock', 'now 必须是有效的 ISO 时间，maxFactsAgeMs 必须是非负安全整数')
+  const stale = [...new Set(currency.reasons.map((entry) => STALE_FIELD[entry.field]).filter((field): field is StaleInput => field !== undefined))]
+  const text = currency.reasons.map((entry) => CURRENCY_TEXT[entry.code]).join('；')
+  throw new PreviewError('stale_inputs', `草稿前提已过期（${text}）：请重新生成`, stale)
 }
 
 /** Convenience for a consumer that wants both checks before showing a form. */

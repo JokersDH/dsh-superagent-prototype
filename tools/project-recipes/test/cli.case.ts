@@ -149,3 +149,11 @@ test('the CLI returns exactly what the library returns for the same inputs', () 
   })
   assert.deepEqual(JSON.parse(result.stdout), JSON.parse(JSON.stringify(expected)))
 })
+
+test('--describe prints the module identity the library reports', async () => {
+  const result = run(['--describe'])
+  assert.equal(result.status, 0, result.stderr)
+  const { describeProjectRecipes } = await import('../../../packages/project-recipes/src/index.ts')
+  assert.deepEqual(JSON.parse(result.stdout), JSON.parse(JSON.stringify(describeProjectRecipes())))
+  assert.equal(result.stdout.includes('project-recipes-module/1'), true)
+})

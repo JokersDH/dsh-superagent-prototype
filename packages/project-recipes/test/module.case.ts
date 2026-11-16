@@ -26,6 +26,8 @@ test('the module description is deterministic and matches the code it describes'
   assert.deepEqual([...first.issueCodes], [...RECIPE_ISSUE_CODES])
   assert.deepEqual([...first.configurationProtocols], ['application-configuration/1'])
   assert.equal(first.authority, 'none')
+  for (const capability of ['match', 'preview-fields', 'observe', 'rebind', 'describe'])
+    assert.ok([...first.capabilities].includes(capability), capability)
   for (const value of Object.values(first.protocols)) assert.ok(value.length > 0)
 })
 

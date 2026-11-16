@@ -51,6 +51,7 @@ const HELP = `project-recipes — 只读的项目任务/检查声明建议（不
 用法：
   node tools/project-recipes/cli.ts --config <config.json> (--facts <facts.json> | --root <项目根>)
       [--previous-facts <facts.json> --root <项目根>]   # 迁移/重绑对比模式
+      [--describe]                                       # 打印模块身份（contracts/catalog/版本）
       [--project <id>] [--kind <${HELP_KINDS.join('|')}>] [--paths <a,b>] [--exclude <a,b>]
       [--criteria <x,y>] [--profile <id>] [--now <ISO>] [--max-facts-age-ms <n>] [--output <新文件>]
 
@@ -80,6 +81,7 @@ const HELP = `project-recipes — 只读的项目任务/检查声明建议（不
 
 type Parsed = {
   help: boolean
+  describe?: boolean
   previousFacts?: string
   config?: string
   facts?: string
@@ -106,6 +108,10 @@ export function parseArgs(argv: readonly string[]): Parsed {
     const arg = argv[index]!
     if (arg === '--help' || arg === '-h') {
       parsed.help = true
+      continue
+    }
+    if (arg === '--describe') {
+      parsed.describe = true
       continue
     }
     if (!arg.startsWith('--')) throw new UsageError(`unexpected argument: ${arg}`)
@@ -168,6 +174,16 @@ export async function main(argv: readonly string[], io: { stdout: (text: string)
   if (parsed.help) {
     io.stdout(HELP)
     return EXIT.draft
+  }
+  if (parsed.describe === true) {
+    try {
+      const library = await loadLibrary()
+      io.stdout(`${JSON.stringify(library.describeProjectRecipes(), null, 2)}\n`)
+      return EXIT.draft
+    } catch (error) {
+      io.stderr(`refused: ${(error as Error).message}\n`)
+      return EXIT.refused
+    }
   }
   let library: Library | undefined
   try {

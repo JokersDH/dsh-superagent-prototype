@@ -31,6 +31,8 @@ export interface ProjectRecipesModuleDescription {
     readonly observer: string
     readonly rebind: string
   }
+  /** Capability names a consumer can check before wiring an optional surface. */
+  readonly capabilities: readonly string[]
   readonly issueCodes: readonly string[]
   readonly previewErrorCodes: readonly string[]
   /** Configuration protocol this module understands; anything else is refused. */
@@ -53,6 +55,7 @@ export function describeProjectRecipes(): ProjectRecipesModuleDescription {
       observer: FACTS_OBSERVER_PROTOCOL,
       rebind: REBIND_PROTOCOL,
     }),
+    capabilities: Object.freeze(['match', 'preview-fields', 'observe', 'rebind', 'describe']),
     issueCodes: Object.freeze([...RECIPE_ISSUE_CODES]),
     previewErrorCodes: Object.freeze([...PREVIEW_ERROR_CODES]),
     configurationProtocols: Object.freeze(['application-configuration/1']),

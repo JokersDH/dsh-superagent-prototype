@@ -135,7 +135,7 @@ export function compareProjectFacts(previous: ProjectFacts, current: ProjectFact
       changes: [],
       previous: previousIdentity,
       current: currentIdentity,
-      notes: ['内容未变化；可沿用已生成建议，仍以原确认流程为准。'],
+      notes: ['内容未变化；可沿用已生成建议，仍以原确认流程为准。根身份由调用方（main）核对，本报告不推断迁移完成。'],
       authorization: 'none',
     }
   const changes = changedFields(previous, current)

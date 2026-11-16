@@ -233,6 +233,7 @@ export function matchRecipe(input: RecipeMatchInput): ProjectRecipeDraft {
     else if (families.size === 1 && declared !== undefined && !families.has(declared))
       needs.push(issue('locks_ambiguous', 'lockfile', `声明的 ${declared} 与现有锁文件不一致；请对齐后再生成建议。`))
     if (facts.manager.kind === 'none') notes.push('未观察到 packageManager 声明或锁文件；建议只引用已登记检查，不推断任何命令。')
+    else if (facts.locks.length === 0) notes.push('已声明包管理器但未观察到锁文件；建议只引用已登记检查，不推断安装或命令。')
     if (facts.languages.includes('typescript')) notes.push('观察到 TypeScript 标记；检查与执行仍由既有配置决定。')
   }
 
