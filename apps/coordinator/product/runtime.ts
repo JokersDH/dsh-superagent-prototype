@@ -314,6 +314,10 @@ export function createProductRuntime(
     ...(options.assistantProvider
       ? {
           assistant: async () => options.assistantProvider!.status(),
+          ...(typeof options.assistantProvider.configure === 'function' ? { configureAssistant: async (input: import('@personal-agent/contracts').AssistantConnectionInput) => {
+            try { return options.assistantProvider!.configure(input) }
+            catch (error) { throw new ApplicationFault('storage_unavailable', error instanceof ModelProviderError ? error.message : '模型配置未能保存，请刷新核对。', 'none') }
+          } } : {}),
           assistantStream: (conversationId: string, signal: AbortSignal) =>
             assistantStreams.changes(conversationId, signal),
           selectModel: async (model: string) => {

@@ -8,6 +8,7 @@ export * from './usage-support.ts';
 export * from './project-recipe-preview.ts';
 export * from './coordinator-channel.ts';
 export * from './assistant.ts';
+export * from './assistant-connection.ts';
 export * from './projects.ts';
 export * from './operations.ts';
 export * from './conversations.ts';
