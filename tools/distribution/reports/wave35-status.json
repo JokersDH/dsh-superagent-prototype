@@ -23,27 +23,26 @@
   "packages": {
     "P1": {
       "D1": {
-        "status": "PASS_SCOPE",
-        "actual": "W35 outer HTTP /v1/assistant/connection + private 0600 save; main App source 4cde tested separately",
-        "positive": [
-          "save 200 configured no model request",
-          "private file 0600",
-          "normal start degrade",
-          "same tuple reuse same PID",
-          "movable path"
-        ],
+        "status": "PASS",
+        "actual": "installed W35 App settings form -> authenticated POST -> private 0600 save",
+        "positive": {
+          "saves": 1,
+          "commands": 0,
+          "errors": 0,
+          "secretVisible": false,
+          "model": "model-one",
+          "keyLength": 21,
+          "fileMode": "0600"
+        },
         "negative": [
           "foreign origin 403",
-          "HTTP without consent 400",
-          "unsafe file 503 retained"
+          "HTTP consent missing 400",
+          "wide permission 503 unchanged"
         ],
-        "notReached": [
-          "actual browser click on installed W35",
-          "no-auth no-origin 401 not recorded"
-        ],
+        "notReached": [],
         "evidence": [
+          "reports/wave35/ui-save.json",
           "reports/wave35/model-save-200.json",
-          "reports/wave35/model-http-400.json",
           "reports/wave35/model-permission-503.json"
         ]
       },
@@ -111,22 +110,22 @@
         ]
       },
       "D5": {
-        "status": "PASS_SCOPE",
-        "actual": "W33 explicit review ordinary message 200/readonly POST 422; W35 not re-run",
-        "positive": [
-          "no review 403",
-          "review 200 candidate metadata",
-          "write 422"
-        ],
+        "status": "PASS",
+        "actual": "W35 exact restored review ordinary candidate projection + readonly write",
+        "positive": {
+          "read": 200,
+          "write": 422,
+          "review": true
+        },
         "negative": [
-          "wrong source/principal remains refused"
+          "no review 403 retained",
+          "foreign source/principal refused"
         ],
+        "notReached": [],
         "evidence": [
-          "reports/wave34/authorized-200.json",
-          "reports/wave34/readonly-422.json"
-        ],
-        "notReached": [
-          "W35 exact review rerun"
+          "reports/wave35/review-read-200.json",
+          "reports/wave35/review-write-422.json",
+          "reports/wave35/review-start.log"
         ]
       },
       "D6": {
@@ -172,18 +171,23 @@
       },
       "D8": {
         "status": "PASS_SCOPE",
-        "actual": "W35 canonical manifest/support + archive checks",
-        "positive": [
-          "tar manifest PASS 7440",
-          "support 0600",
-          "zip 7451"
-        ],
+        "actual": "W35 manifest/closure/support",
+        "positive": {
+          "closure": 192,
+          "manifest": "PASS 7440",
+          "support": "0600",
+          "zip": 7451
+        },
         "negative": [
-          "main verifier refused W35 wrapper pin",
-          "cross-artifact W33 manifest refused"
+          "main verifier old wrapper allowlist refused W35"
+        ],
+        "notReached": [
+          "main verifier W35 allowlist",
+          "cross-machine"
         ],
         "evidence": [
           "reports/wave35/manifest.json",
+          "reports/wave35/ordinary-source-closure.json",
           "reports/wave35/support.json"
         ]
       },
@@ -205,7 +209,7 @@
     }
   },
   "remaining": [
-    "W35 exact review and browser save click",
+    "main verifier W35 wrapper allowlist",
     "E independent W33 and W35 verdicts",
     "cross-machine/signing/native/value"
   ],

@@ -1,0 +1,101 @@
+{
+  "ok": true,
+  "status": "STOPPED",
+  "stopped": true,
+  "stillAlive": false,
+  "code": null,
+  "verification": {
+    "ok": true,
+    "checks": [
+      {
+        "id": "launcher_alive",
+        "ok": true
+      },
+      {
+        "id": "process_start",
+        "ok": true,
+        "detail": "Mon Nov 16 23:35:09 2026"
+      },
+      {
+        "id": "launcher_command",
+        "ok": true,
+        "detail": "exact_argv"
+      },
+      {
+        "id": "owner",
+        "ok": true
+      },
+      {
+        "id": "cwd",
+        "ok": true,
+        "detail": "cwd_checked"
+      },
+      {
+        "id": "install_identity",
+        "ok": true
+      },
+      {
+        "id": "api_argv",
+        "ok": true,
+        "detail": {
+          "exact": true,
+          "mismatches": []
+        }
+      },
+      {
+        "id": "api_process_start",
+        "ok": true,
+        "detail": {
+          "expected": "Mon Nov 16 23:35:10 2026",
+          "observed": "Mon Nov 16 23:35:10 2026"
+        }
+      },
+      {
+        "id": "api_owner",
+        "ok": true
+      },
+      {
+        "id": "api_parent",
+        "ok": true
+      },
+      {
+        "id": "api_cwd",
+        "ok": true
+      },
+      {
+        "id": "listeners",
+        "ok": true
+      },
+      {
+        "id": "health",
+        "ok": true,
+        "detail": "personal"
+      },
+      {
+        "id": "runtime_mode",
+        "ok": true,
+        "detail": {
+          "expected": "personal",
+          "observed": "personal"
+        }
+      },
+      {
+        "id": "startup_mode",
+        "ok": true,
+        "detail": {
+          "expected": "recovery_readonly",
+          "observed": "recovery_readonly"
+        }
+      }
+    ],
+    "failures": [],
+    "health": {
+      "status": "ok",
+      "mode": "personal",
+      "startupMode": "recovery_readonly",
+      "restoredReviewDigest": "d52d882b5297820919a86d68cc739c1d4fdf1fc4dc96afd2426a34df5f892624",
+      "access": "local-development"
+    }
+  },
+  "instanceRecordRemoved": true
+}

@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "saves": 1,
+  "commands": 0,
+  "errors": [],
+  "secretVisible": false,
+  "file": {
+    "model": "model-one",
+    "keyLength": 21
+  }
+}
