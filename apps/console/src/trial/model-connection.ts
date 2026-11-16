@@ -11,9 +11,11 @@ export interface TrialModelConnectionDraft {
   readonly model: string
   /** Transient secret. Never store, log, serialise or render it. */
   readonly apiKey: string
+  readonly allowInsecureHttp?: boolean
 }
 
 export type TrialModelConnectionResult =
+  | { readonly status: 'saved'; readonly message?: string | undefined }
   | { readonly status: 'connected'; readonly message?: string | undefined }
   | { readonly status: 'failed'; readonly message?: string | undefined }
   | { readonly status: 'unsupported'; readonly message?: string | undefined }
@@ -65,7 +67,7 @@ function clean(value: string): string {
  * the clear by this form's suggestion.
  */
 export function trialModelConnectionDraft(
-  input: { readonly endpoint: string; readonly model: string; readonly apiKey: string },
+  input: { readonly endpoint: string; readonly model: string; readonly apiKey: string; readonly allowInsecureHttp?: boolean },
   limit: TrialModelConnectionLimit,
 ): TrialModelConnectionValidation {
   if (!limit.enabled) {
@@ -88,14 +90,16 @@ export function trialModelConnectionDraft(
   if (url.username !== '' || url.password !== '') {
     return { ok: false, failure: { kind: 'invalid', field: 'endpoint', message: '端点中不能包含账号或密码。' } }
   }
-  if (url.protocol === 'http:' && !['127.0.0.1', 'localhost', '::1', '[::1]'].includes(url.hostname)) {
-    return { ok: false, failure: { kind: 'invalid', field: 'endpoint', message: '远程端点需要使用 https。' } }
+  if (url.search || url.hash) return { ok: false, failure: { kind: 'invalid', field: 'endpoint', message: '端点不能包含查询参数或片段。' } }
+  if (url.protocol === 'http:' && !input.allowInsecureHttp) {
+    return { ok: false, failure: { kind: 'invalid', field: 'endpoint', message: '使用 HTTP 需要明确允许未加密传输。' } }
   }
   if (!model) return { ok: false, failure: { kind: 'invalid', field: 'model', message: '请填写模型名称。' } }
   if (model.length > 128) return { ok: false, failure: { kind: 'invalid', field: 'model', message: '模型名称过长。' } }
   if (!apiKey) return { ok: false, failure: { kind: 'invalid', field: 'apiKey', message: '请填写 API Key。' } }
   if (apiKey.length > 4096) return { ok: false, failure: { kind: 'invalid', field: 'apiKey', message: 'API Key 过长。' } }
-  return { ok: true, draft: { endpoint, model, apiKey } }
+  if (endpoint.includes(apiKey) || model.includes(apiKey)) return { ok: false, failure: { kind: 'invalid', field: 'apiKey', message: '密钥不能出现在端点或模型名称中。' } }
+  return { ok: true, draft: { endpoint, model, apiKey, allowInsecureHttp: input.allowInsecureHttp ?? false } }
 }
 
 export const trialModelConnectionFallback = defaultFailure

@@ -1,0 +1,232 @@
+{
+  "protocol": "wave35-runtime-channel-admission/1",
+  "date": "2026-11-16",
+  "status": "OLD_CONTROL_AND_PROTOTYPE_CASES_CLOSED_NEW_FIRST_LEASE_AND_MUTABLE_BIRTH_GAPS_ORIGINAL_PRODUCT_RECOVERY_NOT_REACHED",
+  "mainBaseline": "6b306514ed1e41c84e740669650224ffcaf18c11",
+  "mainOriginalCallbackCheckpoint": "23d5a98e6e75a3b0fb08168431260a9935cf5674",
+  "fixedCandidates": {
+    "B": {
+      "root": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "source": "843cf35f4f366e74d13a372bdb08ced085f031cc",
+      "branch": "codex/g1-runtime",
+      "dirtyPreserved": ["reports/releases/wave11-admission/runtime.json", "reports/releases/wave12-admission/runtime.json", "tests/native-acceptance/b16-real-begin.mjs (untracked)"]
+    },
+    "H": { "root": "/Users/hh/Desktop/joker/superagent-agent-h", "source": "6dc9d26e61a25e14662ef5a38d27d5ead85d49c1", "branch": "codex/g4-trial-operations", "dirty": [] },
+    "I": { "root": "/Users/hh/Desktop/joker/superagent-agent-i", "source": "9337348926277315fe43a0127549184d166e1d98", "branch": "codex/g5-coordinator-channel", "dirty": [] }
+  },
+  "oldFindings": [
+    {
+      "id": "B34-FOREIGN-CANCEL-MUTATES-BEFORE-IDENTITY-REFUSAL",
+      "status": "CLOSED_FOR_COMPLETE_NEW_B_CONTROL_PROTOCOL",
+      "evidence": "New cancel producer envelope is checked before backend; the actual foreign-source negative leaves original admission open/state serving and reports identity_mismatch before any stop. Normal same-attempt cancel remains positive."
+    },
+    {
+      "id": "B34-OLD-CALLBACK-LEASE-FEED",
+      "status": "CLOSED_FOR_REPLACED_ATTACHED_LEASE",
+      "evidence": "After A->B takeover, A.stop plus A.feed(new command id) refuses and the receiver gets no extra command. Terminal/stopped-service new feed also refuses. Local stop() itself remains a polling stop, not a business cancellation authority."
+    },
+    {
+      "id": "B34-INSTANCEOF-IS-NOT-ORIGINAL-SPAWN-PROVENANCE",
+      "status": "CLOSED_FOR_UNISSUED_PLAIN_AND_PROTOTYPE_OBJECTS",
+      "evidence": "A private per-factory WeakMap now rejects plain/prototype/unissued objects and numeric PIDs before registration; exact old prototype counterexample signals0. Factory birth cannot yet be called fully immutable because re-adoption reads mutable child.pid; see new independent negative."
+    },
+    {
+      "id": "H34-ACCEPT-WAIT-PREDICATE-STILL-STOPS-BEFORE-ACTION",
+      "status": "CLOSED_FOR_READINESS_WAIT",
+      "evidence": "waitForAcceptableCandidate waits through empty/stop-only available and verifying until matching candidate includes accept_candidate. Four focused tests pass including delay, timeout, failed and foreign candidate; lifecycle2 now calls this helper."
+    },
+    { "id": "MAIN32-TERMINAL-REMOTE-LEASE-STILL-SETTLES", "status": "REMAINS_CLOSED_BY_MAIN0201", "evidence": "Not re-dispatched; main shared callback and original terminal tests retain their previous scope." },
+    { "id": "B32-PAYLOAD-REFERENCE-BODY", "status": "REMAINS_CLOSED", "evidence": "Latest callback reader still uses reference and original JSON value; main15 class/Store callback tests pass." },
+    { "id": "H31-UNKNOWN-KILL_AND_H32-LAUNCH-COMMAND", "status": "REMAINS_CLOSED", "evidence": "Independent pure UNKNOWN and mismatched full-command negatives still refuse with zero signals." }
+  ],
+  "checks": [
+    {
+      "command": "node /tmp/pa-wave32-signal-pure.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "probeMetadata": "Updated to exact B843/H6dc subjects; filename is historical, output is new",
+      "exitCode": 1,
+      "passed": 10,
+      "failed": 1,
+      "realSpawns": 0,
+      "realSignals": 0,
+      "globalPsOrDiscovery": 0,
+      "scope": "Injected factory spawn/ps/pgrep/kill; only exact private mock birth files",
+      "observed": {
+        "ownFactoryPositive": "PASS",
+        "numericCopiedHandlePlainPrototype": "all refuse, zero mock signals",
+        "changedArgvAndUNKNOWN": "refuse/not exited",
+        "HUnknownAndFullCommandMismatch": "refuse with zero signals",
+        "mutableIssuedChildPid": { "originalPid": 45101, "changedPublicPid": 45102, "newRecordPid": 45102, "registered": true, "mockSignal": "SIGKILL", "mockTarget": 45102 }
+      }
+    },
+    {
+      "command": "node /tmp/pa-wave34-feed-control.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "probeMetadata": "Updated to actual complete latest B service/endpoint/transport/caller and main6b compatibility subject",
+      "exitCode": 1,
+      "passed": 5,
+      "failed": 2,
+      "realSpawns": 0,
+      "realSignals": 0,
+      "nativeModelCalls": 0,
+      "scope": "Actual private authenticated in-process services with scripted command reader; no original Application/QuestionBroker or physical child",
+      "observed": {
+        "normalFeedAndCancel": "PASS same original attempt",
+        "validOldBusinessEpoch": "1 against actual current2 rejected before receiver",
+        "foreignFeedSource": "rejected before receiver",
+        "replacedCallbackLeaseAndTerminalFeed": "rejected before receiver",
+        "foreignCancel": { "error": "refused/identity_mismatch", "beforeAdmission": "open", "afterAdmission": "open", "beforeState": "serving", "afterState": "serving" },
+        "firstUnboundClaimedLease": { "result": "accepted", "receiverCommandId": "unbound-begin", "kind": "begin", "businessEpoch": 2 },
+        "mismatchedHandle": { "handleAttemptId": "different-attempt-id", "portProducerAttemptId": "attempt-1", "bound": true },
+        "oldMainClientNewBServer": { "error": "refused/identity_mismatch", "afterAdmission": "open" },
+        "newBClientOldMainServer": { "error": "unknown_outcome", "afterAdmission": "open", "explicitMatchingOldControl": "normal old pair can still close its own service" }
+      }
+    },
+    {
+      "command": "node --test --test-timeout=12000 apps/runner/test/attach-channel/actual-native-callbacks.test.ts apps/runner/test/attach-channel/actual-guard-and-command.test.ts",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-i",
+      "exitCode": 0,
+      "passed": 6,
+      "failed": 0,
+      "scope": "Real NativeProductAttempt methods, actual service/auth endpoint and Store, but I harness writes its private endpoint field to an independently created scripted service. This is explicitly injected method/component evidence, not launch-returned original handle or Application-created Work/Broker integration."
+    },
+    {
+      "command": "pnpm exec tsc -p apps/runner/src/attach-channel/tsconfig.json",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-i",
+      "exitCode": 0,
+      "scope": "Actual module plus all attach-channel consumers under strict/noUncheckedIndexedAccess/exactOptional"
+    },
+    {
+      "command": "node --test apps/runner/test/attached-caller-native.test.ts apps/runner/test/runner-diagnostics.test.ts",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 0,
+      "passed": 8,
+      "failed": 0,
+      "scope": "Native decision normalization, missing handle pieces and bounded diagnostic classifications. Missing/nonempty handle tests do not cover the mismatched producer identity case independently reproduced above."
+    },
+    {
+      "command": "node --test --test-timeout=6000 tests/integration/native-attach-callbacks.case.mjs tests/integration/attached-port.case.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "exitCode": 0,
+      "passed": 15,
+      "failed": 0,
+      "scope": "Existing real class/Store guarded callbacks and original main actual-service/Store controlled tests; no NativeProductAttempt.launch or vendor process"
+    },
+    {
+      "command": "node --test --test-timeout=8000 tests/operational-soak/package/accept-gate.case.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-h",
+      "exitCode": 0,
+      "passed": 4,
+      "failed": 0,
+      "scope": "Actual new pure helper: empty/stop-only actions delayed to accept, verifying, timeout, failed and foreign candidate"
+    },
+    {
+      "command": "pnpm exec tsc -p tests/native-acceptance/tsconfig.attached.json",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 0,
+      "scope": "Actual latest B caller/control transport direct strict/exactOptional"
+    },
+    {
+      "command": "pnpm exec tsc -p /tmp/pa-wave33-main-attached-consumer.tsconfig.json",
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "exitCode": 0,
+      "scope": "Typed example consumes latest B caller/helper with actual main RunningAttempt/FactSink/stored payload ports and actual main NativeProductAttempt. Compile example only; not committed product integration."
+    }
+  ],
+  "findings": [
+    {
+      "id": "B35-FIRST-CLAIMED-LEASE-IS-NOT-VALIDATED",
+      "priority": 1,
+      "file": "/Users/hh/Desktop/joker/superagent-agent-b/apps/runner/src/runner-service.ts",
+      "line": 246,
+      "scope": "Candidate private RPC control admission, not a main public product bypass",
+      "detail": "controlRefusal compares a supplied lease only when its separate activeLease cache is truthy. Before any remote next/poll has set that cache, an arbitrary never-bound lease can feed begin and the real Runner receives it, despite the current callback owner still being bootstrap stdio. Replaced-lease rejection works, but first-lease admission is open.",
+      "repair": "Whenever a caller claims a lease, validate it against the existing public channel next/lease state even when no remote lease has been cached. Avoid a second partially updated owner cache. Preserve original main no-lease physical-control authority explicitly rather than accepting a false lease claim."
+    },
+    {
+      "id": "B35-FACTORY-READOPTION-TRUSTS-MUTABLE-CHILD-PID",
+      "priority": 1,
+      "file": "/Users/hh/Desktop/joker/superagent-agent-b/tests/native-acceptance/signal-guard.mjs",
+      "line": 120,
+      "scope": "Signal acceptance tool only; no live fault admission",
+      "detail": "The private factory WeakMap closes unissued-object/prototype attacks, but its provenance stores only executable/argv/root/config/operation. Changing the public pid on an originally issued child from45101 to45102 and adopting the same object again snapshots a foreign parent's new PID/start and permits mocked SIGKILL to45102. Private object origin does not freeze the original OS birth identity.",
+      "repair": "Bind the original PID and successful independent birth identity in private immutable provenance, and verify re-adoption against that original identity instead of reading a fresh mutable child.pid as new authority. Retain original child-exit/resource facts and all prior copied/prototype/UNKNOWN refusals."
+    },
+    {
+      "id": "B35-ATTACH-HANDLE-IDENTITY-NOT-MATCHED",
+      "priority": 2,
+      "file": "/Users/hh/Desktop/joker/superagent-agent-b/packages/execution/src/attached-attempt.ts",
+      "line": 97,
+      "scope": "Node-only candidate convenience helper contract; no newly granted main write permission demonstrated",
+      "detail": "attachRunningAttempt checks attemptId only for nonempty text and casts producer from unknown. A handle claiming different-attempt-id with the actual attempt1 registration/producer successfully binds attempt1. The helper does not enforce its advertised same-original-attempt association. Normal actual main running objects remain matching by construction.",
+      "repair": "Validate the complete port producer shape and equality of handle.attemptId with producer.attempt.attemptId before touching the endpoint. Use the actual trusted launch-returned running object, not the NativeProductAttempt class instance or a constructed shape, and avoid claiming callback provenance the helper cannot verify."
+    }
+  ],
+  "progressAndScope": {
+    "BSpawn": "Real private factory provenance is meaningful progress and closes the exact old brand/shape negatives. Mutable OS-birth re-adoption remains a distinct evidenced gap.",
+    "BControl": "Producer-before-cancel-effect and replaced-lease fences work in complete new sources. The first-lease hole and cross-version private protocol transition prevent blanket control admission.",
+    "BCallbacks": "Main original class callbacks and clone port are available; the helper can pair them, but latest B still reports original Application-created Work/QuestionBroker recovery NOT_REACHED.",
+    "BRecovery": "Same original Work/question/answer through controlled interruption to registered check/currentCandidate/explicit manualaccept remains NOT_REACHED.",
+    "BSlots": "AttemptSlotScheduler is unchanged candidate memory records/queue accounting, not the original product scheduler. Its RFC still proposes admitting/promoting alongside the original queue; no actual original2/4/fifth-item waiting/resource-driven release was demonstrated. Do not treat it as the product authority.",
+    "I": "Original class method tests now cover more than an equivalent guard, but private endpoint injection bypasses the real launch/factory boundary. Source/typed/component progress is admitted at that scope; actual launch-returned attachCallbacks/Work/Broker recovery and scheduler release remain unproved.",
+    "HCurrentSource": "Measured pins advanced to B617/I4b841/main23d5 and are explicitly recorded. They do not include later B843/I933; that is temporal scope, not a regression of their fixed measurements.",
+    "HAccept": "The waiting bug is closed by the integrated helper and focused negatives. The old lifecycle staleCandidateRejected expression still treats an unrun stale test as true; preserve NOT_TESTED for unrun evidence rather than inflating an individual negative, without invalidating the fixed package run where it was actually attempted.",
+    "HInstalledAndCohort": "H reports fixed f880 inner fixture acceptance/reopen/support and controlled cohort only, with no human feedback. No new package lifecycle was run here, outer ZIP was not consumed, E remains sole product oracle and original same-run recovery remains NOT_REACHED.",
+    "overall": "Useful source and guarded component foundations have grown. No new completion percentage, native compatibility, installed release or value/innovation benefit follows from these counts."
+  },
+  "mainCanAdvanceNow": {
+    "preferredImmediateComposition": [
+      "Use the actual RunningAttempt returned from runtime.launch, after its original register/ready/current checks. Do not call attachRunningAttempt(this,...): NativeProductAttempt itself has no returned attachPort/attachCallbacks fields.",
+      "Main already has attachRunnerAttempt and original shared callbacks. Build its callback consumer from running.attachPort/running.attachCallbacks and await an initial poll/bind before treating it as ready.",
+      "While the original stdio command channel is live, keep business commands on original running.feed/NativeProductAttempt.feed and physical stop on running.stop/original quiesce. Callback remote takeover does not itself require replacing that original command authority with candidate raw RPC.",
+      "Preserve ProductExecution.nativeFence -> index(command) -> allowAnswer(beforeWrite) -> send -> runtime.feed and current Store/contract/binding validation. This allows a real original Work/QuestionBroker consumer now instead of another data-port milestone.",
+      "A true input disconnect/new coordinator requires a guarded same-Runner RPC/resume factory. Introduce that after the full control closure and first-lease compatibility checks, retaining original ids, Store authority and complete resource barrier. Do not serialize live function pointers or one-shot answer maps as new permission."
+    ],
+    "minimalCompileExample": "attachRunnerAttempt({endpoint: running.attachPort.registration, producer: running.attachPort.producer, leaseId, callbacks: running.attachCallbacks}); await consumer.pollOnce(); commands and stop still use the original running methods. The actual source must reject missing optional pieces and use the trusted original running instance.",
+    "newRFCReview": "B RFC correctly retains original current/index/answer/check/accept ownership, but its attachRunningAttempt(this,...) example is not the actual class shape. Its slot accounting proposal must not become a second queue/promotion authority; use original core/queue/bindings projections and original resource barrier.",
+    "notNeededToStart": ["Another registration/callback data port", "A new scheduler or ledger", "A new Work/session/Runner", "A new Driver/CAC/desktop", "A live SIGKILL proof", "New model or study budget"]
+  },
+  "sourceClosure": {
+    "alreadyInMain": {
+      "attachedCaller": "5a2f8731f61ca1e8cbb3a13c0d38b96a47ec322d",
+      "contracts": "0b1a4a7cf9bbff848280ce372d79e9447fb30c30",
+      "service": "0201f38396f4d3b23039de1c72ae189e2206488d",
+      "endpoint": "25275e3480bda9b4f60edfe56105b41838527abf",
+      "transport": "73752579e28009a50c7062b4d35d91bb9ccca816"
+    },
+    "candidateControlClosureMustStayTogether": [
+      { "path": "packages/execution/src/attached-attempt.ts", "blob": "bf6add876f461e1fd0fa75b04e0980e22dde36fc" },
+      { "path": "packages/execution/src/recovery-transport.ts", "blob": "dbfb5df48dbf94d356967b37525c838de5ba4f02" },
+      { "path": "apps/runner/src/recovery-endpoint.ts", "blob": "ebbaf2a6a2ff940a6f0996cfcaf8dd7567196dd3" },
+      { "path": "apps/runner/src/runner-service.ts", "blob": "d728c548961263ef09f0163826465adb018617a7" }
+    ],
+    "compatibility": "Cancel's private HTTP body changes from bare command to producer envelope. New client on old server fails unknown_outcome; old client on new server fails identity_mismatch before effects. Upgrade the complete client/server set atomically or expose an explicit incompatible version; never silently downgrade to unauthenticated bare cancel.",
+    "admitNow": "Existing main callbacks/current command methods are already sufficient for callback activation with original stdio business feed. Candidate resolveNativeDecision/typed diagnostics can be reviewed separately; do not activate the new raw control closure until first-lease validation is repaired.",
+    "exclude": ["B signal tools/live scripts", "AttemptSlotScheduler records/queue as product authority", "Unrelated DriverKit review/send/budget modules", "I optional helper exports not imported by the actual main consumer", "Historical source/report branch wholesale"]
+  },
+  "largerCompleteProductThemes": [
+    "Activate original main RunningAttempt callbacks and original command/stop methods for one real Application-created Work and QuestionBroker answer, using original state and one runtime owner.",
+    "Complete first/current/stale/terminal/foreign command and cancel admission with original current/index/write guard and explicit mixed-version private protocol behavior.",
+    "Complete immutable original OS-birth provenance and full resource retention for real factory children, preserving all old negative closures without unsafe live demonstrations.",
+    "Carry same original Work through controlled callback interruption and ACK/receipt unknown windows without replay, new ids or a substitute ledger.",
+    "Continue that original Work through frozen artifact, registered check, currentCandidate and actual available accept action to explicit delivery and artifact readback.",
+    "Implement original scheduler2/4-slot capacity/fifth-item waiting/cross-slot control/UNKNOWN occupancy and barrier-driven release from original core queue and bindings.",
+    "Reopen nonempty original execution state and rehydrate the same registration/session/current authority safely; ended stays ended and unknown never becomes an automatic resend.",
+    "Independently verify exact new source and same-run data/physical resources, typed faults/backpressure/callback identity and correct readiness with H/I consumers, keeping injected method tests distinct from actual product factories.",
+    "Deliver one whole usable exact-package journey/support/restore/cohort handoff under E's independent oracle; preserve native/model/research limits and measured rather than invented value claims."
+  ],
+  "preservation": {
+    "candidateSourceAssertionsLocksEdited": 0,
+    "mainProductionEdits": 0,
+    "newTaskPackagesDuringAudit": 0,
+    "newPersistentArtifact": "reports/releases/wave35-admission/runtime-channel.json",
+    "vendorModelNativeCalls": 0,
+    "realOSProcessSpawnsByRuntimeProbes": 0,
+    "realSignals": 0,
+    "globalProcessSocketDiscovery": 0,
+    "newTarOrPersistentService": 0,
+    "userServiceOperations": 0,
+    "kept": "Twelve5180/8796 through5191/8807 services and all dirty/state/profile/tar/ledger/history. B UNKNOWN cap4 and E BLOCKED pilot unchanged.",
+    "probeCleanup": "Only exact private injected-process births and in-process sockets/files; all probe handles shut down and removed, all exec sessions completed; no b27/b28/procguard live tool executed"
+  }
+}

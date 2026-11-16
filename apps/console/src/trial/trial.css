@@ -8,6 +8,132 @@
   background: var(--panel);
 }
 
+.trial-model-connection {
+  padding: 18px 0 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.trial-model-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.trial-model-heading > svg {
+  flex: 0 0 auto;
+  margin-top: 3px;
+  color: var(--accent);
+}
+
+.trial-model-title {
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.trial-model-form {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.trial-model-field {
+  display: grid;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.trial-model-field > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.trial-model-field input {
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 36px;
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px;
+}
+
+.trial-model-field input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.trial-model-field input[aria-invalid='true'] {
+  border-color: var(--danger);
+}
+
+.trial-model-key-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.trial-model-key-note svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+  color: var(--accent);
+}
+
+.trial-model-failure,
+.trial-model-status,
+.trial-model-unavailable {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.trial-model-failure {
+  color: var(--danger);
+}
+
+.trial-model-status {
+  color: var(--ok);
+}
+
+.trial-model-unavailable {
+  margin-top: 10px;
+  color: var(--warn);
+}
+
+.trial-model-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.trial-model-actions button {
+  min-height: 36px;
+  padding: 7px 14px;
+  font-size: 12px;
+}
+
+.trial-model-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.trial-model-form .settings-toggle { align-items: flex-start; font-size: 12px; overflow-wrap: anywhere; }
+
 .trial-header {
   align-items: flex-start;
 }
