@@ -107,6 +107,13 @@ export {
 } from './support.ts'
 export type { SupportEvidence, SupportOrigin, SupportReport, SupportRow, SupportSummary } from './support.ts'
 export {
+  SUPPORT_DTO_PROTOCOL, SUPPORT_FILE_MAX_BYTES, SUPPORT_FILE_PROTOCOL, SupportPortFault, buildSupportFile,
+  SupportReportSchema, createSupportHandler, originFromManifest, readSupportDocument, readSupportFile, supportLabels,
+} from './support-port.ts'
+export type {
+  SupportConservation, SupportDigestCheck, SupportDocumentRead, SupportFile, SupportOriginTrigger,
+} from './support-port.ts'
+export {
   consumerAdmission, consumerLayer, consumerScope, formatMetricValue, metricRowKey, metricUnitLabel,
   observedOutcomeCount, rowCoverageMeaning, rowSemantics, toInsightConsumerView,
 } from './facing.ts'

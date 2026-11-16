@@ -161,6 +161,12 @@ export function renderSupportSummary(summary: SupportSummary): string {
 /** Where the observation came from, when the caller also inspected the running package. */
 export interface SupportOrigin {
   readonly kind: 'package' | 'runtime' | 'unknown'
+  /**
+   * Where build and source came from. `install-manifest` means the package declared both fields;
+   * `incomplete-manifest` means it declared some but not all (the missing ones stay null instead of
+   * being guessed); `archive-only` means only the archive digest is known.
+   */
+  readonly identitySource: 'install-manifest' | 'incomplete-manifest' | 'archive-only' | null
   readonly buildId: string | null
   readonly sourceCommit: string | null
   readonly archiveSha256: string | null
@@ -241,8 +247,11 @@ const supportOriginOf = (raw: unknown): SupportOrigin | null => {
       }
     : null
   const text = (value: unknown): string | null => (typeof value === 'string' && value.length > 0 && value.length <= 128 ? value : null)
+  const identitySource = record.identitySource === 'install-manifest' || record.identitySource === 'incomplete-manifest' ||
+    record.identitySource === 'archive-only' ? record.identitySource : null
   return {
     kind: record.kind === 'package' || record.kind === 'runtime' ? record.kind : 'unknown',
+    identitySource,
     buildId: text(record.buildId),
     sourceCommit: text(record.sourceCommit),
     archiveSha256: typeof record.archiveSha256 === 'string' && /^[a-f0-9]{64}$/.test(record.archiveSha256) ? record.archiveSha256 : null,
