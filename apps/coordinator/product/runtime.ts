@@ -306,7 +306,10 @@ export function createProductRuntime(
         ? { status: 'blocked' as const, code: 'preparation_interrupted' } : status
       return { protocol: 'work-environment/1' as const, workId, ...visible, ...(policy ? { policy } : {}) }
     },
-    guide: async () => readFileSync(new URL('../../../docs/ASSISTANT-GUIDE.zh-CN.md', import.meta.url), 'utf8'),
+    guide: async () => {
+      const sourceGuide = new URL('../../../docs/ASSISTANT-GUIDE.zh-CN.md', import.meta.url)
+      return readFileSync(existsSync(sourceGuide) ? sourceGuide : new URL('./assistant-guide.zh-CN.md', import.meta.url), 'utf8')
+    },
     ...(options.assistantProvider
       ? {
           assistant: async () => options.assistantProvider!.status(),
