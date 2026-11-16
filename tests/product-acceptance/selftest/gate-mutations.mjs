@@ -656,13 +656,16 @@ const evidenceFor = (key) => {
           phase: 'delivered', accepted: 'recorded', artifacts: 2,
           insights: { open: { seven: 200, thirty: 200, days: [7, 30] } } })) }
     case 'journeyContext':
-      return { prepare: 200, send: 200, sendStatus: 'recorded', reply: 'ok', audit: 200, auditBindings: 1, history: 200,
+      return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
+        prepare: 200, send: 200, sendStatus: 'recorded', reply: 'ok', audit: 200, auditBindings: 1, history: 200,
         historyRows: 2, sources: 200, sourceRows: 2, scoped: 200, scopedProtocol: 'context-sources/1', scopeReview: { reasons: [], partial: false } }
     case 'journeyPhases':
-      return { A: { stop: { clean: true, package: 'STOPPED' }, resources: { before: [{ pid: 1, start: 's' }], after: [{ pid: 1, expectedStart: 's', alive: false, sameIdentity: false }] } },
+      return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
+        A: { stop: { clean: true, package: 'STOPPED' }, resources: { before: [{ pid: 1, start: 's' }], after: [{ pid: 1, expectedStart: 's', alive: false, sameIdentity: false }] } },
         B: { stop: { clean: true, package: 'STOPPED' }, resources: { before: [{ pid: 2, start: 's' }], after: [{ pid: 2, expectedStart: 's', alive: false, sameIdentity: false }] } } }
     case 'journeyReopen':
-      return { status: 'RUNNING', works: [{ messages: 2 }, { messages: 1 }], readiness: 200, stop: { clean: true, package: 'STOPPED' } }
+      return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
+        status: 'RUNNING', works: [{ messages: 2 }, { messages: 1 }], readiness: 200, stop: { clean: true, package: 'STOPPED' } }
     case 'recipePreview':
       return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
         capability: { '/v1/insights': true, 'recipes/preview': true }, projectId: 'project-1', profileId: 'profile-1', atom: 'src/',

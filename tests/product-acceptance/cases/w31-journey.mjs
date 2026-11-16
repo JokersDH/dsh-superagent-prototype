@@ -126,7 +126,7 @@ export async function runJourney() {
     const history = await personalClient.request(`/v1/context/history?projectId=${encodeURIComponent(second.id)}&conversationId=conv-w31-2&limit=5`)
     const sources = user ? await personalClient.request(`/v1/messages/${user.id}/context/sources`) : { status: 0, body: null }
     const scoped = user ? await personalClient.request(`/v1/messages/${user.id}/context/sources?scopeReview=1`) : { status: 0, body: null }
-    journey.context = { prepare: prepared.status, send: sent.status, sendStatus: sent.body?.status ?? null, reply: reply?.text ?? null,
+    journey.context = { subject: journey.subject, prepare: prepared.status, send: sent.status, sendStatus: sent.body?.status ?? null, reply: reply?.text ?? null,
       audit: audit.status, auditBindings, auditKeys, history: history.status,
       historyRows: history.body?.entries?.length ?? history.body?.history?.length ?? null,
       sources: sources.status, sourceRows: sources.body?.sources?.length ?? null,
@@ -137,7 +137,7 @@ export async function runJourney() {
 
     const beforeA = fixedSet(root.config)
     const stopA = await stopOwned(root, { mockFile: mock.file, birth: personal.birth, equivalentProof: true })
-    journey.phases.A = { stop: { clean: stopA.clean, package: stopA.packageStop?.json?.status ?? null, reason: stopA.reason ?? null },
+    journey.phases.A = { subject: journey.subject, stop: { clean: stopA.clean, package: stopA.packageStop?.json?.status ?? null, reason: stopA.reason ?? null },
       resources: { before: beforeA, after: observe(beforeA) } }
     if (stopA.clean !== true) throw new Error(`phase A stop not clean: ${stopA.reason}`)
     mark('phase A stopped')
@@ -191,14 +191,14 @@ export async function runJourney() {
 
     const beforeB = fixedSet(root.config)
     const stopB = await stopOwned(root, { mockFile: mock.file, birth: fixture.birth, equivalentProof: true })
-    journey.phases.B = { stop: { clean: stopB.clean, package: stopB.packageStop?.json?.status ?? null, reason: stopB.reason ?? null,
+    journey.phases.B = { subject: journey.subject, stop: { clean: stopB.clean, package: stopB.packageStop?.json?.status ?? null, reason: stopB.reason ?? null,
       recordRemoved: stopB.recordRemoved ?? null }, resources: { before: beforeB, after: observe(beforeB) } }
     if (stopB.clean !== true) throw new Error(`phase B stop not clean: ${stopB.reason}`)
 
     const [portC, apiC] = [await freePort(), await freePort()]
     const reopened = startOwned(root, { ports: [portC, apiC], mockFile: mock.file, fixture: false, extraArgs: ['--discussion-only'], timeoutMs: 60_000 })
     const reopenedValue = await reopened.value
-    journey.reopen = { status: reopenedValue.status, works: [] }
+    journey.reopen = { subject: journey.subject, status: reopenedValue.status, works: [] }
     if (reopenedValue.status === 'RUNNING') {
       const client = new LocalProductClient({ baseURL: reopenedValue.instance.apiURL, stateDir: reopenedValue.instance.state, timeoutMs: 25_000 })
       for (const project of journey.projects) {

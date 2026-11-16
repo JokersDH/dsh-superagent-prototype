@@ -1541,7 +1541,8 @@ export function evaluateRelease({
         item.evidence?.restoredReviewRefusals?.subject ?? item.evidence?.reviewReuse?.subject ??
         item.evidence?.scopeDiagnostics?.subject ?? item.evidence?.readiness?.subject ?? item.evidence?.trialUi?.subject ??
         item.evidence?.supportMaterial?.subject ?? item.evidence?.packagedStop?.subject ?? item.evidence?.insights?.subject ??
-        item.evidence?.recipePreview?.subject ?? item.evidence?.journey?.subject
+        item.evidence?.recipePreview?.subject ?? item.evidence?.journey?.subject ?? item.evidence?.journeyContext?.subject ??
+        item.evidence?.journeyPhases?.subject ?? item.evidence?.journeyReopen?.subject
       if (!subject || typeof subject !== 'object') {
         failures.push(fail('subject_missing', `Case ${id} has no frozen artifact subject`, id))
         continue
