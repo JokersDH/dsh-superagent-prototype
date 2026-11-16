@@ -1,0 +1,53 @@
+$ node --test test/*.case.ts
+✔ no eligible profile yields none_eligible with stable exclusions (39.375042ms)
+✔ one eligible profile is only_eligible with its evidence (0.540958ms)
+✔ multiple eligible profiles need an explicit operator default or fixed rule (0.513125ms)
+✔ eligible advice without supporting evidence is blocked instead of fabricated (0.131958ms)
+✔ review suggestion follows the explicit policy and never measured history (0.625083ms)
+✔ confirmation revalidates expiry, task/catalog/policy, profile identity and scope (2.618209ms)
+✔ blocking dependencies rank above business deadlines and blocked items (2.16175ms)
+✔ overdue business deadlines rank above upcoming and unknown deadlines (0.121666ms)
+✔ question expiry is not a business deadline and expired items are not actionable (1.258458ms)
+✔ permission and authentication rank above clarification at equal deadline and age (4.953083ms)
+✔ ties are deterministic and independent of input order (0.119459ms)
+✔ groups keep every item and require per-target approval without merging actors (0.171416ms)
+✔ attention ranking and grouping work across projects before any routing decision (32.111625ms)
+✔ advice is persisted, replayed and confirmed only against current facts (7.127541ms)
+✔ a frozen subject gets a structured review, persisted evidence and invalidation on change (1.753042ms)
+✔ outcomes persist append-only and list by exact profile (0.164917ms)
+✔ a fully admitted native profile with matching identity, capability, scope and budget is eligible (0.7505ms)
+✔ admission, identity, scope, budget and capability gaps are excluded with stable reasons (0.205666ms)
+✔ controlled or schema evidence cannot satisfy a native requirement (0.097083ms)
+✔ isolation proof is required when review or read-only execution is requested (0.171125ms)
+✔ multiple profiles keep caller order and never widen authorization (0.126625ms)
+✔ main can pass shared items to the ranker and validate the resulting page (67.394083ms)
+✔ the same page and now produce the same ranks for main and C (3.097166ms)
+✔ unknown waiting and strict deadlines survive the shared page projection (0.78ms)
+✔ real A port: advice put/replay/conflict, project scope and append-only history (23.334ms)
+✔ real A port: reviews are filtered by exact subject and outcomes by exact profile (18.217417ms)
+✔ real A port: a failed write rolls back and leaves no evidence row (32.672625ms)
+✔ real A port: persisted review evidence goes stale when the candidate or profile drifts (13.609125ms)
+✔ a matching current review is current but never a machine PASS or human acceptance (3.729958ms)
+✔ inconclusive reports are explicit and not a pass (0.847916ms)
+✔ subject and candidate/artifact/contract/environment/check changes invalidate the review (7.887791ms)
+✔ mutated input, reviewer drift and author assignment reuse are rejected (0.277084ms)
+✔ sealed-copy and legacy readonly isolation proofs are validated separately (0.99425ms)
+✔ the trusted producer layer cannot be claimed by the report (0.154792ms)
+✔ review reports parse strictly and never become executable text (7.438292ms)
+✔ evidence assembly uses the report disposition and requires exactly one isolation proof (4.601334ms)
+✔ returns a complete duplicate-free permutation with at least one shared reason (19.971ms)
+✔ same items and now produce the same order regardless of input order (0.453375ms)
+✔ sinceAt null is unknown waiting, never a fabricated age (2.174709ms)
+✔ deadlineAt is the only business deadline; expiresAt never becomes one (0.25025ms)
+✔ blockedWorkIds is outgoing; being listed as blocked does not make an item a blocker (0.437208ms)
+✔ kind and state reasons use the shared enum (0.654583ms)
+✔ an explicit now changes deadline classification reproducibly (0.362167ms)
+✔ duplicate ids are refused instead of corrupting the public page (0.215125ms)
+ℹ tests 44
+ℹ suites 0
+ℹ pass 44
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1948.527166

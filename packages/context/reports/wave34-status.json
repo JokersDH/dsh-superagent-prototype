@@ -1,0 +1,88 @@
+{
+  "protocol": "wave34-status/1",
+  "agent": "C",
+  "branch": "codex/g3-assistant-context",
+  "base": { "mergeCommit": "df99e6a8", "originMain": "23d5a98e", "rfcs": ["WP-16/0086", "WP-16/0087", "WP-16/0088"] },
+  "wave": 34,
+  "wholeGoal": "explicit decisions enter new work with trustworthy current scope/version/provenance, plus complete ordinary governance and reopen",
+  "sources": {
+    "aHead": "49082c5bd9502494f0372fa399ed800567f00460",
+    "aWorkflows": { "sha256": "1496c51bebc1c7045be14ef3087f69cf25db835bd22d5d943b8b707be89ecf0c" },
+    "snapshot": "packages/knowledge/src/decision-snapshot.ts",
+    "preparation": "packages/knowledge/src/decision-preparation.ts",
+    "governance": "packages/knowledge/src/governance.ts",
+    "sessionCli": "packages/context/tools/assistant-context-cli.mjs"
+  },
+  "dirty": [
+    "packages/knowledge/src/decision-snapshot.ts (strict parse/deep-freeze/full binding)",
+    "packages/knowledge/src/decision-preparation.ts (new)",
+    "packages/knowledge/src/index.ts (exports)",
+    "packages/knowledge/test/decision-context-snapshot.case.ts (expanded negatives)",
+    "packages/knowledge/test/main-personal-decision-work-confirmation.case.ts (new)",
+    "packages/context/tools/assistant-context-cli.mjs (draft --revalidate)",
+    "packages/knowledge/test/main-personal-context-session-cli.case.ts (draft revalidation, supersede)",
+    "docs/reports for wave34"
+  ],
+  "packages": {
+    "one": {
+      "C1": { "status": "complete-source", "source": "decision-snapshot.ts", "consumer": "unit + main-compatible tests", "commands": ["pnpm --filter @personal-agent/knowledge test"], "exit": 0,
+        "objects": ["decision-context-snapshot/1", "deep-frozen nested scope/arrays", "invalid_snapshot codes"],
+        "positive": ["current snapshot valid", "normal version/source", "scan_incomplete refusal"],
+        "negative": ["nested mutation rejected (frozen)", "widened allowedPaths / dropped exclusions / changed sourceMessageId / recordedAt -> content_changed", "unknown protocol/extra key/duplicate ids/invalid time -> invalid_snapshot", "NaN/0 max, duplicate selection, invalid now -> rejected"],
+        "evidence": ["packages/context/reports/wave34-decision-context-snapshot.tap"] },
+      "C2": { "status": "complete-source", "source": "captureDecisionSnapshot bounded inputs", "consumer": "same governance used by main /v1/context/preview", "commands": ["pnpm --filter @personal-agent/knowledge test"], "exit": 0,
+        "objects": ["selectedDecisionIds", "callerTruncated/max", "project snapshot", "main preview decision source"],
+        "positive": ["two-project isolation", "selected set only", "caller cap flagged"],
+        "negative": ["wrong project/unknown id -> not_found", "duplicate selection -> conflict", "invalid limits/time -> invalid_scope", "scan_incomplete -> error"],
+        "evidence": ["packages/context/reports/wave34-decision-context-snapshot.tap"] },
+      "C3": { "status": "complete-source", "source": "decision-preparation.ts prepare/assert", "consumer": "main-compatible create_work chain + work-scoped context send", "commands": ["node --experimental-strip-types --test packages/knowledge/test/main-personal-decision-work-confirmation.case.ts"], "exit": 0,
+        "objects": ["decision-selection-preparation/1", "preparation snapshot version/source", "frozen decision sourceDigest", "Work id"],
+        "positive": ["assert current before/after create", "scopeMatch true", "frozen context includes decision digest", "ordinary no-selection Work still works"],
+        "negative": ["revoke after create -> inactive, frozen unchanged", "narrow project scope -> scope_changed", "other project -> project_mismatch", "forged protocol -> invalid_snapshot", "unknown/duplicate selection rejected"],
+        "evidence": ["packages/context/reports/wave34-decision-work-confirmation.tap"] }
+    },
+    "two": {
+      "C4": { "status": "complete-source", "source": "DecisionGovernance + session CLI", "consumer": "real main HTTP decisions/proposals/context", "commands": ["node --experimental-strip-types --test packages/knowledge/test/main-personal-context-session-cli.case.ts"], "exit": 0,
+        "objects": ["decisionId/version", "superseded/revoked status", "frozen bundleDigest"],
+        "positive": ["record/supersede/replace", "revoke removes future preview decision", "frozen sources readable"],
+        "negative": ["replayed confirm refused", "readonly preview/send exit 3", "cross-project preview refused"],
+        "evidence": ["packages/context/reports/wave34-context-session-cli.tap"] },
+      "C5": { "status": "complete-source", "source": "assistant-context-cli draft save|load --revalidate", "consumer": "two-project reopen", "commands": ["same CLI test"], "exit": 0,
+        "objects": ["0600 draft", "requestId/expiresAt", "matchesCurrent/changedSources"],
+        "positive": ["draft matches current before change", "detects changed sources after new message", "expired usable:false"],
+        "negative": ["0644/symlink/invalid expiry/oversized/forged refused", "4094 unaffected"],
+        "evidence": ["packages/context/reports/wave34-context-session-cli.tap"] },
+      "C6": { "status": "complete-source", "source": ["WAVE34-DECISION-WORK-GUIDE.md", "wave34-ui-input.json", "exports/types"], "consumer": "main/F/A handoff", "commands": ["strict tsc + suites"], "exit": 0,
+        "objects": ["typed exports", "guide", "UI DTO/state contract"],
+        "positive": ["module APIs documented", "layer separation explicit"], "negative": ["no installed/native/value claim"],
+        "evidence": ["packages/context/reports/wave34-final-*.tap"] }
+    }
+  },
+  "suites": {
+    "context": { "tests": 130, "pass": 130, "fail": 0 },
+    "proposals": { "tests": 41, "pass": 41, "fail": 0 },
+    "knowledge": { "tests": 138, "pass": 138, "fail": 0 },
+    "routing": { "tests": 44, "pass": 44, "fail": 0 },
+    "total": { "tests": 353, "pass": 353, "fail": 0 },
+    "typecheck": "pass (context/proposals/knowledge/routing)",
+    "build": "pnpm -r --workspace-concurrency=4 run build exit 0"
+  },
+  "layers": {
+    "source": "verified",
+    "controlled": "verified in tests with fixture provider",
+    "installed": "NOT_TESTED (no new package frozen or installed)",
+    "native": "0",
+    "recovery": "readonly only from wave31/33 scope; no new recovery run",
+    "value": "NOT_MEASURED",
+    "mainIntegration": "NOT_MERGED: typed snapshot/preparation/CLI are candidate source for main; main owns App/HTTP/schema"
+  },
+  "remaining": [
+    "main to adopt preparation/assert at the create_work form/schema boundary and expose snapshot DTOs in App",
+    "F to render snapshot/draft/deprecated states",
+    "A continuation for history coverage if adopted",
+    "installed/native/recovery/value and CAC remain unverified",
+    "E independent acceptance of integrated version"
+  ],
+  "preserved": ["pnpm-lock.yaml diff uncommitted", "twelve services 5180-5191/8796-8807", "all state/profile/tar/ledger/dirty/runs", "no control of user instances"],
+  "budgets": { "realVendorModelTurns": 0, "realNativeTurns": 0, "bCap4": "UNKNOWN unspendable", "ePilot": "BLOCKED, not reset/top-up/refund/replaced" }
+}

@@ -1,0 +1,22 @@
+{
+  "protocol": "wave34-ui-input/1",
+  "owner": "C supplies typed data/consumer; main/F own App, HTTP, form and final authorization",
+  "snapshot": {
+    "protocol": "decision-context-snapshot/1",
+    "fields": ["projectId", "capturedAt", "authorization:'none'", "decisions[].{decisionId,version,contentDigest,scope,sourceMessageId,sourceTextDigest,recordedAt,expiresAt}", "coverage.{scan,callerTruncated,max}"],
+    "revalidation": ["valid", "code(invalid_snapshot|project_mismatch|duplicate_decision|invalid_time|version_changed|content_changed|inactive|source_stale|expired)"],
+    "copy": "valid 仅表示与当前记录一致，不是授权；forge 的 scope/source 不会被接受"
+  },
+  "preparation": {
+    "protocol": "decision-selection-preparation/1",
+    "fields": ["projectId", "preparedAt", "authorization:'none'", "snapshot", "scopeChecked", "scopeMatch", "mismatches[]"],
+    "assertion": ["current", "code(scope_changed|project_mismatch|invalid_snapshot|...)"],
+    "copy": "创建前后各断言一次；决定变化要求显式重新预览"
+  },
+  "draft": {
+    "fields": ["usable", "stale", "revalidation.{state,matchesCurrent,changedSources}"],
+    "copy": "TTL 有效但来源变化时 matchesCurrent=false；草稿不是 token"
+  },
+  "governance": ["preview", "proposal confirm/reject", "decision record/supersede/revoke", "frozen sources after reopen"],
+  "layers": { "source": "verified", "controlled": "verified in tests", "installed": "NOT_TESTED", "native": "0", "recovery": "readonly only", "value": "NOT_MEASURED" }
+}
