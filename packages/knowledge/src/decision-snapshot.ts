@@ -36,7 +36,12 @@ export interface CurrentDecisionSnapshot {
   readonly projectId: string
   readonly authorization: 'none'
   readonly decisions: readonly DecisionSnapshotDecision[]
-  readonly coverage: { readonly scan: 'complete'; readonly callerTruncated: boolean; readonly max: number }
+  readonly coverage: {
+    readonly mode: 'window' | 'selected'
+    readonly scan: 'complete' | 'selected_ids'
+    readonly callerTruncated: boolean
+    readonly max: number
+  }
 }
 
 export interface DecisionSnapshotRevalidation {
@@ -86,9 +91,11 @@ function parseSnapshot(value: unknown): CurrentDecisionSnapshot | undefined {
   if (typeof snapshot.projectId !== 'string' || !ID_PATTERN.test(snapshot.projectId)) return undefined
   if (!isTime(snapshot.capturedAt)) return undefined
   const coverage = snapshot.coverage as Record<string, unknown> | undefined
-  if (!coverage || Object.keys(coverage).sort().join(',') !== 'callerTruncated,max,scan' || coverage.scan !== 'complete' ||
+  if (!coverage || Object.keys(coverage).sort().join(',') !== 'callerTruncated,max,mode,scan' ||
     typeof coverage.callerTruncated !== 'boolean' || !Number.isInteger(coverage.max) || (coverage.max as number) < 1 ||
     (coverage.max as number) > MAX_SNAPSHOT_DECISIONS) return undefined
+  if (!(coverage.mode === 'window' && coverage.scan === 'complete') &&
+    !(coverage.mode === 'selected' && coverage.scan === 'selected_ids')) return undefined
   if (!Array.isArray(snapshot.decisions) || snapshot.decisions.length > MAX_SNAPSHOT_DECISIONS) return undefined
   if (!snapshot.decisions.every((decision) => validDecision(decision, snapshot.projectId as string))) return undefined
   if (new Set(snapshot.decisions.map((decision) => (decision as DecisionSnapshotDecision).decisionId)).size !== snapshot.decisions.length) return undefined
@@ -133,25 +140,41 @@ export async function captureDecisionSnapshot(
     throw new DecisionError('invalid_scope', `Snapshot max must be an integer 1..${MAX_SNAPSHOT_DECISIONS}`, { max })
   const now = input.now ?? new Date()
   if (!(now instanceof Date) || !Number.isFinite(now.getTime())) throw new DecisionError('invalid_scope', 'Snapshot time is invalid')
-  const window = await governance.listEffectiveWindow(input.projectId, max, now)
-  let records = window.decisions
   if (input.selectedDecisionIds) {
     const selected = new Set(input.selectedDecisionIds)
     if (!input.selectedDecisionIds.every((id) => typeof id === 'string' && ID_PATTERN.test(id)) ||
       selected.size !== input.selectedDecisionIds.length)
       throw new DecisionError('conflict', 'Decision snapshot selection is invalid or duplicated', { projectId: input.projectId })
-    const missing = [...selected].filter((id) => !records.some((record) => record.decision.id === id))
+    if (selected.size > max)
+      throw new DecisionError('invalid_scope', 'Selected decisions exceed the caller budget', { projectId: input.projectId, selected: selected.size, max })
+    // A selection is read through the trusted per-id lookup; it is never limited by the project window,
+    // so a still-current decision outside the first `max` records is not reported as missing.
+    const missing: string[] = []
+    const records: DecisionRecord[] = []
+    for (const id of selected) {
+      const record = await governance.getEffective(id, now)
+      if (!record || record.decision.scope.projectId !== input.projectId) { missing.push(id); continue }
+      records.push(record)
+    }
     if (missing.length)
       throw new DecisionError('not_found', 'A selected decision is not currently effective', { projectId: input.projectId, missing })
-    records = records.filter((record) => selected.has(record.decision.id))
+    return immutable({
+      protocol: DECISION_CONTEXT_SNAPSHOT_PROTOCOL,
+      capturedAt: now.toISOString(),
+      projectId: input.projectId,
+      authorization: 'none' as const,
+      decisions: records.map(project),
+      coverage: { mode: 'selected' as const, scan: 'selected_ids' as const, callerTruncated: false, max },
+    })
   }
+  const window = await governance.listEffectiveWindow(input.projectId, max, now)
   return immutable({
     protocol: DECISION_CONTEXT_SNAPSHOT_PROTOCOL,
     capturedAt: now.toISOString(),
     projectId: input.projectId,
     authorization: 'none' as const,
-    decisions: records.map(project),
-    coverage: { scan: 'complete' as const, callerTruncated: window.truncatedByLimit, max },
+    decisions: window.decisions.map(project),
+    coverage: { mode: 'window' as const, scan: 'complete' as const, callerTruncated: window.truncatedByLimit, max },
   })
 }
 

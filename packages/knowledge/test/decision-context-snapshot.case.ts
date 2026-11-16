@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { createHash } from 'node:crypto'
 import { test } from 'node:test'
 import type { Scope } from '@personal-agent/contracts'
 import { InMemoryAssistantState } from '@personal-agent/proposals'
@@ -38,6 +39,7 @@ void test('a current decision snapshot is bounded, project-scoped and revalidate
   assert.equal(snapshot.authorization, 'none')
   assert.equal(snapshot.projectId, 'project-1')
   assert.equal(snapshot.coverage.scan, 'complete')
+  assert.equal(snapshot.coverage.mode, 'window')
   assert.equal(snapshot.coverage.callerTruncated, false)
   assert.deepEqual(snapshot.decisions.map((decision) => decision.decisionId).sort(), ['d1', 'd2'])
   for (const decision of snapshot.decisions) {
@@ -56,6 +58,9 @@ void test('a current decision snapshot is bounded, project-scoped and revalidate
   assert.equal(capped.decisions.length, 1)
   const selected = await captureDecisionSnapshot(governance, { projectId: 'project-1', selectedDecisionIds: ['d2'], now: new Date(NOW) })
   assert.deepEqual(selected.decisions.map((decision) => decision.decisionId), ['d2'])
+  assert.equal(selected.coverage.mode, 'selected')
+  assert.equal(selected.coverage.scan, 'selected_ids')
+  assert.equal(selected.coverage.callerTruncated, false)
   await assert.rejects(() => captureDecisionSnapshot(governance, { projectId: 'project-1', selectedDecisionIds: ['missing'], now: new Date(NOW) }),
     (error: unknown) => error instanceof DecisionError && error.code === 'not_found')
   const mismatch = await revalidateDecisionSnapshot(governance, snapshot, { projectId: 'project-2', now: new Date(NOW) })
@@ -138,4 +143,36 @@ void test('an incomplete governance scan refuses snapshot creation instead of re
   const governance = new DecisionGovernance(broken, { getMessage: async () => undefined })
   await assert.rejects(() => captureDecisionSnapshot(governance, { projectId: 'project-1' }),
     (error: unknown) => error instanceof DecisionError && error.code === 'scan_incomplete')
+})
+
+
+void test('an explicit selection reads current records outside the project window instead of reporting them missing', async () => {
+  const store = new AssistantDecisionStore(new InMemoryAssistantState())
+  const messages = new Map<string, DecisionSource>()
+  const governance = new DecisionGovernance(store, { getMessage: async (id: string) => messages.get(id) }, { now: () => new Date(NOW) })
+  for (let index = 0; index < 40; index += 1) {
+    const id = `big-msg-${index}`
+    messages.set(id, { ...message(id), textDigest: createHash('sha256').update(id).digest('hex') })
+    await governance.record({ decisionId: `big-${index}`, content: `决定 ${index}`, scope: scope(), sourceMessageId: id }, actor())
+  }
+  const window = await captureDecisionSnapshot(governance, { projectId: 'project-1', max: 32, now: new Date(NOW) })
+  assert.equal(window.decisions.length, 32)
+  assert.equal(window.coverage.mode, 'window')
+  assert.equal(window.coverage.callerTruncated, true)
+  const outsideWindow = Array.from({ length: 40 }, (_, index) => `big-${index}`)
+    .find((id) => !window.decisions.some((decision) => decision.decisionId === id))
+  assert.equal(typeof outsideWindow, 'string')
+
+  const selected = await captureDecisionSnapshot(governance, { projectId: 'project-1', selectedDecisionIds: [outsideWindow!], max: 32, now: new Date(NOW) })
+  assert.deepEqual(selected.decisions.map((decision) => decision.decisionId), [outsideWindow])
+  assert.equal(selected.coverage.scan, 'selected_ids')
+  assert.equal(selected.coverage.callerTruncated, false)
+  const revalidated = await revalidateDecisionSnapshot(governance, selected, { projectId: 'project-1', now: new Date(NOW) })
+  assert.equal(revalidated.valid, true)
+
+  await assert.rejects(() => captureDecisionSnapshot(governance, { projectId: 'project-1',
+    selectedDecisionIds: Array.from({ length: 33 }, (_, index) => `big-${index}`), max: 32, now: new Date(NOW) }),
+  (error: { code?: string }) => error.code === 'invalid_scope')
+  await assert.rejects(() => captureDecisionSnapshot(governance, { projectId: 'project-1', selectedDecisionIds: ['missing'], now: new Date(NOW) }),
+    (error: { code?: string }) => error.code === 'not_found')
 })
