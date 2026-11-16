@@ -18,7 +18,9 @@
       "apps/runner/src/recovery-endpoint.ts",
       "apps/runner/test/recovery-endpoint.test.ts",
       "apps/runner/test/recovery-interop.test.ts",
-      "apps/runner/test/attached-caller-native.test.ts"
+      "apps/runner/test/attached-caller-native.test.ts",
+      "packages/execution/src/runner-diagnostics.ts",
+      "apps/runner/test/runner-diagnostics.test.ts"
     ],
     "tar": "NONE - source only; no installed tar/ZIP and no user-instance restart"
   },
@@ -45,14 +47,15 @@
       "notClaimed": "No original Application QuestionBroker live question/answer or original delivery; fixtures are controlled."
     },
     "B3_feed_cancel_after_identity": {
-      "status": "IMPLEMENTED at transport (candidate; main has not admitted raw feed/cancel into the default business path)",
+      "status": "IMPLEMENTED at transport + actionable diagnostics (candidate; main has not admitted raw feed/cancel into the default business path)",
       "implementation": "The endpoint now requires the stated producer BEFORE any cancel effect (bare cancel -> 409 missing_producer, foreign producer -> 409 identity_mismatch, spy proves stopped no cancel); cancel admission only flips closed after a successful original cancel. runner-service tracks the one active callback lease and fences command/cancel control: terminal/stopped feed -> stale_connection channel_closed, old lease -> stale_connection stale_lease, foreign producer -> identity_mismatch, all before admitCommand/stopPhysical. Attached feed/cancel carry their lease.",
       "evidence": [
         "apps/runner/test/recovery-endpoint.test.ts 10/10 incl. 'cancel without a stated producer is refused before the physical stop' (onCancel spy false) and only-cancel-kind 403",
         "b31-attached-consumer: old lease feed refused stale_connection, no extra callback -> 4 PASS/0 FAIL/1 NOT_TESTED",
         "b32-terminal-late: stopped raw feed refused stale_connection before admission -> 4 PASS/0 FAIL/1 NOT_TESTED",
         "runner suite 152/152"
-      ]
+      ],
+      "diagnostics": "packages/execution/src/runner-diagnostics.ts maps control errors to actionable next steps: missing executor (ENOENT), version/protocol mismatch, auth failure, foreign attempt, stale proof, terminal channel/old lease/late callback/closed admission, timeout and unknown outcome. Unknown/timeout explicitly require original reconciliation and never promise an automatic replay. apps/runner/test/runner-diagnostics.test.ts 4/4."
     },
     "B4_same_work_recovery_to_delivery": {
       "status": "NOT_REACHED",
@@ -72,7 +75,7 @@
   "verification": {
     "root_tsc": "exit 0",
     "attached_tsc": "exit 0",
-    "runner_tests": "152 pass / 0 fail",
+    "runner_tests": "156 pass / 0 fail (adds diagnostics 4)",
     "main_native_attach_callbacks": "11/11",
     "main_attached_port": "4/4",
     "b28_signal": "11/0/1",
@@ -80,7 +83,8 @@
     "b27_chain": "4/0/1",
     "b31_attach": "4/0/1",
     "b32_late": "4/0/1",
-    "b33_slots": "7/7"
+    "b33_slots": "7/7",
+    "runner_diagnostics": "4/4"
   },
   "scope": {
     "modelTurns": 0,
