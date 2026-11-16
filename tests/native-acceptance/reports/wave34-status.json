@@ -20,7 +20,8 @@
       "apps/runner/test/recovery-interop.test.ts",
       "apps/runner/test/attached-caller-native.test.ts",
       "packages/execution/src/runner-diagnostics.ts",
-      "apps/runner/test/runner-diagnostics.test.ts"
+      "apps/runner/test/runner-diagnostics.test.ts",
+      "docs/rfcs/WP-03/0003-wave34-recovery-and-slot-port.md"
     ],
     "tar": "NONE - source only; no installed tar/ZIP and no user-instance restart"
   },
@@ -59,13 +60,15 @@
     },
     "B4_same_work_recovery_to_delivery": {
       "status": "NOT_REACHED",
-      "detail": "The original Application/QuestionBroker completion, current binding restore and candidate/check/manualaccept are not wired to an attached consumer in this checkout; main states its attached fixtures are preseeded, not Native.launch/original Work recovery. B did not construct a substitute Work/fixture ledger."
+      "detail": "The original Application/QuestionBroker completion, current binding restore and candidate/check/manualaccept are not wired to an attached consumer in this checkout; main states its attached fixtures are preseeded, not Native.launch/original Work recovery. B did not construct a substitute Work/fixture ledger.",
+      "main_contract": "docs/rfcs/WP-03/0003-wave34-recovery-and-slot-port.md gives the minimal main composition: attachRunningAttempt on the original RunningAttempt, serve original callbacks, feed only after original current authority, then main owns check/candidate/accept with original IDs. No substitute ledger is created."
     },
     "B5_original_scheduler_2_4_slots": {
       "status": "PARTIAL: B-owned accounting validated on real ProductStore bindings; NOT the original core queue",
       "implementation": "packages/execution/src/attempt-slots.ts (candidate) starts at 2 slots, queues boundedly, opens to 4, releases only on confirmed quiescence, retains indeterminate as occupied, cancels queued attempts without a running slot, restores from original Store binding states (ended->released, active->running, stopping->indeterminate, duplicates once), refuses shrink/duplicate/overflow.",
       "evidence": "tests/native-acceptance/b33-slots.mjs 7/7 on real ProductStore tickets/bindings read back from Store",
-      "notClaimed": "Main owns the original scheduler; this module is not composed into it and is not a second authority."
+      "notClaimed": "Main owns the original scheduler; this module is not composed into it and is not a second authority.",
+      "main_contract": "Same RFC: main calls slots.admit on its own start admission, slots.settle with original barrier evidence, slots.restore from original Store bindings at boot, and starts the original queue head when a slot frees. The accounting is not a second queue authority."
     },
     "B6_full_resource_return_and_reopen": {
       "status": "NOT_REACHED",
