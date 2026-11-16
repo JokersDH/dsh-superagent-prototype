@@ -108,6 +108,28 @@ try {
     } finally { clearTimeout(timer); release(); await page.unroute('**/recipes/preview') }
     await page.getByRole('button', { name: '主对话视图', exact: true }).click()
   })
+  await check('ACTUAL-WORKBENCH-RETRIES-THREE-PREVIEWS-AND-READS-SUPPORT-WITHOUT-BUSINESS-WRITES', async () => {
+    const before = store.events.cursor(), commandCount = commands.length
+    await page.route('**/recipes/preview', route => route.fulfill({ status: 503,
+      json: { error: { code: 'storage_unavailable', message: '/private/recipe-secret' } } }))
+    await page.getByRole('button', { name: '试用准备', exact: true }).click()
+    await page.getByRole('group', { name: '按项目筛选' }).getByRole('button', { name: '项目 Alpha', exact: true }).click()
+    const trial = page.getByRole('region', { name: '试用准备', exact: true })
+    const alert = trial.getByRole('alert').filter({ hasText: '配方草案暂时无法读取' })
+    await alert.waitFor(); assert.doesNotMatch(await alert.textContent(), /recipe-secret/)
+    await page.unroute('**/recipes/preview')
+    const previews = previewPosts
+    await alert.getByRole('button', { name: '重试', exact: true }).click()
+    await trial.locator('.trial-recipe').first().waitFor()
+    assert.equal(await trial.locator('.trial-recipe').count(), 3)
+    assert.equal(previewPosts - previews, 3)
+    const support = trial.locator('.trial-support')
+    assert.equal(await support.getAttribute('open'), null)
+    await support.locator('summary').click()
+    assert.match(await support.textContent(), /未提供/); assert.match(await support.textContent(), /未声明/)
+    assert.equal(commands.length, commandCount); assert.equal(store.events.cursor(), before)
+    await page.getByRole('button', { name: '主对话视图', exact: true }).click()
+  })
   await check('PREVIEW-AND-APPLY-ONLY-PREFILL-ORIGINAL-FORM', async () => {
     const before = store.events.cursor(); await open(); await apply()
     assert.equal(commands.length, 0); assert.equal(store.events.cursor(), before)
@@ -217,7 +239,7 @@ try {
 } finally {
   await browser?.close(); await vite.close(); api.closeAllConnections(); await new Promise(resolve => api.close(resolve))
   await product.close(); store.close(); rmSync(root, { recursive: true, force: true })
-  const report = { status: cases.length === 8 ? 'PASS_ACTUAL_PROJECT_RECIPE_WORKFLOW' : 'FAIL',
+  const report = { status: cases.length === 9 ? 'PASS_ACTUAL_PROJECT_RECIPE_WORKFLOW' : 'FAIL',
     sourceCommit: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
     sourceWorktreeClean: execFileSync('git', ['status', '--porcelain', '--', 'apps', 'packages', 'tests/integration/project-recipes*'], { encoding: 'utf8' }).trim() === '',
     cases, errors, previewPosts, unknownAfterRecorded, commands: commands.map(value => ({ kind: value.kind, commandId: value.commandId })), acceptedWorks: acceptedWorks.length,

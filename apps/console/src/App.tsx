@@ -1082,6 +1082,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
               onDownloadInsights={transport.downloadUsageObservation ? observationDownload.download : undefined}
               insightsDownloading={observationDownload.loading} insightsDownloadError={observationDownload.error}
               recipes={recipes.rows} recipesLoading={recipes.loading} recipesError={recipes.error}
+              onReloadRecipes={recipes.reload}
               onOpenRecipe={selection => {
                 const input = ProjectRecipePreviewInputSchema.parse({ projectId: selection.projectId, kind: selection.kind,
                   allowedPaths: selection.allowedPaths, profileId: selection.profileId })
