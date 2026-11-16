@@ -1,0 +1,250 @@
+{
+  "protocol": "wave32-runtime-channel-admission/1",
+  "date": "2026-11-16",
+  "status": "USEFUL_SOURCE_AND_INGRESS_CONSUMER_PROGRESS_ORIGINAL_WORK_RECOVERY_NOT_REACHED_NEW_CALLER_AND_SIGNAL_TOOLS_NOT_ADMITTED",
+  "requestScope": "Accept wave31 and supply progress, architecture, innovation and use implications. No new task package, dispatch, production fix, real model/native turn or service operation.",
+  "main": {
+    "reviewedHead": "8deda18dd249c53f21a79b37b4683eebea9910c5",
+    "runtimeCheckpoint": "303b2c6a974856661c21d0617bd710ebe87374d1",
+    "runtimeServiceBlob": "b9f5f47c20d41d12254f6e6980e9b8e2dec357c3",
+    "recoveryTransportBlob": "73752579e28009a50c7062b4d35d91bb9ccca816",
+    "channelCoreBlob": "d1ef81eb9d51b24417645151440eb1e262c20546",
+    "runnerLinkBlob": "6a53dafac8257535c64fd7ab4bcb02b1e5115629",
+    "sevenFileCommunicationClosureActuallyPresent": true,
+    "preReadyShutdownEOFCleanupActuallyPresent": true,
+    "newAttachedAttemptCallerPresent": false,
+    "attachRegisteredRunnerSymbolFound": false,
+    "actualNewSymbolInB": "attachRunnerAttempt in packages/execution/src/attached-attempt.ts",
+    "originalNativeProductAttemptGuardsStillPresent": "current() + original recorded command canonical digest + one-shot live answer admission; normal spawn path only",
+    "sourceBoundary": "Main303/current8deda actually contains the earlier seven-file callback transport and bootstrap cleanup. It does not contain B's new attached-attempt caller, nor original ProductExecution/Broker recovery composition. A source review must not call those absent features integrated."
+  },
+  "candidates": {
+    "B": {
+      "root": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "source": "4b693eae30610fba134a2f151f835368e8903953",
+      "branch": "codex/g1-runtime",
+      "dirtyPreserved": [
+        "reports/releases/wave11-admission/runtime.json",
+        "reports/releases/wave12-admission/runtime.json",
+        "tests/native-acceptance/b16-real-begin.mjs (untracked)"
+      ],
+      "serviceAndTransportBlobsMatchMain303": true,
+      "newAttachedCallerBlob": "4a84b3041306ab801502c313c9945ca5f4d7196d"
+    },
+    "H": {
+      "root": "/Users/hh/Desktop/joker/superagent-agent-h",
+      "source": "3ea07a7df1d969410547c6f7fc03a105977609d1",
+      "branch": "codex/g4-trial-operations",
+      "dirty": []
+    },
+    "I": {
+      "root": "/Users/hh/Desktop/joker/superagent-agent-i",
+      "source": "cf2e0a9cc92d10546afe40b04244cd9259bca2f4",
+      "branch": "codex/g5-coordinator-channel",
+      "dirty": [],
+      "coreRuntimeImplementationChanged": false,
+      "newWork": "Actual-service, real ProductStore ingress, guard-equivalent, handover, backpressure, isolation and shutdown consumers; adoption manual and bounded scope report"
+    }
+  },
+  "actualProgress": [
+    {
+      "area": "B spawn-intent helper",
+      "delivered": "A new spawnOwned/adoptSpawn API, immutable recorded argv, per-signal fresh checks and injectable OS dependencies. Partial argv is now refused and UNKNOWN remains non-exit.",
+      "verdict": "PARTIAL_NOT_ADMITTED_FOR_LIVE_FAULTS",
+      "remaining": "adoptSpawn/born still accepts a numeric PID and caller-reconstructed full argv with no independent original spawn registration; exact copied handle also retains authority"
+    },
+    {
+      "area": "H incomplete-birth failure cleanup",
+      "delivered": "Removed raw child.kill fallback; incomplete/UNKNOWN birth retains original material with signalSent=false. Failure-path tests spy both child.kill and process.kill.",
+      "verdict": "OLD_P1_CLOSED_NEW_FULL_COMMAND_PROOF_GAP",
+      "remaining": "Observed command is copied into trusted facts without comparing it to the independently recorded launch executable/full argv"
+    },
+    {
+      "area": "B attached attempt caller",
+      "delivered": "Real callable polling adapter and fixture A-to-B fact handover consumer on one Runner. No new ledger or business command creation.",
+      "verdict": "SOURCE_ONLY_PARTIAL_WITH_PAYLOAD_PROTOCOL_DEFECT",
+      "remaining": "Payload reference/value semantics are wrong; original Store/Broker all-three-callback consumer and main composition are absent. B's own report correctly marks B2-B4 PARTIAL and B5-B12 NOT_REACHED."
+    },
+    {
+      "area": "I actual-service and Store ingress tests",
+      "delivered": "The actual serveRunner can feed createStoredRuntimeIngress over a real ProductStore and return its durable receipt; foreign/missing payload controls pass. Actual endpoint consumers replace several earlier service-shaped doubles.",
+      "verdict": "ADMITTED_FOR_MEASURED_CONTROLLED_COMPONENT_SCOPE",
+      "remaining": "Ticket/current binding are seeded fixture values; completion is disabled and no original Application-created Work/question recovery runs. Broker-style guard is a test reimplementation over real Store, not actual NativeProductAttempt/QuestionBroker wiring."
+    },
+    {
+      "area": "H same Store, new process and ordinary delivery support",
+      "delivered": "Same-store normal Work/question/answer readback, a separate process reading an already-completed normal chain, ordinary candidate/explicit acceptance, package status/backup/restore support and honestly bounded reports.",
+      "verdict": "USEFUL_NORMAL_AND_READBACK_SUPPORT_NOT_BUSINESS_RECOVERY",
+      "remaining": "H's new fact is inserted after a separate normal chain and checked by its own receiver predicate. A new process reading old rows is not an old coordinator killed while the same Runner continues. H explicitly labels the original B callback join and recovered candidate path NOT_REACHED."
+    }
+  ],
+  "checks": [
+    {
+      "command": "node /tmp/pa-wave32-signal-pure.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "exitCode": 1,
+      "passed": 5,
+      "failed": 3,
+      "realProcessSpawns": 0,
+      "realSignals": 0,
+      "psOrDiscovery": 0,
+      "scope": "Latest actual B/H helpers imported unchanged, all spawn/ps/pgrep/kill observations injected; only private mock birth files created/removed",
+      "cases": [
+        { "id": "B-original-spawn-intent-positive", "status": "PASS", "observed": "One mocked original spawn and one intended TERM target" },
+        { "id": "B-partial-argv-old-negative-now-refused", "status": "PASS", "observed": "argv_mismatch and zero mock signals" },
+        { "id": "B-numeric-PID-with-complete-observed-argv-is-not-independent-spawn", "status": "FAIL", "observed": "born(45102, complete reconstructed argv) registers a foreign-parent PID with zero spawn calls; signalOwned sends mocked SIGKILL" },
+        { "id": "B-copied-handle-with-same-record-has-no-ownership", "status": "FAIL", "observed": "signalOwned({...originalHandle}) sends mocked TERM because lookup checks handleId and record reference, not the original handle object" },
+        { "id": "B-fresh-argv-change-and-UNKNOWN-refuse", "status": "PASS", "observed": "Changed command and UNKNOWN refuse, confirmExit remains false" },
+        { "id": "H-UNKNOWN-incomplete-birth-old-kill-defect-closed", "status": "PASS", "observed": "retained.reason=observation_unknown, signalSent=false, child.kill0/process.kill0" },
+        { "id": "H-original-complete-spawn-intent-positive", "status": "PASS", "observed": "Correct original full command permits intended mocked TERM; copied handle refuses" },
+        { "id": "H-observed-full-command-must-match-independent-launch-intent", "status": "FAIL", "observed": "Valid child birth plus matching PID/UID/PPID/start but wholly different observed executable/script/root/config/operation command is registered and receives mocked SIGKILL" }
+      ]
+    },
+    {
+      "command": "node /tmp/pa-wave32-attached-actual.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "exitCode": 1,
+      "passed": 0,
+      "failed": 2,
+      "scope": "Actual B serveRunner, authenticated private endpoint, new attached-attempt caller and scripted Driver in process. No actual child, native effect, original ProductStore or Broker claim; exact probe sockets/files cleaned and all service handles shut down.",
+      "cases": [
+        {
+          "id": "B-new-attached-caller-preserves-original-payload-request-and-value",
+          "status": "FAIL",
+          "expectedRef": "payload:original-store-ref",
+          "callbackRequest": { "requestId": "payload-1", "ref": "", "offset": 0, "length": 0 },
+          "expectedDriverValue": { "message": "original frozen payload" },
+          "actualDriverValue": { "total": 37, "digest": "d33a9e428b88fd1aaf0b0f8548774c7f5a8834f90bc5c8e0b13f0472b056875b", "base64": "eyJtZXNzYWdlIjoib3JpZ2luYWwgZnJvemVuIHBheWxvYWQifQ==", "offset": 0, "length": 37 },
+          "served": { "facts": 0, "payloads": 1, "nativeWrites": 0, "refused": 0, "errors": 0 },
+          "oldStdioPayloadFrames": 0
+        },
+        {
+          "id": "B-terminal-shutdown-refuses-late-remote-receipt",
+          "status": "FAIL",
+          "beforeLateReceipt": "pending",
+          "lateResult": { "accepted": true, "generation": 2 },
+          "afterLateReceipt": "resolved",
+          "actualStdioReceiptFactIds": ["w32-shutdown-fact"],
+          "mainAlsoAffected": "Actual tested B service and main303/current8deda have identical b9f5f47c service and73752579 transport blobs"
+        }
+      ]
+    },
+    {
+      "command": "node --test --test-timeout=5000 tests/operational-soak/procguard/guard3.case.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-h",
+      "exitCode": 0,
+      "passed": 7,
+      "failed": 0,
+      "scope": "H submitted pure comparison/failure controls only; no live procguard. These pass while the independent full-command mismatch negative fails."
+    },
+    {
+      "command": "node --test --test-timeout=12000 apps/runner/test/attach-channel/actual-store-callbacks.test.ts apps/runner/test/attach-channel/actual-broker-guard.test.ts",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-i",
+      "exitCode": 0,
+      "passed": 8,
+      "failed": 0,
+      "scope": "Actual service + genuine stored ingress/UoW and seeded ticket/binding; real Store body/current/admission guard-equivalent tests. No actual original Application Work/question or full NativeProductAttempt/Broker and no process recovery."
+    },
+    {
+      "command": "pnpm exec tsc -p tests/native-acceptance/tsconfig.attached.json",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 0,
+      "scope": "New caller's submitted direct strict/exactOptional configuration compiles; casts hide the runtime payload protocol mismatch, so strict alone does not admit the adapter."
+    }
+  ],
+  "findings": [
+    {
+      "id": "MAIN32-TERMINAL-REMOTE-LEASE-STILL-SETTLES",
+      "priority": 1,
+      "file": "/Users/hh/Desktop/joker/superagent/apps/runner/src/runner-service.ts",
+      "line": 146,
+      "alsoLines": [152, 489, 559],
+      "scope": "Actual main303/current8deda and latest B service; independently reproduced in process",
+      "detail": "Terminal bridge shutdown closes business admission but only drops fixed stdio/sink connections. The current remote lease remains valid; a late authenticated receipt is accepted and resolves an outstanding fact after shutdown, emitting a receipt frame. I reported this gap but its green shutdown test only observes pending for150ms and does not submit the late receipt.",
+      "implication": "Terminal callback settlement is not closed. This does not prove native writes bypass main current-command/answer admission; the measured counterexample concerns a fact receipt.",
+      "repairDirection": "Distinguish reconnectable transport loss from terminal teardown. Terminal shutdown must close/fence the actual current channel and pending callbacks; a deliberate ordinary handover can retain the reconnect semantics. Test late reply after terminal shutdown directly."
+    },
+    {
+      "id": "B32-ATTACHED-PAYLOAD-REFERENCE-AND-VALUE-MISMATCH",
+      "priority": 1,
+      "file": "/Users/hh/Desktop/joker/superagent-agent-b/packages/execution/src/attached-attempt.ts",
+      "line": 82,
+      "alsoLines": [19, 27, 83],
+      "scope": "New unintegrated B caller only; not a current public main payload regression",
+      "detail": "The callback protocol uses payload-read.reference and replies with the original JSON value. The new caller instead reads request.ref, supplies absent offset/length as0, and replies with a chunk/base64 metadata object as value. An actual service payload read receives ref empty and returns the envelope instead of the frozen payload while served.payloads increments successfully.",
+      "implication": "Do not admit the new caller as a working three-callback adapter or integrate it for original Store/Broker recovery yet.",
+      "repairDirection": "Use the established coordinator payload callback contract/reference and original JSON semantics. Keep the separate journal descriptor/chunk replay protocol separate. Add actual payload and native-intent consumers alongside the current fact-only fixture."
+    },
+    {
+      "id": "B32-NUMERIC-PID-ADOPTION-STILL-NOT-SPAWN-ORIGIN",
+      "priority": 1,
+      "file": "/Users/hh/Desktop/joker/superagent-agent-b/tests/native-acceptance/signal-guard.mjs",
+      "line": 100,
+      "alsoLines": [66, 76, 117],
+      "scope": "Signal acceptance tool, not public product execution authority",
+      "detail": "adoptSpawn accepts either a ChildProcess-like object or a numeric PID. A caller can pass a foreign-parent PID plus its complete observed argv, causing fresh UID/start/PPID to be snapshotted and accepted with no original spawn ever registered. born is an alias to that path. The partial-argv defect is repaired, but independent spawn origin is still not enforced.",
+      "implication": "Live coordinator-death/procguard tests using this helper are not independently admitted by this audit.",
+      "repairDirection": "Obtain authority from an original private spawn registration and exact handle provenance; do not convert a numeric PID and reconstructed intent object into ownership. Require independently captured complete UID/parent/root/config/operation/resource facts."
+    },
+    {
+      "id": "H32-LAUNCH-COMMAND-NOT-COMPARED",
+      "priority": 1,
+      "file": "/Users/hh/Desktop/joker/superagent-agent-h/tests/operational-soak/procguard/guard3.mjs",
+      "line": 132,
+      "alsoLines": [77, 79, 134, 141],
+      "scope": "Own-probe acceptance tool; old UNKNOWN cleanup defect is separately closed",
+      "detail": "The independent launch argv is recorded, but record.command is copied from the observed process and compared only to that same observed command. A mocked original birth and stable PID/PPID/UID/start with a completely different live script/root/config/operation still registers and permits a signal. The submitted positive even uses command='node fake', so it does not cover the required independent full command proof.",
+      "implication": "H's failure cleanup improvement is admitted narrowly, but its full spawn-intent live guard is not.",
+      "repairDirection": "Validate the fresh full executable/ordered argv against independently captured launch intent before registration and before every signal. Preserve the fixed defensive copies and no-signal UNKNOWN failure paths."
+    },
+    {
+      "id": "B32-COPIED-HANDLE-RETAINS-AUTHORITY",
+      "priority": 2,
+      "file": "/Users/hh/Desktop/joker/superagent-agent-b/tests/native-acceptance/signal-guard.mjs",
+      "line": 119,
+      "scope": "Tool handle contract and regression coverage",
+      "detail": "lookup validates a public handleId plus the same record reference, so {...originalHandle} is accepted. The submitted copied-handle negative changes handleId to an invalid string and therefore does not test an actual copy. This counterexample signals the same original target, not a retargeted PID.",
+      "repairDirection": "Key private provenance by exact opaque handle object or another noncopyable original spawn capability, and test a literal spread copy without changing its fields."
+    }
+  ],
+  "coverageCorrections": [
+    "B's second-child refusal test changes the child's intended root to a different value; it does not try adopting the unregistered child with its actual complete argv. Its copied-handle test also changes handleId. Both submitted negatives miss the independent cases reproduced here.",
+    "I's original ingress uses real Store/core/ingress but pre-seeds ticket/binding and deliberately throws in completionPolicy; it is useful controlled component evidence, not a new original Work delivery.",
+    "I's Broker-style guard is explicitly not the complete NativeProductAttempt/QuestionBroker. Its body mismatch test and modeled write count must not be labeled actual native answer delivery.",
+    "I's four-slot probe creates four independent services and sends fact receipts; its 'denied' variable does not actually request or deny a native write. It proves measured fact/connection isolation, not scheduler capacity, aggregate release or that stated denial scenario.",
+    "H's two/four Work delivery consumer reports uniqueAttemptIds=null and slotCapObserved=not_configurable_in_fixture; no fifth Work overflow/wait/release or full actual resource set is demonstrated.",
+    "H's same-store receiver check writes a new generic facts record after an ordinary completed chain; it does not route that original question/answer through B. H's successor is an independent new process reading already-written rows, not same-Runner business continuation.",
+    "B reports 137 tests with --test-force-exit. Passed assertions under force-exit are not independent evidence of natural shutdown or complete resource reclamation. This audit did not rerun those broad/live scripts.",
+    "H package status/preflight/backup/restore evidence remains its exact R1/R2 scope; started package HTTP content/SSE/review-restored startup and final installed release are explicitly NOT_REACHED or independent E scope, not admitted by this runtime audit."
+  ],
+  "maturityForOverallProgress": {
+    "localOrdinaryMVP": "An earlier bounded macOS/Codex ordinary workflow exists: project/task/question/check/current candidate/manual accept and readable artifacts. This audit preserves that prior scope; it did not run a vendor/native task or certify current user services.",
+    "communicationFoundation": "Substantial implemented source and genuine controlled service/ingress tests, already present in main303. Single owner/CAS/fresh guards remain real engineering progress. Terminal teardown and new caller payload semantics still need closure.",
+    "sameOriginalWorkResilience": "NOT_REACHED: no same original Application Work/question from old coordinator death through same Runner, new process, original answer/native_applied, registered verification/currentCandidate and explicit manual acceptance.",
+    "twoFourSlotProductRecovery": "NOT_REACHED: communication isolation and normal multiple Work completion do not prove original scheduler cap, fifth-item waiting, UNKNOWN retention, cancellation and complete resource-driven release.",
+    "internalTrialProductization": "Partial support and frozen-package work exist; final independent exact-package usability/release is not inferred from these component results. The relevant D/E acceptance must be read separately.",
+    "innovation": "Reliable original-identity continuation and evidence-based candidate acceptance are useful product differentiators when fully working. This wave demonstrates engineering components, not breakthrough novelty, independent-review benefit or measured efficiency gains. No experimental value claim is warranted.",
+    "completionPercentage": "Do not invent a new overall percentage from twelve planned outcomes, test counts, copied source or runtime. Preserve existing frozen denominator/69-of-100/50.8% labels only with their original historical meaning; this audit supplies milestone status rather than a false updated percentage."
+  },
+  "nextThreePrioritiesNotDispatch": [
+    "Close the current main terminal callback lifetime and unintegrated payload contract defect; independently repair full spawn-origin safety before allowing live fault tests. Keep normal shutdown/guard regression and source scopes explicit.",
+    "Connect the real original ProductExecution/Store/QuestionBroker to one same-Runner attached attempt, then prove one same-original-Work crash-to-answer-to-registered-check/currentCandidate/manualaccept chain. This is the missing central product outcome, not another library or fixture suite.",
+    "Use that real path to establish original scheduler2/4-slot UNKNOWN/release behavior, then bind the usable journey to one frozen package for independent internal-trial acceptance. Measure actual task completion and user waiting/review effort before claiming innovation value. No study budget or new task is authorized by this priority list."
+  ],
+  "preservation": {
+    "candidateSourceOrAssertionEdits": 0,
+    "mainProductionEdits": 0,
+    "newTaskPackages": 0,
+    "vendorModelOrNativeTurns": 0,
+    "realChildSpawnsByAudit": 0,
+    "realSignals": 0,
+    "liveSIGKILLOrProcguard": false,
+    "globalProcessSocketDiscovery": false,
+    "newPersistentServices": 0,
+    "userServiceRestarts": 0,
+    "twelveExistingServicePairs": "5180/8796 through5191/8807 preserved",
+    "oldBudgetsLedgersDirtyAndState": "Preserved; B UNKNOWN cap4 unspendable and E pilot BLOCKED",
+    "newPersistentArtifact": "reports/releases/wave32-admission/runtime-channel.json",
+    "temporaryPrivateProbes": "Only /tmp scripts and exact own in-process socket/birth files; all running exec sessions completed and exact transient service/socket roots closed/removed"
+  }
+}

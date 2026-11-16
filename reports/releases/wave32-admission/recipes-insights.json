@@ -1,0 +1,61 @@
+{
+  "protocol": "wave32-recipes-insights-admission/1",
+  "date": "2026-11-16",
+  "candidates": {
+    "G": {
+      "source": "6dbb344024fd6ac014948f24a5ce61ea66ac6720",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-g",
+      "dirty": ""
+    },
+    "J": {
+      "source": "b25bf228e55d8428881a8ee1f6c723ad6753bc73",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-j",
+      "dirty": ""
+    }
+  },
+  "checks": [
+    {
+      "cwd": "superagent-agent-j",
+      "command": "node --test packages/project-recipes/test/rebind.case.ts packages/project-recipes/test/freshness.case.ts tools/project-recipes/test/rebind-cli.case.ts",
+      "exit": 0,
+      "passed": 16,
+      "scope": "new rebinding/freshness and CLI; temporary explicit roots only, no model/native"
+    },
+    {
+      "cwd": "superagent-agent-g",
+      "command": "node --test packages/usage-insights/test/display-export.case.ts packages/usage-insights/test/download-route.case.ts packages/usage-insights/test/report-semantics.case.ts",
+      "exit": 0,
+      "passed": 19,
+      "scope": "actual in-process mainHTTP export consumer, bytes/truncation/privacy/scope/unknown; no listening server"
+    },
+    {
+      "cwd": "superagent-agent-g",
+      "command": "node --test --test-name-pattern='served document exports display-only|tool runs from an unrelated directory' tools/usage-insights/test/cli.case.mjs",
+      "exit": 0,
+      "passed": 2,
+      "scope": "real readonly Node CLI on private fixture files, no browser/model/native"
+    }
+  ],
+  "integration": {
+    "JRebind": "new src/rebind+CLI source candidate only, not main/R2",
+    "GSupport": "new sanitized support/CLI source candidate only, not main/R2",
+    "existingMainDownload": "Already implemented in main303 and now present in exact R2 tar; independent E installedR2 still missing",
+    "R1Download": "Not implemented in R1; correct version distinction"
+  },
+  "innovation": {
+    "measuredOperatorBenefit": false,
+    "realMultiProtocol": false,
+    "numericReverseParsing": false,
+    "observationsAreNotPermission": true
+  },
+  "reportedMainConcerns": {
+    "shaInSchema": "Zod guards document shape; Product producer computes crypto hash and actual HttpTransport recomputes SHA256. Absence of crypto inside shared schema is not a demonstrated accepted browser mismatch.",
+    "status400vs503": "Both refuse; public consumers should follow typed failure, not assume every mismatch has one HTTP status.",
+    "coverage": "Header source enumeration and row partial coverage remain distinct; reports preserve partial/unknown, no quality or savings claim."
+  },
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "productionEdits": false,
+  "candidateEdits": false,
+  "releaseApproved": false
+}
