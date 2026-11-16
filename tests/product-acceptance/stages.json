@@ -1,10 +1,10 @@
 {
   "schema": "product-acceptance-stages/1",
   "agent": "E",
-  "taskPackage": "agent-tasks/product-wave-30/README.zh-CN.md",
+  "taskPackage": "agent-tasks/product-wave-31/README.zh-CN.md",
   "branch": "codex/g3-product-acceptance",
-  "base": "6369eea",
-  "checkpoint": "1675ccb",
+  "base": "b9fcdc7",
+  "checkpoint": "d32080f",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -18,194 +18,98 @@
   "stages": [
     {
       "id": "E1",
-      "title": "Complete no-record resource policy",
+      "title": "Complete known-resource policy on every path",
       "command": "node tests/product-acceptance/cases/w27-lifecycle.mjs",
       "notes": [
-        "Default retain is unchanged; a forced no-record proof may only act on the caller's complete immutable set. Process discovery was removed; an incomplete or unobservable set is UNKNOWN."
+        "A packaged STOPPED is verified against the fixed pre-stop set; a live known child keeps clean=false and retains the root. No global discovery."
       ]
     },
     {
       "id": "E2",
-      "title": "Independent birth and set verification",
+      "title": "Legitimate multi-resource proof and strict exit observation",
       "command": "node tests/product-acceptance/cases/w27-lifecycle.mjs",
       "notes": [
-        "Every resource is checked (pid/start/uid/argv/roots/parent) before the first signal and again fresh before each TERM/KILL; birth config/install/state must equal the request."
+        "liveIdentity carries ppid, a re-parented child of an exited launcher stays legitimate, and the after-set must repeat the exact pid/start with explicit booleans."
       ]
     },
     {
       "id": "E3",
-      "title": "Release only after a fixed-set observation",
-      "command": "node tests/product-acceptance/cases/w27-lifecycle.mjs",
+      "title": "Fixed R1 ordinary and functional",
+      "command": "node tests/product-acceptance/run.mjs --tier=installed-functional",
       "notes": [
-        "Quiescence is an independent re-observation of the fixed pre-stop pids, never an empty array derived from a deleted record."
+        "R1 82ee5b8f/8296720d, tar 04926739: ordinary and functional stop both pass on its own bytes, with the 1fba/1ba/ce64 scopes kept."
       ]
     },
     {
       "id": "E4",
-      "title": "First result: safe startup-phase tool",
-      "command": "node tests/product-acceptance/run.mjs --suites=selftest",
+      "title": "R1 latest UI and visible capabilities",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "Seventeen pure controls: own, wrong start, sibling, foreign child, mixed unknown, start window, refused stop, idempotence, birth root, child scope, no-record birth/exit/reuse/stop/unverified/set-mismatch/birth-config."
+        "Trial navigation, four callbacks, readiness, recipe preview and 7/30 insights are measured against the R1 bundle/API."
       ]
     },
     {
       "id": "E5",
-      "title": "Align to the current D target",
-      "command": "node -e \"require('node:fs').readFileSync('/Users/hh/Desktop/joker/pa-artifacts/wave29-target/install-artifact.json')\"",
+      "title": "Two-project template and execution chain",
+      "command": "node tests/product-acceptance/cases/w31-journey.mjs",
       "notes": [
-        "Subject is D 1fba (source/build/schema/tar/bytes read from its manifest); 1ba and ce64 remain their own historical scopes."
+        "Two registered projects: read-only preview, explicit create with an edited goal, machine check, candidate and manual accept."
       ]
     },
     {
       "id": "E6",
-      "title": "Actual template preview",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4",
+      "title": "7/30 scoped observation",
+      "command": "node tests/product-acceptance/cases/w31-journey.mjs",
       "notes": [
-        "POST /v1/projects/:id/recipes/preview is real: exact input echo, draft fields/digests, zero Work writes, query/project/atom/kind/auth negatives."
+        "Open 7/30 windows answer with scope/coverage; project-scoped refusal is recorded as an authorization boundary, not a missing endpoint."
       ]
     },
     {
       "id": "E7",
-      "title": "Apply and revalidation before create",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4",
+      "title": "Selected context, reply and source review",
+      "command": "node tests/product-acceptance/cases/w31-journey.mjs",
       "notes": [
-        "Apply/edit and pre-create revalidation are browser-level work; the preview digest is recorded as data, not as a command token."
+        "prepare/send/receipt, loopback reply, audit/history/sources and the scoped opt-in run in the same journey with a mock provider."
       ]
     },
     {
       "id": "E8",
-      "title": "Second result: current package template loop",
-      "command": "node tests/product-acceptance/build-handoff.mjs",
+      "title": "Per-phase resource exit and reopen",
+      "command": "node tests/product-acceptance/cases/w31-journey.mjs",
       "notes": [
-        "The preview positive and its negatives are reported for the exact 1fba bytes; the apply/create chain keeps its own scope note."
+        "Each phase ends with a packaged STOPPED plus fixed-set observation, and the same data root reopens with both conversations."
       ]
     },
     {
       "id": "E9",
-      "title": "Statistics entry and 7/30 days",
+      "title": "R1 installer and upgrade compatibility",
       "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "GET /v1/insights validated against its public schema with 7/30 windows, scope, coverage, layers and auth/query negatives."
+        "Cold/no-executor/multi-state, baseline upgrade and rollback keep exit/status/pointer/operation/data on the R1 tar; no R2 claim is made without its fixed identity."
       ]
     },
     {
       "id": "E10",
-      "title": "Context-use and source UI",
+      "title": "Backup restore readonly and multi-root faults",
       "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "Existing prepare/send/audit/history/sources entries run with a local mock provider; default and opt-in shapes are distinguished."
+        "Non-empty backup/verify/restore into a new root, v1/v2 formats, artifact closure, and the recorded target-content gap."
       ]
     },
     {
       "id": "E11",
-      "title": "F identity and two-project daily flow",
+      "title": "Bounded sustained use and private support",
       "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "Installed selector, four navigations, draft and identity isolation remain browser-verified on the frozen bundle."
+        "Bounded readonly concurrency/reopen and support output 0600/non-overwriting/credential-free; no long soak is claimed."
       ]
     },
     {
       "id": "E12",
-      "title": "Third result: visible same-package chain",
-      "command": "node tests/product-acceptance/build-handoff.mjs",
-      "notes": [
-        "Template preview, statistics, context, source and UI results carry HTTP/actions/screenshots and exact remaining gaps."
-      ]
-    },
-    {
-      "id": "E13",
-      "title": "Function mode/start/stop",
-      "command": "node tests/product-acceptance/run.mjs --tier=installed-functional",
-      "notes": [
-        "On 1fba the packaged launcher stops a normal and a restored no-file instance; detection and function stay separate."
-      ]
-    },
-    {
-      "id": "E14",
-      "title": "Two formats and recovery data",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4",
-      "notes": [
-        "v1/v2 snapshots, artifact closure, unknown-table boundary and the target-content gap keep their own evidence."
-      ]
-    },
-    {
-      "id": "E15",
-      "title": "Multi-root reuse and upgrade",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4",
-      "notes": [
-        "Same-install multi-state reuse, wrong root/selection/port refusals and baseline upgrade/rollback keep exit/status/pointer/operation/data."
-      ]
-    },
-    {
-      "id": "E16",
-      "title": "Fourth result: ordinary and functional on the current tar",
-      "command": "node tests/product-acceptance/build-handoff.mjs",
-      "notes": [
-        "All ordinary and functional results are reported for the exact 1fba bytes; native/private/target/value stay separate."
-      ]
-    },
-    {
-      "id": "E17",
-      "title": "Bounded new-risk observation",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4",
-      "notes": [
-        "Only new risks are re-verified within a deadline; no old 600/1800 fixture is rerun as a product soak."
-      ]
-    },
-    {
-      "id": "E18",
-      "title": "G/H/I/J raw inputs",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4",
-      "notes": [
-        "Each input is re-derived from source/tuple/hash/time/layer; no summary becomes a grant or release verdict."
-      ]
-    },
-    {
-      "id": "E19",
-      "title": "Support and colleague guide",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4",
-      "notes": [
-        "Support output stays 0600, non-overwriting and credential-free; the guide matches the real preview/start/stop entries."
-      ]
-    },
-    {
-      "id": "E20",
-      "title": "Fifth result: daily trial and observation handoff",
-      "command": "node tests/product-acceptance/build-handoff.mjs",
-      "notes": [
-        "Short availability, raw observation, support and explicit not-reached items are delivered with ordinary and functional separated."
-      ]
-    },
-    {
-      "id": "E21",
-      "title": "Complete real positives and failure attribution",
+      "title": "Existing release oracle and complete handoff",
       "command": "node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record",
       "notes": [
-        "Every case binds the 1fba subject and its own evidence; 1ba and ce64 scopes stay historical."
-      ]
-    },
-    {
-      "id": "E22",
-      "title": "Layered required and compatibility",
-      "command": "node tests/product-acceptance/build-handoff.mjs",
-      "notes": [
-        "ordinary/functional/template/context/insights/recovery/native keep separate verdicts; full-product still refuses without native."
-      ]
-    },
-    {
-      "id": "E23",
-      "title": "Evidence and version facts",
-      "command": "node tests/product-acceptance/build-handoff.mjs",
-      "notes": [
-        "Usable paths, mode limits and unadmitted capabilities are stated with source/tuple/hash/time/exit indexes."
-      ]
-    },
-    {
-      "id": "E24",
-      "title": "Sixth result and complete handoff",
-      "command": "node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record",
-      "notes": [
-        "wave30-status, four deliverables and the remaining gates; only owned paths are pushed to the original origin branch."
+        "wave31-status indexes all twelve deliverables with source/tuple/consumer/commands and the remaining gates; no new gate or ledger."
       ]
     }
   ]

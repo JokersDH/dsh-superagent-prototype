@@ -3,12 +3,12 @@
   "tier": "full-product",
   "status": "FAIL",
   "ok": false,
-  "checkedAt": "2026-11-15T10:08:34.746Z",
+  "checkedAt": "2026-11-16T01:15:20.531Z",
   "source": {
-    "commit": "1675ccbe9217b26660c5c9b237c1390fd168a83f",
+    "commit": "d32080f543ceac7f127113a5a0adefa232f718f0",
     "dirty": false
   },
-  "expectedSource": "1675ccbe9217b26660c5c9b237c1390fd168a83f",
+  "expectedSource": "d32080f543ceac7f127113a5a0adefa232f718f0",
   "requirements": [
     {
       "id": "E1-GATE-CONTROL",
@@ -377,6 +377,21 @@
     },
     {
       "id": "E1-MUTATE-PILOT-NO-ORACLE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-LIFECYCLE-STOPPED-KNOWN-CHILD",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-LIFECYCLE-STOPPED-NO-RECORD-CHILD",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-LIFECYCLE-PARENT-GONE",
       "required": true,
       "status": "PASS"
     },
@@ -861,6 +876,21 @@
       "status": "PASS"
     },
     {
+      "id": "E5-TWO-PROJECT-TEMPLATE-CREATE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E7-JOURNEY-CONTEXT-SOURCE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E8-JOURNEY-STOP-REOPEN",
+      "required": true,
+      "status": "PASS"
+    },
+    {
       "id": "E11-TRIAL-IDENTITY-FIELDS",
       "required": false,
       "status": "NOT_TESTED"
@@ -996,7 +1026,7 @@
   "claimedBy": {
     "status": "PASS",
     "tier": "controlled-product-workflow",
-    "decidedAt": "2026-11-15T10:00:44.882Z",
+    "decidedAt": "2026-11-16T01:10:48.860Z",
     "failureCodes": []
   },
   "notes": [

@@ -520,7 +520,7 @@ const commandSummary = (prefixes) => {
     .join(' + ')
 }
 
-const handoff = `# Agent E 第三十轮交付交接
+const handoff = `# Agent E 第三十一轮交付交接
 
 - 分支 \`${stages.branch}\`，基线 \`${stages.base}\`，检查点 \`${stages.checkpoint}\`，本次证据源 \`${report.source.commit}\`${report.source.dirty ? '（运行时尚有未提交文件，最终提交包含它们）' : '（干净工作树）'}。证据文件随源提交之后的提交一起交付；\`git log\` 的分支头即最终交付提交。
 - 拥有路径：\`tests/product-acceptance/\`。未修改生产实现、root manifest/lock、公共 schema 或迁移。
@@ -1064,8 +1064,12 @@ if (!existsSync(join(reports, 'wave23-status.json')))
     packagedStop: byId.get('E8-PACKAGED-STOP-CONSISTENCY')?.evidence?.packagedStop ?? null,
     stopFunctional: byId.get('E5-STOP-FUNCTIONAL')?.evidence?.stopFunctional ?? null,
     insights: byId.get('E9-INSIGHTS-HTTP')?.evidence?.insights ?? null,
+    journey: byId.get('E5-TWO-PROJECT-TEMPLATE-CREATE')?.evidence?.journey ?? null,
+    journeyContext: byId.get('E7-JOURNEY-CONTEXT-SOURCE')?.evidence?.journeyContext ?? null,
+    journeyPhases: byId.get('E8-JOURNEY-STOP-REOPEN')?.evidence?.journeyPhases ?? null,
+    journeyReopen: byId.get('E8-JOURNEY-STOP-REOPEN')?.evidence?.journeyReopen ?? null,
     recipePreview: byId.get('E6-RECIPE-PREVIEW')?.evidence?.recipePreview ?? null,
-    lifecycle: ['E1-LIFECYCLE-NO-RECORD-UNVERIFIED', 'E1-LIFECYCLE-SET-MISMATCH', 'E1-LIFECYCLE-BIRTH-CONFIG', 'E1-LIFECYCLE-NO-RECORD-BIRTH', 'E1-LIFECYCLE-NO-RECORD-EXIT', 'E1-LIFECYCLE-NO-RECORD-REUSE', 'E1-LIFECYCLE-STOP-NO-RECORD', 'E1-LIFECYCLE-BIRTH-ROOT', 'E1-LIFECYCLE-CHILD-SCOPE', 'E1-LIFECYCLE-OWN', 'E1-LIFECYCLE-WRONG-START', 'E1-LIFECYCLE-SIBLING', 'E1-LIFECYCLE-FOREIGN-CHILD',
+    lifecycle: ['E1-LIFECYCLE-STOPPED-KNOWN-CHILD', 'E1-LIFECYCLE-STOPPED-NO-RECORD-CHILD', 'E1-LIFECYCLE-PARENT-GONE', 'E1-LIFECYCLE-NO-RECORD-UNVERIFIED', 'E1-LIFECYCLE-SET-MISMATCH', 'E1-LIFECYCLE-BIRTH-CONFIG', 'E1-LIFECYCLE-NO-RECORD-BIRTH', 'E1-LIFECYCLE-NO-RECORD-EXIT', 'E1-LIFECYCLE-NO-RECORD-REUSE', 'E1-LIFECYCLE-STOP-NO-RECORD', 'E1-LIFECYCLE-BIRTH-ROOT', 'E1-LIFECYCLE-CHILD-SCOPE', 'E1-LIFECYCLE-OWN', 'E1-LIFECYCLE-WRONG-START', 'E1-LIFECYCLE-SIBLING', 'E1-LIFECYCLE-FOREIGN-CHILD',
       'E1-LIFECYCLE-MIXED-UNKNOWN', 'E1-LIFECYCLE-START-WINDOW', 'E1-LIFECYCLE-REFUSED-STOP', 'E1-LIFECYCLE-IDEMPOTENT']
       .map(id => ({ id, status: byId.get(id)?.status ?? 'MISSING' })),
     channel: byId.get('E9-COORDINATOR-CHANNEL-CONTRACT')?.evidence?.channelContract ?? null,
@@ -1200,12 +1204,12 @@ if (!existsSync(join(reports, 'wave24-status.json')))
   }, null, 2) + '\n',
 )
 writeFileSync(
-  join(reports, 'wave30-status.json'),
+  join(reports, 'wave31-status.json'),
   JSON.stringify({
     ...executionStatus,
-    schema: 'product-acceptance-wave30-status/1',
-    taskPackage: 'agent-tasks/product-wave-30/README.zh-CN.md',
-    supersedes: 'wave29-status.json',
+    schema: 'product-acceptance-wave31-status/1',
+    taskPackage: 'agent-tasks/product-wave-31/README.zh-CN.md',
+    supersedes: 'wave30-status.json',
     subject: { target: byId.get('E4-INSTALL-ARTIFACT-IDENTITY')?.evidence?.artifact?.tuple?.target ?? null,
       baseline: byId.get('E4-UPGRADE-ROLLBACK')?.evidence?.upgrade?.baseline ?? null,
       control: byId.get('E5-D-OWNERSHIP-MOCKS')?.evidence?.ownershipMocks?.previousPackageHelper ?? null },
@@ -1232,6 +1236,9 @@ writeFileSync(
       trialWorkbenchUi: byId.get('E3-TRIAL-WORKBENCH-UI')?.status ?? 'MISSING',
       functionalStop: byId.get('E5-STOP-FUNCTIONAL')?.status ?? 'MISSING',
       insights: byId.get('E9-INSIGHTS-HTTP')?.status ?? 'MISSING',
+      journey: byId.get('E5-TWO-PROJECT-TEMPLATE-CREATE')?.status ?? 'MISSING',
+      journeyContext: byId.get('E7-JOURNEY-CONTEXT-SOURCE')?.status ?? 'MISSING',
+      journeyReopen: byId.get('E8-JOURNEY-STOP-REOPEN')?.status ?? 'MISSING',
       recipePreview: byId.get('E6-RECIPE-PREVIEW')?.status ?? 'MISSING',
       lifecycleControls: ['E1-LIFECYCLE-NO-RECORD-UNVERIFIED', 'E1-LIFECYCLE-SET-MISMATCH', 'E1-LIFECYCLE-BIRTH-CONFIG', 'E1-LIFECYCLE-NO-RECORD-BIRTH', 'E1-LIFECYCLE-NO-RECORD-EXIT', 'E1-LIFECYCLE-NO-RECORD-REUSE', 'E1-LIFECYCLE-STOP-NO-RECORD', 'E1-LIFECYCLE-BIRTH-ROOT', 'E1-LIFECYCLE-CHILD-SCOPE', 'E1-LIFECYCLE-OWN', 'E1-LIFECYCLE-WRONG-START', 'E1-LIFECYCLE-SIBLING', 'E1-LIFECYCLE-FOREIGN-CHILD',
         'E1-LIFECYCLE-MIXED-UNKNOWN', 'E1-LIFECYCLE-START-WINDOW', 'E1-LIFECYCLE-REFUSED-STOP', 'E1-LIFECYCLE-IDEMPOTENT']
@@ -1300,7 +1307,10 @@ writeFileSync(
       p1Tool: 'wave-27 closed substring/unproven-signal/unconditional-record-deletion; wave-28 closes birth-root and whole-set preflight (a record cannot lend another state birth)',
       measuredCe64W28: '260 PASS / 0 FAIL / 19 NOT_TESTED ordinary scope; functional stop detected as BLOCKED and required to fail in installed-functional (preserved history)',
       measured1ba: 'wave-29 D 1ba0032 scope preserved (274 PASS / 0 FAIL / 20 NOT_TESTED)',
-      measured1fba: 'D 1fba944 measured here: recipes preview plus insights on the same tar, functional stop PASS',
+      measured1fba: 'wave-30 D 1fba944 scope preserved (278 PASS / 0 FAIL / 19 NOT_TESTED)',
+      measuredR1: 'D 82ee5b8f / 8296720d / tar 04926739 measured here: ordinary, functional, UI, template preview, insights and the two-project journey all pass',
+      r2: 'NOT_REACHED: no fixed R2 identity was published (the observed later artifact is a different source), so no R2 installer/upgrade claim is made from it',
+      stoppedChild: 'wave-31 verifies the fixed pre-stop set after a packaged STOPPED: a live known child keeps the root retained',
       noDiscovery: 'wave-30 removes global process discovery from forced no-record cleanup; only the caller\'s complete immutable set can authorize a signal',
       noRecordGap: 'wave-29 closes known-birth/no-record: a missing instance.json no longer releases a live spawn or deletes its private root',
       measuredA826: 'a826 readiness/UI absent from the frozen package; its exact bytes stay a separate scope and are not relabeled',
@@ -1349,7 +1359,7 @@ writeFileSync(
     artifactTuple,
   }, null, 2) + '\n',
 )
-// Historical wave06-29 status files are frozen inputs; wave30 supersedes them.
+// Historical wave06-30 status files are frozen inputs; wave31 supersedes them.
 
 writeFileSync(join(reports, 'handoff.zh-CN.md'), handoff)
 
