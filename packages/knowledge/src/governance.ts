@@ -212,6 +212,13 @@ export class DecisionGovernance {
     }
   }
 
+  /** One effective, source-current record; undefined means revoked, superseded, expired or source-invalid. */
+  async getEffective(decisionId: string, now: Date = this.now()): Promise<DecisionRecord | undefined> {
+    const record = await this.store.get(decisionId)
+    if (!record || !this.isEffectiveRecord(record, now)) return undefined
+    return (await this.sourceState(record)) === 'current' ? this.withExpiry(record, now) : undefined
+  }
+
   /** Current source validity is part of effectiveness, not only a record-time check. */
   async isEffective(decisionId: string, now: Date = this.now()): Promise<boolean> {
     const record = await this.store.get(decisionId)
