@@ -9,6 +9,7 @@
 import { isAbsolute, resolve } from 'node:path'
 import { parseArgs } from 'node:util'
 import { pathToFileURL } from 'node:url'
+import { composeHistoryWindow } from './history-coverage.mjs'
 
 const { values } = parseArgs({ options: {
   'a-worktree': { type: 'string' }, db: { type: 'string' }, work: { type: 'string' }, project: { type: 'string' },
@@ -27,22 +28,6 @@ const workId = values.work, projectId = values.project
 if (!workId || !projectId) throw new Error('--work and --project are required')
 const storage = await import(pathToFileURL(resolve(aWorktree, 'packages/storage/src/index.ts')).href)
 const store = new storage.ProductStore({ path: database })
-const windowOf = (available, sourceState, returned) => {
-  const localTruncated = offset + returned < available
-  const state = sourceState === 'truncated' ? 'truncated_source' : localTruncated ? 'truncated_local' : 'complete'
-  return {
-    sourceState,
-    state,
-    offset,
-    limit,
-    returned,
-    availableKnown: sourceState === 'complete',
-    available: sourceState === 'complete' ? available : null,
-    localTruncated,
-    truncated: sourceState === 'truncated' || localTruncated,
-    ...(localTruncated && sourceState === 'complete' && returned > 0 ? { nextOffset: offset + returned } : {}),
-  }
-}
 try {
   const entry = store.workflows.index.work(workId, [projectId])
   if (!entry) {
@@ -60,11 +45,11 @@ try {
     }))
     const page = reviews.slice(offset, offset + limit)
     const coverage = {
-      reviews: windowOf(reviews.length, sourceCoverage.reviews, page.length),
+      reviews: composeHistoryWindow({ sourceState: sourceCoverage.reviews, total: reviews.length, offset, limit }),
       // Unclassified entries are derived from the same capped verification scan.
-      unclassifiedReviews: windowOf(completion.unclassifiedReviews.length, sourceCoverage.verifications, completion.unclassifiedReviews.length),
-      verifications: windowOf(completion.verifications.length, sourceCoverage.verifications, completion.verifications.length),
-      acceptances: windowOf(completion.acceptances.length, sourceCoverage.acceptances, completion.acceptances.length),
+      unclassifiedReviews: composeHistoryWindow({ sourceState: sourceCoverage.verifications, total: completion.unclassifiedReviews.length, offset: 0, limit: completion.unclassifiedReviews.length }),
+      verifications: composeHistoryWindow({ sourceState: sourceCoverage.verifications, total: completion.verifications.length, offset: 0, limit: completion.verifications.length }),
+      acceptances: composeHistoryWindow({ sourceState: sourceCoverage.acceptances, total: completion.acceptances.length, offset: 0, limit: completion.acceptances.length }),
     }
     const windowOffsetBackwards = offset > 0 && offset >= reviews.length
     process.stdout.write(JSON.stringify({
@@ -82,7 +67,7 @@ try {
       },
       coverage,
       source: { coverage: sourceCoverage, limits: sourceLimits },
-      window: { offset, limit, returned: page.length, totalKnown: sourceCoverage.reviews === 'complete', ...(coverage.reviews.nextOffset === undefined ? {} : { nextOffset: coverage.reviews.nextOffset }) },
+      window: { offset, limit, returned: coverage.reviews.returned, totalKnown: coverage.reviews.complete && coverage.reviews.availableKnown, ...(coverage.reviews.nextOffset === undefined ? {} : { nextOffset: coverage.reviews.nextOffset }) },
       limits: ['A caps each ticket at 50 verifications/acceptances; coverage.reviews reflects that cap',
         'local window is applied to the source slice; truncated_source cannot be widened by paging',
         'read-only; no event/model/acceptance increment'],
