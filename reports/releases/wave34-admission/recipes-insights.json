@@ -1,0 +1,57 @@
+{
+  "protocol": "wave34-recipes-insights-admission/1",
+  "date": "2026-11-16",
+  "fixed": {
+    "G": "76467c33db3ec068d0521997a4511c2fbf9c9de1",
+    "J": "f6a1bf59db7461772661e51d1ac05702788004c0"
+  },
+  "checks": [
+    {
+      "role": "G",
+      "command": "node --test packages/usage-insights/test/support.case.ts packages/usage-insights/test/support-port.case.ts",
+      "exitCode": 0,
+      "pass": 15
+    },
+    {
+      "role": "G",
+      "command": "./node_modules/.bin/tsc --noEmit -p packages/usage-insights/tsconfig.json",
+      "exitCode": 0
+    },
+    {
+      "role": "J",
+      "command": "node --test packages/project-recipes/test/rebind.case.ts packages/project-recipes/test/module.case.ts packages/project-recipes/test/freshness.case.ts tools/project-recipes/test/rebind-cli.case.ts tools/project-recipes/test/two-project-delivery.case.ts",
+      "exitCode": 0,
+      "pass": 21
+    },
+    {
+      "role": "J",
+      "command": "./node_modules/.bin/tsc --noEmit -p packages/project-recipes/tsconfig.json",
+      "exitCode": 0
+    }
+  ],
+  "G": {
+    "source": "Support report/file/digest/conservation/manifest identity are real source behavior.",
+    "mainConsumer": {
+      "source": "23d5a98e6e75a3b0fb08168431260a9935cf5674",
+      "route": "GET /v1/insights/support",
+      "actual": true,
+      "description": "Fresh original authorized observation, server projection, strict public schema, digest download in App; exact G support.ts/support-port.ts and needed exports imported."
+    },
+    "notAdmitted": "Generic passthrough reader/handler not public upload authority; origin null/unverified, no numerical/value-benefit claim."
+  },
+  "J": {
+    "source": "Rebind current/changed/unbound/reidentified and module description remain candidate-only; freshness regressions and real CLI controls passed.",
+    "controlled": "Two actual registered temporary npm/pnpm roots preview->original Work/check/currentCandidate/actions.available accept->manualaccept/delivered->original artifact read->same state reopen.",
+    "limits": "No new production framework or second lifecycle; rebind report not a grant/restore-execution approval. New module/rebind not imported in main."
+  },
+  "limits": {
+    "realVendorModelNative": 0,
+    "candidateEdits": false,
+    "newDependencies": 0,
+    "newArchives": 0,
+    "userServicesTouched": 0,
+    "unsafeLiveSignals": 0,
+    "completionEstimateChanged": false,
+    "releaseApproved": false
+  }
+}

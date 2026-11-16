@@ -4,6 +4,7 @@ export * from './validation.ts';
 export * from './configuration.ts';
 export * from './trial-readiness.ts';
 export * from './usage-observation.ts';
+export * from './usage-support.ts';
 export * from './project-recipe-preview.ts';
 export * from './coordinator-channel.ts';
 export * from './assistant.ts';

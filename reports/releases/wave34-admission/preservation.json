@@ -1,0 +1,88 @@
+{
+  "protocol": "wave34-candidate-preservation/1",
+  "roles": [
+    {
+      "id": "A",
+      "head": "6bbbea3875305f09b8efb3fd54bc3a9a806b23b5",
+      "branch": "codex/g2-workspaces-verification",
+      "headUnchanged": true,
+      "branchUnchanged": true,
+      "dirtyUnchanged": true
+    },
+    {
+      "id": "B",
+      "head": "617349851c1fcef7debf0409849b7c8d19d25d47",
+      "branch": "codex/g1-runtime",
+      "headUnchanged": true,
+      "branchUnchanged": true,
+      "dirtyUnchanged": true
+    },
+    {
+      "id": "C",
+      "head": "ecac059dc8c6e0365acd20dccc12ff6d77ca5caa",
+      "branch": "codex/g3-assistant-context",
+      "headUnchanged": true,
+      "branchUnchanged": true,
+      "dirtyUnchanged": true
+    },
+    {
+      "id": "D",
+      "head": "7b8022e6c8f02bc2701a8df8d0a6a97dc6b56422",
+      "branch": "codex/g3-local-distribution",
+      "headUnchanged": true,
+      "branchUnchanged": true,
+      "dirtyUnchanged": true
+    },
+    {
+      "id": "E",
+      "head": "cc2f5facc5e1576b35c8227526e0358b4f590d00",
+      "branch": "codex/g3-product-acceptance",
+      "headUnchanged": true,
+      "branchUnchanged": true,
+      "dirtyUnchanged": true
+    },
+    {
+      "id": "F",
+      "head": "69e14a08ff7e8135b2ac1a15cd5809397b792411",
+      "branch": "codex/g4-trial-experience",
+      "headUnchanged": true,
+      "branchUnchanged": true,
+      "dirtyUnchanged": true
+    },
+    {
+      "id": "G",
+      "head": "76467c33db3ec068d0521997a4511c2fbf9c9de1",
+      "branch": "codex/g4-usage-insights",
+      "headUnchanged": true,
+      "branchUnchanged": true,
+      "dirtyUnchanged": true
+    },
+    {
+      "id": "H",
+      "head": "4549d0cb704ddd9ee6c7d043a37143ff04114a89",
+      "branch": "codex/g4-trial-operations",
+      "headUnchanged": true,
+      "branchUnchanged": true,
+      "dirtyUnchanged": true
+    },
+    {
+      "id": "I",
+      "head": "4b84127d3eada7078a23108d7ecbf88f2dbdc4ca",
+      "branch": "codex/g5-coordinator-channel",
+      "headUnchanged": true,
+      "branchUnchanged": true,
+      "dirtyUnchanged": true
+    },
+    {
+      "id": "J",
+      "head": "f6a1bf59db7461772661e51d1ac05702788004c0",
+      "branch": "codex/g5-project-recipes",
+      "headUnchanged": true,
+      "branchUnchanged": true,
+      "dirtyUnchanged": true
+    }
+  ],
+  "candidateEdits": false,
+  "userRuntimeOperations": 0,
+  "realVendorModelNative": 0
+}

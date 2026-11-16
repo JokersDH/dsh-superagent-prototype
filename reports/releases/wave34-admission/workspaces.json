@@ -1,0 +1,467 @@
+{
+  "date": "2026-11-16",
+  "main": "e05ee8d8164a010abf87e0f389382a3f94de2257",
+  "roles": [
+    {
+      "id": "A",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "branch": "codex/g2-workspaces-verification",
+      "head": "6bbbea3875305f09b8efb3fd54bc3a9a806b23b5",
+      "dirty": "",
+      "log": "6bbbea38 docs(workflows): record wave33 source-ready continuation evidence\n41b1e9a3 feat(storage): add keyset completion history continuation\n8c85afc8 Merge remote-tracking branch 'origin/main' into codex/g2-workspaces-verification",
+      "evidencePath": "/Users/hh/Desktop/joker/superagent-agent-a/packages/workflows/reports/wave33-status.json",
+      "statusKeys": [
+        "role",
+        "package",
+        "branch",
+        "fixedBaseline",
+        "mergedMain",
+        "mergeCommit",
+        "testedSourceCommit",
+        "dirty",
+        "productSchema",
+        "newMigrationThisWave",
+        "modelOrNativeTurns",
+        "status",
+        "wholeProductComplete",
+        "mainIntegration",
+        "installed",
+        "identities",
+        "commands",
+        "outcomes",
+        "remaining",
+        "preserved"
+      ],
+      "status": "SOURCE_READY",
+      "outcomes": [
+        {
+          "id": "W33-A1",
+          "status": "PASS_SOURCE"
+        },
+        {
+          "id": "W33-A2",
+          "status": "PARTIAL"
+        },
+        {
+          "id": "W33-A3",
+          "status": "PASS_SOURCE"
+        }
+      ],
+      "remaining": [
+        "main/C HTTP/UI continuation wiring with cursor signing and principal/Scope gate",
+        "D/E installed same-instance restart with R1 or a frozen R2 successor",
+        "B/I live native recovery and original Work fault takeover",
+        "F extraction/UI and E final installed verdict; CAC excluded"
+      ]
+    },
+    {
+      "id": "B",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "branch": "codex/g1-runtime",
+      "head": "617349851c1fcef7debf0409849b7c8d19d25d47",
+      "dirty": "M reports/releases/wave11-admission/runtime.json\n M reports/releases/wave12-admission/runtime.json\n?? tests/native-acceptance/b16-real-begin.mjs",
+      "log": "61734985 feat(wave33): fail-closed attached native guard and original feed/cancel transports\n8bdf3bf4 feat(wave33): real-ChildProcess signal authority and B-owned slot accounting\n735193ea Merge remote-tracking branch 'origin/main' into codex/g1-runtime",
+      "evidencePath": "/Users/hh/Desktop/joker/superagent-agent-b/tests/native-acceptance/reports/wave33-status.json",
+      "statusKeys": [
+        "agent",
+        "branch",
+        "wave",
+        "source",
+        "dirtyPreserved",
+        "outcomes",
+        "verification",
+        "scope",
+        "changed_paths_note"
+      ],
+      "status": null,
+      "outcomes": null,
+      "remaining": null
+    },
+    {
+      "id": "C",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "branch": "codex/g3-assistant-context",
+      "head": "ecac059dc8c6e0365acd20dccc12ff6d77ca5caa",
+      "dirty": "M pnpm-lock.yaml",
+      "log": "ecac059d docs(context): publish wave33 whole-goal status\ndd07719a docs(context): publish wave33 governance guide and final suite evidence\n1df0930e feat(knowledge): capture and revalidate a current decision snapshot for new work",
+      "evidencePath": "/Users/hh/Desktop/joker/superagent-agent-c/packages/context/reports/wave33-status.json",
+      "statusKeys": [
+        "protocol",
+        "agent",
+        "branch",
+        "base",
+        "wave",
+        "wholeGoal",
+        "sources",
+        "dirty",
+        "outcomes",
+        "suites",
+        "layers",
+        "remaining",
+        "preserved",
+        "budgets"
+      ],
+      "status": null,
+      "outcomes": null,
+      "remaining": [
+        "main to consume decision snapshot in its Work/creation wire or explicitly adopt the typed contract",
+        "F to render snapshot/draft/decision states",
+        "A/main packaged history coverage if adopted",
+        "real vendor/native, second protocol, CAC, soak unreached",
+        "E independent acceptance of the integrated version"
+      ]
+    },
+    {
+      "id": "D",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-d",
+      "branch": "codex/g3-local-distribution",
+      "head": "7b8022e6c8f02bc2701a8df8d0a6a97dc6b56422",
+      "dirty": "",
+      "log": "7b8022e6 Wave-33 D: fc38 cohort lifecycle, genuine nonempty backup/readonly restore, nonempty upgrade rollback and support\n048f0184 Merge remote-tracking branch 'origin/main' into codex/g3-local-distribution\ne05ee8d8 docs: admit wave32 results and dispatch whole-product wave33 outcomes",
+      "evidencePath": "/Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/reports/wave33-status.json",
+      "statusKeys": [
+        "protocol",
+        "owner",
+        "branch",
+        "state",
+        "source",
+        "runtimeSource",
+        "dirtyAtBuild",
+        "built",
+        "outcomes",
+        "commands",
+        "integrated",
+        "closure",
+        "remaining",
+        "limitations"
+      ],
+      "status": "COMPLETE_CANDIDATE_PENDING_E",
+      "outcomes": null,
+      "remaining": [
+        "E independent verdict for W33 outer/new inner",
+        "explicit allowed-model switch beyond existing private model config",
+        "cross-machine/signing/notarization/long soak",
+        "real native/vendor/model remains 0",
+        "CAC excluded"
+      ]
+    },
+    {
+      "id": "E",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-e",
+      "branch": "codex/g3-product-acceptance",
+      "head": "cc2f5facc5e1576b35c8227526e0358b4f590d00",
+      "dirty": "",
+      "log": "cc2f5fac docs(product-acceptance): record wave-33 outer ZIP, cohort recovery and journey status\nc2568908 test(product-acceptance): bind both outer-ZIP cases to the installed schema and runtime\nde100280 test(product-acceptance): bind the cohort recovery subject to the outer-ZIP runtime",
+      "evidencePath": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave33-status.json",
+      "statusKeys": [
+        "schema",
+        "agent",
+        "branch",
+        "base",
+        "checkpoint",
+        "head",
+        "worktreeDirtyAtRun",
+        "checkedAt",
+        "budget",
+        "stages",
+        "release",
+        "runDirectory",
+        "evidence",
+        "blockers",
+        "untested",
+        "externalBlockers",
+        "next",
+        "taskPackage",
+        "supersedes",
+        "subject",
+        "gateControls",
+        "layers",
+        "functional",
+        "scopes",
+        "externalSummaries",
+        "retainedHistory",
+        "requiredGate",
+        "finalRun",
+        "commands",
+        "personalReview",
+        "reviewReuse",
+        "scopeDiagnostics",
+        "readiness",
+        "packagedStop",
+        "stopFunctional",
+        "lifecycle",
+        "channel",
+        "supportMaterial",
+        "trialUi",
+        "counts",
+        "testCodeSource",
+        "productSource",
+        "mainSource",
+        "artifactTuple",
+        "cohorts"
+      ],
+      "status": null,
+      "outcomes": null,
+      "remaining": []
+    },
+    {
+      "id": "F",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-f",
+      "branch": "codex/g4-trial-experience",
+      "head": "69e14a08ff7e8135b2ac1a15cd5809397b792411",
+      "dirty": "",
+      "log": "69e14a08 docs(trial): record wave33 final source commit (docs only)\n0ce1adcc feat(trial): multi-work daily flow, first-use recovery and history/source support\n4f671e35 Merge remote-tracking branch 'origin/main' into codex/g4-trial-experience",
+      "evidencePath": "/Users/hh/Desktop/joker/superagent-agent-f/reports/trial-experience/wave33-status.json",
+      "statusKeys": [
+        "schemaVersion",
+        "owner",
+        "wave",
+        "goal",
+        "worktree",
+        "branch",
+        "baseMain",
+        "mergedMain",
+        "mergeCommit",
+        "mainAppSource",
+        "fixedStart",
+        "finalSourceCommit",
+        "dirty",
+        "state",
+        "outcome1_multiProject",
+        "outcome2_firstUseRecovery",
+        "outcome3_historySourceSupport",
+        "commands",
+        "actualObjects",
+        "mainMergedVsCandidate",
+        "layers",
+        "remaining",
+        "preserved"
+      ],
+      "status": "SOURCE_READY_AND_MAIN_MAIN_INTEGRATED_PRIOR_SLICE; INSTALLED/NATIVE NOT CLAIMED",
+      "outcomes": null,
+      "remaining": [
+        "D/E exact installed artifact and native verdict",
+        "manual screen-reader, non-Chromium, 200% zoom/forced-colors, real long auth expiry",
+        "long soak/value research intentionally not measured",
+        "history/source body UI remains main/A/C-owned; F only reports entry availability"
+      ]
+    },
+    {
+      "id": "G",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-g",
+      "branch": "codex/g4-usage-insights",
+      "head": "76467c33db3ec068d0521997a4511c2fbf9c9de1",
+      "dirty": "",
+      "log": "76467c33 docs(usage-insights): publish the wave33 support port contract, evidence and status\na7ce12ca feat(usage-insights-cli): derive package identity once and verify download envelopes\n267be004 feat(usage-insights): support port with digest verification, conservation and manifest identity",
+      "evidencePath": "/Users/hh/Desktop/joker/superagent-agent-g/reports/usage-insights/wave33-status.json",
+      "statusKeys": [
+        "protocol",
+        "agent",
+        "branch",
+        "worktree",
+        "origin",
+        "fixedStart",
+        "mergedMain",
+        "mergeCommit",
+        "dirty",
+        "generatedAt",
+        "goal",
+        "adoptedMainSource",
+        "outcomes",
+        "mergedIntoMain",
+        "artifacts",
+        "mainFindings",
+        "remaining",
+        "boundaries",
+        "verification"
+      ],
+      "status": null,
+      "outcomes": [
+        {
+          "id": "1"
+        },
+        {
+          "id": "2"
+        },
+        {
+          "id": "3"
+        }
+      ],
+      "remaining": [
+        {
+          "item": "main mounting createSupportHandler / using supportLabels in the App",
+          "dependency": "main owns HTTP/App/transport",
+          "state": "SOURCE_READY"
+        },
+        {
+          "item": "H/E/main independently consuming one support report and confirming a located gap",
+          "dependency": "an independent owner",
+          "state": "NOT_REACHED; artifact and runbook ready"
+        },
+        {
+          "item": "installed package carrying the support port with an E verdict",
+          "dependency": "a frozen successor tar",
+          "state": "NOT_REACHED; no installed claim"
+        },
+        {
+          "item": "operator long-term baseline, model cost, benefit",
+          "dependency": "real operator data",
+          "state": "NOT_TESTED; no percentage is produced"
+        },
+        {
+          "item": "actual_native execution",
+          "dependency": "vendor/native budget",
+          "state": "NOT_TESTED (0 turns)"
+        }
+      ]
+    },
+    {
+      "id": "H",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-h",
+      "branch": "codex/g4-trial-operations",
+      "head": "4549d0cb704ddd9ee6c7d043a37143ff04114a89",
+      "dirty": "",
+      "log": "4549d0cb docs(trial-ops): pin wave33 status to checkpoint\nee2c2e59 feat(trial-ops): publish wave33 exact consumer, package reopen and field evidence\ndfc21169 Merge remote-tracking branch 'origin/main' into codex/g4-trial-operations",
+      "evidencePath": "/Users/hh/Desktop/joker/superagent-agent-h/reports/trial-operations/wave33-status.json",
+      "statusKeys": [
+        "protocol",
+        "wave",
+        "owner",
+        "branch",
+        "base",
+        "mergedMain",
+        "currentH",
+        "updatedAt",
+        "goal",
+        "ownedPaths",
+        "dirty",
+        "sources",
+        "integratedInMain",
+        "outcomes",
+        "safety",
+        "tests",
+        "remaining",
+        "usage",
+        "errors",
+        "hashes",
+        "evidenceCommit"
+      ],
+      "status": null,
+      "outcomes": null,
+      "remaining": [
+        "review-restored startup/REUSED and package content beyond fixture",
+        "review-restored startup/REUSED and package content beyond fixture",
+        "B original same-Run callback join and coordinator SIGKILL recovery",
+        "recovered same-Work candidate/accept/delivered and native 2/4 slot release",
+        "main attachPort actual ProductExecution/QuestionBroker consumer (H observed only main-owned test)",
+        "E independent 88eb/R2 verdict, vendor/native/installed release, research value",
+        "H/B/I source not merged into main; only candidate branch evidence"
+      ]
+    },
+    {
+      "id": "I",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-i",
+      "branch": "codex/g5-coordinator-channel",
+      "head": "4b84127d3eada7078a23108d7ecbf88f2dbdc4ca",
+      "dirty": "",
+      "log": "4b84127d docs(runtime-channel): publish wave33 three-outcome status\n89d10ed6 test(runner): adopt main's attach port/caller and close the fault/slot outcomes\n93c1c121 Merge remote-tracking branch 'origin/main' into codex/g5-coordinator-channel",
+      "evidencePath": "/Users/hh/Desktop/joker/superagent-agent-i/reports/runtime-channel/wave33-status.json",
+      "statusKeys": [
+        "wave",
+        "role",
+        "title",
+        "date",
+        "workdir",
+        "branch",
+        "baseline",
+        "mergedOriginMain",
+        "mainIntegration",
+        "implementationCommits",
+        "status",
+        "statement",
+        "source",
+        "identity",
+        "outcomes",
+        "checks",
+        "artifacts",
+        "corrections",
+        "dirty",
+        "remaining",
+        "boundaries"
+      ],
+      "status": "SOURCE_READY_THREE_OUTCOMES_PASS_PRODUCT_RECOVERY_NOT_REACHED",
+      "outcomes": [
+        {
+          "id": "outcome1",
+          "status": "PASS"
+        },
+        {
+          "id": "outcome2",
+          "status": "PASS_COMMUNICATION_SCOPE"
+        },
+        {
+          "id": "outcome3",
+          "status": "PASS_COMMUNICATION_SCOPE"
+        }
+      ],
+      "remaining": [
+        "original Application/QuestionBroker Work question-answer and native_applied/ACK-unknown reconciliation (B/main)",
+        "same-Work recovered check/currentCandidate/manualaccept and product 2/4 slot release (B/main)",
+        "same-Runner coordinator SIGKILL successor (not run; no unsafe tools)",
+        "real vendor/model/native turns (0) and installed/native facts",
+        "B's spawn-provenance helper residual (plain metadata object accepted) — B tooling, not I",
+        "H independently executing this wave's source in its own tree"
+      ]
+    },
+    {
+      "id": "J",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-j",
+      "branch": "codex/g5-project-recipes",
+      "head": "f6a1bf59db7461772661e51d1ac05702788004c0",
+      "dirty": "",
+      "log": "f6a1bf59 docs(project-recipes): publish wave33 delivery, migration and hand-off status\n5cd59215 feat(project-recipes): deliver two real projects and publish a version hand-off\n7d6d099c Merge remote-tracking branch 'origin/main' into codex/g5-project-recipes",
+      "evidencePath": "/Users/hh/Desktop/joker/superagent-agent-j/reports/project-recipes/wave33-status.json",
+      "statusKeys": [
+        "protocol",
+        "owner",
+        "date",
+        "branch",
+        "worktree",
+        "baseline",
+        "mergedOriginMain",
+        "dirty",
+        "goal",
+        "outcomes",
+        "evidence",
+        "integration",
+        "packageIdentity",
+        "layers",
+        "remaining",
+        "minimalDependencies",
+        "limits",
+        "ownership"
+      ],
+      "status": null,
+      "outcomes": [
+        {
+          "id": "O1",
+          "status": "PASS_CONTROLLED"
+        },
+        {
+          "id": "O2",
+          "status": "PASS_CONTROLLED"
+        },
+        {
+          "id": "O3",
+          "status": "PASS_CANDIDATE_ONLY"
+        }
+      ],
+      "remaining": [
+        "main re-import of the three new/changed package files, then real App/F consumption of rebind",
+        "D successor build/freeze including contracts -> project-recipes, then E installed verdict on one exact tar",
+        "E independent product assertions unchanged; F presentation verification unchanged",
+        "real model/native/recovery paths and value claims stay out of scope"
+      ]
+    }
+  ]
+}
