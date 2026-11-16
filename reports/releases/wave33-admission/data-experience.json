@@ -1,0 +1,215 @@
+{
+  "protocol": "wave33-data-experience-admission/1",
+  "date": "2026-11-16",
+  "status": "A_SOURCE_PERSISTENCE_AND_F_CONSUMERS_PASS_C_OLD_UNKNOWN_CLOSED_THREE_LOCAL_P2_REMAIN",
+  "scope": "Read-only acceptance of wave32 A/C/F complete-engineering deliveries. No candidate changes, new task packets, preview/package validation, archive consumption or service operations. Main is integrating independently while this report is prepared.",
+  "initialMain": "58b4e4c804291cf414c91a76b4b784a917d2dfba",
+  "fixedSources": {
+    "A": "a9ae5cd1cbba773fca8e5ea898e2216a5bb6f1eb",
+    "C": "4d096ac210ad17604d5ce09a3bcd153b6a4f404a",
+    "F": "fae41f8c1eb0fbd6f7044dbc4ab6e4523e5efd53"
+  },
+  "candidateDirtyBeforeAndAfter": {
+    "A": [],
+    "C": ["pnpm-lock.yaml"],
+    "F": [],
+    "cLockNumstat": "3 additions / 0 deletions, preserved",
+    "cLockSha256": "3b4127d55e2e37f73b398cf04ac798a0678357dc2fdd7b5c558fa310094bb041"
+  },
+  "sourceDigests": {
+    "A:packages/storage/src/workflows.ts": "074d75ad1ef57235aa96410167779aae406279189d7b05cb2de5e8277576cce4",
+    "A:packages/workflows/test/wave32-persistent-two-project.case.ts": "c034104f5f661a27de59aa248595eac2801b75f86e03eb35a9eaccc8ff6b0e91",
+    "C:packages/context/tools/assistant-context-cli.mjs": "014fb5f541f73773bae59704c24862d334b818a4c7b75e0b58c50642ca7d2956",
+    "C:packages/context/tools/history-coverage.mjs": "275851a193a17bfcdac6d73c68fe012c3519cb5a78ded1e344c87534f688380e",
+    "C:packages/context/tools/wave31-completion-history.mjs": "13c815fc3489695e4e419323d8f919a2521f37fa298c09a5fb11620a0af15f26"
+  },
+  "executed": [
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-a/packages/workflows",
+      "command": "node --test test/acceptance.case.ts test/wave32-persistent-two-project.case.ts",
+      "exitCode": 0,
+      "passed": 8,
+      "failed": 0,
+      "durationMs": 5905,
+      "scope": "Original ProductStore/WorkflowPorts acceptance/UoW/history controls plus two genuinely distinct registered Git projects using existing createProductRuntime, original recipe preview, create_work, registered check/current candidate and explicit accept, followed by close/reopen of the same SQLite Store and cross-process C history read."
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "command": "./node_modules/.bin/tsc --noEmit -p packages/workflows/tsconfig.json",
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "command": "node --test --test-concurrency=1 packages/context/test/history-coverage.case.ts packages/knowledge/test/main-personal-history-coverage.case.ts packages/knowledge/test/main-personal-context-session-cli.case.ts",
+      "exitCode": 0,
+      "passed": 3,
+      "failed": 0,
+      "durationMs": 7550,
+      "scope": "Pure missing/unknown coverage; actual A-backed source-cap CLI; real public HTTP session CLI over a controlled normal-start runtime, candidate confirmation, selected-context send, decision record/revoke, frozen-source readback after Store/runtime reopen, draft save/load, cross-project refusal and readonly refusal.",
+      "fixtureBoundary": "Finite self-owned loopback HTTP and a fixed-response local candidate-model fixture, not a real vendor model or installed native agent. Servers/runtimes are closed by the tests."
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "command": "./node_modules/.bin/tsc --noEmit -p packages/context/tsconfig.json",
+      "exitCode": 2,
+      "diagnostic": "packages/context/test/history-coverage.case.ts(3,60): TS7016: Could not find a declaration file for module '../tools/history-coverage.mjs'; implicitly has an 'any' type."
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-f/apps/console",
+      "command": "node --test test/trial/trial-view.case.ts test/trial/recipes.case.ts",
+      "exitCode": 0,
+      "passed": 20,
+      "failed": 0,
+      "scope": "Readiness/actions, readonly/unknown/window/scope and original restricted template selection/coherence controls."
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-f",
+      "command": "./node_modules/.bin/tsc --noEmit -p apps/console/tsconfig.json",
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "command": "Inline Node in-memory TypeScript TSX load hook and ReactDOMServer.renderToStaticMarkup of fixed F TrialWorkspace",
+      "exitCode": 0,
+      "actualComponent": "/Users/hh/Desktop/joker/superagent-agent-f/apps/console/src/trial/TrialWorkspace.tsx",
+      "states": 4,
+      "result": { "firstImportPresent": true, "readonlyImportHidden": true, "recipeRetryCallbackOptional": true, "supportLabelsHonest": true, "callbackInvocations": 0 },
+      "limitation": "Actual component rendering and optional-prop compatibility, not a new browser/visual/installed journey verdict. No server or browser started."
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "command": "Inline Node imports the actual C session CLI with a fixed in-memory fetch response and self-owned temporary draft files; no real network request",
+      "exitCode": 1,
+      "status": "FAIL_DRAFT_FILE_AND_EXPIRY_BOUNDARIES",
+      "cases": [
+        { "id": "existing_public_destination", "cliStatus": "ok", "mode": "644", "overwritten": true },
+        { "id": "symlink_destination", "cliStatus": "ok", "victimOverwritten": true },
+        { "id": "valid_expiry", "cliStatus": "ok", "usable": true, "stale": false },
+        { "id": "expired_expiry", "cliStatus": "ok", "usable": false, "stale": true },
+        { "id": "invalid_expiry", "cliStatus": "ok", "usable": true, "stale": false }
+      ],
+      "scope": "Independent filesystem and invalid-date controls of the actual CLI. All changed files are freshly created probe files; no user credential or existing state was touched."
+    }
+  ],
+  "previousFindingsClosed": [
+    {
+      "id": "C32-MISSING-SOURCE-COVERAGE-RELABELLED-COMPLETE",
+      "status": "CLOSED_FOR_TESTED_UNKNOWN_AND_SOURCE_CAP_PATHS",
+      "implementation": "history-coverage.mjs normalizes every unrecognized/missing upstream state to unknown and exposes complete=false/availableKnown=false/available=null. The actual wave31 CLI imports that module for every collection.",
+      "evidence": "Current pure cases cover undefined/null/empty/unknown/partial/COMPLETE; actual A-backed source-cap CLI remains truncated_source and complete/local windows remain distinct. Three relevant tests pass.",
+      "scope": "Explicit developer history tool, not a new main history API or installed feature. The separate TS7016 error below does not reopen the functional unknown-coverage fix."
+    }
+  ],
+  "newFindings": [
+    {
+      "id": "C33-DRAFT-SAVE-FOLLOWS-LINK-AND-KEEPS-PUBLIC-MODE",
+      "priority": "P2_LOCAL_FILE_INTEGRITY_AND_PRIVACY",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-c/packages/context/tools/assistant-context-cli.mjs",
+      "line": 161,
+      "problem": "Draft save uses writeFileSync with flag=w. It follows an existing symlink and truncates its target; mode0600 applies only to newly created files, so an existing0644 destination is overwritten and remains0644. This contradicts the CLI's owner-private draft behavior and can clobber unrelated same-user material.",
+      "independentEvidence": "Actual CLI with fixed in-memory preview response returns status=ok for both an existing0644 file and a symlink to an owned victim; the first remains0644 and the second victim is overwritten.",
+      "scope": "New C candidate CLI only. No current main HTTP authorization bypass or real user-file incident is claimed.",
+      "necessaryCorrection": "Use a deliberate existing-draft update policy with no-follow/regular-file/owner/private permission checks and safe replacement, or refuse an existing destination. Preserve the current original API/authority."
+    },
+    {
+      "id": "C33-INVALID-DRAFT-EXPIRY-MARKED-USABLE",
+      "priority": "P2_DRAFT_STATE_CORRECTNESS",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-c/packages/context/tools/assistant-context-cli.mjs",
+      "line": 148,
+      "relatedLine": 146,
+      "problem": "The loader checks only that expiresAt is a string. Date.parse('not-a-date') produces NaN; NaN<=Date.now() is false, so an invalid expiry is returned as usable=true/stale=false.",
+      "positiveControl": "A valid future expiry returns usable=true; a real past expiry returns usable=false. Only the invalid timestamp incorrectly passes.",
+      "scope": "Candidate draft-data guidance, with authorization=none. A saved draft does not bypass the original server-side preview/send/confirmation guards.",
+      "necessaryCorrection": "Reject malformed/nonfinite timestamps and preserve explicit unknown/needs-repreview behavior rather than calling the draft usable."
+    },
+    {
+      "id": "C33-CONTEXT-STRICT-MISSING-MJS-DECLARATION",
+      "priority": "P2_INTEGRATION_CHECK_FAILURE",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-c/packages/context/test/history-coverage.case.ts",
+      "line": 3,
+      "problem": "The new test imports ../tools/history-coverage.mjs without a declaration or typed checked-JS interface. The actual package strict command fails TS7016 at the fixed submitted HEAD, despite the status report's pass label.",
+      "evidence": "./node_modules/.bin/tsc --noEmit -p packages/context/tsconfig.json exits2 with the exact diagnostic in executed[]. Runtime tests still pass.",
+      "necessaryCorrection": "Provide the module's real typed interface or equivalent project-consistent declaration, then rerun this exact strict check; do not weaken strictness or relabel the runtime pass as typecheck success."
+    }
+  ],
+  "aProductionAndPersistenceAssessment": {
+    "productionDiffVsPrevious02dc4aa8": "No new A production source or migration this wave. Added one substantial original-product two-project persistence test and evidence. Earlier history source/available contract remains candidate code with the same074d75ad digest.",
+    "actualConsumer": "NativeProjectRegistry.prepare/save -> existing createProductRuntime.read.projectRecipePreview -> original Application create_work/check/currentCandidate/accept_candidate -> same SQLite Store close/reopen -> original WorkIndex and separate Node C reader.",
+    "observed": {
+      "distinctProjectIds": ["project-d84e3a0ea4a41543e92d853b", "project-5536bb2edc70fe6fa5ce7d2b"],
+      "workIds": ["c1570c8f69bf02c83f45838c201e74e2", "fba9c8686a486ae0e67b2d1b74f86bfc"],
+      "originalContractsReadBack": true,
+      "reviewVerificationArtifactDigestRelationsReadBack": true,
+      "originalCreateAndAcceptReceiptsReadBack": true,
+      "heldQueueReadBack": true
+    },
+    "controlledExecution": "profile-fixture-pass on two nonempty registered scratch Git projects. These are distinct original project/Work IDs throughout the test, not one project relabelled after delivery or replacement Work to hide failure. The controlled executor is not a real vendor/native agent.",
+    "limits": [
+      "Reopens ProductStore in the same test process and uses a separate C reader; it does not restart a packaged coordinator or demonstrate original live-Work fault recovery.",
+      "Reopen assertions check review/verification artifact digest relations, not an independent second-process download and hash of every frozen artifact body or renewed current-candidate/accept action.",
+      "A still supplies source50 cap+counts, without source continuation beyond that cap. No whole history UI or installed capability is inferred.",
+      "The source test consumes A's candidate dependency closure; initial main58b4e4c8 does not contain the cumulative A CompletionFacts reader."
+    ],
+    "verdict": "PASS_SOURCE_CONTROLLED_PERSISTENCE; useful evidence of existing original production-chain behavior, not new installed/native/full-product completion. A's SOURCE_READY/wholeProductComplete=false is appropriately narrow."
+  },
+  "cActualSessionConsumerAssessment": {
+    "actualConsumer": "assistant-context-cli/1 makes original authenticated HTTP requests for context preview/send, reply candidate prepare/confirm, explicit decision record/revoke, frozen source reads and observation export. It uses no replacement SQL/coordinator or LLM loop.",
+    "verified": ["two distinct project/conversation identities", "proposal confirmation via original receipt", "selected-context send and frozen bundle", "decision revoke does not rewrite frozen bytes", "same Store/runtime reopen retains original frozen sources", "cross-project and readonly refusals"],
+    "limits": "The finite test uses a normal-start source runtime plus fixture HTTP mode and a fixed-response local model. It does not install or package the CLI, prove the --install credential branch, create a full real native development delivery, or expose these tools in the default App. Draft safety and strict checks above remain incomplete.",
+    "verdict": "REAL_SOURCE_HTTP_CONSUMER_WITH_LOCAL_P2_BLOCKERS; the old coverage bug is fixed, but the whole CLI/draft subsystem should not be called fully admitted."
+  },
+  "fMinimalProductionClosure": {
+    "fixedCandidate": "fae41f8c1eb0fbd6f7044dbc4ab6e4523e5efd53",
+    "admission": "Candidate pure20/console strict0 and actual component static states pass; no new F P1/P2 found in this scope. Source can be progressively integrated while keeping main as HTTP/form/authorization owner.",
+    "runtimeFiles": [
+      { "path": "apps/console/src/trial/TrialWorkspace.tsx", "bytes": 27962, "sha256": "5104770bf7cef5072d6e2bc13456cffe21c5818fb98d17a9decaa1630c75a3d9", "baselineMainSha256": "c0f4cd5dac0a112d5dff563f071ece037fcba75911fd6dfa65bc07605ef2fde0", "purpose": "First import, optional recipe retry, existing export status/retry and read-only support presentation." },
+      { "path": "apps/console/src/trial/insights.ts", "bytes": 5693, "sha256": "bb45b1f8025977658cbf75c9033a711444b2214e5c0f9c2fea69d969a3d96885", "baselineMainSha256": "55ab186e7399dc5b48eb56516415a7cc438bffbddf8e16e41adf17695d8c4c95", "purpose": "Optional observedAt interface used by the component; no new analysis or authority." },
+      { "path": "apps/console/src/trial/support.ts", "bytes": 2408, "sha256": "57b3fcd1372985a2eb69b3d52fc78810c3e5e050b4c7eb7456d77085089da3ff", "baselineMainSha256": null, "purpose": "New pure read-only support mapping, explicit absent package/source labels." },
+      { "path": "apps/console/src/trial/trial.css", "bytes": 12771, "sha256": "330375e511ae41f0d2207f1c1f3415f8938c44439e1e4c2c7344ad6b9ce670c2", "baselineMainSha256": "518b480368884e91156d875d2ab41d0ef0a37577230c789ba70020dd84a8b7c9", "purpose": "Local empty-project/export/support layout and34px retry controls; no global CSS." },
+      { "path": "apps/console/src/trial/recipes.ts", "bytes": 12637, "sha256": "fc16f1d3a14c27cee6d248fe874007bf1a1eff6a6af18e66986c62b14d5d3d33", "baselineMainSha256": "2eb2907a25ef11163410ab5fe9455af51a4721059eaa7f75b33d64df03acbce8", "purpose": "Retain the already-reviewed declaration/preview and additional-exclusion coherence refusals." },
+      { "path": "apps/console/src/trial/index.ts", "bytes": 1385, "sha256": "0bd0f872ff854753923b8381ebc672764d928bdb392e640dc928a2c2669c660b", "baselineMainSha256": "0fcbce85330f61347d0ffa0b16f0d821027d756a667fcce8162a209d11b70866", "purpose": "Nonbreaking barrel exports for support/recipe types and helpers." }
+    ],
+    "minimumForFeatureCompilation": ["TrialWorkspace.tsx", "insights.ts", "support.ts", "trial.css"],
+    "recommendedReviewedCompleteClosure": "The six exact files above retain prior selection safety and public exports as well as the current UX. Do not wholesale copy F App/transport/root files or runtime tests/harnesses into production.",
+    "identicalFilesNotNeedingImport": [
+      { "path": "apps/console/src/trial/useTrialReadiness.ts", "bytes": 5652, "sha256": "c9b392dae1307a37eaeaccf10fe9a203659a227d46834afe653dc198bb589af2" },
+      { "path": "apps/console/src/trial/trial-view.ts", "bytes": 9163, "sha256": "9eb76c80d7256dc3c6c85d4f105b757d076547f1db6ee08a6d9081347a53d461" }
+    ],
+    "newAppProps": {
+      "onReloadRecipes": "Optional () => void. The initial main useProjectRecipeSuggestions lacked a reload port. Main can add a bounded reloadRevision to that original three-preview hook/key, then pass onReloadRecipes={recipes.reload}; missing callback hides only the retry button.",
+      "support": "Optional {packageLabel?, sourceLabel?, note?}. Supply only trusted actual runtime/build metadata. Omission is supported and renders package/source as not provided/undeclared; do not fabricate installed identity.",
+      "existingExportProps": "Continue the current onDownloadInsights/insightsDownloading/insightsDownloadError callback/state from main useObservationDownload; F does not create another export transport."
+    },
+    "preservedOriginalComposition": ["insightWindow/onSelectInsightWindow and current7/30 identity fence", "original server-fields recipe suggestions and restricted selection", "original NewWorkForm preview/apply/edit/revalidate/explicit create", "existing four navigation actions and draft retention", "main transport/current/permission and acceptance authority"],
+    "testsAndVisualScope": "Current candidate20pure+strict and four exact-component static states pass. Submitted F actual App/browser evidence is acknowledged, not independently rerun or upgraded to installed/visual approval in this audit. Main should validate its actual composed source as part of its integration."
+  },
+  "mainConcurrentIntegrationObserved": {
+    "initialState": "Main was clean58b4e4c8 apart from five pre-existing untracked operation outputs; F support/first-import/new retry source was not in that baseline.",
+    "laterWorkInProgress": "During this audit main independently imported F source and added App onReloadRecipes={recipes.reload} plus reloadRevision in the existing project-recipe suggestions hook. These edits were not made by this audit.",
+    "byteComparisonAtReview": "index.ts, insights.ts, recipes.ts, support.ts and trial.css match the fixed F bytes above exactly; useTrialReadiness/trial-view remain byte-identical. TrialWorkspace differs only by removal of the visible implementation-owner sentence about main/H support, a product-copy change with no interface or control-flow difference at that snapshot.",
+    "admissionLimit": "This observes real ongoing integration, not a final committed-main/installed verdict. Main-owned App/hooks and concurrent runtime changes must be accepted at their final exact source; no candidate tree was changed."
+  },
+  "staleScopeNotTreatedAsRuntimeBugs": [
+    "F status labels support/first-import as merged, but initial main58b4e4c8 did not contain them. Later actual main WIP adoption is recorded separately above instead of trusting or rejecting the label.",
+    "C status lists intermediate source dirt and historical package/E scopes. Fixed C HEAD contains the tools; only the original lock diff is dirty. No archive or installation was consumed this wave.",
+    "A source/installed distinctions are retained; old R1/R2 names in its report do not constitute current package completion or a new missing-source defect."
+  ],
+  "preservation": {
+    "realVendorModelCalls": 0,
+    "realNativeTurns": 0,
+    "manualOrFaultSignals": 0,
+    "globalProcessOrSocketDiscovery": false,
+    "userServicesTouched": 0,
+    "persistentServicesStarted": 0,
+    "packageOrArchiveConsumed": false,
+    "previewPackagingValidationContinued": false,
+    "candidateSourcesAssertionsOrLocksEdited": false,
+    "mainProductionEditedByThisAudit": false,
+    "newTaskPackets": false,
+    "allExecSessionsCompleted": true,
+    "budgetsLedgersStateProfilesTarsHistoryPreserved": true,
+    "onlyOutputFile": "reports/releases/wave33-admission/data-experience.json",
+    "completionPercentageChangedByThisSubaudit": false,
+    "releaseApproved": false
+  }
+}

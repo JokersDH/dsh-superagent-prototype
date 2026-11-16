@@ -23,17 +23,10 @@ export type AttemptBinding = {
 
 export type Quiescence = { quiescence: 'confirmed' | 'indeterminate'; evidenceRefs: readonly string[] }
 
-/**
- * The original Runner's authenticated recovery registration, as the host already knows it. This is an
- * OPAQUE reference to an already-registered Runner: it grants no command, no write and no new attempt.
- */
+/** The original authenticated registration; not permission to write or launch another attempt. */
 export type AttachedAttemptPort = {
   readonly registration: { socketPath: string; credentialPath: string; socketIdentity: { dev: number; ino: number } }
-  readonly producer: {
-    attempt: { ticketId: string; assignmentId: string; attemptId: string; fenceEpoch: number; contract: AttemptSpec['contract'] }
-    runnerIdentityRef: string
-    source: string
-  }
+  readonly producer: RuntimeProducer
 }
 
 /** One launched attempt, as seen by the Supervisor. */
@@ -45,10 +38,7 @@ export interface RunningAttempt {
   waitExit(): Promise<ServeExit>
   /** Ask the Runner to stop; resolves only with physical-stop evidence. */
   stop(deadlineMs: number): Promise<Quiescence>
-  /**
-   * Present only for a host that registered an authenticated recovery endpoint. It is the minimal port
-   * main needs to hand an attached consumer the ORIGINAL registration; it is not execution authority.
-   */
+  /** Available only after the host has registered its original Runner. Node-internal, never a public DTO. */
   readonly attachPort?: AttachedAttemptPort
 }
 
