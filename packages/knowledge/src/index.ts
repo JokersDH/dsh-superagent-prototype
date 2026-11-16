@@ -1,6 +1,8 @@
 export { decisionContextProvider } from './context-provider.ts'
 export { captureDecisionSnapshot, revalidateDecisionSnapshot, DECISION_CONTEXT_SNAPSHOT_PROTOCOL } from './decision-snapshot.ts'
 export type { CurrentDecisionSnapshot, DecisionSnapshotDecision, DecisionSnapshotRevalidation } from './decision-snapshot.ts'
+export { prepareDecisionSelection, assertDecisionSelectionCurrent, DECISION_SELECTION_PREPARATION_PROTOCOL } from './decision-preparation.ts'
+export type { DecisionSelectionPreparation, DecisionSelectionAssertion } from './decision-preparation.ts'
 export { DecisionGovernance } from './governance.ts'
 export type { DecisionGovernanceOptions } from './governance.ts'
 export { InMemoryDecisionStore } from './in-memory-store.ts'
