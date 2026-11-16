@@ -104,7 +104,9 @@ try {
   await check('ACTUAL-DESKTOP-MOBILE-CONFIGURATION-FITS-AND-DOES-NOT-DISPATCH-WORK', async () => {
     for (const [name, width, height] of [['desktop', 1440, 1000], ['mobile', 390, 844]]) {
       await page.setViewportSize({ width, height }); await page.evaluate(() => document.fonts.ready)
-      await endpoint.scrollIntoViewIfNeeded()
+      await save.scrollIntoViewIfNeeded()
+      const saveBox = await save.boundingBox()
+      assert.ok(saveBox && saveBox.y >= 52 && saveBox.y + saveBox.height <= height - (width < 720 ? 56 : 0))
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false)
       assert.equal(await panel.evaluate(element => element.scrollWidth > element.clientWidth + 1), false)
       await page.screenshot({ path: join(output, `${name}.png`), fullPage: true, animations: 'disabled' })
