@@ -1,0 +1,296 @@
+{
+  "wave": "product-wave-34",
+  "role": "I",
+  "title": "Original callbacks, guard compatibility and same-run handoff for the unique channel",
+  "date": "2026-11-16",
+  "workdir": "/Users/hh/Desktop/joker/superagent-agent-i",
+  "branch": "codex/g5-coordinator-channel",
+  "baseline": "4b84127d3eada7078a23108d7ecbf88f2dbdc4ca",
+  "mergedOriginMain": "6b306514",
+  "mainIntegration": "23d5a98e",
+  "implementationCommits": [
+    "a6f1f8b4e3701c9420fc7a5bd96954b6a932616c"
+  ],
+  "status": "SOURCE_READY_SIX_OUTCOMES_PASS_APPLICATION_BROKER_RECOVERY_NOT_REACHED",
+  "statement": "Two continuous engineering packages, six outcomes: the unique channel is exercised through main's ORIGINAL NativeProductAttempt methods (recordFact / readPayload / beforeNativeWrite / nativeWriteDecision, the implementation behind attachCallbacks), including void/throw/late guard layering, command-authority independence, temporary detach vs terminal vs EOF, bounded pressure and a same-run handoff record. The channel module is unchanged. Original Application/QuestionBroker Work recovery, native effects, installed bytes and product slot release remain NOT_REACHED.",
+  "source": {
+    "moduleChangedThisWave": false,
+    "blobs": {
+      "coordinator-channel.ts": "d1ef81eb9d51b24417645151440eb1e262c20546",
+      "attach.ts": "321738dae3b87e6ad7d235f52aaa65e6f63ab527",
+      "errors.ts": "ec8ce909d0f30ab1d96488db56cdf3b6a4ab7f49",
+      "index.ts": "6314546e1d1facde00d0d2195edf1c14ad7a85d2"
+    },
+    "inMain": {
+      "module": true,
+      "pullAdapter": true,
+      "errors": true,
+      "index": true
+    },
+    "mainConsumedSources": {
+      "nativeAttempt": {
+        "path": "apps/coordinator/product/native-attempt.ts",
+        "blob": "b3d6e6927f827af77b198e9192fc9cd8bdc03fd0"
+      },
+      "attachedCaller": {
+        "path": "packages/execution/src/attached-attempt.ts",
+        "blob": "5a2f8731f61ca1e8cbb3a13c0d38b96a47ec322d"
+      },
+      "executionContracts": {
+        "path": "packages/execution/src/contracts.ts",
+        "blob": "0b1a4a7cf9bbff848280ce372d79e9447fb30c30"
+      },
+      "callbacksIntegrationTest": {
+        "path": "tests/integration/native-attach-callbacks.case.mjs",
+        "blob": "a11f01dc6910fa40c20172918a8a1f939acc471e"
+      }
+    },
+    "candidateOnly": [
+      "apps/runner/test/attach-channel/actual-native-callbacks.test.ts",
+      "apps/runner/test/attach-channel/actual-guard-and-command.test.ts",
+      "apps/runner/test/attach-channel/actual-native-succession.test.ts",
+      "apps/runner/test/attach-channel/actual-native-pressure.test.ts",
+      "apps/runner/test/attach-channel/actual-run-handoff.test.ts",
+      "apps/runner/test/attach-channel/native-callbacks-harness.ts",
+      "docs/runtime-channel/README.zh-CN.md",
+      "docs/runtime-channel/adoption-manual.zh-CN.md",
+      "docs/runtime-channel/fault-states.zh-CN.md",
+      "reports/runtime-channel/wave34-status.json"
+    ]
+  },
+  "identity": {
+    "inner": {
+      "producer": {
+        "attempt": {
+          "ticketId": "ticket-1",
+          "assignmentId": "assignment-1",
+          "attemptId": "attempt-1",
+          "fenceEpoch": 1,
+          "contract": {
+            "workId": "work-1",
+            "revision": 1,
+            "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          }
+        },
+        "source": "fixture-driver",
+        "runnerIdentityRef": "runner-1"
+      },
+      "factIds": [
+        "fact-orig",
+        "fact-native-succ",
+        "fact-terminal-native",
+        "fact-eof-native",
+        "fact-slow-orig-1..3",
+        "fact-refused-orig",
+        "fact-cap-orig-1..64",
+        "fact-handoff"
+      ],
+      "intentCorrelation": "intent-<module salt>-<n>; business command ids cmd-orig-1/cmd-succ-1/cmd-succ-2/cmd-handoff preserved",
+      "payloadRefs": "payload:<sha256 of canonical JSON>; caller-side local and coordinator-side refs are identical by content addressing"
+    },
+    "outer": {
+      "endpoint": "<recoveryRoot>/<attemptId>/runner.sock + runner.credential (dev/ino pinned)",
+      "leaseIds": [
+        "lease-orig",
+        "lease-guard",
+        "lease-cmd-a",
+        "lease-native-a",
+        "lease-native-b",
+        "lease-terminal-native",
+        "lease-eof-native",
+        "lease-slow-orig",
+        "lease-refused-orig",
+        "lease-cap-orig",
+        "lease-handoff"
+      ],
+      "generations": "1 (stdio bootstrap) -> 2 (first CAS) -> 3 (successor)"
+    }
+  },
+  "outcomes": [
+    {
+      "id": "I1",
+      "title": "Unique channel's three callbacks via original methods",
+      "status": "PASS",
+      "implementation": "NativeProductAttempt.recordFact/readPayload/nativeWriteDecision used as the caller callbacks; endpoint injected as the post-registration state (no launch/spawn)",
+      "consumer": "actual-native-callbacks.test.ts (3)",
+      "positive": "original Store receipt seq == row seq; original payload body; one original guard decision per intent",
+      "negative": "foreign source refused before any receipt; missing index/current refuse",
+      "notReached": "attachCallbacks as returned by launch() (requires native spawn); Application/QuestionBroker Wiring"
+    },
+    {
+      "id": "I2",
+      "title": "Original fresh guard void/throw/late semantics",
+      "status": "PASS",
+      "implementation": "original void beforeNativeWrite + explicit decision wrapper layering",
+      "consumer": "actual-guard-and-command.test.ts (2 of 3)",
+      "positive": "wrapped decision allows exactly once; consumed admission cannot be reused",
+      "negative": "bare void never allows; throw, wrong recorded body, stale current refuse",
+      "notReached": "vendor/native effect observation"
+    },
+    {
+      "id": "I3",
+      "title": "Existing RPC and command-authority compatibility",
+      "status": "PASS_TRANSPORT_SCOPE",
+      "implementation": "typed recovery transport; command identity/epoch checks stay in the original service",
+      "consumer": "actual-guard-and-command.test.ts (1 of 3)",
+      "positive": "command refusal demonstrated with callback lease already at generation>=2",
+      "negative": "foreign-attempt command refused; legal command without a live child is a typed refusal, never a success",
+      "notReached": "feed/cancel through a launched native Runner; B raw-cancel foreign-source residual (B-owned)"
+    },
+    {
+      "id": "I4",
+      "title": "Temporary detach, terminal and succession with original callbacks",
+      "status": "PASS_COMMUNICATION_SCOPE",
+      "implementation": "two original-method callers over the same endpoint; main terminal close",
+      "consumer": "actual-native-succession.test.ts (2)",
+      "positive": "successor continues the same attempt; fresh intent gets its own original decision",
+      "negative": "pending write indeterminate and not migrated; terminal closes a pending record; input EOF is not a shutdown (no ACK, no exit frame)",
+      "notReached": "same original Work recovery to check/currentCandidate/manualaccept"
+    },
+    {
+      "id": "I5",
+      "title": "Namespace, backpressure and bounded diagnostics",
+      "status": "PASS",
+      "implementation": "module bounds applied to the original callback path",
+      "consumer": "actual-native-pressure.test.ts (3)",
+      "positive": "slow original sink drains a burst; 64 facts admitted then capacity restored",
+      "negative": "refusing original sink -> typed ack-failure with no Store row; missing caller-local payload refused; 65th fact capacity",
+      "notReached": "product scheduler 2/4 slots and full resource barrier"
+    },
+    {
+      "id": "I6",
+      "title": "Same-run physical/persistent handoff record",
+      "status": "PASS_SUPPORT_SCOPE",
+      "implementation": "RunHandoffRecord built from an actual run; no candidate/accept gate",
+      "consumer": "actual-run-handoff.test.ts (1)",
+      "positive": "attempt/producer/receipt==Store row/payload/intent nonce/guard count/resources recorded and checked",
+      "negative": "record carries explicit NOT_REACHED/NOT_TESTED/NOT_INSTALLED scope; no business frame and no acceptance artifact",
+      "notReached": "original Application Work/question/answer/native_applied, recovered candidate/manualaccept, slot release, installed/native facts"
+    }
+  ],
+  "checks": [
+    {
+      "command": "node_modules/.bin/tsc -p apps/runner/src/attach-channel/tsconfig.json",
+      "exit": 0
+    },
+    {
+      "command": "cd apps/runner && node --test --test-timeout=60000 test/attach-channel/*.test.ts",
+      "exit": 0,
+      "tests": 159,
+      "passed": 159,
+      "failed": 0,
+      "durationMs": 12189
+    },
+    {
+      "command": "node --test packages/contracts/test/coordinator-channel.case.ts",
+      "exit": 0,
+      "tests": 5,
+      "passed": 5
+    },
+    {
+      "command": "node --test tests/integration/native-attach-callbacks.case.mjs (main)",
+      "exit": 0,
+      "tests": 11,
+      "passed": 11
+    },
+    {
+      "command": "node --test tests/integration/attached-port.case.mjs (main)",
+      "exit": 0,
+      "tests": 4,
+      "passed": 4
+    }
+  ],
+  "artifacts": {
+    "R1": {
+      "buildId": "8296720d8a25f38c",
+      "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "createdOrRefrozenThisWave": false,
+      "note": "D fixes W33 for E; I does not refreeze"
+    },
+    "R2": {
+      "source": "303b2c6a",
+      "successors": "main 6b306514 includes 23d5a98e",
+      "newTarCreatedByI": "none"
+    },
+    "installState": "NOT_INSTALLED",
+    "note": "D freezes a successor only for actual runtime source changes; E verifies the same bytes independently."
+  },
+  "dirty": {
+    "thisWorktree": [],
+    "bPreserved": [
+      "reports/releases/wave11-admission/runtime.json",
+      "reports/releases/wave12-admission/runtime.json",
+      "tests/native-acceptance/b16-real-begin.mjs"
+    ],
+    "hClean": true
+  },
+  "remaining": [
+    "original Application/QuestionBroker Work question-answer and native_applied/ACK-unknown reconciliation (B/main)",
+    "same-Work recovered check/currentCandidate/manualaccept and product 2/4 slot release (B/main)",
+    "attachCallbacks as returned by launch() and any native effect/vendor turn (0 native this wave)",
+    "same-Runner coordinator SIGKILL successor (no unsafe tools run)",
+    "installed/native facts and value/benefit evidence (D/E/main)",
+    "B raw-cancel foreign-source and spawn-provenance tool residuals (B tooling)"
+  ],
+  "boundaries": {
+    "filesOutsideOwnershipModified": false,
+    "contractsRootWireChanged": false,
+    "runnerServiceOrLinkClientChanged": false,
+    "newServerDatabaseLedgerDriverLifecycle": false,
+    "realModelTurns": 0,
+    "nativeTurns": 0,
+    "processSignalsOrUserServiceOperations": 0,
+    "preservedUserServices": [
+      [
+        5180,
+        8796
+      ],
+      [
+        5181,
+        8797
+      ],
+      [
+        5182,
+        8798
+      ],
+      [
+        5183,
+        8799
+      ],
+      [
+        5184,
+        8800
+      ],
+      [
+        5185,
+        8801
+      ],
+      [
+        5186,
+        8802
+      ],
+      [
+        5187,
+        8803
+      ],
+      [
+        5188,
+        8804
+      ],
+      [
+        5189,
+        8805
+      ],
+      [
+        5190,
+        8806
+      ],
+      [
+        5191,
+        8807
+      ]
+    ],
+    "studyState": "BLOCKED_CURRENT_RECIPE_UNTOUCHED"
+  }
+}
