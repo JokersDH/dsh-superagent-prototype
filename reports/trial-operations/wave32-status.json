@@ -5,8 +5,8 @@
   "branch": "codex/g4-trial-operations",
   "base": "55766f412bde0a4bf3b7b2569e8ae9c5b4c5f3ec",
   "mergedMain": "07ccd067",
-  "currentH": "PENDING_COMMIT",
-  "updatedAt": "2026-11-16T04:10:33.018Z",
+  "currentH": "f14ec9e",
+  "updatedAt": "2026-11-16T04:13:09.591Z",
   "goal": {
     "wholeSubsystem": "bounded trial, run/fault support and field retention across the full product",
     "tokenBudget": null,
@@ -475,5 +475,6 @@
     "reports/trial-operations/wave32/lifecycle-r2/report.json": "902942077ff6da78512c6f5854e613bdd8754ca78c9dc7af412019a176f71691",
     "reports/trial-operations/wave32/field-r1/support-summary.json": "720d919cb771bce0b97177b02ee7bb3530ca218598c76fb046bbc80aa178681a",
     "reports/trial-operations/wave32/field-r2/support-summary.json": "6fcb2f4c99291fe0d5ff69cff196131bd2f20f22daed69e159f5344db015b41d"
-  }
+  },
+  "evidenceCommit": "f14ec9e"
 }
