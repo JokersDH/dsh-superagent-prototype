@@ -2,7 +2,7 @@
   "protocol": "wave35-status/1",
   "owner": "agent-d",
   "branch": "codex/g3-local-distribution",
-  "state": "IN_PROGRESS_NINE_OUTCOMES",
+  "state": "COMPLETE_CANDIDATE_PENDING_E",
   "source": "edfe5e14f2f8fbc7f395a84520c781c7f07ce9e7",
   "fixed": {
     "w33": {
@@ -48,19 +48,30 @@
         ]
       },
       "D2": {
-        "status": "NOT_REACHED",
-        "actual": "installed controlled runtime with two project IDs attempted",
-        "positive": [
-          "W33 two Works/two accepts/36 artifacts remain",
-          "one project fixture path exists"
-        ],
+        "status": "PASS_SCOPE",
+        "actual": "W35 installed Application/ProductStore read two distinct project IDs/roots/Works",
+        "positive": {
+          "projects": [
+            "project-alpha",
+            "project-beta"
+          ],
+          "works": [
+            "f9edce3a73b65ffa571caaea2fec5352",
+            "dc8f3692c726f6e801b1b744042113c2"
+          ],
+          "artifactsPerWork": 4,
+          "eventSeq": 102,
+          "accepts": 2
+        },
         "negative": [
-          "second project did NOT obtain accept; controlled runtime requires fixed src/ grant"
+          "wrong/unknown project rejection inherited original Application",
+          "same profile/check fixture disclosed; not two independent production profiles"
         ],
+        "limitation": "two sequential single-project runtimes over one state; controlled fixture requires fixed src/ grant; both use profile-fixture-question/FIXTURE_CHECK",
         "evidence": [
-          "reports/wave35/two-read.json"
-        ],
-        "note": "不能把同一 project-wave33 的两个 Work 冒充两个原项目"
+          "reports/wave35/two-projects.json",
+          "reports/wave35/two-projects-read.json"
+        ]
       },
       "D3": {
         "status": "PASS",
@@ -194,7 +205,6 @@
     }
   },
   "remaining": [
-    "D2 two original projects/installed consumer",
     "W35 exact review and browser save click",
     "E independent W33 and W35 verdicts",
     "cross-machine/signing/native/value"

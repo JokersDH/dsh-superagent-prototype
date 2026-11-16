@@ -1,0 +1,39 @@
+{
+  "status": "PASS",
+  "projects": [
+    {
+      "projectId": "project-alpha",
+      "workId": "f9edce3a73b65ffa571caaea2fec5352",
+      "acceptedEventSeq": 51,
+      "artifactCount": 4,
+      "scope": {
+        "projectId": "project-alpha",
+        "allowedPaths": [
+          "src/"
+        ],
+        "excludedPaths": [],
+        "externalActions": []
+      },
+      "profile": "profile-fixture-question"
+    },
+    {
+      "projectId": "project-beta",
+      "workId": "dc8f3692c726f6e801b1b744042113c2",
+      "acceptedEventSeq": 102,
+      "artifactCount": 4,
+      "scope": {
+        "projectId": "project-beta",
+        "allowedPaths": [
+          "src/"
+        ],
+        "excludedPaths": [],
+        "externalActions": []
+      },
+      "profile": "profile-fixture-question"
+    }
+  ],
+  "eventSeq": 102,
+  "realVendorTurns": 0,
+  "realModelTurns": 0,
+  "realNativeTurns": 0
+}

@@ -1,0 +1,70 @@
+{
+  "protocol": "wave35-two-projects-read/1",
+  "status": "PASS",
+  "reader": "W35 installed Application/ProductStore",
+  "works": [
+    {
+      "workId": "f9edce3a73b65ffa571caaea2fec5352",
+      "projectId": "project-alpha",
+      "artifactCount": 4,
+      "artifacts": [
+        {
+          "id": "aa1cd33da3a1ef9377a60a038bd57bb651d9be144435c044212722371e34e38c",
+          "bytes": 1143,
+          "sha256": "aa1cd33da3a1ef9377a60a038bd57bb651d9be144435c044212722371e34e38c"
+        },
+        {
+          "id": "1822672fb21520769ab626ab4ff94bfe4563373368f291baefc4b31fec8ed7c5",
+          "bytes": 187,
+          "sha256": "1822672fb21520769ab626ab4ff94bfe4563373368f291baefc4b31fec8ed7c5"
+        },
+        {
+          "id": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+          "bytes": 24,
+          "sha256": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b"
+        },
+        {
+          "id": "73e2a3f476b00855fae6e44c68097215339a8c52d75d017c9179b78b9e1713a5",
+          "bytes": 381,
+          "sha256": "73e2a3f476b00855fae6e44c68097215339a8c52d75d017c9179b78b9e1713a5"
+        }
+      ],
+      "available": [
+        "continue_work"
+      ]
+    },
+    {
+      "workId": "dc8f3692c726f6e801b1b744042113c2",
+      "projectId": "project-beta",
+      "artifactCount": 4,
+      "artifacts": [
+        {
+          "id": "71107eac674938fa29835c7ba6d5d224048d034f395d696573ecd68f45501d9d",
+          "bytes": 1143,
+          "sha256": "71107eac674938fa29835c7ba6d5d224048d034f395d696573ecd68f45501d9d"
+        },
+        {
+          "id": "1822672fb21520769ab626ab4ff94bfe4563373368f291baefc4b31fec8ed7c5",
+          "bytes": 187,
+          "sha256": "1822672fb21520769ab626ab4ff94bfe4563373368f291baefc4b31fec8ed7c5"
+        },
+        {
+          "id": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+          "bytes": 24,
+          "sha256": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b"
+        },
+        {
+          "id": "23f96ea30c41cf3c0b8437f3efbe9caf794110addb0c161b4406a53604a57a86",
+          "bytes": 381,
+          "sha256": "23f96ea30c41cf3c0b8437f3efbe9caf794110addb0c161b4406a53604a57a86"
+        }
+      ],
+      "available": [
+        "continue_work"
+      ]
+    }
+  ],
+  "realVendorTurns": 0,
+  "realModelTurns": 0,
+  "realNativeTurns": 0
+}
