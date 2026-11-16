@@ -217,6 +217,8 @@ export function trialRecipeOutcome(suggestion: TrialRecipeSuggestion, context: T
     if (!within(suggestion.scope.allowedPaths, project.scope.allowedPaths)) reasons.push('声明允许路径超出当前项目范围')
     if (!within(project.scope.excludedPaths, suggestion.scope.excludedPaths)) reasons.push('声明遗漏了当前项目必须保留的排除项')
     if (!within(suggestion.scope.externalActions, project.scope.externalActions)) reasons.push('声明外部动作超出当前项目范围')
+    // The restricted selection carries only allowed atoms; extra declared exclusions would be silently dropped.
+    if (!within(suggestion.scope.excludedPaths, project.scope.excludedPaths)) reasons.push('声明的追加排除项无法通过受限选择保留')
   }
 
   const preview = suggestion.preview
@@ -224,6 +226,8 @@ export function trialRecipeOutcome(suggestion: TrialRecipeSuggestion, context: T
   if (project !== undefined && preview !== null) {
     if (!unique(preview.allowedPaths) || preview.allowedPaths.length === 0) reasons.push('模板选择未包含有效的范围原子')
     else if (!within(preview.allowedPaths, project.scope.allowedPaths)) reasons.push('模板选择的范围原子超出当前项目')
+    else if (suggestion.scope !== null && !within(preview.allowedPaths, suggestion.scope.allowedPaths))
+      reasons.push('模板选择范围超出声明范围')
     if (!project.profileIds.includes(preview.profileId)) reasons.push(`当前项目未绑定模板执行器：${preview.profileId}`)
     const existing = context.profiles.find(item => item.id === preview.profileId)
     if (existing === undefined) reasons.push(`当前配置没有模板执行器：${preview.profileId}`)
