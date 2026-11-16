@@ -1,0 +1,166 @@
+{
+  "protocol": "usage-insights-support-summary/1",
+  "observationProtocol": "usage-observation/1",
+  "documentKind": "download",
+  "status": "ready",
+  "summaryId": "0548923b25df6de6bafcbb247191c275c03d9851d78cdb4011b231cd4fd7565b",
+  "observedAt": "2026-11-16T06:48:41.309Z",
+  "days": 7,
+  "timezone": "UTC",
+  "window": {
+    "from": "2026-11-09T06:48:41.309Z",
+    "to": "2026-11-16T06:48:41.309Z"
+  },
+  "scope": {
+    "projectIds": [
+      "project-arcade",
+      "project-beacon"
+    ],
+    "aggregation": "declared_multi_project",
+    "label": "本次 2 个项目"
+  },
+  "coverage": "部分覆盖",
+  "coverageState": "partial",
+  "counts": {
+    "rows": 12,
+    "withValue": 8,
+    "unknown": 4,
+    "sampleCount": 2
+  },
+  "rows": [
+    {
+      "rowId": "execution.durationMs@controlled@",
+      "layer": "controlled",
+      "unit": "ms",
+      "hasValue": false,
+      "sampleCount": 0
+    },
+    {
+      "rowId": "interventions.acceptances@product@",
+      "layer": "observed",
+      "unit": "",
+      "hasValue": true,
+      "sampleCount": 2
+    },
+    {
+      "rowId": "interventions.answers@product@",
+      "layer": "observed",
+      "unit": "",
+      "hasValue": true,
+      "sampleCount": 2
+    },
+    {
+      "rowId": "interventions.questions@product@",
+      "layer": "observed",
+      "unit": "",
+      "hasValue": true,
+      "sampleCount": 2
+    },
+    {
+      "rowId": "interventions.total@product@",
+      "layer": "observed",
+      "unit": "",
+      "hasValue": true,
+      "sampleCount": 2
+    },
+    {
+      "rowId": "outcomes.accepted@controlled@",
+      "layer": "controlled",
+      "unit": "",
+      "hasValue": true,
+      "sampleCount": 2
+    },
+    {
+      "rowId": "outcomes.count@controlled@",
+      "layer": "controlled",
+      "unit": "",
+      "hasValue": true,
+      "sampleCount": 2
+    },
+    {
+      "rowId": "queue.waitMs@controlled@",
+      "layer": "controlled",
+      "unit": "ms",
+      "hasValue": false,
+      "sampleCount": 0
+    },
+    {
+      "rowId": "review.activeMs@controlled@",
+      "layer": "controlled",
+      "unit": "ms",
+      "hasValue": true,
+      "sampleCount": 2
+    },
+    {
+      "rowId": "review.readyToAcceptanceMs@controlled@",
+      "layer": "controlled",
+      "unit": "ms",
+      "hasValue": true,
+      "sampleCount": 2
+    },
+    {
+      "rowId": "usage.inputTokens@controlled@",
+      "layer": "controlled",
+      "unit": "tokens",
+      "hasValue": false,
+      "sampleCount": 0
+    },
+    {
+      "rowId": "usage.outputTokens@controlled@",
+      "layer": "controlled",
+      "unit": "tokens",
+      "hasValue": false,
+      "sampleCount": 0
+    }
+  ],
+  "limitations": [
+    "仅统计现有工作证据；未记录的执行耗时、排队、用量与成本保持未知。",
+    "界面可见审阅时长是部分活动代理，不是人工工时或效率收益。"
+  ],
+  "numericValues": false,
+  "note": "Display document: the served values are formatted strings. This summary carries metadata only; it is not a numeric analysis result.",
+  "authorization": "none",
+  "origin": {
+    "kind": "package",
+    "identitySource": "install-manifest",
+    "buildId": "4dcd28f758bbb265",
+    "sourceCommit": "c0a1f8975232b6397dfaf92d31ac5682df2dab36",
+    "archiveSha256": "405ecd02fcbf288bac0855e17911ec4035521b54fe27d81fa0b28feaf5addcc6",
+    "capabilities": {
+      "pageObservation": true,
+      "numericExport": true,
+      "displayDownload": true
+    },
+    "browserTrigger": "present",
+    "missing": []
+  },
+  "evidence": {
+    "coverageState": "partial",
+    "rowsWithValue": 8,
+    "rowsWithoutValue": 4,
+    "sampleCount": 2,
+    "partial": true,
+    "absentFacts": [
+      "4 row(s) have no observed value",
+      "the observation is partial"
+    ]
+  },
+  "exportCapability": "present",
+  "digestCheck": {
+    "declared": "038e0a71a00d7e54798f1c1f8451c8d30994a481e14c243de1e7f42007b6f039",
+    "actual": "038e0a71a00d7e54798f1c1f8451c8d30994a481e14c243de1e7f42007b6f039",
+    "verified": true,
+    "state": "verified"
+  },
+  "conservation": {
+    "rowsMatch": true,
+    "scopeMatches": true,
+    "windowMatches": true,
+    "headerMatches": true,
+    "notCompared": []
+  },
+  "file": {
+    "bytes": 10036,
+    "sha256": "af90ed50b3f39e8fe7fde6d3268c7fe7d4d98fb23ca21fe054b6fade6fa73d33"
+  }
+}

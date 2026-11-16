@@ -159,6 +159,26 @@ the served path: adding or removing a display field, changing a default bound or
 would make the product route reject its own export. `test/download-route.case.ts` mounts the real route
 and parses the real contract, so such a change fails there first.
 
+## Support port
+
+`support-port.ts` is what main composes (Node only; nothing here enters the browser):
+
+- `readSupportDocument(document, { origin })` accepts the served observation, the downloaded display
+  document, or the `usage-observation-download/1` envelope. For an envelope it **recomputes** the
+  SHA256 (a shape-valid envelope with a wrong digest is a `mismatch`, not a pass) and checks field
+  conservation (`rowsMatch`/`scopeMatches`/`windowMatches`/`headerMatches`). An envelope that fails
+  the product contract is still diagnosed, with `contractValid: false`.
+- `buildSupportFile(report)` / `readSupportFile(file)` — the shareable `usage-insights-support/1`
+  artifact, bounded to 64 KiB, with its own digest.
+- `supportLabels(report)` — the three strings the trial workspace already renders (`packageLabel`,
+  `sourceLabel`, `note`), with nothing invented when no package was inspected.
+- `createSupportHandler({ resolveOrigin })` — a framework-free `(document) => { status, body }` for
+  main to mount; refusals never echo the input.
+- `originFromManifest(manifest, capabilities, options)` — the single identity implementation: a
+  manifest declares identity or it does not. Build + a 40-hex commit is `install-manifest`; only one of
+  them is `incomplete-manifest` with the rest `null`; neither is `null`. A branch name, a path or a
+  bundle keyword never becomes a commit hash.
+
 ## CLI
 
 ```sh

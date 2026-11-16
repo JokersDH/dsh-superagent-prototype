@@ -240,6 +240,9 @@ node tools/usage-insights/cli.mjs package --tar /abs/app.tar.gz [--json] \
   误报为缺失——当前发布的 R2 内层包就是构建布局。
 - 归档预算按文件大小；解压另设上限（预算的 8 倍，至少 64 MiB、最多 2 GiB），小归档不会因为解压后
   更大而被拒绝；扫描文本有 32 MiB 上限，超出预算的成员被跳过。
+- 身份来自 `install/install.json`：报告 `identity` 为 `install-manifest` / `incomplete-manifest` /
+  未声明；清单缺失字段保持 `null`，分支名、路径或 bundle 关键词不会变成 commit hash。
+  清单本身可到数 MB，解析上限 8 MiB，`manifestState` 区分 absent/too_large/invalid。
 - `--expect` 声明期望能力：缺失时 exit 3 并列出 `capability_missing`；`--expect-sha256`/`--expect-build`
   与归档不符时 exit 5。归档过大（`--max-archive-bytes`，默认 512 MiB）或不合法时 exit 5，不先解压。
 
@@ -247,6 +250,10 @@ node tools/usage-insights/cli.mjs package --tar /abs/app.tar.gz [--json] \
 scope/window/summary id/覆盖/每行 id/层/单位/是否有值/样本数；不复制 formatted 值、label、detail
 或路径，也不把它们反解成数字。文档可以是 coordinator 的 `usage-observation/1` 响应，也可以是用户
 下载的 `usage-insights-display-export/1` 文件（`documentKind` 区分）。
+
+文档也可以是下载外壳（`usage-observation-download/1`）：此时工具重算 `sha256(text)` 并做字段守恒
+（行/范围/窗口/header），`digest=mismatch` 直接 exit 5，即使里面的文档本身是 ready。裸下载文件/观察
+没有声明摘要，报告为 `digest=absent`（absent 不是通过）。
 
 加 `--package <绝对 tar>` 时同时读取运行包，报告里出现 `origin.buildId`/`sourceCommit`/包 digest、
 `capabilities`、`browserTrigger` 与 `origin.missing`（缺哪项能力），以及 `evidence.absentFacts`

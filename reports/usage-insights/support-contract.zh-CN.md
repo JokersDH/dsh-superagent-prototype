@@ -70,9 +70,28 @@ node tools/usage-insights/cli.mjs verify --dto /abs/observation-….json \
 
 `--out` 以 0600 独占创建、不覆盖；不给 `--out` 时只写 stdout。
 
+## Node port（main 组合）
+
+`packages/usage-insights/src/support-port.ts` 导出（Node only，不进 browser）：
+
+| 导出 | 作用 |
+| --- | --- |
+| `readSupportDocument(document, {origin?})` | 接受三形态：`observation` / 下载文件 `export` / 下载外壳 `download`。外壳会**重算 sha256**（形状通过≠字节通过），并做字段守恒核对 |
+| `buildSupportFile(report)` | 生成可分享文件 `usage-insights-support/1`：`fileName`、`mediaType`、`text`、`bytes`、`sha256`，默认 64 KiB 上限 |
+| `readSupportFile(file)` | 校验并读回同事发来的支持文件 |
+| `supportLabels(report)` | 直接喂 F 的 `TrialSupportInfo`：`packageLabel`（build / tar 前 12 位）、`sourceLabel`、`note`（缺能力/缺失事实）；无包时三个字段不编造 |
+| `createSupportHandler({resolveOrigin})` | 框架无关 handler：`(document) => {status:200|422, body}`，body 为 `{protocol, report, digest, conservation}`；不把输入回显到错误里 |
+| `originFromManifest(manifest, capabilities?, opts?)` | 唯一身份实现：manifest 有 build+40 位 commit → `install-manifest`；只有其一 → `incomplete-manifest` 且缺失项为 `null`；两者都无 → `null`；分支名/路径不会变成 commit |
+
+`readSupportDocument` 返回的 `digest.state` 三态：`verified` / `mismatch` / `absent`（裸文档没有声明摘要，
+`absent` 不是通过）。`conservation` 报告 `rowsMatch`/`scopeMatches`/`windowMatches`/`headerMatches`；
+`contractValid: false` 表示这份外壳没过产品自己的 contract（旧版或被重写），但仍可给出摘要与守恒诊断。
+
 ## 给 D/E/H 的最小使用约定
 
-- **D**：`package --tar <冻结包> --json` 得到能力与身份；把结果 `<buildId>@<sha256前12位>` 作为包标识。
+- **D**：`package --tar <冻结包> --json` 得到能力、`identitySource` 与身份；把 `<buildId>@<sha256前12位>`
+  作为包标识。`identitySource` 是 `install-manifest` 才说明 build/source 由清单声明；
+  `incomplete-manifest` 表示清单缺字段，缺失项仍是 `null`（不是猜的）。
 - **E**：不接受 G 的 `exportCapability: present` 作为发行准入；E 自己的同包断言仍然独立。
 - **H**：同事附上 `support.md`（含 `origin` 与 `absentFacts`）即可定位“缺哪个能力/哪几行没有值”，
   不需要发送下载文件本身或任何原始 prompt。
@@ -83,5 +102,7 @@ node tools/usage-insights/cli.mjs verify --dto /abs/observation-….json \
   `apps/console/dist/assets/*.js`；两种布局都报告 `console.layout`。库里有函数但没有产品路由/触发入口
   时只算库能力，不算用户可下载。
 - 扫描有界（协调器/控制台文本合计上限 32 MiB），超出预算的成员会被跳过而不是让整份报告失败。
+- 安装清单本身可到数 MB（内含完整文件清单），解析上限 8 MiB；`manifestState` 区分
+  `parsed`/`absent`/`too_large`/`invalid`，不会把“读不了”说成“没有声明”。
 - 归档预算按文件大小检查；解压另设上限（归档预算的 8 倍，至少 64 MiB、最多 2 GiB），
   小归档不会因为解压后更大而被拒绝。

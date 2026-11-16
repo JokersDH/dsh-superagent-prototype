@@ -1,0 +1,189 @@
+{
+  "protocol": "wave33-usage-insights-status/1",
+  "agent": "G",
+  "branch": "codex/g4-usage-insights",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-g",
+  "origin": "https://github.com/JokersDH/dsh-superagent-prototype.git",
+  "fixedStart": "76decf93",
+  "mergedMain": "e05ee8d8",
+  "mergeCommit": "7c667e2f",
+  "dirty": "clean before this file; only owned paths changed",
+  "generatedAt": "2026-11-16T06:55:00Z",
+  "goal": {
+    "statement": "A user exports the same scoped observation they are looking at, plus a secret-free support summary, and a colleague can tell from it what was seen, which build produced it and what is missing.",
+    "tokenBudget": "none",
+    "deadline": "none",
+    "vendorModelNativeTurns": 0,
+    "blockedPilot": "E original 24turn/200000token/USD5 single-in-flight pilot remains BLOCKED; no reset, top-up, refund, replacement sample, borrowed credential or price research.",
+    "notIncluded": ["CAC and CAC-specific subteam experiments", "temporary ZIP sprint", "narrowing Scheme B"]
+  },
+  "adoptedMainSource": {
+    "commit": "fc38bf65",
+    "whatIsConsumed": [
+      "apps/console/src/trial/support.ts: trialSupportRows + TrialSupportInfo (packageLabel/sourceLabel/note) — the UI that renders support facts",
+      "apps/console/src/trial/TrialWorkspace.tsx: support details block calling trialSupportRows",
+      "apps/console/src/useObservationDownload.ts and GET /v1/insights/export: the download the support file describes"
+    ],
+    "notReclaimed": [
+      "the registered runner port (Original RunningAttempt.attachPort) is not treated as an authorization or as recovered delivery",
+      "no claim is made about any closed runner/recovery gap"
+    ]
+  },
+  "outcomes": [
+    {
+      "id": "1",
+      "title": "Candidate support capability as a default product consumer",
+      "state": "SOURCE_READY (port + handler + labels delivered; main integration pending)",
+      "implementation": [
+        "packages/usage-insights/src/support-port.ts: readSupportDocument, buildSupportFile, readSupportFile, supportLabels, createSupportHandler, originFromManifest",
+        "supportLabels emits exactly the three fields F's TrialSupportInfo already renders, so main can wire it without a new UI contract",
+        "originFromManifest is the single identity implementation; build+40-hex commit → install-manifest, partial → incomplete-manifest with the rest null, none → null"
+      ],
+      "consumer": [
+        "tools/usage-insights/cli.mjs verify --dto <file> --package <tar> --out <file> (delivered and exercised)",
+        "main's HTTP/App: createSupportHandler + supportLabels are the composable pieces; main's route wiring is not in this branch"
+      ],
+      "positives": [
+        "the real download envelope + the real packaged tar produce a support report with digest verified and conservation 4/4",
+        "identity comes from install/install.json: build 4dcd28f758bbb265, source c0a1f897…, archive 405ecd02…, identitySource install-manifest"
+      ],
+      "negatives": [
+        "no package supplied → origin null, packageLabel undefined (no placeholder hash)",
+        "manifest with only a build → incomplete-manifest, sourceCommit null; branch name or path never becomes a commit",
+        "manifest unreadable/oversized → manifestState too_large/invalid, not 'absent'",
+        "handler refuses invalid input with 422 and echoes nothing from it"
+      ]
+    },
+    {
+      "id": "2",
+      "title": "Complete observation semantics and a compatible production implementation",
+      "state": "delivered (candidate sources) with the existing bounded reader unchanged",
+      "implementation": [
+        "digest verification separated from shape validation: readSupportDocument recomputes sha256(text) for an envelope and reports verified/mismatch/absent",
+        "field conservation between the file bytes and the observation: rowsMatch, scopeMatches, windowMatches, headerMatches; contractValid marks an envelope that fails the product contract",
+        "readSupportFile validates the shareable support artifact instead of trusting it"
+      ],
+      "consumer": ["main's download route and contract (imported read-only in tests)", "the CLI", "any Node caller of the port"],
+      "positives": [
+        "page and file agree 13/13 on the real runtime",
+        "the envelope's text, observation, scope, window and header agree after a real route round-trip",
+        "a bare display document is reported as digest absent (not verified) and says what could not be compared"
+      ],
+      "negatives": [
+        "shape-valid envelope with a wrong digest → mismatch (the shape check alone accepts it — asserted explicitly)",
+        "rows drifted from the observation → rowsMatch false and contractValid false, while the digest still verifies",
+        "support file over its byte budget → typed too_large refusal",
+        "no formatted value reaches the report or the file (canary cases)"
+      ]
+    },
+    {
+      "id": "3",
+      "title": "One complete problem-feedback and independent-consumption loop",
+      "state": "PARTIAL: artifact, runbook and both positive/negative cases delivered; independent consumption by H/E/main NOT_REACHED",
+      "implementation": [
+        "reports/usage-insights/probe/two-project-20261116T064839.support-report.json: real envelope + real package, digest verified, conservation 4/4, export capability present",
+        "reports/usage-insights/support-contract.zh-CN.md: port, handler, file, labels, digest/conservation semantics, exit codes, runbook",
+        "tools/usage-insights/cli.mjs verify --dto --package --out: new 0600 file, refuses an existing target, keeps unknowns as unknown"
+      ],
+      "consumer": "pending H/E/main; the report is reproducible from the two committed inputs (envelope + tar digest)",
+      "positives": [
+        "complete: 12 rows (8 with a value, 4 unknown), coverageState partial, exportCapability present",
+        "reproducible: the same envelope + tar digest reproduces the same report"
+      ],
+      "negatives": [
+        "old package without the capability (R1 8296720) reports displayDownload absent",
+        "wrong digest → CLI exit 5; foreign/absent scope → 422 from the route",
+        "existing output target refused; symlink target refused"
+      ],
+      "gapLocated": [
+        "the served header coverageState folds the partial review.activeMs row into 'partial', so a completely enumerated source is reported as partial (a data/statement gap visible in every support report)",
+        "the download contract does not recompute sha256, so this port's digest check is the only cryptographic verification a colleague can perform on the file"
+      ]
+    }
+  ],
+  "mergedIntoMain": {
+    "byteIdenticalInMain": [
+      "src/analyze.ts", "src/attention.ts", "src/baseline.ts", "src/browser.ts", "src/crosscheck.ts",
+      "src/display-export.ts", "src/export.ts", "src/metrics.ts", "src/node-composition.ts", "src/protocol.ts", "src/subject.ts"
+    ],
+    "candidateOnly": [
+      "src/facing.ts (rowSemantics/rowCoverageMeaning)", "src/report.ts (Row id / Value state)", "src/index.ts",
+      "src/support.ts (support summary/report)", "src/support-port.ts (port/handler/labels/file)",
+      "packages/usage-insights/test/{support,support-port,download-route,row-semantics}.case.ts",
+      "tools/usage-insights/**", "reports/usage-insights/**"
+    ],
+    "note": "main integrated the download chain and G's six earlier sources; the support port and the report/row-semantics additions are source-only and ready for main to compose."
+  },
+  "artifacts": {
+    "packagedTar": {
+      "path": "/Users/hh/Desktop/joker/pa-artifacts/wave31-target/wave31-target-4dcd28f.tar.gz",
+      "sha256": "405ecd02fcbf288bac0855e17911ec4035521b54fe27d81fa0b28feaf5addcc6",
+      "bytes": 20540568,
+      "buildId": "4dcd28f758bbb265",
+      "sourceCommit": "c0a1f8975232b6397dfaf92d31ac5682df2dab36",
+      "identitySource": "install-manifest",
+      "manifestState": "parsed",
+      "manifestBytes": 1456537,
+      "capabilities": { "pageObservation": true, "numericExport": true, "displayDownload": true },
+      "browserTrigger": "present",
+      "role": "the inner tar main's preview tool packages; no E verdict and no installed admission is claimed here"
+    },
+    "oldTar": {
+      "sha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "buildId": "8296720d8a25f38c",
+      "capabilities": { "pageObservation": true, "numericExport": false, "displayDownload": false },
+      "role": "old-package-without-capability negative"
+    },
+    "evidence": {
+      "downloadEnvelope": "reports/usage-insights/probe/two-project-20261116T064839.download-envelope.json",
+      "supportReport": "reports/usage-insights/probe/two-project-20261116T064839.support-report.json",
+      "supportContract": "reports/usage-insights/support-contract.zh-CN.md"
+    }
+  },
+  "mainFindings": [
+    "The download contract still does not recompute sha256: a shape-valid envelope with a wrong digest is accepted by the schema and rejected only by this port's check. Both statements are now covered by tests.",
+    "The header coverageState folds a partial row into 'partial' for a completely enumerated source; every support report therefore says 'the observation is partial'. That is faithful to the served document, but it is a statement/data mismatch worth fixing in main.",
+    "main's install manifest embeds the full inventory (~1.46 MB). A small parse guard made the manifest look absent and the identity 'unknown'; the guard is now 8 MiB with an explicit manifestState so 'cannot read' never reads as 'did not declare'."
+  ],
+  "remaining": [
+    { "item": "main mounting createSupportHandler / using supportLabels in the App", "dependency": "main owns HTTP/App/transport", "state": "SOURCE_READY" },
+    { "item": "H/E/main independently consuming one support report and confirming a located gap", "dependency": "an independent owner", "state": "NOT_REACHED; artifact and runbook ready" },
+    { "item": "installed package carrying the support port with an E verdict", "dependency": "a frozen successor tar", "state": "NOT_REACHED; no installed claim" },
+    { "item": "operator long-term baseline, model cost, benefit", "dependency": "real operator data", "state": "NOT_TESTED; no percentage is produced" },
+    { "item": "actual_native execution", "dependency": "vendor/native budget", "state": "NOT_TESTED (0 turns)" }
+  ],
+  "boundaries": {
+    "noSqlOrPrivateDb": true,
+    "noRuntimeHttpUiChanges": true,
+    "noNewCollector": true,
+    "noSecondLedger": true,
+    "noModelOrNativeCalls": true,
+    "noRootLockOrContractsChanges": true,
+    "noEAssertionsChanged": true,
+    "noBrowserNodeImports": true,
+    "noNumericReverseParsing": true,
+    "noPackageBuilding": "G inspected existing archives only; D owns freezing",
+    "userServicesPreserved": "twelve 5180/8796 … 5191/8807 instances and all state/profile/tar/ledger/runs left untouched"
+  },
+  "verification": {
+    "commands": [
+      "packages/contracts/node_modules/.bin/tsc -p packages/contracts/tsconfig.build.json",
+      "packages/usage-insights/node_modules/.bin/tsc -p packages/usage-insights/tsconfig.json",
+      "packages/usage-insights/node_modules/.bin/tsc -p packages/usage-insights/tsconfig.build.json",
+      "node --test packages/usage-insights/test/*.case.ts",
+      "node --test tools/usage-insights/test/*.case.mjs",
+      "node tools/usage-insights/probe/observe-two-projects.mjs --keep",
+      "node tools/usage-insights/cli.mjs package --tar <r1|r2>.tar.gz",
+      "node tools/usage-insights/cli.mjs verify --dto <envelope>.json --package <r2 tar> --out <report>.json"
+    ],
+    "results": {
+      "typecheck": "pass",
+      "build": "pass",
+      "packageTests": { "total": 165, "pass": 165, "fail": 0 },
+      "toolTests": { "total": 59, "pass": 59, "fail": 0 },
+      "probe": "pass (download 200, digest verified, conservation 4/4, page 13/13, repeat new snapshot, 0 events)",
+      "supportReport": "exit 0; digest verified; conservation all true; identitySource install-manifest"
+    },
+    "staticChecksConfer": "no runtime, native or release admission"
+  }
+}
