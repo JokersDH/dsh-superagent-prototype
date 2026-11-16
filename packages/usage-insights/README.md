@@ -191,6 +191,16 @@ hash leaves the comparison `null`, because comparing a value with itself proves 
 against expected values are returned as `differences`, so an old installation compared with a newer
 source keeps both facts.
 
+### Evidence levels
+
+A manifest is a claim. `inspectRuntimeIdentity` therefore separates three levels: `self_declared`
+(the manifest says so), `inventory_verified` (the manifest's own file list was checked against the
+disk — size and, by default, sha256, with mismatches reported), and `running_confirmed` (a process
+start record supplied by main/D names exactly this root). Paths in the inventory resolve relative to
+the directory holding `install.json`. Capability signals are counted **outside comments** (a route
+mentioned only in a comment is not a route) across the whole built dist closure, and the running claim
+is only ever compared, never discovered.
+
 `readSupportDocument` reports `verification` (`contract-digest`, `digest-only`, `shape-only`) so a
 consumer can tell what was proven; documents with unknown fields are refused rather than silently
 stripped; and `readSupportFile` degrades an older support file (`schema: 'legacy'` + `missingFields`)

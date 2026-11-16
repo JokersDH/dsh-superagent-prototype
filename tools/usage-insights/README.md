@@ -257,7 +257,10 @@ scope/window/summary id/覆盖/每行 id/层/单位/是否有值/样本数；不
 `verification` 三态（`contract-digest`/`digest-only`/`shape-only`）说明到底证明了什么；
 `digest-only`/`shape-only`/旧文件 exit 3。未知字段一律拒绝，不丢弃后声称已清干净。
 
-`--install <绝对目录>` 读取**正在运行**的安装（`install/install.json` + 已安装文件的能力证据），
+`--install <绝对目录>` 读取安装身份：manifest 自述 vs **inventory 已核** vs **运行已确认** 三级分开，
+`install.json` 的文件清单逐项对磁盘核 size/sha256（`evidence=inventory_verified`），有 mismatch 就退回
+`self_declared` 并 exit 3；`--running-root` 只作为 main/D 进程启动记录的输入做 root 相等比较。
+能力扫描忽略注释、覆盖整个 dist 闭包。（`install/install.json` + 已安装文件的能力证据），
 与 `--package` 互斥：前者证明"运行的是谁"，后者证明"发出的是哪些字节"。安装清单缺失/不全时身份为
 unknown（`manifestState`/`identitySource` 说明原因），不从仓库 HEAD 或路径猜。
 

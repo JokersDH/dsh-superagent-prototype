@@ -1,0 +1,190 @@
+{
+  "protocol": "wave35-usage-insights-status/1",
+  "agent": "G",
+  "branch": "codex/g4-usage-insights",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-g",
+  "fixedStart": "35fc58957c2768b204a8ce67567d3d5a4ff888ed",
+  "mergedMain": "5860da13",
+  "mergeCommit": "6e27cb81",
+  "dirty": "clean before this file; only owned paths changed",
+  "generatedAt": "2026-11-16T13:05:00Z",
+  "goal": {
+    "statement": "Nine complete outcomes across three continuous packages: trustworthy observation semantics, strict diagnostics with a provable identity, real feedback localisation, proxy/bound facts, and maintainable same-version support.",
+    "packages": 3,
+    "outcomes": 9,
+    "tokenBudget": "none",
+    "deadline": "none",
+    "vendorModelNativeTurns": 0,
+    "blockedPilot": "E original 24turn/200000token/USD5 single-in-flight pilot remains BLOCKED; no reset, top-up, refund, replacement sample, borrowed credential or price research.",
+    "notIncluded": ["CAC and CAC-specific subteam experiments", "temporary ZIP sprint", "narrowing Scheme B"]
+  },
+  "layers": {
+    "source": "G sources in this branch; main has byte-identical analyze/export/display-export/crosscheck/support.ts, the rest are candidate-only",
+    "controlled": "probe over the real product runtime with the fixed fixture driver (0 vendor/model/native turns)",
+    "installed": "NOT_REACHED: no E verdict; the materialised install tree is inspected, not installed or started",
+    "native": "NOT_TESTED (0 turns)",
+    "recovery": "NOT_APPLICABLE to G",
+    "value": "NOT_TESTED: no operator baseline, no benefit figure"
+  },
+  "outcomes": [
+    {
+      "id": "G1",
+      "package": 1,
+      "title": "Complete observation-source and sample semantics",
+      "state": "delivered (wave-34 coverage retained; no new production change was needed in main's reader)",
+      "implementation": ["observation-facts.case.ts drives the real ProductUsageObservation: header works vs row samples, layers/currencies/units, unknown-not-zero, partial vs complete, conflicts and out-of-window facts"],
+      "consumer": ["main's authorized reader", "CLI", "the served page/export/support chain"],
+      "positives": ["a replayed receipt counts once", "an empty complete scope is a measured zero", "a recorded zero interval stays a value"],
+      "negatives": ["a contradictory identity makes the summary unavailable", "out-of-window facts produce no row", "a bounded source carries no header sample count"],
+      "reuse": "wave-34 evidence; re-run in this wave's sweep (191 package tests)"
+    },
+    {
+      "id": "G2",
+      "package": 1,
+      "title": "Strict diagnostic files and version compatibility",
+      "state": "delivered",
+      "implementation": ["readSupportDocument verification levels (contract-digest / digest-only / shape-only), digest recomputation, conservation, unknown-field refusal", "readSupportFile legacy degradation with missingFields"],
+      "consumer": ["main's strict contracts", "CLI", "a colleague reading an old file"],
+      "positives": ["the real support download verifies its digest; the legacy wave-32 artifact degrades to schema legacy"],
+      "negatives": ["wrong digest → mismatch and exit 5", "row drift → rowsMatch false", "extra secret field → refusal"],
+      "reuse": "wave-34 evidence; retained"
+    },
+    {
+      "id": "G3",
+      "package": 1,
+      "title": "Provable current installation identity",
+      "state": "delivered (source) — this wave's main new work",
+      "implementation": [
+        "inspectRuntimeIdentity separates self_declared / inventory_verified / running_confirmed",
+        "the manifest's own file list is verified against disk (size + sha256 by default), paths resolved relative to the manifest directory, mismatches listed with a 16-entry cap",
+        "capability signals are counted outside comments by a small lexer, across the whole built dist closure (a symbol re-exported from a sibling module still counts)",
+        "a running claim is an input from main/D ({root,pid?,startedAt?}) that is only compared with the inspected root, never discovered"
+      ],
+      "consumer": ["CLI verify --dto --install <dir> [--running-root <dir>]", "main may call inspectRuntimeIdentity for its DTO origin (not wired)"],
+      "positives": [
+        "materialised R2 install tree: evidence inventory_verified, inventory complete, 6841 files hashed, 0 mismatches (23 symlinks skipped), capabilities pageObservation+numericExport+displayDownload"
+      ],
+      "negatives": [
+        "a forged manifest digest → inventory partial and evidence falls back to self_declared",
+        "a file missing from disk while listed → mismatch, evidence self_declared",
+        "a route written only in a comment → that capability is absent",
+        "a running claim naming another root → rootMatches false, evidence stays inventory_verified, unknown notes the difference",
+        "verify: none or size-only behaves as documented (none → self_declared)"
+      ],
+      "foundFact": "that package has supportSummary=false: it predates the support module, so source-level support is not an installed capability there",
+      "remaining": "main must wire the origin; a live process start record is not available to G"
+    },
+    {
+      "id": "G4",
+      "package": 2,
+      "title": "Real feedback to localisation and re-verification",
+      "state": "delivered for locate/confirm; upstream fix is main's (SOURCE_READY)",
+      "implementation": ["probe calls main's GET /v1/insights/support, reads the file with G's port, re-reads the same scope after a delay", "the same file read with --install gains a verified identity"],
+      "consumer": ["probe", "CLI"],
+      "positives": ["support download 200, 3566 bytes, digest verified", "with --install: identitySource install-manifest, exportCapability present"],
+      "negatives": ["the second download has a new summaryId and the same missing identity", "an absent port returns 422 while the page works"],
+      "locatedGap": "main's diagnostic file carries no installation identity (origin null)",
+      "reuse": "wave-34 evidence retained; this wave upgrades the identity side to inventory_verified"
+    },
+    {
+      "id": "G5",
+      "package": 2,
+      "title": "Human waiting and review proxy facts",
+      "state": "delivered",
+      "implementation": ["recorded zero vs missing interval vs visibility proxy vs comparability gap", "no human-effort or benefit metric exists in the catalogue"],
+      "consumer": ["analyze/report/export", "CLI"],
+      "positives": ["a zero interval is a value with a sample", "the ready-to-accept wait is complete when both timestamps exist"],
+      "negatives": ["missing interval → timing_missing", "the UI proxy stays partial", "no baseline → not_requested with null delta/ratio"],
+      "reuse": "wave-34 evidence; retained"
+    },
+    {
+      "id": "G6",
+      "package": 2,
+      "title": "Bounded collection and data integrity",
+      "state": "delivered (main's reader bounds unchanged: 50 works / 10000 nested / 2 MiB / 2 s)",
+      "implementation": ["bounded inventory verification (16 mismatch cap, per-file size/hash, symlinks skipped)", "archive reader bounds (file budget and a separate inflation budget)", "text scan budget 32 MiB"],
+      "consumer": ["CLI", "runtime identity", "the probe"],
+      "positives": ["6841 files hashed against the manifest on the real install"],
+      "negatives": ["over-budget archive refused before scanning", "scan skips oversized members instead of failing the report"],
+      "reuse": "wave-32/34 bounds retained"
+    },
+    {
+      "id": "G7",
+      "package": 3,
+      "title": "Private import of explicit operator data",
+      "state": "delivered",
+      "implementation": ["operator-baseline/1 import with unit/aggregation/currency/window/scope validation; mismatches are not compared"],
+      "consumer": ["CLI --baseline", "analyze"],
+      "positives": ["a legal manual baseline yields observational_only comparison"],
+      "negatives": ["wrong unit/aggregation/currency/coverage is refused or not comparable", "no operator data → tool usable and value NOT_MEASURED"],
+      "reuse": "wave-26/34 evidence retained"
+    },
+    {
+      "id": "G8",
+      "package": 3,
+      "title": "Maintainable CLI and old-product compatibility",
+      "state": "delivered",
+      "implementation": ["current/legacy download and support files, optional module absence, readonly and normal startup, strict arguments, private output, exit codes"],
+      "consumer": ["main's real files", "the fixed old file in the repository", "the package consumer test"],
+      "positives": ["legacy file → schema legacy with explicit missing fields", "readonly startup serves the export"],
+      "negatives": ["a non-support file is refused with a typed fault", "an optional port missing returns 422 without breaking the page"],
+      "reuse": "wave-34 evidence; retained"
+    },
+    {
+      "id": "G9",
+      "package": 3,
+      "title": "Same-version integration and support handoff",
+      "state": "delivered as source + contract; installed/verdict items remain with D/E",
+      "implementation": ["support-contract.zh-CN.md documents port, handler, file, labels, evidence levels, exits and limits", "main-imports.case.ts guards the exact symbols main imports"],
+      "consumer": ["main/D/H/E"],
+      "positives": ["the minimal interface compiles against main's modules and main's contract accepts the output"],
+      "negatives": ["no installed claim; W33 outer/recovery/upgrade remains E's separate subset"],
+      "remaining": ["D freeze and E final verdict for any successor tar", "distinguishing the W33 artefact from a model-GUI successor is D/E's call, not G's"]
+    }
+  ],
+  "mergedIntoMain": {
+    "byteIdenticalInMain": ["analyze.ts", "attention.ts", "baseline.ts", "browser.ts", "crosscheck.ts", "display-export.ts", "export.ts", "metrics.ts", "node-composition.ts", "protocol.ts", "subject.ts", "support.ts"],
+    "candidateOnly": ["support-port.ts", "runtime-identity.ts", "facing.ts", "report.ts", "index.ts", "tests/**", "tools/usage-insights/**", "reports/usage-insights/**"],
+    "note": "main consumes buildSupportReport/buildSupportFile; the evidence-level identity work is source-only and ready to compose."
+  },
+  "mainFindings": [
+    "main's support DTO still ships origin:null; inspectRuntimeIdentity now provides an inventory-verified origin that main can wire.",
+    "The packaged R2 tar (4dcd28f) predates the support module, so supportSummary=false there: source support is not an installed capability in that build.",
+    "Neither the download nor the support envelope verifies its own sha256; G's port does, and reports mismatch.",
+    "The served header coverageState still folds a partial row into 'partial' for a completely enumerated source."
+  ],
+  "remaining": [
+    { "item": "main wiring inspectRuntimeIdentity into the support DTO", "state": "SOURCE_READY" },
+    { "item": "a live process start record for running_confirmed", "dependency": "main/D original start identity", "state": "NOT_REACHED (input contract documented)" },
+    { "item": "H/E independent consumption of one support report", "state": "NOT_REACHED" },
+    { "item": "D freeze + E verdict for a successor tar", "state": "NOT_REACHED" },
+    { "item": "operator long-term baseline and value; native execution", "state": "NOT_TESTED" }
+  ],
+  "boundaries": {
+    "noSqlOrPrivateDb": true, "noRuntimeHttpUiChanges": true, "noNewCollector": true, "noSecondLedger": true,
+    "noModelOrNativeCalls": true, "noRootLockOrContractsChanges": true, "noEAssertionsChanged": true,
+    "noBrowserNodeImports": true, "noNumericReverseParsing": true,
+    "noInstallOrStart": "the install tree was extracted to a temp directory for identity inspection only; nothing was installed, started or attached",
+    "noProcessDiscovery": "the running claim is an input; no ps/proc scan and no signal was sent",
+    "userServicesPreserved": "twelve 5180/8796 … 5191/8807 instances and all state/profile/tar/ledger/runs left untouched"
+  },
+  "verification": {
+    "commands": [
+      "packages/contracts/node_modules/.bin/tsc -p packages/contracts/tsconfig.build.json",
+      "packages/usage-insights/node_modules/.bin/tsc -p packages/usage-insights/tsconfig.json",
+      "packages/usage-insights/node_modules/.bin/tsc -p packages/usage-insights/tsconfig.build.json",
+      "node --test packages/usage-insights/test/*.case.ts",
+      "node --test tools/usage-insights/test/*.case.mjs",
+      "node tools/usage-insights/probe/observe-two-projects.mjs",
+      "node tools/usage-insights/cli.mjs verify --dto <support-download>.json --install /private/tmp/w34-install/install --out <report>.json"
+    ],
+    "results": {
+      "typecheck": "pass", "build": "pass",
+      "packageTests": { "total": 191, "pass": 191, "fail": 0 },
+      "toolTests": { "total": 59, "pass": 59, "fail": 0 },
+      "probe": "pass (support download 200 / 3566 bytes, digest verified, origin null located, page 13/13, 0 events)",
+      "identity": "evidence inventory_verified, inventory complete, 6841 hashed, 0 mismatches, capabilities page+numeric+displayDownload, supportSummary false"
+    },
+    "staticChecksConfer": "no runtime, native or release admission"
+  }
+}

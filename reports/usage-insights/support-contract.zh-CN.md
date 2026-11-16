@@ -115,6 +115,25 @@ node tools/usage-insights/cli.mjs verify --dto /abs/observation-….json \
   `checks.archiveMatches` 为 `null`（自比不算证明），并在 `unknown` 里说明。
 - `checks`（build/source/archive 是否与 expected 一致）与 `differences` 保留旧安装配新 source 的差异。
 
+## 身份证据级别（wave 35 收紧）
+
+静态 manifest 与文本扫描**不能自证运行身份**。`inspectRuntimeIdentity` 分三级：
+
+| `evidence` | 含义 |
+| --- | --- |
+| `self_declared` | 只有 manifest 自述（或其 inventory 校验未过）。真伪未知，不能当"正在运行的是它" |
+| `inventory_verified` | manifest 自带文件清单的 size/sha256 已对磁盘逐项核对通过（`verify: hash`，或 `size`） |
+| `running_confirmed` | 以上 + main/D 提供的**进程启动记录**里的 root 与本安装 root 完全相同 |
+
+- 清单路径相对 `install.json` 所在目录解析（调用方给 extract root 还是 `install` 目录都成立）。
+- 有 mismatch/缺文件/伪 digest → `inventory.state: partial`，`evidence` 退回 `self_declared`，
+  差异逐条列出；不再"因为 manifest 合法就是已验证"。
+- 能力判定扫描**去掉注释**后的代码：仅写在注释里的路由不算能力；扫描覆盖整个 dist 闭包，
+  因为符号可能从兄弟模块 re-export。
+- `running` 只是**输入**（`{root, pid?, startedAt?}`），本模块只做 root 相等比较，不做进程发现；
+  root 不同 → `rootMatches: false` + `unknown` 说明，文件级证据保留但不升级。
+- `--install` 且 `evidence: self_declared` 时 CLI 打 `unverified_identity` 并 exit 3。
+
 ## 校验强度与旧文件
 
 `readSupportDocument` 返回 `verification`：
