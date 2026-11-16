@@ -1,0 +1,564 @@
+{
+  "protocol": "whole-product-engineering-dispatch/2",
+  "wave": "product-wave-33",
+  "date": "2026-11-16",
+  "status": "PLANNED_NOT_EXECUTED_BY_EXTERNAL_AGENTS",
+  "priority": "COMPLETE_SCHEME_B_ENGINEERING_WITH_CONTINUOUS_REAL_CONSUMERS",
+  "externalAgentCount": 10,
+  "totalOwnersIncludingMain": 11,
+  "completeOutcomesPerOwner": 3,
+  "wholeGoalPerOwner": true,
+  "continueAfterSourceHandoff": true,
+  "independentQueueRequired": true,
+  "microPhaseExpansion": false,
+  "calendarDeadline": null,
+  "tokenBudgetAdded": false,
+  "normalCadence": true,
+  "baseline": "58b4e4c804291cf414c91a76b4b784a917d2dfba",
+  "mainRuntimeSource": "fc38bf65b6a05a7771fc58829152c512255a6a29",
+  "actualMainInput": "docs/rfcs/WP-16/0083-main-registered-port-and-workbench-consumers.md",
+  "sharedInputBoundary": "docs/rfcs/WP-16/0084-wave-33-reviewed-architecture.md",
+  "sharedProgram": "docs/rfcs/WP-16/0085-wave-33-whole-product-program.md",
+  "scope": {
+    "cac": "DEFERRED_EXCLUDED",
+    "temporaryZipSprint": false,
+    "packaging": "Integrated engineering subsystem and final handoff",
+    "originalLifecycleOnly": true,
+    "noNewDriverThisProgram": true
+  },
+  "newModelAllowance": 0,
+  "nativeModelsStartedByDispatch": 0,
+  "externalPromptsSent": false,
+  "newUserThreads": 0,
+  "newWorktrees": 0,
+  "releaseApproved": false,
+  "completionEstimateChangedByTaskCount": false,
+  "preservedServicePairs": [
+    [
+      5180,
+      8796
+    ],
+    [
+      5181,
+      8797
+    ],
+    [
+      5182,
+      8798
+    ],
+    [
+      5183,
+      8799
+    ],
+    [
+      5184,
+      8800
+    ],
+    [
+      5185,
+      8801
+    ],
+    [
+      5186,
+      8802
+    ],
+    [
+      5187,
+      8803
+    ],
+    [
+      5188,
+      8804
+    ],
+    [
+      5189,
+      8805
+    ],
+    [
+      5190,
+      8806
+    ],
+    [
+      5191,
+      8807
+    ]
+  ],
+  "roles": {
+    "A": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "branch": "codex/g2-workspaces-verification",
+      "candidate": "a9ae5cd1cbba773fca8e5ea898e2216a5bb6f1eb",
+      "packet": "agent-tasks/product-wave-33/agent-a-data.zh-CN.md",
+      "ownedPaths": [
+        "packages/storage/",
+        "packages/workflows/"
+      ],
+      "evidencePath": "packages/workflows/reports/wave33-status.json",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "wholeOutcome": "让同一安装实例上的两个原项目完整使用并重开保留Work/合同/候选/产物/回执，不靠换fixture项目或新Work补洞。",
+      "outcomes": [
+        "生产历史有界 Continuation",
+        "Main 兼容的真实历史消费者",
+        "非空恢复、原产物内容与原 ID 重开"
+      ],
+      "wholeGoalCoversOutcomes": true
+    },
+    "B": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "branch": "codex/g1-runtime",
+      "candidate": "f4a99ce1fa1ac822659d734196733990d8fa3a2e",
+      "packet": "agent-tasks/product-wave-33/agent-b-runtime.zh-CN.md",
+      "ownedPaths": [
+        "packages/execution/",
+        "packages/catalog/",
+        "packages/policy-preparation/",
+        "packages/driver-kit/",
+        "packages/testing/",
+        "packages/drivers/",
+        "apps/runner/",
+        "tests/native-acceptance/"
+      ],
+      "evidencePath": "tests/native-acceptance/reports/wave33-status.json",
+      "grantId": "wave03-b-native",
+      "historicalLimit": 4,
+      "remaining": "UNKNOWN_NOT_SPENDABLE",
+      "resetLedger": false,
+      "newFeasibilityInvestigations": 0,
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "excludedOwnedPaths": [
+        "apps/runner/src/attach-channel/",
+        "apps/runner/test/attach-channel/"
+      ],
+      "wholeOutcome": "在原Product/Store/Application/QuestionBroker中完整实现本机执行、原生问题/控制、同原Work故障恢复到候选/检查/人工接受和原两/四槽资源归还。",
+      "outcomes": [
+        "不可伪造出生证明与原应用三回调接线",
+        "同一原 Work 中断后续接到明确交付",
+        "原两/四槽调度、取消、归还与重开"
+      ],
+      "wholeGoalCoversOutcomes": true
+    },
+    "C": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "branch": "codex/g3-assistant-context",
+      "candidate": "4d096ac210ad17604d5ce09a3bcd153b6a4f404a",
+      "packet": "agent-tasks/product-wave-33/agent-c-context.zh-CN.md",
+      "ownedPaths": [
+        "packages/context/",
+        "packages/proposals/",
+        "packages/knowledge/",
+        "packages/routing/"
+      ],
+      "evidencePath": "packages/context/reports/wave33-status.json",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "wholeOutcome": "让用户在同一个普通安装实例里选择真实项目资料、确认提案或明确决定，并在重开后查看原来源。",
+      "outcomes": [
+        "完整生产治理与安全持久草稿",
+        "新工作可消费的当前决定快照",
+        "失效、普通重开与原来源完整体验"
+      ],
+      "wholeGoalCoversOutcomes": true
+    },
+    "D": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-d",
+      "branch": "codex/g3-local-distribution",
+      "candidate": "bb6b5b1132020c209c2c28671698090474c53d32",
+      "packet": "agent-tasks/product-wave-33/agent-d-delivery.zh-CN.md",
+      "ownedPaths": [
+        "apps/launcher/",
+        "tools/distribution/",
+        "packages/portability/"
+      ],
+      "evidencePath": "tools/distribution/reports/wave33-status.json",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "wholeOutcome": "随整体工程并行交付可重复构建、安装、启停、升级/回滚、非空备份迁移恢复和支持能力，在选定集成版本上形成可本机使用、可分享同事的准确安装交付。",
+      "outcomes": [
+        "真实普通运行与配置生命周期",
+        "同版本非空业务备份与搬根只读恢复",
+        "升级回退、支持与唯一发行闭包"
+      ],
+      "wholeGoalCoversOutcomes": true
+    },
+    "E": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-e",
+      "branch": "codex/g3-product-acceptance",
+      "candidate": "84d039871bd4168ff684aa0b3bd11b9bbab373d1",
+      "packet": "agent-tasks/product-wave-33/agent-e-acceptance.zh-CN.md",
+      "ownedPaths": [
+        "tests/product-acceptance/"
+      ],
+      "evidencePath": "tests/product-acceptance/reports/wave33-status.json",
+      "grantId": "wave05-independent-review-pilot-01",
+      "maxNativeTurnStarts": 24,
+      "maxAuthorTurnStarts": 8,
+      "maxReviewTurnStarts": 16,
+      "maxBillableTokens": 200000,
+      "maxCostUSD": 5,
+      "maxInFlight": 1,
+      "resetLedger": false,
+      "unknownCostIsZero": false,
+      "cliFallbackAllowed": false,
+      "executionPolicy": "BLOCKED_CURRENT_RECIPE_NO_SEND_THIS_WAVE",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "wholeOutcome": "独立验证整体产品的原项目正常工作、原生控制、故障恢复、重开、数据与准确安装流程，按证据层给结论，不以临时可启动ZIP替代工程完整性。",
+      "outcomes": [
+        "两个原项目的真实完整旅程",
+        "唯一准确安装 cohort 与 actual outer ZIP",
+        "非空业务恢复、升级重开与完整停止结论"
+      ],
+      "wholeGoalCoversOutcomes": true
+    },
+    "F": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-f",
+      "branch": "codex/g4-trial-experience",
+      "preparedFrom": "fdb3f160b1d867f7167fb034d96a5c13bd16cdfb",
+      "packet": "agent-tasks/product-wave-33/agent-f-experience.zh-CN.md",
+      "ownedPaths": [
+        "apps/console/src/trial/",
+        "apps/console/test/trial/",
+        "apps/console/e2e/trial/",
+        "docs/user-guide/",
+        "reports/trial-experience/"
+      ],
+      "evidencePath": "reports/trial-experience/wave33-status.json",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "implementationStatus": "SOURCE_EXISTS_CONTINUE_COMPLETE_CAPABILITY",
+      "candidate": "fae41f8c1eb0fbd6f7044dbc4ab6e4523e5efd53",
+      "wholeOutcome": "在现有精密浅色工作台中完成首次使用、执行器/模型状态、明确委托到交付和错误恢复的完整体验。",
+      "outcomes": [
+        "完整日常多项目工作流",
+        "当前事实驱动的首次使用与错误恢复",
+        "历史、来源与支持的可访问日常体验"
+      ],
+      "wholeGoalCoversOutcomes": true
+    },
+    "G": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-g",
+      "branch": "codex/g4-usage-insights",
+      "preparedFrom": "fdb3f160b1d867f7167fb034d96a5c13bd16cdfb",
+      "packet": "agent-tasks/product-wave-33/agent-g-insights.zh-CN.md",
+      "ownedPaths": [
+        "packages/usage-insights/",
+        "tools/usage-insights/",
+        "reports/usage-insights/"
+      ],
+      "evidencePath": "reports/usage-insights/wave33-status.json",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "implementationStatus": "SOURCE_EXISTS_CONTINUE_COMPLETE_CAPABILITY",
+      "candidate": "76decf93e7f6ed6d1901d6b70851e47a6e4a5c12",
+      "wholeOutcome": "让用户能导出同一范围的可信观察和无秘密支持信息，帮助快速反馈真实试用问题。",
+      "outcomes": [
+        "把候选支持能力接成默认产品消费者",
+        "完整观察语义与兼容的生产实现",
+        "一次完整问题反馈与独立消费闭环"
+      ],
+      "wholeGoalCoversOutcomes": true
+    },
+    "H": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-h",
+      "branch": "codex/g4-trial-operations",
+      "preparedFrom": "fdb3f160b1d867f7167fb034d96a5c13bd16cdfb",
+      "packet": "agent-tasks/product-wave-33/agent-h-trial-operations.zh-CN.md",
+      "ownedPaths": [
+        "tools/trial-kit/",
+        "tests/operational-soak/",
+        "docs/internal-trial/",
+        "reports/trial-operations/"
+      ],
+      "evidencePath": "reports/trial-operations/wave33-status.json",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "implementationStatus": "SOURCE_EXISTS_CONTINUE_COMPLETE_CAPABILITY",
+      "candidate": "0cc2db471dd2f40954300104a8c60e2853cc507b",
+      "wholeOutcome": "提供贯穿完整产品的有界试用、运行/故障支持和现场保留工具，独立消费原B/I/main真实端口与最终准确包，减少来回交互。",
+      "outcomes": [
+        "可供同事重复使用的当前消费者与 field operations",
+        "同一原运行的故障、回执与外在资源证据",
+        "非空持久重开、迁移恢复与长期支持闭合"
+      ],
+      "wholeGoalCoversOutcomes": true
+    },
+    "I": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-i",
+      "branch": "codex/g5-coordinator-channel",
+      "preparedFrom": "967dc0c677333ec307c215c0ed67e838b5487d92",
+      "packet": "agent-tasks/product-wave-33/agent-i-coordinator-channel.zh-CN.md",
+      "ownedPaths": [
+        "apps/runner/src/attach-channel/",
+        "apps/runner/test/attach-channel/",
+        "docs/runtime-channel/",
+        "reports/runtime-channel/"
+      ],
+      "evidencePath": "reports/runtime-channel/wave33-status.json",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "implementationStatus": "SOURCE_EXISTS_CONTINUE_COMPLETE_CAPABILITY",
+      "candidate": "44d5390582d5a236c066b4fa7f2064e9d56e2633",
+      "wholeOutcome": "在原B/Main消费者中把事实、payload、写前授权和terminal/detach语义完整跑通，避免通信层迟到效果。",
+      "outcomes": [
+        "实际主线三回调与 typed 兼容完整采用",
+        "临时 detach、terminal 与原业务继任共同验证",
+        "有限压力、错误诊断与真实多槽交接"
+      ],
+      "wholeGoalCoversOutcomes": true
+    },
+    "J": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-j",
+      "branch": "codex/g5-project-recipes",
+      "preparedFrom": "967dc0c677333ec307c215c0ed67e838b5487d92",
+      "packet": "agent-tasks/product-wave-33/agent-j-project-recipes.zh-CN.md",
+      "ownedPaths": [
+        "packages/project-recipes/",
+        "tools/project-recipes/",
+        "docs/project-recipes/",
+        "reports/project-recipes/"
+      ],
+      "evidencePath": "reports/project-recipes/wave33-status.json",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "implementationStatus": "SOURCE_EXISTS_CONTINUE_COMPLETE_CAPABILITY",
+      "candidate": "0c67e3b79c0a6425e657740b1187b18532448c29",
+      "wholeOutcome": "让首批用户导入普通Node/npm/pnpm项目后，得到真实可应用的模板字段，并完成原项目的明确交付流程。",
+      "outcomes": [
+        "生产项目声明与三类委托的完整适用性",
+        "真正两个原项目的原产品交付consumer",
+        "迁移后的当前事实重识别与同一版本交接"
+      ],
+      "wholeGoalCoversOutcomes": true
+    },
+    "main": {
+      "workdir": "/Users/hh/Desktop/joker/superagent",
+      "branch": "codex/g2-execution-integration",
+      "packet": "agent-tasks/product-wave-33/main.zh-CN.md",
+      "ownedPaths": [
+        "packages/contracts/",
+        "packages/application/",
+        "packages/questions/",
+        "apps/coordinator/",
+        "apps/console/",
+        "agent-tasks/product-wave-33/",
+        "tools/bootstrap/",
+        "docs/rfcs/WP-16/"
+      ],
+      "evidencePath": "reports/releases/wave33-integration/status.json",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "excludedOwnedPaths": [
+        "apps/console/src/trial/",
+        "apps/console/test/trial/",
+        "apps/console/e2e/trial/"
+      ],
+      "candidate": "fc38bf65b6a05a7771fc58829152c512255a6a29",
+      "outcomes": [
+        "原登记之后原guard/持久恢复真实接线",
+        "默认配置与A/C/G/J产品消费者",
+        "同一工程版本整链集成"
+      ],
+      "wholeGoalCoversOutcomes": true
+    }
+  },
+  "admissionReports": {
+    "inventory": "reports/releases/wave33-admission/workspaces.json",
+    "dataExperience": "reports/releases/wave33-admission/data-experience.json",
+    "runtime": "reports/releases/wave33-admission/runtime-channel.json",
+    "delivery": "reports/releases/wave33-admission/delivery.json",
+    "recipesInsights": "reports/releases/wave33-admission/recipes-insights.json"
+  },
+  "providedInputs": {
+    "mainRegisteredOriginalPort": true,
+    "mainActualAttachedStoreCases": 4,
+    "mainOriginalNativeFreshGuardUnchanged": true,
+    "mainFDefaultConsumers": true,
+    "mainRecipeRetryThreeReadonlyPreviews": true,
+    "mainRecipeBrowser": 9,
+    "mainObservationBrowser": 13,
+    "BCallerReferenceBodyClosed": true,
+    "BNumericPidAndHandleCopyClosed": true,
+    "HLaunchCommandClosed": true,
+    "CToolUnknownCoverageClosed": true,
+    "CSourceDraftAndStrictAdmitted": false,
+    "BForgedSpawnShapeAdmitted": false,
+    "originalApplicationBrokerRecoveredDelivery": false,
+    "originalSchedulerTwoFourSlots": false,
+    "knownW32PackageStaticVerified": true,
+    "knownW32IndependentEAccepted": false
+  },
+  "knownCohort": {
+    "source": "e8348a864d7d192589e72b8099475520f841b1e5",
+    "buildId": "88eb8c69b0671171",
+    "tar": "/Users/hh/Desktop/joker/pa-artifacts/wave32-target/wave32-target-88eb8c6.tar.gz",
+    "tarSha256": "65c386d108d385c1e8463de33b801a1865925d5dd752a7b82a0c57974b8453ac",
+    "tarBytes": 20543106,
+    "innerManifestEntries": 6866,
+    "zip": "/Users/hh/Desktop/joker/pa-artifacts/wave32-preview-88eb8c6/PersonalAgent-Preview-88eb8c6.zip",
+    "zipSha256": "0a46cd3620e00154ea13e7286dcc73e40ffad4df4522f2339e229ffcb027bc06",
+    "zipBytes": 63475809,
+    "staticVerified": true,
+    "EIndependent": false,
+    "containsNewFc38": false
+  },
+  "checkpoints": {
+    "M-original-port": {
+      "owner": "main",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "M-original-fresh-guard": {
+      "owner": "main",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "M-F-default-workbench": {
+      "owner": "main",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "B-I-current-caller": {
+      "owner": "B",
+      "dependsOn": [
+        "M-original-port"
+      ],
+      "providedByReviewedSource": true
+    },
+    "B-proven-spawn-authority": {
+      "owner": "B",
+      "dependsOn": []
+    },
+    "B-control-interface": {
+      "owner": "B",
+      "dependsOn": [
+        "M-original-port"
+      ]
+    },
+    "M-original-Broker-adapter": {
+      "owner": "main",
+      "dependsOn": [
+        "B-I-current-caller",
+        "B-control-interface",
+        "M-original-fresh-guard"
+      ]
+    },
+    "B-control-runtime": {
+      "owner": "B",
+      "dependsOn": [
+        "M-original-Broker-adapter"
+      ]
+    },
+    "M-original-recovered-consumer": {
+      "owner": "main",
+      "dependsOn": [
+        "B-control-runtime"
+      ]
+    },
+    "B-original-crash-to-accept": {
+      "owner": "B",
+      "dependsOn": [
+        "M-original-recovered-consumer",
+        "B-proven-spawn-authority"
+      ]
+    },
+    "B-original-two-four-slots": {
+      "owner": "B",
+      "dependsOn": [
+        "B-original-crash-to-accept"
+      ]
+    },
+    "H-current-field-consumer": {
+      "owner": "H",
+      "dependsOn": [
+        "B-I-current-caller"
+      ]
+    },
+    "H-original-run-evidence": {
+      "owner": "H",
+      "dependsOn": [
+        "B-original-crash-to-accept"
+      ]
+    },
+    "A-history-reader": {
+      "owner": "A",
+      "dependsOn": []
+    },
+    "A-original-byte-history": {
+      "owner": "A",
+      "dependsOn": [
+        "A-history-reader"
+      ]
+    },
+    "C-safe-session-tools": {
+      "owner": "C",
+      "dependsOn": []
+    },
+    "C-current-decision-snapshot": {
+      "owner": "C",
+      "dependsOn": [
+        "C-safe-session-tools"
+      ]
+    },
+    "M-decision-work-consumer": {
+      "owner": "main",
+      "dependsOn": [
+        "C-current-decision-snapshot"
+      ]
+    },
+    "F-daily-original-workflow": {
+      "owner": "F",
+      "dependsOn": [
+        "M-F-default-workbench"
+      ]
+    },
+    "J-two-original-projects": {
+      "owner": "J",
+      "dependsOn": []
+    },
+    "G-default-support-port": {
+      "owner": "G",
+      "dependsOn": []
+    },
+    "M-support-identity-consumer": {
+      "owner": "main",
+      "dependsOn": [
+        "G-default-support-port"
+      ]
+    },
+    "D-existing-W32-fixed": {
+      "owner": "D",
+      "dependsOn": [],
+      "providedByReviewedSource": true
+    },
+    "E-strict-resource-and-journey-oracle": {
+      "owner": "E",
+      "dependsOn": []
+    },
+    "E-current-existing-cohort": {
+      "owner": "E",
+      "dependsOn": [
+        "D-existing-W32-fixed",
+        "E-strict-resource-and-journey-oracle"
+      ]
+    },
+    "D-selected-successor-freeze": {
+      "owner": "D",
+      "dependsOn": [
+        "M-F-default-workbench"
+      ]
+    },
+    "E-selected-cohort-verdict": {
+      "owner": "E",
+      "dependsOn": [
+        "D-selected-successor-freeze",
+        "E-strict-resource-and-journey-oracle"
+      ]
+    },
+    "D-nonempty-restore": {
+      "owner": "D",
+      "dependsOn": [
+        "A-original-byte-history",
+        "D-existing-W32-fixed"
+      ]
+    },
+    "E-two-project-journey": {
+      "owner": "E",
+      "dependsOn": [
+        "E-strict-resource-and-journey-oracle",
+        "J-two-original-projects",
+        "F-daily-original-workflow"
+      ]
+    }
+  }
+}

@@ -497,7 +497,6 @@ export function TrialWorkspace({
             ))}
           </dl>
           {support?.note !== undefined && <p className="trial-note">{support.note}</p>}
-          <p className="trial-note">只读摘要，不含凭据、绝对路径或命令；支持材料由 main/H 提供。</p>
         </details>
 
         <footer className="trial-boundary">
