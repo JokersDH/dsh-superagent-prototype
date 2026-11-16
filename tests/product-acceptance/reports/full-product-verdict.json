@@ -3,12 +3,12 @@
   "tier": "full-product",
   "status": "FAIL",
   "ok": false,
-  "checkedAt": "2026-11-16T01:15:20.531Z",
+  "checkedAt": "2026-11-16T04:43:38.332Z",
   "source": {
-    "commit": "d32080f543ceac7f127113a5a0adefa232f718f0",
+    "commit": "a933479b7ae8cd591f9e2032d70c9b2dcdd356bd",
     "dirty": false
   },
-  "expectedSource": "d32080f543ceac7f127113a5a0adefa232f718f0",
+  "expectedSource": "a933479b7ae8cd591f9e2032d70c9b2dcdd356bd",
   "requirements": [
     {
       "id": "E1-GATE-CONTROL",
@@ -377,6 +377,11 @@
     },
     {
       "id": "E1-MUTATE-PILOT-NO-ORACLE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E1-LIFECYCLE-BIRTH-NO-SET",
       "required": true,
       "status": "PASS"
     },
@@ -891,6 +896,11 @@
       "status": "PASS"
     },
     {
+      "id": "E32-ZIP-LIFECYCLE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
       "id": "E11-TRIAL-IDENTITY-FIELDS",
       "required": false,
       "status": "NOT_TESTED"
@@ -1026,7 +1036,7 @@
   "claimedBy": {
     "status": "PASS",
     "tier": "controlled-product-workflow",
-    "decidedAt": "2026-11-16T01:10:48.860Z",
+    "decidedAt": "2026-11-16T04:37:07.960Z",
     "failureCodes": []
   },
   "notes": [

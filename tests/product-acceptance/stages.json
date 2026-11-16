@@ -1,10 +1,10 @@
 {
   "schema": "product-acceptance-stages/1",
   "agent": "E",
-  "taskPackage": "agent-tasks/product-wave-31/README.zh-CN.md",
+  "taskPackage": "agent-tasks/product-wave-32/README.zh-CN.md",
   "branch": "codex/g3-product-acceptance",
-  "base": "b9fcdc7",
-  "checkpoint": "d32080f",
+  "base": "3cbc648",
+  "checkpoint": "a933479",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -18,98 +18,50 @@
   "stages": [
     {
       "id": "E1",
-      "title": "Complete known-resource policy on every path",
+      "title": "Every stop path verifies the fixed resource set",
       "command": "node tests/product-acceptance/cases/w27-lifecycle.mjs",
       "notes": [
-        "A packaged STOPPED is verified against the fixed pre-stop set; a live known child keeps clean=false and retains the root. No global discovery."
+        "A packaged STOPPED is checked against the fixed pre-stop set; a known live birth without that set stays retained."
       ]
     },
     {
       "id": "E2",
-      "title": "Legitimate multi-resource proof and strict exit observation",
-      "command": "node tests/product-acceptance/cases/w27-lifecycle.mjs",
+      "title": "Journey oracle: original project identity",
+      "command": "node tests/product-acceptance/cases/w31-journey.mjs",
       "notes": [
-        "liveIdentity carries ppid, a re-parented child of an exited launcher stays legitimate, and the after-set must repeat the exact pid/start with explicit booleans."
+        "Previews must be applicable and the execution chain must stay on the original project; needs_input and fixture-pool substitution are recorded as gaps, not passes."
       ]
     },
     {
       "id": "E3",
-      "title": "Fixed R1 ordinary and functional",
-      "command": "node tests/product-acceptance/run.mjs --tier=installed-functional",
+      "title": "Journey oracle: recovery observation",
+      "command": "node tests/product-acceptance/cases/w31-journey.mjs",
       "notes": [
-        "R1 82ee5b8f/8296720d, tar 04926739: ordinary and functional stop both pass on its own bytes, with the 1fba/1ba/ce64 scopes kept."
+        "Reopen must find the original Work id, phase and artifacts; a message count alone is not recovery evidence."
       ]
     },
     {
       "id": "E4",
-      "title": "R1 latest UI and visible capabilities",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4",
+      "title": "ZIP/manifest lifecycle",
+      "command": "node tests/product-acceptance/cases/w32-zip.mjs",
       "notes": [
-        "Trial navigation, four callbacks, readiness, recipe preview and 7/30 insights are measured against the R1 bundle/API."
+        "One frozen distribution drives first-run, unconfigured degradation, configured import, controlled delivery, fixed-set stop, reopen and verified backup."
       ]
     },
     {
       "id": "E5",
-      "title": "Two-project template and execution chain",
-      "command": "node tests/product-acceptance/cases/w31-journey.mjs",
+      "title": "R1 ordinary and functional",
+      "command": "node tests/product-acceptance/run.mjs --tier=installed-functional",
       "notes": [
-        "Two registered projects: read-only preview, explicit create with an edited goal, machine check, candidate and manual accept."
+        "R1 82ee5b8f/8296720d ordinary, functional, UI, readiness, recipe preview, insights and the journey all pass on its own bytes."
       ]
     },
     {
       "id": "E6",
-      "title": "7/30 scoped observation",
-      "command": "node tests/product-acceptance/cases/w31-journey.mjs",
-      "notes": [
-        "Open 7/30 windows answer with scope/coverage; project-scoped refusal is recorded as an authorization boundary, not a missing endpoint."
-      ]
-    },
-    {
-      "id": "E7",
-      "title": "Selected context, reply and source review",
-      "command": "node tests/product-acceptance/cases/w31-journey.mjs",
-      "notes": [
-        "prepare/send/receipt, loopback reply, audit/history/sources and the scoped opt-in run in the same journey with a mock provider."
-      ]
-    },
-    {
-      "id": "E8",
-      "title": "Per-phase resource exit and reopen",
-      "command": "node tests/product-acceptance/cases/w31-journey.mjs",
-      "notes": [
-        "Each phase ends with a packaged STOPPED plus fixed-set observation, and the same data root reopens with both conversations."
-      ]
-    },
-    {
-      "id": "E9",
-      "title": "R1 installer and upgrade compatibility",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4",
-      "notes": [
-        "Cold/no-executor/multi-state, baseline upgrade and rollback keep exit/status/pointer/operation/data on the R1 tar; no R2 claim is made without its fixed identity."
-      ]
-    },
-    {
-      "id": "E10",
-      "title": "Backup restore readonly and multi-root faults",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4",
-      "notes": [
-        "Non-empty backup/verify/restore into a new root, v1/v2 formats, artifact closure, and the recorded target-content gap."
-      ]
-    },
-    {
-      "id": "E11",
-      "title": "Bounded sustained use and private support",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4",
-      "notes": [
-        "Bounded readonly concurrency/reopen and support output 0600/non-overwriting/credential-free; no long soak is claimed."
-      ]
-    },
-    {
-      "id": "E12",
-      "title": "Existing release oracle and complete handoff",
+      "title": "Layered conclusion and status",
       "command": "node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record",
       "notes": [
-        "wave31-status indexes all twelve deliverables with source/tuple/consumer/commands and the remaining gates; no new gate or ledger."
+        "wave32-status separates implemented/merged/candidate/installed/native and lists the remaining gates without a new oracle."
       ]
     }
   ]

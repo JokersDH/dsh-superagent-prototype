@@ -1,0 +1,4785 @@
+{
+  "schema": "product-acceptance-wave32-status/1",
+  "agent": "E",
+  "branch": "codex/g3-product-acceptance",
+  "base": "3cbc648",
+  "checkpoint": "a933479",
+  "head": "a933479b7ae8cd591f9e2032d70c9b2dcdd356bd",
+  "worktreeDirtyAtRun": false,
+  "checkedAt": "2026-11-16T04:37:07.940Z",
+  "budget": {
+    "modelTasks": 0,
+    "nativeRuns": 0,
+    "unknownSends": 0,
+    "pilotGrant": "wave05-independent-review-pilot-01",
+    "pilotTurnsUsed": 0,
+    "pilotTokensUsed": 0,
+    "pilotUsd": null,
+    "note": "Research BLOCKED; no B sender. Real model sends 0; ledger keeps 0/24, 0 tokens, unknown price. Full costOf→settle chain preserves unknown and blocks; E only reserves."
+  },
+  "stages": [
+    {
+      "id": "E1",
+      "title": "Every stop path verifies the fixed resource set",
+      "command": "node tests/product-acceptance/cases/w27-lifecycle.mjs",
+      "notes": [
+        "A packaged STOPPED is checked against the fixed pre-stop set; a known live birth without that set stays retained."
+      ],
+      "result": "PASS",
+      "counts": {
+        "PASS": 137
+      },
+      "cases": [
+        {
+          "id": "E1-GATE-CONTROL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-MISSING-CASE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-UNKNOWN-STATUS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-UNCERTAIN-ACCEPT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-STALE-REPORT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-SOURCE-MISMATCH",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-NO-CANDIDATE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-VACUOUS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-FAILED-ASSERTION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-MISSING-EVIDENCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-DUPLICATE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-BAD-PATCH",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-UNAPPLIED-PATCH",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-MALFORMED-PATCH",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-UNEXECUTED-NATIVE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-INVALID-RESPONSE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-STALE-CASE-BINDING",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-FIXTURE-DRIFT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-GATE-REJECT-SCHEMA",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-FIXTURE-STRICT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-FIXTURE-PORTABILITY-STRICT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-ADMISSION-FAIL-CLOSED",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-PREFLIGHT-NO-FALLBACK",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-WRONG-LAYER",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-DIRTY-SOURCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-MISSING-SOURCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-STALE-REPORT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-CROSS-COMMIT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-UNBOUND-CASE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-EMPTY-EVIDENCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-EMPTY-OBJECT-EVIDENCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-MISSING-CASE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-FAILED-ASSERTION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-NO-DOWNLOAD-BYTES",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-DOWNLOAD-DIGEST",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-PATCH-NOT-APPLIED",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-PATCH-DIGEST",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-DUPLICATE-ID",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-UNKNOWN-STATUS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-UNKNOWN-LAYER",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-NATIVE-NOT-EXECUTED",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-NATIVE-NO-VERSION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-NATIVE-NO-ATTEMPT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-NATIVE-NO-EVIDENCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-NATIVE-NO-MODEL-TASKS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-INSTALL-NOT-STAGED",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-INSTALL-NOT-INDEPENDENT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-NOT-TESTED",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-REQUIRED-FAIL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-REQUIRED-UNKNOWN",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-WRONG-REPORT-SOURCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-WRONG-ARTIFACT-TUPLE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-REQUIRED-PASS-EMPTY-EVIDENCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-FOREIGN-SUBJECT-SOURCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-FOREIGN-SUBJECT-SHA-SIZE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-FOREIGN-SUBJECT-BUILD",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-WRONG-MODE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-REQUIRED-WRONG-RUN",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-CURRENT-BLOCKED-AS-PASS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-CURRENT-FIXTURE-MODE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-OWNERSHIP-COPY-NO-EXIT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-FAULT-STEP-NAMES",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-RECOVER-BLOCKED",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-RECOVER-EXIT1-SUCCESS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-FAULT-WRONG-OPERATION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-NOOP-EXIT1",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-POINTER-MISSING",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-FOREIGN-ABI-PLATFORM",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-HELPER-FOREIGN-PROVENANCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-HELPER-WITHOUT-FILE-HASH",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-OWNERSHIP-SUBJECT-FOREIGN",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-NO-PREVIOUS-CONTROL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-INSTALLED-CANDIDATE-NATIVE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-INSTALLED-CANDIDATE-NO-REPLAY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-SECOND-ROOT-RESEND",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-SOURCE-PREPARE-GRANTED",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-STABILITY-QUEUE-NOT-RETURNED",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-WORKFLOW-V2-BORROWED",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-SECOND-ROOT-PERSONAL-CLAIM",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-PERSONAL-REVIEW-UNBOUND-READ",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-PERSONAL-REVIEW-FIFO-ALLOWED",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-CONSUMER-ENTRY-FOREIGN",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-CONSUMER-ENTRY-SOURCE-ORIGIN",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-REUSE-SILENT-SELECTION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-SCOPE-DIAGNOSTIC-LEAK",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-SCOPE-WITHHELD-NEGATIVE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-SCOPE-WITHHELD-OVERFLOW",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-SCOPE-DUPLICATE-REASON",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-SCOPE-AUTHORIZATION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-CAPABILITY-SELF-DOWNGRADE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-SELF-CLAIM",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-ADMISSION-PROBE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-STRUCTURE-TIER-SUPERSET",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-STRUCTURE-NO-ALLOW-GAP",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-ROUTE-NO-ELIGIBLE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-ROUTE-OVERLAP",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-ROUTE-EXPIRED",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-ROUTE-NO-EVIDENCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-ROUTE-DEFAULT-PATH",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-REVIEW-DISPOSITION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-REVIEW-SAME-ASSIGNMENT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-REVIEW-NO-ISOLATION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-REVIEW-BAD-DIGEST",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-HETERO-SAME-PROTOCOL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-HETERO-NOT-EXECUTED",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-HETERO-NO-VERSION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-HETERO-NO-BUDGET",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-HETERO-NO-ISOLATION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-NATIVE-CONTROL-NOT-EXECUTED",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-NATIVE-CONTROL-NO-STOP",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-NATIVE-CONTROL-NO-RECOVERY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-PILOT-ZERO-TURNS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-PILOT-UNKNOWN-USAGE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-PILOT-BLOCKED-PASS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-PILOT-NO-ORACLE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-MUTATE-HETERO-NO-SUBJECT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-LIFECYCLE-OWN",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-LIFECYCLE-WRONG-START",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-LIFECYCLE-SIBLING",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-LIFECYCLE-FOREIGN-CHILD",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-LIFECYCLE-MIXED-UNKNOWN",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-LIFECYCLE-START-WINDOW",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-LIFECYCLE-REFUSED-STOP",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-LIFECYCLE-IDEMPOTENT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-LIFECYCLE-BIRTH-ROOT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-LIFECYCLE-CHILD-SCOPE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-LIFECYCLE-NO-RECORD-BIRTH",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-LIFECYCLE-NO-RECORD-EXIT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-LIFECYCLE-NO-RECORD-REUSE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-LIFECYCLE-STOP-NO-RECORD",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-LIFECYCLE-NO-RECORD-UNVERIFIED",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-LIFECYCLE-SET-MISMATCH",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-LIFECYCLE-BIRTH-CONFIG",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-LIFECYCLE-STOPPED-KNOWN-CHILD",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-LIFECYCLE-STOPPED-NO-RECORD-CHILD",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-LIFECYCLE-PARENT-GONE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-LIFECYCLE-BIRTH-NO-SET",
+          "status": "PASS",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "id": "E2",
+      "title": "Journey oracle: original project identity",
+      "command": "node tests/product-acceptance/cases/w31-journey.mjs",
+      "notes": [
+        "Previews must be applicable and the execution chain must stay on the original project; needs_input and fixture-pool substitution are recorded as gaps, not passes."
+      ],
+      "result": "PASS_WITH_GAPS",
+      "counts": {
+        "PASS": 25,
+        "NOT_TESTED": 3
+      },
+      "cases": [
+        {
+          "id": "E2-AUTH-AND-ORIGIN",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-CONFIGURATION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-DAILY-VERTICAL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-ARTIFACT-ROUNDTRIP",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-REPLAY-AND-CONFLICT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-SESSION-ISOLATION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-STALE-BUSINESS-REJECTION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-MACHINE-FAIL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-ONE-WRITER",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-SCOPE-AND-PROFILE-GUARDS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-CONTEXT-PROPOSALS-NOT-TESTED",
+          "status": "NOT_TESTED",
+          "reason": "The legacy record_decision command returned rejected (unsupported_capability); explicit decisions use /v1/decisions (E3-DECISION-WORKFLOW), but structured proposal confirmation remains absent."
+        },
+        {
+          "id": "E2-WORK-EVIDENCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-EVIDENCE-HISTORY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-REOPEN-PERSISTENCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-ASSISTANT-SDK-MOCK",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-CONVERSATION-CATALOG",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-VERIFICATION-RECOVERY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-VERIFICATION-FINISHED-STATES",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-ATTENTION-SIGNAL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-REVIEW-TIMING",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-ROUTE-FIXTURE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-ATTENTION-WORKBENCH",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-ROUTE-ADVICE",
+          "status": "NOT_TESTED",
+          "reason": "No route-advice producer or HTTP entry exists; the schema fixture and gate validators are prepared, and the default path remains closed."
+        },
+        {
+          "id": "E2-PROJECT-SETTINGS",
+          "status": "NOT_TESTED",
+          "reason": "Project settings GET returned 422 and POST returned 422 (unsupported_capability)."
+        },
+        {
+          "id": "E2-REPLY-DURABLE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-REPLY-UNKNOWN-DURABLE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-REPLY-MESSAGE-WINDOW",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-REPLY-BAD-ARTIFACT",
+          "status": "PASS",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "id": "E3",
+      "title": "Journey oracle: recovery observation",
+      "command": "node tests/product-acceptance/cases/w31-journey.mjs",
+      "notes": [
+        "Reopen must find the original Work id, phase and artifacts; a message count alone is not recovery evidence."
+      ],
+      "result": "PASS_WITH_GAPS",
+      "counts": {
+        "PASS": 28,
+        "NOT_TESTED": 6
+      },
+      "cases": [
+        {
+          "id": "E3-DESKTOP-GEOMETRY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-NOTEBOOK-GEOMETRY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-MOBILE-GEOMETRY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-QUESTION-FORM",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-ACCEPT-AND-DOWNLOAD",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-OFFLINE-AND-ERROR",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-KEYBOARD-AND-SCROLL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-CONVERSATION-UI",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-VERIFICATION-RECOVERY-UI",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-ASSISTANT-SCHEMA-FIXTURES",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-ASSISTANT-DOMAIN-ADMISSION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-ASSISTANT-END-TO-END",
+          "status": "NOT_TESTED",
+          "reason": "Explicit decisions now work over HTTP (E3-DECISION-WORKFLOW); automatic context/proposal confirmation is still absent."
+        },
+        {
+          "id": "E3-REVIEW-FIXTURES",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-SEALED-COPY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-REVIEW-ACTIVITY-UI",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-REVIEW-PIPELINE",
+          "status": "NOT_TESTED",
+          "reason": "No public entry creates a review Work/Ticket/Assignment or publishes ReviewEvidence; the independent pilot preflight is BLOCKED on pricing."
+        },
+        {
+          "id": "E3-ATTENTION-INBOX",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-ATTENTION-DEADLINES",
+          "status": "NOT_TESTED",
+          "reason": "No public entry creates a question with a real decisionDeadline/expiresAt in this checkout; waiting-age and unknown-wait ordering are verified instead."
+        },
+        {
+          "id": "E3-ATTENTION-INBOX-UI",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-DECISION-WORKFLOW",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-DECISION-SOURCE-STATES",
+          "status": "NOT_TESTED",
+          "reason": "No public entry deletes/changes the source message or expires the project grant; transaction-failure injection is not exposed. These remain NOT_TESTED."
+        },
+        {
+          "id": "E3-PROPOSAL-CONTEXT-BOUNDARY",
+          "status": "NOT_TESTED",
+          "reason": "NOT_TESTED: context preview now exists, but automatic proposal confirmation and grant/revocation invalidation do not. Required inputs: proposal id/revision, source message and digest, current grant/scope/profile/contract, decision to confirm, plus context preview with project/conversation/work binding, window and invalidity. Planned negatives: unconfirmed means no execution; a failed original command leaves no half-confirmed state; an unknown response reuses the same command id; source/actor/grant/scope/profile/version drift is refused; revoke invalidates later context; cross-project isolation and reopen."
+        },
+        {
+          "id": "E3-PROPOSAL-HTTP",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-CONTEXT-GRANT-BOUNDARY",
+          "status": "NOT_TESTED",
+          "reason": "NOT_TESTED: E3-CONTEXT-PREVIEW verifies clamped budgets, omissions and basic refusals, but no public entry binds an expired grant or purpose mismatch to the read path. Required: expired grant, purpose mismatch, caller budget above the grant and negative/NaN budget must be refused before any provider read, with the effective window and truncation reported. The C composer probe shows these still fail at the library boundary, so a product pass cannot be claimed."
+        },
+        {
+          "id": "E3-PROPOSAL-UI",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-CONTEXT-PREVIEW",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-CONTEXT-USE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-CONTEXT-SSE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-CONTEXT-GUARDS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-CONTEXT-HISTORY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-CONTEXT-SOURCES",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-CONTEXT-UI",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-PERSONAL-COLD-START",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-TRIAL-WORKBENCH-UI",
+          "status": "PASS",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "id": "E4",
+      "title": "ZIP/manifest lifecycle",
+      "command": "node tests/product-acceptance/cases/w32-zip.mjs",
+      "notes": [
+        "One frozen distribution drives first-run, unconfigured degradation, configured import, controlled delivery, fixed-set stop, reopen and verified backup."
+      ],
+      "result": "PASS_WITH_GAPS",
+      "counts": {
+        "PASS": 21,
+        "NOT_TESTED": 3
+      },
+      "cases": [
+        {
+          "id": "E4-COMPLETED-REPLY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-CANDIDATE-FLOW",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-BOUNDED-CYCLES",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-PORTABILITY-CHECKLIST",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-RECOVERY-READONLY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-DISTRIBUTION-PREREQUISITES",
+          "status": "NOT_TESTED",
+          "reason": "Distribution source paths absent from this checkout: none. A frozen tar.gz is published outside Git and independently accepted by E4-INSTALL-*; source-level installation and migration remain Agent D owned and are not claimed by this case."
+        },
+        {
+          "id": "E4-REAUTHORIZATION",
+          "status": "NOT_TESTED",
+          "reason": "Read-only inspect/prepare are verified (plan authorization=not_granted, commitAvailable=false, no writes, stale/foreign/commit refused). The commit path, expiry/drift/replay/rollback of a real grant, and activation of only new work are not implemented and stay NOT_TESTED."
+        },
+        {
+          "id": "E4-INSTALL-ARTIFACT-IDENTITY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-INSTALL-FIRST-RUN",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-INSTALL-CONFIG-ROOT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-INSTALL-REUSE-CONCURRENCY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-INSTALL-HOST-GUARDS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-BACKUP-RESTORE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-INSTALL-TAMPER",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-INSTALL-ROLLBACK",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-UPGRADE-ROLLBACK",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-UPGRADE-CROSS-SCHEMA",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-MULTI-STATE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-UPGRADE-FAULTS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-RECOVERY-PREFLIGHT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-B-PRODUCTION-RECOVERY",
+          "status": "NOT_TESTED",
+          "reason": "NOT_TESTED: current main product path uses ProductExecution with fixture/Codex profiles, but B's new production control candidate is not consumed by main and native execution is outside this wave. Required: actual product begin command -> Work/Ticket/effect/fact_receipts/dispatch_receipts/answers/answer_deliveries/user_questions/runtime rows, real transport/epoch counts, independent process SIGKILL, unknown no resend, and stop/answer through the existing queue. A fixture or receipt-only row is not production recovery."
+        },
+        {
+          "id": "E4-SOURCE-CONFIRM",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-SOURCE-CONFIRM-REFUSAL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-PERSONAL-RESTORED-REVIEW",
+          "status": "PASS",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "id": "E5",
+      "title": "R1 ordinary and functional",
+      "command": "node tests/product-acceptance/run.mjs --tier=installed-functional",
+      "notes": [
+        "R1 82ee5b8f/8296720d ordinary, functional, UI, readiness, recipe preview, insights and the journey all pass on its own bytes."
+      ],
+      "result": "PASS_WITH_GAPS",
+      "counts": {
+        "NOT_TESTED": 2,
+        "PASS": 7
+      },
+      "cases": [
+        {
+          "id": "E5-NATIVE-CONTROL",
+          "status": "NOT_TESTED",
+          "reason": "No executed native stop/question/recovery evidence is available in this checkout."
+        },
+        {
+          "id": "E5-INSTALLED-CANDIDATES",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E5-RECOVERY-INTERRUPTION",
+          "status": "NOT_TESTED",
+          "reason": "NOT_TESTED: main has published RecoveryTargetConfiguration/preparation/material/inventory schemas and a configuration binder, but no commit/activate HTTP or composed target startup. Required inputs: source-committed activation fact, A read-only inventory, D materializer readback, main activation pointer switch, and crash replay semantics. Planned negatives: interruption before source commit, after source commit but before target preparation, during target preparation, and at pointer switch must never dispatch old queues, never grant authority from an old ended/PID/missing writer, and never duplicate authorization on response loss or restart; a backup/re-restore must not inherit executable authority. A schema or read-only prepare is not activation."
+        },
+        {
+          "id": "E5-D-OWNERSHIP-MOCKS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E5-WORKFLOW-FORMATS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E5-RESTORED-REVIEW-REFUSALS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E5-REVIEW-REUSE-CONSISTENCY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E5-STOP-FUNCTIONAL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E5-TWO-PROJECT-TEMPLATE-CREATE",
+          "status": "PASS",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "id": "E6",
+      "title": "Layered conclusion and status",
+      "command": "node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record",
+      "notes": [
+        "wave32-status separates implemented/merged/candidate/installed/native and lists the remaining gates without a new oracle."
+      ],
+      "result": "PASS_WITH_GAPS",
+      "counts": {
+        "NOT_TESTED": 3,
+        "PASS": 5
+      },
+      "cases": [
+        {
+          "id": "E6-REVIEW-PILOT",
+          "status": "NOT_TESTED",
+          "reason": "Preflight BLOCKED: adapter_missing; 0/24 turns used."
+        },
+        {
+          "id": "E6-INSTALLED-CONTEXT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E6-ARTIFACT-CURRENT-SCOPE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E6-CURRENT-MAIN-INSTALL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E6-INSTALLED-SOURCE-CONFIRM",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E6-TARGET-CONTENT-DRIFT",
+          "status": "NOT_TESTED",
+          "reason": "NOT_REACHED: the frozen package has no content-binding consumer in main; the producer-side drifted snapshot result was ok. A target-only append cannot be refused by content because no consumer compares restored content with the source subject. This is a recorded product gap for the C/A owners, not an acceptance pass."
+        },
+        {
+          "id": "E6-SOURCE-UI",
+          "status": "NOT_TESTED",
+          "reason": "NOT_REACHED: the scope-review marker exists in this package and its backend ?scopeReview=1 plain/narrow responses are measured, but the independent browser expansion of a restored message scope has not been recorded. Navigation and the trial workbench are separately browser-verified in E3-TRIAL-WORKBENCH-UI."
+        },
+        {
+          "id": "E6-RECIPE-PREVIEW",
+          "status": "PASS",
+          "reason": null
+        }
+      ]
+    }
+  ],
+  "release": {
+    "schema": "product-acceptance-release/1",
+    "tier": "controlled-product-workflow",
+    "status": "PASS",
+    "ok": true,
+    "checkedAt": "2026-11-16T04:37:07.960Z",
+    "source": {
+      "commit": "a933479b7ae8cd591f9e2032d70c9b2dcdd356bd",
+      "dirty": false
+    },
+    "expectedSource": "a933479b7ae8cd591f9e2032d70c9b2dcdd356bd",
+    "requirements": [
+      {
+        "id": "E1-GATE-CONTROL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-MISSING-CASE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-UNKNOWN-STATUS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-UNCERTAIN-ACCEPT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-STALE-REPORT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-SOURCE-MISMATCH",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-NO-CANDIDATE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-VACUOUS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-FAILED-ASSERTION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-MISSING-EVIDENCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-DUPLICATE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-BAD-PATCH",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-UNAPPLIED-PATCH",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-MALFORMED-PATCH",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-UNEXECUTED-NATIVE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-INVALID-RESPONSE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-STALE-CASE-BINDING",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-FIXTURE-DRIFT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-GATE-REJECT-SCHEMA",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-FIXTURE-STRICT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-FIXTURE-PORTABILITY-STRICT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-WRONG-LAYER",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-DIRTY-SOURCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-MISSING-SOURCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-STALE-REPORT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-CROSS-COMMIT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-UNBOUND-CASE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-EMPTY-EVIDENCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-EMPTY-OBJECT-EVIDENCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-MISSING-CASE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-FAILED-ASSERTION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-NO-DOWNLOAD-BYTES",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-DOWNLOAD-DIGEST",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-PATCH-NOT-APPLIED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-PATCH-DIGEST",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-DUPLICATE-ID",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-UNKNOWN-STATUS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-UNKNOWN-LAYER",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-NOT-EXECUTED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-NO-VERSION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-NO-ATTEMPT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-NO-EVIDENCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-NO-MODEL-TASKS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-INSTALL-NOT-STAGED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-INSTALL-NOT-INDEPENDENT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-NOT-TESTED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-SELF-CLAIM",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-ADMISSION-PROBE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-ADMISSION-FAIL-CLOSED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-PREFLIGHT-NO-FALLBACK",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-STRUCTURE-TIER-SUPERSET",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-STRUCTURE-NO-ALLOW-GAP",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-ROUTE-NO-ELIGIBLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-ROUTE-OVERLAP",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-ROUTE-EXPIRED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-ROUTE-NO-EVIDENCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-ROUTE-DEFAULT-PATH",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-REVIEW-DISPOSITION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-REVIEW-SAME-ASSIGNMENT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-REVIEW-NO-ISOLATION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-REVIEW-BAD-DIGEST",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-HETERO-SAME-PROTOCOL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-HETERO-NOT-EXECUTED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-HETERO-NO-VERSION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-HETERO-NO-BUDGET",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-HETERO-NO-ISOLATION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-HETERO-NO-SUBJECT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-CONTROL-NOT-EXECUTED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-CONTROL-NO-STOP",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-NATIVE-CONTROL-NO-RECOVERY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-PILOT-ZERO-TURNS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-PILOT-UNKNOWN-USAGE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-PILOT-BLOCKED-PASS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-MUTATE-PILOT-NO-ORACLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-BIRTH-NO-SET",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-STOPPED-KNOWN-CHILD",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-STOPPED-NO-RECORD-CHILD",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-PARENT-GONE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-NO-RECORD-UNVERIFIED",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-SET-MISMATCH",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-BIRTH-CONFIG",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-NO-RECORD-BIRTH",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-NO-RECORD-EXIT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-NO-RECORD-REUSE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-STOP-NO-RECORD",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-BIRTH-ROOT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-CHILD-SCOPE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-OWN",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-WRONG-START",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-SIBLING",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-FOREIGN-CHILD",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-MIXED-UNKNOWN",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-START-WINDOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-REFUSED-STOP",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-IDEMPOTENT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-CONFIGURATION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-DAILY-VERTICAL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-ARTIFACT-ROUNDTRIP",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-WORK-EVIDENCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-EVIDENCE-HISTORY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REOPEN-PERSISTENCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REPLAY-AND-CONFLICT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-SESSION-ISOLATION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-STALE-BUSINESS-REJECTION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-MACHINE-FAIL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-ONE-WRITER",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-SCOPE-AND-PROFILE-GUARDS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-AUTH-AND-ORIGIN",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-ASSISTANT-SDK-MOCK",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-CONVERSATION-CATALOG",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-ATTENTION-SIGNAL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REVIEW-TIMING",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-ROUTE-FIXTURE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-REVIEW-FIXTURES",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-SEALED-COPY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-REVIEW-ACTIVITY-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-ATTENTION-INBOX",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-ATTENTION-INBOX-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-DECISION-WORKFLOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-PROPOSAL-HTTP",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-PROPOSAL-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONTEXT-PREVIEW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONTEXT-USE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONTEXT-SSE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONTEXT-GUARDS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-CANDIDATE-FLOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONTEXT-HISTORY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONTEXT-SOURCES",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONTEXT-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-SOURCE-CONFIRM",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-SOURCE-CONFIRM-REFUSAL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-COMPLETED-REPLY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REPLY-DURABLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REPLY-UNKNOWN-DURABLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REPLY-MESSAGE-WINDOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REPLY-BAD-ARTIFACT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E8-SCHEMA-MIGRATION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E8-LEGACY16-MIGRATION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E9-CONTEXT-CONCURRENCY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-DESKTOP-GEOMETRY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-NOTEBOOK-GEOMETRY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-MOBILE-GEOMETRY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-QUESTION-FORM",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-ACCEPT-AND-DOWNLOAD",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-ASSISTANT-SCHEMA-FIXTURES",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONVERSATION-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-VERIFICATION-RECOVERY-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-OFFLINE-AND-ERROR",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-KEYBOARD-AND-SCROLL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-BOUNDED-CYCLES",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-PORTABILITY-CHECKLIST",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-RECOVERY-PREFLIGHT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-RECOVERY-READONLY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-VERIFICATION-RECOVERY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-VERIFICATION-FINISHED-STATES",
+        "required": true,
+        "status": "PASS"
+      }
+    ],
+    "failures": [],
+    "claimedBy": null,
+    "notes": [
+      "Controlled fixture, SDK mock, readonly and installed evidence never substitute for actual-native execution.",
+      "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability; there is no allow-gap switch."
+    ]
+  },
+  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z",
+  "evidence": {
+    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/report.json",
+    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/release.json",
+    "screenshots": [
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/screenshots/desktop-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/screenshots/notebook-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/screenshots/mobile-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/screenshots/mobile-navigation.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/screenshots/mobile-detail.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/screenshots/desktop-delivered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/screenshots/desktop-error.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/screenshots/desktop-offline.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/screenshots/desktop-keyboard.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/screenshots/mobile-conversations.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/screenshots/desktop-verification-blocked.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/screenshots/desktop-verification-recovered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/screenshots/desktop-review-activity.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/screenshots/mobile-attention-inbox.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/proposal-preview-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/proposal-preview-notebook.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/proposal-preview-mobile.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/screenshots/context-confirm-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/screenshots/context-confirm-mobile.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/screenshots/context-history-mobile.png"
+    ],
+    "matrix": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/release-matrix.json",
+    "executionStatus": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/execution-status.json",
+    "wave09Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave09-status.json",
+    "wave17Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave17-status.json",
+    "wave18Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave18-status.json",
+    "wave08Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave08-status.json",
+    "wave07Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave07-status.json",
+    "wave06Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave06-status.json",
+    "tierVerdicts": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/tier-verdicts.json"
+  },
+  "blockers": [],
+  "untested": [
+    {
+      "id": "conversation-chat",
+      "gaps": [
+        "真实模型回复与流式界面未在本轮执行；budget 0。"
+      ]
+    },
+    {
+      "id": "explicit-delegation",
+      "gaps": [
+        "真实 Codex 执行属于 B 的原生验收，E 未触发计费任务。"
+      ]
+    },
+    {
+      "id": "question-answer",
+      "gaps": [
+        "真实原生权限/审批问题未执行；B 的原生证据未作为输入提供。"
+      ]
+    },
+    {
+      "id": "verification-completion",
+      "gaps": [
+        "原生注册检查与真实 deliverable 未在本轮复验。"
+      ]
+    },
+    {
+      "id": "verification-recovery",
+      "gaps": [
+        "生产故障注入接口不存在；阻断由受控 completion port 注入，其余步骤走真实 HTTP。"
+      ]
+    },
+    {
+      "id": "accepted-outcome-evidence",
+      "gaps": [
+        "工作台内进一步的时间线展示仍单列；source_missing/not_in_window 需要旧库来源缺失场景。"
+      ]
+    },
+    {
+      "id": "stale-guards",
+      "gaps": [
+        "旧提案与决定的撤销治理（C 未交付）"
+      ]
+    },
+    {
+      "id": "isolation",
+      "gaps": [
+        "两个独立项目的隔离：受控 lane 只有一个项目。"
+      ]
+    },
+    {
+      "id": "writer-identity",
+      "gaps": [
+        "真实原生写进程停止与物理资源屏障由 B 证明。"
+      ]
+    },
+    {
+      "id": "resource-recovery",
+      "gaps": [
+        "协调器 SIGKILL 后的原生恢复与重连（B 范围）。"
+      ]
+    },
+    {
+      "id": "stability",
+      "gaps": [
+        "长时间 soak、负载与多实例并发。"
+      ]
+    },
+    {
+      "id": "install-first-run",
+      "gaps": [
+        "PA_CONFIG_ROOT 覆盖后 release.json 不随 first-run 写入（owner D，已完成最小复现）。"
+      ]
+    },
+    {
+      "id": "backup-restore",
+      "gaps": [
+        "恢复后的新授权/重绑定归 main（E4-REAUTHORIZATION NOT_TESTED）；旧项目绑定恢复仍只读。"
+      ]
+    },
+    {
+      "id": "upgrade-rollback",
+      "gaps": [
+        "真实升级需要第二个冻结 buildId；state 回滚已在同一字节上通过。"
+      ]
+    },
+    {
+      "id": "attention-signal",
+      "gaps": [
+        "真实 decisionDeadline/expiresAt 与多 tab 重叠未验证；本项目只有一个受控项目。"
+      ]
+    },
+    {
+      "id": "attention-workbench",
+      "gaps": [
+        "真实业务截止与授权过期后的问题失效仍无公开入口（E3-ATTENTION-DEADLINES、E3-DECISION-SOURCE-STATES）；deterministic_priority 排序与逐项动作已通过。"
+      ]
+    },
+    {
+      "id": "review-timing",
+      "gaps": [
+        "多 tab 重叠区间并集未直接测量；活动是可见/聚焦代理，不是人工思考时间。"
+      ]
+    },
+    {
+      "id": "route-advice",
+      "gaps": [
+        "C 的 packages/routing 与 main 的 HTTP/UI 入口未交付；0/1/多候选、身份漂移、旧政策等产品负例无法执行。"
+      ]
+    },
+    {
+      "id": "controlled-review",
+      "gaps": [
+        "无 review Work/HTTP/证据发布入口；E3-REVIEW-PIPELINE 未执行。"
+      ]
+    },
+    {
+      "id": "heterogeneous-review",
+      "gaps": [
+        "第二协议未实现，独立试点 preflight 为 BLOCKED；不能把替换模型或 fixture 当异构。"
+      ]
+    },
+    {
+      "id": "project-settings-version",
+      "gaps": [
+        "仅合同 revision 已验证；项目设置版本 API 未交付（RFC-E-001 缺口 2）。"
+      ]
+    },
+    {
+      "id": "context-proposals-decisions",
+      "gaps": [
+        "自动结构化提案确认仍未发布（owner C/main）；当前只验证显式 prepare/confirm/reject。",
+        "源消息删除/授权过期/事务失败注入缺少公开入口（E3-DECISION-SOURCE-STATES）。"
+      ]
+    },
+    {
+      "id": "context-use",
+      "gaps": [
+        "E3-CONTEXT-HISTORY/SOURCES 与 UI history tab 已覆盖签名分页、原文核对、model-off 与损坏 bundle；readonly/跨 principal 历史由各自层报告。",
+        "E3-CONTEXT-UI 已覆盖单 tab 丢响应重放、mobile、双 tab 与 history tab；未覆盖真实崩溃恢复中的浏览器 pending 多进程场景。"
+      ]
+    },
+    {
+      "id": "reply-results",
+      "gaps": [
+        "历史正文本轮由 E7-SECOND-ROOT-READONLY 在第二根重新读取；候选在安装包内 default-off→显式开启后验证非空建议与 confirm/replay/reject。"
+      ]
+    },
+    {
+      "id": "production-control",
+      "gaps": [
+        "E4-B-PRODUCTION-RECOVERY：main 当前产品未消费 B 新生产控制；fixture/WORK 存在不等于真实 Runner begin/answer/stop 恢复。"
+      ]
+    },
+    {
+      "id": "recovery-readonly",
+      "gaps": [
+        "解除隔离后的新授权/环境重绑定未实现，不在本轮声明。"
+      ]
+    },
+    {
+      "id": "assistant-state",
+      "gaps": [
+        "自动提案确认与撤销后上下文失效未发布。"
+      ]
+    },
+    {
+      "id": "distribution",
+      "gaps": [
+        "安装矩阵按 tar/sha/build/source/schema 参数化，不再固定 schema13 或端口；跨机器/跨 ABI 未测，只测 darwin/arm64 + Node 24.21.x + ABI 137。",
+        "旧 config root 指向不同安装时 first-run 以 release_source_conflict 拒绝且不启动；迁移只经显式 upgrade。",
+        "E6-CURRENT-MAIN-INSTALL：99832f6 实测 context/history/sources/replyResults=true，但 discussionReadiness=false；无执行器 personal 探针实际 BLOCKED，因此不是当前 M1 安装。"
+      ]
+    },
+    {
+      "id": "two-binary-upgrade",
+      "gaps": [
+        "已执行 crash_after_stop、crash_after_stop_kill、target_unhealthy 三窗口 recovering previous + data preserved；pointer/spawn/record/ACK after-switch 仍未单独注入。",
+        "升级前的 writer 资源屏障与旧队列隔离由 main/B 证明；E 只验证数据与二进制行为。"
+      ]
+    },
+    {
+      "id": "install-host-guards",
+      "gaps": [
+        "E4-MULTI-STATE 在 schema18 字节通过 requested-root 拒绝；launcher 死后 API 已随 launcher 退出时该窗口标 NOT_TESTED（无可用窗口）。E7 copied-record 与 wrong-install 通过。E5-D-OWNERSHIP-MOCKS 的 UID/argv/operation/journal/scanner/role mock 仍 NOT_TESTED。"
+      ]
+    },
+    {
+      "id": "proposal-http",
+      "gaps": [
+        "source/grant 漂移与 outer receipt 失败注入未在 HTTP 层单独执行；网页层由 E3-PROPOSAL-UI 覆盖。"
+      ]
+    },
+    {
+      "id": "context-window",
+      "gaps": [
+        "E3-CONTEXT-GRANT-BOUNDARY 仍未执行：expired grant/purpose/超预算的 HTTP 级反例缺少入口。"
+      ]
+    },
+    {
+      "id": "work-evidence",
+      "gaps": [
+        "storage_cap 与并发写入窗口未单独触发；历史窗口语义按 complete/caller_limit 已验证。"
+      ]
+    },
+    {
+      "id": "restored-personal-review",
+      "gaps": [
+        "有效签名下的过期/foreign principal/host 拒绝由 main 模块契约覆盖；E 不伪造 probe-owned key。"
+      ]
+    },
+    {
+      "id": "d-safety-helper",
+      "gaps": [
+        "只测 launcher helper 的 same-UID child 归属；广泛 live stop/cleanup 仍按 D 自有矩阵执行。"
+      ]
+    },
+    {
+      "id": "recovery-activation",
+      "gaps": [
+        "commit/activation 未发布；E5-RECOVERY-INTERRUPTION 记录四个中断窗口，prepare 不能替代授权。"
+      ]
+    },
+    {
+      "id": "native-control",
+      "gaps": [
+        "B 的当前真实控制证据未作为输入提供；E 无该预算，不能把 fixture 当原生。"
+      ]
+    },
+    {
+      "id": "review-pilot",
+      "gaps": [
+        "Preflight BLOCKED：adapter_missing（没有经准入的单一实际 adapter 及其整 turn 硬上界/隔离/session/材料/main 准入）；0/24 turn；runner 45 项 selftest 证明损坏账/伪造身份/裁小预留/缺接口 fallback 均拒绝且 fake 发送为 0，但没有准入就不发送；无价值结论。"
+      ]
+    },
+    {
+      "id": "actual-native",
+      "gaps": [
+        "B 的原生证据未作为已提交输入提供；E 未获单独预算，不触发模型任务。"
+      ]
+    }
+  ],
+  "externalBlockers": [
+    {
+      "owner": "B",
+      "code": "production_control_not_consumed",
+      "detail": "NOT_TESTED: current main product path uses ProductExecution with fixture/Codex profiles, but B's new production control candidate is not consumed by main and native execution is outside this wave. Required: actual product begin command -> Work/Ticket/effect/fact_receipts/dispatch_receipts/answers/answer_deliveries/user_questions/runtime rows, real transport/epoch counts, independent process SIGKILL, unknown no resend, and stop/answer through the existing queue. A fixture or receipt-only row is not production recovery."
+    },
+    {
+      "owner": "main",
+      "code": "recovery_activation_missing",
+      "detail": "NOT_TESTED: main has published RecoveryTargetConfiguration/preparation/material/inventory schemas and a configuration binder, but no commit/activate HTTP or composed target startup. Required inputs: source-committed activation fact, A read-only inventory, D materializer readback, main activation pointer switch, and crash replay semantics. Planned negatives: interruption before source commit, after source commit but before target preparation, during target preparation, and at pointer switch must never dispatch old queues, never grant authority from an old ended/PID/missing writer, and never duplicate authorization on response loss or restart; a backup/re-restore must not inherit executable authority. A schema or read-only prepare is not activation."
+    }
+  ],
+  "next": [
+    "D: bind the single install instance record to its exact data root and make a stop aimed at another state refuse without signalling that state's launcher/API; then E can measure launcher-dead/API-alive and PID/start reuse windows.",
+    "C/main: publish automatic proposal/context confirmation, the context-use send path (explicit selection, revalidation, same-transaction binding/receipt, no auto-resend, source audit) and recovery activation; E then converts E5-CONTEXT-USE and E5-RECOVERY-INTERRUPTION from NOT_TESTED.",
+    "D: keep the target immutable; a new target needs its own explicit identity (tar/sha/source/build/schema) and a fresh E4 run, not a mapping from build f2390ffd.",
+    "B: hand off native evidence bound to commit/attempt/command with executed=true and model-task counts; only a separately granted budget lets E re-run native.",
+    "Main: treat controlled-product-workflow PASS as workflow evidence only; local-alpha and full-product remain non-zero until installation and native evidence exist."
+  ],
+  "taskPackage": "agent-tasks/product-wave-32/README.zh-CN.md",
+  "supersedes": "wave31-status.json",
+  "subject": {
+    "target": {
+      "role": "target",
+      "name": "wave30-target-8296720",
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave30-target/wave30-target-8296720.tar.gz",
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "tarBytes": 20481470,
+      "installManifestSha256": "b6d907d626094ce6f73b91f8bd0869e1383c545dd6dfc2b30ad180b9c74dfa43",
+      "releaseManifestSha256": "308980db8b07a8a0d28d51aa31a02d0b6ea6b79a632564b467fc6c9a56688187",
+      "closureDigest": "3fa4b84a05421d67ba870caf5da6249deb45272d47fd0a2425f630e9a01b53c1",
+      "files": 6849,
+      "buildId": "8296720d8a25f38c",
+      "sourceCommit": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "sourceDirty": false,
+      "productSchema": 18,
+      "platform": "darwin",
+      "arch": "arm64",
+      "node": "24.21.0",
+      "abi": "137"
+    },
+    "baseline": {
+      "buildId": "2d94a7c31ef97b57",
+      "schema": 18,
+      "tarSha256": "daee1a94b43156cec659f7df2a3b08e1ecb89b645fde1ea81c35a81d75b47d7a",
+      "source": "1fbaf940d426fa34ff6289304e073b9159586ed9"
+    },
+    "control": {
+      "source": "97cace735c6cdbdd7ecdade05132371da1a5273c",
+      "buildId": "8a5a0a85631f22ca",
+      "tarSha256": "6b6517c441e56405ac9929ffbd7b3e3c8149b217c5ea736a2d9a447b4b4546c3",
+      "upgradeSha256": "fa4b4ed348fccbe00b22af348c8b5513a19662f3fc99ce3bc063a28b8e96742a",
+      "pass": 2,
+      "fail": 3,
+      "failures": [
+        "same_uid_child_not_owned",
+        "child_not_signalled",
+        "unknown_child_blocks_proof"
+      ],
+      "proof": {
+        "proven": true,
+        "stopped": [
+          66901,
+          66902
+        ],
+        "unknownLive": []
+      }
+    }
+  },
+  "gateControls": {
+    "recorded0edePositive": "PASS",
+    "optInHttp": [
+      {
+        "id": "W24-DIAG-OPTIN-500",
+        "status": "PASS"
+      },
+      {
+        "id": "W24-DIAG-OPTIN-MISSING",
+        "status": "PASS"
+      },
+      {
+        "id": "W24-DIAG-OPTIN-NON200",
+        "status": "PASS"
+      },
+      {
+        "id": "W24-DIAG-NARROW-500",
+        "status": "PASS"
+      }
+    ],
+    "recorded595Positive": "PASS",
+    "capabilityAndSchema": [
+      {
+        "id": "W24-CAPABILITY-SELF-DOWNGRADE",
+        "status": "PASS"
+      },
+      {
+        "id": "W24-MISSING-DIGEST",
+        "status": "PASS"
+      },
+      {
+        "id": "W24-DIAG-WITHHELD-NEGATIVE",
+        "status": "PASS"
+      },
+      {
+        "id": "W24-DIAG-WITHHELD-OVERFLOW",
+        "status": "PASS"
+      },
+      {
+        "id": "W24-DIAG-DUPLICATE-REASON",
+        "status": "PASS"
+      },
+      {
+        "id": "W24-DIAG-INVALID-REASON",
+        "status": "PASS"
+      },
+      {
+        "id": "W24-DIAG-AUTHORIZATION",
+        "status": "PASS"
+      },
+      {
+        "id": "W24-DIAG-MISSING-FIELD",
+        "status": "PASS"
+      },
+      {
+        "id": "W24-DIAG-WITHHELD-MISMATCH",
+        "status": "PASS"
+      }
+    ],
+    "foreignConsumer": "PASS"
+  },
+  "layers": {
+    "source": "source-checkout results stay source-level and never back an installed claim",
+    "fixture": "fixture+recovery_readonly second root is its own layer, not personal",
+    "ordinaryInstalled": "PASS",
+    "installedCandidates": "PASS",
+    "stopDetector": "PASS",
+    "stopFunctional": "PASS",
+    "recoveredPersonal": "PASS",
+    "sourceUi": "NOT_TESTED",
+    "readiness": "PASS",
+    "trialWorkbenchUi": "PASS",
+    "functionalStop": "PASS",
+    "insights": "PASS",
+    "journey": "PASS",
+    "journeyContext": "PASS",
+    "journeyReopen": "PASS",
+    "zipLifecycle": "PASS",
+    "originalProjectApplicable": "NOT_TESTED",
+    "recipePreview": "PASS",
+    "lifecycleControls": [
+      "E1-LIFECYCLE-NO-RECORD-UNVERIFIED:PASS",
+      "E1-LIFECYCLE-SET-MISMATCH:PASS",
+      "E1-LIFECYCLE-BIRTH-CONFIG:PASS",
+      "E1-LIFECYCLE-NO-RECORD-BIRTH:PASS",
+      "E1-LIFECYCLE-NO-RECORD-EXIT:PASS",
+      "E1-LIFECYCLE-NO-RECORD-REUSE:PASS",
+      "E1-LIFECYCLE-STOP-NO-RECORD:PASS",
+      "E1-LIFECYCLE-BIRTH-ROOT:PASS",
+      "E1-LIFECYCLE-CHILD-SCOPE:PASS",
+      "E1-LIFECYCLE-OWN:PASS",
+      "E1-LIFECYCLE-WRONG-START:PASS",
+      "E1-LIFECYCLE-SIBLING:PASS",
+      "E1-LIFECYCLE-FOREIGN-CHILD:PASS",
+      "E1-LIFECYCLE-MIXED-UNKNOWN:PASS",
+      "E1-LIFECYCLE-START-WINDOW:PASS",
+      "E1-LIFECYCLE-REFUSED-STOP:PASS",
+      "E1-LIFECYCLE-IDEMPOTENT:PASS"
+    ],
+    "native": "NOT_TESTED: 0 vendor/native sends; B recovery/private permission/target remain separate",
+    "value": "BLOCKED: review pilot unchanged"
+  },
+  "functional": {
+    "alphaVerdict": "PASS",
+    "verdict": "PASS",
+    "detector": "PASS",
+    "functionalCase": "PASS",
+    "evidence": {
+      "subject": {
+        "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+        "buildId": "8296720d8a25f38c",
+        "schema": 18,
+        "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+        "tarBytes": 20481470,
+        "platform": "darwin",
+        "arch": "arm64",
+        "abi": "137"
+      },
+      "normal": {
+        "status": "RUNNING",
+        "mode": "personal",
+        "startupMode": "normal",
+        "health": {
+          "mode": "personal",
+          "startupMode": "normal"
+        },
+        "packageStatus": "STOPPED",
+        "packageCode": null,
+        "exit": 0,
+        "before": {
+          "present": true,
+          "mode": "personal",
+          "startupMode": "normal",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/seed-state",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/install/app",
+          "resources": [
+            {
+              "label": "launcher",
+              "pid": 98387,
+              "start": "Mon Nov 16 12:36:21 2026",
+              "uid": 501,
+              "parentPid": null,
+              "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/install/app/apps/launcher/bin/pa.mjs start --json --port 56394 --api-port 56395 --discussion-only"
+            },
+            {
+              "label": "child",
+              "pid": 98424,
+              "start": "Mon Nov 16 12:36:21 2026",
+              "uid": 501,
+              "parentPid": 98387,
+              "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/install/app/apps/coordinator/product/demo.ts --port 56395 --state /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/seed-state --console-origin htt"
+            }
+          ]
+        },
+        "after": [
+          {
+            "pid": 98387,
+            "expectedStart": "Mon Nov 16 12:36:21 2026",
+            "alive": false,
+            "start": null,
+            "sameIdentity": false
+          },
+          {
+            "pid": 98424,
+            "expectedStart": "Mon Nov 16 12:36:21 2026",
+            "alive": false,
+            "start": null,
+            "sameIdentity": false
+          }
+        ],
+        "recordPresent": false,
+        "recordMode": null
+      },
+      "restored": {
+        "status": "RUNNING",
+        "mode": "personal",
+        "startupMode": "recovery_readonly",
+        "health": {
+          "mode": "personal",
+          "startupMode": "recovery_readonly"
+        },
+        "packageStatus": "STOPPED",
+        "packageCode": null,
+        "exit": 0,
+        "before": {
+          "present": true,
+          "mode": "personal",
+          "startupMode": "recovery_readonly",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/restored",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/install/app",
+          "resources": [
+            {
+              "label": "launcher",
+              "pid": 98722,
+              "start": "Mon Nov 16 12:36:23 2026",
+              "uid": 501,
+              "parentPid": null,
+              "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/install/app/apps/launcher/bin/pa.mjs start --json --port 56406 --api-port 56407 --discussion-only"
+            },
+            {
+              "label": "child",
+              "pid": 98763,
+              "start": "Mon Nov 16 12:36:23 2026",
+              "uid": 501,
+              "parentPid": 98722,
+              "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/install/app/apps/coordinator/product/demo.ts --port 56407 --state /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/restored --console-origin http:"
+            }
+          ]
+        },
+        "after": [
+          {
+            "pid": 98722,
+            "expectedStart": "Mon Nov 16 12:36:23 2026",
+            "alive": false,
+            "start": null,
+            "sameIdentity": false
+          },
+          {
+            "pid": 98763,
+            "expectedStart": "Mon Nov 16 12:36:23 2026",
+            "alive": false,
+            "start": null,
+            "sameIdentity": false
+          }
+        ],
+        "recordPresent": false,
+        "recordMode": null
+      },
+      "resourcePolicy": "fixed pre-stop pid/start set, independently re-observed after stop",
+      "detectorCase": "E8-PACKAGED-STOP-CONSISTENCY records the refusal; this case is the product functional requirement",
+      "proofFallbackUsed": false
+    },
+    "note": "A detector PASS that records a packaged-stop refusal is not the package stopping itself; installed-alpha keeps the ordinary scope and does not certify stop functional."
+  },
+  "scopes": {
+    "workflowFormats": {
+      "status": "PASS",
+      "capability": "default1+explicit2",
+      "packageCapabilities": {
+        "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+        "buildId": "8296720d8a25f38c",
+        "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+        "digestSupported": true
+      }
+    },
+    "secondRootFixtureReadonly": {
+      "status": "PASS",
+      "probeScope": "fixture+recovery_readonly"
+    },
+    "restoredPersonalReview": {
+      "status": "PASS",
+      "consumerOrigin": "package",
+      "healthDigest": "9cefdb2ed75476a4f7bd7de456f01ee0ce9f0f30badad740be77c42bc1aadf3c"
+    },
+    "restoredReviewRefusals": "PASS",
+    "reviewReuse": {
+      "status": "PASS",
+      "sameFile": "REUSED",
+      "differentFile": "BLOCKED",
+      "digestSame": true
+    },
+    "scopeDiagnostics": {
+      "status": "PASS",
+      "plainHttp": 200,
+      "narrowHttp": 200,
+      "optInProtocol": "context-scope-review/1"
+    },
+    "sourceUi": "NOT_TESTED",
+    "readiness": {
+      "status": "PASS",
+      "normal": {
+        "protocol": "trial-readiness/1",
+        "observedAt": "2026-11-16T04:36:18.222Z",
+        "configurationRevision": "a9c826f123324b2d8f1a07902775e6a1c453f4de86b467027490a903c324e84b",
+        "mode": "personal",
+        "startupMode": "normal",
+        "discussion": "configuration_present",
+        "execution": {
+          "state": "unavailable",
+          "reason": "operator_disabled"
+        },
+        "development": "blocked",
+        "projects": {
+          "development": 0,
+          "discussion": 1,
+          "dispatchable": 0
+        },
+        "profiles": {
+          "native": 1,
+          "controlled": 0,
+          "admittedNative": 0,
+          "admittedControlled": 0
+        },
+        "capabilities": {
+          "contextHistory": true,
+          "contextSources": true,
+          "decisions": true,
+          "proposals": true
+        },
+        "authorization": "none"
+      },
+      "readonly": {
+        "protocol": "trial-readiness/1",
+        "observedAt": "2026-11-16T04:36:19.431Z",
+        "configurationRevision": "5dd35a33f26351be4d6b2c10d97103503efddf4b4ebbc3bd3fdfba7084422e2d",
+        "mode": "personal",
+        "startupMode": "recovery_readonly",
+        "discussion": "unknown",
+        "execution": {
+          "state": "unavailable",
+          "reason": "recovery_readonly"
+        },
+        "development": "readonly",
+        "projects": {
+          "development": 1,
+          "discussion": 2,
+          "dispatchable": 0
+        },
+        "profiles": {
+          "native": 0,
+          "controlled": 4,
+          "admittedNative": 0,
+          "admittedControlled": 0
+        },
+        "capabilities": {
+          "contextHistory": true,
+          "contextSources": true,
+          "decisions": false,
+          "proposals": false
+        },
+        "authorization": "none"
+      },
+      "fixture": {
+        "protocol": "trial-readiness/1",
+        "observedAt": "2026-11-16T04:36:20.858Z",
+        "configurationRevision": "83d2a00c18fe919d4671f2916ce9baec23e44fc5cfd8f51b3ba2d241462e06af",
+        "mode": "fixture",
+        "startupMode": "normal",
+        "discussion": "configuration_present",
+        "execution": {
+          "state": "available",
+          "kind": "controlled_fixture"
+        },
+        "development": "fixture_only",
+        "projects": {
+          "development": 1,
+          "discussion": 0,
+          "dispatchable": 1
+        },
+        "profiles": {
+          "native": 0,
+          "controlled": 4,
+          "admittedNative": 0,
+          "admittedControlled": 4
+        },
+        "capabilities": {
+          "contextHistory": true,
+          "contextSources": true,
+          "decisions": true,
+          "proposals": true
+        },
+        "authorization": "none"
+      }
+    },
+    "trialWorkbenchUi": {
+      "status": "PASS",
+      "actions": {
+        "model": "opened-settings",
+        "import": "opened-import-form",
+        "executor": "opened-executor",
+        "phaseOneRendered": [
+          "configure_model",
+          "import_project",
+          "inspect_executor"
+        ],
+        "conversation": "opened-conversation-draft-kept"
+      },
+      "screenshots": [
+        {
+          "path": "tests/product-acceptance/reports/wave27/browser/desktop.png",
+          "sha256": "cc344669f2a96c07852b3ff146e40f4f1caff0a05306b0c827769a0a1dca275d",
+          "bytes": 124674,
+          "size": 124674
+        },
+        {
+          "path": "tests/product-acceptance/reports/wave27/browser/mobile.png",
+          "sha256": "6d373705ea3efaae678d8fce2a7765eb91eafafef8394646823ee651bdbab758",
+          "bytes": 56076,
+          "size": 56076
+        },
+        {
+          "path": "tests/product-acceptance/reports/wave27/browser/configured-conversation.png",
+          "sha256": "78c0eb1d366de861cc08c882c53d924e090ab5b0c76f40b230e0da0847a88a68",
+          "bytes": 76516,
+          "size": 76516
+        }
+      ],
+      "bundle": {
+        "entry": "install/app/apps/console/dist/assets/index-DTOhkXHZ.js",
+        "sha256": "5a70bf9fd07b0e2f3c15b9ba556f4d6abb1e05de767e8b0070b0623976265972",
+        "bytes": 658695
+      }
+    },
+    "twoSnapshotSameChain": {
+      "formats": "PASS",
+      "artifactClosure": {
+        "v1": {
+          "copied": 22,
+          "digests": [
+            {
+              "id": "953b4300b4fd0c6382f6b19cb3715a428e8e1c663acafd82340f24e42fa72e10",
+              "present": true,
+              "digest": "953b4300b4fd0c6382f6b19cb3715a428e8e1c663acafd82340f24e42fa72e10",
+              "registryDigest": "953b4300b4fd0c6382f6b19cb3715a428e8e1c663acafd82340f24e42fa72e10",
+              "match": true,
+              "bytes": 412
+            },
+            {
+              "id": "c500e19059fc98746211c452900da4c9c942d8c2119692b1388b6656fea2c031",
+              "present": true,
+              "digest": "c500e19059fc98746211c452900da4c9c942d8c2119692b1388b6656fea2c031",
+              "registryDigest": "c500e19059fc98746211c452900da4c9c942d8c2119692b1388b6656fea2c031",
+              "match": true,
+              "bytes": 234
+            },
+            {
+              "id": "4c5838a0f7a796721724a32f15e5d18ab5f04342663b411ff6fbe177de28e2dc",
+              "present": true,
+              "digest": "4c5838a0f7a796721724a32f15e5d18ab5f04342663b411ff6fbe177de28e2dc",
+              "registryDigest": "4c5838a0f7a796721724a32f15e5d18ab5f04342663b411ff6fbe177de28e2dc",
+              "match": true,
+              "bytes": 704
+            },
+            {
+              "id": "b59928ac3a32789df75c76721bbf4e4ecc81664404bf3d9c8a9f70bc22f7b96f",
+              "present": true,
+              "digest": "b59928ac3a32789df75c76721bbf4e4ecc81664404bf3d9c8a9f70bc22f7b96f",
+              "registryDigest": "b59928ac3a32789df75c76721bbf4e4ecc81664404bf3d9c8a9f70bc22f7b96f",
+              "match": true,
+              "bytes": 712
+            },
+            {
+              "id": "dac804d033a2990daaac655a78c74556ae4a6bb1824ed521f0ac0ccb967bf4ce",
+              "present": true,
+              "digest": "dac804d033a2990daaac655a78c74556ae4a6bb1824ed521f0ac0ccb967bf4ce",
+              "registryDigest": "dac804d033a2990daaac655a78c74556ae4a6bb1824ed521f0ac0ccb967bf4ce",
+              "match": true,
+              "bytes": 262
+            },
+            {
+              "id": "87bbbbc1040345b2cdcb57fc0ad3d8727b28e0ab89c61a9123fbb627540b0345",
+              "present": true,
+              "digest": "87bbbbc1040345b2cdcb57fc0ad3d8727b28e0ab89c61a9123fbb627540b0345",
+              "registryDigest": "87bbbbc1040345b2cdcb57fc0ad3d8727b28e0ab89c61a9123fbb627540b0345",
+              "match": true,
+              "bytes": 267
+            },
+            {
+              "id": "8eefb66fc881f500f31c2cd9d5d0c92fb81c374fb1afda1a436c0654f1f976e0",
+              "present": true,
+              "digest": "8eefb66fc881f500f31c2cd9d5d0c92fb81c374fb1afda1a436c0654f1f976e0",
+              "registryDigest": "8eefb66fc881f500f31c2cd9d5d0c92fb81c374fb1afda1a436c0654f1f976e0",
+              "match": true,
+              "bytes": 153
+            },
+            {
+              "id": "df49cf5256109d9249bdf021b83501603a8a512ecba604db7e897fc69df6e1d2",
+              "present": true,
+              "digest": "df49cf5256109d9249bdf021b83501603a8a512ecba604db7e897fc69df6e1d2",
+              "registryDigest": "df49cf5256109d9249bdf021b83501603a8a512ecba604db7e897fc69df6e1d2",
+              "match": true,
+              "bytes": 1330
+            },
+            {
+              "id": "bade6766e449064a27fa9eee553442cc6531aa8e099ef13bf81bb7e9e685c1c2",
+              "present": true,
+              "digest": "bade6766e449064a27fa9eee553442cc6531aa8e099ef13bf81bb7e9e685c1c2",
+              "registryDigest": "bade6766e449064a27fa9eee553442cc6531aa8e099ef13bf81bb7e9e685c1c2",
+              "match": true,
+              "bytes": 570
+            },
+            {
+              "id": "79d293b67d659a2ba04df26ad7286303db3011cf48f3abe61faf0156008f2852",
+              "present": true,
+              "digest": "79d293b67d659a2ba04df26ad7286303db3011cf48f3abe61faf0156008f2852",
+              "registryDigest": "79d293b67d659a2ba04df26ad7286303db3011cf48f3abe61faf0156008f2852",
+              "match": true,
+              "bytes": 790
+            },
+            {
+              "id": "038a3e97a4f9da50657b02c846f4ad02167daa0f50666925a556c259162fffd8",
+              "present": true,
+              "digest": "038a3e97a4f9da50657b02c846f4ad02167daa0f50666925a556c259162fffd8",
+              "registryDigest": "038a3e97a4f9da50657b02c846f4ad02167daa0f50666925a556c259162fffd8",
+              "match": true,
+              "bytes": 174
+            },
+            {
+              "id": "20260e2738f80fc3a37a1706b0d9da301a16fe4ac92081427e81571d7bcccda9",
+              "present": true,
+              "digest": "20260e2738f80fc3a37a1706b0d9da301a16fe4ac92081427e81571d7bcccda9",
+              "registryDigest": "20260e2738f80fc3a37a1706b0d9da301a16fe4ac92081427e81571d7bcccda9",
+              "match": true,
+              "bytes": 187
+            },
+            {
+              "id": "833c7e90dd3ba1de034355fd62bd6d1a64c65a2839340badf0e4f1183b7032be",
+              "present": true,
+              "digest": "833c7e90dd3ba1de034355fd62bd6d1a64c65a2839340badf0e4f1183b7032be",
+              "registryDigest": "833c7e90dd3ba1de034355fd62bd6d1a64c65a2839340badf0e4f1183b7032be",
+              "match": true,
+              "bytes": 253
+            },
+            {
+              "id": "f4c8092236fe351296f4a1c9d0f9d4df747990eac545d9f7af47ee195c4d7756",
+              "present": true,
+              "digest": "f4c8092236fe351296f4a1c9d0f9d4df747990eac545d9f7af47ee195c4d7756",
+              "registryDigest": "f4c8092236fe351296f4a1c9d0f9d4df747990eac545d9f7af47ee195c4d7756",
+              "match": true,
+              "bytes": 142
+            },
+            {
+              "id": "d5bfcaa8989bc2f34de9b5593628cff7dbcb41afdbdb4422b9cbceffa3d19101",
+              "present": true,
+              "digest": "d5bfcaa8989bc2f34de9b5593628cff7dbcb41afdbdb4422b9cbceffa3d19101",
+              "registryDigest": "d5bfcaa8989bc2f34de9b5593628cff7dbcb41afdbdb4422b9cbceffa3d19101",
+              "match": true,
+              "bytes": 874
+            },
+            {
+              "id": "467879792587ccb701f1dbe6ec251192f3f1a6bac89c59582bdbfafd6152c2ff",
+              "present": true,
+              "digest": "467879792587ccb701f1dbe6ec251192f3f1a6bac89c59582bdbfafd6152c2ff",
+              "registryDigest": "467879792587ccb701f1dbe6ec251192f3f1a6bac89c59582bdbfafd6152c2ff",
+              "match": true,
+              "bytes": 234
+            },
+            {
+              "id": "2e93b7e426defc41588854f427e7ba06f75ec8171aed7219f67eb94ad2697f98",
+              "present": true,
+              "digest": "2e93b7e426defc41588854f427e7ba06f75ec8171aed7219f67eb94ad2697f98",
+              "registryDigest": "2e93b7e426defc41588854f427e7ba06f75ec8171aed7219f67eb94ad2697f98",
+              "match": true,
+              "bytes": 376
+            },
+            {
+              "id": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+              "present": true,
+              "digest": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+              "registryDigest": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+              "match": true,
+              "bytes": 24
+            },
+            {
+              "id": "57f2162bd14e3cc029b4cd1c23a5bbe9768b8e669db1fb878123d106fb580506",
+              "present": true,
+              "digest": "57f2162bd14e3cc029b4cd1c23a5bbe9768b8e669db1fb878123d106fb580506",
+              "registryDigest": "57f2162bd14e3cc029b4cd1c23a5bbe9768b8e669db1fb878123d106fb580506",
+              "match": true,
+              "bytes": 213
+            },
+            {
+              "id": "fa86c3ffd16ff9044eda5bcb202c61539bda5a1e772e86e65b48c6041701eeaa",
+              "present": true,
+              "digest": "fa86c3ffd16ff9044eda5bcb202c61539bda5a1e772e86e65b48c6041701eeaa",
+              "registryDigest": "fa86c3ffd16ff9044eda5bcb202c61539bda5a1e772e86e65b48c6041701eeaa",
+              "match": true,
+              "bytes": 1143
+            },
+            {
+              "id": "081d0290ce29e66d2e93f29b5b323ad72a9a706c7745120213a17544e832c39d",
+              "present": true,
+              "digest": "081d0290ce29e66d2e93f29b5b323ad72a9a706c7745120213a17544e832c39d",
+              "registryDigest": "081d0290ce29e66d2e93f29b5b323ad72a9a706c7745120213a17544e832c39d",
+              "match": true,
+              "bytes": 1615
+            },
+            {
+              "id": "1b1d9c28e230cbd6fd87f1ee8a421d70768a53df069d5f42bb1b8b742522dcd8",
+              "present": true,
+              "digest": "1b1d9c28e230cbd6fd87f1ee8a421d70768a53df069d5f42bb1b8b742522dcd8",
+              "registryDigest": "1b1d9c28e230cbd6fd87f1ee8a421d70768a53df069d5f42bb1b8b742522dcd8",
+              "match": true,
+              "bytes": 505
+            }
+          ],
+          "allMatch": true
+        },
+        "v2": {
+          "copied": 22,
+          "digests": [
+            {
+              "id": "953b4300b4fd0c6382f6b19cb3715a428e8e1c663acafd82340f24e42fa72e10",
+              "present": true,
+              "digest": "953b4300b4fd0c6382f6b19cb3715a428e8e1c663acafd82340f24e42fa72e10",
+              "registryDigest": "953b4300b4fd0c6382f6b19cb3715a428e8e1c663acafd82340f24e42fa72e10",
+              "match": true,
+              "bytes": 412
+            },
+            {
+              "id": "c500e19059fc98746211c452900da4c9c942d8c2119692b1388b6656fea2c031",
+              "present": true,
+              "digest": "c500e19059fc98746211c452900da4c9c942d8c2119692b1388b6656fea2c031",
+              "registryDigest": "c500e19059fc98746211c452900da4c9c942d8c2119692b1388b6656fea2c031",
+              "match": true,
+              "bytes": 234
+            },
+            {
+              "id": "4c5838a0f7a796721724a32f15e5d18ab5f04342663b411ff6fbe177de28e2dc",
+              "present": true,
+              "digest": "4c5838a0f7a796721724a32f15e5d18ab5f04342663b411ff6fbe177de28e2dc",
+              "registryDigest": "4c5838a0f7a796721724a32f15e5d18ab5f04342663b411ff6fbe177de28e2dc",
+              "match": true,
+              "bytes": 704
+            },
+            {
+              "id": "b59928ac3a32789df75c76721bbf4e4ecc81664404bf3d9c8a9f70bc22f7b96f",
+              "present": true,
+              "digest": "b59928ac3a32789df75c76721bbf4e4ecc81664404bf3d9c8a9f70bc22f7b96f",
+              "registryDigest": "b59928ac3a32789df75c76721bbf4e4ecc81664404bf3d9c8a9f70bc22f7b96f",
+              "match": true,
+              "bytes": 712
+            },
+            {
+              "id": "dac804d033a2990daaac655a78c74556ae4a6bb1824ed521f0ac0ccb967bf4ce",
+              "present": true,
+              "digest": "dac804d033a2990daaac655a78c74556ae4a6bb1824ed521f0ac0ccb967bf4ce",
+              "registryDigest": "dac804d033a2990daaac655a78c74556ae4a6bb1824ed521f0ac0ccb967bf4ce",
+              "match": true,
+              "bytes": 262
+            },
+            {
+              "id": "87bbbbc1040345b2cdcb57fc0ad3d8727b28e0ab89c61a9123fbb627540b0345",
+              "present": true,
+              "digest": "87bbbbc1040345b2cdcb57fc0ad3d8727b28e0ab89c61a9123fbb627540b0345",
+              "registryDigest": "87bbbbc1040345b2cdcb57fc0ad3d8727b28e0ab89c61a9123fbb627540b0345",
+              "match": true,
+              "bytes": 267
+            },
+            {
+              "id": "8eefb66fc881f500f31c2cd9d5d0c92fb81c374fb1afda1a436c0654f1f976e0",
+              "present": true,
+              "digest": "8eefb66fc881f500f31c2cd9d5d0c92fb81c374fb1afda1a436c0654f1f976e0",
+              "registryDigest": "8eefb66fc881f500f31c2cd9d5d0c92fb81c374fb1afda1a436c0654f1f976e0",
+              "match": true,
+              "bytes": 153
+            },
+            {
+              "id": "df49cf5256109d9249bdf021b83501603a8a512ecba604db7e897fc69df6e1d2",
+              "present": true,
+              "digest": "df49cf5256109d9249bdf021b83501603a8a512ecba604db7e897fc69df6e1d2",
+              "registryDigest": "df49cf5256109d9249bdf021b83501603a8a512ecba604db7e897fc69df6e1d2",
+              "match": true,
+              "bytes": 1330
+            },
+            {
+              "id": "bade6766e449064a27fa9eee553442cc6531aa8e099ef13bf81bb7e9e685c1c2",
+              "present": true,
+              "digest": "bade6766e449064a27fa9eee553442cc6531aa8e099ef13bf81bb7e9e685c1c2",
+              "registryDigest": "bade6766e449064a27fa9eee553442cc6531aa8e099ef13bf81bb7e9e685c1c2",
+              "match": true,
+              "bytes": 570
+            },
+            {
+              "id": "79d293b67d659a2ba04df26ad7286303db3011cf48f3abe61faf0156008f2852",
+              "present": true,
+              "digest": "79d293b67d659a2ba04df26ad7286303db3011cf48f3abe61faf0156008f2852",
+              "registryDigest": "79d293b67d659a2ba04df26ad7286303db3011cf48f3abe61faf0156008f2852",
+              "match": true,
+              "bytes": 790
+            },
+            {
+              "id": "038a3e97a4f9da50657b02c846f4ad02167daa0f50666925a556c259162fffd8",
+              "present": true,
+              "digest": "038a3e97a4f9da50657b02c846f4ad02167daa0f50666925a556c259162fffd8",
+              "registryDigest": "038a3e97a4f9da50657b02c846f4ad02167daa0f50666925a556c259162fffd8",
+              "match": true,
+              "bytes": 174
+            },
+            {
+              "id": "20260e2738f80fc3a37a1706b0d9da301a16fe4ac92081427e81571d7bcccda9",
+              "present": true,
+              "digest": "20260e2738f80fc3a37a1706b0d9da301a16fe4ac92081427e81571d7bcccda9",
+              "registryDigest": "20260e2738f80fc3a37a1706b0d9da301a16fe4ac92081427e81571d7bcccda9",
+              "match": true,
+              "bytes": 187
+            },
+            {
+              "id": "833c7e90dd3ba1de034355fd62bd6d1a64c65a2839340badf0e4f1183b7032be",
+              "present": true,
+              "digest": "833c7e90dd3ba1de034355fd62bd6d1a64c65a2839340badf0e4f1183b7032be",
+              "registryDigest": "833c7e90dd3ba1de034355fd62bd6d1a64c65a2839340badf0e4f1183b7032be",
+              "match": true,
+              "bytes": 253
+            },
+            {
+              "id": "f4c8092236fe351296f4a1c9d0f9d4df747990eac545d9f7af47ee195c4d7756",
+              "present": true,
+              "digest": "f4c8092236fe351296f4a1c9d0f9d4df747990eac545d9f7af47ee195c4d7756",
+              "registryDigest": "f4c8092236fe351296f4a1c9d0f9d4df747990eac545d9f7af47ee195c4d7756",
+              "match": true,
+              "bytes": 142
+            },
+            {
+              "id": "d5bfcaa8989bc2f34de9b5593628cff7dbcb41afdbdb4422b9cbceffa3d19101",
+              "present": true,
+              "digest": "d5bfcaa8989bc2f34de9b5593628cff7dbcb41afdbdb4422b9cbceffa3d19101",
+              "registryDigest": "d5bfcaa8989bc2f34de9b5593628cff7dbcb41afdbdb4422b9cbceffa3d19101",
+              "match": true,
+              "bytes": 874
+            },
+            {
+              "id": "467879792587ccb701f1dbe6ec251192f3f1a6bac89c59582bdbfafd6152c2ff",
+              "present": true,
+              "digest": "467879792587ccb701f1dbe6ec251192f3f1a6bac89c59582bdbfafd6152c2ff",
+              "registryDigest": "467879792587ccb701f1dbe6ec251192f3f1a6bac89c59582bdbfafd6152c2ff",
+              "match": true,
+              "bytes": 234
+            },
+            {
+              "id": "2e93b7e426defc41588854f427e7ba06f75ec8171aed7219f67eb94ad2697f98",
+              "present": true,
+              "digest": "2e93b7e426defc41588854f427e7ba06f75ec8171aed7219f67eb94ad2697f98",
+              "registryDigest": "2e93b7e426defc41588854f427e7ba06f75ec8171aed7219f67eb94ad2697f98",
+              "match": true,
+              "bytes": 376
+            },
+            {
+              "id": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+              "present": true,
+              "digest": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+              "registryDigest": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+              "match": true,
+              "bytes": 24
+            },
+            {
+              "id": "57f2162bd14e3cc029b4cd1c23a5bbe9768b8e669db1fb878123d106fb580506",
+              "present": true,
+              "digest": "57f2162bd14e3cc029b4cd1c23a5bbe9768b8e669db1fb878123d106fb580506",
+              "registryDigest": "57f2162bd14e3cc029b4cd1c23a5bbe9768b8e669db1fb878123d106fb580506",
+              "match": true,
+              "bytes": 213
+            },
+            {
+              "id": "fa86c3ffd16ff9044eda5bcb202c61539bda5a1e772e86e65b48c6041701eeaa",
+              "present": true,
+              "digest": "fa86c3ffd16ff9044eda5bcb202c61539bda5a1e772e86e65b48c6041701eeaa",
+              "registryDigest": "fa86c3ffd16ff9044eda5bcb202c61539bda5a1e772e86e65b48c6041701eeaa",
+              "match": true,
+              "bytes": 1143
+            },
+            {
+              "id": "081d0290ce29e66d2e93f29b5b323ad72a9a706c7745120213a17544e832c39d",
+              "present": true,
+              "digest": "081d0290ce29e66d2e93f29b5b323ad72a9a706c7745120213a17544e832c39d",
+              "registryDigest": "081d0290ce29e66d2e93f29b5b323ad72a9a706c7745120213a17544e832c39d",
+              "match": true,
+              "bytes": 1615
+            },
+            {
+              "id": "1b1d9c28e230cbd6fd87f1ee8a421d70768a53df069d5f42bb1b8b742522dcd8",
+              "present": true,
+              "digest": "1b1d9c28e230cbd6fd87f1ee8a421d70768a53df069d5f42bb1b8b742522dcd8",
+              "registryDigest": "1b1d9c28e230cbd6fd87f1ee8a421d70768a53df069d5f42bb1b8b742522dcd8",
+              "match": true,
+              "bytes": 505
+            }
+          ],
+          "allMatch": true
+        },
+        "corruptDetected": true,
+        "corruptDetail": {
+          "status": "blocked",
+          "artifacts": [
+            {
+              "id": "953b4300b4fd0c6382f6b19cb3715a428e8e1c663acafd82340f24e42fa72e10",
+              "status": "corrupt"
+            },
+            {
+              "id": "c500e19059fc98746211c452900da4c9c942d8c2119692b1388b6656fea2c031",
+              "status": "ok"
+            },
+            {
+              "id": "4c5838a0f7a796721724a32f15e5d18ab5f04342663b411ff6fbe177de28e2dc",
+              "status": "ok"
+            },
+            {
+              "id": "b59928ac3a32789df75c76721bbf4e4ecc81664404bf3d9c8a9f70bc22f7b96f",
+              "status": "ok"
+            },
+            {
+              "id": "dac804d033a2990daaac655a78c74556ae4a6bb1824ed521f0ac0ccb967bf4ce",
+              "status": "ok"
+            },
+            {
+              "id": "87bbbbc1040345b2cdcb57fc0ad3d8727b28e0ab89c61a9123fbb627540b0345",
+              "status": "ok"
+            },
+            {
+              "id": "8eefb66fc881f500f31c2cd9d5d0c92fb81c374fb1afda1a436c0654f1f976e0",
+              "status": "ok"
+            },
+            {
+              "id": "df49cf5256109d9249bdf021b83501603a8a512ecba604db7e897fc69df6e1d2",
+              "status": "ok"
+            },
+            {
+              "id": "bade6766e449064a27fa9eee553442cc6531aa8e099ef13bf81bb7e9e685c1c2",
+              "status": "ok"
+            },
+            {
+              "id": "79d293b67d659a2ba04df26ad7286303db3011cf48f3abe61faf0156008f2852",
+              "status": "ok"
+            },
+            {
+              "id": "038a3e97a4f9da50657b02c846f4ad02167daa0f50666925a556c259162fffd8",
+              "status": "ok"
+            },
+            {
+              "id": "20260e2738f80fc3a37a1706b0d9da301a16fe4ac92081427e81571d7bcccda9",
+              "status": "ok"
+            },
+            {
+              "id": "833c7e90dd3ba1de034355fd62bd6d1a64c65a2839340badf0e4f1183b7032be",
+              "status": "ok"
+            },
+            {
+              "id": "f4c8092236fe351296f4a1c9d0f9d4df747990eac545d9f7af47ee195c4d7756",
+              "status": "ok"
+            },
+            {
+              "id": "d5bfcaa8989bc2f34de9b5593628cff7dbcb41afdbdb4422b9cbceffa3d19101",
+              "status": "ok"
+            },
+            {
+              "id": "467879792587ccb701f1dbe6ec251192f3f1a6bac89c59582bdbfafd6152c2ff",
+              "status": "ok"
+            },
+            {
+              "id": "2e93b7e426defc41588854f427e7ba06f75ec8171aed7219f67eb94ad2697f98",
+              "status": "ok"
+            },
+            {
+              "id": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+              "status": "ok"
+            },
+            {
+              "id": "57f2162bd14e3cc029b4cd1c23a5bbe9768b8e669db1fb878123d106fb580506",
+              "status": "ok"
+            },
+            {
+              "id": "fa86c3ffd16ff9044eda5bcb202c61539bda5a1e772e86e65b48c6041701eeaa",
+              "status": "ok"
+            },
+            {
+              "id": "081d0290ce29e66d2e93f29b5b323ad72a9a706c7745120213a17544e832c39d",
+              "status": "ok"
+            },
+            {
+              "id": "1b1d9c28e230cbd6fd87f1ee8a421d70768a53df069d5f42bb1b8b742522dcd8",
+              "status": "ok"
+            }
+          ]
+        },
+        "missingDetected": true
+      },
+      "derived": {
+        "table": "conversation_search_probe_unknown",
+        "status": "blocked",
+        "complete": false,
+        "unknownTables": [
+          "conversation_search_probe_unknown"
+        ],
+        "refused": true
+      },
+      "targetDrift": {
+        "subject": {
+          "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+          "buildId": "8296720d8a25f38c",
+          "schema": 18,
+          "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+          "tarBytes": 20481470,
+          "platform": "darwin",
+          "arch": "arm64",
+          "abi": "137"
+        },
+        "appended": true,
+        "verify": {
+          "status": "ok",
+          "error": null,
+          "verified": "ok"
+        },
+        "consumerContentBinding": "NOT_AVAILABLE_IN_MAIN",
+        "reason": "the packaged producer accepted a snapshot of the drifted target: its verify covers database integrity, schema and artifact digests, not source-content equality"
+      }
+    },
+    "channel": {
+      "status": "PASS",
+      "consumer": "NOT_INTEGRATED"
+    },
+    "supportMaterial": "PASS",
+    "trialIdentity": "NOT_TESTED",
+    "gSummary": "NOT_TESTED",
+    "installedSourceConfirm": "PASS",
+    "installedStability": "PASS",
+    "missingArtifactTerminal": "fail_closed_unclean_exit1",
+    "privatePermissionTarget": "NOT_REACHED: private startup permission and target activation remain main scope",
+    "bBusinessRecovery": "NOT_TESTED: B control source is not admitted as business resume"
+  },
+  "externalSummaries": {
+    "g": "INPUT_NOT_AUTHORITY: wrong-scope metrics and complete summaries over bad work do not become acceptance evidence",
+    "h": "INPUT_NOT_AUTHORITY: a preflight-refused tool that still executed and unverified checkers do not certify product or native",
+    "f": "INPUT_ONLY: the F trial sources are read from the packaged console bytes; E drives and asserts the installed UI itself"
+  },
+  "retainedHistory": {
+    "measured0ede": "223 PASS / 0 FAIL / 16 NOT_TESTED at the recorded 162-required scope",
+    "measured3b": "227 PASS / 0 FAIL / 17 NOT_TESTED at the recorded 162-required scope (wave25 target, preserved)",
+    "measuredCe64": "wave-26 ce64 164-required ordinary installed scope preserved (238 PASS / 0 FAIL / 16 NOT_TESTED)",
+    "p1Tool": "wave-27 closed substring/unproven-signal/unconditional-record-deletion; wave-28 closes birth-root and whole-set preflight (a record cannot lend another state birth)",
+    "measuredCe64W28": "260 PASS / 0 FAIL / 19 NOT_TESTED ordinary scope; functional stop detected as BLOCKED and required to fail in installed-functional (preserved history)",
+    "measured1ba": "wave-29 D 1ba0032 scope preserved (274 PASS / 0 FAIL / 20 NOT_TESTED)",
+    "measured1fba": "wave-30 D 1fba944 scope preserved (278 PASS / 0 FAIL / 19 NOT_TESTED)",
+    "measuredR1": "D 82ee5b8f / 8296720d / tar 04926739 measured here: ordinary, functional, UI, template preview, insights and the two-project journey all pass",
+    "r2": "NOT_REACHED: no fixed R2 identity was published (the observed later artifact is a different source), so no R2 installer/upgrade claim is made from it",
+    "stoppedChild": "wave-31 verifies the fixed pre-stop set after a packaged STOPPED: a live known child keeps the root retained",
+    "measuredR1W32": "wave-32 keeps the R1 82ee5b8f/8296720d subject: 290 PASS / 0 FAIL / 20 NOT_TESTED with the ZIP lifecycle and the tightened journey oracle",
+    "sameProjectGap": "original registered projects are not dispatchable in the controlled fixture and personal mode has no executor; same-project create/check/candidate/accept stays NOT_REACHED",
+    "r2w32": "no fixed R2 identity was published; the observed later wave31 target is a different source and is not admitted",
+    "noDiscovery": "wave-30 removes global process discovery from forced no-record cleanup; only the caller's complete immutable set can authorize a signal",
+    "noRecordGap": "wave-29 closes known-birth/no-record: a missing instance.json no longer releases a live spawn or deletes its private root",
+    "measuredA826": "a826 readiness/UI absent from the frozen package; its exact bytes stay a separate scope and are not relabeled",
+    "measured595": "200 PASS / 0 FAIL / 15 NOT_TESTED at the recorded 161-required scope",
+    "measuredA9b": "208 PASS / 0 FAIL / 15 NOT_TESTED at the recorded 162-required scope",
+    "e4eFailure": "wave22 e4e run kept its honest reuse FAIL",
+    "sourceOnly": "wave20 revoked source-level review PASS stays revoked"
+  },
+  "requiredGate": {
+    "installedAlphaCases": [
+      "E6-ARTIFACT-CURRENT-SCOPE",
+      "E4-INSTALL-ARTIFACT-IDENTITY",
+      "E7-BACKUP-CONTEXT-REPLY",
+      "E5-INSTALLED-CANDIDATES",
+      "E7-SECOND-ROOT-READONLY",
+      "E6-INSTALLED-SOURCE-CONFIRM",
+      "E9-INSTALLED-STABILITY",
+      "E5-WORKFLOW-FORMATS",
+      "E4-PERSONAL-RESTORED-REVIEW",
+      "E5-RESTORED-REVIEW-REFUSALS",
+      "E5-REVIEW-REUSE-CONSISTENCY",
+      "E7-SCOPE-DIAGNOSTICS",
+      "E7-READINESS",
+      "E8-PACKAGED-STOP-CONSISTENCY",
+      "E6-TARGET-CONTENT-DRIFT",
+      "E9-COORDINATOR-CHANNEL-CONTRACT",
+      "E17-SUPPORT-MATERIAL",
+      "E9-INSIGHTS-HTTP",
+      "E6-RECIPE-PREVIEW",
+      "E5-TWO-PROJECT-TEMPLATE-CREATE",
+      "E7-JOURNEY-CONTEXT-SOURCE",
+      "E8-JOURNEY-STOP-REOPEN",
+      "E32-ZIP-LIFECYCLE",
+      "E11-TRIAL-IDENTITY-FIELDS",
+      "E13-G-SCOPED-SUMMARY",
+      "E3-TRIAL-WORKBENCH-UI",
+      "E6-INSTALLED-CONTEXT",
+      "E3-PERSONAL-COLD-START",
+      "E4-INSTALL-FIRST-RUN",
+      "E4-INSTALL-CONFIG-ROOT",
+      "E4-INSTALL-REUSE-CONCURRENCY",
+      "E4-INSTALL-HOST-GUARDS",
+      "E4-BACKUP-RESTORE",
+      "E4-INSTALL-TAMPER",
+      "E4-INSTALL-ROLLBACK",
+      "E4-UPGRADE-FAULTS",
+      "E7-OWNERSHIP-COPY",
+      "E5-D-OWNERSHIP-MOCKS",
+      "E6-CURRENT-MAIN-INSTALL",
+      "E4-UPGRADE-ROLLBACK",
+      "E4-UPGRADE-CROSS-SCHEMA",
+      "E4-MULTI-STATE"
+    ],
+    "current": {
+      "ownershipMocks": "PASS",
+      "installedCandidates": "PASS",
+      "stopDetector": "PASS",
+      "stopFunctional": "PASS",
+      "secondRoot": "PASS",
+      "installedSourceConfirm": "PASS",
+      "installedStability": "PASS",
+      "workflowFormats": "PASS",
+      "personalReview": "PASS",
+      "reviewRefusals": "PASS",
+      "reviewReuse": "PASS",
+      "scopeDiagnostics": "PASS",
+      "readiness": "PASS",
+      "trialWorkbenchUi": "PASS",
+      "currentMainInstall": "PASS",
+      "upgradeFaults": "PASS",
+      "upgradeRollback": "PASS"
+    }
+  },
+  "finalRun": {
+    "command": "node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record",
+    "exitCode": 0,
+    "source": {
+      "commit": "a933479b7ae8cd591f9e2032d70c9b2dcdd356bd",
+      "dirty": false
+    }
+  },
+  "commands": [
+    {
+      "id": "E1",
+      "command": "node tests/product-acceptance/cases/w27-lifecycle.mjs"
+    },
+    {
+      "id": "E2",
+      "command": "node tests/product-acceptance/cases/w31-journey.mjs"
+    },
+    {
+      "id": "E3",
+      "command": "node tests/product-acceptance/cases/w31-journey.mjs"
+    },
+    {
+      "id": "E4",
+      "command": "node tests/product-acceptance/cases/w32-zip.mjs"
+    },
+    {
+      "id": "E5",
+      "command": "node tests/product-acceptance/run.mjs --tier=installed-functional"
+    },
+    {
+      "id": "E6",
+      "command": "node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record"
+    }
+  ],
+  "personalReview": {
+    "subject": {
+      "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "buildId": "8296720d8a25f38c",
+      "schema": 18,
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "tarBytes": 20481470,
+      "platform": "darwin",
+      "arch": "arm64",
+      "abi": "137"
+    },
+    "mode": "personal",
+    "state": "recovery_readonly",
+    "consumerEntry": {
+      "origin": "package",
+      "package": {
+        "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+        "buildId": "8296720d8a25f38c",
+        "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+        "tarBytes": 20481470
+      },
+      "files": [
+        {
+          "path": "apps/launcher/lib/start.mjs",
+          "sha256": "de21a1cf0117ecee9794442e679da90abea1a6d2971fb6dea28abcb226233e09",
+          "bytes": 23370
+        },
+        {
+          "path": "apps/launcher/lib/daemon.mjs",
+          "sha256": "2597175e8a27c69c986f4dc728ba40b6b86bf8d4958983bda7055fc7e29a6d56",
+          "bytes": 7716
+        },
+        {
+          "path": "apps/coordinator/product/restored-review.ts",
+          "sha256": "e6b77f1cdbdd9d9bd67f78e2e1c5f2bd3228f87ef7aa8d14314246135d6034c5",
+          "bytes": 7325
+        },
+        {
+          "path": "apps/coordinator/product/demo.ts",
+          "sha256": "ea78e3e915854071f7ee4344de0f0dc9d94795c11b205aebf55e86c4a5cf89e1",
+          "bytes": 6819
+        }
+      ]
+    },
+    "before": {
+      "status": "RUNNING",
+      "candidates": 403,
+      "history": 403
+    },
+    "after": {
+      "candidates": 200,
+      "history": 200,
+      "sources": 200,
+      "originalBody": true
+    },
+    "reviewFile": {
+      "mode": "600",
+      "access": "historical_data_read_only",
+      "startupAvailable": false,
+      "projects": 1
+    },
+    "business": 422,
+    "queueHeld": true,
+    "providerRequests": 2,
+    "health": {
+      "status": "ok",
+      "mode": "personal",
+      "startupMode": "recovery_readonly",
+      "digest": "9cefdb2ed75476a4f7bd7de456f01ee0ce9f0f30badad740be77c42bc1aadf3c"
+    },
+    "healthDigest": "9cefdb2ed75476a4f7bd7de456f01ee0ce9f0f30badad740be77c42bc1aadf3c",
+    "scopeDiagnostics": "present",
+    "packageCapability": {
+      "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "buildId": "8296720d8a25f38c",
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "digestSupported": true
+    },
+    "registry": {
+      "present": true,
+      "digest": "b38ca5612a45e8873b4d4a2bfeecad11d1e72f3791c85231d179796465120fe8"
+    },
+    "restore": {
+      "verify": "VERIFIED",
+      "restore": "RESTORED"
+    }
+  },
+  "reviewReuse": {
+    "subject": {
+      "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "buildId": "8296720d8a25f38c",
+      "schema": 18,
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "tarBytes": 20481470,
+      "platform": "darwin",
+      "arch": "arm64",
+      "abi": "137"
+    },
+    "mode": "personal",
+    "consumerEntry": {
+      "origin": "package",
+      "package": {
+        "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+        "buildId": "8296720d8a25f38c",
+        "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+        "tarBytes": 20481470
+      },
+      "files": [
+        {
+          "path": "apps/launcher/lib/start.mjs",
+          "sha256": "de21a1cf0117ecee9794442e679da90abea1a6d2971fb6dea28abcb226233e09",
+          "bytes": 23370
+        },
+        {
+          "path": "apps/launcher/lib/daemon.mjs",
+          "sha256": "2597175e8a27c69c986f4dc728ba40b6b86bf8d4958983bda7055fc7e29a6d56",
+          "bytes": 7716
+        },
+        {
+          "path": "apps/coordinator/product/restored-review.ts",
+          "sha256": "e6b77f1cdbdd9d9bd67f78e2e1c5f2bd3228f87ef7aa8d14314246135d6034c5",
+          "bytes": 7325
+        },
+        {
+          "path": "apps/coordinator/product/demo.ts",
+          "sha256": "ea78e3e915854071f7ee4344de0f0dc9d94795c11b205aebf55e86c4a5cf89e1",
+          "bytes": 6819
+        }
+      ]
+    },
+    "packageCapability": {
+      "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "buildId": "8296720d8a25f38c",
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "digestSupported": true
+    },
+    "healthDigest": "fff2de23ecdf67fc9f26f5aec3fd997bf4236ea258560be26c07c4fd3e93a8e9",
+    "digestAvailable": true,
+    "sameDigest": "fff2de23ecdf67fc9f26f5aec3fd997bf4236ea258560be26c07c4fd3e93a8e9",
+    "processes": {
+      "live": "Mon Nov 16 12:36:11 2026",
+      "reused": "Mon Nov 16 12:36:11 2026"
+    },
+    "firstPid": 95764,
+    "unboundPid": 96779,
+    "pidAfterRefusals": 95764,
+    "pidAfterUnbound": 96779,
+    "outcomes": {
+      "sameFile": {
+        "status": "REUSED",
+        "instance": {
+          "protocol": "personal-product-instance/1",
+          "pid": 95764,
+          "processStart": "Mon Nov 16 12:36:11 2026",
+          "apiPid": 95804,
+          "consolePid": 95764,
+          "apiURL": "http://127.0.0.1:56296",
+          "consoleURL": "http://127.0.0.1:56295",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/restored",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/install/app",
+          "buildId": "8296720d8a25f38c",
+          "mode": "personal",
+          "access": "local-development",
+          "startupMode": "recovery_readonly",
+          "launcherArgv": [
+            "/Users/hh/.nvm/versions/node/v24.21.0/bin/node",
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/install/app/apps/launcher/bin/pa.mjs",
+            "start",
+            "--json",
+            "--port",
+            "56295",
+            "--api-port",
+            "56296",
+            "--discussion-only",
+            "--review-restored-scope",
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/reuse-first.json"
+          ],
+          "launcherCwd": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN",
+          "apiArgv": [
+            "/Users/hh/.nvm/versions/node/v24.21.0/bin/node",
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/install/app/apps/coordinator/product/demo.ts",
+            "--port",
+            "56296",
+            "--state",
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/restored",
+            "--console-origin",
+            "http://127.0.0.1:56295",
+            "--startup-mode",
+            "recovery_readonly",
+            "--assistant",
+            "--discussion-only",
+            "--review-restored-scope",
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/reuse-first.json",
+            "--local-access"
+          ],
+          "apiProcessStart": "Mon Nov 16 12:36:11 2026",
+          "apiUid": 501,
+          "startedAt": "2026-11-16T04:36:12.206Z",
+          "configRoot": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/config"
+        },
+        "recovery": {
+          "startupMode": "recovery_readonly",
+          "markerPresent": true,
+          "markerValid": true,
+          "warning": "恢复态只读：仅历史/诊断；重新绑定与重新验证由 main 的恢复授权完成前不会开启业务。",
+          "requiresRevalidation": [
+            "Native execution environment and policy evidence were not migrated; re-probe before dispatching.",
+            "Native authentication lives in the account home and is not part of the bundle; re-authenticate locally.",
+            "The old writer pid/nonce and runtime records are historical and never become authority on restore.",
+            "Project bindings not explicitly remapped stay pending and must be rebound to a local path."
+          ],
+          "pendingRebind": [
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/historical-project"
+          ]
+        },
+        "stderr": "",
+        "birth": {
+          "pid": 95829,
+          "start": "Mon Nov 16 12:36:12 2026",
+          "uid": 501,
+          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/install/bin/pa start --json --port 56295 --api-port 56296 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/reuse-first.json",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/restored",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/config",
+          "consolePort": 56295,
+          "apiPort": 56296,
+          "argvExact": false,
+          "recordedAt": "2026-11-16T04:36:12.222Z"
+        }
+      },
+      "differentFile": {
+        "status": "BLOCKED",
+        "code": "restored_review_selection_mismatch",
+        "message": "本次显式 review 选择与已运行实例的实际选择不同；保留旧 PID，不复用、不结束",
+        "detail": {
+          "requestedReviewIdentity": "aca2fce7162393f1a1900e86bcb1f80997a892e8a8c3cf11c0f445c940eadeb7",
+          "liveReviewIdentity": "fff2de23ecdf67fc9f26f5aec3fd997bf4236ea258560be26c07c4fd3e93a8e9",
+          "pid": 95764
+        },
+        "hint": "用与运行实例相同的已验证文件复用，或先 `pa stop` 旧实例再以新选择启动；不会重新签发/刷新旧窗口。",
+        "stderr": "",
+        "birth": {
+          "pid": 95987,
+          "start": "Mon Nov 16 12:36:12 2026",
+          "uid": 501,
+          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/install/bin/pa start --json --port 56295 --api-port 56296 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/reuse-narrow.json",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/restored",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/config",
+          "consolePort": 56295,
+          "apiPort": 56296,
+          "argvExact": false,
+          "recordedAt": "2026-11-16T04:36:12.846Z"
+        }
+      },
+      "missingFile": {
+        "status": "BLOCKED",
+        "code": "restored_review_selection_mismatch",
+        "message": "本次显式 review 选择与已运行实例的实际选择不同；保留旧 PID，不复用、不结束",
+        "detail": {
+          "requestedReviewIdentity": null,
+          "liveReviewIdentity": "fff2de23ecdf67fc9f26f5aec3fd997bf4236ea258560be26c07c4fd3e93a8e9",
+          "pid": 95764
+        },
+        "hint": "用与运行实例相同的已验证文件复用，或先 `pa stop` 旧实例再以新选择启动；不会重新签发/刷新旧窗口。",
+        "stderr": "",
+        "birth": {
+          "pid": 96157,
+          "start": "Mon Nov 16 12:36:13 2026",
+          "uid": 501,
+          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/install/bin/pa start --json --port 56295 --api-port 56296 --discussion-only",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/restored",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/config",
+          "consolePort": 56295,
+          "apiPort": 56296,
+          "argvExact": false,
+          "recordedAt": "2026-11-16T04:36:13.516Z"
+        }
+      },
+      "missingFilePath": {
+        "status": "BLOCKED",
+        "code": "review_scope_missing",
+        "message": "显式 review 配置文件不存在",
+        "detail": {
+          "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/reuse-gone.json"
+        },
+        "hint": "用 main 的 review-restored 命令重新生成新的私有文件。",
+        "stderr": "",
+        "birth": {
+          "pid": 96315,
+          "start": "Mon Nov 16 12:36:14 2026",
+          "uid": 501,
+          "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/install/app/apps/launcher/bin/pa.mjs start --json --port 56295 --api-port 56296 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/reuse-gone.json",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/restored",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/config",
+          "consolePort": 56295,
+          "apiPort": 56296,
+          "argvExact": false,
+          "recordedAt": "2026-11-16T04:36:14.084Z"
+        }
+      },
+      "portChange": {
+        "status": "BLOCKED",
+        "code": "instance_conflict",
+        "message": "已运行实例与本次请求的身份不一致；不静默复用不同 state/mode/access/build/端口",
+        "detail": {
+          "differences": [
+            {
+              "field": "consoleURL",
+              "expected": "http://127.0.0.1:56333",
+              "actual": "http://127.0.0.1:56295"
+            },
+            {
+              "field": "apiURL",
+              "expected": "http://127.0.0.1:56334",
+              "actual": "http://127.0.0.1:56296"
+            }
+          ],
+          "running": {
+            "pid": 95764,
+            "consoleURL": "http://127.0.0.1:56295",
+            "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/restored"
+          }
+        },
+        "hint": "用与运行实例相同的参数复用；要切换请先 `pa stop`，再以新参数启动。",
+        "stderr": "",
+        "birth": {
+          "pid": 96351,
+          "start": "Mon Nov 16 12:36:14 2026",
+          "uid": 501,
+          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/install/bin/pa start --json --port 56333 --api-port 56334 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/reuse-first.json",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/restored",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/config",
+          "consolePort": 56333,
+          "apiPort": 56334,
+          "argvExact": false,
+          "recordedAt": "2026-11-16T04:36:14.467Z"
+        }
+      },
+      "unboundThenSelection": {
+        "status": "BLOCKED",
+        "code": "restored_review_selection_mismatch",
+        "message": "本次显式 review 选择与已运行实例的实际选择不同；保留旧 PID，不复用、不结束",
+        "detail": {
+          "requestedReviewIdentity": "fff2de23ecdf67fc9f26f5aec3fd997bf4236ea258560be26c07c4fd3e93a8e9",
+          "liveReviewIdentity": null,
+          "pid": 96779
+        },
+        "hint": "用与运行实例相同的已验证文件复用，或先 `pa stop` 旧实例再以新选择启动；不会重新签发/刷新旧窗口。",
+        "stderr": "",
+        "birth": {
+          "pid": 96841,
+          "start": "Mon Nov 16 12:36:15 2026",
+          "uid": 501,
+          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/install/bin/pa start --json --port 56338 --api-port 56339 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/reuse-first.json",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/restored",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/config",
+          "consolePort": 56338,
+          "apiPort": 56339,
+          "argvExact": false,
+          "recordedAt": "2026-11-16T04:36:15.985Z"
+        }
+      }
+    },
+    "scope": "selection digest present"
+  },
+  "scopeDiagnostics": {
+    "subject": {
+      "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "buildId": "8296720d8a25f38c",
+      "schema": 18,
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "tarBytes": 20481470,
+      "platform": "darwin",
+      "arch": "arm64",
+      "abi": "137"
+    },
+    "mode": "personal",
+    "consumerEntry": {
+      "origin": "package",
+      "package": {
+        "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+        "buildId": "8296720d8a25f38c",
+        "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+        "tarBytes": 20481470
+      },
+      "files": [
+        {
+          "path": "apps/launcher/lib/start.mjs",
+          "sha256": "de21a1cf0117ecee9794442e679da90abea1a6d2971fb6dea28abcb226233e09",
+          "bytes": 23370
+        },
+        {
+          "path": "apps/launcher/lib/daemon.mjs",
+          "sha256": "2597175e8a27c69c986f4dc728ba40b6b86bf8d4958983bda7055fc7e29a6d56",
+          "bytes": 7716
+        },
+        {
+          "path": "apps/coordinator/product/restored-review.ts",
+          "sha256": "e6b77f1cdbdd9d9bd67f78e2e1c5f2bd3228f87ef7aa8d14314246135d6034c5",
+          "bytes": 7325
+        },
+        {
+          "path": "apps/coordinator/product/demo.ts",
+          "sha256": "ea78e3e915854071f7ee4344de0f0dc9d94795c11b205aebf55e86c4a5cf89e1",
+          "bytes": 6819
+        }
+      ]
+    },
+    "plain": {
+      "plain": 200,
+      "plainHasDiagnostic": false,
+      "state": "scope_changed",
+      "bindingSourceCount": 3,
+      "optIn": 200,
+      "diagnostic": {
+        "protocol": "context-scope-review/1",
+        "reasons": [
+          "selection_replaced"
+        ],
+        "partial": true,
+        "withheldSourceCount": 3,
+        "authorization": "none"
+      },
+      "duplicate": 400,
+      "unknown": 400
+    },
+    "narrow": {
+      "start": "RUNNING",
+      "plain": 200,
+      "bodyServed": false,
+      "state": "scope_changed",
+      "bindingSourceCount": 3,
+      "optIn": 200,
+      "diagnostic": {
+        "protocol": "context-scope-review/1",
+        "reasons": [
+          "selection_replaced"
+        ],
+        "partial": true,
+        "withheldSourceCount": 3,
+        "authorization": "none"
+      }
+    }
+  },
+  "readiness": {
+    "subject": {
+      "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "buildId": "8296720d8a25f38c",
+      "schema": 18,
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "tarBytes": 20481470,
+      "platform": "darwin",
+      "arch": "arm64",
+      "abi": "137"
+    },
+    "mode": "personal",
+    "normal": {
+      "status": "RUNNING",
+      "mode": "personal",
+      "startupMode": "normal",
+      "readiness": {
+        "status": 200,
+        "body": {
+          "protocol": "trial-readiness/1",
+          "observedAt": "2026-11-16T04:36:18.222Z",
+          "configurationRevision": "a9c826f123324b2d8f1a07902775e6a1c453f4de86b467027490a903c324e84b",
+          "mode": "personal",
+          "startupMode": "normal",
+          "discussion": "configuration_present",
+          "execution": {
+            "state": "unavailable",
+            "reason": "operator_disabled"
+          },
+          "development": "blocked",
+          "projects": {
+            "development": 0,
+            "discussion": 1,
+            "dispatchable": 0
+          },
+          "profiles": {
+            "native": 1,
+            "controlled": 0,
+            "admittedNative": 0,
+            "admittedControlled": 0
+          },
+          "capabilities": {
+            "contextHistory": true,
+            "contextSources": true,
+            "decisions": true,
+            "proposals": true
+          },
+          "authorization": "none"
+        }
+      },
+      "configuration": {
+        "revision": "a9c826f123324b2d8f1a07902775e6a1c453f4de86b467027490a903c324e84b",
+        "projects": [
+          {
+            "discussionOnly": true,
+            "dispatchAllowed": false
+          }
+        ],
+        "profiles": [
+          {
+            "kind": "native",
+            "dispatchAllowed": false
+          }
+        ],
+        "contextHistoryAvailable": true,
+        "contextSourcesAvailable": true,
+        "decisionsAvailable": true,
+        "proposalsAvailable": true
+      },
+      "negatives": {
+        "invalidBearer": 401,
+        "noBearer": 200,
+        "badQuery": 400,
+        "badQueryCode": "invalid_request",
+        "missingRoute": 404
+      },
+      "health": {
+        "status": "ok",
+        "mode": "personal",
+        "access": "local-development"
+      },
+      "code": null,
+      "issues": [],
+      "registration": 200,
+      "after": {
+        "status": 200,
+        "body": {
+          "protocol": "trial-readiness/1",
+          "observedAt": "2026-11-16T04:36:18.356Z",
+          "configurationRevision": "b0ad3d200871a7553b7c85093fff6bd20c4c91d25a359e9a9daeb1a768593ef3",
+          "mode": "personal",
+          "startupMode": "normal",
+          "discussion": "configuration_present",
+          "execution": {
+            "state": "unavailable",
+            "reason": "operator_disabled"
+          },
+          "development": "blocked",
+          "projects": {
+            "development": 1,
+            "discussion": 1,
+            "dispatchable": 0
+          },
+          "profiles": {
+            "native": 1,
+            "controlled": 0,
+            "admittedNative": 0,
+            "admittedControlled": 0
+          },
+          "capabilities": {
+            "contextHistory": true,
+            "contextSources": true,
+            "decisions": true,
+            "proposals": true
+          },
+          "authorization": "none"
+        }
+      }
+    },
+    "readonly": {
+      "status": "RUNNING",
+      "mode": "personal",
+      "startupMode": "recovery_readonly",
+      "readiness": {
+        "status": 200,
+        "body": {
+          "protocol": "trial-readiness/1",
+          "observedAt": "2026-11-16T04:36:19.431Z",
+          "configurationRevision": "5dd35a33f26351be4d6b2c10d97103503efddf4b4ebbc3bd3fdfba7084422e2d",
+          "mode": "personal",
+          "startupMode": "recovery_readonly",
+          "discussion": "unknown",
+          "execution": {
+            "state": "unavailable",
+            "reason": "recovery_readonly"
+          },
+          "development": "readonly",
+          "projects": {
+            "development": 1,
+            "discussion": 2,
+            "dispatchable": 0
+          },
+          "profiles": {
+            "native": 0,
+            "controlled": 4,
+            "admittedNative": 0,
+            "admittedControlled": 0
+          },
+          "capabilities": {
+            "contextHistory": true,
+            "contextSources": true,
+            "decisions": false,
+            "proposals": false
+          },
+          "authorization": "none"
+        }
+      },
+      "configuration": {
+        "revision": "5dd35a33f26351be4d6b2c10d97103503efddf4b4ebbc3bd3fdfba7084422e2d",
+        "projects": [
+          {
+            "discussionOnly": true,
+            "dispatchAllowed": false
+          },
+          {
+            "discussionOnly": true,
+            "dispatchAllowed": false
+          },
+          {
+            "discussionOnly": false,
+            "dispatchAllowed": false
+          }
+        ],
+        "profiles": [
+          {
+            "kind": "controlled_fixture",
+            "dispatchAllowed": false
+          },
+          {
+            "kind": "controlled_fixture",
+            "dispatchAllowed": false
+          },
+          {
+            "kind": "controlled_fixture",
+            "dispatchAllowed": false
+          },
+          {
+            "kind": "controlled_fixture",
+            "dispatchAllowed": false
+          }
+        ],
+        "contextHistoryAvailable": true,
+        "contextSourcesAvailable": true,
+        "decisionsAvailable": false,
+        "proposalsAvailable": false
+      },
+      "negatives": {
+        "invalidBearer": 401,
+        "noBearer": 200,
+        "badQuery": 400,
+        "badQueryCode": "invalid_request",
+        "missingRoute": 404
+      },
+      "health": {
+        "status": "ok",
+        "mode": "personal",
+        "startupMode": "recovery_readonly",
+        "restoredReviewDigest": "6fc3646bbba97358fad5f0292a35fff35c09e939d99663b2d51237d110599fb3",
+        "access": "local-development"
+      },
+      "code": null,
+      "issues": []
+    },
+    "fixture": {
+      "status": "RUNNING",
+      "mode": "fixture",
+      "startupMode": "normal",
+      "readiness": {
+        "status": 200,
+        "body": {
+          "protocol": "trial-readiness/1",
+          "observedAt": "2026-11-16T04:36:20.858Z",
+          "configurationRevision": "83d2a00c18fe919d4671f2916ce9baec23e44fc5cfd8f51b3ba2d241462e06af",
+          "mode": "fixture",
+          "startupMode": "normal",
+          "discussion": "configuration_present",
+          "execution": {
+            "state": "available",
+            "kind": "controlled_fixture"
+          },
+          "development": "fixture_only",
+          "projects": {
+            "development": 1,
+            "discussion": 0,
+            "dispatchable": 1
+          },
+          "profiles": {
+            "native": 0,
+            "controlled": 4,
+            "admittedNative": 0,
+            "admittedControlled": 4
+          },
+          "capabilities": {
+            "contextHistory": true,
+            "contextSources": true,
+            "decisions": true,
+            "proposals": true
+          },
+          "authorization": "none"
+        }
+      },
+      "configuration": {
+        "revision": "83d2a00c18fe919d4671f2916ce9baec23e44fc5cfd8f51b3ba2d241462e06af",
+        "projects": [
+          {
+            "discussionOnly": false,
+            "dispatchAllowed": true
+          }
+        ],
+        "profiles": [
+          {
+            "kind": "controlled_fixture",
+            "dispatchAllowed": true
+          },
+          {
+            "kind": "controlled_fixture",
+            "dispatchAllowed": true
+          },
+          {
+            "kind": "controlled_fixture",
+            "dispatchAllowed": true
+          },
+          {
+            "kind": "controlled_fixture",
+            "dispatchAllowed": true
+          }
+        ],
+        "contextHistoryAvailable": true,
+        "contextSourcesAvailable": true,
+        "decisionsAvailable": true,
+        "proposalsAvailable": true
+      },
+      "negatives": {
+        "invalidBearer": 401,
+        "noBearer": 200,
+        "badQuery": 400,
+        "badQueryCode": "invalid_request",
+        "missingRoute": 404
+      },
+      "health": {
+        "status": "ok",
+        "mode": "fixture",
+        "access": "local-development"
+      },
+      "code": null,
+      "issues": []
+    },
+    "mockRequests": 2,
+    "providerBefore": 2,
+    "consumer": {
+      "origin": "package",
+      "package": {
+        "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+        "buildId": "8296720d8a25f38c",
+        "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+        "tarBytes": 20481470
+      },
+      "files": [
+        {
+          "path": "apps/launcher/lib/start.mjs",
+          "sha256": "de21a1cf0117ecee9794442e679da90abea1a6d2971fb6dea28abcb226233e09",
+          "bytes": 23370
+        },
+        {
+          "path": "apps/launcher/lib/daemon.mjs",
+          "sha256": "2597175e8a27c69c986f4dc728ba40b6b86bf8d4958983bda7055fc7e29a6d56",
+          "bytes": 7716
+        },
+        {
+          "path": "apps/coordinator/product/restored-review.ts",
+          "sha256": "e6b77f1cdbdd9d9bd67f78e2e1c5f2bd3228f87ef7aa8d14314246135d6034c5",
+          "bytes": 7325
+        },
+        {
+          "path": "apps/coordinator/product/demo.ts",
+          "sha256": "ea78e3e915854071f7ee4344de0f0dc9d94795c11b205aebf55e86c4a5cf89e1",
+          "bytes": 6819
+        }
+      ]
+    },
+    "packageCapability": {
+      "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "buildId": "8296720d8a25f38c",
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "digestSupported": true
+    }
+  },
+  "packagedStop": {
+    "subject": {
+      "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "buildId": "8296720d8a25f38c",
+      "schema": 18,
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "tarBytes": 20481470,
+      "platform": "darwin",
+      "arch": "arm64",
+      "abi": "137"
+    },
+    "status": "RUNNING",
+    "healthMode": "personal",
+    "healthStartupMode": "recovery_readonly",
+    "recordMode": "personal",
+    "stopStatus": "STOPPED",
+    "stopCode": null,
+    "finding": null,
+    "cleaned": {
+      "clean": true,
+      "package": "STOPPED",
+      "refusal": null,
+      "recordRemoved": null,
+      "signals": [],
+      "reason": null
+    }
+  },
+  "stopFunctional": {
+    "subject": {
+      "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "buildId": "8296720d8a25f38c",
+      "schema": 18,
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "tarBytes": 20481470,
+      "platform": "darwin",
+      "arch": "arm64",
+      "abi": "137"
+    },
+    "normal": {
+      "status": "RUNNING",
+      "mode": "personal",
+      "startupMode": "normal",
+      "health": {
+        "mode": "personal",
+        "startupMode": "normal"
+      },
+      "packageStatus": "STOPPED",
+      "packageCode": null,
+      "exit": 0,
+      "before": {
+        "present": true,
+        "mode": "personal",
+        "startupMode": "normal",
+        "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/seed-state",
+        "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/install/app",
+        "resources": [
+          {
+            "label": "launcher",
+            "pid": 98387,
+            "start": "Mon Nov 16 12:36:21 2026",
+            "uid": 501,
+            "parentPid": null,
+            "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/install/app/apps/launcher/bin/pa.mjs start --json --port 56394 --api-port 56395 --discussion-only"
+          },
+          {
+            "label": "child",
+            "pid": 98424,
+            "start": "Mon Nov 16 12:36:21 2026",
+            "uid": 501,
+            "parentPid": 98387,
+            "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/install/app/apps/coordinator/product/demo.ts --port 56395 --state /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/seed-state --console-origin htt"
+          }
+        ]
+      },
+      "after": [
+        {
+          "pid": 98387,
+          "expectedStart": "Mon Nov 16 12:36:21 2026",
+          "alive": false,
+          "start": null,
+          "sameIdentity": false
+        },
+        {
+          "pid": 98424,
+          "expectedStart": "Mon Nov 16 12:36:21 2026",
+          "alive": false,
+          "start": null,
+          "sameIdentity": false
+        }
+      ],
+      "recordPresent": false,
+      "recordMode": null
+    },
+    "restored": {
+      "status": "RUNNING",
+      "mode": "personal",
+      "startupMode": "recovery_readonly",
+      "health": {
+        "mode": "personal",
+        "startupMode": "recovery_readonly"
+      },
+      "packageStatus": "STOPPED",
+      "packageCode": null,
+      "exit": 0,
+      "before": {
+        "present": true,
+        "mode": "personal",
+        "startupMode": "recovery_readonly",
+        "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/restored",
+        "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/install/app",
+        "resources": [
+          {
+            "label": "launcher",
+            "pid": 98722,
+            "start": "Mon Nov 16 12:36:23 2026",
+            "uid": 501,
+            "parentPid": null,
+            "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/install/app/apps/launcher/bin/pa.mjs start --json --port 56406 --api-port 56407 --discussion-only"
+          },
+          {
+            "label": "child",
+            "pid": 98763,
+            "start": "Mon Nov 16 12:36:23 2026",
+            "uid": 501,
+            "parentPid": 98722,
+            "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/install/app/apps/coordinator/product/demo.ts --port 56407 --state /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-2cWYdN/restored --console-origin http:"
+          }
+        ]
+      },
+      "after": [
+        {
+          "pid": 98722,
+          "expectedStart": "Mon Nov 16 12:36:23 2026",
+          "alive": false,
+          "start": null,
+          "sameIdentity": false
+        },
+        {
+          "pid": 98763,
+          "expectedStart": "Mon Nov 16 12:36:23 2026",
+          "alive": false,
+          "start": null,
+          "sameIdentity": false
+        }
+      ],
+      "recordPresent": false,
+      "recordMode": null
+    },
+    "resourcePolicy": "fixed pre-stop pid/start set, independently re-observed after stop",
+    "detectorCase": "E8-PACKAGED-STOP-CONSISTENCY records the refusal; this case is the product functional requirement",
+    "proofFallbackUsed": false
+  },
+  "lifecycle": [
+    {
+      "id": "E1-LIFECYCLE-BIRTH-ROOT",
+      "status": "PASS"
+    },
+    {
+      "id": "E1-LIFECYCLE-CHILD-SCOPE",
+      "status": "PASS"
+    },
+    {
+      "id": "E1-LIFECYCLE-OWN",
+      "status": "PASS"
+    },
+    {
+      "id": "E1-LIFECYCLE-WRONG-START",
+      "status": "PASS"
+    },
+    {
+      "id": "E1-LIFECYCLE-SIBLING",
+      "status": "PASS"
+    },
+    {
+      "id": "E1-LIFECYCLE-FOREIGN-CHILD",
+      "status": "PASS"
+    },
+    {
+      "id": "E1-LIFECYCLE-MIXED-UNKNOWN",
+      "status": "PASS"
+    },
+    {
+      "id": "E1-LIFECYCLE-START-WINDOW",
+      "status": "PASS"
+    },
+    {
+      "id": "E1-LIFECYCLE-REFUSED-STOP",
+      "status": "PASS"
+    },
+    {
+      "id": "E1-LIFECYCLE-IDEMPOTENT",
+      "status": "PASS"
+    }
+  ],
+  "channel": {
+    "module": "packages/contracts/src/coordinator-channel.ts",
+    "validFact": true,
+    "mismatchedFact": false,
+    "validPayload": true,
+    "mismatchedPayload": false,
+    "answerWrite": true,
+    "otherWrite": false,
+    "goodReceipt": true,
+    "badReceipt": false,
+    "producerMismatch": false,
+    "consumer": "NOT_INTEGRATED",
+    "limits": false
+  },
+  "supportMaterial": {
+    "subject": {
+      "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "buildId": "8296720d8a25f38c",
+      "schema": 18,
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "tarBytes": 20481470,
+      "platform": "darwin",
+      "arch": "arm64",
+      "abi": "137"
+    },
+    "bundle": {
+      "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-support-ngRwzm/support-one.pab",
+      "bytes": 13953,
+      "mode": "600"
+    },
+    "repeated": {
+      "status": 2,
+      "result": "BLOCKED"
+    },
+    "credentialLike": false,
+    "installManifestMode": "600",
+    "releaseManifestMode": "600"
+  },
+  "trialUi": {
+    "subject": {
+      "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "buildId": "8296720d8a25f38c",
+      "schema": 18,
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "tarBytes": 20481470,
+      "platform": "darwin",
+      "arch": "arm64",
+      "abi": "137"
+    },
+    "mode": "personal",
+    "selector": {
+      "navigations": [
+        "主对话视图",
+        "试用准备"
+      ],
+      "trialRegion": "试用准备",
+      "draft": ".composer textarea"
+    },
+    "bundle": {
+      "entry": "install/app/apps/console/dist/assets/index-DTOhkXHZ.js",
+      "sha256": "5a70bf9fd07b0e2f3c15b9ba556f4d6abb1e05de767e8b0070b0623976265972",
+      "bytes": 658695
+    },
+    "actions": {
+      "model": "opened-settings",
+      "import": "opened-import-form",
+      "executor": "opened-executor",
+      "phaseOneRendered": [
+        "configure_model",
+        "import_project",
+        "inspect_executor"
+      ],
+      "conversation": "opened-conversation-draft-kept"
+    },
+    "negatives": {
+      "abort": {
+        "preservesPrior": true
+      },
+      "badSchema": {
+        "alertShown": true,
+        "leaksGranted": false,
+        "keepsPersonal": true
+      },
+      "legacy": {
+        "absentInterfaceStated": true
+      }
+    },
+    "layout": {
+      "desktop": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "boxes": [
+          {
+            "name": "主对话视图",
+            "present": true,
+            "x": 8,
+            "y": 67,
+            "width": 40,
+            "height": 40
+          },
+          {
+            "name": "试用准备",
+            "present": true,
+            "x": 8,
+            "y": 267,
+            "width": 40,
+            "height": 40
+          }
+        ],
+        "overlaps": [],
+        "overflow": {
+          "scrollWidth": 1440,
+          "innerWidth": 1440
+        }
+      },
+      "mobile": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "boxes": [
+          {
+            "name": "主对话视图",
+            "present": true,
+            "x": 31.390625,
+            "y": 797,
+            "width": 44,
+            "height": 38
+          },
+          {
+            "name": "试用准备",
+            "present": true,
+            "x": 314.59375,
+            "y": 797,
+            "width": 44,
+            "height": 38
+          }
+        ],
+        "overlaps": [],
+        "overflow": {
+          "scrollWidth": 390,
+          "innerWidth": 390
+        }
+      }
+    },
+    "screenshots": [
+      {
+        "path": "tests/product-acceptance/reports/wave27/browser/desktop.png",
+        "sha256": "cc344669f2a96c07852b3ff146e40f4f1caff0a05306b0c827769a0a1dca275d",
+        "bytes": 124674,
+        "size": 124674
+      },
+      {
+        "path": "tests/product-acceptance/reports/wave27/browser/mobile.png",
+        "sha256": "6d373705ea3efaae678d8fce2a7765eb91eafafef8394646823ee651bdbab758",
+        "bytes": 56076,
+        "size": 56076
+      },
+      {
+        "path": "tests/product-acceptance/reports/wave27/browser/configured-conversation.png",
+        "sha256": "78c0eb1d366de861cc08c882c53d924e090ab5b0c76f40b230e0da0847a88a68",
+        "bytes": 76516,
+        "size": 76516
+      }
+    ],
+    "problems": [
+      "console: Failed to load resource: net::ERR_FAILED",
+      "console: Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "console: Failed to load resource: net::ERR_EMPTY_RESPONSE",
+      "console: Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "console: Failed to load resource: net::ERR_CONNECTION_REFUSED"
+    ],
+    "readinessReads": 9,
+    "writes": 0,
+    "providerBefore": 0,
+    "providerAfter": 0,
+    "lifecycle": {
+      "stages": [],
+      "root": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-dFhw92",
+      "startA": {
+        "status": "RUNNING",
+        "code": null,
+        "birth": {
+          "pid": 99399,
+          "start": "Mon Nov 16 12:36:30 2026",
+          "uid": 501,
+          "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-dFhw92/install/app/apps/launcher/bin/pa.mjs start --json --port 56449 --api-port 56450 --discussion-only",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-dFhw92/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-dFhw92/state",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-dFhw92/config",
+          "consolePort": 56449,
+          "apiPort": 56450,
+          "argvExact": false,
+          "recordedAt": "2026-11-16T04:36:30.595Z"
+        },
+        "instance": {
+          "mode": "personal",
+          "processStart": "Mon Nov 16 12:36:30 2026"
+        }
+      },
+      "stageAStop": {
+        "clean": true,
+        "reason": null,
+        "package": "STOPPED",
+        "refusal": null,
+        "recordRemoved": null,
+        "signals": []
+      },
+      "startB": {
+        "status": "RUNNING",
+        "code": null,
+        "birth": {
+          "pid": 99743,
+          "start": "Mon Nov 16 12:36:33 2026",
+          "uid": 501,
+          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-dFhw92/install/bin/pa start --json --port 56478 --api-port 56479 --discussion-only",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-dFhw92/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-dFhw92/state",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-dFhw92/config",
+          "consolePort": 56478,
+          "apiPort": 56479,
+          "argvExact": false,
+          "recordedAt": "2026-11-16T04:36:33.439Z"
+        },
+        "instance": {
+          "mode": "personal",
+          "processStart": "Mon Nov 16 12:36:33 2026"
+        }
+      },
+      "stageBStop": {
+        "clean": true,
+        "reason": null,
+        "package": "STOPPED",
+        "refusal": null,
+        "recordRemoved": null,
+        "signals": []
+      },
+      "released": {
+        "removed": true
+      },
+      "unknown": null
+    },
+    "configuredMode": {
+      "actions": {
+        "configureVisible": 0,
+        "openConversationVisible": 1,
+        "draft": "尚未发送的原始草稿"
+      },
+      "status": "RUNNING",
+      "mode": "personal"
+    },
+    "pageErrors": []
+  },
+  "counts": {
+    "PASS": 290,
+    "FAIL": 0,
+    "SKIPPED": 0,
+    "NOT_TESTED": 20,
+    "BLOCKED": 0,
+    "UNKNOWN": 0
+  },
+  "testCodeSource": {
+    "commit": "a933479b7ae8cd591f9e2032d70c9b2dcdd356bd",
+    "dirty": false,
+    "branch": "codex/g3-product-acceptance"
+  },
+  "productSource": {
+    "commit": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+    "buildId": "8296720d8a25f38c",
+    "schema": 18
+  },
+  "mainSource": {
+    "commit": "3cbc648",
+    "schema": 18
+  },
+  "artifactTuple": {
+    "baseline": {
+      "role": "baseline",
+      "name": "wave29-target-1fbaf94",
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave29-target/wave29-target-1fbaf94.tar.gz",
+      "tarSha256": "daee1a94b43156cec659f7df2a3b08e1ecb89b645fde1ea81c35a81d75b47d7a",
+      "tarBytes": 20458656,
+      "installManifestSha256": "057731760a6be5eead713c0fc13c2102eb2dac39ecc33a7bc50dba80fb8aa585",
+      "releaseManifestSha256": "a6fef63e2a31bbbd2e96cf7433085fd8508de74a6e722e58d287bf43a5d3b918",
+      "closureDigest": "c2920614d1e0d45b86f0cebf4ff2891306d7be87c88d96877061c576f84e6ed4",
+      "files": 6849,
+      "buildId": "2d94a7c31ef97b57",
+      "sourceCommit": "1fbaf940d426fa34ff6289304e073b9159586ed9",
+      "sourceDirty": false,
+      "productSchema": 18,
+      "platform": "darwin",
+      "arch": "arm64",
+      "node": "24.21.0",
+      "abi": "137"
+    },
+    "target": {
+      "role": "target",
+      "name": "wave30-target-8296720",
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave30-target/wave30-target-8296720.tar.gz",
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "tarBytes": 20481470,
+      "installManifestSha256": "b6d907d626094ce6f73b91f8bd0869e1383c545dd6dfc2b30ad180b9c74dfa43",
+      "releaseManifestSha256": "308980db8b07a8a0d28d51aa31a02d0b6ea6b79a632564b467fc6c9a56688187",
+      "closureDigest": "3fa4b84a05421d67ba870caf5da6249deb45272d47fd0a2425f630e9a01b53c1",
+      "files": 6849,
+      "buildId": "8296720d8a25f38c",
+      "sourceCommit": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "sourceDirty": false,
+      "productSchema": 18,
+      "platform": "darwin",
+      "arch": "arm64",
+      "node": "24.21.0",
+      "abi": "137"
+    }
+  }
+}

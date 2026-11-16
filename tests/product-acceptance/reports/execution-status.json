@@ -2,11 +2,11 @@
   "schema": "agent-execution-status/1",
   "agent": "E",
   "branch": "codex/g3-product-acceptance",
-  "base": "b9fcdc7",
-  "checkpoint": "d32080f",
-  "head": "d32080f543ceac7f127113a5a0adefa232f718f0",
+  "base": "3cbc648",
+  "checkpoint": "a933479",
+  "head": "a933479b7ae8cd591f9e2032d70c9b2dcdd356bd",
   "worktreeDirtyAtRun": false,
-  "checkedAt": "2026-11-16T01:10:48.844Z",
+  "checkedAt": "2026-11-16T04:37:07.940Z",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -20,14 +20,14 @@
   "stages": [
     {
       "id": "E1",
-      "title": "Complete known-resource policy on every path",
+      "title": "Every stop path verifies the fixed resource set",
       "command": "node tests/product-acceptance/cases/w27-lifecycle.mjs",
       "notes": [
-        "A packaged STOPPED is verified against the fixed pre-stop set; a live known child keeps clean=false and retains the root. No global discovery."
+        "A packaged STOPPED is checked against the fixed pre-stop set; a known live birth without that set stays retained."
       ],
       "result": "PASS",
       "counts": {
-        "PASS": 136
+        "PASS": 137
       },
       "cases": [
         {
@@ -709,15 +709,20 @@
           "id": "E1-LIFECYCLE-PARENT-GONE",
           "status": "PASS",
           "reason": null
+        },
+        {
+          "id": "E1-LIFECYCLE-BIRTH-NO-SET",
+          "status": "PASS",
+          "reason": null
         }
       ]
     },
     {
       "id": "E2",
-      "title": "Legitimate multi-resource proof and strict exit observation",
-      "command": "node tests/product-acceptance/cases/w27-lifecycle.mjs",
+      "title": "Journey oracle: original project identity",
+      "command": "node tests/product-acceptance/cases/w31-journey.mjs",
       "notes": [
-        "liveIdentity carries ppid, a re-parented child of an exited launcher stays legitimate, and the after-set must repeat the exact pid/start with explicit booleans."
+        "Previews must be applicable and the execution chain must stay on the original project; needs_input and fixture-pool substitution are recorded as gaps, not passes."
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
@@ -869,10 +874,10 @@
     },
     {
       "id": "E3",
-      "title": "Fixed R1 ordinary and functional",
-      "command": "node tests/product-acceptance/run.mjs --tier=installed-functional",
+      "title": "Journey oracle: recovery observation",
+      "command": "node tests/product-acceptance/cases/w31-journey.mjs",
       "notes": [
-        "R1 82ee5b8f/8296720d, tar 04926739: ordinary and functional stop both pass on its own bytes, with the 1fba/1ba/ce64 scopes kept."
+        "Reopen must find the original Work id, phase and artifacts; a message count alone is not recovery evidence."
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
@@ -1054,10 +1059,10 @@
     },
     {
       "id": "E4",
-      "title": "R1 latest UI and visible capabilities",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4",
+      "title": "ZIP/manifest lifecycle",
+      "command": "node tests/product-acceptance/cases/w32-zip.mjs",
       "notes": [
-        "Trial navigation, four callbacks, readiness, recipe preview and 7/30 insights are measured against the R1 bundle/API."
+        "One frozen distribution drives first-run, unconfigured degradation, configured import, controlled delivery, fixed-set stop, reopen and verified backup."
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
@@ -1189,10 +1194,10 @@
     },
     {
       "id": "E5",
-      "title": "Two-project template and execution chain",
-      "command": "node tests/product-acceptance/cases/w31-journey.mjs",
+      "title": "R1 ordinary and functional",
+      "command": "node tests/product-acceptance/run.mjs --tier=installed-functional",
       "notes": [
-        "Two registered projects: read-only preview, explicit create with an edited goal, machine check, candidate and manual accept."
+        "R1 82ee5b8f/8296720d ordinary, functional, UI, readiness, recipe preview, insights and the journey all pass on its own bytes."
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
@@ -1249,10 +1254,10 @@
     },
     {
       "id": "E6",
-      "title": "7/30 scoped observation",
-      "command": "node tests/product-acceptance/cases/w31-journey.mjs",
+      "title": "Layered conclusion and status",
+      "command": "node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record",
       "notes": [
-        "Open 7/30 windows answer with scope/coverage; project-scoped refusal is recorded as an authorization boundary, not a missing endpoint."
+        "wave32-status separates implemented/merged/candidate/installed/native and lists the remaining gates without a new oracle."
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
@@ -1301,164 +1306,6 @@
           "reason": null
         }
       ]
-    },
-    {
-      "id": "E7",
-      "title": "Selected context, reply and source review",
-      "command": "node tests/product-acceptance/cases/w31-journey.mjs",
-      "notes": [
-        "prepare/send/receipt, loopback reply, audit/history/sources and the scoped opt-in run in the same journey with a mock provider."
-      ],
-      "result": "PASS",
-      "counts": {
-        "PASS": 7
-      },
-      "cases": [
-        {
-          "id": "E7-BACKUP-CONTEXT-REPLY",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E7-OWNERSHIP-COPY",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E7-OWNERSHIP-WRONG-INSTALL",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E7-SECOND-ROOT-READONLY",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E7-SCOPE-DIAGNOSTICS",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E7-READINESS",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E7-JOURNEY-CONTEXT-SOURCE",
-          "status": "PASS",
-          "reason": null
-        }
-      ]
-    },
-    {
-      "id": "E8",
-      "title": "Per-phase resource exit and reopen",
-      "command": "node tests/product-acceptance/cases/w31-journey.mjs",
-      "notes": [
-        "Each phase ends with a packaged STOPPED plus fixed-set observation, and the same data root reopens with both conversations."
-      ],
-      "result": "PASS",
-      "counts": {
-        "PASS": 4
-      },
-      "cases": [
-        {
-          "id": "E8-SCHEMA-MIGRATION",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E8-LEGACY16-MIGRATION",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E8-PACKAGED-STOP-CONSISTENCY",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E8-JOURNEY-STOP-REOPEN",
-          "status": "PASS",
-          "reason": null
-        }
-      ]
-    },
-    {
-      "id": "E9",
-      "title": "R1 installer and upgrade compatibility",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4",
-      "notes": [
-        "Cold/no-executor/multi-state, baseline upgrade and rollback keep exit/status/pointer/operation/data on the R1 tar; no R2 claim is made without its fixed identity."
-      ],
-      "result": "PASS",
-      "counts": {
-        "PASS": 4
-      },
-      "cases": [
-        {
-          "id": "E9-CONTEXT-CONCURRENCY",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E9-INSTALLED-STABILITY",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E9-COORDINATOR-CHANNEL-CONTRACT",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E9-INSIGHTS-HTTP",
-          "status": "PASS",
-          "reason": null
-        }
-      ]
-    },
-    {
-      "id": "E10",
-      "title": "Backup restore readonly and multi-root faults",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4",
-      "notes": [
-        "Non-empty backup/verify/restore into a new root, v1/v2 formats, artifact closure, and the recorded target-content gap."
-      ],
-      "result": "SEE_RUN",
-      "counts": {},
-      "cases": []
-    },
-    {
-      "id": "E11",
-      "title": "Bounded sustained use and private support",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4",
-      "notes": [
-        "Bounded readonly concurrency/reopen and support output 0600/non-overwriting/credential-free; no long soak is claimed."
-      ],
-      "result": "PASS_WITH_GAPS",
-      "counts": {
-        "NOT_TESTED": 1
-      },
-      "cases": [
-        {
-          "id": "E11-TRIAL-IDENTITY-FIELDS",
-          "status": "NOT_TESTED",
-          "reason": "NOT_REACHED: main contains a newer trial readiness source, but the frozen package bytes do not carry the {enabled, identity} field; an installed identity-isolation claim needs a successor frozen package, not a source relabel."
-        }
-      ]
-    },
-    {
-      "id": "E12",
-      "title": "Existing release oracle and complete handoff",
-      "command": "node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record",
-      "notes": [
-        "wave31-status indexes all twelve deliverables with source/tuple/consumer/commands and the remaining gates; no new gate or ledger."
-      ],
-      "result": "SEE_RUN",
-      "counts": {},
-      "cases": []
     }
   ],
   "release": {
@@ -1466,12 +1313,12 @@
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-16T01:10:48.860Z",
+    "checkedAt": "2026-11-16T04:37:07.960Z",
     "source": {
-      "commit": "d32080f543ceac7f127113a5a0adefa232f718f0",
+      "commit": "a933479b7ae8cd591f9e2032d70c9b2dcdd356bd",
       "dirty": false
     },
-    "expectedSource": "d32080f543ceac7f127113a5a0adefa232f718f0",
+    "expectedSource": "a933479b7ae8cd591f9e2032d70c9b2dcdd356bd",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -1840,6 +1687,11 @@
       },
       {
         "id": "E1-MUTATE-PILOT-NO-ORACLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E1-LIFECYCLE-BIRTH-NO-SET",
         "required": true,
         "status": "PASS"
       },
@@ -2251,31 +2103,31 @@
       "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability; there is no allow-gap switch."
     ]
   },
-  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T01-04-18-721Z",
+  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z",
   "evidence": {
-    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T01-04-18-721Z/report.json",
-    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T01-04-18-721Z/release.json",
+    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/report.json",
+    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/release.json",
     "screenshots": [
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T01-04-18-721Z/screenshots/desktop-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T01-04-18-721Z/screenshots/notebook-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T01-04-18-721Z/screenshots/mobile-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T01-04-18-721Z/screenshots/mobile-navigation.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T01-04-18-721Z/screenshots/mobile-detail.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T01-04-18-721Z/screenshots/desktop-delivered.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T01-04-18-721Z/screenshots/desktop-error.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T01-04-18-721Z/screenshots/desktop-offline.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T01-04-18-721Z/screenshots/desktop-keyboard.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T01-04-18-721Z/screenshots/mobile-conversations.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T01-04-18-721Z/screenshots/desktop-verification-blocked.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T01-04-18-721Z/screenshots/desktop-verification-recovered.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T01-04-18-721Z/screenshots/desktop-review-activity.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T01-04-18-721Z/screenshots/mobile-attention-inbox.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T01-04-18-721Z/proposal-preview-desktop.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T01-04-18-721Z/proposal-preview-notebook.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T01-04-18-721Z/proposal-preview-mobile.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T01-04-18-721Z/screenshots/context-confirm-desktop.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T01-04-18-721Z/screenshots/context-confirm-mobile.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T01-04-18-721Z/screenshots/context-history-mobile.png"
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/screenshots/desktop-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/screenshots/notebook-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/screenshots/mobile-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/screenshots/mobile-navigation.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/screenshots/mobile-detail.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/screenshots/desktop-delivered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/screenshots/desktop-error.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/screenshots/desktop-offline.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/screenshots/desktop-keyboard.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/screenshots/mobile-conversations.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/screenshots/desktop-verification-blocked.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/screenshots/desktop-verification-recovered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/screenshots/desktop-review-activity.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/screenshots/mobile-attention-inbox.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/proposal-preview-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/proposal-preview-notebook.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/proposal-preview-mobile.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/screenshots/context-confirm-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/screenshots/context-confirm-mobile.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/screenshots/context-history-mobile.png"
     ],
     "matrix": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/release-matrix.json",
     "executionStatus": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/execution-status.json",
