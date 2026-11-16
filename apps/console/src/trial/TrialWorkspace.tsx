@@ -40,6 +40,7 @@ export interface TrialWorkspaceProps {
   readonly recipes?: readonly TrialRecipeSuggestion[] | undefined
   readonly recipesLoading?: boolean | undefined
   readonly recipesError?: string | undefined
+  readonly onReloadRecipes?: (() => void) | undefined
   readonly onOpenRecipe?: ((selection: TrialRecipeSelection) => void) | undefined
   readonly onAction: (action: TrialNavigationAction) => void
   readonly onReload?: (() => void) | undefined
@@ -98,7 +99,7 @@ export function TrialWorkspace({
   readiness, loading = false, error, unavailable = false, configuration, activeProjectId,
   activeConversationTitle, insights, insightWindow, onSelectInsightWindow, insightsLoading = false,
   insightsError, onReloadInsights, onDownloadInsights, insightsDownloading = false, insightsDownloadError,
-  support, recipes, recipesLoading = false, recipesError, onOpenRecipe,
+  support, recipes, recipesLoading = false, recipesError, onReloadRecipes, onOpenRecipe,
   onAction, onReload, headingLevel = 2, className,
 }: TrialWorkspaceProps) {
   const base = useId()
@@ -270,7 +271,14 @@ export function TrialWorkspace({
             {configuration === undefined
               ? <p className="trial-muted">项目明细尚未读取。</p>
               : configuration.projects.length === 0
-                ? <p className="trial-muted">还没有项目。导入后即可在对话中明确委托开发。</p>
+                ? (
+                  <div className="trial-empty-project">
+                    <p className="trial-muted">还没有项目。首次使用先导入一个本地 Git 项目，之后即可在对话中明确委托开发。</p>
+                    {actions.some(item => item.action === 'import_project') && (
+                      <button type="button" className="quiet" aria-label="在项目列表导入第一个项目" onClick={() => run('import_project')}>导入项目</button>
+                    )}
+                  </div>
+                )
                 : (
                   <ul className="trial-projects" aria-label="已配置项目">
                     {configuration.projects.map(project => {
@@ -420,7 +428,15 @@ export function TrialWorkspace({
               <h3 id={recipesId} className="trial-section-title"><ClipboardList size={15} aria-hidden="true" />配方草案</h3>
               <span className="trial-panel-meta">只读声明 · 不执行</span>
             </div>
-            {recipesError !== undefined && <p className="trial-muted" role="alert">配方草案暂时无法读取；原委托表单仍可使用。</p>}
+            {recipesError !== undefined && (
+              <div className="trial-banner trial-banner-danger" role="alert">
+                <TriangleAlert size={17} aria-hidden="true" />
+                <p><strong>配方草案暂时无法读取</strong><span>{recipesError} 原委托表单仍可使用。</span></p>
+                {onReloadRecipes !== undefined && (
+                  <button type="button" className="quiet" onClick={onReloadRecipes}>重试</button>
+                )}
+              </div>
+            )}
             {recipesLoading && <p className="trial-muted" role="status">正在读取项目声明…</p>}
             {!recipesLoading && recipesError === undefined && recipes !== undefined && recipes.length === 0 && (
               <p className="trial-muted">该项目没有可用的声明草案。</p>

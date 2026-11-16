@@ -33,6 +33,7 @@ declare global {
     __TRIAL_RECIPE_SELECTION__?: unknown
     __TRIAL_WINDOWS__?: number[]
     __TRIAL_EXPORTS__?: number
+    __TRIAL_RECIPE_RELOADS__?: number
     __TRIAL_SAME_READS__?: number
   }
 }
@@ -49,6 +50,7 @@ window.__TRIAL_DISABLED_READS__ = 0
 window.__TRIAL_RECIPES__ = []
 window.__TRIAL_WINDOWS__ = []
 window.__TRIAL_EXPORTS__ = 0
+window.__TRIAL_RECIPE_RELOADS__ = 0
 const nativeFetch = window.fetch.bind(window)
 window.fetch = ((input: RequestInfo | URL, init?: RequestInit) => {
   requests.push(typeof input === 'string' ? input : input instanceof URL ? input.href : input.url)
@@ -93,6 +95,7 @@ function PropsHarness({ state }: { readonly state: TrialHarnessState }) {
         recipes={props.recipes}
         recipesLoading={props.recipesLoading}
         recipesError={props.recipesError}
+        onReloadRecipes={() => { window.__TRIAL_RECIPE_RELOADS__ = (window.__TRIAL_RECIPE_RELOADS__ ?? 0) + 1 }}
         insightWindow={props.insightWindow}
         insightsLoading={props.insightsLoading}
         insightsError={props.insightsError}

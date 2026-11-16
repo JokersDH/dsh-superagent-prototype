@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 8,
+  "owner": "F",
+  "wave": "product-wave-32",
+  "goal": "whole-subsystem first-run workbench: status, project selection, template to original form, decisions/candidates, delivery and recovery in the real precision desktop UI",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-f",
+  "branch": "codex/g4-trial-experience",
+  "baseMain": "58b4e4c8",
+  "mergedMain": "58b4e4c8",
+  "mergeCommit": "bf6a08ce",
+  "appSource": "303b2c6a974856661c21d0617bd710ebe87374d1",
+  "finalSourceCommit": null,
+  "dirty": [],
+  "state": "SOURCE_READY_WITH_INSTALLED_AND_EXTERNAL_CALLBACK_PENDING",
+  "wholeBlock": {
+    "firstUse": "state strip + next action + empty-project inline import (existing onAction, unique accessible name)",
+    "modelExecutor": "separate facts and actions; configuration-present is not execution authority; blocked/unknown/readonly explicit",
+    "projectSelection": "existing sidebar chips + trial current project/rows; no second catalog",
+    "templateToForm": "main 0077 server-preview suggestions -> restricted selection -> original NewWorkForm preview/apply/edit/confirm",
+    "decisionsCandidates": "existing待我决定/工作与交付/交付详情; trial returns to original object with draft",
+    "delivery": "controlled fixture two projects: delegation/question/answer/PASS/evidence/manual accept; reload history",
+    "recovery": "readiness retry, recipe error retry (when callback supplied), export retry, auth/legacy/503/404, late/identity isolation"
+  },
+  "implementedThisWave": [
+    "trial-empty-project: in-place 导入项目 action using the existing navigation callback; unique accessible name to keep main toolbar locator unambiguous",
+    "trial-recipes: optional onReloadRecipes; error becomes an alert with explicit retry, no direct HTTP",
+    "export toolbar: downloading status, disabled reason, display-only note, error alert with retry, no button when callback absent",
+    "support/diagnostics: collapsed read-only summary (mode/startup/project/conversation/window/config/observedAt/package/source), no secrets",
+    "observedAt/current-scope display and scope-preview consistency retained",
+    "mobile/keyboard/layout audit extended to new states"
+  ],
+  "consumers": {
+    "mainApp": "trial-workbench-browser 8/8 PASS after changes",
+    "mainObservationExport": "usage-observation-browser 13/13 PASS (7/30, scope, late/503/404, export/download)",
+    "mainRecipeTemplate": "project-recipes-browser 8/8 PASS (trial suggestions -> original form -> two manual accepts)",
+    "fOwned": [
+      "trial-states 33/33 (first-use empty project, recipe retry, export toolbar, support panel, mobile/keyboard)",
+      "app-daily-flow 7/7 (two projects, question/evidence/accept, decisions/works return, reload)",
+      "trial-http 6/6 (real readiness/configuration)"
+    ]
+  },
+  "commands": [
+    { "command": "node e2e/trial/run-all.mjs", "exit": 0, "result": "10/10 suites" },
+    { "command": "node --test test/trial/*.case.ts", "exit": 0, "result": "20 PASS" },
+    { "command": "npx tsc -p tsconfig.json --noEmit", "exit": 0 },
+    { "command": "npx tsc -p e2e/trial/tsconfig.json --noEmit", "exit": 0 },
+    { "command": "npx vite build", "exit": 0 },
+    { "command": "node tests/integration/trial-workbench-browser.mjs", "exit": 0, "result": "8/8 PASS" },
+    { "command": "node tests/integration/usage-observation-browser.mjs", "exit": 0, "result": "13/13 PASS" },
+    { "command": "node tests/integration/project-recipes-browser.mjs", "exit": 0, "result": "8/8 PASS" }
+  ],
+  "actualObjects": {
+    "source": "main 58b4e4c8 / App 303b2c6a",
+    "r1InstalledArtifact": {
+      "path": "/Users/hh/Desktop/joker/pa-artifacts/wave30-target/wave30-target-8296720.tar.gz",
+      "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "build": "8296720d8a25f38c",
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "bytes": 20458670,
+      "entries": 6849,
+      "fInteraction": "read-only bundle inspection; no instance started; installed user flow E-owned"
+    },
+    "currentPersonalPreviewSource": "b72e935d packaging source; F did not install or verify it",
+    "successorArtifact": "NOT_TESTED by F"
+  },
+  "mainMergedVsCandidate": {
+    "merged": ["trial readiness/workbench", "7/30 observation", "recipes -> original form", "observation export UI", "support panel", "empty-project inline import"],
+    "candidateNotWired": ["onReloadRecipes optional callback: main currently does not pass it, so recipe error retry is hidden (accurate fallback)"]
+  },
+  "positiveNegative": {
+    "positive": ["first-run empty project -> inline import opens original form", "unconfigured model/blocked executor distinguish discussion vs execution", "two-project delivery and return", "export explicit click, no auto download", "support collapsed and keyboard-openable"],
+    "negative": ["readonly no import/approval", "blocked/expired project no template", "declared/preview scope mismatch refused", "recipe/export/readiness errors show bounded recovery", "late/old identity cannot overwrite current", "reload does not fabricate unsent draft"]
+  },
+  "layers": {
+    "source": "DELIVERED + main source integration",
+    "controlled": "DELIVERED (main controlled browser + F fixture journeys)",
+    "installed": "NOT_REACHED by F (R1 inspected only; current preview package not installed)",
+    "native": "0 turns",
+    "recovery": "not applicable to F; no new work/registry substitute",
+    "value": "no efficiency/cost claim"
+  },
+  "remaining": [
+    "main may pass onReloadRecipes to expose recipe retry in the default App",
+    "D/E must verify the current packaging/artifact on their exact bytes; F does not self-admit installed",
+    "real long auth expiry, manual screen-reader, non-Chromium, 200% zoom/forced-colors",
+    "native/vendor/model and benefit/value research intentionally not measured"
+  ],
+  "preserved": {
+    "userServicesChanged": 0,
+    "stateProfileTarLedgerTouched": false,
+    "newCheckout": false,
+    "resetOrClean": false,
+    "privateTempRoots": "under /tmp and removed",
+    "autoVendorModelNativeTurns": 0
+  }
+}

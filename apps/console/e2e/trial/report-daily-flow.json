@@ -16,61 +16,61 @@
   "posts": [
     "/v1/commands",
     "/v1/commands",
-    "/v1/works/18b39e90cc487126f1c4f228c864d3c1/review-activity",
+    "/v1/works/37eceda6e68f5c5ff38db962f729c771/review-activity",
     "/v1/commands",
-    "/v1/works/18b39e90cc487126f1c4f228c864d3c1/review-activity",
-    "/v1/projects/project-9b1e78c4695ee3f05c2f7738/recipes/preview",
-    "/v1/projects/project-9b1e78c4695ee3f05c2f7738/recipes/preview",
-    "/v1/projects/project-9b1e78c4695ee3f05c2f7738/recipes/preview",
+    "/v1/works/37eceda6e68f5c5ff38db962f729c771/review-activity",
+    "/v1/projects/project-ea14463d38ff0bede985f789/recipes/preview",
+    "/v1/projects/project-ea14463d38ff0bede985f789/recipes/preview",
+    "/v1/projects/project-ea14463d38ff0bede985f789/recipes/preview",
     "/v1/commands",
-    "/v1/works/bba35a2e92187db54c0f7a4774c21b42/review-activity",
+    "/v1/works/2b05b99a4dc62c0eb288f76f5436dc5c/review-activity",
     "/v1/commands",
-    "/v1/works/bba35a2e92187db54c0f7a4774c21b42/review-activity",
-    "/v1/projects/project-bf05808d1944908116b9a831/recipes/preview",
-    "/v1/projects/project-bf05808d1944908116b9a831/recipes/preview",
-    "/v1/projects/project-bf05808d1944908116b9a831/recipes/preview",
-    "/v1/projects/project-bf05808d1944908116b9a831/recipes/preview",
-    "/v1/projects/project-bf05808d1944908116b9a831/recipes/preview",
-    "/v1/projects/project-bf05808d1944908116b9a831/recipes/preview"
+    "/v1/works/2b05b99a4dc62c0eb288f76f5436dc5c/review-activity",
+    "/v1/projects/project-513ae02c1a30aadec17c58d3/recipes/preview",
+    "/v1/projects/project-513ae02c1a30aadec17c58d3/recipes/preview",
+    "/v1/projects/project-513ae02c1a30aadec17c58d3/recipes/preview",
+    "/v1/projects/project-513ae02c1a30aadec17c58d3/recipes/preview",
+    "/v1/projects/project-513ae02c1a30aadec17c58d3/recipes/preview",
+    "/v1/projects/project-513ae02c1a30aadec17c58d3/recipes/preview"
   ],
   "modelCalls": 0,
   "reviewActivityConflicts": 2,
-  "generatedAt": "2026-11-15T15:14:05.225Z",
+  "generatedAt": "2026-11-16T03:03:00.450Z",
   "results": [
     {
       "id": "ALPHA-QUESTION-VERIFY-EVIDENCE-ACCEPT",
       "status": "PASS",
-      "ms": 2140,
+      "ms": 3386,
       "detail": "Alpha delegation, native question, answer, PASS verification, evidence and acceptance"
     },
     {
       "id": "ALPHA-TRIAL-IDENTITY",
       "status": "PASS",
-      "ms": 197,
+      "ms": 135,
       "detail": "the trial view shows the Alpha project, conversation and fixture execution honestly"
     },
     {
       "id": "BETA-DRAFT-AND-DELIVERY",
       "status": "PASS",
-      "ms": 2229,
+      "ms": 1945,
       "detail": "Beta delegation runs the pass fixture through verification and acceptance"
     },
     {
       "id": "BETA-TRIAL-AND-DRAFT-PRESERVED",
       "status": "PASS",
-      "ms": 130,
+      "ms": 131,
       "detail": "the second project keeps its own conversation, draft and delivery"
     },
     {
       "id": "DAILY-VIEWS-RETURN-TO-ORIGINAL",
       "status": "PASS",
-      "ms": 155,
+      "ms": 157,
       "detail": "decisions/works/delivery return to the original work without losing the draft"
     },
     {
       "id": "RELOAD-AND-EXISTING-HISTORY",
       "status": "PASS",
-      "ms": 1192,
+      "ms": 1226,
       "detail": "reload keeps delivered history/evidence and honest project identity; drafts are not invented"
     },
     {

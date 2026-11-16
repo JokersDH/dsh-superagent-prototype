@@ -1,42 +1,42 @@
 {
   "subject": "trial hook identity/async behavior with controlled transports (no product service or model)",
   "viewport": "1440x900",
-  "generatedAt": "2026-11-15T15:12:42.365Z",
+  "generatedAt": "2026-11-16T03:01:50.697Z",
   "results": [
     {
       "id": "IDENTITY-SWITCH-A-TO-B",
       "status": "PASS",
-      "ms": 1363,
+      "ms": 1355,
       "detail": "transport identity change cancels A, reads B once and rejects A late response"
     },
     {
       "id": "IDENTITY-SWITCH-BACK-HIDES-OLD-DATA",
       "status": "PASS",
-      "ms": 168,
+      "ms": 172,
       "detail": "switching identity hides the old service observation instead of relabelling it"
     },
     {
       "id": "SAME-TRANSPORT-IDENTITY-CHANGE",
       "status": "PASS",
-      "ms": 923,
+      "ms": 898,
       "detail": "an opaque identity change isolates results even when the transport object is unchanged"
     },
     {
       "id": "INLINE-PROPS-NO-LOOP",
       "status": "PASS",
-      "ms": 988,
+      "ms": 966,
       "detail": "inline transport objects do not cause a request loop"
     },
     {
       "id": "DISABLE-MID-FLIGHT",
       "status": "PASS",
-      "ms": 1178,
+      "ms": 1171,
       "detail": "disabling mid-flight clears loading, ignores the late response and re-enables with one read"
     },
     {
       "id": "AUTH-EXPIRY-KEEPS-LAST-OBSERVATION",
       "status": "PASS",
-      "ms": 715,
+      "ms": 685,
       "detail": "an auth failure keeps the prior observation and shows bounded copy"
     },
     {

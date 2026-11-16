@@ -41,7 +41,7 @@ main 0077 已把试用准备的真实 server-preview 建议接到原 NewWorkForm
 
 ### 2.2 观察导出与支持（main 已实现，F 为消费者）
 
-main 已通过 `onDownloadInsights/insightsDownloading/insightsDownloadError` 接入 `POST` 后的下载副作用。F 的组件只负责：明确点击、显示-only 说明、下载中状态、失败重试和旧包隐藏；真实文件生成/鉴权/取消仍由 main `useObservationDownload` 与 transport 完成。支持摘要通过可选 `support={{packageLabel, sourceLabel, note}}` 传入；缺少标签时显示“未提供/未声明”，不要伪造包身份。
+main 已通过 `onDownloadInsights/insightsDownloading/insightsDownloadError` 接入 `POST` 后的下载副作用；F 的组件在本轮补充下载中/失败重试/旧包无按钮/展示-only 说明。F 的组件只负责：明确点击、显示-only 说明、下载中状态、失败重试和旧包隐藏；真实文件生成/鉴权/取消仍由 main `useObservationDownload` 与 transport 完成。支持摘要通过可选 `support={{packageLabel, sourceLabel, note}}` 传入；缺少标签时显示“未提供/未声明”，不要伪造包身份。
 
 ### 2.3 真实观察（main 已实现 7/30，F 为消费者）
 
@@ -97,7 +97,7 @@ main 自有测试在本包改动后重跑：trial App 8/8、真实观察 6/6、0
 
 ## 6. 明确未达
 
-- main 已接入 0077 原表单模板与 0076 7/30 观察；D 的 1fbaf94 包未包含这些入口，installed 验收 NOT_REACHED。
+- main 已接入 0077 原表单模板与 0076 7/30 观察；本轮 F 新增可选 `onReloadRecipes`（main 未传时错误条只说明、不显示重试）与空项目内联导入按钮（复用原 `onAction('import_project')`，accessible name 唯一，避免与工具栏重复）。D 的准确安装验收仍由 E 负责。
 - J/G 模块未进入本仓库默认产品；F 只有 typed consumer、fixtures 与校验。
 - 真实 vendor/model/native 0；`app-daily-flow` 使用 controlled fixture（固定 scratch 写入），不是原生或安装包证明。
 - 非 Chromium、人工屏幕阅读器、真实服务端会话中途过期未测。

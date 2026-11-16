@@ -167,6 +167,12 @@ try {
     assert((await page.locator('.trial-panel').first().innerText()).includes('开发 0 · 讨论 0 · 可派工 0'), 'zero counts are real zero, not unknown')
     assert((await page.locator('.trial-panel').first().innerText()).includes('还没有项目'), 'empty project list is explained')
     assert((await labels())[0] === '导入项目', 'import is the primary action')
+    const emptyImport = page.locator('.trial-empty-project').getByRole('button', { name: '在项目列表导入第一个项目', exact: true })
+    assert(await emptyImport.count() === 1, 'the empty project state offers its next action in place')
+    await page.evaluate(() => { window.__TRIAL_ACTIONS__.length = 0 })
+    await emptyImport.click()
+    await page.waitForTimeout(80)
+    assert((await page.evaluate(() => window.__TRIAL_ACTIONS__ ?? [])).join(',') === 'import_project', 'the empty-state action uses the existing navigation callback')
     await page.locator('.trial-view').screenshot({ path: join(screenshots, 'no-projects.png') })
   }, 'an empty project set is an actionable state, not a blank panel')
 
@@ -473,6 +479,11 @@ try {
     assert(await page.locator('.trial-recipes [role=alert]').count() === 1, 'recipe failure is an explicit alert')
     assert((await page.locator('.trial-recipes').innerText()).includes('原委托表单仍可使用'), 'the failure names the fallback')
     assert(await page.locator('.trial-recipe').count() === 0, 'no stale recipe rows are shown after failure')
+    const before = await page.evaluate(() => window.__TRIAL_RECIPE_RELOADS__ ?? 0)
+    await page.locator('.trial-recipes [role=alert]').getByRole('button', { name: '重试', exact: true }).click()
+    await page.waitForTimeout(80)
+    assert(await page.evaluate(() => window.__TRIAL_RECIPE_RELOADS__) === before + 1, 'recipe retry asks main for one new read')
+    assert((await requests()).length === 0, 'recipe retry performs no direct request')
     await page.locator('.trial-view').screenshot({ path: join(screenshots, 'recipes-error.png') })
   }, 'recipe loading/failure keep the workspace usable and show no stale rows')
 
@@ -547,7 +558,7 @@ try {
     const mobilePage = await mobile.newPage()
     const mobileErrors = []
     mobilePage.on('pageerror', error => mobileErrors.push(error.message))
-    for (const state of ['configured', 'unconfigured', 'blocked', 'unknown', 'readonly', 'long', 'insights-unscoped', 'insights-wrong-project', 'insights-partial', 'recipes', 'recipes-scope', 'recipes-project-state', 'recipes-all-projects', 'recipes-error', 'insights-window', 'insights-export', 'support']) {
+    for (const state of ['configured', 'unconfigured', 'blocked', 'unknown', 'readonly', 'long', 'no-projects', 'insights-unscoped', 'insights-wrong-project', 'insights-partial', 'recipes', 'recipes-scope', 'recipes-project-state', 'recipes-all-projects', 'recipes-error', 'insights-window', 'insights-export', 'support']) {
       await mobilePage.goto(`${base}/e2e/trial/harness.html?state=${state}`, { waitUntil: 'networkidle' })
       await mobilePage.waitForSelector('.trial-view')
       const overflow = await mobilePage.evaluate(() => ({ page: document.documentElement.scrollWidth, client: document.documentElement.clientWidth }))
