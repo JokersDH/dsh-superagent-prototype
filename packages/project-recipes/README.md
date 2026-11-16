@@ -23,6 +23,7 @@ application's existing preview and explicit user confirmation.
 | `draft.ts` | `project-recipe-draft/1` | Result schema plus `draftRevision` / `parseProjectRecipeDraft`. |
 | `preview.ts` | `project-recipe-create-work-fields/1` | Reshape a `draft` into the existing `create_work` command input, with precise stale-input refusal. |
 | `rebind.ts` | `project-facts-rebind/1` | Compare a previous observation with a re-observed root: `current`/`changed`/`unbound`/`reidentified`, field-level changes, no root or grant in the report. |
+| `module.ts` | `project-recipes-module/1` | Deterministic self-description (contracts, catalog digest, vocabularies, version) for a same-version hand-off; no path or authority. |
 
 ## Guarantees
 

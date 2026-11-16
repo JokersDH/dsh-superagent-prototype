@@ -4,7 +4,7 @@
  */
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
-import { mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import { mkdtempSync, readFileSync, rmSync, statSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
@@ -107,6 +107,7 @@ test('--output never overwrites an existing file and writes an identical new one
     const written = run([...base, '--paths', 'src/', '--output', fresh])
     assert.equal(written.status, 0, written.stderr)
     assert.deepEqual(JSON.parse(readFileSync(fresh, 'utf8')), JSON.parse(written.stdout))
+    assert.equal(statSync(fresh).mode & 0o777, 0o600, 'new output files are private')
   })
 })
 

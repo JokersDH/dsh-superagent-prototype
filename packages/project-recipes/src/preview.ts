@@ -31,7 +31,8 @@ export interface CreateWorkFields {
   readonly authorization: 'none'
 }
 
-export type PreviewErrorCode = 'not_actionable' | 'revision_mismatch' | 'stale_inputs' | 'invalid_clock' | 'stale_draft_version'
+export const PREVIEW_ERROR_CODES = ['not_actionable', 'revision_mismatch', 'stale_inputs', 'invalid_clock', 'stale_draft_version'] as const
+export type PreviewErrorCode = (typeof PREVIEW_ERROR_CODES)[number]
 
 /** Which prerequisite changed, so a caller can tell the user exactly what to regenerate. */
 export type StaleInput = 'configuration' | 'facts' | 'expiry'

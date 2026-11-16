@@ -210,15 +210,7 @@ export async function main(argv: readonly string[], io: { stdout: (text: string)
     for (const note of notes) io.stderr(`note: ${note}\n`)
 
     const text = `${JSON.stringify(result, null, 2)}\n`
-    if (parsed.output !== undefined) {
-      const target = resolve(parsed.output)
-      try {
-        writeFileSync(target, text, { flag: 'wx', encoding: 'utf8' })
-      } catch {
-        throw new library.MetadataRefused('unreadable', target.split('/').pop() ?? 'output', '输出文件已存在或不可写；不覆盖既有文件')
-      }
-      io.stderr(`wrote: ${target}\n`)
-    }
+    if (parsed.output !== undefined) writeNewFile(library, parsed.output, text, io)
     io.stdout(text)
     if (result.status === 'needs_input') {
       for (const item of result.needsInput) io.stderr(`needs_input ${item.code} (${item.field}): ${item.message}\n`)
@@ -248,13 +240,29 @@ export async function main(argv: readonly string[], io: { stdout: (text: string)
   }
 }
 
+/** New reports are private (0600) and exclusive: an existing file or a dangling symlink is refused. */
+function writeNewFile(
+  library: Library,
+  output: string,
+  text: string,
+  io: { stderr: (text: string) => void },
+): void {
+  const target = resolve(output)
+  try {
+    writeFileSync(target, text, { flag: 'wx', encoding: 'utf8', mode: 0o600 })
+  } catch {
+    throw new library.MetadataRefused('unreadable', target.split('/').pop() ?? 'output', '输出文件已存在或不可写；不覆盖既有文件')
+  }
+  io.stderr(`wrote: ${target}\n`)
+}
+
 /** Migration comparison mode: observe an explicitly authorized root and compare to prior facts. */
 async function rebind(parsed: Parsed, io: { stdout: (text: string) => void; stderr: (text: string) => void }): Promise<number> {
   const library = await loadLibrary()
   try {
     if (parsed.root === undefined) throw new UsageError('迁移对比需要 --root（明确授权的项目根）')
     if (parsed.facts !== undefined) throw new UsageError('迁移对比只使用 --root 重新观察，不接受 --facts')
-    for (const [flag, value] of [['--kind', parsed.kind], ['--paths', parsed.paths], ['--exclude', parsed.exclude], ['--criteria', parsed.criteria], ['--profile', parsed.profile], ['--output', parsed.output]] as const)
+    for (const [flag, value] of [['--kind', parsed.kind], ['--paths', parsed.paths], ['--exclude', parsed.exclude], ['--criteria', parsed.criteria], ['--profile', parsed.profile]] as const)
       if (value !== undefined) throw new UsageError(`${flag} 不能与 --previous-facts 同用`)
     const previous = library.readJsonFile(parsed.previousFacts!)
     const observedAt = parsed.now ?? new Date().toISOString()
@@ -265,7 +273,9 @@ async function rebind(parsed: Parsed, io: { stdout: (text: string) => void; stde
       ...(parsed.project === undefined ? {} : { projectId: parsed.project }),
       observedAt,
     })
-    io.stdout(`${JSON.stringify(result.report, null, 2)}\n`)
+    const text = `${JSON.stringify(result.report, null, 2)}\n`
+    if (parsed.output !== undefined) writeNewFile(library, parsed.output, text, io)
+    io.stdout(text)
     for (const note of result.report.notes) io.stderr(`note: ${note}\n`)
     if (result.report.status === 'unbound') return EXIT.needsInput
     if (result.report.status === 'reidentified') {

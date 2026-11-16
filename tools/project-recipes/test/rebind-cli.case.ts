@@ -4,7 +4,7 @@
  */
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
@@ -65,6 +65,20 @@ test('an unregistered or missing root is unbound with exit 3, not a fake current
     const report = RebindReportSchema.parse(JSON.parse(result.stdout))
     assert.equal(report.status, 'unbound')
     assert.equal(report.current, null)
+  })
+})
+
+test('a migration report can be written to a new private file, never over an existing one', () => {
+  withFixture(({ dir, previous }) => {
+    const target = join(dir, 'rebind-report.json')
+    const first = run(['--previous-facts', previous, '--root', join(dir, 'before'), '--now', NOW, '--output', target])
+    assert.equal(first.status, 0, first.stderr)
+    assert.deepEqual(JSON.parse(readFileSync(target, 'utf8')), JSON.parse(first.stdout))
+    assert.equal(statSync(target).mode & 0o777, 0o600, 'the report file is private')
+
+    const again = run(['--previous-facts', previous, '--root', join(dir, 'before'), '--now', NOW, '--output', target])
+    assert.equal(again.status, 5, 'an existing report is never overwritten')
+    assert.equal(readFileSync(target, 'utf8'), first.stdout)
   })
 })
 

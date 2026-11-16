@@ -9,14 +9,14 @@
  * root and dispatching controlled commands; no install, no script execution, no model/native call.
  */
 import assert from 'node:assert/strict'
-import { execFileSync } from 'node:child_process'
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
 import { ProductStore } from '../../../packages/storage/dist/index.js'
 import { createProductRuntime } from '../../../apps/coordinator/product/runtime.ts'
-import { ensureStarterProject, NativeProjectRegistry } from '../../../apps/coordinator/product/project-registry.ts'
+import { NativeProjectRegistry } from '../../../apps/coordinator/product/project-registry.ts'
+import { makeNpmProject, makePnpmProject, makePlainProject } from './project-fixtures.ts'
 import {
   createProjectFactsObserver,
   rebindRegisteredProject,
@@ -26,46 +26,19 @@ import {
 const KINDS = ['regression_fix', 'scoped_change', 'verification_followup'] as const
 const PROFILE = 'profile-fixture-pass'
 
-const git = (cwd: string, args: string[]) =>
-  execFileSync('git', ['-c', 'user.name=Personal Agent', '-c', 'user.email=agent@example.invalid', ...args], { cwd, stdio: 'ignore' })
-
-const initRepo = (path: string) => {
-  mkdirSync(join(path, 'src'), { recursive: true })
-  mkdirSync(join(path, 'test'), { recursive: true })
-  writeFileSync(join(path, 'src/index.mjs'), 'export const greet = name => `Hello, ${name}!`\n')
-  writeFileSync(join(path, '.gitignore'), 'node_modules/\n')
-  git(path, ['init', '-q'])
-  git(path, ['add', '.'])
-  git(path, ['commit', '-q', '-m', 'fixture'])
-}
-
-const makeNpmProject = (path: string) => {
-  initRepo(path)
-  writeFileSync(join(path, 'package.json'), JSON.stringify({ name: 'npm-app', packageManager: 'npm@11.6.0', engines: { node: '>=22' }, scripts: { test: 'node --test' } }))
-  writeFileSync(join(path, 'package-lock.json'), '{"lockfileVersion":3}')
-  git(path, ['add', '.'])
-  git(path, ['commit', '-q', '-m', 'npm lock'])
-}
-
-const makePnpmProject = (path: string) => {
-  initRepo(path)
-  writeFileSync(join(path, 'package.json'), JSON.stringify({ name: 'pnpm-app', packageManager: 'pnpm@11.7.0', engines: { node: '>=24' }, scripts: { test: 'node --test' } }))
-  writeFileSync(join(path, 'pnpm-lock.yaml'), "lockfileVersion: '9.0'\n")
-  git(path, ['add', '.'])
-  git(path, ['commit', '-q', '-m', 'pnpm lock'])
-}
+const paths = (root: string) => ({ plain: join(root, 'plain'), npm: join(root, 'npm-app'), pnpm: join(root, 'pnpm-app') })
 
 const fixture = (t: { after(fn: () => void): void }) => {
   const root = mkdtempSync(join(tmpdir(), 'pa-recipes-first-user-'))
   const stateRoot = join(root, 'state')
   mkdirSync(stateRoot, { mode: 0o700 })
   const registry = new NativeProjectRegistry(stateRoot)
-  const paths = { plain: join(root, 'plain'), npm: join(root, 'npm-app'), pnpm: join(root, 'pnpm-app') }
-  ensureStarterProject(paths.plain)
-  makeNpmProject(paths.npm)
-  makePnpmProject(paths.pnpm)
-  const records = (Object.keys(paths) as (keyof typeof paths)[]).map((key) => {
-    const record = registry.prepare({ path: paths[key], displayName: `项目 ${key}`, check: 'node_test' })
+  const projectPaths = paths(root)
+  makePlainProject(projectPaths.plain)
+  makeNpmProject(projectPaths.npm)
+  makePnpmProject(projectPaths.pnpm)
+  const records = (Object.keys(projectPaths) as (keyof typeof projectPaths)[]).map((key) => {
+    const record = registry.prepare({ path: projectPaths[key], displayName: `项目 ${key}`, check: 'node_test' })
     registry.save(record)
     return record
   })
@@ -75,7 +48,7 @@ const fixture = (t: { after(fn: () => void): void }) => {
   const product = createProductRuntime({
     store,
     stateRoot,
-    scratchProject: paths.plain,
+    scratchProject: projectPaths.plain,
     projectRegistry: registry,
     projects: records.map((record) => ({
       id: record.id,
@@ -90,7 +63,7 @@ const fixture = (t: { after(fn: () => void): void }) => {
     store.close()
     rmSync(root, { recursive: true, force: true })
   })
-  return { root, paths, records, registry, product, actor }
+  return { root, paths: projectPaths, records, registry, product, actor }
 }
 
 test('three ordinary project shapes get a draft for every kind and create the original work', async (t) => {
