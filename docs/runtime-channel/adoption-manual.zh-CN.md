@@ -54,7 +54,7 @@ Native Driver ──facts/payloads──▶ AttemptIO
 
 ```bash
 cd apps/runner
-node --test --test-timeout=60000 test/attach-channel/*.test.ts     # 136/136
+node --test --test-timeout=60000 test/attach-channel/*.test.ts     # 147/147
 node_modules/.bin/tsc -p apps/runner/src/attach-channel/tsconfig.json
 ```
 
@@ -73,6 +73,9 @@ node_modules/.bin/tsc -p apps/runner/src/attach-channel/tsconfig.json
 | `actual-compatibility.test.ts` | 导出/契约面、v2/缺 id 拒绝、typed failure | 4 例 |
 | `actual-reattach.test.ts` | 临时 detach 后合法继任、未决写 indeterminate、旧 allowed 无效 | 2 例 |
 | `actual-transport-integration.test.ts` | journal 页游标、reference 帧、分块 payload digest、未匹配 ACK | 2 例 |
+| `actual-main-port-consumer.test.ts` | main `AttachedAttemptPort` + `attachRunnerAttempt` + 真实 Store ingress/payload/guard | 4 例 |
+| `actual-caller-succession.test.ts` | 两个真实 caller 的继任、未决写 indeterminate、terminal closed | 3 例 |
+| `actual-pressure-diagnostics.test.ts` | 慢 Store、typed ack-failure、64 饱和恢复、四端点隔离 | 4 例 |
 
 ## 5. 错误处理示例
 
@@ -94,6 +97,40 @@ try {
 ```
 
 消费者扩宽自己的错误 union 用 `AttachFailureCode`，不要用 `as` 绕过。
+
+## 5.0 main 原端口（attachPort）与原 caller
+
+main `fc38` 在 register+ready+current 与 endpoint 存在后返回可选的 `RunningAttempt.attachPort`：
+
+```ts
+type AttachedAttemptPort = {
+  registration: { socketPath: string; credentialPath: string; socketIdentity: { dev: number; ino: number } }
+  producer: RuntimeProducer
+}
+```
+
+它是**原登记数据**，不是命令许可；真正的写许可仍由 main/Broker 的 current/command digest/live answer guard 判。原 caller 在 `packages/execution/src/attached-attempt.ts`：
+
+```ts
+const attached = attachRunnerAttempt({
+  endpoint: port.registration,
+  producer: port.producer,
+  leaseId,                                  // 由调用方显式选择，不另造 owner
+  callbacks: {
+    fact,                                   // 原 Store ingress
+    payload: request => store.read(request.reference),   // 原 immutable body
+    nativeWrite: intent => guard(intent.command),        // 每次 fresh
+  },
+})
+await attached.run({ pollMs: 25, deadlineMs })   // 或 pollOnce()
+```
+
+注意点：
+
+- caller 以 `channelState()` 的 generation 做首次 CAS；之后的 poll 只读。
+- `payload` 回调收到的是 `reference`，返回值必须是**原 JSON body**；journal descriptor/chunk 是另一条协议。
+- `nativeWrite` 缺省即拒绝；回调内部异常会转成 ack-failure，不会伪造 receipt/allow。
+- 拒绝由 `NativeWriteDenied` 表示；用 `instanceof` 判定或 `toAttachFailure` 归一为 `native_write_denied`。错误对象字段形状保持原样，main 现有 consumer 的观测字符串不变。
 
 ## 5.1 terminal 与 detach
 

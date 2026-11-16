@@ -60,7 +60,7 @@ attach.close('Runner service is terminal')
 
 | code | 含义 | 后端/消费者动作 |
 | --- | --- | --- |
-| `native_write_denied` | 当前 guard 的权威否定 | 不写；可对同一原 command 重新询问 |
+| `native_write_denied` | 当前 guard 的权威否定（`instanceof NativeWriteDenied`） | 不写；可对同一原 command 重新询问 |
 | `indeterminate` | native 结果未知 | 回原 command reconciliation；禁止盲重试 |
 | `closed` | 通道/attempt 终态 | 停止使用 |
 | `timeout` | 本请求窗口到期 | facts 可用原 id 再确认；payloads 可重读 |

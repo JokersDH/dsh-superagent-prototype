@@ -182,10 +182,10 @@ attach.drop(leaseRef, 'socket closed')
 # 严格类型（strict + noUncheckedIndexedAccess + exactOptionalPropertyTypes）
 node_modules/.bin/tsc -p apps/runner/src/attach-channel/tsconfig.json
 # 行为矩阵（注入时钟，无 sleep、无真实网络/模型）
-cd apps/runner && node --test --test-timeout=8000 test/attach-channel/*.test.ts   # 136/136
+cd apps/runner && node --test --test-timeout=8000 test/attach-channel/*.test.ts   # 147/147
 ```
 
-覆盖：模块既有 scope 之外，wave-31 增加了真实消费者：真实 `serveRunner`（原 fact id/fresh intent/重放拒绝）、真实 `ProductStore` ingress（receipt 回读）、真实 Broker 等价 guard、真实 endpoint 双 client 与继任、ACK 窗口、64 上限背压、4 槽隔离、shutdown/malformed、公开接口兼容。完整清单与调用图见 `adoption-manual.zh-CN.md`；terminal/detach 与页/块语义见 `fault-states.zh-CN.md`。wave-27 的 44 个历史用例保留在原 scope 内。
+覆盖：模块既有 scope 之外，wave-31 增加了真实消费者：真实 `serveRunner`（原 fact id/fresh intent/重放拒绝）、真实 `ProductStore` ingress（receipt 回读）、真实 Broker 等价 guard、真实 endpoint 双 client 与继任、ACK 窗口、64 上限背压、4 槽隔离、shutdown/malformed、公开接口兼容。完整清单与调用图见 `adoption-manual.zh-CN.md`；terminal/detach 与页/块语义见 `fault-states.zh-CN.md`。wave-33 起同时消费 main 的 `RunningAttempt.attachPort` 数据形状与 `attachRunnerAttempt` caller（真实 Store ingress / 原 payload body / 逐意图 guard），见手册 §2.1。wave-27 的 44 个历史用例保留在原 scope 内。
 
 ## 9. 本文明确不证明的事
 
