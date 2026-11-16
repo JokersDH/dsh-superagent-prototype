@@ -27,6 +27,8 @@
 
 用户在本机浏览器管理项目/会话、讨论需求、确认委托、集中回答问题、审阅检查与patch、接受当前候选。后台协调器与网页独立，关网页不等于停止工作。每个内部试用者应有自己的本机安装、私有根、账号与项目，不是多人共享服务。
 
+2026-11-16范围调整：当前完整方案B不包含CAC接入或CAC专属subteam协作实验；不占当前实现、验收、排期或完成度分母，不作为当前交付门槛。现有DriverKit扩展边界保留，后续独立实验时再确定适配设计，不提前实现CAC专用基础设施。
+
 外部系统是本地Git项目、原生Agent CLI、已配置模型API和明确授权的离线包缓存。ZCode、DeepSeek Harness、CAC、跨机共享/组织ACL、自动合并部署、动态多writer竞速均不是当前生产能力。
 
 ```mermaid
@@ -182,7 +184,7 @@ HTTP仅loopback，使用本机session/Bearer和origin校验；恢复只读单独
 | 确认/检查/人工接受分离 | 模型建议不会自授权限；增加人工步骤，自动接受需另有证据与授权 |
 | 历史真实性与当前可执行性分离 | 旧记录保留可查，但不复活旧授权；coverage必须保留unknown/truncated |
 
-未来增加Agent，优先复用DriverKit和原Questions/Completion/UI，只新增真实协议adapter、版本/profile/capability证据及隔离/停止/恢复conformance。仅换模型不算第二协议；CAC native subteam可保留在CAC内部，跨session问题仍经主产品的原身份/批准链，不能另设一个调度权威。
+未来增加Agent，优先复用DriverKit和原Questions/Completion/UI，只新增真实协议adapter、版本/profile/capability证据及隔离/停止/恢复conformance。仅换模型不算第二协议。CAC接入及其native subteam仅作后续独立实验候选；当前不实施，未来再验证是否沿CAC内部团队能力和产品原身份/批准链适配，不能另设调度权威。
 
 ## 风险与未决项
 

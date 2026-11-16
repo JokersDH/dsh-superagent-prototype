@@ -2,7 +2,7 @@
   "protocol": "product-completion-estimate/1",
   "date": "2026-11-16",
   "productSource": "303b2c6a974856661c21d0617bd710ebe87374d1",
-  "method": "Same original12 deliverable weights and4 SchemeB group weights; evidence-based engineering estimate with uncertainty. No credit for agent count, planned outcomes, commits or test-pass ratio; not release authorization.",
+  "method": "Original12 stable-alpha weights unchanged; original including-CAC assessment retained in fullSchemeB. Current reporting uses currentSchemeB: retained original70:15:10 weights normalized over95 after explicit user scope change. No implementation credit or release authorization from scope changes.",
   "stableAlpha": {
     "rawScore": 76,
     "totalWeight": 100,
@@ -200,5 +200,61 @@
       "after": 3,
       "reason": "main preparePersonalStartup处理缺CLI/版本不符/探测失败为executionUnavailable，讨论/审阅可启动；显式discussion-only/currentreadiness与R1独立准入有证据。原生控制仍在questions/recovery项扣分。"
     }
-  ]
+  ],
+  "currentSchemeB": {
+    "scopeId": "scheme-b-without-cac-2026-11-16",
+    "label": "当前完整方案B（不含CAC）",
+    "reason": "User explicitly deferred CAC integration and CAC-specific subteam experiments to a later independent experiment.",
+    "excludedGroupIds": [
+      "cac"
+    ],
+    "groups": [
+      {
+        "id": "stable-alpha",
+        "name": "首期稳定内测",
+        "weight": 70,
+        "completion": 76
+      },
+      {
+        "id": "multi-protocol",
+        "name": "多协议扩展",
+        "weight": 15,
+        "completion": 10
+      },
+      {
+        "id": "innovation-value",
+        "name": "创新收益验证",
+        "weight": 10,
+        "completion": 10
+      }
+    ],
+    "totalWeight": 95,
+    "weightedCompleted": 55.7,
+    "completionPercent": 58.6,
+    "roundedEstimatePercent": 60,
+    "scopeChangeOnly": true,
+    "newImplementationCredit": 0,
+    "releaseApproved": false,
+    "exclusions": [
+      {
+        "id": "cac",
+        "name": "CAC接入与CAC专属协作实验",
+        "status": "DEFERRED_FUTURE_EXPERIMENT",
+        "excludedFromCompletionDenominator": true,
+        "blocksCurrentDelivery": false,
+        "implementationScheduled": false
+      }
+    ],
+    "historicalIncludedCacSnapshot": {
+      "ref": "fullSchemeB",
+      "totalWeight": 100,
+      "rawScore": 55.7
+    },
+    "notes": [
+      "Stable-alpha twelve-item weights and scores remain unchanged.",
+      "The retained three groups keep original relative weights70:15:10 and are normalized over95; no reweighting between retained capabilities.",
+      "fullSchemeB remains the historical including-CAC assessment; use currentSchemeB for current reporting.",
+      "Second real protocol and innovation-value verification remain in current scope; deferring CAC does not mark those complete."
+    ]
+  }
 }

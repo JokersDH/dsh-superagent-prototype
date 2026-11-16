@@ -19,7 +19,7 @@ R2 sourcec0a1f897/build4dcd28f758bbb265/SHA405ecd02fcbf288bac0855e17911ec4035521
 
 ## 产品结论与文档
 
-沿[原分母](../wave13-admission/progress.json)重估：[当前76/100本机内测目标、55.7/100完整B](progress.json)，对外约75%和55%，不是精确完成率或发行授权。仅因备份/准确安装/有限独立验收/缺执行器退化的实际新证据增加7分；研发人数/提交/120成果/测试数不加分。
+沿[原权重](../wave13-admission/progress.json)重估：[本机内测76/100、审查时含CAC完整B55.7/100](progress.json)，不是精确完成率或发行授权。仅因备份/准确安装/有限独立验收/缺执行器退化的实际新证据增加7分；研发人数/提交/120成果/测试数不加分。用户随后明确将CAC留待独立实验，当前口径为同文件`currentSchemeB`：移出5权重，以55.7/95归一化为58.6%，约59%；原含CAC评估保留，范围变更不增加功能完成量。
 
 完整用户材料：[进度](../../../docs/product/STATUS.zh-CN.md)、[如何使用](../../../docs/ASSISTANT-GUIDE.zh-CN.md)、[架构](../../../docs/product/ARCHITECTURE.zh-CN.md)、[创新现状](../../../docs/product/INNOVATION.zh-CN.md)。
 
