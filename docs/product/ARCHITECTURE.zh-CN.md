@@ -7,7 +7,7 @@
 | 项目 | 当前事实 |
 | --- | --- |
 | 仓库 | `https://github.com/JokersDH/dsh-superagent-prototype` |
-| 本文基线 | 2026-11-16；main文档8deda18d，产品运行源码303b2c6a |
+| 本文基线 | 2026-11-16；产品运行源码23d5a98e，原回调和默认诊断消费者见0086，原恢复仍单独验 |
 | 首个用户界面 | React网页工作台；本机CLI负责启停/发行，暂无桌面壳 |
 | 技术栈 | TypeScript、Node24、pnpm workspace、React18/Vite、Hono、Zod、SQLite、Git worktree |
 | 原生执行 | 当前生产路径为Codex app-server；历史准入版本`codex-cli 0.164.0`，新版本需重新验证 |
@@ -41,6 +41,8 @@ flowchart LR
 ```
 
 ## 运行形态
+
+最新接线见[0086](../rfcs/WP-16/0086-main-native-callbacks-and-support-consumer.md)：原NativeProductAttempt三类回调与stdio共用同一guard/载荷/Store；Gmetadata支持已从认证只读GET接到真实App下载。内部回调非公开授权，未知安装身份保持null；这不等于原Work故障恢复已完成。[当前验收边界](../rfcs/WP-16/0087-wave-34-reviewed-architecture.md)另列。
 
 ```mermaid
 flowchart TB

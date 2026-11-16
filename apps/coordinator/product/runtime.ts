@@ -215,6 +215,7 @@ export function createProductRuntime(
     projectRecipePreview: input => recipes.preview(input),
     usageObservation: query => usage.read(query),
     usageObservationDownload: query => usage.download(query),
+    usageSupportDownload: query => usage.support(query),
     recovery: async () => recovery.inspect(),
     recoveryActivation: async activationId => readRecoveryActivationRecord(store, activationId, options.principal),
     ...(completedReplies ? { replyCandidates: async (messageId: string) => proposals.replyCandidates(messageId) } : {}),
