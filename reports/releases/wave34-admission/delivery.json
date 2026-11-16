@@ -1,0 +1,239 @@
+{
+  "protocol": "wave34-delivery-admission/1",
+  "date": "2026-11-16",
+  "scope": "Read-only wave33 D/E engineering acceptance, exact archives and source closure, actual installed consumer provenance, nonempty data and byte continuity, full recorded oracle mutations and actual-source pure lifecycle simulations. No start/stop, live signals, global discovery, model/native tasks, new archive or candidate/assertion modification.",
+  "fixedInputs": {
+    "main": "e05ee8d8164a010abf87e0f389382a3f94de2257",
+    "mainRuntimeCheckpoint": "fc38bf65",
+    "D": "7b8022e6c8f02bc2701a8df8d0a6a97dc6b56422",
+    "DDirty": false,
+    "DBuildSource": "048f0184606202b0b39e7426b7747f3fe57541c1",
+    "E": "cc2f5facc5e1576b35c8227526e0358b4f590d00",
+    "EDirty": false,
+    "EMeasuredSource": "c2568908c327590ca5756d9040b03a8997b701ca",
+    "EMeasuredSourceDirty": false,
+    "EActualRun": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T08-53-56-787Z/report.json",
+    "ECheckedAt": "2026-11-16T09:02:00.331Z"
+  },
+  "newDCurrentCohort": {
+    "name": "W33 fc38 candidate",
+    "source": "048f0184606202b0b39e7426b7747f3fe57541c1",
+    "buildId": "f880e5bc9c6c1c57",
+    "tar": "/Users/hh/Desktop/joker/pa-artifacts/wave33-target/wave33-target-f880e5b.tar.gz",
+    "tarSha256": "ee45c92c7c5a8f2caa0449572b14bf97175b0392f1fd92c6f89d7a19464604e8",
+    "tarBytes": 20547728,
+    "tarEntries": 7424,
+    "innerEntries": 6867,
+    "innerManifestSha256": "f8d40ee86e10bb0319cb1959744760f986609f81eaa6e8db67f2cdca9de44693",
+    "zip": "/Users/hh/Desktop/joker/pa-artifacts/wave33-preview-f880e5b/PersonalAgent-Preview-f880e5b.zip",
+    "zipSha256": "46e01c8c7b79818d19e019f6d2208ad54c5c9538674218f85455434eff8207f9",
+    "zipBytes": 63481603,
+    "archiveEntries": 7435,
+    "outerEntries": 6875,
+    "outerManifestSha256": "13e46a1018abf9e431be87049ae267d7ad92f69469a3165aeb25f445e8847081",
+    "environment": { "platform": "darwin", "arch": "arm64", "node": "24.21.0", "abi": "137", "sqlite": "3.53.4", "schema": 18 },
+    "independentVerification": {
+      "actualZipStaticVerifier": "VERIFIED_STATIC_exit0",
+      "zipCRCInventoryRuntimeLicenseAndExactCommands": "PASS",
+      "runtimeNodeSha256": "e4b5a3af0e05c75de2eae013904145f40fe7fc2a6e6f17510128bf45cca4e79b",
+      "fullNodeLicenseSha256": "5888dbb9a1d2b18f2c3e6c5f6af1b39de658372b402a0577b002777f14c62ace",
+      "originalHelperSha256": "8de31c59d8c9afe90d6464a9b9208d3757a57e76ea49d7af20e473b90360c5dc",
+      "freshInnerExtraction": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-wave34-inner-fiwSDU/install",
+      "all6867InnerFilesAndLinks": "PASS_zero_mismatches",
+      "tarAndZipInnerManifestShaMatch": true,
+      "sourceClosure": { "records": 192, "uniquePaths": 192, "errors": [], "rawGroupedRecords": 204 },
+      "sourceClosureOld209Count": "CLOSED: current canonical record set is deduplicated192 and old W32 historical197/192 is accurately retained",
+      "diffFc38ToBuildAppsPackages": "EMPTY",
+      "packagedStructuredSourcemap": "Actual hashed App/TrialWorkspace/support sources contain download, expanded support and recipe retry consumers; fc38 UI is really in this package",
+      "packageCodeExecutedByReviewer": false,
+      "releaseApprovedByStaticCheck": false
+    },
+    "DSubmittedOrdinaryLifecycle": "New private HOME cold/reuse/restart/stop, same PID13026 reuse, later PID14468, existing private model configuration and permission refusal are genuine submitted developer records on W33. No reviewer live rerun.",
+    "independentESameW33": "NOT_REACHED"
+  },
+  "DNonemptyBusiness": {
+    "status": "REAL_NEW_DATA_CONTINUITY_WITH_NARROW_PROVENANCE",
+    "producer": "/Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/create-wave33-nonempty.mjs",
+    "producerScope": "Current D source createControlledProduct/ProductStore/Application, not an installed personal/native project. The current runtime.ts, completion.ts and storage dist/index.js used by the producer are independently byte-identical to the W33 inner inventory.",
+    "reader": "/Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/verify-wave33-restore.mjs",
+    "readerScope": "Current D ProductStore reader with original IDs and per-artifact bytes; this helper opens ProductStore and is not a public HTTP authorization proof. Reviewer independently used Node SQLite readOnly, not this writer-capable constructor.",
+    "workId": "e9c9a0de8048124ad16d7a04bd979024",
+    "projectId": "project-wave33",
+    "sourceState": "/tmp/w33-nonempty/state",
+    "restoredState": "/tmp/w33-home/restored",
+    "upgradeState": "/tmp/w33-upstate",
+    "independentReadOnlySql": {
+      "source": { "works": 1, "contracts": 1, "acceptances": 1, "artifacts": 20 },
+      "restored": { "works": 1, "contracts": 1, "acceptances": 1, "artifacts": 20 },
+      "upgradeRootAtAudit": { "works": 1, "contracts": 1, "acceptances": 1, "artifacts": 21 },
+      "sameWorkIdAndProjectInAllRoots": true
+    },
+    "independentArtifactBytes": {
+      "fourDeliveredArtifactBytes": [1143, 187, 24, 380],
+      "sourceRestoredAndUpgradeRoots": "All four registered IDs/digests/actual bytes match the current recipe in each of the three roots",
+      "mismatches": []
+    },
+    "backup": { "status": "CREATED", "entries": 21, "artifacts": 20, "eventSeq": 51, "acceptedEventSeq": 49, "sha256": "be40f037fe85e1328e07183bef014a40b1ae9c1af11d3a41f4b3b09396d48d21" },
+    "sameCohort": "Source-generated business facts at048 match W33 product bytes; original W33 CLI backup/verify/restore handles the same data. This is not borrowed old R2/eventSeq0 evidence, but it remains controlled/source production plus installed data lifecycle, not original personal-project native execution.",
+    "publicRestoreScope": "Submitted actual recovery_readonly health and unauthorized403 are valid. An authorized public original-project historical read is not established by the direct Store positive.",
+    "upgrade": {
+      "baseline": "W32:88eb8c69b0671171/e8348a86",
+      "target": "W33:f880e5bc9c6c1c57/048f0184",
+      "rawResult": "CONFIRMED",
+      "targetHealth": "ok",
+      "sameSchema": 18,
+      "baselineDataPreparation": "Copied from the same-schema W33 controlled writer, explicitly disclosed in D limitations; not a real baseline-version-created or cross-schema migration proof",
+      "postUpgradeOriginalWorkAndBytes": "PASS"
+    },
+    "rollbackEvidenceConflict": {
+      "submittedRawFile": "/Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/reports/wave33/rollback.json",
+      "knownProbeRawFile": "/tmp/w33-rollback.json",
+      "bothRawResults": "BLOCKED_unknown_live_resource",
+      "rawUnknown": "Unregistered wrapper shell recorded by the original operation guard; no reviewer process action",
+      "summaryAndGuideClaim": "BINARY_ROLLED_BACK with pointer88eb and dataRolledBackfalse",
+      "actualDataPositive": "A W32 installed Store reader and matching four artifact bytes support continued data readability, but no successful original rollback receipt/exit was supplied",
+      "admission": "Preserve CONFIRMED upgrade and data continuity; full original rollback command success is NOT_ADMITTED until the successful operation-bound raw result is provided"
+    }
+  },
+  "EActualProgress": {
+    "counts": { "PASS": 306, "FAIL": 0, "NOT_TESTED": 20 },
+    "cohorts": {
+      "legacyRequiredTarget": "R1:82ee5b8f/8296720d/tar04926739",
+      "newActualOuterAndRecovery": {
+        "source": "e8348a864d7d192589e72b8099475520f841b1e5",
+        "buildId": "88eb8c69b0671171",
+        "tarSha256": "65c386d108d385c1e8463de33b801a1865925d5dd752a7b82a0c57974b8453ac",
+        "tarBytes": 20543106,
+        "zip": "/Users/hh/Desktop/joker/pa-artifacts/wave32-preview-88eb8c6/PersonalAgent-Preview-88eb8c6.zip",
+        "zipSha256": "0a46cd3620e00154ea13e7286dcc73e40ffad4df4522f2339e229ffcb027bc06",
+        "zipBytes": 63475809
+      },
+      "newDCurrentW33": "Not measured by this E run"
+    },
+    "outerConsumer": "E33-OUTER-ZIP now actually verifies/extracts the exact W32 ZIP, uses bundled Node and real Start/Stop/status over a private HOME. This is a real closure of the earlier tar-only ZIP-consumer gap.",
+    "recoveryConsumer": "E33-COHORT-RECOVERY uses the verified W32 outer's inner/runtime for first-run, controlled original Product delivery, nonempty backup/verify/restore and actual recovery-readonly HTTP Work/history/artifact reads. No current checkout supplies product runtime.",
+    "newNonemptyRecovery": {
+      "workId": "8ac7276b869418abc22880b27ca687fd",
+      "seed": "accepted recorded, phase delivered,4 delivered artifact IDs; sampled actual artifact bytes1143/213/24",
+      "backup": { "entries": 21, "artifacts": 20, "eventSeq": 51, "sha256": "48022b55c4bd74ba55844909f81746b2f70eb80b4028270ea284fa15d55a31b9" },
+      "readonly": "same delivered Work/artifact IDs, sampled bytes/history/goal equal, business422, provider requests0 before/after",
+      "limits": "Controlled project-atlas data, no executable authority on restore, no native/active same-Runner recovery. The completed seed has no demonstrated interrupted pending queue; general old-queue-held claims need their own rows and no-resend observations."
+    },
+    "recordedOracle": {
+      "method": "Actual evaluateRelease/tier/resolveFixtureDigest on the complete real report at its checkedAt and clean measured source, without freshness renewal",
+      "installedAlpha": { "required": 199, "ok": true },
+      "installedFunctional": { "required": 200, "ok": true },
+      "fullProduct": { "required": 201, "ok": false, "cause": "E5-NATIVE-DELIVERY absent and E5-NATIVE-CONTROL not executed" },
+      "scope": "This is a declared two-cohort aggregate, not199/200 installed cases all run on W32 and not any E verdict on W33. Preserve original R1 positives and new W32 subset separately."
+    },
+    "originalProjects": "Two personal project previews still needs_input and their executions use fixture project-atlas; E32-ORIGINAL-PROJECT-APPLICABLE remains honestly NOT_TESTED. Do not count this as original-project completion."
+  },
+  "pureControlsAndMutations": {
+    "oldParentNoSetHelper": [
+      { "case": "live parent/no set", "clean": false, "retained": true, "reason": "resources_unverified" },
+      { "case": "exited parent/no set", "clean": false, "retained": true, "reason": "resources_unverified" },
+      { "case": "complete known child still alive", "clean": false, "retained": true, "reason": "known_resource_alive_after_package_stop" },
+      { "case": "complete fixed set all exited", "clean": true, "retained": false }
+    ],
+    "helperOldP1": "CLOSED_IN_ACTUAL_HELPER: all four independent pure controls use synthetic ps/liveness/package responses and capture zero signals",
+    "fullReportMutationResults": [
+      { "mutation": "needs_input falsely claimed applicable", "oracle": "REFUSE_journey_invalid" },
+      { "mutation": "foreign executionProjectId while claiming original sameProject", "oracle": "REFUSE_journey_invalid" },
+      { "mutation": "reopen foundfalse/phasenull/artifacts0", "oracle": "REFUSE_journeyReopen_invalid" },
+      { "mutation": "actual outer phases empty after arrays", "oracle": "REFUSE_outerZip_invalid" },
+      { "mutation": "recovery subject source changed to W33 while outer remains W32", "oracle": "REFUSE_subject_mismatch" },
+      { "mutation": "bundled runtime digest mismatch", "oracle": "REFUSE_outerZip_invalid" },
+      { "mutation": "claim original sameProject with applicable draft and same IDs but scoped403", "oracle": "PASS_200_REQUIRED" },
+      { "mutation": "old E32 tar lifecycle empty after arrays", "oracle": "PASS_200_REQUIRED" },
+      { "mutation": "actual outer after rows name foreign PID42/43 without expectedStart", "oracle": "PASS_200_REQUIRED" },
+      { "mutation": "cohort recovery seed/read after arrays replaced with one foreign PID42/no expectedStart", "oracle": "PASS_200_REQUIRED" }
+    ],
+    "callerCleanupActualSourceVmControls": [
+      { "file": "tests/product-acceptance/cases/w33-outer-zip.mjs", "scenario": "Simulated Start spawned, next original status call throws", "stopAttempts": 0, "result": "rmSync(privateHome,recursive/force) captured while simulated child remains started" },
+      { "file": "tests/product-acceptance/cases/w33-cohort-recovery.mjs", "scenario": "Simulated startOwned RUNNING, next client fails, stopOwned returns UNKNOWN/resources_unverified", "result": "retainMaterial(root) then rmSync(privateHome,recursive/force) still captured while simulated child remains started" }
+    ],
+    "vmScope": "Original submitted case source evaluated unchanged with synthetic imports; no package code, API, server, real process, real deletion or signal executed"
+  },
+  "HReadyAcceptClosure": {
+    "report": "/Users/hh/Desktop/joker/superagent-agent-h/reports/trial-operations/wave33/package-88eb/lifecycle/lifecycle.json",
+    "actualSubject": "W32:88eb8c69b0671171",
+    "oldIssue": "H previously accepted immediately on currentCandidate presence, before trusted review availability",
+    "newSource": "lifecycle2.mjs requires actions.available.includes(accept_candidate) before the accept request",
+    "actualResult": { "accept": "recorded", "workId": "ca73397f13d97d6e419d8a4ca76cb205", "phase": "delivered", "artifacts": 4, "sameWorkReopened": true, "packageStop": "STOPPED" },
+    "interpretation": "This genuinely closes H's early-accept consumer issue on the installed controlled cohort. Preserve trusted review/machine/resource product gates; do not invent a second review or call the old rejection a persistent product capability defect.",
+    "staleNegativeLimit": "H sends a stale candidate after the successful acceptance; it still returns review-unavailable. That proves refusal, not the specific stale-generation guard cause. Native control and original-project semantics remain separate."
+  },
+  "findingsOrdered": [
+    {
+      "id": "E_NEW_OUTER_AND_RECOVERY_CALLERS_DELETE_MATERIAL_ON_UNKNOWN_FAILURE",
+      "priority": "P1_TEST_TOOL_MATERIAL_SAFETY",
+      "files": ["/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/cases/w33-outer-zip.mjs", "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/cases/w33-cohort-recovery.mjs"],
+      "lines": [192, 268],
+      "summary": "The old no-fixed-set helper is fixed, but its new callers bypass material retention. Outer failure unconditionally removes the private HOME without reconciling any already spawned Start. Recovery retains an UNKNOWN operation root and then unconditionally removes HOME, which contains the running install/Node.",
+      "independentEvidence": "Both original source functions reproduced in pure VM import stubs: simulated child started, outer status or recovery client failure, recursive/force private HOME removal captured. Recovery also captured UNKNOWN stop and retainMaterial before removal. Zero real process/delete/signal.",
+      "narrowCorrection": "Track the complete fixed birth/resource set through every start and catch/finally. Only release all associated HOME/install/state/model materials after complete proven exit; unknown retains the whole operation. A failed assertion must not authorize cleanup. Add actual-caller pure failure controls before further failure-window live tests.",
+      "scope": "New acceptance-tool failure cleanup; does not erase genuine recorded successful W32 stops or imply the ordinary product stop entry has this behavior."
+    },
+    {
+      "id": "E_FINAL_LIFECYCLE_VALIDATORS_DO_NOT_BIND_POSTSTOP_IDENTITIES",
+      "priority": "P2_ACCEPTANCE_EVIDENCE_COMPLETENESS",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/lib/release.mjs",
+      "lines": [511, 536, 541, 571],
+      "summary": "New outer empty arrays now reject, but deadAfter checks only nonempty safe pid and booleans. It does not bind expectedStart/pid/cardinality to the pre-stop set; actual outer and recovery accept foreign PID observations. Old tar lifecycle still accepts empty after arrays.",
+      "independentEvidence": "Complete real installed-functional200 report still passes old empty arrays, actual outer foreign42/43 without expectedStart and recovery one-row foreign42 despite two pre-stop resources.",
+      "narrowCorrection": "Use the existing strict fixed-set semantics for every phase, including negative/restored-mode branches; require exact pid/start/one-to-one coverage and explicit observations, original package status/exit and UNKNOWN retention. Keep all genuine complete-set positives."
+    },
+    {
+      "id": "E_CLAIMED_ORIGINAL_PROJECT_JOURNEY_DOES_NOT_REQUIRE_SCOPED_READ",
+      "priority": "P2_ACCEPTANCE_SEMANTICS",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/lib/release.mjs",
+      "line": 599,
+      "summary": "The gate correctly rejects false applicability and wrong execution identity, preserving a legal narrowed fixture positive. But when sameProject is explicitly true with draft/same project IDs, selected project insights403 still pass because only open200 is required.",
+      "independentEvidence": "Full recorded functional200 mutation with claimed original execution and scoped403 remains PASS.",
+      "narrowCorrection": "For the original-project claim require full applicable fields and same-project scoped7/30 identities/readable responses; retain the explicit narrow fixture/NOT_REACHED scope without pretending it satisfies the stronger claim."
+    },
+    {
+      "id": "D_ROLLBACK_SUMMARY_CONTRADICTS_SUBMITTED_RAW_RESULT",
+      "priority": "P2_DELIVERY_EVIDENCE",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/reports/wave33/rollback.json",
+      "summary": "The raw submitted result and preserved /tmp result are BLOCKED unknown_live_resource, but status/guide/summary say original rollback returned BINARY_ROLLED_BACK. Pointer/data-read observations do not supply that successful operation receipt.",
+      "narrowCorrection": "Retain the blocked attempt and provide a separate successful original CLI receipt/exit with exact operation/pointer/before-after identities, or narrow the claim to observed data/pointer continuity. Do not remove guards, force-clean unknown resources or rewrite the blocked raw record."
+    }
+  ],
+  "currentReusableCohorts": {
+    "independentlyMeasuredOrdinarySubset": "W32 sourcee834/build88eb/ZIP0a46: actual bundled outer entry, configuration and controlled nonempty readonly recovery are now independently recorded by E. Reuse these exact bytes for that scope; not a full stable Beta/native/recovered-agent release.",
+    "currentFc38Candidate": "W33 source048/buildf880/ZIP46e: exact newest source/byte/developer candidate with real new nonempty continuity; E same-subject adoption is pending.",
+    "legacy": "R1 remains the legacy required-case cohort; aggregate199/200 is not automatically a complete verdict on W32 or W33.",
+    "selection": "Choose one explicit cohort for the next actual product outcome, retaining old scopes. Use W33's already frozen bytes when testing fc38; refreeze only for necessary changed runtime, not docs or test-only work. No new package was created by this review."
+  },
+  "nextLargerOutcomeThemes": {
+    "scope": "Six complete outcome themes per role for parent planning only; no task packets or new implementation dispatched here.",
+    "D": [
+      { "theme": "Complete ordinary installed operating lifecycle", "result": "One exact cohort supports cold/reuse/reopen/configuration/model selection/native availability with honest degradation, original state identity and supported-path diagnostics; no new wrapper or model budget." },
+      { "theme": "Managed nonempty upgrade and proven binary rollback", "result": "Baseline-origin business plus post-upgrade new data survive the original managed operation, rollback has actual successful receipt/exit and pointer provenance, unknown materials remain retained." },
+      { "theme": "Authorized historical-project migration and readonly continuity", "result": "Current cohort preserves original Work/accepted/artifact/history across move/restore, explicit current review/rebinding enables only selected public reads, true v1/v2 and required A migrations remain exact." },
+      { "theme": "Original-project installed workflow consumer integration", "result": "Consume main's valid two-project configuration/template/work/verification consumers on frozen bytes, close actual integration gaps without bypassing review/criteria or introducing another business ledger." },
+      { "theme": "Colleague deployment and compatibility support", "result": "Repeatable second-user/Apple Silicon installation and secure configuration without author state, complete license/platform reality, safe diagnosis/repair and measured cross-machine boundaries; signing remains explicitly scoped." },
+      { "theme": "Reproducible long-lived release and recovery maintenance", "result": "Single canonical source/dependency/ABI/console closure, coherent support and data protection, finite failure/resume controls and one stable handoff cohort for E; source/runtime changes batch by product need." }
+    ],
+    "E": [
+      { "theme": "Complete operation ownership from birth through failure cleanup", "result": "Actual callers and helpers retain every HOME/install/state/model material on unknown, with full fixed resource proof and pure failure controls before safe lifecycle tests." },
+      { "theme": "Two original projects through accepted and reopened Work", "result": "Real applicable drafts, exact project/profile/scope/check identities, current candidate/manual acceptance, selected-project HTTP and original Work/phase/artifact reopen; narrowed fixture results remain separate." },
+      { "theme": "Whole installed product on one current outer cohort", "result": "Adopt exact W33 or an explicitly necessary successor, independently drive actual bundled external entries and visible fc38 features, bind every required consumer to immutable bytes rather than aggregate mixed-cohort labels." },
+      { "theme": "Original Work recovery and control contract acceptance", "result": "When main/B/I publish the real consumer, measure original Store/Application/QuestionBroker continuation and no-resend/current authority through local controlled faults, candidate/acceptance and scheduler capacity; no native/model spend inferred." },
+      { "theme": "Nonempty portability and upgrade recovery equivalence", "result": "Same cohort's original business and all referenced bytes survive backup/restore/rebind/upgrade/rollback, with direct data, public readonly and authorization/no-provider/no-resend evidence independently separated." },
+      { "theme": "Strict final oracle and repeated-use reliability", "result": "All cohort/resource/identity/coverage assertions reject independent complete-report mutations, measured repeated sessions and multi-instance failures retain exact provenance, ordinary/native/recovery/value conclusions stay distinct." }
+    ]
+  },
+  "limits": {
+    "startStopExecuted": 0,
+    "realSignalsOrDeletesInPureControls": 0,
+    "globalProcessDiscovery": 0,
+    "modelVendorNativeTurns": 0,
+    "newTarOrZip": 0,
+    "candidateOrAssertionEdits": 0,
+    "allExecSessionsCompleted": true,
+    "preserved": "Every candidate, state/profile/archive/ledger/history and all twelve user service pairs",
+    "budget": "B UNKNOWN cap remains unspendable; E pilot BLOCKED with no reset/top-up/refund/research spend. No completion estimate or broad release admission follows from PASS counts."
+  }
+}

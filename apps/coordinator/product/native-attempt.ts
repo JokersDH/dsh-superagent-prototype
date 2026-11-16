@@ -85,6 +85,58 @@ export class NativeProductAttempt {
     })
     registerRecoveryRunner(this.store, proof)
   }
+  /** Shared Node-internal payload callback for stdio and an explicitly attached consumer. */
+  async readPayload(reference: string) {
+    if (this.environment?.planRef === reference) {
+      await this.register()
+      if (!this.current() || this.store.bindings.binding(this.spec.attemptId)?.state !== 'active')
+        throw new Error('Preparation authorization is no longer current')
+    }
+    return storedAttemptPayloads(this.store).read(reference)
+  }
+  /** Shared original answer admission; success is void, never a reusable approval token. */
+  async beforeNativeWrite(command: RunnerCommand): Promise<void> {
+    RunnerCommandSchema.parse(command)
+    const indexed = this.store.commands.get(key('product-command', command.id))?.result as
+      | { command?: unknown }
+      | undefined
+    if (
+      !this.current() ||
+      !indexed?.command ||
+      canonicalDigest(JsonSchema.parse(indexed.command)) !== canonicalDigest(JsonSchema.parse(command))
+    )
+      throw new Error('Native answer write is not currently authorized')
+    const before = this.answerWrites.get(command.id)
+    if (!before) throw new Error('Native answer has no live write admission')
+    before()
+    this.answerWrites.delete(command.id)
+  }
+  async nativeWriteDecision(command: RunnerCommand): Promise<{ allowed: boolean }> {
+    try {
+      await this.beforeNativeWrite(command)
+      return { allowed: true }
+    } catch {
+      return { allowed: false }
+    }
+  }
+  /** Keep immutable copying, original registration and policy readiness in the original fact path. */
+  async recordFact(incoming: unknown, local: RunnerPayloadStore, prepared: () => void) {
+    const fact = CriticalFactSchema.parse(incoming)
+    if (fact.attemptId !== this.spec.attemptId || fact.source !== this.producer.source)
+      throw new Error('Native fact has another producer')
+    const payload = local.read(fact.payloadRef)
+    const restored = this.store.payloads.write(payload)
+    if (restored.ref !== fact.payloadRef) throw new Error('Native immutable payload identity changed')
+    await this.register()
+    if (fact.kind === 'policy.prepared') this.environment?.capture()
+    const receipt = await this.sink.record(fact)
+    if (fact.kind === 'policy.prepared') {
+      const policy = PreparedExecutionPolicySchema.parse((payload as { value: unknown }).value)
+      this.preparedPolicyRef = this.store.payloads.write(JsonSchema.parse(policy)).ref
+      prepared()
+    }
+    return receipt
+  }
   async launch(): Promise<RunningAttempt> {
     mkdirSync(this.stateRoot, { recursive: true, mode: 0o700 })
     const local = new RunnerPayloadStore(join(this.stateRoot, 'payloads'))
@@ -94,6 +146,7 @@ export class NativeProductAttempt {
       failed = reject
     })
     void ready.catch(() => undefined)
+    const recordFact = (incoming: unknown) => this.recordFact(incoming, local, prepared)
     const link = new RunnerLink({
       executable: process.execPath,
       entry: fileURLToPath(new URL('../../runner/src/runner-service-entry.ts', import.meta.url)),
@@ -102,47 +155,10 @@ export class NativeProductAttempt {
       env: { PA_RUNNER_CWD: this.workspacePath, PA_RUNNER_RECOVERY_ROOT: this.recoveryRoot,
         ...(this.environment ? { PA_RUNNER_ENVIRONMENT_PLAN: this.environment.planRef } : {}) },
       producer: { source: this.producer.source, runnerIdentityRef: this.producer.runnerIdentityRef },
-      payloads: { read: async reference => {
-        if (this.environment?.planRef === reference) {
-          await this.register()
-          if (!this.current() || this.store.bindings.binding(this.spec.attemptId)?.state !== 'active') throw new Error('Preparation authorization is no longer current')
-        }
-        return storedAttemptPayloads(this.store).read(reference)
-      } },
-      beforeNativeWrite: async (command) => {
-        RunnerCommandSchema.parse(command)
-        const indexed = this.store.commands.get(key('product-command', command.id))?.result as
-          | { command?: unknown }
-          | undefined
-        if (
-          !this.current() ||
-          !indexed?.command ||
-          canonicalDigest(JsonSchema.parse(indexed.command)) !== canonicalDigest(JsonSchema.parse(command))
-        )
-          throw new Error('Native answer write is not currently authorized')
-        const before = this.answerWrites.get(command.id)
-        if (!before) throw new Error('Native answer has no live write admission')
-        before()
-        this.answerWrites.delete(command.id)
-      },
+      payloads: { read: reference => this.readPayload(reference) },
+      beforeNativeWrite: command => this.beforeNativeWrite(command),
     })
-    this.child = await link.spawnAttempt(this.spec, async (incoming) => {
-      const fact = CriticalFactSchema.parse(incoming)
-      if (fact.attemptId !== this.spec.attemptId || fact.source !== this.producer.source)
-        throw new Error('Native fact has another producer')
-      const payload = local.read(fact.payloadRef)
-      const restored = this.store.payloads.write(payload)
-      if (restored.ref !== fact.payloadRef) throw new Error('Native immutable payload identity changed')
-      await this.register()
-      if (fact.kind === 'policy.prepared') this.environment?.capture()
-      const receipt = await this.sink.record(fact)
-      if (fact.kind === 'policy.prepared') {
-        const policy = PreparedExecutionPolicySchema.parse((payload as { value: unknown }).value)
-        this.preparedPolicyRef = this.store.payloads.write(JsonSchema.parse(policy)).ref
-        prepared()
-      }
-      return receipt
-    })
+    this.child = await link.spawnAttempt(this.spec, recordFact)
     void this.child.waitExit().then(() => failed(new Error('Native Runner ended before policy preparation')))
     const timeout = setTimeout(() => failed(new Error('Native policy preparation timed out')), 45000)
     try {
@@ -157,6 +173,11 @@ export class NativeProductAttempt {
     return {
       attemptId: this.spec.attemptId,
       attachPort: structuredClone({ registration: endpoint, producer: this.producer }),
+      attachCallbacks: {
+        fact: recordFact,
+        payload: request => this.readPayload(request.reference),
+        nativeWrite: intent => this.nativeWriteDecision(intent.command),
+      },
       feed: (command) => this.feed(command),
       waitExit: async () => (await this.child!.waitExit()).exit,
       stop: async () => {

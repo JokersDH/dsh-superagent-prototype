@@ -4,6 +4,8 @@ import { ApplicationFault } from '@personal-agent/application'
 import { UsageObservationQuerySchema, UsageObservationSchema, UsageObservationDownloadSchema, WorkEvidenceSchema, IdSchema } from '@personal-agent/contracts'
 import type { UsageObservation, UsageObservationQuery, UsageObservationDownload, WorkEvidence } from '@personal-agent/contracts'
 import type { MetricRow, UsageInsightsSummary } from '@personal-agent/usage-insights'
+import { UsageSupportDownloadSchema, UsageSupportReportSchema } from '@personal-agent/contracts'
+import type { UsageSupportDownload } from '@personal-agent/contracts'
 
 export interface UsageObservationReaders {
   projectIds(): readonly string[]
@@ -28,6 +30,28 @@ export class ProductUsageObservation {
   private readonly readers: UsageObservationReaders
   private readonly now: () => string
   constructor(readers: UsageObservationReaders, now = () => new Date().toISOString()) { this.readers = readers; this.now = now }
+
+  async support(raw: UsageObservationQuery): Promise<UsageSupportDownload> {
+    const observation = await this.read(raw)
+    const { buildSupportReport, buildSupportFile } = await import('@personal-agent/usage-insights').catch(error => {
+      if (error && typeof error === 'object' && 'code' in error && ['ERR_MODULE_NOT_FOUND', 'MODULE_NOT_FOUND'].includes(String(error.code)))
+        throw new ApplicationFault('unsupported_capability', 'Support summaries are not available in this installation', 'none')
+      throw error
+    })
+    if (!buildSupportReport || !buildSupportFile)
+      throw new ApplicationFault('unsupported_capability', 'Support summaries are not available in this installation', 'none')
+    const limitations: ('部分指标没有可核对值。' | '当前观察不完整。' | '当前范围未提供观察。')[] = []
+    if (observation.metrics.some(row => row.value === null)) limitations.push('部分指标没有可核对值。')
+    if (observation.coverageState !== 'complete' || observation.status !== 'ready') limitations.push('当前观察不完整。')
+    if (observation.status === 'unavailable') limitations.push('当前范围未提供观察。')
+    const metadataSource = { ...observation, limitations,
+      coverage: ({ complete: '完整覆盖', partial: '部分覆盖', unknown: '未声明' } as const)[observation.coverageState],
+      scope: { ...observation.scope, label: observation.scope.projectIds.length === 1 ? '当前项目' : `本次 ${observation.scope.projectIds.length} 个项目` } }
+    const report = UsageSupportReportSchema.parse(buildSupportReport({ observation: metadataSource }))
+    const file = buildSupportFile(report)
+    return UsageSupportDownloadSchema.parse({ protocol: 'usage-support-download/1', report,
+      fileName: file.fileName, mediaType: file.mediaType, text: file.text, bytes: file.bytes, sha256: file.sha256 })
+  }
 
   async download(raw: UsageObservationQuery): Promise<UsageObservationDownload> {
     const observation = await this.read(raw)
