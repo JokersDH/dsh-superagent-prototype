@@ -594,8 +594,8 @@ export function cohortRecoveryIssues(value) {
   if (recovery.markerPresent !== true || recovery.startupMode !== 'recovery_readonly' || recovery.authorization !== 'BLOCKED') issues.push('authorization')
   const readonly = value.readonly ?? {}
   if (readonly.startupMode !== 'recovery_readonly' || readonly.work?.phase !== 'delivered' || readonly.work?.artifactsEqual !== true) issues.push('readonly_work')
-  if (readonly.artifactBytesEqual !== true) issues.push('artifact_bytes')
-  if (readonly.messagesEqual !== true || readonly.goalVisible !== true || !((readonly.messages ?? 0) >= 1) ||
+  if (readonly.artifactsEqual !== true) issues.push('artifact_bytes')
+  if ((readonly.messages ?? 0) !== (seed.messages ?? -1) || readonly.goalVisible !== true ||
     JSON.stringify(readonly.messageShape) !== JSON.stringify(seed.messageShape)) issues.push('history')
   if (readonly.business?.status !== 422) issues.push('business_write')
   if (readonly.providerRequests?.afterSeed !== readonly.providerRequests?.afterReads) issues.push('provider_called')

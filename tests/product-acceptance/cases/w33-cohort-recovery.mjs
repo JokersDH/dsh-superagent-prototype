@@ -8,6 +8,7 @@ import { candidateModel } from '../../../tests/integration/fixtures/assistant-ca
 import { captureSet, createOperation, resourceBirth, rollout } from '../lib/caller-safety.mjs'
 import { DEFAULT_FROZEN_DIRS, frozenArtifactSubject, loadFrozenArtifact } from '../lib/frozen-package.mjs'
 import { extractFrozen, freePort, launcher, liveIdentity, privateRoot, readRecord, sha256, startOwned, stopOwned } from '../lib/packaged-instance.mjs'
+import { verifyOuterZip } from '../lib/outer-zip.mjs'
 
 /**
  * Wave-34 same-cohort non-empty business recovery.
@@ -107,6 +108,12 @@ export async function runCohortRecovery() {
 
   try {
     mark('extract locked W33 tar')
+    // The tar cohort is the inner package of the one outer ZIP; bind it to that outer identity too.
+    const outer = verifyOuterZip()
+    evidence.zip = { sha256: outer.sha256, bytes: outer.bytes, sumsMatch: outer.sumsMatch, resultMatch: outer.resultMatch,
+      buildId: outer.result?.inner?.buildId ?? null, source: outer.result?.inner?.source ?? null,
+      innerTarSha256: outer.result?.inner?.tarSha256 ?? null, innerTarBytes: outer.result?.inner?.tarBytes ?? null,
+      digestsMatch: outer.result?.inner?.tarSha256 === target.tarSha256 && outer.result?.inner?.buildId === target.buildId }
     extractFrozen(target, root.install)
     install = root.install
     const first = launcher(install, ['first-run', '--json'], { env: { PA_CONFIG_ROOT: root.config, PA_DATA_ROOT: root.state } })

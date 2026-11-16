@@ -757,7 +757,7 @@ const evidenceFor = (key) => {
         restore: { status: 'RESTORED', marker: true, counts: { works: 1, artifacts: 1, messages: 1 },
           recovery: { markerPresent: true, startupMode: 'recovery_readonly', authorization: 'BLOCKED' } },
         readonly: { startupMode: 'recovery_readonly', work: { phase: 'delivered', artifactsEqual: true },
-          artifactBytesEqual: true, messages: 1, messagesEqual: true, goalVisible: true, messageShape: shape,
+          artifactsEqual: true, messages: 1, messagesEqual: true, goalVisible: true, messageShape: shape,
           business: { status: 422 }, providerRequests: { afterSeed: 1, afterReads: 1 }, stop: { clean: true } },
         negatives: { tamperedBundle: { status: 2, result: 'BLOCKED' }, fixtureOnRestored: { status: 'RUNNING', startupMode: 'recovery_readonly', business: 422 } },
         resources: { seed: { stop: { clean: true }, ...resourcePair(104, 'cohort:seed') },
@@ -2404,7 +2404,7 @@ const ROUTING_CASES = [
     title: 'Restored artifact bytes that differ from the seeded delivery are rejected',
     check: ({ assert }) =>
       rejectWith(assert, 'RECOVERY_BYTES', (report) => {
-        findCase(report, 'E33-COHORT-RECOVERY').evidence.cohortRecovery.readonly.artifactBytesEqual = false
+        findCase(report, 'E33-COHORT-RECOVERY').evidence.cohortRecovery.readonly.artifactsEqual = false
         return report
       }, 'cohortRecovery_invalid'),
   },
