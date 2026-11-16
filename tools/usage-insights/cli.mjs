@@ -386,34 +386,34 @@ async function commandVerify(options, io) {
         if (error?.name === 'ArchiveError') throw new UsageInsightsError('source_unavailable', error.message)
         throw error
       }
-      origin = {
-        kind: 'package',
-        buildId: inspected.manifest?.buildId ?? null,
-        sourceCommit: inspected.manifest?.sourceCommit ?? null,
-        archiveSha256: inspected.archive.sha256,
-        capabilities: inspected.capabilities,
-        browserTrigger: inspected.browserTrigger,
-        missing: inspected.absent,
-      }
+      origin = insights.originFromManifest(inspected.rawManifest, inspected.capabilities, {
+        browserTrigger: inspected.browserTrigger, missing: inspected.absent, archiveSha256: inspected.archive.sha256,
+      })
     }
-    let report
+    let read
     try {
-      report = insights.buildSupportReport({ observation: served.value, origin })
+      read = insights.readSupportDocument(served.value, origin === null ? {} : { origin })
     } catch (error) {
-      if (error?.name === 'SupportFault') throw new UsageInsightsError('source_unavailable', error.message)
+      if (error?.name === 'SupportPortFault' || error?.name === 'SupportFault')
+        throw new UsageInsightsError('source_unavailable', error.message)
       throw error
     }
+    const report = read.report
     const format = options.format ?? 'json'
     if (!['json', 'markdown'].includes(format)) throw new UsageError('--format must be json or markdown for verify')
     const body = format === 'markdown'
       ? insights.renderSupportReport(report)
-      : `${JSON.stringify({ ...report, bytes: served.bytes, digest: served.digest }, null, 2)}\n`
+      : `${JSON.stringify({ ...report, documentKind: read.documentKind, digestCheck: read.digest,
+          conservation: read.conservation, file: { bytes: served.bytes, sha256: served.digest } }, null, 2)}\n`
     if (options.out !== undefined) {
       const written = writeExclusive(requiredString(options.out, 'out'), body)
       io.stdout(`wrote ${basename(written)} (${Buffer.byteLength(body)} bytes) format=${format}\n`)
     } else io.stdout(body)
     const status = report.status === 'ready' ? 'complete' : report.status === 'insufficient_data' ? 'insufficient_data' : 'unavailable'
-    io.stderr(`status=${status} coverage=${report.coverageState} rows=${report.counts.rows} unknown=${report.counts.unknown} export=${report.exportCapability} display-only\n`)
+    io.stderr(`status=${status} coverage=${report.coverageState} rows=${report.counts.rows} unknown=${report.counts.unknown} export=${report.exportCapability} digest=${read.digest.state} display-only\n`)
+    // A downloaded envelope whose declared digest does not match its bytes is refused as an integrity
+    // failure, even when the document inside would otherwise be ready.
+    if (read.digest.state === 'mismatch') return EXIT.unavailable
     return report.status === 'ready' ? EXIT.ok : report.status === 'insufficient_data' ? EXIT.insufficient : EXIT.unavailable
   }
   const bundle = readBundle(requiredString(options.input, 'input'), maxBytes)
@@ -461,6 +461,7 @@ async function commandCatalogue(_options, io) {
  * happens to exist next to the package cannot be reported as a feature inside it.
  */
 async function commandPackage(options, io) {
+  const insights = io.insights
   if (options.json && options.json !== true && options.json !== 'true') throw new UsageError('--json takes no value')
   const tarPath = requiredString(options.tar, 'tar')
   if (!isAbsolute(tarPath)) throw new UsageError('--tar must be an absolute path')
@@ -487,13 +488,21 @@ async function commandPackage(options, io) {
   const expectedCapabilities = options.expect === undefined ? [] : options.expect.split(',').map(name => name.trim()).filter(Boolean)
   const unknown = expectedCapabilities.filter(name => !CAPABILITIES.includes(name))
   if (unknown.length) throw new UsageError(`--expect accepts ${CAPABILITIES.join(', ')}; unknown: ${unknown.join(', ')}`)
+  // Identity is derived by the package's single implementation, which refuses to invent a commit from
+  // a label and leaves missing manifest fields unknown.
+  const identity = insights.originFromManifest(report.rawManifest, report.capabilities, {
+    browserTrigger: report.browserTrigger, missing: report.absent, archiveSha256: report.archive.sha256,
+  })
   const missing = expectedCapabilities.filter(name => !report.capabilities[name])
   if (options.json === true || options.json === 'true') {
-    io.stdout(`${JSON.stringify({ ...report, expected: expectedCapabilities, missing }, null, 2)}\n`)
+    io.stdout(`${JSON.stringify({ ...report, identity, expected: expectedCapabilities, missing }, null, 2)}\n`)
   } else {
     const manifest = report.manifest
     io.stdout(`package ${report.usageInsights.version ?? '?'}  sha256 ${report.archive.sha256.slice(0, 16)}…  ${report.archive.bytes} bytes\n`)
     io.stdout(`  source      ${manifest?.sourceCommit?.slice(0, 16) ?? 'not recorded'}  build ${manifest?.buildId ?? 'not recorded'}  dirty ${manifest?.sourceDirty ?? 'unknown'}\n`)
+    io.stdout(`  identity    ${identity === null
+      ? `not declared (manifest ${report.manifestState}${report.manifestBytes === null ? '' : `, ${report.manifestBytes} bytes`})`
+      : identity.identitySource}\n`)
     io.stdout(`  files       content ${report.archive.contentFiles} + symlinks ${report.archive.symlinks} (manifest ${manifest?.declaredFiles ?? '—'}, delta ${report.accounting.manifestDelta ?? '—'})\n`)
     io.stdout(`  entries     headers ${report.archive.headers}, appleDouble ${report.archive.appleDouble}, pax ${report.archive.paxHeaders}\n`)
     for (const name of CAPABILITIES) io.stdout(`  ${name.padEnd(16)} ${report.capabilities[name] ? 'present' : 'absent'}\n`)

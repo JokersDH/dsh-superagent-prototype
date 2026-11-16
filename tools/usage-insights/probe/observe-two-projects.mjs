@@ -35,6 +35,7 @@ import { consumerAdmission, toInsightConsumerView } from '../../../packages/usag
 import { buildDisplayExport, displayExportDigest } from '../../../packages/usage-insights/src/display-export.ts'
 import { crossCheckAnalysisWithDisplay } from '../../../packages/usage-insights/src/crosscheck.ts'
 import { describeDisplayDocument } from '../../../packages/usage-insights/src/support.ts'
+import { buildSupportFile, readSupportDocument, supportLabels, originFromManifest } from '../../../packages/usage-insights/src/support-port.ts'
 import { UsageObservationDownloadSchema } from '../../../packages/contracts/dist/index.js'
 
 const CLI = fileURLToPath(new URL('../cli.mjs', import.meta.url))
@@ -515,6 +516,27 @@ async function main() {
   assert.equal(fileCheck.comparable, true)
   assert.deepEqual(fileCheck.disagreements, [], JSON.stringify(fileCheck.disagreements))
   assert.equal(fileCheck.agreements, fileCheck.checked)
+  // The port main composes: digest verification (the shape check is not a crypto check), field
+  // conservation between the bytes and the observation, and the labels the workspace renders.
+  const portRead = readSupportDocument(download)
+  assert.equal(portRead.documentKind, 'download')
+  assert.equal(portRead.digest.state, 'verified', 'the declared digest matches the delivered text')
+  assert.equal(portRead.digest.actual, download.sha256)
+  assert.deepEqual(portRead.conservation, { rowsMatch: true, scopeMatches: true, windowMatches: true, headerMatches: true, notCompared: [] })
+  const supportFile = buildSupportFile(portRead.report)
+  assert.equal(supportFile.fileName.startsWith(`support-7d-${download.observation.summaryId.slice(0, 12)}-`), true, supportFile.fileName)
+  assert.equal(supportFile.sha256, createHash('sha256').update(supportFile.text).digest('hex'))
+  const reread = JSON.parse(supportFile.text)
+  assert.equal(reread.protocol, 'usage-insights-support/1')
+  assert.equal(reread.report.summaryId, download.observation.summaryId)
+  assert.equal(JSON.stringify(reread).includes(download.observation.metrics[0].value ?? '\u0000'), false,
+    'the support file carries no formatted value')
+  // No package was inspected in this probe run, so the labels stay unset and say so. A label is only
+  // produced from a manifest that declares the identity (see the package tests).
+  const labels = supportLabels(portRead.report)
+  assert.equal(labels.packageLabel, undefined)
+  assert.equal(typeof labels.note, 'string')
+
   // The original work is still readable after the export, and nothing was written.
   const afterExport = await product.application.inspect({ limit: 5 })
   assert.ok(afterExport.works.length >= 2, 'the original works are still there')
@@ -621,6 +643,7 @@ async function main() {
       export: join(directoryOut, `two-project-${stamp}.export.json`),
       displayExport: join(directoryOut, `two-project-${stamp}.display-export.json`),
       download: join(directoryOut, `two-project-${stamp}.download.json`),
+      downloadEnvelope: join(directoryOut, `two-project-${stamp}.download-envelope.json`),
       support: join(directoryOut, `two-project-${stamp}.support.json`),
       crossCheck: join(directoryOut, `two-project-${stamp}.crosscheck.json`),
     }
@@ -631,6 +654,7 @@ async function main() {
     // generated in this run, not copied from a bundle.
     writeFileSync(published.displayExport, display.text, { flag: 'wx', mode: 0o600 })
     writeFileSync(published.download, download.text, { flag: 'wx', mode: 0o600 })
+    writeFileSync(published.downloadEnvelope, `${JSON.stringify(download, null, 2)}\n`, { flag: 'wx', mode: 0o600 })
     writeFileSync(published.support, `${JSON.stringify(describeDisplayDocument(download.observation), null, 2)}\n`,
       { flag: 'wx', mode: 0o600 })
     writeFileSync(published.crossCheck, `${JSON.stringify({
@@ -693,6 +717,9 @@ async function main() {
       repeatIsNewSnapshot: repeatDocument.snapshot.snapshotId !== file.snapshot.snapshotId,
       pageAgreesWithFile: fileCheck.agreements === fileCheck.checked && fileCheck.disagreements.length === 0,
       eventsDuringExportAndWorkRead: store.events.cursor() - eventsBeforeExport,
+      supportPort: { documentKind: portRead.documentKind, digest: portRead.digest.state,
+        conservation: portRead.conservation, supportFile: supportFile.fileName,
+        supportBytes: supportFile.bytes, labels },
     },
     digest: verified.digest,
     repeatedCollectionIdentical: true,

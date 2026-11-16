@@ -45,11 +45,17 @@ export function inspectArchive(path, options = {}) {
   const directories = archive.entries.filter(entry => entry.type === 'directory')
   const paxHeaders = archive.entries.filter(entry => entry.type === 'other')
 
+  // The install manifest embeds the whole file inventory (megabytes), so the guard is generous but
+  // still bounded, and a manifest that is present but skipped is reported as its own state instead of
+  // looking like a package that declared nothing.
   const installText = archive.text('install/install.json')
+  const manifestState = installText === null ? 'absent'
+    : installText.length > 8 * 1024 * 1024 ? 'too_large' : 'parsed'
   let install = null
-  if (installText !== null) {
+  if (manifestState === 'parsed') {
     try { install = JSON.parse(installText) } catch { install = null }
   }
+  const resolvedManifestState = manifestState === 'parsed' && install === null ? 'invalid' : manifestState
 
   const manifestText = archive.text(`${USAGE_PACKAGE}package.json`)
   let manifest = null
@@ -127,6 +133,10 @@ export function inspectArchive(path, options = {}) {
       symlinks: links.length,
       directories: directories.length,
     },
+    /** The parsed install manifest, so identity is derived in one place instead of per caller. */
+    rawManifest: install,
+    manifestState: resolvedManifestState,
+    manifestBytes: installText === null ? null : installText.length,
     manifest: install === null ? null : {
       format: install.format ?? null,
       formatVersion: install.formatVersion ?? null,
