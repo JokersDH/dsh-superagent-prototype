@@ -1,0 +1,22 @@
+{
+  "protocol": "wave33-ui-input/1",
+  "owner": "C provides data/CLI; main/F own App, HTTP and visual composition",
+  "decisionSnapshot": {
+    "protocol": "decision-context-snapshot/1",
+    "fields": ["projectId", "capturedAt", "authorization:'none'", "decisions[].{decisionId,version,contentDigest,scope,sourceMessageId,sourceTextDigest,recordedAt,expiresAt}", "coverage.{scan,callerTruncated,max}"],
+    "revalidation": ["valid", "code(project_mismatch|version_changed|content_changed|inactive|source_stale|expired|invalid_snapshot)"],
+    "copy": "快照是当前可用的数据投影；创建新工作前必须重验，原表单/确认仍是权威"
+  },
+  "draft": {
+    "protocol": "assistant-context-draft/1",
+    "fields": ["projectId", "conversationId", "selections", "requestId", "observedAt", "expiresAt", "status", "sources[].{sourceId,path,sourceDigest}", "usable", "stale"],
+    "copy": "草稿只用于再次预览；过期/invalid 不显示为可用；不是执行 token"
+  },
+  "policy": {
+    "draftFile": "0600 新建/替换，symlink/公开/foreign/超大/非法时间拒绝",
+    "revocation": "撤销后新预览不再包含，已冻结来源仍可读",
+    "readonly": "sources 可读，preview/send/decide 拒绝"
+  },
+  "exitCodes": { "0": "ok", "2": "usage", "3": "refused by product or unsafe draft", "4": "request/parse failure" },
+  "limits": ["no private SQL", "no second confirmation", "no LLM loop", "snapshot != authorization"]
+}
