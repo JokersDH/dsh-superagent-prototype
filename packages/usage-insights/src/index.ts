@@ -113,6 +113,8 @@ export {
 export type {
   SupportConservation, SupportDigestCheck, SupportDocumentRead, SupportFile, SupportOriginTrigger,
 } from './support-port.ts'
+export { RUNTIME_IDENTITY_PROTOCOL, RuntimeIdentityFault, inspectRuntimeIdentity } from './runtime-identity.ts'
+export type { RuntimeCapabilities, RuntimeIdentity, RuntimeIdentityOptions } from './runtime-identity.ts'
 export {
   consumerAdmission, consumerLayer, consumerScope, formatMetricValue, metricRowKey, metricUnitLabel,
   observedOutcomeCount, rowCoverageMeaning, rowSemantics, toInsightConsumerView,
