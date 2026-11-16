@@ -1,0 +1,76 @@
+{
+  "ok": true,
+  "checks": [
+    {
+      "id": "mock_frozen_birth_facts",
+      "ok": true
+    },
+    {
+      "id": "mock_defensive_copy_is_distinct",
+      "ok": true
+    },
+    {
+      "id": "mock_external_mutation_does_not_change_facts",
+      "ok": true
+    },
+    {
+      "id": "mock_own_positive",
+      "ok": true
+    },
+    {
+      "id": "mock_foreign_pid_refused",
+      "ok": true
+    },
+    {
+      "id": "mock_foreign_uid_refused",
+      "ok": true
+    },
+    {
+      "id": "mock_recycled_start_refused",
+      "ok": true
+    },
+    {
+      "id": "mock_sibling_root_refused",
+      "ok": true
+    },
+    {
+      "id": "mock_sibling_operation_refused",
+      "ok": true
+    },
+    {
+      "id": "mock_missing_birth_refused",
+      "ok": true
+    },
+    {
+      "id": "mock_missing_argv_refused",
+      "ok": true
+    },
+    {
+      "id": "mock_birth_argv_mismatch_refused",
+      "ok": true
+    },
+    {
+      "id": "mock_missing_plan_refused",
+      "ok": true
+    },
+    {
+      "id": "mock_missing_resources_refused",
+      "ok": true
+    },
+    {
+      "id": "mock_argv_change_refused",
+      "ok": true
+    },
+    {
+      "id": "mock_ps_fixture_alive",
+      "ok": true
+    },
+    {
+      "id": "mock_ps_fixture_gone_only_on_not_found",
+      "ok": true
+    }
+  ],
+  "spawns": 0,
+  "signals": 0,
+  "ps": 0
+}

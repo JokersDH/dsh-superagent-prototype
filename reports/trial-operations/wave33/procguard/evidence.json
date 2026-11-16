@@ -1,0 +1,92 @@
+{
+  "protocol": "trial-operations/wave33-h1/1",
+  "generatedAt": "2026-11-16T06:43:06.588Z",
+  "command": "node tests/operational-soak/procguard/produce3.mjs --out <new-root>",
+  "exit": 0,
+  "sources": {
+    "tests/operational-soak/procguard/guard3.mjs": "94c7d1f778860c01c57255efc2daee962172c66d3f3191ba5b10395fa446eb7f",
+    "tests/operational-soak/procguard/produce3.mjs": "dbb0500073ea2b6b870a7bdc953717ace2db19f376838bb12779e6af7866fe42",
+    "tests/operational-soak/procguard/guard3.case.mjs": "d4b4bf90fde662116edd18fda3d779661d3061c0c5397eb7973a56def617d329",
+    "reports/trial-operations/wave33/procguard/report.json": "3124449e8a174a2660fa3425f620ba62c2bb32cb39f572a174e5dcb2586582f7"
+  },
+  "mock": {
+    "ok": true,
+    "checks": 17
+  },
+  "failure": {
+    "ok": true,
+    "childKillCalls": 0,
+    "processKillCalls": 0,
+    "cases": [
+      "observation_unknown",
+      "birth_report_missing",
+      "identity_mismatch"
+    ]
+  },
+  "live": {
+    "status": "LIVE_OK",
+    "checks": [
+      {
+        "id": "born_normal",
+        "ok": true
+      },
+      {
+        "id": "returned_observation_is_copy",
+        "ok": true
+      },
+      {
+        "id": "caller_mutation_does_not_retarget",
+        "ok": true
+      },
+      {
+        "id": "pure_controls",
+        "ok": true
+      },
+      {
+        "id": "unknown_wait_not_gone",
+        "ok": true
+      },
+      {
+        "id": "first_signal_plan_verified",
+        "ok": true
+      },
+      {
+        "id": "normal_term_gone",
+        "ok": true
+      },
+      {
+        "id": "stubborn_survived_term",
+        "ok": true
+      },
+      {
+        "id": "stubborn_kill_gone",
+        "ok": true
+      }
+    ],
+    "signals": [
+      {
+        "target": "normal",
+        "step": "TERM",
+        "sent": true,
+        "pid": 90592
+      },
+      {
+        "target": "stubborn",
+        "step": "TERM",
+        "sent": true,
+        "pid": 90629
+      },
+      {
+        "target": "stubborn",
+        "step": "KILL",
+        "sent": true,
+        "pid": 90629
+      }
+    ]
+  },
+  "limits": [
+    "own probe only",
+    "no global discovery/foreign signal",
+    "UNKNOWN retained"
+  ]
+}

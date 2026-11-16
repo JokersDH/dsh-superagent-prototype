@@ -1,0 +1,239 @@
+{
+  "protocol": "trial-operations/wave33-h6h7/1",
+  "ack": {
+    "protocol": "ack-window-consumer/1",
+    "surface": "original A ProductStore facts/answers/deliveries/events public APIs",
+    "modelCalls": 0,
+    "vendorTurns": 0,
+    "signalsSent": 0,
+    "windows": [
+      {
+        "kind": "begin_before_write",
+        "resend": false,
+        "newCommandId": false,
+        "newAttempt": false,
+        "newSession": false,
+        "clearMarker": false,
+        "state": "not_accepted",
+        "durable": false
+      },
+      {
+        "kind": "answer_before_write",
+        "resend": false,
+        "newCommandId": false,
+        "newAttempt": false,
+        "newSession": false,
+        "clearMarker": false,
+        "state": "not_accepted",
+        "durable": false
+      },
+      {
+        "kind": "receiver_observed_before_receipt",
+        "resend": false,
+        "newCommandId": false,
+        "newAttempt": false,
+        "newSession": false,
+        "clearMarker": false,
+        "state": "indeterminate",
+        "durable": false
+      },
+      {
+        "kind": "after_fact_receipt",
+        "resend": false,
+        "newCommandId": false,
+        "newAttempt": false,
+        "newSession": false,
+        "clearMarker": false,
+        "state": "durable",
+        "durable": true,
+        "seq": 1,
+        "replayedSameSeq": true,
+        "eventsAfterFirst": 1,
+        "eventsAfterReplay": 1,
+        "conflict": "FactConflict",
+        "storedDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      {
+        "kind": "after_answer_receipt_before_reply",
+        "resend": false,
+        "newCommandId": false,
+        "newAttempt": false,
+        "newSession": false,
+        "clearMarker": false,
+        "state": "response_written",
+        "durable": true
+      },
+      {
+        "kind": "late_duplicate",
+        "resend": false,
+        "newCommandId": false,
+        "newAttempt": false,
+        "newSession": false,
+        "clearMarker": false,
+        "state": "already_recorded",
+        "durable": true,
+        "answerReplayAlreadyRecorded": true,
+        "backward": "AnswerConflict"
+      },
+      {
+        "kind": "after_delivery_terminal",
+        "resend": false,
+        "newCommandId": false,
+        "newAttempt": false,
+        "newSession": false,
+        "clearMarker": false,
+        "state": "native_applied",
+        "durable": true,
+        "delivery": "native_applied"
+      },
+      {
+        "kind": "missing_delivery",
+        "resend": false,
+        "newCommandId": false,
+        "newAttempt": false,
+        "newSession": false,
+        "clearMarker": false,
+        "state": "unknown",
+        "durable": false
+      }
+    ],
+    "checks": {
+      "beginNotAccepted": true,
+      "answerNotAccepted": true,
+      "receiverUnknown": true,
+      "factDurable": true,
+      "conflictRefused": true,
+      "answerWrittenNotTerminal": true,
+      "lateDuplicateNoResend": true,
+      "terminalNative": true,
+      "missingDeliveryUnknown": true,
+      "zeroResend": true
+    },
+    "notReached": [
+      "actual B coordinator SIGKILL -> new process original A/question/answer/ACK recovery",
+      "same original Work recovered candidate/accept/delivered after a real rebind",
+      "live FD/socket/queue physical quiescence (H1 guard covers only own probes)"
+    ]
+  },
+  "resourceLedger": {
+    "full": {
+      "quiescent": true,
+      "complete": true,
+      "counts": {
+        "total": 9,
+        "ended": 9,
+        "live": 0,
+        "unknown": 0,
+        "missingEvidence": 0
+      },
+      "unknown": [],
+      "live": [],
+      "missingEvidence": [],
+      "badKind": [],
+      "duplicates": false,
+      "moduleClosed": true,
+      "parentPidGone": true,
+      "reason": "all_known_resources_ended",
+      "closeIsQuiescence": false
+    },
+    "unknown": {
+      "quiescent": false,
+      "complete": true,
+      "counts": {
+        "total": 9,
+        "ended": 8,
+        "live": 0,
+        "unknown": 1,
+        "missingEvidence": 0
+      },
+      "unknown": [
+        {
+          "kind": "socket",
+          "id": "fixture-socket"
+        }
+      ],
+      "live": [],
+      "missingEvidence": [],
+      "badKind": [],
+      "duplicates": false,
+      "moduleClosed": true,
+      "parentPidGone": true,
+      "reason": "unknown_resource",
+      "closeIsQuiescence": false
+    },
+    "live": {
+      "quiescent": false,
+      "complete": true,
+      "counts": {
+        "total": 9,
+        "ended": 8,
+        "live": 1,
+        "unknown": 0,
+        "missingEvidence": 0
+      },
+      "unknown": [],
+      "live": [
+        {
+          "kind": "fd",
+          "id": "fixture-fd"
+        }
+      ],
+      "missingEvidence": [],
+      "badKind": [],
+      "duplicates": false,
+      "moduleClosed": true,
+      "parentPidGone": true,
+      "reason": "live_resource",
+      "closeIsQuiescence": false
+    },
+    "no-evidence": {
+      "quiescent": false,
+      "complete": true,
+      "counts": {
+        "total": 9,
+        "ended": 9,
+        "live": 0,
+        "unknown": 0,
+        "missingEvidence": 1
+      },
+      "unknown": [],
+      "live": [],
+      "missingEvidence": [
+        {
+          "kind": "timer",
+          "id": "fixture-timer"
+        }
+      ],
+      "badKind": [],
+      "duplicates": false,
+      "moduleClosed": true,
+      "parentPidGone": true,
+      "reason": "ended_without_evidence",
+      "closeIsQuiescence": false
+    },
+    "module-only": {
+      "quiescent": false,
+      "complete": true,
+      "counts": {
+        "total": 0,
+        "ended": 0,
+        "live": 0,
+        "unknown": 0,
+        "missingEvidence": 0
+      },
+      "unknown": [],
+      "live": [],
+      "missingEvidence": [],
+      "badKind": [],
+      "duplicates": false,
+      "moduleClosed": true,
+      "parentPidGone": true,
+      "reason": "empty_set",
+      "closeIsQuiescence": false
+    }
+  },
+  "sources": {
+    "windows": "8af48c4acb57edd4fe732ad4c2b7b9bccb489a533f6244173ede63f3a75f4028",
+    "resources": "8b59dbb802a9412f64834f33e57092695ebc70820ccfdc6c1f7792791c044175"
+  }
+}

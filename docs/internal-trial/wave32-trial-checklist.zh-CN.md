@@ -38,7 +38,7 @@
 
 - R1/R2 预检均有 `host_sqlite` UNKNOWN（需包内 doctor 执行 native binding）；R1/R2 machinecheck 均 46 PASS / 3 UNKNOWN / 0 FAIL。
 - R2 尚无 E 同一 tar 独立最终 verdict；R1/R2 都不能由 H 观察替代 E required。
-- 安装包 fixture 受控 Work 可以创建并出现 currentCandidate，但包的 `accept_candidate` 返回 `verification_failed: Trusted artifact review is unavailable`（R1/R2 同样）；该安装态人工接受仍 NOT_REACHED。source controlled consumer 的 normal accept 是另一层证据，不能替代此安装结论。
+- 安装包 fixture 受控 Work 必须等到 `actions.available` 包含 `accept_candidate` 再接受；在 verifying/只看到 currentCandidate 时提前 accept 会返回 `verification_failed: Trusted artifact review is unavailable`，这是调用时机错误，不是产品拒绝。88eb 等待后 accept/delivered/重开已通过。
 - 包内实际启动后的 HTTP/SSE 内容、review-restored 启动/REUSED、原 Work 恢复、native 2/4 slot、vendor/native 均未测，分层为 NOT_REACHED/NOT_MEASURED。
 - 字段 `authorization` 在脱敏报告中可能被泛化为 `<redacted>`；以 `authorization_none` 检查为准，不重新解释为授权。
 - 失败路径（出生不完整/ps UNKNOWN）现在**不发送任何信号**，保留 probe 与 reason；不要清理成“干净”。

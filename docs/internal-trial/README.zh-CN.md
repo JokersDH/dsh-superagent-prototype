@@ -149,3 +149,11 @@ H 的材料是原始观测。E 会按自己的 required 断言独立核验；不
 - 新 P1 已封闭：guard3 现在要求独立 launch executable/有序 full argv 与观测 `command` 完全一致；缺失、前缀、ambiguous、观测失败均拒绝登记，出生失败不发送任何信号。
 - 当前 I/B source consumer 仍是进程内证据；安装包内 B/I 端口、原 Work 恢复、scheduler 2/4 槽和 review 启动没有因 field kit 变成已支持。
 - wave-32 安装态 lifecycle（R1/R2）已实际 first-run/start/readiness/health/console/SSE/REUSED/同一 Work 重开/stop；但包内 `accept_candidate` 对 fixture Work 返回 `Trusted artifact review is unavailable`，安装态人工接受仍 NOT_REACHED。
+
+## 3f. wave-33 当前源、88eb 包与持久重开
+
+- 当前 source：B `f4a99ce1`、I `44d53905`、main `fc38bf65`。当前 B/I consumer 仍为 I 12/12、B 8/8；main `attached-port.case.mjs` 4/4 只作为 main-owned 端口证据，不等于原 Application/QuestionBroker 恢复。
+- 最新 D 内部包：`wave32-target-88eb8c6`，source `e8348a86`，build `88eb8c69b0671171`，tar `65c386d1…8453ac`，closure `276ffce8…029c`。只读预检 32 PASS/1 UNKNOWN，machinecheck 46/3/0；它**不含** main fc38 后的新运行时，不能称含最新 main。
+- 88eb 包内 first-run/start/readiness/health/console/SSE/REUSED/同一 Work 重开/stop 已实测。安装态 `accept_candidate` 必须等 `actions.available` 含该项；此前在 verifying/currentCandidate 阶段提前 accept 会得到 `Trusted artifact review is unavailable`，等待后同一 Work 的 accept 已 recorded、delivered 并重开为 delivered。
+- 88eb 包内非空 backup→verify→restore 到第二根通过，原 Work/question/answer/native_applied 可读；再次 restore 同目标 `BLOCKED target_not_empty`。review-restored 启动未测。
+- 原 Store receiver join、新进程同 Store 读回、ACK 8 窗口、资源台账保持 source 证据；B same-run 回调、SIGKILL 恢复、native 2/4 槽仍 NOT_REACHED。

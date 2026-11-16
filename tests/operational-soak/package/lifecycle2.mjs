@@ -153,6 +153,8 @@ export async function runPackageLifecycle({ packageRoot, releaseManifest, out })
   let snapshot = null
   let configuration = null
   let work = null
+  let candidateSeen = false
+  let acceptGateObserved = false
   let stale = null
   let accepted = null
   let reopened = null
@@ -174,9 +176,12 @@ export async function runPackageLifecycle({ packageRoot, releaseManifest, out })
     const asked = await waitSnapshot(instance, (body) => body.questions.some((entry) => entry.contract.workId === work.body?.workId))
     const question = asked?.questions?.find((entry) => entry.contract.workId === work.body?.workId)
     if (question !== undefined) await postCommand(instance, { commandId: 'h32-installed-answer-1', conversationId: 'h32-installed-chat', kind: 'answer_question', questionId: question.id, expectedVersion: question.version, answer: { kind: 'choices', optionIds: ['allow'] } })
-    const created = await waitSnapshot(instance, (body) => body.works.some((entry) => entry.work.id === work.body?.workId && entry.actions?.currentCandidate !== undefined))
+    const created = await waitSnapshot(instance, (body) => body.works.some((entry) => entry.work.id === work.body?.workId && entry.actions?.currentCandidate !== undefined && entry.phase !== 'verifying'))
     installedWork = created?.works?.find((entry) => entry.work.id === work.body?.workId) ?? null
-    if (installedWork?.actions?.currentCandidate !== undefined) {
+    candidateSeen = installedWork?.actions?.currentCandidate !== undefined
+    acceptGateObserved = candidateSeen && Array.isArray(installedWork?.actions?.available)
+    const available = installedWork?.actions?.available ?? []
+    if (installedWork?.actions?.currentCandidate !== undefined && available.includes('accept_candidate')) {
       const candidate = installedWork.actions.currentCandidate
       accepted = await postCommand(instance, { commandId: 'h32-installed-accept-1', conversationId: 'h32-installed-chat', kind: 'accept_candidate', candidate })
       stale = await postCommand(instance, { commandId: 'h32-installed-stale-1', conversationId: 'h32-installed-chat', kind: 'accept_candidate', candidate: { ...candidate, candidateGeneration: candidate.candidateGeneration + 1 } })
@@ -204,9 +209,11 @@ export async function runPackageLifecycle({ packageRoot, releaseManifest, out })
     snapshotVisible: snapshot?.status === 200 && snapshot?.body !== null,
     configurationVisible: configuration?.status === 200 && (configuration?.body?.projects?.length ?? 0) > 0,
     installedWorkCreated: work?.status === 200 && work?.body?.status === 'recorded' && typeof work?.body?.workId === 'string',
-    installedCandidateSeen: installedWork?.actions?.currentCandidate !== undefined,
-    staleCandidateRejected: stale?.status === 200 && stale?.body?.status === 'rejected',
-    installedAcceptBlockedByProductReview: accepted?.status === 200 && accepted?.body?.status === 'rejected' && String(accepted?.body?.error?.message ?? '').includes('Trusted artifact review'),
+    installedCandidateSeen: candidateSeen,
+    staleCandidateRejected: stale === null || (stale?.status === 200 && stale?.body?.status === 'rejected'),
+    installedAcceptGateObserved: acceptGateObserved,
+    installedAcceptRecorded: accepted?.status === 200 && accepted?.body?.status === 'recorded',
+    installedDelivered: installedWork?.phase === 'delivered' && (installedWork?.artifactIds?.length ?? 0) >= 1 && installedWork?.resourceStatus === 'quiescent',
     reusedSamePid: restartStatus.parsed?.status === 'RUNNING' && restartStatus.parsed?.instance?.pid === instance?.pid,
     reviewOnFixtureRefused: reviewNegative.parsed?.status === 'BLOCKED',
     stoppedOwnInstance: stop.parsed?.status === 'STOPPED' && stop.parsed?.stillAlive === false && stop.parsed?.verification?.ok === true,
@@ -221,7 +228,7 @@ export async function runPackageLifecycle({ packageRoot, releaseManifest, out })
     expectedBuild, packageRoot, roots, ports: { console: port, api: apiPort },
     instance: instance === null ? null : { ...instance, launcherArgv: (instance.launcherArgv ?? []).map((entry) => redactPath(entry, homeDir())), apiArgv: (instance.apiArgv ?? []).map((entry) => redactPath(entry, homeDir())), launcherCwd: redactPath(instance.launcherCwd, homeDir()) },
     commandExits: { firstRun: first.exit, start: start.exit, status: status.exit, restart: restart.exit, restartStatus: restartStatus.exit, reviewNegative: reviewNegative.exit, stop: stop.exit, afterStop: afterStop.exit },
-    installedWork: work === null ? null : { createStatus: work.status, createBody: work.body, workId: work.body?.workId ?? null, staleStatus: stale?.status ?? null, staleBody: stale?.body ?? null, acceptStatus: accepted?.status ?? null, acceptBody: accepted?.body ?? null, final: installedWork === null ? null : { phase: installedWork.phase, artifactIds: installedWork.artifactIds, resourceStatus: installedWork.resourceStatus }, reopened: reopened === null ? null : { phase: reopened.phase, workId: reopened.work?.id, artifactIds: reopened.artifactIds } },
+    installedWork: work === null ? null : { createStatus: work.status, createBody: work.body, workId: work.body?.workId ?? null, acceptAttempted: accepted !== null, staleStatus: stale?.status ?? null, staleBody: stale?.body ?? null, acceptStatus: accepted?.status ?? null, acceptBody: accepted?.body ?? null, final: installedWork === null ? null : { phase: installedWork.phase, artifactIds: installedWork.artifactIds, resourceStatus: installedWork.resourceStatus, available: installedWork.actions?.available ?? [] }, reopened: reopened === null ? null : { phase: reopened.phase, workId: reopened.work?.id, artifactIds: reopened.artifactIds } },
     statuses: { firstRun: first.parsed?.status ?? null, start: start.exit === 0 ? 'STARTED' : 'FAILED', status: status.parsed?.status ?? null, restart: restart.exit === 0 ? 'REUSED_OR_RUNNING' : 'FAILED', reviewNegative: reviewNegative.parsed?.status ?? null, stop: stop.parsed?.status ?? null, afterStop: afterStop.parsed?.status ?? null },
     readiness, health, consolePage, sse, snapshot, checks,
     limits: ['fixture/discussion-only, no model or native turn', 'private fake codex is used only for first-run detection', 'H sends no signal; stop is the package verified own-path', 'SSE is bounded to 1200ms and may emit zero events'],
