@@ -23,6 +23,12 @@ export type AttemptBinding = {
 
 export type Quiescence = { quiescence: 'confirmed' | 'indeterminate'; evidenceRefs: readonly string[] }
 
+/** The original authenticated registration; not permission to write or launch another attempt. */
+export type AttachedAttemptPort = {
+  readonly registration: { socketPath: string; credentialPath: string; socketIdentity: { dev: number; ino: number } }
+  readonly producer: RuntimeProducer
+}
+
 /** One launched attempt, as seen by the Supervisor. */
 export interface RunningAttempt {
   readonly attemptId: string
@@ -32,6 +38,8 @@ export interface RunningAttempt {
   waitExit(): Promise<ServeExit>
   /** Ask the Runner to stop; resolves only with physical-stop evidence. */
   stop(deadlineMs: number): Promise<Quiescence>
+  /** Available only after the host has registered its original Runner. Node-internal, never a public DTO. */
+  readonly attachPort?: AttachedAttemptPort
 }
 
 /** Launches attempts. The real implementation lives in apps/runner; tests inject a fake. */

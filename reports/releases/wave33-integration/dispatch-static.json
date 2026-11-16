@@ -1,0 +1,23 @@
+{
+  "status": "PASS_WHOLE_PRODUCT_DISPATCH_STATIC_ONLY",
+  "externalAgents": 10,
+  "ownersIncludingMain": 11,
+  "completeOutcomesPerOwner": 3,
+  "plannedOutcomes": 33,
+  "acyclic": true,
+  "checkpoints": 29,
+  "ownershipDisjoint": true,
+  "originalBranchesChecked": 11,
+  "localLinks": 84,
+  "currentSource": "fc38bf65b6a05a7771fc58829152c512255a6a29",
+  "mainOriginalPortPublished": true,
+  "mainActualWorkbenchConsumer": true,
+  "activeRecoveryStillRequired": true,
+  "existingCohortNotRecreated": true,
+  "cacExcluded": true,
+  "temporaryPackagingSprint": false,
+  "budgetUnchanged": true,
+  "runtimeTests": 0,
+  "nativeTurnStarts": 0,
+  "releaseApproved": false
+}
