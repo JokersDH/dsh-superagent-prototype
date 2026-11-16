@@ -323,6 +323,24 @@
   line-height: 1.65;
 }
 
+.trial-empty-project {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.trial-empty-project .trial-muted {
+  margin-top: 0;
+}
+
+.trial-empty-project button {
+  min-height: 34px;
+  padding: 6px 11px;
+  font-size: 12px;
+}
+
 .trial-muted {
   margin: 10px 0 0;
   color: var(--muted);
@@ -376,8 +394,8 @@
 
 .trial-banner button {
   flex: 0 0 auto;
-  min-height: 30px;
-  padding: 4px 10px;
+  min-height: 34px;
+  padding: 6px 11px;
   font-size: 12px;
 }
 
@@ -630,6 +648,35 @@
   font-size: 10px;
 }
 
+.trial-export-status {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.trial-support {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.trial-support > summary {
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 550;
+  line-height: 1.6;
+  cursor: pointer;
+}
+
+.trial-support-rows {
+  margin-top: 8px;
+}
+
+.trial-support-rows .trial-fact dd {
+  text-align: right;
+}
+
 @media (max-width: 960px) {
   .trial-next {
     flex-direction: column;
@@ -677,5 +724,9 @@
   .trial-actions button {
     flex: 1 1 auto;
     justify-content: center;
+  }
+
+  .trial-observation-toolbar {
+    flex-wrap: wrap;
   }
 }
