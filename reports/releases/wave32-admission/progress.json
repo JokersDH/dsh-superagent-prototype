@@ -1,0 +1,204 @@
+{
+  "protocol": "product-completion-estimate/1",
+  "date": "2026-11-16",
+  "productSource": "303b2c6a974856661c21d0617bd710ebe87374d1",
+  "method": "Same original12 deliverable weights and4 SchemeB group weights; evidence-based engineering estimate with uncertainty. No credit for agent count, planned outcomes, commits or test-pass ratio; not release authorization.",
+  "stableAlpha": {
+    "rawScore": 76,
+    "totalWeight": 100,
+    "roundedEstimatePercent": 75,
+    "engineeringRangePercent": [
+      70,
+      80
+    ],
+    "deliverables": [
+      {
+        "id": "conversation",
+        "name": "主对话、流式与日常工作台",
+        "weight": 8,
+        "completed": 8,
+        "evidence": "真实HTTP/SSE、模型配置、桌面/手机、上下文历史/原文已接通"
+      },
+      {
+        "id": "projects",
+        "name": "项目导入、目录与设置版本",
+        "weight": 7,
+        "completed": 7,
+        "evidence": "本机Git项目、持久会话/搜索、设置/归档等已有实际消费者"
+      },
+      {
+        "id": "work-contract",
+        "name": "委托与版本化合同",
+        "weight": 8,
+        "completed": 8,
+        "evidence": "明确确认、scope/criteria/profile、修订与旧版本守卫已接通"
+      },
+      {
+        "id": "workspace",
+        "name": "隔离工作区与依赖准备",
+        "weight": 8,
+        "completed": 7,
+        "evidence": "真实worktree/冻结、Node和普通单包pnpm离线缓存已验证；适用范围有限"
+      },
+      {
+        "id": "delivery",
+        "name": "机器检查、补丁与人工验收",
+        "weight": 10,
+        "completed": 9,
+        "evidence": "真实Codex正常交付链曾通过；当前验证/接受/导出已有回归"
+      },
+      {
+        "id": "questions",
+        "name": "提问、回答与运行控制",
+        "weight": 10,
+        "completed": 6,
+        "evidence": "Broker/逐target协议与产品界面存在；原生审批/steer/运行中停止覆盖不全"
+      },
+      {
+        "id": "durability",
+        "name": "回执、回复结果与审计持久化",
+        "weight": 10,
+        "completed": 8,
+        "evidence": "A18真实SQL、消息结果SIGKILL恢复、历史来源与原请求核对已验证"
+      },
+      {
+        "id": "active-recovery",
+        "name": "活动任务恢复与物理资源屏障",
+        "weight": 10,
+        "completed": 4,
+        "evidence": "部分认证/屏障通过；B最新测试仍未覆盖真实产品命令恢复"
+      },
+      {
+        "id": "restore",
+        "name": "非空备份、搬根与新授权",
+        "weight": 8,
+        "completed": 5,
+        "evidence": "源级v1/v2及准确R1非空备份/搬根/恢复只读已有实际证据；旧队列不重放，target新执行授权仍未闭合。只加1，不把数据恢复等作业务恢复。"
+      },
+      {
+        "id": "distribution",
+        "name": "当前个人安装、升级与多实例",
+        "weight": 10,
+        "completed": 7,
+        "evidence": "准确R1 829安装/正常与恢复只读启停/静态UI和固定包闭包已有独立证据；R2 4dcd已冻且字节/导出核验，但E未同包独立验。测试清理残余和跨机/长期未达，非10/10。"
+      },
+      {
+        "id": "release-proof",
+        "name": "独立当前版本验收与稳定性",
+        "weight": 8,
+        "completed": 4,
+        "evidence": "E已真实转R1，recorded ordinary195/functional196PASS；独立复核保留正常启停合法证据，但两项目/Work重开oracle不足且R2未验，不能按总PASS给高分。"
+      },
+      {
+        "id": "readiness",
+        "name": "无执行器退化与接入收口",
+        "weight": 3,
+        "completed": 3,
+        "evidence": "main preparePersonalStartup处理缺CLI/版本不符/探测失败为executionUnavailable，讨论/审阅可启动；显式discussion-only/currentreadiness与R1独立准入有证据。原生控制仍在questions/recovery项扣分。"
+      }
+    ],
+    "measuredGateStatus": "PERSONAL_CONTROLLED_ALPHA_PROGRESS_NOT_STABLE_RELEASE"
+  },
+  "fullSchemeB": {
+    "rawScore": 55.7,
+    "roundedEstimatePercent": 55,
+    "engineeringRangePercent": [
+      50,
+      60
+    ],
+    "groups": [
+      {
+        "id": "stable-alpha",
+        "name": "首期稳定内测",
+        "weight": 70,
+        "completion": 76
+      },
+      {
+        "id": "multi-protocol",
+        "name": "多协议扩展",
+        "weight": 15,
+        "completion": 10
+      },
+      {
+        "id": "innovation-value",
+        "name": "创新收益验证",
+        "weight": 10,
+        "completion": 10
+      },
+      {
+        "id": "cac",
+        "name": "CAC与高级协作",
+        "weight": 5,
+        "completion": 0
+      }
+    ],
+    "notes": [
+      "Multi-protocol credit covers interfaces only; no second real protocol admitted",
+      "Innovation credit covers experiment preparation only; measured benefit is unproven",
+      "Desktop shell and shared cloud hosting are not added to this denominator",
+      "No second real protocol, no effective innovation-value experiment, no CAC production integration in this review. Candidate branches not integrated do not automatically increase main completion."
+    ]
+  },
+  "releaseApproved": false,
+  "hardGates": [
+    "Main remote terminal shutdown must close original lease; late native/fact/reply must not settle after terminal.",
+    "B original ProductStore/Application/QuestionBroker sameWork crash-to-currentCandidate/manualaccept and actual2/4scheduler resource release remain NOT_REACHED.",
+    "B/H complete independent original spawn identity before live fault signals; residual tools not admitted.",
+    "E package STOPPED with known birth but no fixed set must retain; journey oracle must require each original project/scoped observations/reopened Work identities.",
+    "E independently verify actualR2 artifact, retaining exactR1 scope; no broad/cross-machine/long-duration release from old reports.",
+    "Private/target restored execution authority and full native questions/control/version compatibility remain separately unverified."
+  ],
+  "realModelTurnsThisAudit": 0,
+  "nativeTurnStartsThisAudit": 0,
+  "observedMain": "8deda18dd249c53f21a79b37b4683eebea9910c5",
+  "baselineEstimate": "reports/releases/wave13-admission/progress.json",
+  "evidenceScope": {
+    "source": "303b2c6a",
+    "independentlyMeasuredInstalled": "R1 source82ee5b8f/build8296720d8a25f38c/SHA04926739…",
+    "newerFrozenCandidate": "R2 build4dcd28f758bbb265/SHA405ecd02… without E verdict",
+    "latestExternalHeads": {
+      "A": "02dc4aa889bdf3e5832808133916ff43b22e49f3",
+      "B": "4b693eae30610fba134a2f151f835368e8903953",
+      "C": "84b9376d9e0dd2ccb4d85d1017cf2ad5fe6b0fc0",
+      "D": "790671ef449327c68e58c90859be9231a36dfbea",
+      "E": "3cbc648a4a1d5467f669bb42685fb279a7ba7135",
+      "F": "328ffb1ca3718ff03cb0e0ebddfc60b790272b51",
+      "G": "6dbb344024fd6ac014948f24a5ce61ea66ac6720",
+      "H": "3ea07a7df1d969410547c6f7fc03a105977609d1",
+      "I": "cf2e0a9cc92d10546afe40b04244cd9259bca2f4",
+      "J": "b25bf228e55d8428881a8ee1f6c723ad6753bc73"
+    },
+    "candidateDeliveryIsMainIntegration": false,
+    "ordinaryInstalledPassIsNativeRecoveryPass": false
+  },
+  "changedScores": [
+    {
+      "id": "restore",
+      "weight": 8,
+      "before": 4,
+      "after": 5,
+      "reason": "源级v1/v2及准确R1非空备份/搬根/恢复只读已有实际证据；旧队列不重放，target新执行授权仍未闭合。只加1，不把数据恢复等作业务恢复。"
+    },
+    {
+      "id": "distribution",
+      "weight": 10,
+      "before": 4,
+      "after": 7,
+      "reason": "准确R1 829安装/正常与恢复只读启停/静态UI和固定包闭包已有独立证据；R2 4dcd已冻且字节/导出核验，但E未同包独立验。测试清理残余和跨机/长期未达，非10/10。"
+    },
+    {
+      "id": "release-proof",
+      "weight": 8,
+      "before": 3,
+      "after": 4,
+      "reason": "E已真实转R1，recorded ordinary195/functional196PASS；独立复核保留正常启停合法证据，但两项目/Work重开oracle不足且R2未验，不能按总PASS给高分。"
+    },
+    {
+      "id": "readiness",
+      "weight": 3,
+      "before": 1,
+      "after": 3,
+      "reason": "main preparePersonalStartup处理缺CLI/版本不符/探测失败为executionUnavailable，讨论/审阅可启动；显式discussion-only/currentreadiness与R1独立准入有证据。原生控制仍在questions/recovery项扣分。"
+    }
+  ]
+}

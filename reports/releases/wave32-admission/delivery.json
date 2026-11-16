@@ -1,0 +1,212 @@
+{
+  "protocol": "wave32-delivery-admission/1",
+  "date": "2026-11-16",
+  "requestScope": "Read-only acceptance of completed wave31 D/E delivery and accurate install/use guidance. No new task packets, runtime/model/native executions, service changes, signals or global process discovery.",
+  "fixedInputs": {
+    "D": "790671ef449327c68e58c90859be9231a36dfbea",
+    "DWorkingTreeDirty": false,
+    "E": "3cbc648a4a1d5467f669bb42685fb279a7ba7135",
+    "EWorkingTreeDirty": false,
+    "EActualTestSource": "d32080f543ceac7f127113a5a0adefa232f718f0",
+    "EActualTestSourceDirty": false,
+    "actualReport": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T01-04-18-721Z/report.json",
+    "checkedAt": "2026-11-16T01:10:48.844Z",
+    "note": "The current E subject is R1 82ee/829, not stale ce64 or1fba. Candidate HEAD and measured test source are distinct because final HEAD records the completed run."
+  },
+  "r1": {
+    "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+    "buildId": "8296720d8a25f38c",
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave30-target/wave30-target-8296720.tar.gz",
+    "sha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+    "tarBytes": 20481470,
+    "manifestEntries": 6849,
+    "tarEntries": 7405,
+    "archiveRoot": "install/",
+    "launcher": "install/bin/pa",
+    "manifest": "install/install.json",
+    "payload": "install/app/",
+    "independentTarHashAndManifestRecheck": "PASS",
+    "previousCompleteEntryCheck": "wave31-admission/delivery.json:6849 entries and197 source closure records were independently verified",
+    "latestECounts": { "PASS": 288, "FAIL": 0, "NOT_TESTED": 19 },
+    "independentRecordedOracle": {
+      "method": "Import actual current E evaluateRelease/tier/resolveFixtureDigest; evaluate the complete recorded report at its checkedAt with its actual clean test source",
+      "ordinaryInstalled": { "tier": "installed-alpha", "required": 195, "ok": true, "failures": [] },
+      "functionalInstalled": { "tier": "installed-functional", "required": 196, "ok": true, "failures": [] },
+      "fullProduct": {
+        "tier": "full-product",
+        "required": 197,
+        "ok": false,
+        "failures": ["missing_required_case:E5-NATIVE-DELIVERY", "case_not_pass:E5-NATIVE-CONTROL", "layer_not_allowed:E5-NATIVE-CONTROL", "required_evidence_missing:E5-NATIVE-CONTROL"]
+      },
+      "interpretation": "Real ordinary installed and normal/restored package-stop progress on this exact R1 is retained. These are scoped recorded conclusions, not full product, native, value, private startup or target admission. The new journey semantics below must not be promoted by the aggregate PASS."
+    },
+    "normalAndRestoredStop": {
+      "packageStatus": "STOPPED",
+      "exit": 0,
+      "proofFallbackUsed": false,
+      "normalBefore": [{ "pid": 61311, "start": "Mon Nov 16 09:10:17 2026" }, { "pid": 61348, "start": "Mon Nov 16 09:10:18 2026" }],
+      "restoredBefore": [{ "pid": 61644, "start": "Mon Nov 16 09:10:19 2026" }, { "pid": 61680, "start": "Mon Nov 16 09:10:19 2026" }],
+      "after": "Each same pid/expectedStart explicitly records alive=false and sameIdentity=false; both instance records absent",
+      "independentOriginalValidator": "PASS",
+      "independentEmptyAfterMutation": "REFUSED_stopFunctional_invalid",
+      "independentWrongAfterPidMutation": "REFUSED_stopFunctional_invalid"
+    },
+    "userVisibleScope": ["Ordinary installed web workbench, conversation and project registration", "Read-only task recipe preview and existing explicit draft/create entrypoints", "Controlled fixture candidate/manual acceptance and recorded artifacts", "7/30-day observations with scope/unknown/partial semantics", "Context preparation, confirmation, reply, history and optional scope diagnostics", "Ordinary installation, stopped/reopened roots, backup and restored read-only scopes"],
+    "notInR1": ["New main303 observation download export", "New current A/C/F/G/J candidate changes", "Proven two registered personal projects executing their own delivery chains", "Proven personal reopen of fixture Work views", "Real vendor/native recovery, target/private grants or measured efficiency benefit"]
+  },
+  "r2": {
+    "source": "c0a1f8975232b6397dfaf92d31ac5682df2dab36",
+    "runtimeCheckpoint": "303b2c6a",
+    "buildId": "4dcd28f758bbb265",
+    "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave31-target/wave31-target-4dcd28f.tar.gz",
+    "sha256": "405ecd02fcbf288bac0855e17911ec4035521b54fe27d81fa0b28feaf5addcc6",
+    "tarBytes": 20540568,
+    "tarEntries": 7421,
+    "manifestEntries": 6864,
+    "regularFiles": 6841,
+    "internalSymlinks": 23,
+    "regularBytes": 68705149,
+    "verifiedInstall": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-wave32-package-2pZwBZ/install",
+    "verification": {
+      "tarShaAndBytes": "PASS",
+      "boundedSafeMemberNames": "7421 safe install-relative members; listing/decompression commands bounded",
+      "eachManifestFileSizeAndSha": "PASS",
+      "eachLinkTargetAndInternalRealpath": "PASS",
+      "mismatches": [],
+      "sourceClosureRecords": 209,
+      "uniqueSourcePaths": 198,
+      "sourceClosureCheck": "All209 reported source records match git c0a1f897 bytes and hashes;11 duplicated paths occur across source groups",
+      "sourceClosureMismatches": [],
+      "compiledConsoleNote": "Packaged frontend is built dist and structured sourcemap, not a complete copy of development source/tests/tools. Source closure is checked against the exact source commit; runtime manifest separately verifies all packaged bytes."
+    },
+    "sourceScope": {
+      "main303IsAncestor": true,
+      "diffMain303ToBuildC0aPackagesAndApps": "EMPTY",
+      "diffBuildC0aToLatestD790PackagesAndApps": "EMPTY",
+      "includes": "Main303 integrated runtime checkpoint, including the previously reviewed G display export, J/F workbench and reviewed runtime source slices",
+      "doesNotInclude": "Later wave31 A/C/F/G/J candidate changes unless they were already integrated at main303. Reports or later D HEAD do not update frozen runtime bytes.",
+      "strictExportContractSha": "caa8c26787d9e6da7fd732617e51130f134d51324fada90071cbb7d1cab8110b"
+    },
+    "actualConsoleStructuredSourcemap": {
+      "App": ["useObservationDownload", "downloadUsageObservation", "onDownloadInsights", "onSelectInsightWindow"],
+      "TrialWorkspace": ["onDownloadInsights", "onSelectInsightWindow"],
+      "transport": ["downloadUsageObservation", "/v1/insights/export"],
+      "downloadHook": ["useObservationDownload", "downloadUsageObservation"],
+      "interpretation": "These fields occur in the actual immutable bundle sourcesContent entries, not merely a current checkout or an unrelated source file."
+    },
+    "dCandidateEvidence": {
+      "windowAndExport": "13/13, two downloads, six export reads, zero business posts,21 read-only recipe preview POSTs, eventDelta0",
+      "installedJ": "6/6",
+      "installedF": "8/8",
+      "managedUpgradeFromR1": "7/7",
+      "personalLifecycle": "7/7",
+      "backup": "6/6",
+      "noExecutor": "4/4",
+      "portable": "5/5",
+      "nonemptyRelocation": "4/4 uses retained controlled B normal-producer data; v1/v2 families13/21, question/answer/delivery/binding preserved, second-root read-only and source not_granted",
+      "relocationLimit": "Historical Work read is explicitly NOT_TESTED/not authorized; no cross-machine or recovered native execution claim",
+      "liveFaultLimit": "D now records one exact-own parent SIGKILL/child alive window with UNKNOWN retention. Partial-write/interrupted-restore,48h and broad faults remain unmeasured; this audit did not repeat any live fault."
+    },
+    "independentEOnSameR2": "NOT_REACHED",
+    "admission": "Verified coherent newer candidate with genuine installed-byte D developer evidence; not independently E-certified ordinary/functional R2 and not native/full-product admission."
+  },
+  "oldEFindingsRechecked": {
+    "method": "Actual E packaged-instance imported with mocked node:child_process and captured process.kill; all liveness/process/argv responses synthetic, no global ps or real signal",
+    "knownChildAfterPackageStopped": { "status": "CLOSED", "clean": false, "retained": true, "reason": "known_resource_alive_after_package_stop", "signals": [] },
+    "legalCompleteParentChild": { "status": "CLOSED", "clean": true, "capturedSyntheticSignals": ["TERM101", "TERM102"], "realSignals": 0 },
+    "defaultNoRecordKnownBirth": { "status": "PRESERVED", "clean": false, "retained": true, "reason": "record_missing_known_birth", "signals": [] },
+    "emptyPostStopObjects": { "status": "CLOSED", "fullRecordedOracleMutation": "REFUSED_stopFunctional_invalid" },
+    "wrongJourneySubject": { "fullRecordedOracleMutation": "REFUSED_subject_mismatch" },
+    "globalPsCalls": 0,
+    "realSignals": 0
+  },
+  "findingsOrdered": [
+    {
+      "id": "E_PACKAGE_STOPPED_WITH_KNOWN_BIRTH_BUT_NO_FIXED_SET_RETURNS_CLEAN",
+      "priority": "P1_TEST_TOOL_MATERIAL_SAFETY",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/lib/packaged-instance.mjs",
+      "line": 206,
+      "summary": "The repaired package-success branch checks preStop.set, but captureKnownSet does not include birth. With an absent record and resources=null, the known set is empty even when a known birth is alive. A package STOPPED then returns clean=true/retained=false without observing that birth, allowing releaseRoot to discard its material.",
+      "independentPureControl": { "packageStop": true, "packageResult": "STOPPED_exit0", "recordPresent": false, "birth101Alive": true, "resources": null, "preStopCount": 0, "actualClean": true, "actualRetained": false, "signals": [], "realSignals": 0 },
+      "expected": "A known birth with no complete fixed set stays UNKNOWN and retained on the package-success path, just as on the existing no-record default path.",
+      "narrowCorrection": "Before returning clean from package-success, require the complete fixed resource set for a known birth or conservatively retain. Keep the now-fixed explicit known-child and legal multi-resource paths closed.",
+      "scope": "Residual test-tool early-clean branch; the recorded R1 normal/restored stop positive includes complete observed sets and is not negated. No product lifecycle defect or unsafe live action was demonstrated."
+    },
+    {
+      "id": "E_TWO_PROJECT_JOURNEY_ORACLE_ACCEPTS_SINGLE_FIXTURE_AND_MISSING_WORK_REOPEN",
+      "priority": "P2_ACCEPTANCE_SEMANTICS",
+      "files": ["/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/cases/w31-journey.mjs", "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/lib/release.mjs"],
+      "lines": [157, 510, 559],
+      "summary": "The report honestly records two registered personal project previews but both are needs_input. Both deliveries execute as the same controlled project-atlas; selected personal project observations are403 while unscoped windows200. Personal reopen finds neither Work view, and only conversation message counts are required. This is not a same-project preview/apply/create/check/accept/reopen journey for two personal projects.",
+      "actualRawEvidence": {
+        "personalProjects": ["project-fa8193f50707241bd3e28d07", "project-0c1b0e9ff69075bd7d2cd4e1"],
+        "previewStatuses": ["needs_input", "needs_input"],
+        "executionProjectIds": ["project-atlas", "project-atlas"],
+        "deliveryPhases": ["delivered", "delivered"],
+        "acceptReceipts": ["recorded", "recorded"],
+        "personalProjectScopedObservationStatuses": [403, 403],
+        "openObservationStatuses": [200, 200],
+        "reopenedWorkFound": [false, false],
+        "reopenedWorkPhase": [null, null],
+        "reopenedConversationMessages": [2, 6]
+      },
+      "independentFullRecordedOracleMutation": {
+        "mutation": "Force needs_input/fieldsnull and selected-project403 on both, bind both executions to project-atlas, set both reopened Work foundfalse/phase null; retain recorded conversation messages and complete resource stops",
+        "expectedForFullTwoProjectJourney": "REFUSE_OR_NARROW_THE_CLAIM",
+        "actualInstalledFunctional": "PASS_196_REQUIRED",
+        "interpretation": "195/196 recorded ordinary/functional PASS remains an accurate scoped outcome of the present gate, but the gate does not prove the broader journey semantics."
+      },
+      "narrowCorrection": "Separate the already proven personal registration/context, single-fixture two-Work delivery, conversation persistence and physical-stop scopes. A true two-project journey needs draft fields applied to each original project, explicit create against that same project, scoped observations and admitted reopened Work identity; mode restrictions remain guards."
+    },
+    {
+      "id": "D_GUIDES_STILL_DESCRIBE_OLD_E_SUBJECT_AND_D11_STATE",
+      "priority": "P2_OPERATOR_DOCUMENTATION",
+      "files": ["/Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/recipes/wave31-r1-r2-guide.zh-CN.md", "/Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/recipes/wave30-install-guide.zh-CN.md"],
+      "summary": "Latest guides still say E is on1fba/R1 waiting and that no parent-exit-child-live probe ran, although current E measures R1 and latest D records that limited live fault. The install recipe reuses fixed /tmp directories, and backup/restore examples use obsolete --output/--from flags instead of actual --out/--bundle/--to.",
+      "narrowCorrection": "Use current exact R1/E and separate R2 pending scope, fresh no-overwrite roots and actual launcher flags. This audit supplies corrected shortest ordinary steps below without editing candidate guides."
+    }
+  ],
+  "shortestUserRecipe": {
+    "recommendedStableSubject": "R1 829: independently measured ordinary/functional installed candidate on macOS arm64/Node24.21.x/ABI137; newer R2 export remains D developer-tested only",
+    "platform": "darwin arm64, Node>=24.21.0 <25, ABI137, SQLite3.53.4; Linux/Windows/x64/other machines and native execution remain unmeasured",
+    "archiveAndEntry": "Archive expands as install/; use <new-extract-root>/install/bin/pa, not a bin/pa directly at archive root",
+    "adoption": "On a fresh private config root, first-run verifies and automatically adopts the same install manifest. --adopt-release is unnecessary; do not use it to replace an existing unrelated config identity.",
+    "manualStepsNotExecuted": [
+      "Verify Node24.21.x and ABI137. Set PA_TAR=/Users/hh/Desktop/joker/pa-artifacts/wave30-target/wave30-target-8296720.tar.gz; verify shasum -a 256 equals04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543.",
+      "Set PA_EXTRACT=$(mktemp -d \"$HOME/superagent-r1.XXXXXX\"); tar -xzf \"$PA_TAR\" -C \"$PA_EXTRACT\". The new extraction root must not already contain an install.",
+      "Set PA_BIN=\"$PA_EXTRACT/install/bin/pa\"; set PA_TRIAL_ROOT=$(mktemp -d \"$HOME/.superagent-trial.XXXXXX\"). Keep this root path for later commands.",
+      "Export PA_CONFIG_ROOT=\"$PA_TRIAL_ROOT/config\", PA_DATA_ROOT=\"$PA_TRIAL_ROOT/data\", PA_CACHE_ROOT=\"$PA_TRIAL_ROOT/cache\", PA_LOGS_ROOT=\"$PA_TRIAL_ROOT/logs\", PA_WORKSPACE_ROOT=\"$PA_TRIAL_ROOT/workspaces\". The bin wrapper respects these variables for every subsequent command.",
+      "Export PA_MODEL_CONFIG=\"$PA_CONFIG_ROOT/model.json\" to avoid silently sharing another trial's model settings. Run \"$PA_BIN\" first-run --json, then \"$PA_BIN\" doctor --json. first-run only probes an executor version and creates private roots; it does not grant native execution.",
+      "Configure the private model.json when chat is needed, with directory0700/file0600 and schema fields listed below. No key is embedded in the package or this report.",
+      "Run \"$PA_BIN\" start --discussion-only --port 5260 --api-port 8860 --open; if occupied choose another free pair. This starts a new trial only; it does not stop or replace the preserved twelve instances.",
+      "Run \"$PA_BIN\" status --json with the same environment. Open the returned instance.consoleURL, or use start --open on macOS. Browser model sending occurs only for the user's explicit chat request.",
+      "In the workbench: inspect readiness, import a Git project, preview a template, apply/edit its fields, and explicitly create only when the configured executor is available. discussion-only has no execution; controlled fixture demonstrations are not native delivery.",
+      "For this exact trial run \"$PA_BIN\" stop --json using the same five roots and same bin. BLOCKED/UNKNOWN means preserve the root and inspect status/doctor; no forced global cleanup."
+    ],
+    "privateModelConfigurationSchema": {
+      "baseURL": "Your OpenAI-compatible endpoint including/v1",
+      "apiKey": "Your private key, stored only in the0600file",
+      "model": "One member of allowedModels",
+      "allowedModels": ["Your selected allowed model names"],
+      "allowInsecureHttp": "false for HTTPS; explicitly true only for a chosen HTTP endpoint",
+      "maxOutputTokens": "Optional integer64..4096",
+      "suggestionsEnabled": "Optional boolean"
+    },
+    "configurationLimit": "The current web model selector selects among allowedModels; source PrivateModelProvider reads connection/key from the private JSON file. Do not promise a GUI API-key editor absent from this measured source.",
+    "sameRootRule": "--config-root alone does not automatically restore all other root overrides for every CLI command. Keep the five environment variables or repeat all root flags; the bin sets PA_INSTALL_ROOT to its own exact payload.",
+    "r2OptIn": "For the newer developer-tested export candidate, use a separate fresh extraction/root with the R2 tar and SHA405ecd02fcbf288bac0855e17911ec4035521b54fe27d81fa0b28feaf5addcc6. The same entry commands apply. Do not reuse R1's config to silently adopt R2 or label R2 independently certified.",
+    "readOnlyActualHelpCheck": { "command": "node <verifiedR2>/app/apps/launcher/bin/pa.mjs help start", "exit": 0, "effect": "Only printed help; no root/state/service created or started" }
+  },
+  "limits": {
+    "realVendorModelNativeTurns": 0,
+    "realSignals": 0,
+    "globalProcessDiscovery": 0,
+    "serviceRestarts": 0,
+    "newTarBuilds": 0,
+    "candidateEdits": 0,
+    "newTaskPackets": 0,
+    "preserved": "Twelve service pairs5180/8796 through5191/8807 and all state/profile/tar/ledger/history/candidate trees",
+    "releaseFreshness": "Oracle re-evaluation uses recorded checkedAt to validate the historical run; it does not renew freshness or authorize future release.",
+    "percentages": "New package/test counts do not establish a new completion percentage or efficiency gain. Use the concrete admitted scopes above."
+  }
+}
