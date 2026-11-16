@@ -1,0 +1,11 @@
+WAVE35_EXACT_BUDGET {"status":"ok","returned":187,"hasMore":true,"bytes":4193837,"maxBytes":4194304,"nextCursor":true}
+WAVE33_CONTINUATION {"pages":[50,50,20],"unique":120,"available":120,"zeroHasMore":true,"reviewsReturned":3}
+✔ completion history continues beyond the 50-row source cap by stable keyset pages (142.569167ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 321.145125

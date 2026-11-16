@@ -666,6 +666,7 @@ export interface CompletionHistoryPage {
   coverage: 'complete' | 'truncated'
   entries: readonly unknown[]
   unclassifiedReviews: readonly UnclassifiedReviewFact[]
+  omittedUnclassifiedReviews: number
   limits: { maxLimit: 200; maxBytes: number }
 }
 
@@ -854,7 +855,7 @@ export class WorkflowIndex {
             : count(`SELECT COUNT(*) AS count FROM completion_verifications WHERE ticket_id IN (${ph || "''"})`, ticketIds)
       return { protocol: 'completion-history/1', status: 'ok', reason: null, workId, projectId, kind: query.kind, limit,
         returned: 0, available, hasMore: available > 0, nextCursor: null, coverage: available > 0 ? 'truncated' : 'complete',
-        entries, unclassifiedReviews, limits: { maxLimit: 200, maxBytes } }
+        entries, unclassifiedReviews, omittedUnclassifiedReviews: 0, limits: { maxLimit: 200, maxBytes } }
     }
     if (query.kind === 'contracts') {
       const [rev, dig] = cursorKey ? cursorKey.split('\u0000') : []
@@ -908,29 +909,40 @@ export class WorkflowIndex {
       }
     }
 
-    // One byte budget covers the serialized envelope, every entry and top-level unclassified facts for all collections.
-    const envelope = { protocol: 'completion-history/1' as const, workId, projectId, kind: query.kind, limit, available,
-      limits: { maxLimit: 200, maxBytes } }
-    let used = Buffer.byteLength(JSON.stringify({ ...envelope, entries: [], unclassifiedReviews: [] }))
-    for (const item of unclassifiedReviews) used += Buffer.byteLength(JSON.stringify(item)) + 1
-    let included = 0
-    for (const entry of entries) {
-      const size = Buffer.byteLength(JSON.stringify(entry)) + 1
-      if (used + size > maxBytes) break
-      used += size; included += 1
+    // Exact final-envelope budget: hasMore/nextCursor/coverage/reason and unclassified facts are all
+    // included before accepting a page. A page that cannot fit its first entry is explicitly blocked.
+    let selected = entries.slice()
+    let selectedUnclassified = unclassifiedReviews.slice()
+    let omittedUnclassifiedReviews = 0
+    const makePage = (status: 'ok' | 'blocked', reason: 'entry_too_large' | 'page_budget' | null,
+      pageEntries: unknown[], pageUnclassified: UnclassifiedReviewFact[]): CompletionHistoryPage => {
+      const pageHasMore = hasMore || pageEntries.length < entries.length
+      const pageKey = pageEntries.length ? keys[pageEntries.length - 1] : null
+      return { protocol: 'completion-history/1', status, reason, workId, projectId, kind: query.kind, limit,
+        returned: pageEntries.length, available, hasMore: pageHasMore,
+        nextCursor: pageHasMore && pageKey ? this.historyCursor(query, projectId, pageKey) : null,
+        coverage: pageHasMore ? 'truncated' : 'complete', entries: pageEntries, unclassifiedReviews: pageUnclassified,
+        omittedUnclassifiedReviews, limits: { maxLimit: 200, maxBytes } }
     }
-    if (entries.length > 0 && included === 0) {
-      return { protocol: 'completion-history/1', status: 'blocked', reason: 'entry_too_large', workId, projectId, kind: query.kind,
-        limit, returned: 0, available, hasMore: true, nextCursor: null, coverage: 'truncated', entries: [], unclassifiedReviews,
-        limits: { maxLimit: 200, maxBytes } }
+    let page = makePage('ok', entries.length > selected.length ? 'page_budget' : null, selected, selectedUnclassified)
+    while (Buffer.byteLength(JSON.stringify(page)) > maxBytes) {
+      if (selected.length > 0) {
+        selected = selected.slice(0, -1)
+        page = makePage('ok', 'page_budget', selected, selectedUnclassified)
+        continue
+      }
+      if (selectedUnclassified.length > 0) {
+        selectedUnclassified = selectedUnclassified.slice(0, -1); omittedUnclassifiedReviews += 1
+        page = makePage('ok', 'page_budget', selected, selectedUnclassified)
+        continue
+      }
+      if (entries.length > 0) {
+        return makePage('blocked', 'entry_too_large', [], [])
+      }
+      return makePage('blocked', 'entry_too_large', [], [])
     }
-    const overBudget = included < entries.length
-    const selected = entries.slice(0, included)
-    hasMore = hasMore || overBudget
-    const nextKey = selected.length ? keys[included - 1] : null
-    return { protocol: 'completion-history/1', status: 'ok', reason: overBudget ? 'page_budget' : null, workId, projectId, kind: query.kind,
-      limit, returned: selected.length, available, hasMore, nextCursor: hasMore && nextKey ? this.historyCursor(query, projectId, nextKey) : null,
-      coverage: hasMore ? 'truncated' : 'complete', entries: selected, unclassifiedReviews, limits: { maxLimit: 200, maxBytes } }
+    if (entries.length > 0 && selected.length === 0) return makePage('blocked', 'entry_too_large', [], [])
+    return page
   }
 
   work(workId: string, projectIds: readonly string[]): WorkIndexEntry | undefined {

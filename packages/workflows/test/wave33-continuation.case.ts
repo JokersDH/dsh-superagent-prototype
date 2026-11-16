@@ -54,6 +54,18 @@ test('completion history continues beyond the 50-row source cap by stable keyset
     const blocked = ports.index.completionHistory({ workId: 'wave33-work', projectIds: ['wave33-project'], kind: 'verifications', limit: 1 })
     assert.equal(blocked.status, 'blocked'); assert.equal(blocked.reason, 'entry_too_large')
     assert.equal(blocked.returned, 0); assert.equal(blocked.hasMore, true); assert.equal(blocked.nextCursor, null)
+    const medium = JSON.stringify('m'.repeat(22000))
+    const insertMedium = store.db.prepare(`INSERT INTO completion_verifications
+      (id, ticket_id, assignment_id, candidate_generation, contract, artifact_digest, criteria_digest,
+       environment_ref, verifier_identity_ref, results, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+    for (let index = 0; index < 205; index += 1) insertMedium.run(`verification-medium-${String(index).padStart(3, '0')}`, 'wave33-ticket',
+      'wave33-assignment', 1, JSON.stringify(contract), 'd'.repeat(64), 'c'.repeat(64), 'environment-1', 'verifier-1', medium, '2026-11-18T00:00:00.000Z')
+    const budget = ports.index.completionHistory({ workId: 'wave33-work', projectIds: ['wave33-project'], kind: 'verifications', limit: 200 })
+    assert.equal(budget.status, 'ok'); assert.equal(budget.hasMore, true); assert.ok(budget.nextCursor)
+    assert.ok(budget.returned > 0 && budget.returned < 200)
+    assert.equal(Buffer.byteLength(JSON.stringify(budget)) <= budget.limits.maxBytes, true)
+    console.log('WAVE35_EXACT_BUDGET', JSON.stringify({ status: budget.status, returned: budget.returned, hasMore: budget.hasMore,
+      bytes: Buffer.byteLength(JSON.stringify(budget)), maxBytes: budget.limits.maxBytes, nextCursor: Boolean(budget.nextCursor) }))
     console.log('WAVE33_CONTINUATION', JSON.stringify({ pages: [first.returned, second.returned, third.returned], unique: new Set(ids).size,
       available: first.available, zeroHasMore: zero.hasMore, reviewsReturned: reviews.returned }))
   } finally { store.close(); rmSync(root, { recursive: true, force: true }) }
