@@ -1,0 +1,13 @@
+✔ registered project metadata becomes exact scoped form fields with no events or project writes (243.035125ms)
+✔ current configuration and stable content digests bind independent previews; metadata changes are detected (234.888458ms)
+✔ HTTP rejects unauthenticated, injected-root, foreign, malformed and wrong-scope requests (248.798666ms)
+✔ missing roots, unreadable metadata, blocked profile and changing configuration never yield actionable fields (245.003125ms)
+✔ two actual previews explicitly enter the original Work/check/currentCandidate/manualaccept chain (2407.82875ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3381.83775

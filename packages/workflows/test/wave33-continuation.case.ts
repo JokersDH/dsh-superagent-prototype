@@ -45,6 +45,15 @@ test('completion history continues beyond the 50-row source cap by stable keyset
     assert.throws(() => ports.index.completionHistory({ workId: 'wave33-work', projectIds: ['wave33-project'], kind: 'attempts', cursor: first.nextCursor! }))
     const reviews = ports.index.completionHistory({ workId: 'wave33-work', projectIds: ['wave33-project'], kind: 'reviews', limit: 3 })
     assert.equal(reviews.returned, 3); assert.equal(reviews.coverage, 'truncated')
+    const huge = 'x'.repeat(4 * 1024 * 1024 + 1024)
+    store.db.prepare(`INSERT INTO completion_verifications
+      (id, ticket_id, assignment_id, candidate_generation, contract, artifact_digest, criteria_digest,
+       environment_ref, verifier_identity_ref, results, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+      .run('verification-huge', 'wave33-ticket', 'wave33-assignment', 1, JSON.stringify(contract), 'd'.repeat(64), 'c'.repeat(64),
+        'environment-1', 'verifier-1', JSON.stringify(huge), '2026-11-17T00:00:00.000Z')
+    const blocked = ports.index.completionHistory({ workId: 'wave33-work', projectIds: ['wave33-project'], kind: 'verifications', limit: 1 })
+    assert.equal(blocked.status, 'blocked'); assert.equal(blocked.reason, 'entry_too_large')
+    assert.equal(blocked.returned, 0); assert.equal(blocked.hasMore, true); assert.equal(blocked.nextCursor, null)
     console.log('WAVE33_CONTINUATION', JSON.stringify({ pages: [first.returned, second.returned, third.returned], unique: new Set(ids).size,
       available: first.available, zeroHasMore: zero.hasMore, reviewsReturned: reviews.returned }))
   } finally { store.close(); rmSync(root, { recursive: true, force: true }) }

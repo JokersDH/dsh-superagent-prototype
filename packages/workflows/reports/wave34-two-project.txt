@@ -1,0 +1,10 @@
+WAVE32_TWO_PROJECT_REOPEN {"works":[{"projectId":"project-0be7dfe228eaab122ede4ae2","workId":"c1570c8f69bf02c83f45838c201e74e2","contractDigest":"2e07c4172ad9749ba1a9f99f8aa28d6b62bd9ae52ac8d1cf9c3d8c71d5979b31"},{"projectId":"project-e70c2ac3acfda3bfb1c3a7d5","workId":"fba9c8686a486ae0e67b2d1b74f86bfc","contractDigest":"b5f0ecb5c3239b41546ac3419e190d8f179ffa575bcc9e52bcb5a39cba1af3f7"}],"heldQueue":true}
+✔ two original projects complete and reopen with their Work/contract/candidate/artifact/receipt facts (2519.041416ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2793.461708
