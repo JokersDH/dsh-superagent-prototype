@@ -1,0 +1,64 @@
+{
+  "ok": true,
+  "status": "CREATED",
+  "bundlePath": "/private/tmp/w33-home2/chat-backup.tar",
+  "archiveSha256": "33568a5805bc58d29971361762ec36ea6600f64e0040f02a316723206e2a96de",
+  "manifestDigest": "70da7753a5a01c6537245c2ef4e63fa8e5892bb8c29bf5d16dee392fae88d083",
+  "bytes": 58321,
+  "counts": {
+    "entries": 38,
+    "artifacts": 36,
+    "excluded": 10
+  },
+  "evidence": {
+    "protocol": "personal-evidence",
+    "formatVersion": 2,
+    "digest": "d307a017b9dad83639aa21aeab99ea0df2c68cb0cfd3fe0d5f394d7661e58e88",
+    "productSchema": 18,
+    "counts": {
+      "projects": 1,
+      "works": 0,
+      "decisions": 0,
+      "assistantDecisions": 0,
+      "assistantProposals": 0,
+      "artifacts": 36,
+      "acceptedEvents": 2,
+      "routeAdvice": 0,
+      "reviewEvidence": 0,
+      "executionOutcomes": 0
+    },
+    "routingEvidence": {
+      "status": "included",
+      "reason": null,
+      "requiredPorts": [],
+      "advice": [],
+      "reviews": [],
+      "outcomes": [],
+      "artifactRefs": [],
+      "missingArtifactRefs": []
+    },
+    "limitations": [
+      "Route advice, review reports and execution outcomes have no storage implementation in this merge; the public RoutingEvidencePort is a contract only.",
+      "The evidence digest covers readable persisted facts from public storage ports, not model quality, native truth or human acceptance.",
+      "Route advice, review evidence and execution outcomes are read from A v13 append-only tables through the public RoutingEvidence port; a record is an immutable fact, not proof of currentness, review PASS or model value.",
+      "Review-evidence artifact references are listed explicitly; a bundle whose review evidence points outside the artifact registry fails closed instead of copying unreferenced bytes.",
+      "Project/worktree content and native sessions are out of scope; only persisted references and digests are included."
+    ]
+  },
+  "database": {
+    "integrity": "ok",
+    "foreignKeyViolations": 0,
+    "eventSeq": 105
+  },
+  "source": {
+    "stateName": "w33-upstate",
+    "instanceRunning": false,
+    "access": null
+  },
+  "limitations": [
+    "Account homes, model/API keys, native authentication, native session material and environment authority receipts are not included.",
+    "Project and worktree content is not included; only non-secret project bindings are carried and must be explicitly rebound/revalidated.",
+    "Runtime records, sockets, PIDs, caches and node_modules are not included.",
+    "Restoring into a new directory does not replay begin/deliver/answer and does not start the daemon."
+  ]
+}

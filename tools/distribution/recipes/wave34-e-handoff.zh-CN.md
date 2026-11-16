@@ -30,6 +30,6 @@ node tools/bootstrap/verify-personal-preview.mjs --zip <W33.zip> \
 
 ## 未达
 - E 对 W33 outer/new inner 的 independent required 仍待；旧 E306/20NT 是 R1+W32 aggregate，不能贴 W33。
-- public review 文件已生成、health 显示 review digest，但本次 candidate source 仍 403（不是 ordinary configured user message）；无授权的 403 已证，授权后 200 未证。业务写入422未测。
+- 无审阅 403 已证；使用 ordinary unanchored message（无 work anchor）和显式 review 后，`GET /v1/messages/<id>/candidates` 返回 200，authorization none；同一恢复实例 `POST /v1/commands` 返回 422 只读拒绝。health 显示 restoredReviewDigest。
 - main `23d5a98e` callbacks/support 是 W33 之后的新 runtime；如需要 successor 必须另 freeze/subject，不能移动本 W33 或重贴本 handoff。
 - 跨机/签名/公证/长时/native/private/target/value 未测；真实 vendor/model/native 0。

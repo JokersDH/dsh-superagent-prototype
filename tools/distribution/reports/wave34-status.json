@@ -2,7 +2,7 @@
   "protocol": "wave34-status/1",
   "owner": "agent-d",
   "branch": "codex/g3-local-distribution",
-  "state": "IN_PROGRESS_PACKAGE1",
+  "state": "COMPLETE_CANDIDATE_PENDING_E",
   "source": "048f0184606202b0b39e7426b7747f3fe57541c1",
   "fixedCohort": {
     "build": "f880e5bc9c6c1c57",
@@ -39,31 +39,54 @@
         ]
       },
       "D2": {
-        "status": "PARTIAL",
-        "actual": "W33 controlled Product/Application -> backup/verify/restore -> ProductStore reader + recovery HTTP",
-        "positive": [
-          "second accepted Work 76a82043, eventSeq103",
-          "repeat backup artifacts36 collected/accepted2",
-          "restore new root integrity ok",
-          "two Works x 4 artifacts bytes verified",
-          "readonly health recovery_readonly",
-          "unreviewed 403"
-        ],
+        "status": "PASS",
+        "actual": "W33 controlled Product/Application -> repeated backup -> restore -> explicit review -> authorized HTTP reader",
+        "positive": {
+          "secondWork": "76a82043b8c7e1495e27748f4381e5d1",
+          "eventSeq": 105,
+          "repeatBackup": {
+            "artifacts": 36,
+            "acceptedEvents": 2,
+            "projects": 1,
+            "sha256": "c98f946738f41d62b346025162efa4feb33cc0ad2cab53b6d721bd118b490c68"
+          },
+          "restored": {
+            "status": "RESTORED",
+            "eventSeq": 105,
+            "integrity": "ok"
+          },
+          "twoWorks": {
+            "works": 2,
+            "contracts": 2,
+            "acceptances": 2,
+            "artifacts": 8
+          },
+          "authorizedRead": {
+            "status": 200,
+            "protocol": "assistant-candidates/1",
+            "authorization": "none"
+          },
+          "unreviewed403": true,
+          "readonlyWrite": {
+            "status": 422,
+            "code": "unsupported_capability"
+          },
+          "stop": "STOPPED"
+        },
         "negative": [
-          "artifact tamper/missing exit1",
+          "same-length artifact tamper exit1",
+          "missing artifact exit1",
           "nonprivate parent refused",
-          "cross-artifact manifest exit1"
-        ],
-        "notReached": [
-          "explicit review still 403 because source not ordinary configured user message; authorized 200 not proven",
-          "business write 422 not tested"
+          "cross-artifact manifest REFUSED"
         ],
         "evidence": [
           "reports/wave34/second-work.json",
           "reports/wave34/repeat-backup.json",
           "reports/wave34/repeat-restore.json",
           "reports/wave34/two-works-read.json",
-          "reports/wave34/review-still-403.json"
+          "reports/wave34/chat-review.json",
+          "reports/wave34/authorized-200.json",
+          "reports/wave34/readonly-422.json"
         ]
       },
       "D3": {
@@ -148,8 +171,6 @@
     }
   },
   "remaining": [
-    "D2 explicit authorized public read 200 after proper configured source/rebind",
-    "D2 business write 422",
     "E independent W33 verdict",
     "main23d successor if selected, separate freeze",
     "cross-machine/signing/notarization/native/value"

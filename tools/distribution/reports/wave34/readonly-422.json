@@ -1,0 +1,1 @@
+{"error":{"code":"unsupported_capability","message":"Restored state is read-only until explicit recovery and local revalidation","retry":"none"}}

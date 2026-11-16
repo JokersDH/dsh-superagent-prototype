@@ -1,0 +1,13 @@
+{
+  "ok": true,
+  "status": "prepared",
+  "output": "/tmp/w33-home2/chat-review.scope",
+  "projects": [
+    "project-wave33"
+  ],
+  "expiresAt": "2026-11-16T11:19:43.374Z",
+  "createdAt": "2026-11-16T11:14:43.374Z",
+  "access": "historical_data_read_only",
+  "startupAvailable": false,
+  "protocol": "restored-personal-review/1"
+}
