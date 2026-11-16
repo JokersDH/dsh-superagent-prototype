@@ -520,6 +520,17 @@ const commandSummary = (prefixes) => {
     .join(' + ')
 }
 
+const w34outer = byId.get('E33-OUTER-ZIP')?.evidence?.outerZip ?? null
+const w34rec = byId.get('E33-COHORT-RECOVERY')?.evidence?.cohortRecovery ?? null
+const w34up = byId.get('E5-COHORT-UPGRADE')?.evidence?.cohortUpgrade ?? null
+const w34journey = byId.get('E5-TWO-PROJECT-TEMPLATE-CREATE')?.evidence?.journey ?? null
+const callerIds = ['E1-CALLER-RETAIN-PREVENTS-RELEASE', 'E1-CALLER-COMPLETE-RELEASE', 'E1-CALLER-INCOMPLETE-SET',
+  'E1-CALLER-DUPLICATE-AND-FOREIGN', 'E1-CALLER-EXPECTED-START-MISMATCH', 'E1-CALLER-PARENT-DEAD-CHILD-ALIVE',
+  'E1-CALLER-SIGNAL-REFUSES-STALE-IDENTITY', 'E1-CALLER-ASSERT-FAILURE-RETAINS', 'E1-CALLER-NO-FORCE-API', 'E1-CALLER-SOURCE-DISCIPLINE']
+const oracleMutations = ['E2-MUTATE-E32-EMPTY-AFTER', 'E2-MUTATE-FOREIGN-PID-MISSING-START', 'E2-MUTATE-RESOURCE-ALIVE',
+  'E2-MUTATE-COHORT-CARDINALITY', 'E2-MUTATE-JOURNEY-PHASE-EXPECTED-START', 'E3-MUTATE-SAME-PROJECT-SCOPED-403',
+  'E3-MUTATE-SAME-PROJECT-NO-DRAFT', 'E3-MUTATE-INSIGHTS-WINDOW']
+
 const handoff = `# Agent E 第三十四轮交付交接
 
 - 分支 \`${stages.branch}\`，基线 \`${stages.base}\`，检查点 \`${stages.checkpoint}\`，本次证据源 \`${report.source.commit}\`${report.source.dirty ? '（运行时尚有未提交文件，最终提交包含它们）' : '（干净工作树）'}。证据文件随源提交之后的提交一起交付；\`git log\` 的分支头即最终交付提交。
@@ -1438,16 +1449,6 @@ const wave33Status = {
 }
 writeFileSync(join(reports, 'wave33-status.json'), JSON.stringify(wave33Status, null, 2) + '\n')
 
-const w34outer = byId.get('E33-OUTER-ZIP')?.evidence?.outerZip ?? null
-const w34rec = byId.get('E33-COHORT-RECOVERY')?.evidence?.cohortRecovery ?? null
-const w34up = byId.get('E5-COHORT-UPGRADE')?.evidence?.cohortUpgrade ?? null
-const w34journey = byId.get('E5-TWO-PROJECT-TEMPLATE-CREATE')?.evidence?.journey ?? null
-const callerIds = ['E1-CALLER-RETAIN-PREVENTS-RELEASE', 'E1-CALLER-COMPLETE-RELEASE', 'E1-CALLER-INCOMPLETE-SET',
-  'E1-CALLER-DUPLICATE-AND-FOREIGN', 'E1-CALLER-EXPECTED-START-MISMATCH', 'E1-CALLER-PARENT-DEAD-CHILD-ALIVE',
-  'E1-CALLER-SIGNAL-REFUSES-STALE-IDENTITY', 'E1-CALLER-ASSERT-FAILURE-RETAINS', 'E1-CALLER-NO-FORCE-API', 'E1-CALLER-SOURCE-DISCIPLINE']
-const oracleMutations = ['E2-MUTATE-E32-EMPTY-AFTER', 'E2-MUTATE-FOREIGN-PID-MISSING-START', 'E2-MUTATE-RESOURCE-ALIVE',
-  'E2-MUTATE-COHORT-CARDINALITY', 'E2-MUTATE-JOURNEY-PHASE-EXPECTED-START', 'E3-MUTATE-SAME-PROJECT-SCOPED-403',
-  'E3-MUTATE-SAME-PROJECT-NO-DRAFT', 'E3-MUTATE-INSIGHTS-WINDOW']
 const wave34Status = {
   ...wave33Status,
   schema: 'product-acceptance-wave34-status/1',

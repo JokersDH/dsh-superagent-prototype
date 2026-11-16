@@ -193,8 +193,9 @@ export async function runZip() {
       zip.reopen.messages = page?.messages?.length ?? null
       const beforeD = fixedSet(root.config, root, 'zip:reopen')
       const stopD = await stopOwned(root, { mockFile: mock.file, birth: reopened.birth, equivalentProof: true })
+      zip.reopen.resources = { before: beforeD, after: observe(beforeD) }
       zip.reopen.stop = { clean: stopD.clean, package: stopD.packageStop?.json?.status ?? null,
-        resources: { before: beforeD, after: observe(beforeD) } }
+        resources: zip.reopen.resources }
     }
   } catch (error) { failure = `${zip.stage ?? 'unknown'}: ${String(error?.message ?? error)}`.slice(0, 600) }
 

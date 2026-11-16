@@ -87,7 +87,7 @@ export async function runCohortRecovery() {
   let mock = null, failure = null, install = null
 
   const track = (label, pid, { state, config, role }) => {
-    try { operation.track(resourceBirth(pid, { root, config, state, op: `cohort:${label}`, role })); return true } catch (error) {
+    try { operation.track(resourceBirth(pid, { root: root.install, config, state, op: `cohort:${label}`, role })); return true } catch (error) {
       operation.fail(`track:${label}`, error); operation.retain(`track_failed:${label}`); return false
     }
   }
@@ -102,7 +102,7 @@ export async function runCohortRecovery() {
     const record = readRecord(config).value ?? null
     const pids = record ? [...new Set([record.pid, record.apiPid, record.consolePid])].filter(Number.isSafeInteger) : []
     for (const pid of pids) track(label, pid, { state, config, role: 'product' })
-    return captureSet(pids, { root, config, state, op: `cohort:${label}` })
+    return captureSet(pids, { root: root.install, config, state, op: `cohort:${label}` })
   }
 
   try {
