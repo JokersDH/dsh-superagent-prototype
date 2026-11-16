@@ -1,0 +1,50 @@
+$ node --test test/*.case.ts
+✔ the in-memory assistant port enforces create/CAS/replay and history (2.982959ms)
+✔ prepare is read-only, persistPending stores version 1 and commit confirms atomically (9.61975ms)
+✔ commit refuses another actor, another effect command, a changed payload and failed current checks (0.752875ms)
+✔ a pending proposal cannot be committed before persistPending (1.838125ms)
+✔ rejection, expiry and supersession advance the persisted version and block confirmation (1.714625ms)
+✔ prepare rejects plain text, foreign scopes and changed pending payloads (1.21025ms)
+✔ a replied proposal has no business effect (1.104209ms)
+✔ create_work maps to the existing command only with user-confirmed scope/criteria/profile (2.582375ms)
+✔ a revision proposal needs the complete new contract instead of guessing from rationale (0.702ms)
+✔ a decision proposal maps to record_decision with its exact scope and source (39.252083ms)
+✔ a confirmed scope from another project is refused rather than widened (5.895959ms)
+✔ the admitted main path confirms once and derives the command from the persisted intent (10.211917ms)
+✔ a replay with another effect id, actor, reviewed digest or payload is refused (0.571917ms)
+✔ an under-specified work proposal plans as needs_user_input, and a reply has no effect (0.4305ms)
+✔ only structured output becomes a proposal; plain text and Markdown stay replies (3.114291ms)
+✔ a model cannot smuggle actor, tool authority, command ids or a wider work scope (2.682208ms)
+✔ create binds source, project, contract and current authorization (1.426583ms)
+✔ a proposal id is idempotent for the same payload and conflicts on a changed payload (28.781208ms)
+✔ confirmation returns only a typed intent and never an actor or command id (0.920875ms)
+✔ confirmation revalidates actor, version, digest, current authorization and physical barrier (0.387375ms)
+✔ a confirmed replay still authenticates the actor and current authorization (0.153209ms)
+✔ stored proposals and returned records are independent immutable snapshots (0.182125ms)
+✔ rejected, superseded and expired proposals cannot be confirmed (0.2705ms)
+✔ expiry is enforced at confirmation and by the sweep (0.214125ms)
+✔ decision and revision proposals keep their exact scope and current contract (0.258166ms)
+✔ the shared ReasonerProposal schema is the only accepted proposal shape (0.093625ms)
+✔ supported candidates are projected with the exact remaining user inputs and no execution (4.984334ms)
+✔ foreign-project, stale-contract and unbound suggestions are refused with reasons (30.882083ms)
+✔ a whole reply body bound to another conversation/project is invalid before any suggestion (1.157375ms)
+✔ a body with no legal candidate keeps the ordinary reply and never invents a candidate (4.86375ms)
+✔ an invalid or oversized reply body is reported without retry or partial acceptance (2.992792ms)
+✔ candidate bounds and invalid configuration are enforced explicitly (0.604458ms)
+✔ a revision proposal without a current contract is refused rather than guessed (0.174833ms)
+✔ an expired-or-wider candidate scope and a foreign revision are refused item by item (2.416458ms)
+✔ only a main-verified completed reply reaches the candidate reviewer (2.345ms)
+✔ unknown verified-wrapper input is refused before any dereference (0.430208ms)
+✔ public unknown candidate input fails closed for getters, hostile arrays and oversized data (42.439875ms)
+✔ nested body and principal getters stay inside the bounded invalid_body boundary (1.016917ms)
+✔ a non-empty structured reply yields candidates that keep their original index and payload digest (4.510375ms)
+✔ the original payload, not the display summary, drives the deterministic command plan (0.51625ms)
+✔ partial or forged artifact tuples are refused before candidate review (0.237417ms)
+ℹ tests 41
+ℹ suites 0
+ℹ pass 41
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2226.418125

@@ -1,0 +1,17 @@
+{
+  "protocol": "wave35-ui-input/1",
+  "owner": "C supplies typed data/consumer; main/F own App, HTTP, form, persistence and final authorization",
+  "capture": {
+    "coverage": ["mode:window|selected", "scan:complete|selected_ids", "callerTruncated", "max"],
+    "copy": "selected 模式逐条读取当前记录，不因项目窗口截断误报 missing；window 模式必须显示 callerTruncated"
+  },
+  "preparation": ["decision-selection-preparation/1", "scopeChecked", "scopeMatch", "mismatches"],
+  "binding": {
+    "protocol": "decision-selection-binding/1",
+    "fields": ["projectId", "boundAt", "authorization:'none'", "snapshotDigest", "decisions[].{decisionId,version,contentDigest,scope,sourceMessageId,sourceTextDigest,recordedAt}"],
+    "guard": ["assertDecisionSelectionBindingCurrentSync", "current", "code(version_changed|content_changed|expired|source_stale|project_mismatch|invalid_binding)"],
+    "copy": "guard 无 await，供 main 的 create 事务提交前调用；binding 不是批准 token，main 必须持久化引用并保留原写前 guard"
+  },
+  "draft": ["usable", "stale", "revalidation.matchesCurrent/changedSources"],
+  "layers": { "source": "verified", "controlled": "verified", "mainIntegration": "NOT_MERGED", "installed": "NOT_TESTED", "native": "0", "recovery": "readonly only", "value": "NOT_MEASURED" }
+}

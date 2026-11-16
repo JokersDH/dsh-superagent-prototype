@@ -1,0 +1,75 @@
+{
+  "protocol": "wave35-status/1",
+  "agent": "C",
+  "branch": "codex/g3-assistant-context",
+  "base": { "mergeCommit": "cc4da568", "originMain": "4cde5883", "rfcs": ["WP-16/0089", "WP-16/0090", "WP-16/0091"] },
+  "wave": 35,
+  "wholeGoal": "explicit current decisions, safe context and drafts usable in the original new-Work confirmation and everyday reopen",
+  "sources": {
+    "aHead": "49082c5bd9502494f0372fa399ed800567f00460",
+    "snapshot": "packages/knowledge/src/decision-snapshot.ts",
+    "preparation": "packages/knowledge/src/decision-preparation.ts",
+    "cli": "packages/context/tools/assistant-context-cli.mjs"
+  },
+  "dirty": [
+    "packages/knowledge/src/decision-snapshot.ts (selection mode, coverage schema, window-bug fix)",
+    "packages/knowledge/src/decision-preparation.ts (binding + sync guard)",
+    "packages/knowledge/src/index.ts (exports)",
+    "packages/knowledge/test/decision-context-snapshot.case.ts (40-decision/window test)",
+    "packages/knowledge/test/main-personal-decision-work-confirmation.case.ts (transactional guard)",
+    "docs/reports for wave35"
+  ],
+  "outcomes": {
+    "C1": { "status": "complete-source", "source": "captureDecisionSnapshot selected mode", "consumer": "unit + main-compatible", "commands": ["pnpm --filter @personal-agent/knowledge test"], "exit": 0,
+      "objects": ["coverage.mode/scan", "selected current records", "coverage.callerTruncated"],
+      "positive": ["40 current decisions; selected id outside first 32 is found", "revalidate selected snapshot valid"],
+      "negative": ["selection > max -> invalid_scope", "duplicate -> conflict", "truly unknown/foreign -> not_found", "window mode callerTruncated true"],
+      "evidence": ["packages/context/reports/wave35-decision-context-snapshot.tap"] },
+    "C2": { "status": "complete-source", "source": "canonical snapshot parse/full binding/deep-freeze", "consumer": "same governance/preview projection", "commands": ["same suite"], "exit": 0,
+      "objects": ["strict schema", "deep-frozen nested scope", "content/scope/source/time binding"],
+      "positive": ["normal current", "selected mode valid"], "negative": ["nested mutation/forced scope/source/time/version rejected", "invalid protocol/time/coverage -> invalid_snapshot"],
+      "evidence": ["packages/context/reports/wave35-decision-context-snapshot.tap"] },
+    "C3": { "status": "complete-source", "source": "bindDecisionSelection + assertDecisionSelectionBindingCurrentSync", "consumer": "main-compatible prepareCommand + store.uow.atomic(guard + commitPrepared)", "commands": ["node --experimental-strip-types --test packages/knowledge/test/main-personal-decision-work-confirmation.case.ts"], "exit": 0,
+      "objects": ["decision-selection-binding/1", "snapshotDigest", "Work id", "frozen decision sourceDigest"],
+      "positive": ["guard inside same transaction before commit", "work created once", "frozen context includes decision", "ordinary no-selection Work works"],
+      "negative": ["revoked binding guard false; prepared command not committed", "forged protocol/project mismatch rejected", "narrow scope scope_changed"],
+      "remaining": "main must persist binding refs into Work/contract and call the sync guard in its default create handler",
+      "evidence": ["packages/context/reports/wave35-decision-work-confirmation.tap"] },
+    "C4": { "status": "complete-source", "source": "existing preview/select/prepare/send/sources + snapshot", "consumer": "session CLI + main HTTP", "commands": ["CLI test"], "exit": 0,
+      "objects": ["requestId", "messageId", "bundleDigest", "frozen sources"], "positive": ["continuous flow", "reopen original sources"], "negative": ["readonly send refused", "cross-project refused", "replayed confirm refused"],
+      "evidence": ["packages/context/reports/wave35-context-session-cli.tap"] },
+    "C5": { "status": "complete-source", "source": "DecisionGovernance + CLI decide", "consumer": "real main decisions API", "commands": ["CLI test"], "exit": 0,
+      "objects": ["decisionId/version", "superseded/revoked statuses"], "positive": ["record -> supersede -> revoke", "future preview excludes"], "negative": ["predecessor cannot be reused", "replay no resurrection"],
+      "evidence": ["packages/context/reports/wave35-context-session-cli.tap"] },
+    "C6": { "status": "complete-source", "source": "draft save/load --revalidate", "consumer": "two-project reopen", "commands": ["CLI test"], "exit": 0,
+      "objects": ["0600 draft", "matchesCurrent/changedSources"], "positive": ["current matches; changed after new message", "expired usable:false"], "negative": ["0644/symlink/invalid expiry/oversized refused"],
+      "evidence": ["packages/context/reports/wave35-context-session-cli.tap"] },
+    "C7": { "status": "partial-main-integration", "source": "typed exports/DTO/guide", "consumer": "main/F not yet wired", "commands": ["strict tsc"], "exit": 0,
+      "objects": ["exports"], "positive": ["typed contract stable"], "negative": ["no installed/App claim"], "remaining": "main App/HTTP/default form consumption" },
+    "C8": { "status": "complete-source", "source": "bounded selection/limits + sync guard", "consumer": "unit/main-compatible", "commands": ["suites"], "exit": 0,
+      "objects": ["bounds", "finite failures"], "positive": ["legal large project selection"], "negative": ["invalid limits/time, truncated/unknown not complete"],
+      "remaining": "installed compatibility matrix and main default" },
+    "C9": { "status": "complete-source", "source": ["WAVE35-DECISION-BINDING-GUIDE.md", "wave35-ui-input.json"], "consumer": "main/F/A/H/E handoff", "commands": ["docs + suites"], "exit": 0,
+      "objects": ["operational guide", "layer separation"], "positive": ["select->bind->create->reopen documented"], "negative": ["native/installed/value explicitly unreached"] }
+  },
+  "suites": {
+    "context": { "tests": 130, "pass": 130, "fail": 0 },
+    "proposals": { "tests": 41, "pass": 41, "fail": 0 },
+    "knowledge": { "tests": 139, "pass": 139, "fail": 0 },
+    "routing": { "tests": 44, "pass": 44, "fail": 0 },
+    "total": { "tests": 354, "pass": 354, "fail": 0 },
+    "typecheck": "pass (context/proposals/knowledge/routing)",
+    "build": "pnpm -r --workspace-concurrency=4 run build exit 0"
+  },
+  "layers": {
+    "source": "verified", "controlled": "verified in tests", "mainIntegration": "NOT_MERGED",
+    "installed": "NOT_TESTED", "native": "0", "recovery": "readonly only", "value": "NOT_MEASURED"
+  },
+  "remaining": [
+    "main to persist decision-selection binding refs into Work/contract and call sync guard inside the default create transaction",
+    "main/F to consume DTOs in App/UI; A continuation if adopted",
+    "installed/native/active-recovery/value and CAC unverified; E independent acceptance"
+  ],
+  "preserved": ["pnpm-lock.yaml diff uncommitted", "twelve services 5180-5191/8796-8807", "all state/profile/tar/ledger/dirty/runs", "no control of user instances"],
+  "budgets": { "realVendorModelTurns": 0, "realNativeTurns": 0, "bCap4": "UNKNOWN unspendable", "ePilot": "BLOCKED, not reset/top-up/refund/replaced" }
+}
