@@ -1,0 +1,7 @@
+{
+  "protocol": "assistant-connection/1",
+  "runtimeContractSchemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
+  "runtimeValidationRequired": true,
+  "schemaHash": "2ddc2fdcd6e835d57a4d4020fb353825ff66bb9e4ccdf2317354df250b6c6724",
+  "sourceHash": "f2d8feb0b5077267bbf8591f3ea23b32f297133579ee5ff5ceeafaa38598e69f"
+}
