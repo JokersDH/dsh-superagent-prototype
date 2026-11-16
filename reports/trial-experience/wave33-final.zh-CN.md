@@ -1,6 +1,6 @@
 # F 包 wave-33 最终报告：三个完整工作台成果
 
-日期：2026-11-16 · 分支 `codex/g4-trial-experience` · 基线 main `e05ee8d8`（合并后），main App `fc38bf65`，本包最终源码提交在 `wave33-status.json` 记录。
+日期：2026-11-16 · 分支 `codex/g4-trial-experience` · 基线 main `e05ee8d8`（合并后），main App `fc38bf65`，本包最终源码提交 `0ce1adcc`（之后仅有文档/状态更新）。
 
 ## 成果一：完整日常多项目工作流
 
