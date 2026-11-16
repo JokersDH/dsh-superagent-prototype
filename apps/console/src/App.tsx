@@ -85,6 +85,8 @@ import { ReplyCandidates } from './ReplyCandidates.tsx'
 import type { CandidateDraft } from './ReplyCandidates.tsx'
 import { ContextWorkspace } from './ContextWorkspace.tsx'
 import { TrialWorkspace, useTrialReadiness } from './trial/index.ts'
+import { TrialModelConnectionForm } from './trial/ModelConnectionForm.tsx'
+import type { TrialModelConnectionDraft, TrialModelConnectionResult } from './trial/model-connection.ts'
 import { ContextSourceRecord } from './ContextSources.tsx'
 import { WorkEvidencePanel } from './WorkEvidencePanel.tsx'
 import { blockedLabel, executionUnavailableLabel } from './configuration-labels.ts'
@@ -666,6 +668,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
     ? configuration?.projects.find(project => project.id === projectFilter)?.displayName ?? projectFilter
     : '个人工作区'
   const trialIdentity = useMemo(() => newId('trial-client'), [transport, auth])
+  const modelIdentity = useRef(trialIdentity); modelIdentity.current = trialIdentity
   const trial = useTrialReadiness(transport, { enabled: auth === 'ready' && workspaceView === 'trial', identity: trialIdentity })
   const usage = useUsageObservation(transport, { enabled: auth === 'ready' && workspaceView === 'trial', identity: trialIdentity,
     projectId: projectFilter, days: usageDays, configurationRevision: configuration?.revision })
@@ -1189,7 +1192,20 @@ export function App({ transport }: { transport: ConsoleTransport }) {
             <div className="detail-heading"><span>工作上下文</span><button className="icon-button" type="button" aria-label="关闭工作详情" title="关闭工作详情" onClick={() => { setInspectorOpen(false); setModelPanelOpen(false) }}><X size={17} /></button></div>
             {modelPanelOpen && (
               <ModelPanel
+                identity={trialIdentity}
                 status={assistant}
+                onConfigure={auth === 'ready' && transport.configureAssistant ? async draft => {
+                  const identity = trialIdentity
+                  try {
+                    const next = await transport.configureAssistant!({ baseURL: draft.endpoint, model: draft.model,
+                      apiKey: draft.apiKey, allowInsecureHttp: draft.allowInsecureHttp ?? false })
+                    if (modelIdentity.current === identity) setAssistant(next)
+                    return { status: 'saved', message: '已保存到本机；尚未发送验证请求。' }
+                  } catch (error) {
+                    return { status: error instanceof TransportError && error.code === 'unsupported_capability' ? 'unsupported' : 'failed',
+                      message: '配置结果尚未确认，请刷新模型设置核对后再试。' }
+                  }
+                } : undefined}
                 onClose={() => setModelPanelOpen(false)}
                 onSelect={async (model) => {
                   if (transport.selectModel) setAssistant(await transport.selectModel(model))
@@ -1482,17 +1498,21 @@ function WorkStageStrip({ work, questionCount, onInspect, onDecisions }: { work:
 }
 
 function ModelPanel({
+  identity,
   status,
   onClose,
   onSelect,
   onReload,
   onSuggestions,
+  onConfigure,
 }: {
+  identity: string
   status: AssistantProviderStatus | undefined
   onClose: () => void
   onSelect: (model: string) => Promise<void>
   onReload: () => Promise<void>
   onSuggestions: ((enabled: boolean) => Promise<void>) | undefined
+  onConfigure: ((draft: TrialModelConnectionDraft) => Promise<TrialModelConnectionResult>) | undefined
 }) {
   const [pending, setPending] = useState(false)
   const [error, setError] = useState<string | undefined>()
@@ -1561,6 +1581,13 @@ function ModelPanel({
         <dt>传输</dt>
         <dd>{status?.secureTransport ? 'HTTPS' : 'HTTP'}</dd>
       </dl>
+      <TrialModelConnectionForm key={identity} identity={identity} availability={{ enabled: !!onConfigure && status?.state !== 'responding' }}
+        initialEndpoint={status?.baseURL ?? ''} initialModel={status?.model ?? ''}
+        onConnect={async draft => {
+          if (!onConfigure || pending) return { status: 'unsupported' }
+          setPending(true)
+          try { return await onConfigure(draft) } finally { setPending(false) }
+        }} />
       {error && (
         <p role="alert" className="warn-text">
           {error}

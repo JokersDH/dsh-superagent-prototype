@@ -1,0 +1,163 @@
+{
+  "protocol": "wave35-delivery-admission/1",
+  "date": "2026-11-16",
+  "scope": "Independent read-only wave34 D/E acceptance: fixed source, immutable cohort hashes, original rollback and nonempty evidence, actual caller plus shared-module pure failure controls and complete-report oracle mutations. No live start/stop, signal, process discovery, model/native task, new archive or candidate/assertion edit.",
+  "fixedInputs": {
+    "main": "6b306514",
+    "D": "86301c9fb89eab327ac2acfa985077f07dac8ebd",
+    "DDirty": false,
+    "E": "4f9373a4e66354f9c6b2557cf0084e69e9a4a6af",
+    "EDirty": false,
+    "EMeasuredSource": "7e269fff38e4a80b64a347261ab1095efe1c557a",
+    "EMeasuredSourceDirty": false,
+    "EActualReport": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T13-14-54-426Z/report.json",
+    "ECheckedAt": "2026-11-16T13:23:36.592Z"
+  },
+  "laterMainSourceHandoff": {
+    "modelConfiguration": "4cde5883: parent reports actual App/private save checks, no model/native sends",
+    "previewMkdirFix": "8cd709ca: parent reports EEXIST followed by independent directory/owner/mode revalidation and3 pure controls",
+    "scope": "Later source handoff only, not independently re-run in this D/E audit; immutable W33 was not changed or refrozen"
+  },
+  "lockedCohort": {
+    "name": "W33 fc38",
+    "source": "048f0184606202b0b39e7426b7747f3fe57541c1",
+    "buildId": "f880e5bc9c6c1c57",
+    "tar": "/Users/hh/Desktop/joker/pa-artifacts/wave33-target/wave33-target-f880e5b.tar.gz",
+    "tarSha256": "ee45c92c7c5a8f2caa0449572b14bf97175b0392f1fd92c6f89d7a19464604e8",
+    "tarBytes": 20547728,
+    "innerEntries": 6867,
+    "zip": "/Users/hh/Desktop/joker/pa-artifacts/wave33-preview-f880e5b/PersonalAgent-Preview-f880e5b.zip",
+    "zipSha256": "46e01c8c7b79818d19e019f6d2208ad54c5c9538674218f85455434eff8207f9",
+    "zipBytes": 63481603,
+    "outerEntries": 6875,
+    "sourceClosureUnique": 192,
+    "freshAuditHashCheck": "Actual tar and ZIP sizes/digests still match exactly; prior independent full inventory/CRC/runtime/license/source/sourcemap checks remain applicable to unchanged immutable bytes",
+    "environment": { "platform": "darwin", "arch": "arm64", "node": "24.21.0", "abi": "137", "schema": 18 },
+    "scope": "D and the new E outer/recovery/upgrade cases now actually consume this fixed W33. It is not main's later callbacks/support/model-configuration runtime, and no artifact was rebuilt for this audit."
+  },
+  "DTrueProgress": {
+    "rollbackOldConflict": {
+      "status": "CLOSED_FOR_SUBMITTED_RAW_RECEIPTS",
+      "oldBlockedPreserved": "reports/wave33/rollback.json remains BLOCKED unknown_live_resource",
+      "newRetry": "reports/wave33/rollback-retry.json reports BINARY_ROLLED_BACK fromf880 to88eb/dataRolledBackfalse; rollback-retry.exit is0",
+      "secondOperation": "reports/wave34/second-upgrade.json CONFIRMED88eb->f880 and second-rollback.json BINARY_ROLLED_BACKf880->88eb/dataRolledBackfalse",
+      "interpretation": "The successful raw retry now exists separately from the original refusal; do not keep reassigning the old missing-receipt repair or erase the original blocked attempt."
+    },
+    "repeatedNonemptyData": {
+      "works": ["e9c9a0de8048124ad16d7a04bd979024", "76a82043b8c7e1495e27748f4381e5d1"],
+      "project": "project-wave33",
+      "acceptedEvents": [49, 101],
+      "repeatBackup": { "eventSeq": 103, "artifacts": 36, "entries": 38, "sha256": "c98f946738f41d62b346025162efa4feb33cc0ad2cab53b6d721bd118b490c68" },
+      "laterChatBackup": { "eventSeq": 105, "artifacts": 36, "projects": 1, "acceptedEvents": 2, "sha256": "33568a5805bc58d29971361762ec36ea6600f64e0040f02a316723206e2a96de" },
+      "independentReadOnlyCheck": "Known restored2 and upgraded roots contain the same two original Work rows; all8 delivered artifact references match recorded bytes/digests with zero mismatches",
+      "restoredRoot": "/tmp/w33-home2/restored2",
+      "upgradeRoot": "/tmp/w33-upstate",
+      "counterNote": "Repeat backup103 and later chat backup105 are distinct real snapshots. Status must not collapse them or call both the same bundle."
+    },
+    "authorizedHistoricalRead": {
+      "explicitConfig": "reports/wave34/chat-review.json is a newly prepared restored-personal-review/1 selection for project-wave33, access historical_data_read_only/startupAvailablefalse",
+      "actualRead": "authorized-200.json is assistant-candidates/1 for an ordinary unanchored historical user message, correct selected project, authorizationnone and statusunavailable",
+      "actualWrite": "readonly-422.json retains business unsupported_capability",
+      "scope": "The selected historical candidate projection is now actually authorized and returned200, preserving execution refusal. It is a metadata projection with no suggested candidates; direct two-Work/byte reads and authorized HTTP source selection are different evidence layers, not proof that all Work-anchored/private content is publicly readable."
+    },
+    "ordinaryAndRelocation": "Submitted fixed W33 normal availability degradation, same-tuple reuse, restart/stop, explicit existing model configuration, occupied-port refusal and moved Chinese/space path results are retained; no new reviewer live run."
+  },
+  "ETrueProgress": {
+    "counts": { "PASS": 325, "FAIL": 0, "NOT_TESTED": 20 },
+    "actualW33Cases": ["E33-OUTER-ZIP", "E33-COHORT-RECOVERY", "E5-COHORT-UPGRADE"],
+    "legacyBase": "R1 remains the frozen required target for many historical installed cases; W32 is the managed-upgrade baseline",
+    "outer": "Real locked46e ZIP, bundled Node, Start/Stop/status, model-unconfigured/configured/import/reopen and original resource observations; Settings GUI explicitly HELD, template only inspected",
+    "recovery": {
+      "subject": "W33:f880/ee45 bound to46e outer metadata",
+      "acceptedWork": "4f5057192f07bcb6549888d18cfc9314",
+      "recordedQuestionWork": "87d27d3453404a08ccc2e317e07f9496",
+      "backup": { "eventSeq": 73, "entries": 27, "artifacts": 26, "sha256": "c37fa535e33e1817a2a4f1e02fb3ca8c5a67be1584318ba2eaf81018c67577de" },
+      "allAcceptedArtifactBytes": [1143, 213, 24, 376],
+      "readonly": "Same accepted Work/artifact IDs/all4 bytes/history, second historical Work found, recorded questions2, effect rows retained, answer/business422, provider0 before/after",
+      "directConsumer": "The frozen install's readArtifactRegistry/readWorkflowEvidence entry over a database copy, not a current checkout writer-capable Store",
+      "limit": "The question Work was shut down before backup and reopens stopping with no public open question; preserved historical rows/held reconcile effect are not active native question continuation. answers count stays null where unavailable, not a fabricated0."
+    },
+    "upgrade": "An independent same-schema W32->W33 managed probe records raw binary-only rollback and retained post-upgrade data; its current summary still cites the older D conflict snapshot, which has now been corrected by D's raw retry",
+    "recordedTierReevaluation": {
+      "method": "Actual evaluateRelease/tier/resolveFixtureDigest over complete recorded report at its checkedAt and measured clean source; no freshness renewal",
+      "installedAlpha": { "required": 200, "ok": true },
+      "installedFunctional": { "required": 201, "ok": true },
+      "fullProduct": { "required": 202, "ok": false, "cause": "Native delivery/control absent or unexecuted" },
+      "meaning": "The report explicitly contains legacyR1 and currentW33 scopes, plusW32 baseline.200/201 is not every installed case independently run onW33 and not full engineering/native admission."
+    },
+    "oldNamedCallerP1": {
+      "status": "CLOSED_FOR_THE_TWO_ORIGINAL_FAILURE_PATHS",
+      "method": "Original current outer/cohort source plus actual current caller-safety module in VM, mocked process/filesystem/network imports only",
+      "outer": "Simulated Start born then status throws -> sticky operation_unknown, retained1, released0, no deletion/signal",
+      "cohort": "Simulated startOwned born then client fails and stop returnsUNKNOWN -> operation_unknown, retained1, released0, no deletion/signal",
+      "limit": "This closes the earlier unconditional rmHOME/install failures; it does not imply every shared operation API or later assertion path is correct."
+    },
+    "oldReportOracleClosures": ["actual outer empty after refuses", "actual outer foreign PID42/missing start refuses", "cohort foreign PID/cardinality refuses", "old tar lifecycle empty after refuses", "notfound/phase null/artifacts0 refuses"],
+    "originalProjects": "Two original personal project previews remain needs_input; controlled execution is a separate fixture project. Original-project applicable end-to-end remains NOT_TESTED and cannot be declared complete by the six-outcome summary."
+  },
+  "newFindings": [
+    {
+      "id": "E_OPERATION_SIGNAL_DOES_NOT_PREFLIGHT_OTHER_RESOURCES",
+      "priority": "P1_TEST_TOOL_SIGNAL_AUTHORITY",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/lib/caller-safety.mjs",
+      "line": 110,
+      "summary": "signal checks that descriptors are structurally complete, then freshly observes only the target. A stale/foreign child elsewhere in the same operation does not prevent signalling the valid parent, contradicting the whole-set-before-any-signal contract.",
+      "pureReproduction": "Actual module, two complete recorded births; live parent101 matches, child102 has a different start/argv. signal101 returnsSIGTERM and the fake kill capturesTERM101; real signals0.",
+      "scope": "Shared E test-tool signal surface currently used by caller-safety controls, not the product's public stop entry or the measured outer cases' zero-signal path.",
+      "next": "Freshly preflight the entire immutable set for current/unknown/foreign identity before any target effect, then re-observe that target immediately before its signal. A mixed set retains all materials and emits no signal."
+    },
+    {
+      "id": "E_OPERATION_RELEASE_ACCEPTS_DUPLICATE_OBSERVATIONS",
+      "priority": "P2_TEST_TOOL_MATERIAL_PROOF",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/lib/caller-safety.mjs",
+      "line": 129,
+      "summary": "releaseAllowed checks total length but not unique one-to-one coverage, expected UID/argv or explicit observation types. Duplicating the actual exited parent observation twice can omit a live child and still authorize material removal.",
+      "pureReproduction": "Two births101/102; actual synthetic observe says parent exited and child alive. release with[parentRow,parentRow] is allowed and captures rm('/synthetic/install'); real deletion0. A complete distinct all-exited positive also passes.",
+      "scope": "Current named callers use operation.observe and now retain on caught UNKNOWN; this is a residual shared primitive contract gap, not a rerun of the already closed direct finally rm.",
+      "next": "Use strict full pre/post mapping in the release decision itself, including uniqueness and explicit liveness/query facts; a separate report validator is not sufficient. Product assertion failures should be known before releasing diagnostic materials."
+    },
+    {
+      "id": "E_PROJECT_INSIGHTS403_IS_CHECKED_AGAINST_CONTEXT_SOURCE_INSTEAD",
+      "priority": "P2_ACCEPTANCE_SCOPE",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/lib/release.mjs",
+      "line": 1734,
+      "summary": "The new sameProject block requires contextSources.scoped200, not each project's seven/thirty observation response. With schema-valid full draft fields, actual field count, matching original execution IDs and context200, both selected-project insights403 still satisfy the complete functional oracle.",
+      "pureReproduction": "ProjectRecipeFieldsSchema validates all5 draft fields for each original project; sameProjecttrue/executionPool and IDs match; each project.insights7/30 remains403. Full installed-functional201 report still PASS.",
+      "next": "For the stronger original-project claim validate each project's scoped observation statuses/IDs/window; keep the unrelated context-source proof and honest narrowed fixture scope distinct."
+    },
+    {
+      "id": "E_FINAL_ORACLE_OMITS_NEW_PENDING_AND_OPERATION_CONCLUSIONS",
+      "priority": "P2_ACCEPTANCE_EVIDENCE_COMPLETENESS",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/lib/release.mjs",
+      "line": 579,
+      "summary": "New producer assertions cover a historical pending Work and operation release, but the final cohort/outer validators do not bind those conclusions. Removing readonly.pending or changing outer operation to UNKNOWN with retained materials leaves the full functional201 oracle passing.",
+      "next": "Bind the new actual required claims to explicit final-validator fields, while allowing a separately labelled honest retained diagnostic outcome. Do not call the stronger whole outcome complete from legacy seed/clean flags alone."
+    },
+    {
+      "id": "PREVIEW_PRIVATE_DIRECTORY_FIRST_START_RACE",
+      "priority": "P2_USER_STARTUP_RELIABILITY",
+      "status": "SOURCE_FIXED_MAIN_8cd709ca_INSTALLED_W33_UNCHANGED",
+      "file": "/Users/hh/Desktop/joker/superagent/tools/bootstrap/personal-preview-launcher.mjs",
+      "line": 47,
+      "summary": "existsSync followed by mkdirSync is racy between first Start and status. The real E W33 run records EEXIST at the workspaces directory on attempt1, then success on retry. The helper was implemented earlier in this task; this is a real packaging-layer reliability defect, not a product executor failure.",
+      "evidence": "E33-OUTER-ZIP.phases.unconfigured.attempts preserves the initial EEXIST and second RUNNING, rather than a genuine clean first attempt",
+      "next": "Main8cd709ca now supplies the source fix; parent reports3 pure controls passing. Do not reassign that source repair. Validate it with main4cde5883 model configuration in a necessary future runtime successor; keep frozenW33 and its original retry evidence unchanged."
+    }
+  ],
+  "availableCohortAndNextEngineering": {
+    "usableMeasuredSubject": "Exact W33f880/46e now has real independent outer/configuration/import/reopen and controlled nonempty recovery/upgrade subset evidence. LegacyR1 aggregate scope is still retained separately; full native/original-project/recovered-agent and stable broad release are not implied.",
+    "preserveClosed": ["D successful raw rollback retry and repeated two-Work data", "D explicit selected historical HTTP projection200 with readonly422", "E lockedW33 actual outer and all4 recovered artifact bytes", "E two original finally UNKNOWN retention paths", "E strict old resource-row full-report negatives", "H legitimate ready-based installed acceptance"],
+    "next": "Expand one stable cohort into daily original-project use, versioned safe model setup, repeated nonempty upgrade/recovery lifecycle and colleague-maintainable handoff. Main's new authenticated private model-save/App consumer is a necessary future runtime successor with its own tuple; no moving-main retarget or docs/test refreeze.",
+    "taskPackets": "Parent additionally requested D/E wave35 three-package whole-goal documents after this report; no runtime or candidate changes are authorized by this report."
+  },
+  "limits": {
+    "liveStartStop": 0,
+    "realSignalsDeletesOrDiscovery": 0,
+    "realModelVendorNativeTurns": 0,
+    "newTarOrZip": 0,
+    "candidateOrAssertionEdits": 0,
+    "allExecSessionsComplete": true,
+    "preserved": "All twelve user services, state/profile/archive/ledger/history and candidate runs",
+    "budget": "B UNKNOWN cap remains unspendable; E original pilot BLOCKED, no reset/top-up/refund/spend; PASS counts do not establish product completion or value."
+  }
+}

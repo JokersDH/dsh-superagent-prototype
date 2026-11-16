@@ -1,0 +1,239 @@
+{
+  "protocol": "wave35-data-experience-admission/1",
+  "date": "2026-11-16",
+  "status": "OLD_A_C_FAILURE_MODES_CLOSED_NEW_C_SELECTION_AND_A_ENVELOPE_P2_F_FORM_FIXED_IN_MAIN_INTEGRATION",
+  "initialMain": "6b306514ed1e41c84e740669650224ffcaf18c11",
+  "scope": "Independent read-only wave34 A/C/F acceptance. Main chooses an actual private-model configuration vertical integration; its concurrent source changes are distinguished from unchanged candidate bytes. No candidate or main production edits by this audit.",
+  "fixedSources": {
+    "A": "49082c5bd9502494f0372fa399ed800567f00460",
+    "C": "0929145f4062dffa1f7c0df1c0564cecca730175",
+    "F": "d03a78720fb818dff26e696b33246c39a066a509"
+  },
+  "dirtyPreserved": {
+    "A": [],
+    "C": ["pnpm-lock.yaml"],
+    "FUntracked": [
+      "reports/releases/wave12-context/history-browser/scope-desktop.png",
+      "reports/releases/wave12-context/history-browser/scope-mobile.png",
+      "reports/releases/wave29-integration/browser/workbench-desktop.png",
+      "reports/releases/wave29-integration/browser/workbench-mobile.png",
+      "reports/releases/wave31-integration/browser/support-desktop.png",
+      "reports/releases/wave31-integration/browser/support-mobile.png"
+    ],
+    "mainExistingUntracked": ["new-start.err", "new-start.json", "old-onnew.err", "old-onnew.json", "old-start2.json"]
+  },
+  "executed": [
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-a/packages/workflows",
+      "command": "node --test test/acceptance.case.ts test/wave33-continuation.case.ts test/wave32-persistent-two-project.case.ts",
+      "exitCode": 0,
+      "passed": 9,
+      "failed": 0,
+      "scope": "Production keyset120 rows50+50+20, original historical/current classification and acceptance facts, original two registered projects through controlled Work/check/accept, Store reopen and real referenced artifact reads in a second PID."
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "command": "node --test --test-concurrency=1 packages/knowledge/test/decision-context-snapshot.case.ts packages/knowledge/test/main-personal-decision-work-confirmation.case.ts packages/context/test/history-coverage.case.ts",
+      "exitCode": 0,
+      "passed": 4,
+      "failed": 0,
+      "durationMs": 26594,
+      "scope": "Canonical snapshot/deep-freeze/current/stale controls; actual original Work source consumer calls preparation/assert before and after create, then work-scoped frozen-context send; previous unknown coverage retained. Only a fixed local provider fixture, no real vendor/native.",
+      "scopeLimit": "The creation command itself still carries no preparation reference or server-integrated assertion. A separate caller assertion is not an atomic create-time freshness/selection binding. The passing test is a source composition example, not an installed default confirmation flow.",
+      "testHarnessTiming": "Uncleared bounded Promise.race timers keep the Node test process alive after its subtests finish; the finite session exited0 and is closed. No forced termination was used."
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-f/apps/console",
+      "command": "node --test test/trial/trial-view.case.ts test/trial/recipes.case.ts test/trial/model-connection.case.ts test/trial/history-source.case.ts",
+      "exitCode": 0,
+      "passed": 39,
+      "failed": 0,
+      "scope": "New form validation/feedback and history/source pure rules plus retained readiness/recipe/window controls."
+    },
+    { "cwd": "/Users/hh/Desktop/joker/superagent-agent-a", "command": "./node_modules/.bin/tsc --noEmit -p packages/storage/tsconfig.json", "exitCode": 0 },
+    { "cwd": "/Users/hh/Desktop/joker/superagent-agent-a", "command": "./node_modules/.bin/tsc --noEmit -p packages/workflows/tsconfig.json", "exitCode": 0 },
+    { "cwd": "/Users/hh/Desktop/joker/superagent-agent-c", "command": "./node_modules/.bin/tsc --noEmit -p packages/context/tsconfig.json", "exitCode": 0 },
+    { "cwd": "/Users/hh/Desktop/joker/superagent-agent-c", "command": "./node_modules/.bin/tsc --noEmit -p packages/knowledge/tsconfig.json", "exitCode": 0 },
+    { "cwd": "/Users/hh/Desktop/joker/superagent-agent-f", "command": "./node_modules/.bin/tsc --noEmit -p apps/console/tsconfig.json", "exitCode": 0 },
+    {
+      "command": "Inline Node: actual A ProductStore/evidence/history methods with the previous legal oversized verification and attempt controls, then an exact final-envelope boundary",
+      "exitCode": 1,
+      "result": {
+        "oldVerification": { "status": "blocked", "reason": "entry_too_large", "returned": 0, "encodedBytes": 310 },
+        "oldAttempt": { "status": "blocked", "reason": "entry_too_large", "returned": 0, "encodedBytes": 304 },
+        "edge": { "status": "ok", "reason": null, "returned": 1, "maxBytes": 4194304, "actualBytes": 4194305 }
+      },
+      "scope": "Old unresumable implicit-more and unbounded-attempt examples now explicitly block. A small residual total-envelope accounting error remains; no large stress run or user state was involved."
+    },
+    {
+      "command": "Inline Node: actual C governance/capture/revalidate/preparation over33 explicit current in-memory decisions",
+      "exitCode": 1,
+      "result": { "effectiveTotal": 33, "defaultReturned": 32, "defaultCallerTruncated": true, "selectedCount": 1, "selectedIsCurrent": true, "defaultSelectedError": "not_found", "widerSelectedReturned": 1 },
+      "scope": "A selected current decision outside the initial caller window is misclassified as not found. The same selection succeeds with a wider window. No network/model/source mutation or new execution."
+    },
+    {
+      "command": "Inline Node/Chromium: fixed candidate Form transpiled in memory, actual React18 development and ReactDOM StrictMode in a self-contained page",
+      "exitCode": 1,
+      "status": "FAIL_ACTUAL_REACT_FORM_LIFECYCLE",
+      "result": {
+        "normal": { "keyCleared": true, "busy": "false", "savedVisible": true },
+        "strict": { "busyAfterResolved": "true", "savedVisible": false },
+        "identity": { "oldSecretInNewIdentityFeedback": true, "oldResultAcceptedAfterIdentityChange": true, "keyFieldEmpty": true },
+        "optionalMessage": { "connectedDefaultShowsFailureCopy": true }
+      },
+      "scope": "Real React effects and events, candidate component/helper unchanged; icons are irrelevant render stubs and CSS is not part of this lifecycle test. Fixed virtual key only, callback in memory, no App service/provider/network or screenshots."
+    },
+    {
+      "command": "Repeat the same real React/StrictMode controls against main's revised Form/helper, no source edit by this audit",
+      "exitCode": 0,
+      "status": "PASS_ACTUAL_MAIN_REACT_FORM_LIFECYCLE",
+      "result": {
+        "strictResolvedSavedEndsBusy": true,
+        "oldIdentityEchoIgnored": true,
+        "oldSecretNotRendered": true,
+        "keyFieldCleared": true,
+        "savedWithoutMessageUsesSavedCopy": true,
+        "connectedWithoutMessageNoFailureCopy": true
+      },
+      "sourceIdentity": {
+        "ModelConnectionFormSha256": "657111b00cda29e5bfe856dd18b0f7aa24e1f603f42f4b64b9cfbb87cd2f918f",
+        "modelConnectionHelperSha256": "d2b70739edd0fb809dab71b5140b1ca449529ac998f3dd2fc38ada1fcd7f983f"
+      },
+      "scope": "Independent lifecycle retest of the main bytes subsequently committed in4cde5883, not a new backend/API/installation verdict. Browser closed normally; no app server, network request or screenshot written."
+    }
+  ],
+  "previousFindingsClosed": [
+    {
+      "id": "A34-HISTORY-BYTE-BOUND-AND-CONTINUATION-PROGRESS",
+      "status": "REPORTED_OVERSIZE_AND_ALL_KIND_EXAMPLES_CLOSED_RESIDUAL_ENVELOPE_P2_SEPARATE",
+      "evidence": "One common post-selection budgeting path now handles attempts and the other kinds; previous huge-first cases return explicit blocked/entry_too_large rather than an ordinary more-page with no continuation. Normal keyset pages remain intact. This does not certify exact final encoded-envelope limits or a hard synchronous deadline."
+    },
+    {
+      "id": "C34-SNAPSHOT-VALID-DOES-NOT-BIND-SCOPE-OR-PROVENANCE",
+      "status": "CLOSED_FOR_REPORTED_MUTATIONS",
+      "evidence": "Nested Scope/arrays are now deeply frozen through the existing immutable helper. Revalidation checks known complete Scope plus sourceMessageId/textDigest/recordedAt/version/content against current governed records, and rejects the reported widened/dropped/forged clones. Pure tests and original source consumer pass."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F35-STRICTMODE-MOUNT-FLAG-NEVER-RESTORED",
+      "priority": "P2_ACTUAL_APP_COMPATIBILITY",
+      "candidateFile": "/Users/hh/Desktop/joker/superagent-agent-f/apps/console/src/trial/ModelConnectionForm.tsx",
+      "line": 60,
+      "problem": "The effect only sets mounted=false in cleanup. React.StrictMode's development effect replay leaves it false, so an actual resolved submission ignores its result/finally and stays busy. Main's actual entry uses StrictMode.",
+      "positiveControl": "The same actual component in normal mode clears its key and resolves correctly.",
+      "resolution": "Main integration now resets mounted=true in setup and fences requests; the independent same real-React control passes at the exact main source hashes above. Raw candidate HEAD remains unchanged and must inherit the main fix through normal sync.",
+      "status": "CLOSED_IN_COMMITTED_MAIN_4cde5883_NOT_IN_RAW_CANDIDATE"
+    },
+    {
+      "id": "F35-LATE-IDENTITY-RESULT-AND-SECRET-FEEDBACK",
+      "priority": "P2_TRANSIENT_SECRET_AND_IDENTITY_BOUNDARY",
+      "candidateFile": "/Users/hh/Desktop/joker/superagent-agent-f/apps/console/src/trial/ModelConnectionForm.tsx",
+      "line": 103,
+      "relatedLines": [65, 105, 114],
+      "problem": "Identity changes clear the transient key but do not fence the awaiting result. The old result can update the new identity; because redaction compares against the already-cleared transient.apiKey, a callback echo containing the original virtual key is displayed. The test demonstrates the missing local guard, not a real-key incident or a claim that main's new backend echoes keys.",
+      "resolution": "Main now uses request generation/currentIdentity plus an independent submitted-secret redaction value. The exact same old-echo/current-key-empty control shows no old result or secret in the new identity. Saved status/default copy and server-private persistence semantics are also corrected.",
+      "status": "CLOSED_IN_COMMITTED_MAIN_4cde5883_NOT_IN_RAW_CANDIDATE"
+    },
+    {
+      "id": "A35-FINAL-ENCODED-ENVELOPE-NOT-FULLY-COUNTED",
+      "priority": "P2_RESIDUAL_READER_BOUNDARY",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-a/packages/storage/src/workflows.ts",
+      "line": 914,
+      "problem": "The shared budget seed still omits final status/reason/returned/hasMore/cursor/coverage fields. A legal attempt entry sized against the actual final base envelope returns status=ok at4194305 bytes despite maxBytes4194304.",
+      "scope": "Small tight-boundary residue, not the old many-megabyte leak or implicit unresumable page. It is not a current main HTTP bypass and should not block the separate model-configuration vertical path. Main must validate its final strictly projected response size when integrating history.",
+      "requiredBehavior": "Budget the exact final serialized response or reserve/prove every remaining field, including variable nextCursor; keep explicit blocked/page_budget semantics and normal pages.",
+      "status": "OPEN_CANDIDATE"
+    },
+    {
+      "id": "C35-SELECTED-CURRENT-DECISION-HIDDEN-BY-CALLER-CAP",
+      "priority": "P2_SELECTED_DECISION_PRODUCT_BEHAVIOR",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-c/packages/knowledge/src/decision-snapshot.ts",
+      "line": 136,
+      "relatedLine": 143,
+      "problem": "captureDecisionSnapshot first truncates the whole project effective window, then looks for selected IDs only in that slice. With33 effective decisions and default32 cap, selecting the one omitted current decision throws not_found even though only one decision is requested and getEffective confirms it is current; max200 returns it normally.",
+      "requiredBehavior": "Bound and validate the explicit selected set against current trusted records, or report source/caller incompleteness accurately. A valid selection outside an initial window must not be presented as inactive/missing. Do not solve it by globally increasing the cap or scanning without bounds.",
+      "scope": "Candidate capture/preparation data behavior, not an original Work authorization bypass. The new main model save path is independent.",
+      "status": "OPEN_CANDIDATE"
+    }
+  ],
+  "actualProgressAndLimits": {
+    "A": "Production common all-kind budgeting and explicit blocked first-item status are real additions, not only tests. Normal pagination, canonical historical/current separation, actual artifact bytes and original-ID source reopen are retained. Public principal/Scope/signed cursor/F consumer remain main integration work; source pre-materialization/deadline behavior is not proven merely by a final4MiB response budget.",
+    "C": "The former scope/provenance integrity bug is substantively repaired; preparation/assert now has a real source composition before and after original creation. However create_work does not contain the preparation and the original server transaction does not invoke it, so stale-between-assert-and-create and durable selected-version binding remain main-owned integration, not proven default product behavior. Post-create work-scoped context is still distinct from creation-time selection binding.",
+    "F": "New ModelConnectionForm and HistorySourcePanel are real reusable components/helpers, with39 pure checks. Candidate reported main backend/mount held; main has now acted on this and is integrating private configure through original ModelPanel with necessary local Form fixes. The history panel is for existing ContextHistory/ContextSources, not A completion-history/1; existing main ContextHistoryPanel must not be blindly replaced or counted as a new A reader.",
+    "source": "New A/C modules and raw F candidate components are source-level. Main integration of the revised form is recorded separately at its actual bytes.",
+    "controlled": "Original controlled Work/Store tests, pure governed decisions and real React component controls pass or fail exactly as above.",
+    "installed": "Not tested by this audit; no archive read, freeze, install or user-service change.",
+    "native": "Real vendor/model/native0. Fixed local provider in one existing controlled test is not native compatibility.",
+    "recovery": "Original data/source reopen is not active same-Work native failure recovery or actual2/4 scheduler resource return.",
+    "value": "No measured efficiency, independent-review benefit or learning claim. Test/component counts do not change completion percentages."
+  },
+  "minimalSafeImportAdvice": {
+    "initialRecommendation": "A real Work-history consumer is viable with host strict projection/cursor/bytes and the residual budget guard. Main instead selected an original private-model configuration vertical path, which removes F's actual backend/mount dependency and is independently lifecycle-tested here.",
+    "A": {
+      "files": [
+        { "path": "packages/storage/src/workflows.ts", "bytes": 75151, "sha256": "1496c51bebc1c7045be14ef3087f69cf25db835bd22d5d943b8b707be89ecf0c" },
+        { "path": "packages/storage/src/index.ts", "bytes": 10322, "sha256": "56ef659c386b2094bca1f9b04ea5106c241e3d3a6098faac71dcd76e3cda53e9" },
+        { "path": "packages/workflows/src/ports.ts", "bytes": 8768, "sha256": "da2418e22bb1e78d0b0146826be7578e2647d78dd5b9851fd5d5fa07c8719513" }
+      ],
+      "hunks": "Take completion-history/types/read helpers. For storage/index only take completion exports, not its unrelated content-proof export with absent main dependency. For workflows/ports take the history imports/exports/method, not old unrelated recoverySource changes.",
+      "port": "index.completionHistory({workId,projectIds:[oneCurrentProject],kind,limit0..200,cursor?}) -> completion-history/1 with status ok|blocked, reason null|entry_too_large|page_budget, entries/available/returned/hasMore/nextCursor/coverage/limits.",
+      "mainContract": "Original authenticated principal/current Scope determine the subject. Sign/bind any external cursor and filters, project only strict public row fields, never raw attempt binding, validate final bytes/progress and show a live keyset honestly. Do not call physical verification-candidate counts authentic reviews."
+    },
+    "C": {
+      "files": [
+        { "path": "packages/knowledge/src/decision-snapshot.ts", "bytes": 11974, "sha256": "f6dfb5a2ca97af073c5daa97d1bc8a7304b54d4f1f330b6458c4835ab4eb6527" },
+        { "path": "packages/knowledge/src/decision-preparation.ts", "bytes": 5458, "sha256": "9169b9d90940341e159f366ba141b478a246277b63ffc2b30f54612a59f71330" },
+        { "path": "packages/knowledge/src/governance.ts", "bytes": 13447, "sha256": "af2b09e3073ffc655f036cc6e13a677df9fe8cdddc7254d2c97028853b4130e5" },
+        { "path": "packages/knowledge/src/index.ts", "bytes": 1727, "sha256": "01483fe8c22a586c0d316e6c573f1f5bb425f2c0be48b74196a370cba61d3116" }
+      ],
+      "port": "captureDecisionSnapshot/revalidateDecisionSnapshot; prepareDecisionSelection(governance,{projectId,selectedDecisionIds?,projectScope?,max?,now?}) -> decision-selection-preparation/1; assertDecisionSelectionCurrent(...,{projectId?,projectScope?,now?}) -> current/code/decisions.",
+      "mainContract": "Always resolve trusted current projectScope and original source records at the host. Data-only preparation is not a grant, durable Work ref or server transaction guard. Fix bounded selected-ID lookup before declaring selection complete, then bind original prepare/assert/current refs at the actual original confirmation boundary."
+    },
+    "FModel": {
+      "candidateFiles": [
+        { "path": "apps/console/src/trial/ModelConnectionForm.tsx", "bytes": 9839, "sha256": "4b2d255d2149e328cb115efbb320f7df5214abd076a5a891adcd54d57fb1f846" },
+        { "path": "apps/console/src/trial/model-connection.ts", "bytes": 5213, "sha256": "7b9944e1f08a952fd703ce5522a8f9bb74ba9b851285d136a5b0912e84c4b2fb" }
+      ],
+      "minimumClosure": "Direct component/helper imports plus only the model CSS slice. Copying the whole trial/index barrel also requires unrelated HistorySourcePanel/history-source files; not necessary for the original ModelPanel configuration path.",
+      "callback": "availability/identity/initialEndpoint/initialModel/onConnect(transient draft)/onCancel. Main owns authenticated private configure and typed transport. The corrected result supports saved separately from connected; saved does not mean a vendor request was made or validated.",
+      "necessaryMainDifferences": "mounted setup reset, request generation/currentIdentity guard, separate submitted-secret redaction, duplicate-submit ref, initial-prop update policy, saved/default copy, explicit allowInsecureHttp checkbox/validation and clear server-private versus browser-persistence ownership. These are integrated fixes, not raw-byte candidate admission."
+    },
+    "FHistory": {
+      "files": [
+        { "path": "apps/console/src/trial/HistorySourcePanel.tsx", "bytes": 10353, "sha256": "3223629820864ee73f03b718c39cb21450823f66865e8598689a0d5bc5d04e7a" },
+        { "path": "apps/console/src/trial/history-source.ts", "bytes": 6084, "sha256": "381d0e1287aa023c6e77ee54b339bf0e71471e6214123823efeb7897613adf68" }
+      ],
+      "port": "Validated original ContextHistory/ContextSources, current project/conversation scope, selected message and onSelect/onLoadMore/onRetry callbacks; no fetch or local body reads.",
+      "scope": "Optional alternate presentation for existing context history. It cannot directly consume A completion-history/1 or supply its missing Work-history route. Keep the already working original main ContextHistory surface unless a deliberate integrated UI change is verified."
+    }
+  },
+  "mainIntegrationDuringAudit": {
+    "committedModelConfigurationSource": "4cde58832f2287a26e2f65a4a30ed01b5cb9f56c",
+    "laterTestOnlySource": "c544781b strengthens mobile-save visibility, no model runtime bytes changed",
+    "laterUnrelatedRuntimeSource": "8cd709ca launcher EEXIST-race repair, three pure controls; no new archive or packaged service start",
+    "actualCheckpoint": "docs/rfcs/WP-16/0089-main-model-configuration-consumer.md",
+    "parentReportedWork": "Committed and pushed original PrivateModelProvider.configure private atomic write -> strict authenticated POST/DTO -> typed transport -> original ModelPanel/Form. Actual App six StrictMode HTTP scenarios pass with zero vendor/model/native/commands/events. Save sends no model request; remote HTTP requires explicit opt-in. Backend/contract/strict and full-App checks belong to main's own evidence, not this audit's independently rerun count.",
+    "independentlyChecked": "The revised main Form/helper at the exact hashes above pass the actual React lifecycle counterexamples. The candidate branch remains untouched. This surface is now an actual main consumer, not a next-wave waiting-for-backend item.",
+    "notClaimed": "No successful real provider connection, native agent setup, installed package, old user-instance restart or atomic decision-bound Work creation is inferred from this model-save path."
+  },
+  "preservation": {
+    "realVendorModelCalls": 0,
+    "realNativeTurns": 0,
+    "manualOrFaultSignals": 0,
+    "globalProcessOrSocketDiscovery": false,
+    "userServicesTouched": 0,
+    "persistentServicesStarted": 0,
+    "standaloneFormAppServicesStarted": 0,
+    "screenshotsWrittenOrDeleted": 0,
+    "candidateSourcesAssertionsOrLocksEdited": false,
+    "mainProductionEditedByThisAudit": false,
+    "archivesOrNewTar": false,
+    "allExecSessionsCompleted": true,
+    "budgetsLedgersStateProfilesTarsHistoryPreserved": true,
+    "auditOutputFile": "reports/releases/wave35-admission/data-experience.json",
+    "followingTaskBooksAreSeparateAuthorizedDocumentation": true,
+    "completionPercentageChangedByThisSubaudit": false,
+    "releaseApproved": false
+  }
+}
