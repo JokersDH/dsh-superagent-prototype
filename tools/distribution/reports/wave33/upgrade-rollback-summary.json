@@ -128,5 +128,21 @@
   "dataRolledBack": false,
   "realVendorTurns": 0,
   "realModelTurns": 0,
-  "realNativeTurns": 0
+  "realNativeTurns": 0,
+  "rawRollback": {
+    "status": "BLOCKED",
+    "code": "unknown_live_resource",
+    "receipt": "reports/wave33/rollback.json",
+    "note": "preserved original failure; wrapper shell matched state path and was not claimed"
+  },
+  "retry": {
+    "status": "BINARY_ROLLED_BACK",
+    "exit": 0,
+    "receipt": "reports/wave33/rollback-retry.json",
+    "from": "f880e5bc9c6c1c57",
+    "to": "88eb8c69b0671171",
+    "dataRolledBack": false,
+    "cleanParentCommand": true
+  },
+  "summaryReplacesRawReceipt": false
 }

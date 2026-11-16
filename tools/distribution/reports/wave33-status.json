@@ -176,7 +176,17 @@
         "reports/wave33/support.json",
         "reports/wave33/outer-verify.json",
         "reports/wave33/ordinary-source-closure.json"
-      ]
+      ],
+      "rawRollback": {
+        "status": "BLOCKED",
+        "code": "unknown_live_resource"
+      },
+      "retry": {
+        "status": "BINARY_ROLLED_BACK",
+        "exit": 0,
+        "pointer": "88eb8c69b0671171",
+        "dataRetained": true
+      }
     }
   },
   "commands": [
@@ -261,6 +271,7 @@
     "backup evidence counters do not list Work rows; restored ProductStore read proves Work/contract/acceptance/artifact bytes",
     "upgrade baseline state was copied from same schema nonempty W33 writer; no production migration claimed",
     "status STOPPED exits 2 by original CLI semantics",
-    "outer unsigned/not notarized"
+    "outer unsigned/not notarized",
+    "raw rollback attempted while wrapper shell matched state path was BLOCKED; a clean-parent retry has exit0 receipt; summary never replaces raw failure"
   ]
 }
