@@ -1,0 +1,69 @@
+{
+  "protocol": "wave35-preservation/1",
+  "roles": [
+    {
+      "id": "A",
+      "headUnchanged": true,
+      "branchUnchanged": true,
+      "dirtyUnchanged": true
+    },
+    {
+      "id": "B",
+      "headUnchanged": true,
+      "branchUnchanged": true,
+      "dirtyUnchanged": true
+    },
+    {
+      "id": "C",
+      "headUnchanged": true,
+      "branchUnchanged": true,
+      "dirtyUnchanged": true
+    },
+    {
+      "id": "D",
+      "headUnchanged": true,
+      "branchUnchanged": true,
+      "dirtyUnchanged": true
+    },
+    {
+      "id": "E",
+      "headUnchanged": true,
+      "branchUnchanged": true,
+      "dirtyUnchanged": true
+    },
+    {
+      "id": "F",
+      "headUnchanged": true,
+      "branchUnchanged": true,
+      "dirtyUnchanged": true
+    },
+    {
+      "id": "G",
+      "headUnchanged": true,
+      "branchUnchanged": true,
+      "dirtyUnchanged": true
+    },
+    {
+      "id": "H",
+      "headUnchanged": true,
+      "branchUnchanged": true,
+      "dirtyUnchanged": true
+    },
+    {
+      "id": "I",
+      "headUnchanged": true,
+      "branchUnchanged": true,
+      "dirtyUnchanged": true
+    },
+    {
+      "id": "J",
+      "headUnchanged": true,
+      "branchUnchanged": true,
+      "dirtyUnchanged": true
+    }
+  ],
+  "candidateSourceEdits": 0,
+  "userServicesTouched": 0,
+  "realVendorModelNativeTurns": 0,
+  "newTar": 0
+}

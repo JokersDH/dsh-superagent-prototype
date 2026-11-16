@@ -2,6 +2,10 @@
 
 版本：`B-1.0-draft` · 2026-11-07 · 状态：可用于拆分实施，须先通过 G0。本文档集是本产品的当前设计基线；不是已实现产品的说明书。
 
+2026-11-16当前实施：[Wave35三连续工程包](../agent-tasks/product-wave-35/README.zh-CN.md)，每位九完整成果；[独立验收](../reports/releases/wave35-admission/README.zh-CN.md)和[实际配置消费者](../docs/rfcs/WP-16/0089-main-model-configuration-consumer.md)区分当前源码/准确安装/恢复/收益。下文旧阶段为历史设计，不替当前实测。
+
+当前工程入口：[Wave35三连续工程包](../agent-tasks/product-wave-35/README.zh-CN.md)，十原owner每人九完整成果，主线模型配置消费者见[0089](../docs/rfcs/WP-16/0089-main-model-configuration-consumer.md)；[最新验收](../reports/releases/wave35-admission/README.zh-CN.md)区分旧闭合与新边界，不按任务数量计完成。
+
 2026-11-16工程续交：[Wave34双工程包](../agent-tasks/product-wave-34/README.zh-CN.md)及[本轮验收](../reports/releases/wave34-admission/README.zh-CN.md)。每位六个完整成果，main持续接入实际消费者；原架构基线保留，当前功能/证据以产品总览和0086–0088为准。
 
 **2026-11-16当前范围修订：用户明确将CAC留待后续独立实验。当前完整方案B不包含CAC接入或CAC专属协作，不占当前实现、排期、验收及完成度分母，不阻塞本期交付。以下原设计、G6及历史任务保留作未来参考，不自动启动；当前范围与进度以[产品总览](../docs/product/STATUS.zh-CN.md)为准。**
