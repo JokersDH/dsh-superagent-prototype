@@ -12,6 +12,7 @@ import { cpSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { createServer } from 'node:net'
 import { join } from 'node:path'
 import { homeDir, redactPath } from '../../../tools/trial-kit/lib/redact.mjs'
+import { waitForAcceptableCandidate } from '../../../tools/trial-kit/lib/accept-gate.mjs'
 
 const PA = 'apps/launcher/bin/pa.mjs'
 
@@ -176,13 +177,12 @@ export async function runPackageLifecycle({ packageRoot, releaseManifest, out })
     const asked = await waitSnapshot(instance, (body) => body.questions.some((entry) => entry.contract.workId === work.body?.workId))
     const question = asked?.questions?.find((entry) => entry.contract.workId === work.body?.workId)
     if (question !== undefined) await postCommand(instance, { commandId: 'h32-installed-answer-1', conversationId: 'h32-installed-chat', kind: 'answer_question', questionId: question.id, expectedVersion: question.version, answer: { kind: 'choices', optionIds: ['allow'] } })
-    const created = await waitSnapshot(instance, (body) => body.works.some((entry) => entry.work.id === work.body?.workId && entry.actions?.currentCandidate !== undefined && entry.phase !== 'verifying'))
-    installedWork = created?.works?.find((entry) => entry.work.id === work.body?.workId) ?? null
-    candidateSeen = installedWork?.actions?.currentCandidate !== undefined
-    acceptGateObserved = candidateSeen && Array.isArray(installedWork?.actions?.available)
-    const available = installedWork?.actions?.available ?? []
-    if (installedWork?.actions?.currentCandidate !== undefined && available.includes('accept_candidate')) {
-      const candidate = installedWork.actions.currentCandidate
+    const gate = await waitForAcceptableCandidate({ workId: work.body?.workId, readSnapshot: async () => (await waitJson(`${instance.apiURL}/v1/snapshot`, 3000))?.body, timeoutMs: 20000, pollMs: 150 })
+    installedWork = gate.work
+    candidateSeen = gate.candidateSeen
+    acceptGateObserved = gate.gateObserved === true
+    if (gate.status === 'ready') {
+      const candidate = gate.candidate
       accepted = await postCommand(instance, { commandId: 'h32-installed-accept-1', conversationId: 'h32-installed-chat', kind: 'accept_candidate', candidate })
       stale = await postCommand(instance, { commandId: 'h32-installed-stale-1', conversationId: 'h32-installed-chat', kind: 'accept_candidate', candidate: { ...candidate, candidateGeneration: candidate.candidateGeneration + 1 } })
       const delivered = await waitSnapshot(instance, (body) => body.works.some((entry) => entry.work.id === work.body?.workId && entry.phase === 'delivered'))

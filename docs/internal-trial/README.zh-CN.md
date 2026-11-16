@@ -157,3 +157,12 @@ H 的材料是原始观测。E 会按自己的 required 断言独立核验；不
 - 88eb 包内 first-run/start/readiness/health/console/SSE/REUSED/同一 Work 重开/stop 已实测。安装态 `accept_candidate` 必须等 `actions.available` 含该项；此前在 verifying/currentCandidate 阶段提前 accept 会得到 `Trusted artifact review is unavailable`，等待后同一 Work 的 accept 已 recorded、delivered 并重开为 delivered。
 - 88eb 包内非空 backup→verify→restore 到第二根通过，原 Work/question/answer/native_applied 可读；再次 restore 同目标 `BLOCKED target_not_empty`。review-restored 启动未测。
 - 原 Store receiver join、新进程同 Store 读回、ACK 8 窗口、资源台账保持 source 证据；B same-run 回调、SIGKILL 恢复、native 2/4 槽仍 NOT_REACHED。
+
+## 3g. wave-34 W33 f880 包、延迟 accept 门与双工程包
+
+- 当前 source：B `61734985`、I `4b84127d`、main `23d5a98e`。H 当前 B/I consumer 仍 I 12/12、B 8/8；main 的 native callback 11 项由 main-owned 测试观察到 11/11，但 H 不把 Node 回调当原 Application/QuestionBroker 恢复。
+- 最新 W33 内部包：`wave33-target-f880e5b`，source `048f0184`，build `f880e5bc9c6c1c57`，tar `ee45c92c…04e8`，closure `1c39d4c7…388a`；预检 32 PASS/1 UNKNOWN，machinecheck 46/3/0。旧 88eb 保留历史 scope，不贴成当前。
+- `actions.available` 延迟门已独立实现：candidate 先出现但 available=[] 时必须继续等，只有出现 `accept_candidate` 才能 accept；提前 accept 的旧错误不再算产品缺陷。W33 包内 Work `ca73397f…` 已等待后 accept/recorded/delivered，重启重开仍 delivered。
+- W33 包内非空 backup→verify→restore 到第二根通过，原 Work `94012e1a…`/question/answer/native_applied 可读；再次 restore 同目标 BLOCKED。review-restored 启动/REUSED 未测。
+- 同原 run 的 B application/Broker 恢复、SIGKILL、native 2/4 槽仍 NOT_REACHED；H 提供原 Store join、新进程读回、ACK 8 窗口与资源台账作为独立事实，不替代 B。
+- 实际 human cohort 未提供；当前只有 controlled 自动试用，不生成访谈/收益结论。E 仍是唯一 oracle。

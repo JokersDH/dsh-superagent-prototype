@@ -1,0 +1,145 @@
+{
+  "protocol": "selected-source-current/1",
+  "observedAt": "2026-11-16T10:53:20.098Z",
+  "roots": {
+    "I": "~/Desktop/joker/superagent-agent-i",
+    "B": "~/Desktop/joker/superagent-agent-b",
+    "main": "~/Desktop/joker/superagent-agent-h"
+  },
+  "bindings": {
+    "I": {
+      "ok": true,
+      "root": "~/Desktop/joker/superagent-agent-i",
+      "branch": "codex/g5-coordinator-channel",
+      "head": "4b601ec8d92d3930c85719e4677f48eed35261c7",
+      "commit": "4b84127d3eada7078a23108d7ecbf88f2dbdc4ca",
+      "issues": [],
+      "files": [
+        {
+          "rel": "apps/runner/src/attach-channel/attach.ts",
+          "commitBlob": "321738dae3b87e6ad7d235f52aaa65e6f63ab527",
+          "sha256": "79b3189bfdd589b17cbc41fa8b359b85128e076db77716b9efb75c47f1626c59",
+          "bytes": 8655
+        },
+        {
+          "rel": "apps/runner/src/attach-channel/coordinator-channel.ts",
+          "commitBlob": "d1ef81eb9d51b24417645151440eb1e262c20546",
+          "sha256": "5cb142ac905fdcd08063aa678aea768a0397f2341fb60a38b56b7832eadfa7b0",
+          "bytes": 25538
+        },
+        {
+          "rel": "apps/runner/src/attach-channel/errors.ts",
+          "commitBlob": "ec8ce909d0f30ab1d96488db56cdf3b6a4ab7f49",
+          "sha256": "b9c9bd111cd672b479314faf284d308ba6a1c2d3f5520af6decbded220d08b10",
+          "bytes": 1693
+        },
+        {
+          "rel": "apps/runner/src/attach-channel/index.ts",
+          "commitBlob": "6314546e1d1facde00d0d2195edf1c14ad7a85d2",
+          "sha256": "6cb777c2fcc13fc7b81afd1890da5914ffbfac79aabb9b064cc79b7e964a3971",
+          "bytes": 1556
+        },
+        {
+          "rel": "apps/runner/src/attach-channel/refusals.ts",
+          "commitBlob": "25ebcd26f1fb4aad583048dc672ec2bf09066b32",
+          "sha256": "6908ad2cbc96a01bd71f479ea57e7613c8db3beb88bedffd535ab118ff5f804f",
+          "bytes": 2573
+        },
+        {
+          "rel": "apps/runner/src/attach-channel/sink-responder.ts",
+          "commitBlob": "992a8cc0fceb55d7b2a9e2e8c8068202a892acb3",
+          "sha256": "9d20a0fb932dce4d235b53253139cc155f3f112d7a6a047d275f5c9dd56fea32",
+          "bytes": 3950
+        },
+        {
+          "rel": "packages/contracts/src/coordinator-channel.ts",
+          "commitBlob": "cf451efe433b8f9140d992ccfb415df9cd74b92c",
+          "sha256": "a1445944e47379a13a3f47593173d35c5a20cd0d27a02daa6a880bce98a4f3c1",
+          "bytes": 6362
+        },
+        {
+          "rel": "packages/contracts/src/schemas.ts",
+          "commitBlob": "0eaafbf444c5ef099971fbc226c36a33002f983d",
+          "sha256": "763732584c3b9150f90b644301b679465e252498d75dec19ad601b536f0db045",
+          "bytes": 30887
+        },
+        {
+          "rel": "packages/contracts/src/types.ts",
+          "commitBlob": "423043fe2b999a2e71e0dd3995c7d33f522144de",
+          "sha256": "ed6661e6bcaa26a24892ad82086bcd5375a19aec3a184f1d6f256af8655103ac",
+          "bytes": 6016
+        }
+      ],
+      "zod": {
+        "version": "4.4.3"
+      }
+    },
+    "B": {
+      "ok": true,
+      "root": "~/Desktop/joker/superagent-agent-b",
+      "branch": "codex/g1-runtime",
+      "head": "f67d21d32a9f19756f60a345a4e83c696044b872",
+      "commit": "617349851c1fcef7debf0409849b7c8d19d25d47",
+      "issues": [],
+      "files": [
+        {
+          "rel": "apps/runner/src/attach-channel/attach.ts",
+          "commitBlob": "321738dae3b87e6ad7d235f52aaa65e6f63ab527",
+          "sha256": "79b3189bfdd589b17cbc41fa8b359b85128e076db77716b9efb75c47f1626c59",
+          "bytes": 8655
+        },
+        {
+          "rel": "apps/runner/src/attach-channel/coordinator-channel.ts",
+          "commitBlob": "d1ef81eb9d51b24417645151440eb1e262c20546",
+          "sha256": "5cb142ac905fdcd08063aa678aea768a0397f2341fb60a38b56b7832eadfa7b0",
+          "bytes": 25538
+        },
+        {
+          "rel": "apps/runner/src/attach-channel/errors.ts",
+          "commitBlob": "ec8ce909d0f30ab1d96488db56cdf3b6a4ab7f49",
+          "sha256": "b9c9bd111cd672b479314faf284d308ba6a1c2d3f5520af6decbded220d08b10",
+          "bytes": 1693
+        },
+        {
+          "rel": "apps/runner/src/attach-channel/index.ts",
+          "commitBlob": "b26154f343634cb6c7536aa5cd5bcb7169e0b980",
+          "sha256": "709e4dc2b046b40f4d1748875d37984b8aec81ff16008405193ecb5831dfac40",
+          "bytes": 1252
+        },
+        {
+          "rel": "apps/runner/src/runner-service.ts",
+          "commitBlob": "ce25fc5d4478b559478116ef92c2eef4f5e22358",
+          "sha256": "fa2ad3784f533efc04bac62e1afce13d58dbfedc3277220d431506feec9eb511",
+          "bytes": 31307
+        },
+        {
+          "rel": "apps/runner/src/business-attach.ts",
+          "commitBlob": "2f69fedf5b4a33343968b8cc8a0269598dacbc1f",
+          "sha256": "9f3a4640c27847f624c0496c262dfb0789014c6fbaf40e73ce55d2b6e2d78f9e",
+          "bytes": 6481
+        }
+      ],
+      "zod": {
+        "version": "4.4.3"
+      }
+    },
+    "main": {
+      "ok": true,
+      "root": "~/Desktop/joker/superagent-agent-h",
+      "branch": "codex/g4-trial-operations",
+      "head": "873b29b55e4fad5161ff8a661786bf0456187a8d",
+      "commit": "873b29b55e4fad5161ff8a661786bf0456187a8d",
+      "issues": [],
+      "files": [
+        {
+          "rel": "packages/contracts/src/coordinator-channel.ts",
+          "commitBlob": "cf451efe433b8f9140d992ccfb415df9cd74b92c",
+          "sha256": "a1445944e47379a13a3f47593173d35c5a20cd0d27a02daa6a880bce98a4f3c1",
+          "bytes": 6362
+        }
+      ],
+      "zod": null
+    }
+  },
+  "ok": true
+}

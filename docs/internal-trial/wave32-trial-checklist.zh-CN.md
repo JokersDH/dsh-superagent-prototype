@@ -47,6 +47,8 @@
 
 可分享：`support-summary.json`、`FIELD-NOTES.md`、`manifest.json`、`machinecheck-report.json`、`diagnostics-bundle.json`、`reproduce.txt`、实际命令与 exit、脱敏后的错误码。
 
+Wave-34: W33 f880（tar `ee45c92c…`，build `f880e5bc…`）与 88eb 分列；accept 必须等 `actions.available`，candidate 先出现不等于可接受。
+
 不可分享：token/Authorization header、对话正文、私有数据库、用户 project 路径、native profile、其他 home 凭据。分享前仍要扫一遍 canary。
 
 ## 5. 重现
