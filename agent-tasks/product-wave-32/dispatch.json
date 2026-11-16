@@ -1,0 +1,260 @@
+{
+  "protocol": "whole-product-engineering-dispatch/1",
+  "date": "2026-11-16",
+  "status": "PLANNED_NOT_EXECUTED_BY_EXTERNAL_AGENTS",
+  "priority": "ACCELERATE_WHOLE_SCHEME_B_ENGINEERING_THEN_PACKAGE_INTEGRATED_PRODUCT",
+  "platform": "macOS Apple Silicon",
+  "normalCadence": true,
+  "calendarDeadline": null,
+  "goalMode": "WHOLE_PRODUCT_OUTCOME_CONTINUE_AFTER_SOURCE_HANDOFF",
+  "countingMicroPhases": false,
+  "scope": {
+    "cac": "DEFERRED_FUTURE_EXPERIMENT_EXCLUDED",
+    "deliveryModel": "Complete product capability lines with continuous main integration; packaging is an integrated engineering subsystem and final handoff",
+    "wholeProductIncludes": [
+      "normal-workflow",
+      "runtime-control",
+      "same-original-work-recovery",
+      "durable-data-context-decisions",
+      "workbench-project-recipes-observations",
+      "reproducible-install-upgrade-backup-restore"
+    ],
+    "independentEngineeringContinuesIfStudyBlocked": true,
+    "temporaryPreviewNotCompletionProxy": true,
+    "unchangedSafetyAndNativeBudgets": true
+  },
+  "roles": {
+    "A": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "branch": "codex/g2-workspaces-verification",
+      "candidate": "02dc4aa889bdf3e5832808133916ff43b22e49f3",
+      "packet": "agent-tasks/product-wave-32/agent-a-data.zh-CN.md",
+      "ownedPaths": [
+        "packages/storage/",
+        "packages/workflows/"
+      ],
+      "evidencePath": "packages/workflows/reports/wave32-status.json",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "wholeOutcome": "让同一安装实例上的两个原项目完整使用并重开保留Work/合同/候选/产物/回执，不靠换fixture项目或新Work补洞。"
+    },
+    "B": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "branch": "codex/g1-runtime",
+      "candidate": "4b693eae30610fba134a2f151f835368e8903953",
+      "packet": "agent-tasks/product-wave-32/agent-b-runtime.zh-CN.md",
+      "ownedPaths": [
+        "packages/execution/",
+        "packages/catalog/",
+        "packages/policy-preparation/",
+        "packages/driver-kit/",
+        "packages/testing/",
+        "packages/drivers/",
+        "apps/runner/",
+        "tests/native-acceptance/"
+      ],
+      "evidencePath": "tests/native-acceptance/reports/wave32-status.json",
+      "grantId": "wave03-b-native",
+      "historicalLimit": 4,
+      "remaining": "UNKNOWN_NOT_SPENDABLE",
+      "resetLedger": false,
+      "newFeasibilityInvestigations": 0,
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "excludedOwnedPaths": [
+        "apps/runner/src/attach-channel/",
+        "apps/runner/test/attach-channel/"
+      ],
+      "wholeOutcome": "在原Product/Store/Application/QuestionBroker中完整实现本机执行、原生问题/控制、同原Work故障恢复到候选/检查/人工接受和原两/四槽资源归还。"
+    },
+    "C": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "branch": "codex/g3-assistant-context",
+      "candidate": "84b9376d9e0dd2ccb4d85d1017cf2ad5fe6b0fc0",
+      "packet": "agent-tasks/product-wave-32/agent-c-context.zh-CN.md",
+      "ownedPaths": [
+        "packages/context/",
+        "packages/proposals/",
+        "packages/knowledge/",
+        "packages/routing/"
+      ],
+      "evidencePath": "packages/context/reports/wave32-status.json",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "wholeOutcome": "让用户在同一个普通安装实例里选择真实项目资料、确认提案或明确决定，并在重开后查看原来源。"
+    },
+    "D": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-d",
+      "branch": "codex/g3-local-distribution",
+      "candidate": "790671ef449327c68e58c90859be9231a36dfbea",
+      "packet": "agent-tasks/product-wave-32/agent-d-delivery.zh-CN.md",
+      "ownedPaths": [
+        "apps/launcher/",
+        "tools/distribution/",
+        "packages/portability/"
+      ],
+      "evidencePath": "tools/distribution/reports/wave32-status.json",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "wholeOutcome": "随整体工程并行交付可重复构建、安装、启停、升级/回滚、非空备份迁移恢复和支持能力，在选定集成版本上形成可本机使用、可分享同事的准确安装交付。"
+    },
+    "E": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-e",
+      "branch": "codex/g3-product-acceptance",
+      "candidate": "3cbc648a4a1d5467f669bb42685fb279a7ba7135",
+      "packet": "agent-tasks/product-wave-32/agent-e-acceptance.zh-CN.md",
+      "ownedPaths": [
+        "tests/product-acceptance/"
+      ],
+      "evidencePath": "tests/product-acceptance/reports/wave32-status.json",
+      "grantId": "wave05-independent-review-pilot-01",
+      "maxNativeTurnStarts": 24,
+      "maxAuthorTurnStarts": 8,
+      "maxReviewTurnStarts": 16,
+      "maxBillableTokens": 200000,
+      "maxCostUSD": 5,
+      "maxInFlight": 1,
+      "resetLedger": false,
+      "unknownCostIsZero": false,
+      "cliFallbackAllowed": false,
+      "executionPolicy": "BLOCKED_CURRENT_RECIPE_NO_SEND_THIS_WAVE",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "wholeOutcome": "独立验证整体产品的原项目正常工作、原生控制、故障恢复、重开、数据与准确安装流程，按证据层给结论，不以临时可启动ZIP替代工程完整性。"
+    },
+    "F": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-f",
+      "branch": "codex/g4-trial-experience",
+      "preparedFrom": "fdb3f160b1d867f7167fb034d96a5c13bd16cdfb",
+      "packet": "agent-tasks/product-wave-32/agent-f-experience.zh-CN.md",
+      "ownedPaths": [
+        "apps/console/src/trial/",
+        "apps/console/test/trial/",
+        "apps/console/e2e/trial/",
+        "docs/user-guide/",
+        "reports/trial-experience/"
+      ],
+      "evidencePath": "reports/trial-experience/wave32-status.json",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "implementationStatus": "SOURCE_EXISTS_CONTINUE_COMPLETE_CAPABILITY",
+      "candidate": "328ffb1ca3718ff03cb0e0ebddfc60b790272b51",
+      "wholeOutcome": "在现有精密浅色工作台中完成首次使用、执行器/模型状态、明确委托到交付和错误恢复的完整体验。"
+    },
+    "G": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-g",
+      "branch": "codex/g4-usage-insights",
+      "preparedFrom": "fdb3f160b1d867f7167fb034d96a5c13bd16cdfb",
+      "packet": "agent-tasks/product-wave-32/agent-g-insights.zh-CN.md",
+      "ownedPaths": [
+        "packages/usage-insights/",
+        "tools/usage-insights/",
+        "reports/usage-insights/"
+      ],
+      "evidencePath": "reports/usage-insights/wave32-status.json",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "implementationStatus": "SOURCE_EXISTS_CONTINUE_COMPLETE_CAPABILITY",
+      "candidate": "6dbb344024fd6ac014948f24a5ce61ea66ac6720",
+      "wholeOutcome": "让用户能导出同一范围的可信观察和无秘密支持信息，帮助快速反馈真实试用问题。"
+    },
+    "H": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-h",
+      "branch": "codex/g4-trial-operations",
+      "preparedFrom": "fdb3f160b1d867f7167fb034d96a5c13bd16cdfb",
+      "packet": "agent-tasks/product-wave-32/agent-h-trial-operations.zh-CN.md",
+      "ownedPaths": [
+        "tools/trial-kit/",
+        "tests/operational-soak/",
+        "docs/internal-trial/",
+        "reports/trial-operations/"
+      ],
+      "evidencePath": "reports/trial-operations/wave32-status.json",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "implementationStatus": "SOURCE_EXISTS_CONTINUE_COMPLETE_CAPABILITY",
+      "candidate": "3ea07a7df1d969410547c6f7fc03a105977609d1",
+      "wholeOutcome": "提供贯穿完整产品的有界试用、运行/故障支持和现场保留工具，独立消费原B/I/main真实端口与最终准确包，减少来回交互。"
+    },
+    "I": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-i",
+      "branch": "codex/g5-coordinator-channel",
+      "preparedFrom": "967dc0c677333ec307c215c0ed67e838b5487d92",
+      "packet": "agent-tasks/product-wave-32/agent-i-coordinator-channel.zh-CN.md",
+      "ownedPaths": [
+        "apps/runner/src/attach-channel/",
+        "apps/runner/test/attach-channel/",
+        "docs/runtime-channel/",
+        "reports/runtime-channel/"
+      ],
+      "evidencePath": "reports/runtime-channel/wave32-status.json",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "implementationStatus": "SOURCE_EXISTS_CONTINUE_COMPLETE_CAPABILITY",
+      "candidate": "cf2e0a9cc92d10546afe40b04244cd9259bca2f4",
+      "wholeOutcome": "在原B/Main消费者中把事实、payload、写前授权和terminal/detach语义完整跑通，避免通信层迟到效果。"
+    },
+    "J": {
+      "workdir": "/Users/hh/Desktop/joker/superagent-agent-j",
+      "branch": "codex/g5-project-recipes",
+      "preparedFrom": "967dc0c677333ec307c215c0ed67e838b5487d92",
+      "packet": "agent-tasks/product-wave-32/agent-j-project-recipes.zh-CN.md",
+      "ownedPaths": [
+        "packages/project-recipes/",
+        "tools/project-recipes/",
+        "docs/project-recipes/",
+        "reports/project-recipes/"
+      ],
+      "evidencePath": "reports/project-recipes/wave32-status.json",
+      "budgetMode": "zero_native_model_tasks_this_wave",
+      "implementationStatus": "SOURCE_EXISTS_CONTINUE_COMPLETE_CAPABILITY",
+      "candidate": "b25bf228e55d8428881a8ee1f6c723ad6753bc73",
+      "wholeOutcome": "让首批用户导入普通Node/npm/pnpm项目后，得到真实可应用的模板字段，并完成原项目的明确交付流程。"
+    }
+  },
+  "releaseApproved": false,
+  "newModelAllowance": 0,
+  "externalPromptsSent": false,
+  "preservedServicePairs": [
+    [
+      5180,
+      8796
+    ],
+    [
+      5181,
+      8797
+    ],
+    [
+      5182,
+      8798
+    ],
+    [
+      5183,
+      8799
+    ],
+    [
+      5184,
+      8800
+    ],
+    [
+      5185,
+      8801
+    ],
+    [
+      5186,
+      8802
+    ],
+    [
+      5187,
+      8803
+    ],
+    [
+      5188,
+      8804
+    ],
+    [
+      5189,
+      8805
+    ],
+    [
+      5190,
+      8806
+    ],
+    [
+      5191,
+      8807
+    ]
+  ],
+  "userClarification": "Do not rush a temporary installable preview. Accelerate the full engineering effort; package and use the integrated product afterward."
+}
