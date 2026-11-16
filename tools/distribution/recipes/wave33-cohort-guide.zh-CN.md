@@ -36,7 +36,7 @@ restore 后不启动也由 W33 ProductStore 读取同一 Work/合同/接受/4 ar
 ## 升级/回退（同 schema，非空数据）
 - baseline W32 `88eb8c69b0671171`；目标 W33 `f880e5bc9c6c1c57`；`pa upgrade` 状态 CONFIRMED，pre-backup evidence digest 与原非空一致，health ok。
 - 升级后读取同一 Work、contract1、acceptance1、4 artifact 字节。
-- `pa rollback-install` 返回 BINARY_ROLLED_BACK，pointer 回 `88eb8c69...`，数据未回滚；W32 installed ProductStore 读取同一 Work/artifact 字节。
+- 首次 raw `pa rollback-install` 实际为 `BLOCKED unknown_live_resource`，原回执保留；干净 parent retry 才返回 BINARY_ROLLED_BACK，pointer 回 `88eb8c69...`，数据未回滚；W32 installed ProductStore 读取同一 Work/artifact 字节。retry 不覆盖 raw。
 - 没有用旧快照覆盖新写入；本 cohort 不声称生产 schema migration。
 - 升级命令在无运行实例时需显式 `--mode personal --access local-development`，backup 父目录必须私有。
 

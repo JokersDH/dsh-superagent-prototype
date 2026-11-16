@@ -1,0 +1,162 @@
+{
+  "protocol": "wave34-status/1",
+  "owner": "agent-d",
+  "branch": "codex/g3-local-distribution",
+  "state": "IN_PROGRESS_PACKAGE1",
+  "source": "048f0184606202b0b39e7426b7747f3fe57541c1",
+  "fixedCohort": {
+    "build": "f880e5bc9c6c1c57",
+    "inner": "ee45c92c7c5a8f2caa0449572b14bf97175b0392f1fd92c6f89d7a19464604e8",
+    "outer": "46e01c8c7b79818d19e019f6d2208ad54c5c9538674218f85455434eff8207f9",
+    "closure": "192 unique",
+    "runtimeSource": "fc38bf65",
+    "notRefrozenForWave34": true
+  },
+  "packages": {
+    "P1": {
+      "D1": {
+        "status": "PASS",
+        "actual": "W33 outer Start/Stop/status + actual workbench",
+        "positive": [
+          "cold RUNNING",
+          "same tuple REUSED same PID",
+          "STOPPED exit2 semantic",
+          "restart new PID",
+          "normal start auto-degrades to discussion-only",
+          "existing private model.json 0600"
+        ],
+        "negative": [
+          "unsafe config 0755 refused state retained",
+          "occupied port BLOCKED exit2",
+          "wrong outer build exit1"
+        ],
+        "evidence": [
+          "reports/wave33/status-running.json",
+          "reports/wave34/normal-degrade.log",
+          "reports/wave34/normal-status.json",
+          "reports/wave34/occupied-port.log",
+          "reports/wave33/bad-permission.err"
+        ]
+      },
+      "D2": {
+        "status": "PARTIAL",
+        "actual": "W33 controlled Product/Application -> backup/verify/restore -> ProductStore reader + recovery HTTP",
+        "positive": [
+          "second accepted Work 76a82043, eventSeq103",
+          "repeat backup artifacts36 collected/accepted2",
+          "restore new root integrity ok",
+          "two Works x 4 artifacts bytes verified",
+          "readonly health recovery_readonly",
+          "unreviewed 403"
+        ],
+        "negative": [
+          "artifact tamper/missing exit1",
+          "nonprivate parent refused",
+          "cross-artifact manifest exit1"
+        ],
+        "notReached": [
+          "explicit review still 403 because source not ordinary configured user message; authorized 200 not proven",
+          "business write 422 not tested"
+        ],
+        "evidence": [
+          "reports/wave34/second-work.json",
+          "reports/wave34/repeat-backup.json",
+          "reports/wave34/repeat-restore.json",
+          "reports/wave34/two-works-read.json",
+          "reports/wave34/review-still-403.json"
+        ]
+      },
+      "D3": {
+        "status": "PASS",
+        "actual": "original W32/W33 upgrade/pointer/rollback + W32/W33 installed ProductStore readers",
+        "positive": [
+          "raw rollback BLOCKED preserved",
+          "clean retry BINARY_ROLLED_BACK exit0",
+          "second CONFIRMED upgrade with two works",
+          "two Works +8 artifacts survive upgrade and rollback"
+        ],
+        "negative": [
+          "unknown live resource blocked initial raw retry",
+          "pointer/data distinction kept"
+        ],
+        "evidence": [
+          "reports/wave33/rollback.json",
+          "reports/wave33/rollback-retry.json",
+          "reports/wave34/second-upgrade.json",
+          "reports/wave34/second-upgrade-read.json",
+          "reports/wave34/second-rollback.json",
+          "reports/wave34/w32-two-works-read.json"
+        ]
+      }
+    },
+    "P2": {
+      "D4": {
+        "status": "PASS",
+        "actual": "W33 outer moved to path with spaces/Chinese; bundled Node",
+        "positive": [
+          "moved path RUNNING/STOPPED",
+          "install path reported correctly",
+          "no global Node needed",
+          "single outer entry"
+        ],
+        "negative": [
+          "occupied port exit2 BLOCKED",
+          "wrong build verified exit1"
+        ],
+        "evidence": [
+          "reports/wave34/moved-path-start.log",
+          "reports/wave34/moved-path-status.json",
+          "reports/wave34/moved-path-stop.log",
+          "reports/wave34/occupied-port.log"
+        ]
+      },
+      "D5": {
+        "status": "PASS",
+        "actual": "manifest checker/source closure/support",
+        "positive": [
+          "W33 manifest PASS sha/bytes/entries",
+          "canonical 192 unique paths",
+          "support PASS 0600"
+        ],
+        "negative": [
+          "W32 tar vs W33 manifest REFUSED",
+          "support duplicate output REFUSED"
+        ],
+        "evidence": [
+          "reports/wave34/manifest-positive.json",
+          "reports/wave34/manifest-cross-negative.json",
+          "reports/wave33/support.json"
+        ]
+      },
+      "D6": {
+        "status": "PASS_CANDIDATE_E",
+        "actual": "E handoff of stable W33 f880/46e; successor main23d not frozen",
+        "positive": [
+          "full tuple and sidecars",
+          "two-work nonempty recipe",
+          "raw rollback correction",
+          "outer/inner checker"
+        ],
+        "notReached": [
+          "E independent W33 verdict",
+          "main23d successor separate subject not built"
+        ],
+        "evidence": [
+          "recipes/wave34-e-handoff.zh-CN.md"
+        ]
+      }
+    }
+  },
+  "remaining": [
+    "D2 explicit authorized public read 200 after proper configured source/rebind",
+    "D2 business write 422",
+    "E independent W33 verdict",
+    "main23d successor if selected, separate freeze",
+    "cross-machine/signing/notarization/native/value"
+  ],
+  "real": {
+    "vendor": 0,
+    "model": 0,
+    "native": 0
+  }
+}

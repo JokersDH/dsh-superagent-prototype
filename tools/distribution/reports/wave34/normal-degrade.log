@@ -1,0 +1,17 @@
+原启动器尚未确认可用的开发执行器，本次明确以仅对话模式启动。
+个人预览 f880e5bc9c6c1c57
+私有数据：/tmp/w33-normal-home/Library/Application Support/PersonalAgent/Preview-f880e5bc9c6c1c57
+模型配置：/tmp/w33-normal-home/Library/Application Support/PersonalAgent/Preview-f880e5bc9c6c1c57/config/model.json
+请保留启动窗口；结束时双击 Stop.command。
+[daemon:out] Personal product API: http://127.0.0.1:58521/v1/health
+[daemon:out] Private state/credential references: /private/tmp/w33-normal-home/Library/Application Support/PersonalAgent/Preview-f880e5bc9c6c1c57/data
+[daemon:out] Personal discussion mode: execution unavailable (operator_disabled); business queues are retained.
+Workbench: http://127.0.0.1:58520
+  api: http://127.0.0.1:58521
+  mode: personal access: local-development startup: normal
+  state: /private/tmp/w33-normal-home/Library/Application Support/PersonalAgent/Preview-f880e5bc9c6c1c57/data
+  build: f880e5bc9c6c1c57
+daemon 已退出（code 0）；日志: /private/tmp/w33-normal-home/Library/Application Support/PersonalAgent/Preview-f880e5bc9c6c1c57/logs/daemon-f880e5bc9c6c1c57.log
+  Personal product API: http://127.0.0.1:58521/v1/health
+  Private state/credential references: /private/tmp/w33-normal-home/Library/Application Support/PersonalAgent/Preview-f880e5bc9c6c1c57/data
+  Personal discussion mode: execution unavailable (operator_disabled); business queues are retained.

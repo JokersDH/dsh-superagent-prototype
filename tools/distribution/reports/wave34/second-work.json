@@ -1,0 +1,33 @@
+{
+  "protocol": "wave33-second-work/1",
+  "status": "PASS",
+  "workId": "76a82043b8c7e1495e27748f4381e5d1",
+  "acceptedEventSeq": 103,
+  "artifactCount": 4,
+  "artifacts": [
+    {
+      "id": "1f672d1e38ff122436243ed3c841ca36e1a149b3b759bf3d7a3c588e26f0880e",
+      "sha256": "1f672d1e38ff122436243ed3c841ca36e1a149b3b759bf3d7a3c588e26f0880e",
+      "bytes": 1143
+    },
+    {
+      "id": "1822672fb21520769ab626ab4ff94bfe4563373368f291baefc4b31fec8ed7c5",
+      "sha256": "1822672fb21520769ab626ab4ff94bfe4563373368f291baefc4b31fec8ed7c5",
+      "bytes": 187
+    },
+    {
+      "id": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+      "sha256": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+      "bytes": 24
+    },
+    {
+      "id": "de4bcc6608d1c9b75dd93864bc35c90ce75adca1af30d36d52de05cce6b997dc",
+      "sha256": "de4bcc6608d1c9b75dd93864bc35c90ce75adca1af30d36d52de05cce6b997dc",
+      "bytes": 380
+    }
+  ],
+  "eventSeq": 103,
+  "realVendorTurns": 0,
+  "realModelTurns": 0,
+  "realNativeTurns": 0
+}

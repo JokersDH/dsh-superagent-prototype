@@ -1,0 +1,8 @@
+{
+  "protocol": "personal-install-switch/1",
+  "status": "BINARY_ROLLED_BACK",
+  "from": "f880e5bc9c6c1c57",
+  "to": "88eb8c69b0671171",
+  "dataRolledBack": false,
+  "note": "Only the installed binary pointer changed. Post-upgrade data remains in the same state directory; if the older binary cannot read the newer schema it must refuse to start instead of deleting data."
+}

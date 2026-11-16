@@ -1,0 +1,9 @@
+个人预览 f880e5bc9c6c1c57
+私有数据：/tmp/w33-port-home/Library/Application Support/PersonalAgent/Preview-f880e5bc9c6c1c57
+模型配置：/tmp/w33-port-home/Library/Application Support/PersonalAgent/Preview-f880e5bc9c6c1c57/config/model.json
+请保留启动窗口；结束时双击 Stop.command。
+BLOCKED port_in_use: 本机端口 58710 已被占用
+  name: port
+  port: 58710
+  cause: EADDRINUSE
+  hint: 用 --port/--api-port 选择其它端口，或先运行 `pa doctor` 核对已有实例。
