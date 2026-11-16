@@ -1,0 +1,71 @@
+{
+  "protocol": "main-product-integration/34",
+  "date": "2026-11-16",
+  "source": "23d5a98e6e75a3b0fb08168431260a9935cf5674",
+  "browserTestSource": "233fb217a088faab1c4f9fb8abb7b4239e5bffa2",
+  "browserOnlySourceDelta": [
+    "tests/integration/usage-observation-browser.mjs"
+  ],
+  "checks": {
+    "nativeClassCallbacks": 11,
+    "attachedRealStore": 4,
+    "supportHTTP": 4,
+    "supportTransport": 1,
+    "previousObservationExport": 4,
+    "contracts": 241,
+    "generatedReproducible": true,
+    "runnerFrozenHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
+    "consoleStrict": 0,
+    "coordinatorStrict": 0,
+    "consoleBuild": 0
+  },
+  "callbackPort": {
+    "actualOriginalClass": true,
+    "sharedStdioMethods": true,
+    "originalFreshGuardPreserved": true,
+    "autoAttach": false,
+    "publicHTTPExposure": false,
+    "rawCandidateFeedCancelImported": false,
+    "newMemorySlotSchedulerImported": false,
+    "nativeLaunchExecuted": false
+  },
+  "support": {
+    "route": "GET /v1/insights/support",
+    "actualAppDownload": true,
+    "strictPublicProjection": true,
+    "metadataOnly": true,
+    "arbitraryUploadHandler": false,
+    "origin": null,
+    "exportCapability": "unverified",
+    "digestCheckedInBrowser": true,
+    "scopeAbort": true
+  },
+  "browserReport": "reports/releases/wave34-integration/recipes-browser/browser-report.json",
+  "observationReport": "reports/releases/wave34-integration/observation-browser-final/browser-report.json",
+  "initialObservationReport": "reports/releases/wave34-integration/observation-browser/browser-report.json",
+  "screenshotsInspected": [
+    "reports/releases/wave34-integration/observation-browser-final/support-desktop.png",
+    "reports/releases/wave34-integration/observation-browser-final/support-mobile.png",
+    "reports/releases/wave34-integration/observation-browser/desktop.png",
+    "reports/releases/wave34-integration/observation-browser/mobile.png"
+  ],
+  "newDependencies": 0,
+  "newMigrations": 0,
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "candidateWorktreesEdited": false,
+  "newTarCreated": false,
+  "newPersistentServiceStarted": false,
+  "userTwelveServicesTouched": false,
+  "fullOriginalWorkRecovery": false,
+  "actualNativeAdmission": false,
+  "independentInstalledAdmission": false,
+  "valueBenefitAdmission": false,
+  "releaseApproved": false,
+  "completionEstimateChanged": false,
+  "verificationNotes": [
+    "Initial union-method call failed console TS2684; explicit optional-method branch corrected and strict passed before source commit.",
+    "First clean-source observation16 and recipe9 passed at23d5a98e; second observation16 at test-only233fb217 adds actual new support viewport captures, same product bytes.",
+    "Existing673.97KB console bundle advisory remains; no broad UI redesign or dependency churn this turn."
+  ]
+}

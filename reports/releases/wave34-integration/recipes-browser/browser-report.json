@@ -1,0 +1,72 @@
+{
+  "status": "PASS_ACTUAL_PROJECT_RECIPE_WORKFLOW",
+  "sourceCommit": "23d5a98e6e75a3b0fb08168431260a9935cf5674",
+  "sourceWorktreeClean": true,
+  "cases": [
+    {
+      "id": "CURRENT-PROJECT-WORKBENCH-SUGGESTIONS-OPEN-THE-ORIGINAL-FORM-WITHOUT-CREATING",
+      "status": "PASS"
+    },
+    {
+      "id": "PROJECT-SUGGESTIONS-IGNORE-LATE-PREVIEWS-FROM-THE-PREVIOUS-PROJECT",
+      "status": "PASS"
+    },
+    {
+      "id": "ACTUAL-WORKBENCH-RETRIES-THREE-PREVIEWS-AND-READS-SUPPORT-WITHOUT-BUSINESS-WRITES",
+      "status": "PASS"
+    },
+    {
+      "id": "PREVIEW-AND-APPLY-ONLY-PREFILL-ORIGINAL-FORM",
+      "status": "PASS"
+    },
+    {
+      "id": "CHANGED-FACTS-REFUSE-EXPLICIT-CREATION-UNTIL-REAPPLIED",
+      "status": "PASS"
+    },
+    {
+      "id": "SELECTION-AND-CONFIG-CHANGES-CANNOT-KEEP-HIDDEN-OLD-ATOMS",
+      "status": "PASS"
+    },
+    {
+      "id": "ERROR-AND-LEGACY-ABSENCE-KEEP-MANUAL-DELEGATION-AVAILABLE",
+      "status": "PASS"
+    },
+    {
+      "id": "TWO-EXPLICIT-TEMPLATE-WORKS-REACH-ORIGINAL-CANDIDATE-AND-MANUAL-ACCEPT",
+      "status": "PASS"
+    },
+    {
+      "id": "DESKTOP-MOBILE-TEMPLATE-CONTROLS-AND-TEXT-FIT",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "previewPosts": 40,
+  "unknownAfterRecorded": true,
+  "commands": [
+    {
+      "kind": "create_work",
+      "commandId": "cmd-work-f5c17c2c-9c96-44c0-8db9-ff70a5cd3a4a"
+    },
+    {
+      "kind": "create_work",
+      "commandId": "cmd-work-f5c17c2c-9c96-44c0-8db9-ff70a5cd3a4a"
+    },
+    {
+      "kind": "accept_candidate",
+      "commandId": "cmd-accept-824b1a98-8e7d-4b15-a97d-2e4a7f07e29f"
+    },
+    {
+      "kind": "create_work",
+      "commandId": "cmd-work-46eb4bf8-903f-428e-8266-af8969b75b05"
+    },
+    {
+      "kind": "accept_candidate",
+      "commandId": "cmd-accept-116d23b2-29c7-40b2-a200-63da84bd6a9c"
+    }
+  ],
+  "acceptedWorks": 2,
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "scope": "Actual App/React/J observer/registered project/HTTP/Product/Broker/check/accept controlled workflow; no installed, native or recovered admission"
+}

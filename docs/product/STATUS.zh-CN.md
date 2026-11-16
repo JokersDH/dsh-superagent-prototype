@@ -2,7 +2,7 @@
 
 日期：2026-11-16。本次核对十位A–J的固定最新提交、主线代码、必要正反例和准确安装字节；不是按“Agent说完成”统计。读者入口：[如何使用](../ASSISTANT-GUIDE.zh-CN.md)、[架构](ARCHITECTURE.zh-CN.md)、[创新](INNOVATION.zh-CN.md)。
 
-最新续交：wave32提交已按[本轮验收](../../reports/releases/wave33-admission/README.zh-CN.md)独立复核，mainfc38已接原Runner内部登记port/B正确caller和F实际工作台retry/support，干净网页9模板/13观察通过。F这些片段不再是未集成候选，C新工具、G默认support数据、J迁移消费者仍需后续接线；原恢复/安装/研究证据层不随源码集成自动升级。下列计分保留此前冻结口径，不因测试和新任务数上调。下一轮沿[完整子系统长包](../../agent-tasks/product-wave-33/README.zh-CN.md)持续工程。
+最新续交：wave33十路已按[本轮验收](../../reports/releases/wave34-admission/README.zh-CN.md)独立复核。main23d5a98e新增原NativeProductAttempt真实三回调、G严格metadata支持GET与实际App下载，干净16观察/9模板过，两受控Work人工接受。A真实keyset、D/E非空/包内ZIP、Havailable后交付有实质进展；B控制/工具、A预算、C完整snapshot、Ecaller/oracle和Drollback主张仍需收口。原Work恢复与各证据层不随源码集成自动升级。下列分数保留，沿[Wave34双工程包](../../agent-tasks/product-wave-34/README.zh-CN.md)继续；每位两连续包/六完整成果，非按任务数加分。
 
 ## 现在到哪一步
 
@@ -22,7 +22,7 @@
 | 当前完整方案B（不含CAC） | 同范围折算约53.5%（原含CAC为50.8/100） | **55.7/95 = 58.6%，约60%** | 包含多协议与创新收益；CAC不占当前交付、验收或完成度分母 |
 | 最终发行准入 | 未通过 | **仍未通过** | P1/原恢复/新版同包与长期证据不能由平均分抵消 |
 
-详细机器记录：[progress.json](../../reports/releases/wave32-admission/progress.json)的`currentSchemeB`为当前口径，`fullSchemeB`保留此前含CAC的55.7/100评估。历史[旧记录](../../reports/releases/wave13-admission/progress.json)保持不改。此前约55%变为当前约59%只来自移出CAC分母，本次新增功能为0；本机内测仍76/100，约75%。
+详细机器记录：[progress.json](../../reports/releases/wave32-admission/progress.json)的`currentSchemeB`为当前口径，`fullSchemeB`保留此前含CAC的55.7/100评估。历史[旧记录](../../reports/releases/wave13-admission/progress.json)保持不改。此前约55%变约59%来自移出CAC分母；此后新增功能单独列证据，尚未据此重新计分。本机内测仍76/100，约75%。
 
 ### 同一分母的12项
 
@@ -48,20 +48,21 @@
 
 | 层 | 准确身份 | 已证范围 | 未证范围 |
 | --- | --- | --- | --- |
-| main运行代码 | fc38bf65 | 原Runner内部登记port/正确caller、F工作台重试与支持已接；13观察+9模板干净网页，两受控Work明确接受 | Gsupport/Jrebind/C新工具仍有候选；内部port不等原Broker恢复，本轮未执行真实native |
+| main运行代码 | 23d5a98e | 原Runner内部登记port和三类真实回调、G严格诊断摘要下载；16观察+9模板干净网页，两受控Work明确接受 | A新history/C完整snapshot/Jrebind仍候选；回调不等Native.launch/原Broker恢复，本轮真实native0 |
 | R1 | source82ee5b8f / build8296720d8a25f38c / tarSHA04926739… | E最新290PASS/0FAIL/20NT，recorded普通197/功能198过；合法启停保留，同fixture Work真重开found=true新增 | 两原project完整旅程仍未达，oracle仍会接不足材料；新ZIPcase实际只用R1tar；无新观察download，非全原生/全产品 |
 | R2 | source c0a1f897 / build4dcd28f758bbb265 / tarSHA405ecd02… | 6864清单项/209closure，实际包含main303严格导出；D开发受控证据 | E尚无同R2独立结果；不含本轮新A/C/F/G/J候选 |
-| W32候选 | sourcee8348a86 / build88eb8c69b0671171 / innerSHA65c386d1… / outerSHA0a46cd36… | 6866inner项/实际closure197records/192unique，全量静态核验；含main58b4的终态修复/安装指南 | E尚未同W32验，旧status209为旧计数；本轮backup eventSeq0/artifacts0，不作非空迁移证明；未含fc38 |
-| 十位候选 | 固定HEAD见[清单](../../reports/releases/wave32-admission/workspaces.json) | 每位各自source/受控结果 | “提交了12项材料”不等于12项真实产品闭合 |
+| W32候选 | sourcee8348a86 / build88eb8c69b0671171 / innerSHA65c386d1… / outerSHA0a46cd36… | 全量静态；E新actual ZIP包内Node/启动/非空原Work备份/readonly HTTP读取是真实进展 | E306/20NT、普通199/功能200是R1+W32 aggregate，不是W32全套或W33；未含fc38 |
+| W33当前工程包 | source048f0184 / buildf880e5bc9c6c1c57 / innerSHAee45c92c… / outerSHA46e01c8c… | 6867项/192uniqueclosure全量静态；含fc38；D非空Work/4产物bytes恢复与CONFIRMED升级 | E尚未独立同W33；rawrollback BLOCKED与summary成功冲突；未含23d5a98e |
+| 十位候选 | 固定HEAD见[清单](../../reports/releases/wave34-admission/workspaces.json) | 每位各自source/受控结果 | 新six成果是计划，不等真实产品闭合 |
 | 用户旧5180–5191实例 | 每个实例独立state与启动代码 | 保留原历史 | 不自动升级/迁移，不据仓库HEAD推它们的能力 |
 
 R1 archive有6849个manifest项，R2为6864；目录tar entries与文件/链接manifest项不是同一计数，不能混成“漏文件”。准确路径/SHA/大小/环境见[发行验收](../../reports/releases/wave32-admission/delivery.json)。
 
-R2已经真实产出，因此其它候选文档中的“还没有R2包”和“E仍ce64/1fba”是陈旧说明。本次以实际字节与E最终run为准。反过来，R2存在也不代表E已经验过。
+W33已经真实产出；E已真实消费W32 outer及非空数据，不能再写E只验R1tar。W33存在也不代表E验过，原rawrollback缺口不能以升级成功或数据可读抵消。准确包/命令与范围见[当前发行验收](../../reports/releases/wave34-admission/delivery.json)。
 
 ## 此前Wave31验收快照
 
-以下为上一版计分对应的历史快照，部分问题已关闭，不能作当前缺口清单；最新十路结论以[Wave32提交验收](../../reports/releases/wave33-admission/README.zh-CN.md)和0083主线实际接入为准。
+以下为上一版计分对应的历史快照，部分问题已关闭，不能作当前缺口清单；最新十路结论以[Wave33提交验收](../../reports/releases/wave34-admission/README.zh-CN.md)和0086主线实际接入为准。
 
 | 角色 | 已交与本次复验 | 仍未闭合 |
 | --- | --- | --- |
@@ -80,7 +81,7 @@ R2已经真实产出，因此其它候选文档中的“还没有R2包”和“E
 
 ## 此前阻断与当前收口
 
-以下原问题保留来由。当前B numericPID/复制handle/payload和Hlaunchcommand、Cunknowncoverage已关闭；新B伪造spawn对象、C草稿/expiry/strict、Eparentdead缺set/旅程与ZIPoracle仍需完成。原Work/Broker恢复与原2/4槽仍未达；H抢跑candidate不是已证ready后缺Review，主线不会据此放松gate。
+以下编号原问题保留来由，按历史范围读。当前C草稿/expiry/strict、Eparentdead缺set/helper及actual ZIP旧问题也已关闭；新B原型spawn/foreigncancel写后拒绝/旧leasefeed、A总预算、C完整snapshot、Ecaller finally/oracle仍需完成。原Work/Broker恢复与原2/4槽未达；H已真正等待available后接受重开，不能再据旧抢跑松gate。
 
 1. **审查时主线P1：terminal shutdown后remote lease仍接迟到receipt。** 在303b源码实际service纯受控消费者复现；随后b72e935d已用现有attach.close关闭终态lease与pending，18项针对性回归和strict通过，仍running时临时断连接管保留。该修复不等于同原Work完整恢复已通过，也不把旧R2重标为含修复。
 2. **未合B caller P1：payload-read字段/返回协议不对。** 新caller把reference当ref，且将chunk envelope当原payload返回，三回调尚未准入。
@@ -93,15 +94,15 @@ R2已经真实产出，因此其它候选文档中的“还没有R2包”和“E
 
 先收口以上实际缺口，减少继续造helper/接口/大包。三个完整产品结果优先：
 
-1. **一个准确新版可重复用。** 修旅程断言和清理边界，独立验R2；两个不同原项目各自preview/apply/create/check/candidate/manualaccept，再在同安装实例重开读到原Work。不要用fixture代替原项目。
+1. **一个准确新版可重复用。** 修旅程断言和caller清理边界，先独立验固定W33 f880/46e；必要新runtime successor另立subject。两个不同原项目各自preview/apply/create/check/candidate/manualaccept，再在同安装实例重开读到原Work。不要用fixture替原项目。
 2. **一条同原Work恢复到交付。** 修terminal lease/newcaller和工具出生边界，使用原Store/Application/QuestionBroker，从同一Work故障接管到检查/候选/接受及原2/4槽实际归还。
 3. **小规模日常使用与创新验证。** 有了稳定普通出口后，用真实任务记录质量、等待、人时代理和费用unknown；原复核试点依原预算/可行性门槛，不靠继续研发自动变出收益。
 
-本轮已生成[十路三成果完整工程包](../../agent-tasks/product-wave-33/README.zh-CN.md)，source早交后持续集成/联调，不逐小修重派；由用户转发，不声称自动启动外部chat。未重启实例、执行真实模型、替换包或刷新预算。CAC移出当前完整B，留待后续独立实验；第二真实协议和创新验证仍属当前完整B，研究受阻不停止独立工程。桌面/自动接受仍后置。
+本轮已生成[十路双工程包/六成果](../../agent-tasks/product-wave-34/README.zh-CN.md)，source早交后持续集成/联调/独立队列，不逐小修重派；由用户转发，不声称自动启动外部chat。未重启实例、执行真实模型、替换包或刷新预算。CAC后置；第二真实协议和创新验证仍属当前完整B，研究受阻不停止独立工程。桌面/自动接受仍后置。
 
 ## 查阅完整材料
 
 - [使用指南](../ASSISTANT-GUIDE.zh-CN.md)：源码/安装、配置、第一次交付、故障与备份。
 - [架构说明](ARCHITECTURE.zh-CN.md)：进程、七个模块组、请求/数据/执行/恢复、代码位置。
 - [创新状态](INNOVATION.zh-CN.md)：原I1/I2/I3、独立复核、路由/注意力，怎样证明价值。
-- [最新验收总表](../../reports/releases/wave33-admission/README.zh-CN.md)：命令、反例、准确source/tar及限制；原计分来由保留在wave32报告。
+- [最新验收总表](../../reports/releases/wave34-admission/README.zh-CN.md)：命令、反例、准确source/tar及限制；原计分来由保留在wave32报告。
