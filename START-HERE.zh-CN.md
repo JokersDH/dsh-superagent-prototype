@@ -1,5 +1,7 @@
 # 从这里开始：仓库、代码位置和并行开发
 
+**当前推进：[第三十三轮完整子系统长包](agent-tasks/product-wave-33/README.zh-CN.md)。** wave32十路已[独立验收](reports/releases/wave33-admission/README.zh-CN.md)，mainfc38已实际接原Runner登记port/B新caller与4realStore回归、F六源及同scope模板retry/support；干净网页9模板/13观察、backend13/trial20/strict/build通过，两原受控Work人工接受。旧修复真关与C/E/工具残余均分层列明；原Work/Broker恢复和原2/4槽仍未达。十位继续原目录分支，每位整块goal覆盖三个完整工程成果，source早交后持续联调/独立队列，main持续接入，不逐小修等派工、不临时ZIP冲刺、不含CAC。分别转发[十段新话术](agent-tasks/product-wave-33/forward-prompts.zh-CN.md)，见[目录](agent-tasks/product-wave-33/workspaces.json)/[0083](docs/rfcs/WP-16/0083-main-registered-port-and-workbench-consumers.md)/[0084](docs/rfcs/WP-16/0084-wave-33-reviewed-architecture.md)/[0085](docs/rfcs/WP-16/0085-wave-33-whole-product-program.md)。十二实例/state/dirty/预算保持，无新tar/新服务/真实模型任务，以下旧派工按历史范围阅读。
+
 **当前方向：[完整工程十路并行推进](agent-tasks/product-wave-32/README.zh-CN.md)。** 用户已澄清：先加速完整方案B工程，CAC暂不包含，打包纳入工程集成与最终使用交付，不突击一个功能收窄的临时ZIP。原十位各完成整块子系统，早交source后持续联调/修复/独立队列，main持续接线集成，不逐fix等派工，也不等十枝全交才集成。分别转发[已纠正的十段话术](agent-tasks/product-wave-32/forward-prompts.zh-CN.md)，替代此前安装预览版表述。原目录/分支、用户状态及预算不变；[当前不含CAC的进度](docs/product/STATUS.zh-CN.md)58.6%仅分母调整，工程目标未缩成打包工作。
 
 **2026-11-16 产品总览已更新：** [整体进度与计分依据](docs/product/STATUS.zh-CN.md)、[实际使用指南](docs/ASSISTANT-GUIDE.zh-CN.md)、[当前架构与代码地图](docs/product/ARCHITECTURE.zh-CN.md)、[创新现状](docs/product/INNOVATION.zh-CN.md)。十路wave31最新提交已[独立复验](reports/releases/wave32-admission/README.zh-CN.md)：E已切准确R1 829且普通/功能记录通过，R2 4dcd已真实打包但未E同包。原Work恢复、main terminal lease及候选caller/工具、两项目重开语义仍有阻断；评估时主线运行303b2c6a，后续修复/打包按准确source另记，不自动升级十二实例。以下为原派工与历史范围。
