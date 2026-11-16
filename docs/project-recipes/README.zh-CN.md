@@ -52,6 +52,18 @@ fixture 与 native 的区分由配置决定，本模块不参与判定，但保�
 
 ---
 
+## 1.5 首次使用：导入普通项目到交付
+
+目标：同事把自己机器上的**普通 Node 项目**（纯 Node、npm 单包、pnpm 单包）接入后，拿到可应用的模板字段并走完原确认流程。实际链路（已由 `tools/project-recipes/test/first-user.case.ts` 在真实 `createProductRuntime` 上验证）：
+
+1. **导入项目**：用原产品入口（main 的 ProjectSettings/`NativeProjectRegistry`）登记项目根与显示名；根必须是已有提交的 git 仓库根。登记后项目获得自己的 `project-<digest(path)>` id。
+2. **预览三模板**：`POST /v1/projects/:id/recipes/preview`（main 实现）按 `kind`（`regression_fix`/`scoped_change`/`verification_followup`）、当前项目已声明 atoms（如 `src/`）与已启用 profile 返回 `draft` 字段；纯 Node 项目（无 manager/lock）同样可用，只是附「未观察到 packageManager」说明。
+3. **应用与编辑**：只有 `draft` 可应用；应用只预填 goal/scope/criteria/profile，用户仍可编辑 goal；未应用的模板不能创建。
+4. **明确创建**：创建前 main 会重新读取同一 preview，比较配置 revision、facts 内容摘要、catalog 与字段；变化要求重新应用。之后发送原 `create_work`，由原 Application 再校验 scope/criteria/profile，再走原检查/候选/人工接受。
+5. **迁移/重绑**：搬目录或重新登记后，用 `--previous-facts` 或 `rebindRegisteredProject` 对比旧观察；身份变化（新 id）报 `reidentified`，只给迁移差异、不复用旧建议。
+
+限制：只支持 Node/npm/pnpm 单包与显式声明的 monorepo 原子；不安装依赖、不执行 scripts/版本命令、不自动注册检查、不猜成员/父目录；未知语言或布局保持 `unsupported`/`needs_input`。
+
 ## 2. 事实（facts）从哪来
 
 只接受两种来源，二者都写进 `provenance`：
@@ -333,12 +345,12 @@ const { facts, report } = rebindRegisteredProject({
   observedAt: new Date().toISOString(),
   roots: { rootFor: (id) => registeredRoots.get(id) },  // main 自己的已登记映射
 })
-// report.status: 'current' | 'changed' | 'unbound' | 'foreign'
+// report.status: 'current' | 'changed' | 'unbound' | 'reidentified'
 // report.changes: ['stack'|'manager'|'packageJson'|'lockfile'|'workspace'|'scripts'|'languages'|'observation']
 ```
 
 - `unbound`：当前没有该项目的已登记 root → 只能先走原项目设置/登记流程，**不猜路径**。
-- `foreign`：`previous` 属于另一个项目 → 旧观察不能复用为当前项目建议。
+- `reidentified`：项目换了身份（搬目录后重新登记会产生新 project id，main 的 registry id 由路径摘要生成）→ 报告给出 `previousProjectId` 与元数据差异供迁移核对，但**旧建议不能复用**，需按新项目重新生成。
 - `current`：内容摘要相同（观察时间可以不同）→ 可沿用已生成建议，仍以原确认流程为准。
 - `changed`：列出字段级变化（manager/lock/workspace/scripts…），旧草稿由 `previewInputs` 判定为 `stale_inputs`，需用当前配置重新生成。
 - 报告只含 digest/时间/字段名/脱敏 note，没有绝对 root、metadata 正文、凭据或授权；`authorization` 恒 `none`。
@@ -350,7 +362,7 @@ node tools/project-recipes/cli.ts --previous-facts /tmp/old-facts.json \
   --root /path/to/new/project --project project-alpha --now 2026-11-15T00:00:00.000Z
 ```
 
-退出码：`current`/`changed` → 0；`unbound`（未登记/根不存在）→ 3；`foreign` 或输入被拒绝 → 5；参数冲突 → 2。该模式不接受 `--facts/--kind/--paths/--output`，避免把迁移对比混成生成或写入。
+退出码：`current`/`changed` → 0；`unbound`（未登记/根不存在）→ 3；`reidentified`（身份已变化，仅供迁移核对）或输入被拒绝 → 5；参数冲突 → 2。该模式不接受 `--facts/--kind/--paths/--output`，避免把迁移对比混成生成或写入。
 
 ## 8. 兼容、版本与分发
 

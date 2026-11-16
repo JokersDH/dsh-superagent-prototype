@@ -1,0 +1,193 @@
+{
+  "protocol": "project-recipes-wave32-status/1",
+  "owner": "J",
+  "date": "2026-11-16",
+  "branch": "codex/g5-project-recipes",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-j",
+  "baseline": "b25bf228e55d8428881a8ee1f6c723ad6753bc73",
+  "mergedOriginMain": "58b4e4c8 (wave-32 dispatch), merged as 345fb72c; includes b72e935d/1498b07a packaging work",
+  "packet": "agent-tasks/product-wave-32/agent-j-project-recipes.zh-CN.md",
+  "dirty": {
+    "state": "clean at runtime source 7a164c57",
+    "note": "Only the four owned paths were touched; no reset, no state clearing, no new checkout. Reports/docs are committed after the runtime source."
+  },
+  "result": {
+    "title": "first users import ordinary Node/npm/pnpm projects, get applicable template fields and complete the original delivery flow",
+    "status": "SERVICE_SOURCE_READY_CONTROLLED_CONSUMER_PASSED_NOT_INSTALLED",
+    "summary": "Three ordinary project shapes registered through main's NativeProjectRegistry get a draft for all three kinds through the coordinator's real recipe consumer, and the fields create work through the original ProductApplication. Migration re-binding is re-read through the registry mapping. Nothing is installed; the new rebind/reidentified source is candidate-only in main."
+  },
+  "source": {
+    "runtimeCommit": "7a164c57a3880dcede70426703a3ffb927cc545a",
+    "changedFiles": [
+      "packages/project-recipes/src/rebind.ts",
+      "packages/project-recipes/src/index.ts",
+      "packages/project-recipes/test/rebind.case.ts",
+      "tools/project-recipes/cli.ts",
+      "tools/project-recipes/test/rebind-cli.case.ts",
+      "tools/project-recipes/test/first-user.case.ts"
+    ],
+    "publicApi": [
+      "rebindRegisteredProject",
+      "reobserveProjectFacts",
+      "compareProjectFacts",
+      "changedFields",
+      "RebindReportSchema",
+      "RebindError",
+      "CLI --previous-facts"
+    ],
+    "contracts": [
+      "project-facts-rebind/1 (statuses current | changed | unbound | reidentified)"
+    ]
+  },
+  "consumers": {
+    "mainCoordinator": {
+      "entry": "apps/coordinator/product/project-recipes.ts -> POST /v1/projects/:id/recipes/preview",
+      "evidence": "tests/integration/project-recipes.case.mjs 5/5 executed here; 8/8 browser cases at clean source 7a164c57",
+      "state": "IN_MAIN"
+    },
+    "originalApplication": {
+      "entry": "ProductApplication.dispatch(create_work) with the returned fields",
+      "evidence": "first-user.case.ts dispatches three created works (plain/npm/pnpm) recorded",
+      "state": "IN_MAIN"
+    },
+    "forwarderConsole": {
+      "entry": "apps/console/src/useProjectRecipe.ts (F renders, main owns fields)",
+      "state": "IN_MAIN_NOT_MODIFIED_BY_J"
+    },
+    "distribution": {
+      "entry": "tools/distribution/build.mjs includes 'project-recipes'",
+      "state": "IN_MAIN_CLOSURE"
+    }
+  },
+  "evidence": {
+    "package": {
+      "typecheckExit": 0,
+      "tests": 82,
+      "pass": 82,
+      "fail": 0,
+      "buildExit": 0
+    },
+    "tools": {
+      "typecheckExit": 0,
+      "tests": 36,
+      "pass": 36,
+      "fail": 0
+    },
+    "exampleExit": 0,
+    "mainIntegration": {
+      "command": "node --test tests/integration/project-recipes.case.mjs",
+      "exit": 0,
+      "tests": 5,
+      "pass": 5
+    },
+    "mainBrowser": {
+      "command": "node tests/integration/project-recipes-browser.mjs reports/project-recipes/wave32-browser",
+      "exit": 0,
+      "cases": 8,
+      "pass": 8,
+      "sourceCommit": "7a164c57a3880dcede70426703a3ffb927cc545a",
+      "sourceWorktreeClean": true,
+      "acceptedWorks": 2
+    },
+    "firstUser": {
+      "file": "tools/project-recipes/test/first-user.case.ts",
+      "cases": [
+        {
+          "id": "three-shapes-three-kinds-create",
+          "result": "plain/npm/pnpm each draft all three kinds; three create_work recorded"
+        },
+        {
+          "id": "undeclared-atom-and-unknown-project",
+          "result": "needs_input for 'test/' atom; forbidden for a project that was never imported"
+        },
+        {
+          "id": "migration-rebind",
+          "result": "changed for the same id on a new root; reidentified with previousProjectId for a moved project registered under a new id"
+        }
+      ]
+    },
+    "wave32Verifier": "not present in agent-tasks/product-wave-32 (no verify.mjs); dispatch.json is the static plan only",
+    "workspaceRebuild": "after merging main, contracts dist must be rebuilt (`pnpm -r --workspace-concurrency=2 run build`, exit 0) or main imports fail on a missing export"
+  },
+  "integration": {
+    "alreadyInMain": [
+      "wave-30 J source e6400429 (5 files): facts/contentDigest, freshness, budget validation, omissions",
+      "0073/0077 preview + original form + create_work consumer",
+      "distribution build list includes project-recipes"
+    ],
+    "candidateOnly": [
+      "rebind.ts and the reidentified migration semantics (origin/main has no rebind.ts)",
+      "wave-32 CLI --previous-facts mode",
+      "first-user test"
+    ],
+    "notInMainReason": "main imports J by exact bytes at chosen checkpoints; this block's source is published for the next integration round"
+  },
+  "packageIdentity": {
+    "R1": {
+      "status": "PINNED_UNMODIFIED_REFERENCE",
+      "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "build": "8296720d8a25f38c",
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "bytes": 20481470,
+      "entries": 6849,
+      "note": "J did not install, re-freeze or modify R1; E owns its installed verdict."
+    },
+    "R2": {
+      "status": "SOURCE_READY_TAR_NOT_CREATED",
+      "runtimeSource": "7a164c57",
+      "buildCommand": "./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.build.json",
+      "pack": {
+        "files": 38,
+        "bytes": 47298
+      },
+      "note": "D freezes the successor tar after choosing the integrated runtime; E binds one exact tar. No tar exists for this source yet."
+    },
+    "installed": false
+  },
+  "layers": {
+    "source": "PASS (82 library / 36 tools / strict / build / example)",
+    "controlled": "PASS (real registry + coordinator preview + original Application on three project shapes; main 5 integration + 8 browser cases)",
+    "installed": "NOT_REACHED (no package built or installed in this worktree)",
+    "native": "NOT_APPLICABLE (real vendor/model/native turns 0)",
+    "recovered": "NOT_REACHED (B/I recovery outside this block; no fixture registry substituted)",
+    "value": "NOT_CLAIMED"
+  },
+  "remaining": [
+    "main re-import of rebind.ts and the --previous-facts CLI (candidate only today)",
+    "D successor build/freeze including project-recipes, then E installed verdict on one exact tar",
+    "F presentation verification on its own side; E independent assertions unchanged",
+    "real model/native/recovery paths and value claims stay out of scope"
+  ],
+  "minimalDependencies": [
+    "main: keep root workspace importer/lock and the registered-root lookup; re-import the two changed package files",
+    "D: build order contracts -> project-recipes, include the package in the runtime closure",
+    "E: bind the exact tar tuple (R1 829 for R1; the frozen R2 successor otherwise)"
+  ],
+  "limits": {
+    "realModelTurns": 0,
+    "nativeTurns": 0,
+    "vendorCalls": 0,
+    "dependencyInstalls": 0,
+    "executedProjectCommands": 0,
+    "checkRegistrations": 0,
+    "sqlWrites": 0,
+    "executionLifecycles": 0,
+    "userServicesTouched": 0,
+    "newWorktreesCreated": 0
+  },
+  "ownership": {
+    "owned": [
+      "packages/project-recipes/",
+      "tools/project-recipes/",
+      "docs/project-recipes/",
+      "reports/project-recipes/"
+    ],
+    "untouchedByDesign": [
+      "pnpm-lock.yaml",
+      "root package.json",
+      "packages/contracts/",
+      "apps/",
+      "A/B/C/D/E/F/G/H/I paths"
+    ]
+  }
+}

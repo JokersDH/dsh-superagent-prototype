@@ -129,14 +129,15 @@ node tools/project-recipes/cli.ts --config <config.json> --root <绝对项目根
 | 项 | 状态 |
 | --- | --- |
 | 纯库 `matchRecipe` / 结果 schema / revision 校验 / 原子 scope / 内容摘要 / 时间与预算校验 / 迁移对比 | 已实现并通过 82 项库测试 |
-| 只读 facts observer（注册根 port，无任意 root）+ CLI（含迁移对比模式） | 已实现并通过测试；CLI 32 项 |
+| 只读 facts observer（注册根 port，无任意 root）+ CLI（含迁移对比模式） | 已实现并通过测试；CLI 36 项 |
 | `create_work` 命令候选 + 过期保护（精确 staleInputs） | 已实现 |
 | 真实 `createProductApplication` 消费者（same-config dispatch） | 已实现：`recorded`；子路径原子 `forbidden` |
 | main 实际 HTTP/App 组合 | **已接入**（0073/0076/0077：`POST /v1/projects/:id/recipes/preview`、工作台建议、原 NewWorkForm 预填、创建前重验、两项目原委托/人工接受；本轮 clean-source 8/8 浏览器流程） |
 | main 契约 `ProjectRecipePreviewInput/Fields/Preview` | 已对齐（`ProjectRecipeFieldsSchema` 通过；`factsContentDigest` 与 main 公式一致） |
 | F 实际表单呈现 | 由 F 消费 main 的 preview 结果；J 只提供字段 |
-| 迁移/重绑对比 `rebindRegisteredProject` | 已实现；main 用**自己的**已登记 root 映射调用，J 只读 metadata，不写 registry/SQL |
+| 迁移/重绑对比 `rebindRegisteredProject` | 已实现（`current`/`changed`/`unbound`/`reidentified`）；main 用**自己的**已登记 root 映射调用，J 只读 metadata，不写 registry/SQL。搬目录后重新登记会产生新 project id，此时为 `reidentified`：只给迁移差异、不复用旧建议 |
 | R1 固定包（829） | 未修改；能力基线由 `r1-baseline.case.ts` 从 R1 source 核对，后续 fresh 边界不在 R1 |
+| 首次用户导入普通项目 | `first-user.case.ts`：纯 Node/npm/pnpm 三形态经真实 registry+preview+`create_work` 全通 |
 | R2 后继包 | source+dist+pack 列表已就绪；tar 由 D 冻结、E 独立验收 |
 | 模型提案路径复用 | 不适用：配方不是模型提案 |
 | monorepo 成员枚举 / manager 版本探测 | 明确不做 |

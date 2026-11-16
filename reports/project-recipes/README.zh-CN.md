@@ -2,7 +2,8 @@
 
 工作树 `/Users/hh/Desktop/joker/superagent-agent-j`，分支 `codex/g5-project-recipes`。
 
-- 当前（wave-31）机读状态：[wave31-status.json](wave31-status.json)
+- 当前（wave-32）机读状态：[wave32-status.json](wave32-status.json)
+- 历史（wave-31）：[wave31-status.json](wave31-status.json)
 - 历史（wave-30）：[wave30-status.json](wave30-status.json)
 - 历史（wave-29）：[wave29-status.json](wave29-status.json)
 - 历史（wave-28）：[wave28-status.json](wave28-status.json)
@@ -10,7 +11,69 @@
 
 ---
 
-# wave-31（2026-11-15）
+# wave-32（2026-11-16）
+
+起点 `b25bf228`，合并 `origin/main`（wave-32 派工 `58b4e4c8`，合并为 `345fb72c`；含 `b72e935d`/`1498b07a` 的打包工作）后执行 `agent-tasks/product-wave-32/agent-j-project-recipes.zh-CN.md` 的整块结果：**普通 Node/npm/pnpm 项目导入后拿到可应用模板字段并走完原交付流程**。
+
+## 1. 整块结果
+
+新增 `tools/project-recipes/test/first-user.case.ts`，在真实 `createProductRuntime` 组合上验证：
+
+| 场景 | 结果 |
+| --- | --- |
+| 三种普通项目形态（`ensureStarterProject` 纯 Node、npm 单包、pnpm 单包）经 `NativeProjectRegistry` 导入 | 观察到的 manager 分别为 `none`/`npm`/`pnpm` |
+| 每个项目 × 三个 kind 通过 coordinator 的 `projectRecipePreview` | 9 次 `draft`，`fields.projectId` 始终是导入项目本身，profile/atom/criteria 来自当前服务端字段 |
+| 每个项目一次原 `create_work` | 3 次 `recorded`（原 Application 校验 scope/criteria/profile） |
+| 未声明 atom（`test/`） | `needs_input`，`fields: null` |
+| 从未导入的项目 | `forbidden`，不会借用别的项目 |
+| 迁移重绑 | 同 id 换 root → `changed`；搬目录后重新登记生成新 id → `reidentified`（带 `previousProjectId` 与字段差异），旧建议不复用，新身份仍能生成自己的 draft |
+
+## 2. 迁移语义修正（本轮实现增量）
+
+main 的 registry id 是 `project-${digest(path)}`，所以搬目录后重新登记会得到**新项目 id**。此前 `foreign` 直接拒绝，导致迁移无法核对；现在：
+
+- `reidentified`：给出 `previousProjectId` 与元数据差异（供迁移核对），但**旧建议不可复用**；CLI 以 exit 5 明示「身份已变化」。
+- 同 id 指向新 root（main 的重绑映射）仍是 `changed`，`previewInputs` 判旧草稿 `stale_inputs`。
+- 报告依旧只有 digest/时间/字段名，无绝对 root、凭据或授权。
+
+## 3. 实际验证
+
+| 命令 | exit | 结果 |
+| --- | --- | --- |
+| `./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.json` | 0 | strict |
+| `node --test packages/project-recipes/test/*.case.ts` | 0 | 82 tests / 82 pass |
+| `./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.build.json` | 0 | dist |
+| `./node_modules/.bin/tsc -p tools/project-recipes/tsconfig.json` | 0 | strict |
+| `node --test tools/project-recipes/test/*.case.ts` | 0 | 36 tests / 36 pass |
+| `node packages/project-recipes/examples/preview-consumer.ts` | 0 | 三态自检 |
+| `node --test tests/integration/project-recipes.case.mjs` | 0 | main 真实链路 5/5 |
+| `node tests/integration/project-recipes-browser.mjs reports/project-recipes/wave32-browser` | 0 | 8/8，clean source `7a164c57`，2 个人工接受 |
+| `npm pack --dry-run` | 0 | 38 files / 47,298 B |
+
+wave-32 目录没有 `verify.mjs`，本轮静态检查只有 `dispatch.json` 计划本身，已在状态中注明；`pnpm -r build` 在合并 main 后必须重跑（exit 0），否则旧 contracts dist 缺导出会让 main 导入失败。
+
+## 4. 已进 main / 仅候选 / 安装
+
+| 项 | 状态 |
+| --- | --- |
+| wave-30 J 五源（facts/freshness/预算/omissions）与 0073/0077 预览、原表单、`create_work` | **已在 main** |
+| `tools/distribution/build.mjs` 已包含 `project-recipes` | **已在 main 的发行闭包列表** |
+| `rebind.ts`、`reidentified` 语义、CLI `--previous-facts`、first-user 测试 | **仅候选**（origin/main 无 `rebind.ts`） |
+| R1 829（`82ee5b8f` / `8296720d8a25f38c` / tar `04926739…`） | 未修改、未安装；E 独立验收 |
+| R2 后继包 | source `7a164c57` + dist + pack 列表；**tar 未创建**，D 冻结、E 绑定同一 tar |
+
+分层：source/controlled PASS（真实 registry+preview+原 Application，三种形态）；installed NOT_REACHED；native 0；recovered NOT_REACHED（未用 fixture registry 替代）；value 不声称。
+
+## 5. 余项与最小依赖
+
+- main：重导入 `rebind.ts` 与 `index.ts`，并把 `--previous-facts` 纳入发布说明。
+- D：按 contracts → project-recipes 顺序构建，纳入后继运行闭包并冻结 tar。
+- E：对 R1 用 829 精确 tuple；对 R2 用 D 冻结的同一 tar。
+- F/E 自身呈现与独立断言不在本包，未修改。
+
+---
+
+# 历史：wave-31（2026-11-15）
 
 起点 `e6400429`，合并 `origin/main`（wave-31 派工 `8deda18d`，含 `303b2c6a` 观察导出/运行时检查点）后按 `agent-tasks/product-wave-31/agent-j-project-recipes.zh-CN.md` 执行三个连续交付包、每包四个完整成果（共 12 项）。
 
