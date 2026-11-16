@@ -136,15 +136,31 @@ export async function runOuterZip() {
     const recordPath = indexPath(root, home, manifest)
 
     // Phase 1: unconfigured private root, discussion-only start through the supported Start.command.
+    // The packaged launcher can race its own first-run directory creation (EEXIST) on a loaded host;
+    // one immediate retry is recorded, never hidden.
     const [p1, a1] = [await freePort(), await freePort()]
     mark('start unconfigured')
-    const firstStart = await startAsync(root, home, ['--port', String(p1), '--api-port', String(a1), '--discussion-only'])
-    track('unconfigured:launcher', firstStart.child.pid, { role: 'launcher' })
-    const status1 = await waitStatus(runnerFn)
-    const firstExit = await Promise.race([
+    const attempts = []
+    let firstStart = await startAsync(root, home, ['--port', String(p1), '--api-port', String(a1), '--discussion-only'])
+    track('unconfigured:launcher:1', firstStart.child.pid, { role: 'launcher' })
+    let status1 = await waitStatus(runnerFn)
+    let firstExit = await Promise.race([
       new Promise(resolvePromise => firstStart.child.once('exit', code => resolvePromise({ code }))),
       new Promise(resolvePromise => setTimeout(() => resolvePromise({ code: 'RUNNING' }), 1_000)),
     ])
+    attempts.push({ status: status1?.json?.status ?? null, exit: firstExit, output: firstStart.output().slice(-300) })
+    if (status1?.json?.status !== 'RUNNING') {
+      await waitExited(firstStart.child.pid)
+      await new Promise(resolvePromise => setTimeout(resolvePromise, 800))
+      firstStart = await startAsync(root, home, ['--port', String(p1), '--api-port', String(a1), '--discussion-only'])
+      track('unconfigured:launcher:2', firstStart.child.pid, { role: 'launcher' })
+      status1 = await waitStatus(runnerFn)
+      firstExit = await Promise.race([
+        new Promise(resolvePromise => firstStart.child.once('exit', code => resolvePromise({ code }))),
+        new Promise(resolvePromise => setTimeout(() => resolvePromise({ code: 'RUNNING' }), 1_000)),
+      ])
+      attempts.push({ status: status1?.json?.status ?? null, exit: firstExit, output: firstStart.output().slice(-300) })
+    }
     const setA = capture('unconfigured', recordPath)
     let readinessA = null, configurationA = null
     if (status1?.json?.status === 'RUNNING' && status1.json.instance?.apiURL) {
@@ -163,7 +179,7 @@ export async function runOuterZip() {
         try { return Number(db.prepare("select value from schema_meta where key='product_schema'").get()?.value ?? 0) } finally { db.close() }
       } catch { return null }
     })()
-    evidence.phases.unconfigured = { consolePort: p1, apiPort: a1, schema, startOutput: firstStart.output().slice(-500), startExit: firstExit,
+    evidence.phases.unconfigured = { consolePort: p1, apiPort: a1, schema, startOutput: firstStart.output().slice(-500), startExit: firstExit, attempts,
       recordPresent: existsSync(recordPath), status: status1?.json?.status ?? null, mode: status1?.json?.instance?.mode ?? null,
       startupMode: status1?.json?.instance?.startupMode ?? null,
       readiness: readinessA ? { status: readinessA.status, discussion: readinessA.body?.discussion ?? null, authorization: readinessA.body?.authorization ?? null } : null,
