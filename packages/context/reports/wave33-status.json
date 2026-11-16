@@ -1,0 +1,89 @@
+{
+  "protocol": "wave33-status/1",
+  "agent": "C",
+  "branch": "codex/g3-assistant-context",
+  "base": { "mergeCommit": "613117f8", "originMain": "fc38bf65", "rfcs": ["WP-16/0083", "WP-16/0084", "WP-16/0085"] },
+  "wave": 33,
+  "wholeGoal": "safe decision/source governance, a current decision snapshot usable by new work, and expiry/reopen/original-source experience",
+  "sources": {
+    "aHead": "6bbbea3875305f09b8efb3fd54bc3a9a806b23b5",
+    "aWorkflows": { "sha256": "1426c4c29b1db11f68b7a8a2e060086ac5233ac2052d5f89cd9dbde4172ac599" },
+    "historyCoverage": "packages/context/tools/history-coverage.mjs",
+    "historyCoverageTypes": "packages/context/tools/history-coverage.d.mts",
+    "sessionCli": "packages/context/tools/assistant-context-cli.mjs",
+    "decisionSnapshot": "packages/knowledge/src/decision-snapshot.ts",
+    "governance": "packages/knowledge/src/governance.ts"
+  },
+  "dirty": [
+    "packages/context/tools/history-coverage.d.mts (new)",
+    "packages/context/tools/assistant-context-cli.mjs (draft policy, subcommand parsing)",
+    "packages/knowledge/src/decision-snapshot.ts (new)",
+    "packages/knowledge/src/governance.ts (getEffective)",
+    "packages/knowledge/src/index.ts (exports)",
+    "packages/knowledge/test/decision-context-snapshot.case.ts (new)",
+    "packages/knowledge/test/main-personal-decision-snapshot-consumer.case.ts (new)",
+    "packages/knowledge/test/main-personal-context-session-cli.case.ts (draft/sourcerevoke cases)",
+    "docs/reports for wave33"
+  ],
+  "outcomes": {
+    "governanceAndDrafts": {
+      "status": "complete-source",
+      "source": ["history-coverage.d.mts", "assistant-context-cli.mjs draft save|load"],
+      "consumer": "session CLI over real main HTTP; DecisionGovernance public methods",
+      "commands": ["pnpm --filter @personal-agent/context exec tsc --noEmit", "node --experimental-strip-types --test packages/knowledge/test/main-personal-context-session-cli.case.ts"],
+      "exit": 0,
+      "objects": ["draft file 0600", "requestId/expiresAt", "decisionId/version", "frozen bundleDigest"],
+      "positive": ["0600 create/update", "expired draft usable:false", "revoke reduces future preview decisions", "reopen reads original sources"],
+      "negative": ["existing 0644 unchanged/refused", "symlink target untouched/refused", "invalid expiry refused", ">64KiB refused", "forged protocol refused", "cross-project preview refused"],
+      "mergedToMain": false,
+      "evidence": ["packages/context/reports/wave33-context-session-cli.tap", "packages/context/reports/wave33-final-context.tap"]
+    },
+    "decisionSnapshot": {
+      "status": "complete-source",
+      "source": ["packages/knowledge/src/decision-snapshot.ts", "packages/knowledge/src/governance.ts getEffective"],
+      "consumer": "main-compatible test builds governance from ProductStore public ports and compares with /v1/context/preview; new Work context send freezes same decision digest",
+      "commands": ["pnpm --filter @personal-agent/knowledge test", "node --experimental-strip-types --test packages/knowledge/test/main-personal-decision-snapshot-consumer.case.ts"],
+      "exit": 0,
+      "objects": ["decision-context-snapshot/1", "decisionId/version/contentDigest/sourceTextDigest", "preview decision sourceDigest", "work-scoped frozen bundleDigest"],
+      "positive": ["two projects isolated snapshots", "selected decision included in new Work frozen context", "revalidation valid while current"],
+      "negative": ["revoked decision -> inactive", "superseded -> invalid", "source text change -> source_stale", "expired scope -> expired", "project mismatch", "tampered version refused", "scan_incomplete refuses capture"],
+      "mergedToMain": false,
+      "evidence": ["packages/context/reports/wave33-decision-context-snapshot.tap", "packages/context/reports/wave33-decision-snapshot-consumer.tap"]
+    },
+    "expiryReopenSources": {
+      "status": "complete-source",
+      "source": ["session CLI sources/draft/decide", "decision-snapshot revalidation"],
+      "consumer": "real main HTTP + reopen on same store",
+      "commands": ["node --experimental-strip-types --test packages/knowledge/test/main-personal-context-session-cli.case.ts"],
+      "exit": 0,
+      "objects": ["frozen bundleDigest across reopen", "decision catalog status", "draft stale/usable"],
+      "positive": ["frozen bytes unchanged after revoke", "readonly sources readable", "two-project isolation"],
+      "negative": ["readonly preview/send/decide exit 3", "replayed confirm refused", "late/unknown source not synthesized"],
+      "mergedToMain": false
+    }
+  },
+  "suites": {
+    "context": { "tests": 130, "pass": 130, "fail": 0, "tap": "packages/context/reports/wave33-final-context.tap" },
+    "proposals": { "tests": 41, "pass": 41, "fail": 0, "tap": "packages/context/reports/wave33-final-proposals.tap" },
+    "knowledge": { "tests": 137, "pass": 137, "fail": 0, "tap": "packages/context/reports/wave33-final-knowledge.tap", "note": "decision snapshot consumer cleanup is bounded; test durations include runtime close wait" },
+    "routing": { "tests": 44, "pass": 44, "fail": 0, "tap": "packages/context/reports/wave33-final-routing.tap" },
+    "total": { "tests": 352, "pass": 352, "fail": 0 },
+    "typecheck": "pass (context/proposals/knowledge/routing; history-coverage typed via d.mts)",
+    "build": "pnpm -r --workspace-concurrency=4 run build exit 0"
+  },
+  "layers": {
+    "mainDelivered": ["fc38bf65 RunningAttempt.attachPort, F workbench consumers", "main /v1/context/preview decisions path consumed by C tests"],
+    "candidateOnly": ["session CLI", "decision-context-snapshot/1", "draft policy"],
+    "package": "no new freeze or install this wave; R2 4dcd28f remains last accurate artifact, not installed by C",
+    "native": "0; private/target/native unreached"
+  },
+  "remaining": [
+    "main to consume decision snapshot in its Work/creation wire or explicitly adopt the typed contract",
+    "F to render snapshot/draft/decision states",
+    "A/main packaged history coverage if adopted",
+    "real vendor/native, second protocol, CAC, soak unreached",
+    "E independent acceptance of the integrated version"
+  ],
+  "preserved": ["pnpm-lock.yaml diff uncommitted", "twelve services 5180-5191/8796-8807", "all state/profile/tar/ledger/dirty/runs", "no control of user instances"],
+  "budgets": { "realVendorModelTurns": 0, "realNativeTurns": 0, "bCap4": "UNKNOWN unspendable", "ePilot": "BLOCKED, not reset/top-up/refund/replaced" }
+}
