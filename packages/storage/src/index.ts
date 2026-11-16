@@ -132,7 +132,7 @@ export {
   WorkflowRecords, ProductConversations, ProductProjects, ProductDecisions, WorkflowIndex, WorkflowConflict,
   type Conversation, type ConversationPage, type ConversationSearchHit, type ConversationSearchPage,
   type ProjectCheck, type ProjectEnvironment, type ProjectSettings, type ProjectVersion, type ProjectCurrent,
-  type DecisionRecord, type WorkIndexEntry, type CompletionReviewFact, type UnclassifiedReviewFact, productReviewCommandId, type CompletionVerificationFact, type CompletionAcceptanceFact, type CompletionFacts, type SourceMessageMetadata, type WorkflowStateFacts, type TimelineEntry, type EvidencePage,
+  type DecisionRecord, type WorkIndexEntry, type CompletionHistoryKind, type CompletionHistoryQuery, type CompletionHistoryPage, type CompletionReviewFact, type UnclassifiedReviewFact, productReviewCommandId, type CompletionVerificationFact, type CompletionAcceptanceFact, type CompletionFacts, type SourceMessageMetadata, type WorkflowStateFacts, type TimelineEntry, type EvidencePage,
 } from './workflows.ts'
 export { AssistantState, type LegacyDecisionRecord } from './assistant-state.ts'
 export { AssistantContextBindingStore } from './assistant-context.ts'

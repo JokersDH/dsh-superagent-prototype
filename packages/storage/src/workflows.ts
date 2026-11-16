@@ -653,6 +653,20 @@ export function productReviewCommandId(candidate: { ticketId: string; assignment
     candidateGeneration: candidate.candidateGeneration })
   return createHash('sha256').update(JSON.stringify(['product-review', canonical])).digest('hex').slice(0, 32)
 }
+export type CompletionHistoryKind = 'reviews' | 'verifications' | 'acceptances' | 'contracts' | 'attempts'
+export interface CompletionHistoryQuery {
+  workId: string; projectIds: readonly string[]; kind: CompletionHistoryKind; limit?: number; cursor?: string
+}
+export interface CompletionHistoryPage {
+  protocol: 'completion-history/1'
+  workId: string; projectId: string; kind: CompletionHistoryKind
+  limit: number; returned: number; available: number; hasMore: boolean; nextCursor: string | null
+  coverage: 'complete' | 'truncated'
+  entries: readonly unknown[]
+  unclassifiedReviews: readonly UnclassifiedReviewFact[]
+  limits: { maxLimit: 200; maxBytes: number }
+}
+
 export interface WorkIndexEntry {
   work: WorkRecord
   authority: ContractRef | undefined
@@ -746,6 +760,160 @@ export class WorkflowIndex {
       ...(rows.length > limit && last ? { nextCursor: cursorOf({ createdAt: last.createdAt, id: last.id })! } : {}),
       hasMore: rows.length > limit,
     }
+  }
+
+  private completionVerification(row: Row): CompletionVerificationFact {
+    return { id: text(row.id), ticketId: text(row.ticket_id), assignmentId: text(row.assignment_id),
+      candidateGeneration: Number(row.candidate_generation), artifactDigest: text(row.artifact_digest),
+      criteriaDigest: text(row.criteria_digest), environmentRef: text(row.environment_ref),
+      verifierIdentityRef: text(row.verifier_identity_ref), results: json<unknown>(row.results), createdAt: text(row.created_at) }
+  }
+  private completionAcceptance(row: Row): CompletionAcceptanceFact {
+    return { id: text(row.id), ticketId: text(row.ticket_id), assignmentId: text(row.assignment_id),
+      candidateGeneration: Number(row.candidate_generation), artifactDigest: text(row.artifact_digest),
+      criterionIds: json<string[]>(row.criterion_ids), actorRef: text(row.actor_ref), acceptedAt: text(row.accepted_at) }
+  }
+  private completionReviewFor(workId: string, ticketId: string, currentAttemptId: string | null, verification: Row):
+    { review?: CompletionReviewFact; unclassified?: UnclassifiedReviewFact } {
+    let contract: { workId: string; revision: number; digest: string }
+    try { contract = json(verification.contract) } catch { return { unclassified: { commandId: '', reason: 'verification_contract_invalid' } } }
+    const candidate = { ticketId, assignmentId: text(verification.assignment_id), contract, candidateGeneration: Number(verification.candidate_generation) }
+    const commandId = productReviewCommandId(candidate)
+    const receipt = this.db.prepare(`SELECT command_id, payload_digest, seq, recorded_at, result FROM command_receipts WHERE command_id = ?`).get(commandId) as Row | undefined
+    if (!receipt) return {}
+    const unclassified = (reason: string) => ({ unclassified: { commandId, reason } })
+    let parsed: Record<string, unknown>
+    try { parsed = json<Record<string, unknown>>(receipt.result) } catch { return unclassified('result_not_json') }
+    if (Object.keys(parsed).sort().join(',') !== 'artifactIds,attemptId,proposal,verification') return unclassified('review_shape')
+    const proposal = CompletionProposalSchema.safeParse(parsed.proposal)
+    const verified = VerificationSchema.safeParse(parsed.verification)
+    if (!proposal.success) return unclassified('proposal_shape')
+    if (!verified.success) return unclassified('verification_shape')
+    const attemptId = IdSchema.safeParse(parsed.attemptId)
+    const artifactIds = Array.isArray(parsed.artifactIds) ? parsed.artifactIds : null
+    if (!attemptId.success || !artifactIds || artifactIds.length === 0 || artifactIds.length > 512 ||
+      artifactIds.some(value => !IdSchema.safeParse(value).success) || new Set(artifactIds).size !== artifactIds.length)
+      return unclassified('artifact_or_attempt_shape')
+    const bindingRow = this.db.prepare('SELECT value FROM runtime_bindings WHERE attempt_id = ?').get(attemptId.data) as Row | undefined
+    if (!bindingRow) return unclassified('historical_binding_missing')
+    const binding = json<Record<string, unknown>>(bindingRow.value)
+    if (proposal.data.ticketId !== ticketId || proposal.data.contract.workId !== workId ||
+      proposal.data.ticketId !== text(binding.ticketId) || proposal.data.assignmentId !== text(binding.assignmentId) ||
+      attemptId.data !== text(binding.attemptId) || digest(proposal.data.contract) !== digest(binding.contract))
+      return unclassified('foreign_work_or_binding')
+    if (proposal.data.verificationId !== verified.data.id || proposal.data.artifactDigest !== verified.data.artifactDigest ||
+      proposal.data.ticketId !== verified.data.ticketId || proposal.data.assignmentId !== verified.data.assignmentId ||
+      proposal.data.candidateGeneration !== verified.data.candidateGeneration ||
+      digest(proposal.data.contract) !== digest(verified.data.contract)) return unclassified('proposal_verification_mismatch')
+    if (commandId !== productReviewCommandId(proposal.data)) return unclassified('noncanonical_review_key')
+    return { review: { commandId, payloadDigest: text(receipt.payload_digest), seq: Number(receipt.seq), recordedAt: text(receipt.recorded_at),
+      proposal: proposal.data as unknown as Record<string, unknown>, verification: verified.data as unknown as Record<string, unknown>,
+      artifactIds: [...artifactIds] as string[], attemptId: attemptId.data, bindingState: text(binding.state),
+      currentLink: currentAttemptId === attemptId.data ? 'current_attempt' : 'historical_attempt' } }
+  }
+  private historyCursor(query: CompletionHistoryQuery, projectId: string, key: string): string {
+    return Buffer.from(JSON.stringify({ v: 1, workId: query.workId, projectId, kind: query.kind, key }), 'utf8').toString('base64url')
+  }
+  private parseHistoryCursor(query: CompletionHistoryQuery, projectId: string, cursor: string | undefined): string | null {
+    if (!cursor) return null
+    let value: any
+    try { value = JSON.parse(Buffer.from(cursor, 'base64url').toString('utf8')) } catch { throw new WorkflowConflict('invalid completion history cursor') }
+    if (value?.v !== 1 || value.workId !== query.workId || value.projectId !== projectId || value.kind !== query.kind ||
+      typeof value.key !== 'string' || !value.key) throw new WorkflowConflict('completion history cursor does not belong to this subject')
+    return value.key
+  }
+
+  /** Stable keyset continuation over existing facts; no history ledger or second candidate state. */
+  completionHistory(query: CompletionHistoryQuery): CompletionHistoryPage {
+    const workId = id(query.workId, 'work id')
+    if (query.projectIds.length !== 1) throw new WorkflowConflict('completion history requires exactly one project')
+    const projectId = id(query.projectIds[0], 'project id')
+    const row = this.db.prepare('SELECT value FROM works WHERE id = ?').get(workId) as Row | undefined
+    if (!row) throw new WorkflowConflict('unknown work')
+    const work = json<WorkRecord>(row.value)
+    if (work.projectId !== projectId) throw new WorkflowConflict('work does not belong to the requested project')
+    if (!['reviews', 'verifications', 'acceptances', 'contracts', 'attempts'].includes(query.kind)) throw new WorkflowConflict('unknown completion history kind')
+    const limit = query.limit === undefined ? 50 : Math.trunc(query.limit)
+    if (!Number.isInteger(limit) || limit < 0 || limit > 200) throw new WorkflowConflict('completion history limit must be 0..200')
+    const cursorKey = this.parseHistoryCursor(query, projectId, query.cursor)
+    const linkRows = this.db.prepare('SELECT value FROM ticket_links WHERE work_id = ? ORDER BY revision DESC, ticket_id').all(workId) as Row[]
+    const links = linkRows.map(item => json<TicketLink>(item.value))
+    const ticketIds = links.map(link => link.ticketId)
+    const ph = ticketIds.map(() => '?').join(', ')
+    const entries: unknown[] = []
+    const unclassifiedReviews: UnclassifiedReviewFact[] = []
+    let available = 0, hasMore = false, nextKey: string | null = null, bytes = 0
+    const maxBytes = 4 * 1024 * 1024
+    if (limit === 0) {
+      available = query.kind === 'contracts' ? Number((this.db.prepare('SELECT COUNT(*) AS count FROM contract_revisions WHERE work_id = ?').get(workId) as Row).count)
+        : query.kind === 'attempts' ? Number((this.db.prepare(`SELECT COUNT(*) AS count FROM runtime_bindings WHERE ticket_id IN (${ph || "''"})`).get(...ticketIds) as Row).count)
+          : query.kind === 'acceptances' ? Number((this.db.prepare(`SELECT COUNT(*) AS count FROM completion_acceptances WHERE ticket_id IN (${ph || "''"})`).get(...ticketIds) as Row).count)
+            : Number((this.db.prepare(`SELECT COUNT(*) AS count FROM completion_verifications WHERE ticket_id IN (${ph || "''"})`).get(...ticketIds) as Row).count)
+      return { protocol: 'completion-history/1', workId, projectId, kind: query.kind, limit, returned: 0, available,
+        hasMore: available > 0, nextCursor: null, coverage: available > 0 ? 'truncated' : 'complete', entries,
+        unclassifiedReviews, limits: { maxLimit: 200, maxBytes } }
+    }
+    if (query.kind === 'contracts') {
+      const [rev, dig] = cursorKey ? cursorKey.split('\u0000') : []
+      const rows = this.db.prepare(`SELECT revision, digest FROM contract_revisions WHERE work_id = ?
+        ${cursorKey ? 'AND (revision < ? OR (revision = ? AND digest < ?))' : ''} ORDER BY revision DESC, digest DESC LIMIT ?`)
+        .all(workId, ...(cursorKey ? [Number(rev), Number(rev), dig] : []), limit + 1) as Row[]
+      available = Number((this.db.prepare('SELECT COUNT(*) AS count FROM contract_revisions WHERE work_id = ?').get(workId) as Row).count)
+      for (const item of rows.slice(0, limit)) entries.push({ revision: Number(item.revision), digest: text(item.digest) })
+      hasMore = rows.length > limit; const last = rows[limit - 1]; if (last) nextKey = `${text(last.revision)}\u0000${text(last.digest)}`
+    } else if (query.kind === 'attempts') {
+      if (!ticketIds.length) available = 0
+      else {
+        const [epoch, attempt] = cursorKey ? cursorKey.split('\u0000') : []
+        const rows = this.db.prepare(`SELECT value FROM runtime_bindings WHERE ticket_id IN (${ph})
+          ${cursorKey ? "AND (json_extract(value, '$.fenceEpoch') < ? OR (json_extract(value, '$.fenceEpoch') = ? AND attempt_id < ?))" : ''}
+          ORDER BY json_extract(value, '$.fenceEpoch') DESC, attempt_id DESC LIMIT ?`).all(...ticketIds, ...(cursorKey ? [Number(epoch), Number(epoch), attempt] : []), limit + 1) as Row[]
+        available = Number((this.db.prepare(`SELECT COUNT(*) AS count FROM runtime_bindings WHERE ticket_id IN (${ph})`).get(...ticketIds) as Row).count)
+        for (const item of rows.slice(0, limit)) entries.push({ attempt: json<Record<string, unknown>>(item.value) })
+        hasMore = rows.length > limit; const last = rows[limit - 1]; if (last) { const value = json<Record<string, unknown>>(last.value); nextKey = `${text(value.fenceEpoch)}\u0000${text(value.attemptId)}` }
+      }
+    } else if (query.kind === 'acceptances') {
+      if (!ticketIds.length) available = 0
+      else {
+        const [at, aid] = cursorKey ? cursorKey.split('\u0000') : []
+        const rows = this.db.prepare(`SELECT id, ticket_id, assignment_id, candidate_generation, artifact_digest, criterion_ids, actor_ref, accepted_at
+          FROM completion_acceptances WHERE ticket_id IN (${ph}) ${cursorKey ? 'AND (accepted_at < ? OR (accepted_at = ? AND id < ?))' : ''}
+          ORDER BY accepted_at DESC, id DESC LIMIT ?`).all(...ticketIds, ...(cursorKey ? [at, at, aid] : []), limit + 1) as Row[]
+        available = Number((this.db.prepare(`SELECT COUNT(*) AS count FROM completion_acceptances WHERE ticket_id IN (${ph})`).get(...ticketIds) as Row).count)
+        for (const item of rows.slice(0, limit)) entries.push({ acceptance: this.completionAcceptance(item) })
+        hasMore = rows.length > limit; const last = rows[limit - 1]; if (last) nextKey = `${text(last.accepted_at)}\u0000${text(last.id)}`
+      }
+    } else {
+      if (!ticketIds.length) available = 0
+      else {
+        const [created, vid] = cursorKey ? cursorKey.split('\u0000') : []
+        const rows = this.db.prepare(`SELECT id, ticket_id, assignment_id, candidate_generation, artifact_digest, criteria_digest,
+          environment_ref, verifier_identity_ref, results, contract, created_at FROM completion_verifications WHERE ticket_id IN (${ph})
+          ${cursorKey ? 'AND (created_at < ? OR (created_at = ? AND id < ?))' : ''} ORDER BY created_at DESC, id DESC LIMIT ?`)
+          .all(...ticketIds, ...(cursorKey ? [created, created, vid] : []), limit + 1) as Row[]
+        available = Number((this.db.prepare(`SELECT COUNT(*) AS count FROM completion_verifications WHERE ticket_id IN (${ph})`).get(...ticketIds) as Row).count)
+        const currentAttempts = new Map<string, string | null>()
+        for (const ticketId of ticketIds) { const current = this.db.prepare('SELECT attempt_id FROM runtime_current WHERE ticket_id = ?').get(ticketId) as Row | undefined; currentAttempts.set(ticketId, current ? text(current.attempt_id) : null) }
+        for (const item of rows.slice(0, limit)) {
+          const fact = this.completionVerification(item)
+          let entry: unknown = { verification: fact }
+          if (query.kind === 'reviews') {
+            const classified = this.completionReviewFor(workId, fact.ticketId, currentAttempts.get(fact.ticketId) ?? null, item)
+            if (classified.review) entry = { verification: fact, review: classified.review }
+            else if (classified.unclassified) { entry = { verification: fact, unclassified: classified.unclassified }; unclassifiedReviews.push(classified.unclassified) }
+          }
+          const size = Buffer.byteLength(JSON.stringify(entry)) + 1
+          if (bytes + size > maxBytes) { hasMore = true; break }
+          bytes += size; entries.push(entry)
+        }
+        hasMore = hasMore || rows.length > limit
+        const lastIncluded = rows[entries.length - 1]
+        if (lastIncluded) nextKey = `${text(lastIncluded.created_at)}\u0000${text(lastIncluded.id)}`
+      }
+    }
+    const nextCursor = hasMore && nextKey ? this.historyCursor(query, projectId, nextKey) : null
+    return { protocol: 'completion-history/1', workId, projectId, kind: query.kind, limit, returned: entries.length, available,
+      hasMore, nextCursor, coverage: hasMore ? 'truncated' : 'complete', entries, unclassifiedReviews, limits: { maxLimit: 200, maxBytes } }
   }
 
   work(workId: string, projectIds: readonly string[]): WorkIndexEntry | undefined {

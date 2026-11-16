@@ -1,0 +1,10 @@
+WAVE33_CONTINUATION {"pages":[50,50,20],"unique":120,"available":120,"zeroHasMore":true,"reviewsReturned":3}
+✔ completion history continues beyond the 50-row source cap by stable keyset pages (21.841875ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 194.242291

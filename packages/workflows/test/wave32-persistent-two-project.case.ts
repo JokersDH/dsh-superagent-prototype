@@ -1,6 +1,7 @@
 /** Wave-32 A: two original projects complete through the current product chain and reopen with original IDs. */
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
+import { createHash } from 'node:crypto'
 import { mkdirSync, mkdtempSync, rmSync } from 'node:fs'
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
@@ -64,8 +65,22 @@ test('two original projects complete and reopen with their Work/contract/candida
       const artifactDigest = String((review.proposal as any).artifactDigest)
       assert.match(artifactDigest, /^[a-f0-9]{64}$/)
       assert.equal(work.completion.verifications.some(value => value.artifactDigest === artifactDigest), true)
+      assert.ok(review.artifactIds.length >= 1)
+      for (const artifactId of review.artifactIds) {
+        const artifact = store.artifacts.read(artifactId)
+        assert.ok(artifact); assert.equal(artifact.record.bytes, artifact.data.byteLength)
+        assert.equal(createHash('sha256').update(artifact.data).digest('hex'), artifact.record.digest)
+      }
       assert.equal(store.commands.get(item.createId)?.status, 'recorded')
       assert.equal(store.commands.get(item.acceptId)?.status, 'recorded')
+      const reader = spawnSync(process.execPath, [join(import.meta.dirname, 'fixtures', 'wave33-project-reader.mjs'), store.database.path,
+        item.workId, item.projectId, item.createId, item.acceptId], { encoding: 'utf8', timeout: 20000 })
+      assert.equal(reader.status, 0, reader.stderr || reader.stdout)
+      const reopened = JSON.parse(reader.stdout)
+      assert.notEqual(reopened.pid, process.pid); assert.equal(reopened.workId, item.workId)
+      assert.equal(reopened.receipts.create, 'recorded'); assert.equal(reopened.receipts.accept, 'recorded')
+      assert.equal(reopened.artifacts.length, review.artifactIds.length)
+      assert.equal(reopened.artifacts.every((value: any) => value.bytes > 0 && value.digest.length === 64), true)
     }
     assert.equal(store.queue.dueRows('application.execute', Number.MAX_SAFE_INTEGER, 20).some(row => row.key === 'wave32-held'), true)
 

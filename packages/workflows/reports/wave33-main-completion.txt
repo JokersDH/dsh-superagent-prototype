@@ -1,0 +1,16 @@
+✔ scoped public reader composition counts two projects and preserves unknown usage without product writes (32.670459ms)
+✔ original nested record limit and conflicting work mapping are blocked before G analysis (64.313542ms)
+✔ missing, truncated, changing and outside-window sources never become a complete total (2.282541ms)
+✔ authorization, nested subject, bytes and source scope changes have finite refusals (2.89425ms)
+✔ an older installed closure without the optional G package returns unavailable before collecting (132.761ms)
+✔ a synchronous reader that returns after the deadline cannot create a complete observation (2105.999166ms)
+✔ actual HTTP authenticates and validates query and returned scope, including restored readonly (15.736083ms)
+✔ real Product/Broker/SQLite/check/acceptance outcomes feed the same readonly API for two projects (2262.826541ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4622.343042
