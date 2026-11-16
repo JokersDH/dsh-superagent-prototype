@@ -9,7 +9,7 @@
  */
 import { createHash } from 'node:crypto'
 import { z } from 'zod'
-import { UsageObservationDownloadSchema, UsageObservationSchema } from '@personal-agent/contracts'
+import { UsageObservationDownloadSchema, UsageObservationSchema, UsageSupportDownloadSchema } from '@personal-agent/contracts'
 import { DisplayExportDocumentSchema } from './display-export.ts'
 import { buildSupportReport, describeDisplayDocument, SUPPORT_SUMMARY_PROTOCOL, type SupportReport } from './support.ts'
 
@@ -38,10 +38,22 @@ export interface SupportConservation {
   readonly notCompared: readonly string[]
 }
 
+/**
+ * What was actually proven about the document. `contract-digest` means the product's own contract and
+ * the payload digest both hold; `digest-only` means the bytes match their declared hash but the
+ * envelope does not satisfy the product contract; `shape-only` means no digest was available at all.
+ */
+export type SupportVerification = 'contract-digest' | 'digest-only' | 'shape-only'
+
 export interface SupportDocumentRead {
   readonly report: SupportReport
+  /**
+   * Unknown fields are not dropped-and-forgotten: a document that carries them fails its contract and
+   * is refused, so a report can never be read as "we inspected and cleared every field".
+   */
+  readonly verification: SupportVerification
   /** `observation` (served DTO), `export` (downloaded display document) or `download` (envelope). */
-  readonly documentKind: 'observation' | 'export' | 'download'
+  readonly documentKind: 'observation' | 'export' | 'download' | 'support'
   readonly digest: SupportDigestCheck
   readonly conservation: SupportConservation
   /**
@@ -62,6 +74,22 @@ export class SupportPortFault extends Error {
 }
 
 const sha256 = (text: string): string => createHash('sha256').update(text).digest('hex')
+
+/**
+ * Attach a caller-supplied origin to a report that was written without one (a file main produced, or
+ * a legacy summary). The report's own evidence is kept; only the identity and the capability verdict
+ * change, and the verdict is derived from the origin rather than copied.
+ */
+const withOrigin = (report: SupportReport, origin: unknown): SupportReport => {
+  if (origin === null || origin === undefined) return report
+  const parsed = SupportOriginSchema.safeParse(origin)
+  if (!parsed.success) return report
+  const block = parsed.data as unknown as SupportReport['origin']
+  if (block === null) return report
+  const exportCapability = block.capabilities === null ? 'unverified' as const
+    : block.capabilities.displayDownload ? 'present' as const : 'absent' as const
+  return { ...report, origin: block, exportCapability }
+}
 
 interface LooseEnvelope {
   readonly observation: unknown
@@ -94,6 +122,7 @@ const envelopeRead = (envelope: LooseEnvelope, contractValid: boolean, options: 
   const report = buildSupportReport({ observation: envelope.observation, origin: options.origin })
   return {
     report,
+    verification: digest.state !== 'verified' || !contractValid ? 'digest-only' : 'contract-digest',
     documentKind: 'download',
     digest,
     conservation: conservationOf(envelope.observation, document),
@@ -131,6 +160,39 @@ const conservationOf = (observation: unknown, document: unknown): SupportConserv
  * and the conservation block says what could not be compared.
  */
 export function readSupportDocument(input: unknown, options: { origin?: unknown } = {}): SupportDocumentRead {
+  // A support file main produced: the envelope names a digest of the text, and the text carries the
+  // report. The product contract checks the two agree by shape; the digest check is ours.
+  const support = UsageSupportDownloadSchema.safeParse(input)
+  if (support.success) {
+    const actual = sha256(support.data.text)
+    const digest: SupportDigestCheck = support.data.sha256 === actual
+      ? { declared: support.data.sha256, actual, verified: true, state: 'verified' }
+      : { declared: support.data.sha256, actual, verified: false, state: 'mismatch' }
+    const file = readSupportFile(JSON.parse(support.data.text))
+    return {
+      report: withOrigin(file.report, options.origin),
+      verification: digest.state === 'verified' && file.schema === 'current' ? 'contract-digest' : 'digest-only',
+      documentKind: 'support',
+      digest,
+      conservation: { rowsMatch: false, scopeMatches: false, windowMatches: false, headerMatches: false,
+        notCompared: ['a support file carries one report, so there is no second document to compare'] },
+      contractValid: file.schema === 'current',
+    }
+  }
+  // A bare summary written by an older build: no envelope, no digest. It is re-projected and marked
+  // shape-only so a colleague can still read it, with nothing presented as verified.
+  if (input !== null && typeof input === 'object' && (input as Record<string, unknown>).protocol === SUPPORT_SUMMARY_PROTOCOL) {
+    const file = readSupportFile({ protocol: SUPPORT_DTO_PROTOCOL, report: input })
+    return {
+      report: withOrigin(file.report, options.origin),
+      verification: 'shape-only',
+      documentKind: 'support',
+      digest: { declared: null, actual: sha256(JSON.stringify(input)), verified: false, state: 'absent' },
+      conservation: { rowsMatch: false, scopeMatches: false, windowMatches: false, headerMatches: false,
+        notCompared: ['a bare summary carries one report and no envelope, so there is nothing to verify against'] },
+      contractValid: file.schema === 'current',
+    }
+  }
   const strict = UsageObservationDownloadSchema.safeParse(input)
   if (strict.success) return envelopeRead(strict.data, true, options)
 
@@ -146,7 +208,10 @@ export function readSupportDocument(input: unknown, options: { origin?: unknown 
     throw new SupportPortFault('invalid_document', 'The document is not an observation, a display export or a download envelope')
   const report = buildSupportReport({ observation: input, origin: options.origin })
   return {
-    contractValid: false,
+    // A bare document is not an envelope, but it did pass the strict schema that defines it: the
+    // contract holds, only a payload digest is missing.
+    contractValid: true,
+    verification: 'shape-only',
     report,
     documentKind: observation.success ? 'observation' : 'export',
     // A bare document carries no payload digest to verify; calling that "verified" would be a lie.
@@ -245,16 +310,100 @@ export function supportLabels(report: SupportReport): {
   return { packageLabel, sourceLabel, ...(parts.length ? { note: parts.join('；') } : {}) }
 }
 
-/** Read a support file a colleague received, validating its shape instead of trusting it. */
-export function readSupportFile(input: unknown): { readonly report: SupportReport; readonly declared: string | null } {
+export interface SupportFileRead {
+  readonly report: SupportReport
+  /** `current` satisfies the published shape; `legacy` was re-projected from an older one. */
+  readonly schema: 'current' | 'legacy'
+  /** Fields an older file did not carry; they are null/unknown, never guessed. */
+  readonly missingFields: readonly string[]
+}
+
+/**
+ * Read a support file a colleague received.
+ *
+ * A file from an older build (before `origin` and `evidence` existed) is not refused and not trusted:
+ * its known fields are re-projected, the missing ones stay unknown/`unverified`, and the caller is told
+ * the schema is `legacy`.
+ */
+export function readSupportFile(input: unknown): SupportFileRead {
   if (input === null || typeof input !== 'object')
     throw new SupportPortFault('invalid_document', 'The support file is not an object')
   const envelope = input as Record<string, unknown>
   if (envelope.protocol !== SUPPORT_DTO_PROTOCOL)
     throw new SupportPortFault('invalid_document', 'The file is not a usage-insights-support/1 payload')
   const parsed = SupportReportSchema.safeParse(envelope.report)
-  if (!parsed.success) throw new SupportPortFault('invalid_document', 'The support report does not match its published shape')
-  return { report: parsed.data as unknown as SupportReport, declared: null }
+  if (parsed.success) return { report: parsed.data as unknown as SupportReport, schema: 'current', missingFields: [] }
+  const legacy = legacyReport(envelope.report)
+  if (legacy === null) throw new SupportPortFault('invalid_document', 'The support report does not match its published shape')
+  return { report: legacy.report, schema: 'legacy', missingFields: legacy.missingFields }
+}
+
+/**
+ * Re-project a wave-32-era report: keep the fields that were recorded, derive `evidence` from them,
+ * and leave `origin`/`exportCapability` explicitly unknown instead of inventing them.
+ */
+const legacyReport = (raw: unknown): { report: SupportReport; missingFields: string[] } | null => {
+  if (raw === null || typeof raw !== 'object') return null
+  const record = raw as Record<string, unknown>
+  if (record.protocol !== SUPPORT_SUMMARY_PROTOCOL) return null
+  const rows = Array.isArray(record.rows) ? record.rows as Record<string, unknown>[] : null
+  const counts = record.counts !== null && typeof record.counts === 'object' ? record.counts as Record<string, unknown> : null
+  const window = record.window !== null && typeof record.window === 'object' ? record.window as Record<string, unknown> : null
+  const scope = record.scope !== null && typeof record.scope === 'object' ? record.scope as Record<string, unknown> : null
+  const coverageState = record.coverageState === 'complete' || record.coverageState === 'partial' || record.coverageState === 'unknown'
+    ? record.coverageState : null
+  const status = record.status === 'ready' || record.status === 'insufficient_data' || record.status === 'unavailable'
+    ? record.status : null
+  const days = record.days === 7 || record.days === 30 ? record.days : null
+  if (rows === null || counts === null || window === null || scope === null || coverageState === null || status === null ||
+    days === null || typeof window.from !== 'string' || typeof window.to !== 'string' ||
+    typeof record.observedAt !== 'string' || typeof record.timezone !== 'string' || !Array.isArray(scope.projectIds))
+    return null
+  const layers = ['observed', 'controlled', 'native', 'operator', 'unknown'] as const
+  type Layer = (typeof layers)[number]
+  const supportRows = rows.map(row => ({
+    rowId: String(row.rowId ?? ''),
+    layer: (layers as readonly unknown[]).includes(row.layer) ? row.layer as Layer : 'unknown' as Layer,
+    unit: String(row.unit ?? ''), hasValue: row.hasValue === true,
+    sampleCount: typeof row.sampleCount === 'number' ? row.sampleCount : null,
+  }))
+  const withValue = supportRows.filter(row => row.hasValue).length
+  const absentFacts: string[] = []
+  if (supportRows.length - withValue > 0) absentFacts.push(`${supportRows.length - withValue} row(s) have no observed value`)
+  if (coverageState === 'partial') absentFacts.push('the observation is partial')
+  if (coverageState === 'unknown') absentFacts.push('coverage is unknown')
+  if (status === 'unavailable') absentFacts.push('the observation is unavailable')
+  const sampleCount = typeof counts.sampleCount === 'number' ? counts.sampleCount : null
+  if (sampleCount === null) absentFacts.push('the header sample count is not established')
+  const report: SupportReport = {
+    protocol: SUPPORT_SUMMARY_PROTOCOL,
+    observationProtocol: 'usage-observation/1',
+    documentKind: 'observation',
+    status,
+    summaryId: typeof record.summaryId === 'string' ? record.summaryId : null,
+    observedAt: record.observedAt,
+    days,
+    timezone: record.timezone,
+    window: { from: window.from, to: window.to },
+    scope: { projectIds: scope.projectIds.map(String), aggregation: String(scope.aggregation ?? 'declared_multi_project'),
+      label: String(scope.label ?? '') },
+    coverage: String(record.coverage ?? ''),
+    coverageState,
+    counts: { rows: supportRows.length, withValue, unknown: supportRows.length - withValue, sampleCount },
+    rows: supportRows,
+    limitations: Array.isArray(record.limitations) ? record.limitations.map(String).slice(0, 32) : [],
+    numericValues: false,
+    note: String(record.note ?? 'Legacy support report: metadata only.'),
+    authorization: 'none',
+    origin: null,
+    evidence: { coverageState, rowsWithValue: withValue, rowsWithoutValue: supportRows.length - withValue, sampleCount,
+      partial: coverageState !== 'complete' || status !== 'ready', absentFacts },
+    exportCapability: 'unverified',
+  }
+  const missingFields: string[] = []
+  for (const field of ['origin', 'evidence', 'exportCapability', 'documentKind'] as const)
+    if (!(field in record)) missingFields.push(field)
+  return { report, missingFields }
 }
 
 /**

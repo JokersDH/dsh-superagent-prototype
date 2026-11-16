@@ -178,3 +178,75 @@ test('the handler returns a DTO and refuses without leaking', { skip }, async ()
   assert.equal(refused.status, 422)
   assert.equal(JSON.stringify(refused.body).includes('nope'), false, 'the refusal echoes nothing from the input')
 })
+
+test('the verification marker says exactly what was proven', { skip }, async () => {
+  const envelope = await download()
+  const strict = readSupportDocument(envelope)
+  assert.equal(strict.verification, 'contract-digest')
+
+  // An unknown field is not silently dropped and reported as clean: the document fails its contract
+  // and is refused, so no report can be read as "every field was inspected and cleared".
+  const withSecret = structuredClone(envelope)
+  ;(withSecret.observation as unknown as Record<string, unknown>).prompt = 'CANARY-SECRET-PROMPT'
+  assert.throws(() => readSupportDocument(withSecret), (error: unknown) =>
+    error instanceof SupportPortFault && error.code === 'invalid_document')
+  const bareSecret = { ...envelope.observation, prompt: 'CANARY-SECRET-PROMPT' }
+  assert.throws(() => readSupportDocument(bareSecret), (error: unknown) => error instanceof SupportPortFault)
+})
+
+test('a legacy support file is re-projected, not trusted or refused', () => {
+  // The shape written before `origin`/`evidence`/`exportCapability` existed.
+  const legacy = {
+    protocol: 'usage-insights-support/1',
+    report: {
+      protocol: 'usage-insights-support-summary/1',
+      observationProtocol: 'usage-observation/1',
+      status: 'ready',
+      summaryId: 'b'.repeat(64),
+      observedAt: '2026-11-15T06:00:00.000Z',
+      days: 7,
+      timezone: 'UTC',
+      window: { from: '2026-11-08T06:00:00.000Z', to: '2026-11-15T06:00:00.000Z' },
+      scope: { projectIds: ['one'], aggregation: 'single_project', label: '当前项目' },
+      coverage: '部分覆盖',
+      coverageState: 'partial',
+      counts: { rows: 2, withValue: 1, unknown: 1, sampleCount: 2 },
+      rows: [
+        { rowId: 'outcomes.count@controlled@', layer: 'controlled', unit: 'count', hasValue: true, sampleCount: 1 },
+        { rowId: 'queue.waitMs@controlled@', layer: 'controlled', unit: 'ms', hasValue: false, sampleCount: 0 },
+      ],
+      limitations: ['旧版摘要'],
+      numericValues: false,
+      note: 'Display document: the served values are formatted strings.',
+      authorization: 'none',
+    },
+  }
+  const read = readSupportFile(legacy)
+  assert.equal(read.schema, 'legacy')
+  assert.deepEqual(read.missingFields, ['origin', 'evidence', 'exportCapability', 'documentKind'])
+  assert.equal(read.report.origin, null)
+  assert.equal(read.report.exportCapability, 'unverified')
+  assert.equal(read.report.documentKind, 'observation')
+  assert.equal(read.report.evidence.rowsWithValue, 1)
+  assert.equal(read.report.evidence.rowsWithoutValue, 1)
+  assert.equal(read.report.evidence.partial, true)
+  assert.equal(read.report.counts.unknown, 1, 'counts are recomputed from the rows, not copied on trust')
+
+  // A file that is not a support file at all is still refused.
+  assert.throws(() => readSupportFile({ protocol: 'usage-insights-support/1', report: { protocol: 'other' } }),
+    (error: unknown) => error instanceof SupportPortFault)
+})
+
+test('a fixed older support file from the repository degrades explicitly', { skip }, async () => {
+  const { readFileSync, existsSync } = await import('node:fs')
+  const path = resolve(here, '../../../reports/usage-insights/probe/two-project-20261115T152615.support.json')
+  if (!existsSync(path)) return
+  const parsed = JSON.parse(readFileSync(path, 'utf8')) as { protocol?: string }
+  const read = readSupportFile({ protocol: 'usage-insights-support/1', report: parsed })
+  assert.ok(read.schema === 'legacy' || read.schema === 'current')
+  if (read.schema === 'legacy') {
+    assert.equal(read.report.origin, null)
+    assert.equal(read.report.exportCapability, 'unverified')
+    assert.ok(read.missingFields.length > 0)
+  }
+})
