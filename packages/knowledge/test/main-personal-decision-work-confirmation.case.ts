@@ -6,7 +6,8 @@ import { tmpdir } from 'node:os'
 import { key } from '@personal-agent/orchestrator-core'
 import { ProductStore } from '@personal-agent/storage'
 import {
-  AssistantDecisionStore, DecisionGovernance, assertDecisionSelectionCurrent, prepareDecisionSelection,
+  AssistantDecisionStore, DecisionGovernance, assertDecisionSelectionBindingCurrentSync, assertDecisionSelectionCurrent,
+  bindDecisionSelection, prepareDecisionSelection,
 } from '@personal-agent/knowledge'
 import { createProductRuntime } from '../../../apps/coordinator/product/runtime.ts'
 import { createLocalHttpApp } from '../../../apps/coordinator/http/app.ts'
@@ -108,8 +109,23 @@ test('an explicit decision preparation is asserted before and after the original
   const worksBefore = ((await (await app.request('/v1/snapshot', { headers })).json()) as { works: unknown[] }).works.length
   const assertion = await assertDecisionSelectionCurrent(governance, preparation, { projectId: projectA, projectScope: runtimeScope(projectA) })
   assert.equal(assertion.current, true)
-  const created = (await product.application.dispatch({ kind: 'create_work', commandId: 'wave34-work-a', conversationId: 'wave34-conv-a',
-    projectId: projectA, goal: '按当前决定修正错误码', profileId: 'profile-fixture-pass', scope: runtimeScope(projectA), criteria }, actor)) as unknown as { workId: string }
+  const binding = await bindDecisionSelection(governance, preparation, { projectId: projectA, projectScope: runtimeScope(projectA) })
+  assert.equal(binding.protocol, 'decision-selection-binding/1')
+  assert.equal(binding.authorization, 'none')
+  assert.match(binding.snapshotDigest, /^[a-f0-9]{64}$/)
+  assert.equal(binding.decisions[0]!.decisionId, decisionA)
+  const reader = {
+    getDecision: (id: string) => store.workflows.assistant.get(id) as never,
+    sourceTextDigest: (id: string) => store.workflows.index.sourceMessage(id, [projectA, projectB])?.textDigest,
+  }
+  const command = { kind: 'create_work' as const, commandId: 'wave34-work-a', conversationId: 'wave34-conv-a',
+    projectId: projectA, goal: '按当前决定修正错误码', profileId: 'profile-fixture-pass', scope: runtimeScope(projectA), criteria }
+  const preparedCommand = await product.application.prepareCommand(command as never, actor)
+  const created = store.uow.atomic(() => {
+    const guarded = assertDecisionSelectionBindingCurrentSync(binding, reader, { projectId: projectA, projectScope: runtimeScope(projectA) })
+    assert.equal(guarded.current, true, JSON.stringify(guarded))
+    return product.application.commitPrepared(preparedCommand) as unknown as { workId: string }
+  })
   const worksAfter = ((await (await app.request('/v1/snapshot', { headers })).json()) as { works: unknown[] }).works.length
   assert.equal(worksAfter, worksBefore + 1)
   assert.equal((await assertDecisionSelectionCurrent(governance, preparation, { projectId: projectA,
@@ -133,6 +149,16 @@ test('an explicit decision preparation is asserted before and after the original
   assert.equal(late.code, 'inactive')
   const frozenAgain = (await (await app.request(`/v1/messages/${encodeURIComponent(key('message', workContext.commandId))}/context`, { headers })).json()) as Record<string, any>
   assert.equal(frozenAgain.bundleDigest, frozen.bundleDigest)
+  const lateBinding = assertDecisionSelectionBindingCurrentSync(binding, reader, { projectId: projectA, projectScope: runtimeScope(projectA) })
+  assert.equal(lateBinding.current, false)
+  const beforeRefusal = ((await (await app.request('/v1/snapshot', { headers })).json()) as { works: unknown[] }).works.length
+  const preparedAfterRevoke = await product.application.prepareCommand({ ...command, commandId: 'wave34-work-after-revoke' } as never, actor)
+  assert.equal(assertDecisionSelectionBindingCurrentSync(binding, reader, { projectId: projectA }).current, false)
+  assert.equal(typeof preparedAfterRevoke, 'object')
+  assert.equal(((await (await app.request('/v1/snapshot', { headers })).json()) as { works: unknown[] }).works.length, beforeRefusal)
+  const forgedBinding = { ...binding, protocol: 'decision-selection-binding/2' }
+  assert.equal(assertDecisionSelectionBindingCurrentSync(forgedBinding as never, reader).code, 'invalid_binding')
+  assert.equal(assertDecisionSelectionBindingCurrentSync(binding, reader, { projectId: projectB }).code, 'project_mismatch')
 
   // A narrower project scope or a mismatched project cannot claim the preparation is current.
   const decisionC = await recordDecision(projectA, 'wave34-conv-a', messageA, '另一条决定。', 'wave34-decision-c')
