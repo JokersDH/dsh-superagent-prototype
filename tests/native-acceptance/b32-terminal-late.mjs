@@ -52,6 +52,14 @@ try {
   const context = { attempt, ...producer }
   const client = connectRunnerRecovery(registered, context, 3000)
 
+  log.begin('B32-FIRST-LEASE-NEVER-BOUND-REFUSED', 'a claimed lease that was never bound cannot feed the original attempt', 'controlled_process')
+  const early = connectRunnerRecovery(registered, context, 3000)
+  const firstLeaseFeed = await early.command(makeCommand('begin', { id: 'cmd-never-bound', inputRef: 'input-never-bound', preparedPolicyRef: spec.policySnapshotRef }), 'lease-never-bound')
+    .then(() => ({ ok: true })).catch(error => ({ ok: false, code: error?.code ?? null, serverError: error?.serverError ?? null }))
+  log.evidence({ firstLeaseFeed })
+  if (!firstLeaseFeed.ok && firstLeaseFeed.serverError === 'stale_connection') log.pass('the never-bound claimed lease was refused (stale_connection) before any admission')
+  else log.fail(`a never-bound lease could feed: ${JSON.stringify(firstLeaseFeed)}`)
+
   log.begin('B32-LATE-REMOTE-FACT-DISPATCHED', 'a real fact request is dispatched to the remote lease', 'controlled_process')
   const state = await client.channelState()
   const bound = await client.channelNext('lease-late', state.generation)

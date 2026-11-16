@@ -1,0 +1,100 @@
+{
+  "agent": "B",
+  "branch": "codex/g1-runtime",
+  "wave": 35,
+  "source": {
+    "B_merge_head": "98acea19",
+    "main_merged": "8cd709ca line (origin/main merged; merge commit 98acea19)",
+    "changed_paths": [
+      "tests/native-acceptance/signal-guard.mjs",
+      "tests/native-acceptance/b28-signal.mjs",
+      "tests/native-acceptance/b32-terminal-late.mjs",
+      "apps/runner/src/runner-service.ts",
+      "packages/execution/src/attached-attempt.ts",
+      "apps/runner/test/attached-caller-native.test.ts",
+      "docs/rfcs/WP-03/0003-wave34-recovery-and-slot-port.md"
+    ],
+    "tar": "NONE - source only; no installed tar/ZIP and no user-instance restart"
+  },
+  "dirtyPreserved": [
+    "reports/releases/wave11-admission/runtime.json",
+    "reports/releases/wave12-admission/runtime.json",
+    "tests/native-acceptance/b16-real-begin.mjs (untracked)"
+  ],
+  "outcomes": {
+    "B1_factory_birth_registry_resources": {
+      "status": "COMPLETE (tool scope; not native/release admission)",
+      "implementation": "Private factory provenance now stores the IMMUTABLE birth pid together with executable/ordered argv/root/config/option. adoptSpawn refuses a mutated public child.pid (pid_mutated), a child from another factory (foreign_spawn), plain/prototype/never-spawn objects, numeric pids and copied metadata. The issued handle keeps the original birth: after the original process is gone and the pid is reused, a fresh signal refuses without touching the reused pid; every signal re-reads complete pid/start/UID/parent/ordered argv and the child plan; UNKNOWN retains material.",
+      "evidence": [
+        "tests/native-acceptance/b28-signal.mjs 12 PASS/0 FAIL/1 NOT_TESTED (13 cases; new pid-mutation/reuse/cross-factory case)",
+        "b27-sigkill 7/0/1 and b27-chain 4/0/1 through the factory",
+        "mock kill spy proves zero signals to foreign/reused pids"
+      ]
+    },
+    "B2_running_callbacks_activation": {
+      "status": "PARTIAL: original callback/port consumption helper is complete; actual launch-returned running and original Broker activation not executed",
+      "implementation": "attachRunningAttempt checks handle.attemptId equals attachPort.producer.attempt.attemptId (P2 mismatch closed) and requires both attachPort and attachCallbacks; no reflection/private fields. Main's shared callbacks are consumed by the same caller, with the original receipt/payload/native guard semantics unchanged. RFC 0003 now documents activation from the real launch-returned RunningAttempt while keeping original stdio feed/stop.",
+      "evidence": [
+        "apps/runner/test/attached-caller-native.test.ts 4/4 incl. attempt/producer mismatch",
+        "main attached-port 4/4 and native-attach-callbacks 11/11 re-run"
+      ],
+      "notClaimed": "No actual Native.launch/original Application Work/Broker question was executed by B."
+    },
+    "B3_command_authority_first_lease_cancel": {
+      "status": "IMPLEMENTED at transport (candidate; main has not admitted raw feed/cancel into default business path)",
+      "implementation": "Control admission now uses I's own public currentness: a claimed lease is validated with attach.next before any effect, so a NEVER-BOUND lease can no longer feed while no active lease exists; old/superseded leases are refused; a remote callback lease owning the channel refuses a raw no-lease business feed, while the ORIGINAL stdio feed remains allowed when the stdio adapter owns I's channel and a no-lease physical cancel stays distinct. producer envelope+lease is one client/server closure; bare cancel remains 409 missing_producer (no auto-fallback); admission flips closed only after the original cancel succeeds; foreign cancel is refused before any onCancel effect.",
+      "evidence": [
+        "b32-first-lease-never-bound refused stale_connection (new)",
+        "b31 old lease feed refused stale_connection with no extra callback",
+        "b32 stopped raw feed refused stale_connection",
+        "recovery-endpoint 10/10 incl. foreign-cancel spy false",
+        "diagnostics 4/4",
+        "runner 156/156"
+      ]
+    },
+    "B4_original_work_question_execution": {
+      "status": "NOT_REACHED",
+      "detail": "No original Application-created Work/original Question answer loop is activated in this checkout; main owns that composition. B did not construct a substitute Work or write business tables."
+    },
+    "B5_same_run_interrupt_ack_succession": {
+      "status": "PARTIAL (transport-level continuation only)",
+      "detail": "b31 proves A→B takeover on the SAME spawned Runner/attempt with original fact ids, old lease refused and stdio 0; b32 proves terminal late receipt/stopped feed refusal. before-write / receiver-after-ACK / receipt windows and pending-native indeterminate continuation require the original Broker receiver, so are NOT_REACHED."
+    },
+    "B6_frozen_check_candidate_accept_delivery": {
+      "status": "NOT_REACHED",
+      "detail": "Original frozen artifact/registered check/currentCandidate/accept_candidate/delivered cannot run without main's original Application completion wiring; no new candidate table or accepted flag was created."
+    },
+    "B7_original_core_queue_2_4_slots": {
+      "status": "COMPONENT ONLY / NOT_REACHED as authority",
+      "detail": "AttemptSlotScheduler is explicitly a component candidate, not a second queue: b33-slots uses real ProductStore bindings for 7/7 accounting checks, but no original core/queue/bindings projection or fifth-item queue wait is observed; main has not composed it and it must not become authority."
+    },
+    "B8_nonempty_state_restart_rebuild": {
+      "status": "PARTIAL (same-run rebind, no non-empty original restart)",
+      "detail": "b31 reuses the same registered Runner endpoint/attempt after a coordinator detach and re-reads original fact ids; b33 restores accounting from original binding states. Reopening a NON-EMPTY original Work/question/candidate/artifacts from the Store and rebuilding endpoint/session from original registration is main-owned and NOT_REACHED."
+    },
+    "B9_source_handoff_diagnostics_support": {
+      "status": "PARTIAL",
+      "detail": "Source closure includes caller/transport/controls/diagnostics/RFC; actionable diagnosis distinguishes missing executor/version/auth/foreign/terminal/old lease/late callback/closed admission/timeout/unknown and never promises automatic replay. No installed tar, no native/model turn, no value/installation/recovery admission; D freeze→E final remain main/E-owned."
+    }
+  },
+  "verification": {
+    "root_tsc": "exit 0",
+    "attached_tsc": "exit 0",
+    "runner_tests": "156 pass / 0 fail",
+    "main_attached_port": "4/4",
+    "main_native_attach_callbacks": "11/11",
+    "b28_signal": "12/0/1",
+    "b27_sigkill": "7/0/1",
+    "b27_chain": "4/0/1",
+    "b31_attach": "4/0/1",
+    "b32_late": "5/0/1",
+    "b33_slots": "7/7"
+  },
+  "scope": {
+    "modelTurns": 0,
+    "nativeTurns": 0,
+    "cap4UnknownUnspendable": true,
+    "noNew": "no second coordinator/queue/ledger/candidate table/Work/migration/shared schema/HTTP/App/transport edit; no new Driver/CAC/desktop/auto-accept/writer racing/DAG/second lifecycle; no unsafe live SIGKILL/procguard/global discovery",
+    "installed": "not installed; SOURCE_READY/PARTIAL only, not a complete product delivery"
+  }
+}

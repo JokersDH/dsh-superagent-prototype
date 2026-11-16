@@ -36,5 +36,6 @@ test('attaching to the original handle requires both its port and its shared cal
   const callbacks = { fact: async () => ({ factId: 'f', persisted: true, seq: 1 }) }
   assert.throws(() => attachRunningAttempt({ attemptId: 'attempt-1', attachCallbacks: callbacks }, 'lease-1'), /attachPort/)
   assert.throws(() => attachRunningAttempt({ attemptId: 'attempt-1', attachPort: { registration: { socketPath: '/tmp/x', credentialPath: '/tmp/x.c', socketIdentity: { dev: 1, ino: 2 } }, producer: {} } }, 'lease-1'), /attachCallbacks/)
+  assert.throws(() => attachRunningAttempt({ attemptId: 'attempt-other', attachPort: { registration: { socketPath: '/tmp/x', credentialPath: '/tmp/x.c', socketIdentity: { dev: 1, ino: 2 } }, producer: { attempt: { attemptId: 'attempt-1' } } }, attachCallbacks: callbacks }, 'lease-1'), /does not belong/)
   assert.throws(() => attachRunningAttempt({ attemptId: '', attachPort: { registration: { socketPath: '/tmp/x', credentialPath: '/tmp/x.c', socketIdentity: { dev: 1, ino: 2 } }, producer: {} }, attachCallbacks: callbacks }, 'lease-1'), /attempt identity/)
 })

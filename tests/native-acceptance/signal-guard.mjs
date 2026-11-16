@@ -99,6 +99,7 @@ function issueSpawn(store, spawnFn, executable, args, intent = {}) {
     if (value !== undefined && value !== null && !argv.includes(value)) return { ok: false, unknown: `spawn_${name}_not_in_argv`, child }
   }
   const provenance = deepFreeze(structuredClone({
+    pid: child.pid,
     executable, argv,
     ...(intent.root === undefined ? {} : { root: intent.root }),
     ...(intent.config === undefined ? {} : { config: intent.config }),
@@ -121,6 +122,8 @@ function adoptWithProvenance(store, childOrPid, intent = {}) {
   // No provenance means this factory never spawned this object: a plain object, a copied ChildProcess,
   // Object.create(ChildProcess.prototype), new ChildProcess() and a foreign process all fail here.
   if (!provenance) return { ok: false, unknown: 'foreign_spawn' }
+  // The public child.pid is not authority: mutating it must not retarget the immutable birth.
+  if (childOrPid.pid !== provenance.pid) return { ok: false, unknown: 'pid_mutated' }
   if (Array.isArray(intent.argv) && !sameTokens(intent.argv, provenance.argv)) return { ok: false, unknown: 'intent_differs_from_spawn' }
   if (typeof intent.executable === 'string' && intent.executable !== provenance.executable) return { ok: false, unknown: 'intent_differs_from_spawn' }
   for (const [name, value] of [['root', intent.root], ['config', intent.config], ['operation', intent.operation]]) {

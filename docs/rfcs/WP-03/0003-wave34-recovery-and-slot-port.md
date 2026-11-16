@@ -55,3 +55,20 @@ Main composes it with ONE call site in its executor/scheduler:
 - No new Work/attempt/Runner/credential/permission, no public HTTP or wire change.
 - No automatic accept, no writer racing, no second lifecycle/ledger/queue.
 - Slot accounting is not quiescence: `module close`, one PID, or a phase change never releases a slot.
+
+## Wave-35 activation note (actual launch-returned RunningAttempt)
+
+Main can activate this from the real `NativeProductAttempt.launch()` result without a new port:
+
+```ts
+const runtime = await product.native.launch()            // original register/ready/current already passed
+const consumer = attachRunningAttempt(runtime, 'successor-lease') // checks attemptId/producer identity
+await consumer.pollOnce()                                 // initial bind/poll before readiness is claimed
+// keep the ORIGINAL stdio feed/stop for business commands; attach only serves the three callbacks
+```
+
+`attachRunningAttempt` rejects a handle whose `attemptId` differs from `attachPort.producer.attempt.attemptId`
+and requires both the port and the shared callbacks; no reflection or private-field access is used.
+`AttemptSlotScheduler` remains a component/accounting candidate only: it must not become a second queue
+authority. Original core/queue/bindings stay authoritative for B7; the blocking input for B4–B8 is main
+composing this activation and the original completion path, not another data port.

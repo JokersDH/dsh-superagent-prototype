@@ -105,6 +105,32 @@ try {
     else log.fail(`factory provenance controls are wrong: ${JSON.stringify({ spawned, adopted, sent, world: world.kills.length, prototypeAdopt, neverSpawn })}`)
   }
 
+  log.begin('B31-SIGNAL-PID-MUTATION-AND-REUSE', 'mutating the public pid or reusing a dead pid cannot retarget the birth', 'pure_mock')
+  {
+    const world = mockWorld()
+    const factory = createSpawnFactory((executable, args) => { const child = { pid: world.nextPid++, spawnfile: executable, spawnargs: [executable, ...args] }; world.add(child.pid, [executable, ...args]); return child })
+    const spawned = factory.spawn(process.execPath, ['--serve'], { expectedChildren: [] })
+    const originalPid = spawned.child.pid
+    const foreignPid = world.nextPid + 500
+    world.add(foreignPid, [process.execPath, '--foreign'])
+    spawned.child.pid = foreignPid
+    const readopted = factory.adopt(spawned.child, { expectedChildren: [] })
+    // The already-issued handle still resolves the immutable ORIGINAL pid (not the mutated public one) and
+    // signals it once; after the process is gone and the pid is reused, the same handle must refuse.
+    const viaHandle = signalOwned(spawned.handle, 'SIGKILL')
+    world.procs.set(originalPid, { state: 'gone', reason: 'silent_absence' })
+    world.add(originalPid, [process.execPath, '--reused'], { start: 'Sun Nov 16 23:00:00 2026' })
+    const reused = factory.adopt(spawned.child, { expectedChildren: [] })
+    const afterReuse = signalOwned(spawned.handle, 'SIGKILL')
+    const otherFactory = createSpawnFactory((executable, args) => ({ pid: 4700, spawnfile: executable, spawnargs: [executable, ...args] }))
+    const foreignAdopt = otherFactory.adopt(spawned.child, { expectedChildren: [] })
+    log.evidence({ readopted, viaHandle, afterReuse, reused, foreignAdopt, kills: world.kills })
+    const killedOnlyBirth = world.kills.length === 1 && world.kills[0][0] === originalPid
+    if (!readopted.ok && readopted.unknown === 'pid_mutated' && viaHandle.sent && killedOnlyBirth && !afterReuse.sent && afterReuse.refused && !reused.ok && reused.unknown === 'pid_mutated' && !foreignAdopt.ok && foreignAdopt.unknown === 'foreign_spawn') {
+      log.pass('a mutated public pid was refused (pid_mutated); the issued handle signalled only its immutable original pid once and refused the reused pid; another factory could not adopt the child')
+    } else log.fail(`pid mutation/reuse controls failed: ${JSON.stringify({ readopted, viaHandle, afterReuse, reused, foreignAdopt, kills: world.kills })}`)
+  }
+
   log.begin('B31-SIGNAL-IDENTITY-UID-START', 'uid/start changes end ownership', 'pure_mock')
   {
     const world = mockWorld()

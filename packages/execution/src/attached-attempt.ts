@@ -98,6 +98,8 @@ export function attachRunningAttempt(handle: AttachableRunningAttempt, leaseId: 
   if (!handle?.attachPort) throw new Error('The original Runner has no registered attachPort yet')
   if (!handle.attachCallbacks) throw new Error('The original Runner exposes no shared attachCallbacks')
   if (!handle.attemptId) throw new Error('The original Runner handle has no attempt identity')
+  const producerAttempt = (handle.attachPort.producer as { attempt?: { attemptId?: unknown } } | undefined)?.attempt
+  if (producerAttempt?.attemptId !== handle.attemptId) throw new Error('The attachPort producer does not belong to this original attempt')
   return attachRunnerAttempt({
     endpoint: handle.attachPort.registration,
     producer: handle.attachPort.producer as AttachAttemptInput['producer'],
