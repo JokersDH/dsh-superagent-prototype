@@ -1,0 +1,233 @@
+{
+  "wave": "product-wave-32",
+  "role": "I",
+  "title": "Complete consumers and terminal semantics for the single communication module",
+  "date": "2026-11-16",
+  "workdir": "/Users/hh/Desktop/joker/superagent-agent-i",
+  "branch": "codex/g5-coordinator-channel",
+  "baseline": "cf2e0a9cc92d10546afe40b04244cd9259bca2f4",
+  "mergedOriginMain": "58b4e4c8",
+  "mainTerminalFix": "b72e935d",
+  "implementationCommits": [
+    "9849fe70e6a0f3d1d9c822b7b2e98d3c34d689e6"
+  ],
+  "status": "SOURCE_READY_CONSUMERS_PASS_TERMINAL_FENCE_VERIFIED_PRODUCT_RECOVERY_NOT_REACHED",
+  "statement": "The communication block is exercised end to end against the real service after main's terminal fence: facts, payloads, fresh native admission, temporary detach and terminal close all behave as specified, and the channel coexists with the original journal paging/chunk transport. Product Work recovery, the full Broker chain, SIGKILL and native/installed facts remain NOT_REACHED and are not claimed by module green.",
+  "source": {
+    "runtimeFiles": [
+      "apps/runner/src/attach-channel/coordinator-channel.ts",
+      "apps/runner/src/attach-channel/attach.ts",
+      "apps/runner/src/attach-channel/errors.ts",
+      "apps/runner/src/attach-channel/index.ts"
+    ],
+    "optionalFiles": [
+      "apps/runner/src/attach-channel/sink-responder.ts",
+      "apps/runner/src/attach-channel/refusals.ts"
+    ],
+    "blobs": {
+      "coordinator-channel.ts": "d1ef81eb9d51b24417645151440eb1e262c20546",
+      "attach.ts": "321738dae3b87e6ad7d235f52aaa65e6f63ab527",
+      "errors.ts": "ec8ce909d0f30ab1d96488db56cdf3b6a4ab7f49",
+      "index.ts": "6314546e1d1facde00d0d2195edf1c14ad7a85d2"
+    },
+    "unchangedThisWave": true,
+    "inMain": {
+      "module": true,
+      "pullAdapter": true,
+      "errors": true,
+      "index": true,
+      "evidence": "origin/main blobs equal the values above (303b2c6a / successors)"
+    },
+    "candidateOnly": [
+      "apps/runner/test/attach-channel/actual-*.test.ts",
+      "apps/runner/test/attach-channel/actual-harness.ts",
+      "apps/runner/test/attach-channel/product-ingress-harness.ts",
+      "docs/runtime-channel/fault-states.zh-CN.md",
+      "docs/runtime-channel/adoption-manual.zh-CN.md",
+      "docs/runtime-channel/README.zh-CN.md",
+      "reports/runtime-channel/wave32-status.json"
+    ]
+  },
+  "identity": {
+    "inner": {
+      "producer": {
+        "attempt": {
+          "ticketId": "ticket-1",
+          "assignmentId": "assignment-1",
+          "attemptId": "attempt-1",
+          "fenceEpoch": 1,
+          "contract": {
+            "workId": "work-1",
+            "revision": 1,
+            "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          }
+        },
+        "source": "fake-driver",
+        "runnerIdentityRef": "i31-runner"
+      },
+      "factIds": [
+        "fact-adopt",
+        "fact-i31",
+        "fact-dual-1",
+        "fact-dual-2",
+        "fact-succession",
+        "fact-ack",
+        "fact-kind",
+        "fact-load-1..64",
+        "fact-page-1..7",
+        "fact-terminal",
+        "fact-reattach",
+        "fact-fence"
+      ],
+      "intentCorrelation": "intent-<module salt>-<n>; business command.id unchanged (e.g. cmd-answer, cmd-reattach)",
+      "payloadRefs": "payload:<sha256 of canonical JSON>"
+    },
+    "outer": {
+      "endpoint": "<recoveryRoot>/<attemptId>/runner.sock + runner.credential (dev/ino pinned)",
+      "leaseIds": [
+        "lease-a",
+        "lease-b",
+        "lease-old",
+        "lease-new",
+        "lease-terminal",
+        "lease-intent",
+        "lease-page",
+        "lease-slot-1..4"
+      ],
+      "generations": "1 (bootstrap) -> 2 (first explicit CAS) -> 3 (second client)",
+      "slotAttempts": [
+        "attempt-slot-1",
+        "attempt-slot-2",
+        "attempt-slot-3",
+        "attempt-slot-4"
+      ]
+    }
+  },
+  "actualObjects": {
+    "service": "real serveRunner (apps/runner/src/runner-service.ts) with a scripted Native Driver; no vendor/model/native turn",
+    "store": "real ProductStore + createStoredRuntimeIngress + bindCoreRepositories (temp sqlite/artifacts)",
+    "transport": "real authenticated Unix endpoint + connectRunnerRecovery clients; journal paging and payload chunk reads",
+    "terminal": "main finish() -> attach.close('Runner service is terminal') verified: fact closed, intent indeterminate, late next/reply zero effect"
+  },
+  "checks": [
+    {
+      "command": "node_modules/.bin/tsc -p apps/runner/src/attach-channel/tsconfig.json",
+      "exit": 0
+    },
+    {
+      "command": "cd apps/runner && node --test --test-timeout=60000 test/attach-channel/*.test.ts",
+      "exit": 0,
+      "tests": 136,
+      "passed": 136,
+      "failed": 0,
+      "durationMs": 9528
+    },
+    {
+      "command": "node --test packages/contracts/test/coordinator-channel.case.ts",
+      "exit": 0,
+      "tests": 5,
+      "passed": 5
+    },
+    {
+      "command": "B source identity check (blobs + HEAD)",
+      "exit": 0,
+      "observed": "B f4a99ce1 shares coordinator d1ef81 / attach 321738; B's own suites are B's evidence and were not rerun this wave"
+    }
+  ],
+  "artifacts": {
+    "R1": {
+      "buildId": "8296720d8a25f38c",
+      "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "createdOrRefrozenThisWave": false
+    },
+    "R2": {
+      "source": "303b2c6a",
+      "successors": "main 58b4e4c8 includes terminal fix b72e935d",
+      "newTarCreatedByI": "none"
+    },
+    "installState": "NOT_INSTALLED",
+    "note": "I delivers source and consumers; D freezes the integration artifact and E verifies the same bytes independently. Docs/test changes do not create a new runtime artifact."
+  },
+  "corrections": [
+    "wave-31 reported that shutdown leaves a pending fact unknown; that observation came from a shutdown frame without an id (protocol error, never executed). With a valid frame id and main's terminal fence, the pending fact is closed and a pending native intent is indeterminate.",
+    "wave-31's reported B gap (closeAdmission only dropping stdio/sink ids) is superseded at the observed main source by finish() calling attach.close(); the service still drops only the two adapter ids on admission close, but terminal finish now closes every lease."
+  ],
+  "dirty": {
+    "thisWorktree": [],
+    "bPreserved": [
+      "reports/releases/wave11-admission/runtime.json",
+      "reports/releases/wave12-admission/runtime.json",
+      "tests/native-acceptance/b16-real-begin.mjs"
+    ]
+  },
+  "remaining": [
+    "original Work recovery: original A new process, question/native_applied/ACK-unknown reconciliation (B/main)",
+    "full NativeProductAttempt Broker chain and real question/answer (needs spawned child; I uses equivalent store checks)",
+    "recovered candidate/manualaccept and 2/4 slot release (B/main)",
+    "same-Runner coordinator SIGKILL question->answer (not run; no unsafe tools used)",
+    "real vendor/model/native turns (0) and installed/native facts",
+    "H independently executing this wave's source in its own tree",
+    "B has not yet confirmed consuming the new terminal/detach test evidence; its own suites remain its evidence"
+  ],
+  "boundaries": {
+    "filesOutsideOwnershipModified": false,
+    "contractsRootWireChanged": false,
+    "runnerServiceOrLinkClientChanged": false,
+    "newServerDatabaseLedgerDriverLifecycle": false,
+    "realModelTurns": 0,
+    "nativeTurns": 0,
+    "processSignalsOrUserServiceOperations": 0,
+    "preservedUserServices": [
+      [
+        5180,
+        8796
+      ],
+      [
+        5181,
+        8797
+      ],
+      [
+        5182,
+        8798
+      ],
+      [
+        5183,
+        8799
+      ],
+      [
+        5184,
+        8800
+      ],
+      [
+        5185,
+        8801
+      ],
+      [
+        5186,
+        8802
+      ],
+      [
+        5187,
+        8803
+      ],
+      [
+        5188,
+        8804
+      ],
+      [
+        5189,
+        8805
+      ],
+      [
+        5190,
+        8806
+      ],
+      [
+        5191,
+        8807
+      ]
+    ],
+    "studyState": "BLOCKED_CURRENT_RECIPE_UNTOUCHED"
+  }
+}
