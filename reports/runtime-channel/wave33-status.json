@@ -1,0 +1,251 @@
+{
+  "wave": "product-wave-33",
+  "role": "I",
+  "title": "Main attach port adoption, terminal/detach succession and bounded fault support",
+  "date": "2026-11-16",
+  "workdir": "/Users/hh/Desktop/joker/superagent-agent-i",
+  "branch": "codex/g5-coordinator-channel",
+  "baseline": "44d5390582d5a236c066b4fa7f2064e9d56e2633",
+  "mergedOriginMain": "e05ee8d8",
+  "mainIntegration": "fc38bf65",
+  "implementationCommits": [
+    "89d10ed6f6f307c9c06be1e9b3080e1b57237f06"
+  ],
+  "status": "SOURCE_READY_THREE_OUTCOMES_PASS_PRODUCT_RECOVERY_NOT_REACHED",
+  "statement": "Three communication outcomes are consumed end to end on main's real sources: the optional AttachedAttemptPort plus attachRunnerAttempt caller over the real Store ingress/payload/guard; temporary detach, terminal close and business succession across two real callers; and bounded pressure, typed diagnostics and four-endpoint isolation. The channel module itself is unchanged (already in main). Original Application/QuestionBroker Work recovery, SIGKILL and product slot release remain NOT_REACHED.",
+  "source": {
+    "moduleChangedThisWave": false,
+    "blobs": {
+      "coordinator-channel.ts": "d1ef81eb9d51b24417645151440eb1e262c20546",
+      "attach.ts": "321738dae3b87e6ad7d235f52aaa65e6f63ab527",
+      "errors.ts": "ec8ce909d0f30ab1d96488db56cdf3b6a4ab7f49",
+      "index.ts": "6314546e1d1facde00d0d2195edf1c14ad7a85d2"
+    },
+    "inMain": {
+      "module": true,
+      "pullAdapter": true,
+      "errors": true,
+      "index": true
+    },
+    "mainConsumedSources": {
+      "attachPortContract": "packages/execution/src/contracts.ts (AttachedAttemptPort)",
+      "attachedCaller": "packages/execution/src/attached-attempt.ts",
+      "mainComposition": "apps/coordinator/product/native-attempt.ts (optional attachPort after register+ready+current)",
+      "integrationTest": "tests/integration/attached-port.case.mjs"
+    },
+    "candidateOnly": [
+      "apps/runner/test/attach-channel/actual-main-port-consumer.test.ts",
+      "apps/runner/test/attach-channel/actual-caller-succession.test.ts",
+      "apps/runner/test/attach-channel/actual-pressure-diagnostics.test.ts",
+      "docs/runtime-channel/README.zh-CN.md",
+      "docs/runtime-channel/adoption-manual.zh-CN.md",
+      "docs/runtime-channel/fault-states.zh-CN.md",
+      "reports/runtime-channel/wave33-status.json"
+    ]
+  },
+  "identity": {
+    "inner": {
+      "producer": {
+        "attempt": {
+          "ticketId": "ticket-1",
+          "assignmentId": "assignment-1",
+          "attemptId": "attempt-1",
+          "fenceEpoch": 1,
+          "contract": {
+            "workId": "work-1",
+            "revision": 1,
+            "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          }
+        },
+        "source": "fixture-driver",
+        "runnerIdentityRef": "runner-1"
+      },
+      "factIds": [
+        "fact-main-port",
+        "fact-succ-1",
+        "fact-succ-2",
+        "fact-detach",
+        "fact-terminal-caller",
+        "fact-slow-1..3",
+        "fact-reject",
+        "fact-cap-1..64",
+        "fact-slot33-1..4"
+      ],
+      "intentCorrelation": "intent-<module salt>-<n>; business command.id preserved",
+      "payloadRefs": "payload:<sha256 of canonical JSON>"
+    },
+    "outer": {
+      "endpoint": "<recoveryRoot>/<attemptId>/runner.sock + runner.credential (dev/ino pinned)",
+      "leaseIds": [
+        "lease-main-port",
+        "lease-denied",
+        "lease-missing",
+        "lease-succ-a",
+        "lease-detach-a",
+        "lease-cap",
+        "lease-slot33-1..4"
+      ],
+      "generations": "1 (bootstrap) -> 2 (first CAS) -> 3 (successor)",
+      "slotAttempts": [
+        "attempt-slot33-1",
+        "attempt-slot33-2",
+        "attempt-slot33-3",
+        "attempt-slot33-4"
+      ]
+    }
+  },
+  "outcomes": [
+    {
+      "id": "outcome1",
+      "title": "Actual main three callbacks and typed compatibility adopted",
+      "status": "PASS",
+      "implementation": "main optional AttachedAttemptPort (data only) + attachRunnerAttempt caller; I module unchanged",
+      "consumer": "actual-main-port-consumer.test.ts (4)",
+      "positive": "payload callback receives the original reference and returns the original JSON body; fact receipt equals the real ProductStore row seq; one guard call per intent and a fresh nonce",
+      "negative": "foreign producer refused at bind; deny and missing guard both zero writes; no fabricated receipt/body",
+      "notReached": "original Application-created Work / QuestionBroker question-answer delivery"
+    },
+    {
+      "id": "outcome2",
+      "title": "Temporary detach, terminal and original-business succession",
+      "status": "PASS_COMMUNICATION_SCOPE",
+      "implementation": "two real callers over the same endpoint/generation CAS; main terminal close",
+      "consumer": "actual-caller-succession.test.ts (3)",
+      "positive": "successor continues the same attempt and original fact ids reach the Store; fresh intent needs and gets its own decision",
+      "negative": "pending native intent is indeterminate with zero served writes; old approval cannot settle; terminal fails a pending callback closed and refuses a late/new caller",
+      "notReached": "same original Work recovered to check/currentCandidate/manualaccept (B/main)"
+    },
+    {
+      "id": "outcome3",
+      "title": "Bounded pressure, diagnostics and multi-slot handoff",
+      "status": "PASS_COMMUNICATION_SCOPE",
+      "implementation": "real caller + real service bounds; four endpoint pairs",
+      "consumer": "actual-pressure-diagnostics.test.ts (4)",
+      "positive": "slow-Store burst drains within deadline; 64-fact bound admits 64 and drains; four slots keep their own decisions",
+      "negative": "65th fact refused as capacity; callback failure is a typed ack-failure; terminal channels refuse a new caller",
+      "notReached": "product scheduler 2/4 slots, fifth-item waiting, aggregate slot release and full resource barrier (B/main)"
+    }
+  ],
+  "checks": [
+    {
+      "command": "node_modules/.bin/tsc -p apps/runner/src/attach-channel/tsconfig.json",
+      "exit": 0
+    },
+    {
+      "command": "cd apps/runner && node --test --test-timeout=60000 test/attach-channel/*.test.ts",
+      "exit": 0,
+      "tests": 147,
+      "passed": 147,
+      "failed": 0,
+      "durationMs": 10622
+    },
+    {
+      "command": "node --test packages/contracts/test/coordinator-channel.case.ts",
+      "exit": 0,
+      "tests": 5,
+      "passed": 5
+    },
+    {
+      "command": "node --test tests/integration/attached-port.case.mjs (main)",
+      "exit": 0,
+      "tests": 4,
+      "passed": 4,
+      "note": "restored after reverting an additive error-field change that altered main's observed denial string"
+    }
+  ],
+  "artifacts": {
+    "R1": {
+      "buildId": "8296720d8a25f38c",
+      "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "createdOrRefrozenThisWave": false
+    },
+    "R2": {
+      "source": "303b2c6a",
+      "successors": "main e05ee8d8 includes fc38bf65",
+      "newTarCreatedByI": "none"
+    },
+    "installState": "NOT_INSTALLED",
+    "note": "No tar/ZIP created or certified here; D freezes and E verifies the same bytes independently."
+  },
+  "corrections": [
+    "An additive `NativeWriteDenied.code` field was tried and reverted: it changed main's observed denial string from 'refused' to 'native_write_denied' and broke tests/integration/attached-port.case.mjs (2/4). The error shape stays unchanged; consumers use instanceof or toAttachFailure."
+  ],
+  "dirty": {
+    "thisWorktree": [],
+    "bPreserved": [
+      "reports/releases/wave11-admission/runtime.json",
+      "reports/releases/wave12-admission/runtime.json",
+      "tests/native-acceptance/b16-real-begin.mjs"
+    ],
+    "hClean": true
+  },
+  "remaining": [
+    "original Application/QuestionBroker Work question-answer and native_applied/ACK-unknown reconciliation (B/main)",
+    "same-Work recovered check/currentCandidate/manualaccept and product 2/4 slot release (B/main)",
+    "same-Runner coordinator SIGKILL successor (not run; no unsafe tools)",
+    "real vendor/model/native turns (0) and installed/native facts",
+    "B's spawn-provenance helper residual (plain metadata object accepted) — B tooling, not I",
+    "H independently executing this wave's source in its own tree"
+  ],
+  "boundaries": {
+    "filesOutsideOwnershipModified": false,
+    "contractsRootWireChanged": false,
+    "runnerServiceOrLinkClientChanged": false,
+    "newServerDatabaseLedgerDriverLifecycle": false,
+    "realModelTurns": 0,
+    "nativeTurns": 0,
+    "processSignalsOrUserServiceOperations": 0,
+    "preservedUserServices": [
+      [
+        5180,
+        8796
+      ],
+      [
+        5181,
+        8797
+      ],
+      [
+        5182,
+        8798
+      ],
+      [
+        5183,
+        8799
+      ],
+      [
+        5184,
+        8800
+      ],
+      [
+        5185,
+        8801
+      ],
+      [
+        5186,
+        8802
+      ],
+      [
+        5187,
+        8803
+      ],
+      [
+        5188,
+        8804
+      ],
+      [
+        5189,
+        8805
+      ],
+      [
+        5190,
+        8806
+      ],
+      [
+        5191,
+        8807
+      ]
+    ],
+    "studyState": "BLOCKED_CURRENT_RECIPE_UNTOUCHED"
+  }
+}
