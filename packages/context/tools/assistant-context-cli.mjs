@@ -25,6 +25,7 @@ const { values, positionals } = parseArgs({ args: process.argv.slice(3), allowPo
   days: { type: 'string' }, timezone: { type: 'string' }, 'command-id': { type: 'string' },
   limit: { type: 'string' }, cursor: { type: 'string' }, file: { type: 'string' },
   'include-content': { type: 'boolean' }, reject: { type: 'boolean' }, 'prepare-only': { type: 'boolean' }, export: { type: 'boolean' },
+  revalidate: { type: 'boolean' },
   'timeout-ms': { type: 'string' },
 } })
 const protocol = 'assistant-context-cli/1'
@@ -208,7 +209,22 @@ try {
       if (positionals[0] === 'load') {
         const parsed = readPrivateDraft(values.file)
         const stale = Date.parse(parsed.expiresAt) <= Date.now()
-        out({ status: 'ok', operation: 'draft-load', result: { ...parsed, usable: !stale, stale, authorization: 'none' } })
+        let revalidation = null
+        if (values.revalidate) {
+          const preview = await request('/v1/context/preview', { method: 'POST', body: JSON.stringify({
+            projectId: parsed.projectId, conversationId: parsed.conversationId, selections: parsed.selections,
+            budget: { maxFiles: 32, maxBytes: 65536, maxTokens: 16000 } }) })
+          if (!preview) { revalidation = { state: 'unavailable', matchesCurrent: null, changedSources: null } }
+          else {
+            const current = new Set(sourcesOf(preview).map((source) => String(source.sourceDigest)))
+            const previous = new Set((parsed.sources ?? []).map((source) => String(source.sourceDigest)))
+            const changedSources = [...previous].filter((digest) => !current.has(digest)).length +
+              [...current].filter((digest) => !previous.has(digest)).length
+            revalidation = { state: 'revalidated', matchesCurrent: changedSources === 0, changedSources }
+          }
+        }
+        out({ status: 'ok', operation: 'draft-load', result: { ...parsed, usable: !stale, stale,
+          ...(revalidation === null ? {} : { revalidation }), authorization: 'none' } })
       } else if (positionals[0] === undefined || positionals[0] === 'save') {
         if (!need('project', 'conversation')) stop()
         const selections = (values.select ?? 'conversation').split(',').map((value) => value.trim()).filter(Boolean)

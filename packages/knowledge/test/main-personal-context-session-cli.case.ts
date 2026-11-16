@@ -18,6 +18,7 @@ const cli = join(repoRoot, 'packages/context/tools/assistant-context-cli.mjs')
 const principal = { userId: 'wave32-cli-user', authorityRef: 'wave32-cli-authority' }
 const actor = { ...principal, source: 'local_cli' as const }
 const apiToken = 'a'.repeat(64)
+const headers = { authorization: `Bearer ${apiToken}`, 'content-type': 'application/json' }
 const projectA = 'wave32-project-a', projectB = 'wave32-project-b'
 const conversationA = 'wave32-conversation-a', conversationB = 'wave32-conversation-b'
 const scopeFor = (projectId: string) => ({ projectId, allowedPaths: ['src/'], excludedPaths: ['.git'], externalActions: [] })
@@ -180,6 +181,10 @@ test('a normal instance selects sources, confirms a proposal and records/revokes
     assert.equal(statSync(draftFile).mode & 0o777, 0o600)
     draftRequestId = (JSON.parse(readFileSync(draftFile, 'utf8')) as { requestId: string }).requestId
 
+    const revalidated = await run(['draft', 'load', '--api', instance.api, '--api-token', apiToken, '--file', draftFile, '--revalidate'])
+    assert.equal(revalidated.exit, 0, JSON.stringify(revalidated.result))
+    assert.equal(revalidated.result.result.revalidation.matchesCurrent, true)
+
     // A conversation change produces a new preview; the saved draft stays historical data.
     await instance.product.application.dispatch({ commandId: `${conversationA}-later`, conversationId: conversationA,
       kind: 'chat', projectId: projectA, text: '之后新增的一条消息。' }, actor)
@@ -188,6 +193,24 @@ test('a normal instance selects sources, confirms a proposal and records/revokes
       '--conversation', conversationA, '--select', 'conversation'])
     assert.equal(changed.exit, 0)
     assert.notEqual(changed.result.result.requestId, draftRequestId)
+    const staleDraft = await run(['draft', 'load', '--api', instance.api, '--api-token', apiToken, '--file', draftFile, '--revalidate'])
+    assert.equal(staleDraft.exit, 0, JSON.stringify(staleDraft.result))
+    assert.equal(staleDraft.result.result.revalidation.matchesCurrent, false)
+    assert.equal(staleDraft.result.result.revalidation.changedSources > 0, true)
+
+    // A second decision can be explicitly superseded by a new one; the predecessor never becomes current again.
+    const supersededDecision = await run(['decide', '--api', instance.api, '--api-token', apiToken, '--project', projectA,
+      '--conversation', conversationA, '--message', messageA, '--content', '临时约定。'])
+    assert.equal(supersededDecision.exit, 0, JSON.stringify(supersededDecision.result))
+    const supersededId = supersededDecision.result.result.decisionId as string
+    const replacement = await run(['decide', '--api', instance.api, '--api-token', apiToken, '--project', projectA,
+      '--conversation', conversationA, '--message', messageA, '--content', '替代约定。', '--supersedes', supersededId])
+    assert.equal(replacement.exit, 0, JSON.stringify(replacement.result))
+    const catalog = (await (await instance.app.request(`/v1/decisions?projectId=${projectA}&limit=50`, { headers })).json()) as Record<string, any>
+    const statusOf = (id: string) => (catalog.decisions as { record: { decision: { id: string } }; status: string }[])
+      .find((view) => view.record.decision.id === id)?.status
+    assert.equal(statusOf(supersededId), 'superseded')
+    assert.equal(statusOf(replacement.result.result.decisionId as string), 'recorded')
 
     const history = await run(['history', '--api', instance.api, '--api-token', apiToken, '--work', 'missing-work'])
     assert.equal(history.exit, 3)
