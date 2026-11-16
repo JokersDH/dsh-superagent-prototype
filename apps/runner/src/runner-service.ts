@@ -146,9 +146,8 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
   const closeAdmission = () => {
     preparation.abort()
     businessClosed = true; processHost.closeAdmission(); runner?.closeAdmission()
-    // Closing admission DROPS the two adapter connections, so pending native writes become
-    // indeterminate. The I channel stays open: it is the communication surface a recovery client
-    // attaches to, and channel close means physical teardown, not "this attempt stopped".
+    // Admission closure alone leaves the channel available for reconnectable control. Terminal
+    // finish closes every lease and pending callback, including the current remote connection.
     for (const connectionId of [stdioConnectionId, SINK_CONNECTION_ID]) {
       try { attach?.drop(connectionId, 'Attempt admission is closed') } catch {}
     }
@@ -297,9 +296,8 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
   const finish = (): void => {
     closed = true
     clearInterval(timer)
-    // The channel deliberately stays OPEN: a recovery client must still be able to bind and read the
-    // original journal/IDs after the attempt stopped. Channel close means physical teardown, not "the
-    // attempt ended", and the process exit is that teardown.
+    attach?.close('Runner service is terminal')
+    dispatched.clear()
     notify()
   }
   const launch = () => {
@@ -471,6 +469,7 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
               // A caller that already owns the live connection never rebinds: polling is read-only.
               channelNext: async (producer, leaseId, expectedGeneration) => {
                 assertChannelProducer(producer)
+                if (closed) throw channelError('stale_connection', 'channel_closed', 'Runner service is terminal')
                 const current = attach!.next(leaseId, producer as never)
                 if (!current.ok && current.refused === 'stale_connection') {
                   try {
