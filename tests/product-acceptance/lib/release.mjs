@@ -618,8 +618,8 @@ export function cohortRecoveryIssues(value) {
   const pending = readonly.pending ?? {}
   if (pending.found !== true || !Array.isArray(pending.recordedBeforeStop) || pending.recordedBeforeStop.length === 0 ||
     !((pending.questionsRecorded ?? 0) >= pending.recordedBeforeStop.length) || pending.held !== true ||
-    !(seed.pending?.beforeStop?.openQuestionIds?.length >= 1) ||
-    !['needs_user', 'running', 'waiting_answer'].includes(String(seed.pending?.beforeStop?.phase ?? ''))) issues.push('pending')
+    !((value.pending?.beforeStop ?? seed.pending?.beforeStop)?.openQuestionIds?.length >= 1) ||
+    !['needs_user', 'running', 'waiting_answer'].includes(String((value.pending?.beforeStop ?? seed.pending?.beforeStop)?.phase ?? ''))) issues.push('pending')
   if (readonly.answer?.status !== 422) issues.push('answer_accepted')
   const counts = readonly.counts ?? {}
   if (!Array.isArray(counts.before?.effect) || !Array.isArray(counts.after?.effect)) issues.push('effect_unknown')
