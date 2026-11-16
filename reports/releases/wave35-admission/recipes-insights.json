@@ -1,0 +1,77 @@
+{
+  "protocol": "wave35-recipes-insights-admission/1",
+  "date": "2026-11-16",
+  "fixed": {
+    "G": "35fc58957c2768b204a8ce67567d3d5a4ff888ed",
+    "J": "db8647ea059c103fd17b8640c927182b663603fd"
+  },
+  "checks": [
+    {
+      "role": "G",
+      "command": "node --test packages/usage-insights/test/runtime-identity.case.ts packages/usage-insights/test/observation-facts.case.ts packages/usage-insights/test/support-port.case.ts",
+      "exitCode": 0,
+      "passed": 27
+    },
+    {
+      "role": "J",
+      "command": "node --test packages/project-recipes/test/currency.case.ts packages/project-recipes/test/rebind.case.ts tools/project-recipes/test/fail-recovery.case.ts tools/project-recipes/test/restore-continuity.case.ts",
+      "exitCode": 0,
+      "passed": 23
+    }
+  ],
+  "progress": {
+    "G": "Actual digest/conservation/legacy re-projection/verification markers and zero/unknown observation facts passed. No new G source imported; main's existing default support remains actual.",
+    "J": "Structured current reasons and original assertion compatibility, valid/foreign/reidentified root semantics, missing-input repair and real registered projects through original controlled delivery/artifact bytes/reopen passed. Store reopen is not an A/D archive restore."
+  },
+  "newFinding": {
+    "id": "G_UNVERIFIED_STATIC_TREE_AS_RUNTIME_IDENTITY",
+    "priority": "P2_SUPPORT_PROVENANCE_BEFORE_MAIN_ADMISSION",
+    "file": "/Users/hh/Desktop/joker/superagent-agent-g/packages/usage-insights/src/runtime-identity.ts",
+    "line": 245,
+    "problem": "Reads a caller-selected static tree and manifest build/source without verifying declared inventory, then calls origin.kind runtime and infers capability/browserTrigger from text needles.",
+    "actualPureControl": {
+      "origin": {
+        "kind": "runtime",
+        "identitySource": "install-manifest",
+        "buildId": "forged-build",
+        "sourceCommit": "ffffffffffffffffffffffffffffffffffffffff",
+        "archiveSha256": null,
+        "capabilities": {
+          "pageObservation": false,
+          "numericExport": true,
+          "displayDownload": true
+        },
+        "browserTrigger": "present",
+        "missing": [
+          "pageObservation"
+        ]
+      },
+      "checks": {
+        "buildMatches": null,
+        "sourceMatches": null,
+        "archiveMatches": null
+      },
+      "unknown": [],
+      "declaredFiles": 1,
+      "capabilities": {
+        "pageObservation": false,
+        "numericExport": true,
+        "displayDownload": true,
+        "supportSummary": true
+      },
+      "sourceInventoryActuallyVerified": false,
+      "executedRuntime": false
+    },
+    "scope": "Candidate data helper, not main permission bypass. No source/entry execution occurred. Main must keep unknown origin or consume trusted current-runtime/verified inventory facts, not blindly mount this helper.",
+    "required": "Separate static declaration, inventory verification, current executing entry, and actual capability consumer evidence; reuse existing trusted D/main verification and avoid another collector/authority."
+  },
+  "limits": {
+    "realVendorModelNativeTurns": 0,
+    "signals": 0,
+    "newArchive": 0,
+    "candidateEdits": false,
+    "userServicesTouched": 0,
+    "releaseApproved": false,
+    "completionChanged": false
+  }
+}

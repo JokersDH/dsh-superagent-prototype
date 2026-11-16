@@ -12,6 +12,7 @@ import {
   SnapshotSchema,
   VerificationSchema,
   AssistantProviderStatusSchema,
+  AssistantConnectionInputSchema,
   AssistantCandidatesSchema,
   AssistantCandidatePrepareSchema,
   AssistantSuggestionsSettingSchema,
@@ -67,6 +68,7 @@ import type {
   AgentProfile,
   ApplicationConfiguration,
   AssistantProviderStatus,
+  AssistantConnectionInput,
   AssistantCandidates,
   AssistantCandidatePrepare,
   AssistantStreamUpdate,
@@ -152,6 +154,7 @@ export interface ConsoleTransport {
   assistant?(): Promise<AssistantProviderStatus | undefined>
   assistantChanges?(conversationId: string, signal: AbortSignal): AsyncIterable<AssistantStreamUpdate>
   selectModel?(model: string): Promise<AssistantProviderStatus>
+  configureAssistant?(input: AssistantConnectionInput): Promise<AssistantProviderStatus>
   setAssistantSuggestions?(enabled: boolean): Promise<AssistantProviderStatus>
   replyCandidates?(messageId: string): Promise<AssistantCandidates>
   prepareReplyCandidate?(input: AssistantCandidatePrepare): Promise<ProposalPreview>
@@ -371,6 +374,15 @@ export class HttpTransport implements ConsoleTransport {
     return AssistantProviderStatusSchema.parse(
       await this.request('/v1/assistant/model', { method: 'POST', body: JSON.stringify({ model }) }),
     )
+  }
+  async configureAssistant(input: AssistantConnectionInput): Promise<AssistantProviderStatus> {
+    const value = AssistantConnectionInputSchema.parse(input)
+    const status = AssistantProviderStatusSchema.parse(await this.request('/v1/assistant/connection', {
+      method: 'POST', body: JSON.stringify(value),
+    }))
+    if (!status.configured || status.baseURL !== value.baseURL || status.model !== value.model || JSON.stringify(status).includes(value.apiKey))
+      throw new TransportError('schema_mismatch', '配置保存结果尚未确认，请刷新核对。')
+    return status
   }
   async setAssistantSuggestions(enabled: boolean): Promise<AssistantProviderStatus> {
     const input = AssistantSuggestionsSettingSchema.parse({ enabled })
