@@ -102,8 +102,10 @@ export {
   CROSS_CHECK_ABSOLUTE_TOLERANCE, CROSS_CHECK_PROTOCOL, CrossCheckFault, crossCheckAnalysisWithDisplay, expectedDisplayId,
 } from './crosscheck.ts'
 export type { CrossCheckDisagreement, CrossCheckDisagreementKind, CrossCheckResult } from './crosscheck.ts'
-export { SUPPORT_SUMMARY_PROTOCOL, SupportFault, describeDisplayDocument, renderSupportSummary } from './support.ts'
-export type { SupportRow, SupportSummary } from './support.ts'
+export {
+  SUPPORT_SUMMARY_PROTOCOL, SupportFault, buildSupportReport, describeDisplayDocument, renderSupportReport, renderSupportSummary,
+} from './support.ts'
+export type { SupportEvidence, SupportOrigin, SupportReport, SupportRow, SupportSummary } from './support.ts'
 export {
   consumerAdmission, consumerLayer, consumerScope, formatMetricValue, metricRowKey, metricUnitLabel,
   observedOutcomeCount, rowCoverageMeaning, rowSemantics, toInsightConsumerView,
