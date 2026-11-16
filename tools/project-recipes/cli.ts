@@ -268,7 +268,10 @@ async function rebind(parsed: Parsed, io: { stdout: (text: string) => void; stde
     io.stdout(`${JSON.stringify(result.report, null, 2)}\n`)
     for (const note of result.report.notes) io.stderr(`note: ${note}\n`)
     if (result.report.status === 'unbound') return EXIT.needsInput
-    if (result.report.status === 'foreign') return EXIT.refused
+    if (result.report.status === 'reidentified') {
+      io.stderr(`rebind reidentified ${result.report.previousProjectId} -> ${result.report.projectId}; old suggestion is not reusable\n`)
+      return EXIT.refused
+    }
     io.stderr(`rebind ${result.report.status} for ${result.report.projectId}${result.report.changes.length ? `: ${result.report.changes.join(', ')}` : ''}\n`)
     return EXIT.draft
   } catch (error) {

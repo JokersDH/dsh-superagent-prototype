@@ -50,15 +50,18 @@ test('an unregistered project reports unbound instead of guessing a root', () =>
   assert.match(report.notes[0]!, /重新登记/)
 })
 
-test('a mismatched project identity is foreign and never reuses the old observation', () => {
+test('a moved project re-registered under a new id is reidentified, not silently reused', () => {
   withDir((dir) => {
     writeProject(dir, pnpmJson, 'pnpm-lock.yaml')
-    const { facts, report } = reobserveProjectFacts({ previous: alphaFacts, root: dir, projectId: 'project-other', observedAt: NOW })
-    assert.equal(facts, null)
-    assert.equal(report.status, 'foreign')
-    assert.equal(report.projectId, 'project-other')
-    assert.deepEqual(report.changes, [])
-    assert.match(report.notes[0]!, /不一致/)
+    const { facts, report } = reobserveProjectFacts({ previous: alphaFacts, root: dir, projectId: 'project-moved', observedAt: NOW })
+    // The new identity is observed, but the previous suggestion stays unusable.
+    assert.ok(facts)
+    assert.equal(report.status, 'reidentified')
+    assert.equal(report.projectId, 'project-moved')
+    assert.equal(report.previousProjectId, 'project-alpha')
+    assert.ok(report.changes.includes('lockfile'), report.changes.join(','))
+    assert.match(report.notes[0]!, /旧建议不能复用/)
+    assert.equal(report.authorization, 'none')
   })
 })
 

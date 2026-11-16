@@ -68,11 +68,14 @@ test('an unregistered or missing root is unbound with exit 3, not a fake current
   })
 })
 
-test('a foreign project identity is refused and usage errors do not touch the filesystem', () => {
+test('a re-identified project reports the migration diff and is refused for reuse', () => {
   withFixture(({ dir, previous }) => {
-    const foreign = run(['--previous-facts', previous, '--root', join(dir, 'before'), '--project', 'project-other', '--now', NOW])
-    assert.equal(foreign.status, 5)
-    assert.equal(JSON.parse(foreign.stdout).status, 'foreign')
+    const moved = run(['--previous-facts', previous, '--root', join(dir, 'before'), '--project', 'project-other', '--now', NOW])
+    assert.equal(moved.status, 5)
+    const report = JSON.parse(moved.stdout)
+    assert.equal(report.status, 'reidentified')
+    assert.equal(report.previousProjectId, 'project-alpha')
+    assert.match(moved.stderr, /not reusable/)
 
     for (const args of [
       ['--previous-facts', previous, '--now', NOW],

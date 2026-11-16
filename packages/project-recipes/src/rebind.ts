@@ -25,8 +25,14 @@ export type RebindField = (typeof REBIND_FIELDS)[number]
 export const RebindReportSchema = z.strictObject({
   protocol: z.literal(REBIND_PROTOCOL),
   projectId: IdSchema,
-  /** `unbound` = the project has no registered root right now; `foreign` = previous facts are another project. */
-  status: z.enum(['current', 'changed', 'unbound', 'foreign']),
+  /**
+   * `unbound` = this project has no registered root right now;
+   * `reidentified` = the observation is a different project identity (a moved project re-registered
+   * under a new id); metadata differences are reported for migration, but nothing is reusable.
+   */
+  status: z.enum(['current', 'changed', 'unbound', 'reidentified']),
+  /** Set only for `reidentified`: the project the previous facts belonged to. */
+  previousProjectId: IdSchema.nullable(),
   changes: z.array(z.enum(REBIND_FIELDS)).max(REBIND_FIELDS.length).readonly(),
   previous: z
     .strictObject({ contentDigest: DigestSchema, observedAt: TimestampSchema, provider: z.string().trim().min(1).max(160) })
@@ -104,22 +110,28 @@ export function compareProjectFacts(previous: ProjectFacts, current: ProjectFact
     provider: current.provenance.provider,
     source: current.provenance.source,
   }
-  if (previous.projectId !== current.projectId)
+  if (previous.projectId !== current.projectId) {
+    const changes = changedFields(previous, current)
     return {
       protocol: REBIND_PROTOCOL,
       projectId: current.projectId,
-      status: 'foreign',
-      changes: [],
+      status: 'reidentified',
+      previousProjectId: previous.projectId,
+      changes,
       previous: previousIdentity,
       current: currentIdentity,
-      notes: [`上一次观察属于另一个项目（${previous.projectId}），不能复用为当前项目的建议。`],
+      notes: [
+        `项目身份已变化（${previous.projectId} → ${current.projectId}）；旧建议不能复用，下列字段差异仅供迁移核对：${changes.join(', ') || '无观察差异'}。`,
+      ],
       authorization: 'none',
     }
+  }
   if (contentDigest === previousIdentity.contentDigest)
     return {
       protocol: REBIND_PROTOCOL,
       projectId: current.projectId,
       status: 'current',
+      previousProjectId: null,
       changes: [],
       previous: previousIdentity,
       current: currentIdentity,
@@ -131,6 +143,7 @@ export function compareProjectFacts(previous: ProjectFacts, current: ProjectFact
     protocol: REBIND_PROTOCOL,
     projectId: current.projectId,
     status: 'changed',
+    previousProjectId: null,
     changes,
     previous: previousIdentity,
     current: currentIdentity,
@@ -140,21 +153,11 @@ export function compareProjectFacts(previous: ProjectFacts, current: ProjectFact
 }
 
 /** Observation without a registered root: the report says `unbound` instead of guessing a path. */
-const foreign = (previous: ProjectFacts, projectId: string): RebindReport => ({
-  protocol: REBIND_PROTOCOL,
-  projectId,
-  status: 'foreign',
-  changes: [],
-  previous: { contentDigest: factsContentDigest(previous), observedAt: previous.observedAt, provider: previous.provenance.provider },
-  current: null,
-  notes: [`请求的项目 ${projectId} 与上一次观察的项目 ${previous.projectId} 不一致；不能复用旧观察。`],
-  authorization: 'none',
-})
-
 const unbound = (projectId: string, previous: ProjectFacts): RebindReport => ({
   protocol: REBIND_PROTOCOL,
   projectId,
   status: 'unbound',
+  previousProjectId: previous.projectId === projectId ? null : previous.projectId,
   changes: [],
   previous: { contentDigest: factsContentDigest(previous), observedAt: previous.observedAt, provider: previous.provenance.provider },
   current: null,
@@ -197,8 +200,6 @@ export function rebindRegisteredProject(input: RebindInput): RebindResult {
   const previous = parsePrevious(input.previous)
   assertClock(input.observedAt)
   const projectId = input.projectId ?? previous.projectId
-  if (input.projectId !== undefined && input.projectId !== previous.projectId)
-    return { facts: null, report: foreign(previous, projectId) }
   const root = input.roots.rootFor(projectId)
   if (root === undefined) return { facts: null, report: unbound(projectId, previous) }
   const observation = observeProjectMetadata({
@@ -223,8 +224,6 @@ export function reobserveProjectFacts(input: {
   const previous = parsePrevious(input.previous)
   assertClock(input.observedAt)
   const projectId = input.projectId ?? previous.projectId
-  if (input.projectId !== undefined && input.projectId !== previous.projectId)
-    return { facts: null, report: foreign(previous, projectId) }
   try {
     const observation = observeProjectMetadata({
       root: input.root,

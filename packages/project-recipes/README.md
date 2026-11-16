@@ -22,7 +22,7 @@ application's existing preview and explicit user confirmation.
 | `match.ts` | pure function | `matchRecipe({ facts, configuration, kind, selection, now })` → deterministic result. |
 | `draft.ts` | `project-recipe-draft/1` | Result schema plus `draftRevision` / `parseProjectRecipeDraft`. |
 | `preview.ts` | `project-recipe-create-work-fields/1` | Reshape a `draft` into the existing `create_work` command input, with precise stale-input refusal. |
-| `rebind.ts` | `project-facts-rebind/1` | Compare a previous observation with a re-observed root: `current`/`changed`/`unbound`/`foreign`, field-level changes, no root or grant in the report. |
+| `rebind.ts` | `project-facts-rebind/1` | Compare a previous observation with a re-observed root: `current`/`changed`/`unbound`/`reidentified`, field-level changes, no root or grant in the report. |
 
 ## Guarantees
 
