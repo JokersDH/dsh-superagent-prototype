@@ -1,0 +1,78 @@
+{
+  "protocol": "wave33-main-integration/1",
+  "date": "2026-11-16",
+  "source": "fc38bf65b6a05a7771fc58829152c512255a6a29",
+  "baseline": "58b4e4c804291cf414c91a76b4b784a917d2dfba",
+  "scope": "REGISTERED_INTERNAL_PORT_AND_REAL_WORKBENCH_CONSUMERS",
+  "nodePort": {
+    "originalRegistrationClone": true,
+    "afterRegisterPolicyReadyCurrent": true,
+    "autoAttach": false,
+    "publicHTTPExposure": false,
+    "originalFreshGuardUnchanged": true,
+    "newLifecycle": false,
+    "callerSource": "f4a99ce1fa1ac822659d734196733990d8fa3a2e",
+    "callerByteExact": true,
+    "contractsTypeAdaptedWithExistingRuntimeProducer": true
+  },
+  "workbench": {
+    "FSource": "fae41f8c1eb0fbd6f7044dbc4ab6e4523e5efd53",
+    "exactSources": [
+      "insights.ts",
+      "recipes.ts",
+      "support.ts",
+      "trial.css",
+      "index.ts"
+    ],
+    "TrialWorkspaceAdaptation": "Only remove a visible sentence naming internal main/H ownership",
+    "recipeRetryUsesOriginalThreePreviews": true,
+    "reloadRevisionInScopeKey": true,
+    "packageIdentityUnknownIsExplicit": true,
+    "originalFormAndWindowPreserved": true
+  },
+  "checks": {
+    "attachedRealStore": 4,
+    "trial": 20,
+    "backend": 13,
+    "recipeBrowser": 9,
+    "observationBrowser": 13,
+    "consoleStrict": "PASS",
+    "coordinatorStrict": "PASS",
+    "directNativeAndCallerStrict": "PASS",
+    "consoleBuild": "PASS",
+    "scopeRetryBusinessCommands": 0,
+    "scopeRetryEventDelta": 0
+  },
+  "browserReport": "reports/releases/wave33-integration/recipes-browser/browser-report.json",
+  "observationReport": "reports/releases/wave33-integration/observation-browser/browser-report.json",
+  "actualControlledAccepts": 2,
+  "sourceWorktreeClean": true,
+  "initialFailure": {
+    "case": "old main recipe test asserted extra exclusions safe when restricted selection cannot preserve them",
+    "result": "19PASS_1FAIL",
+    "resolution": "Imported matching F test with stricter scope/effect expectation, added declared mismatch negative; final20PASS, no permission loosened"
+  },
+  "visual": {
+    "desktopAndMobileInspected": true,
+    "noHorizontalOverflow": true,
+    "existingCSSAdvisories": true,
+    "bundleSizeWarning": true
+  },
+  "newSharedWireSchema": false,
+  "rootLockChanged": false,
+  "newDependencies": 0,
+  "newMigrations": 0,
+  "candidateWorktreesEdited": false,
+  "newTarCreated": false,
+  "newPersistentServiceStarted": false,
+  "userTwelveServicesTouched": false,
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "fullOriginalWorkRecovery": false,
+  "actualNativeAdmission": false,
+  "independentInstalledAdmission": false,
+  "valueBenefitAdmission": false,
+  "privateTargetAdmission": false,
+  "releaseApproved": false,
+  "completionEstimateChanged": false
+}
