@@ -142,7 +142,7 @@ const { facts, notes } = observer.observe({ projectId, observedAt: new Date().to
 
 - 根目录必须**绝对路径**、已存在、是目录；拒绝 `/`、用户 home、未登记项目。根被替换时读取会拒绝（读完再核对父目录 realpath）。
 - 只打开根目录下白名单名字：`package.json`、`tsconfig.json`、`pnpm-workspace.yaml`、`package-lock.json`、`pnpm-lock.yaml`、`npm-shrinkwrap.json`、`yarn.lock`、`bun.lockb`、`pyproject.toml`、`go.mod`、`Cargo.toml`、`pom.xml`、`build.gradle`。不递归、不进子目录。
-- 每次都 `O_NOFOLLOW` + `fstat`：符号链接、非普通文件一律拒绝。
+- 每次都 `O_NOFOLLOW` + `fstat`：符号链接、非普通文件一律拒绝；只读文件可正常读取，权限拒绝（EACCES）与读中断都以 `unreadable` 返回，不抛原始 fs 错误。
 - 打开前后比对 `dev/ino/size`，读完再比对 `size/mtime`：文件在读取期间被替换或改写时以 `replaced` / `changed_during_read` 拒绝，不会把不完整的内容当完整事实。
 - 默认上限：`package.json` 256 KiB，锁文件 4 MiB，最多读 12 个文件，整次观察 8 MiB；上限本身也受校验：`MetadataLimits` 必须是有限安全整数且在允许范围内，`0`/负数/小数/`NaN`/`Infinity`/超大预算一律 `invalid_limits`，不能靠配置预算绕过边界。
 - 只解析 `package.json` 的 JSON；YAML/锁文件只做存在性判断或有界哈希。
@@ -373,12 +373,13 @@ node tools/project-recipes/cli.ts --previous-facts /tmp/old-facts.json \
 ```ts
 import { describeProjectRecipes } from '@personal-agent/project-recipes'
 const described = describeProjectRecipes()
-// { protocol: 'project-recipes-module/1', version, catalog: { id, version, digest },
+// { protocol: 'project-recipes-module/1', version,
+//   catalog: { id, version, digest }, contracts: { version, apiMajor },
 //   kinds, protocols: { facts, draft, fields, observer, rebind }, capabilities,
 //   issueCodes, previewErrorCodes, configurationProtocols, authority: 'none' }
 ```
 
-D 冻结一个包、E 验一个精确 tar 时，可比较 source 与安装产物里的这份描述：contracts 协议、catalog 摘要、issue/error 词表一致才算同一版本。`capabilities` 让消费者在接线前判断可选能力（如旧包缺 `rebind` 时不要调用），普通预览/手动委托不受影响。描述里没有路径、凭据或授权字段；`version` 与 `package.json` 由测试绑定。CLI 也可直接输出：`node tools/project-recipes/cli.ts --describe`。
+D 冻结一个包、E 验一个精确 tar 时，可比较 source 与安装产物里的这份描述：contracts 协议、catalog 摘要、issue/error 词表一致才算同一版本。`capabilities` 让消费者在接线前判断可选能力（如旧包缺 `rebind` 时不要调用，`supportsCapability(description, 'rebind')` 返回 false），普通预览/手动委托不受影响；`contracts` 记录构建时的 wire 版本与 API major。描述里没有路径、凭据或授权字段；`version` 与 `package.json` 由测试绑定。CLI 也可直接输出：`node tools/project-recipes/cli.ts --describe`。
 
 ## 7.7 结构化重验原因（main/F 可直接渲染）
 
@@ -438,6 +439,8 @@ D 冻结一个包、E 验一个精确 tar 时，可比较 source 与安装产物
 - 不枚举 monorepo 成员（不解析 `pnpm-workspace.yaml` 内容）；只接受显式声明原子。
 - 不探测包管理器实际版本（不执行 `--version`）；只记录声明值。
 - 不判断测试是否通过、不估算节省的时间。
+- **机器 FAIL→修复→同一 Work 重检**在受控 fixture 下不可达：fixture 模式的完成标准固定为产品自有 `check-fixture-output`，项目登记检查与 `projectSettings.authorize` 只在提供 native 配置时存在；`fail-layer-held.case.ts` 用「项目测试故意失败仍然 delivered」证明这一点，故该层 HELD（真实 FAIL 由 main/H 的可信 verifier 承担）。
+- A/D 真实 bundle 备份恢复属外部；`restore-continuity.case.ts` 只证明同一非空 Store 重开后的身份/字节连续性，不冒充 bundle 恢复。
 
 ---
 
@@ -451,7 +454,7 @@ pnpm --dir packages/contracts build
 
 # 纯库
 ./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.json
-node --test packages/project-recipes/test/*.case.ts     # 98 tests
+node --test packages/project-recipes/test/*.case.ts     # 102 tests
 ./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.build.json
 
 # CLI 与真实 Application 消费者（后者需要产品包构建）

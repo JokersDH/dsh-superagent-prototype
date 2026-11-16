@@ -1,0 +1,258 @@
+{
+  "protocol": "project-recipes-wave35-status/1",
+  "owner": "J",
+  "date": "2026-11-16",
+  "branch": "codex/g5-project-recipes",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-j",
+  "baseline": "db8647ea059c103fd17b8640c927182b663603fd",
+  "mergedOriginMain": "5860da13 merged as local merge; includes 16b04abb and 8cd709ca (main-owned, not modified)",
+  "dirty": { "state": "clean at runtime source 5b1ef235", "note": "Owned paths only; no reset, no state clearing, no checkout." },
+  "goal": "Three continuous engineering packages with three complete outcomes each: ordinary project delivery, migration/identity closure, configuration evolution and colleague handoff.",
+  "outcomes": [
+    {
+      "id": "J1",
+      "title": "ordinary project applicability for the three delegations",
+      "status": "PASS_CONTROLLED",
+      "implementation": ["packages/project-recipes/src/match.ts", "packages/project-recipes/src/observe.ts"],
+      "actualConsumer": "main authenticated preview -> original NewWorkForm -> original Application",
+      "positive": [
+        "plain Node, npm and pnpm single packages get drafts for all three kinds with project-local profile/check/criteria",
+        "declared atoms, exclusions and expiry come from the same current configuration"
+      ],
+      "independentNegative": [
+        "undeclared atom -> needs_input; unknown project -> forbidden",
+        "declared manager without a lockfile gets an actionable note, never a guessed install or command",
+        "scripts stay names-only; no install/run/register"
+      ],
+      "commands": [
+        { "command": "node --test packages/project-recipes/test/*.case.ts", "exit": 0, "tests": 102, "pass": 102 },
+        { "command": "node --test tools/project-recipes/test/first-user.case.ts", "exit": 0, "tests": 3, "pass": 3 }
+      ],
+      "remaining": ["monorepo members remain explicit-atomic only"]
+    },
+    {
+      "id": "J2",
+      "title": "original project delivery and real failure recovery",
+      "status": "PASS_CONTROLLED_WITH_FAIL_LAYER_HELD",
+      "implementation": [
+        "tools/project-recipes/test/two-project-delivery.case.ts",
+        "tools/project-recipes/test/fail-recovery.case.ts",
+        "tools/project-recipes/test/fail-layer-held.case.ts"
+      ],
+      "actualConsumer": "original Application/Store/check/currentCandidate/manualaccept via createProductRuntime",
+      "positive": [
+        "two registered roots: preview -> create -> fixture attempt -> check/candidate -> ready -> manual accept -> delivered",
+        "artifact bytes readable; same Work revise_work reaches revision 2 and delivers; reopen verifies both works",
+        "missing atom repaired by choosing a declared atom, then delivered; config revision change invalidates an applied draft and re-reads"
+      ],
+      "independentNegative": [
+        "accept not offered before readiness; cross-project candidate rejected; replay after a legal accept is stale",
+        "same commandId with a different body is refused as conflict"
+      ],
+      "held": {
+        "layer": "machine FAIL -> repair -> same-Work re-check",
+        "reason": "In controlled fixture mode the completion contract is the product's own check-fixture-output; project settings/authorize and the project check only exist with an admitted native configuration (outside this wave's zero-native budget).",
+        "evidence": "fail-layer-held.case.ts shows a deliberately failing project suite still delivers under the fixture check, so the layer is not claimed as tested; main/H own the real verifier."
+      },
+      "commands": [
+        { "command": "node --test tools/project-recipes/test/two-project-delivery.case.ts", "exit": 0, "tests": 1, "pass": 1 },
+        { "command": "node --test tools/project-recipes/test/fail-recovery.case.ts", "exit": 0, "tests": 3, "pass": 3 },
+        { "command": "node --test tools/project-recipes/test/fail-layer-held.case.ts", "exit": 0, "tests": 1, "pass": 1 },
+        { "command": "node --test tests/integration/project-recipes.case.mjs", "exit": 0, "tests": 5, "pass": 5 },
+        { "command": "node tests/integration/project-recipes-browser.mjs reports/project-recipes/wave35-browser", "exit": 0, "cases": 9, "pass": 9, "sourceCommit": "5b1ef235", "sourceWorktreeClean": true, "acceptedWorks": 2 }
+      ],
+      "remaining": ["real vendor/model/native turns remain 0", "no fake verifier or E assertion change"]
+    },
+    {
+      "id": "J3",
+      "title": "explainable revalidation under configuration and fact change",
+      "status": "PASS",
+      "implementation": ["packages/project-recipes/src/preview.ts"],
+      "actualConsumer": "main/F render structured reasons; previewInputs keeps its error contract",
+      "positive": [
+        "one closed reason vocabulary: configuration version/schema/revision/removal, facts invalid/changed/future/expired, expiry, clock",
+        "stable content digest: re-reading unchanged bytes stays current"
+      ],
+      "independentNegative": [
+        "future/expired observations and invalid clocks are never current",
+        "observationComplete=false when the current facts have gaps, so 'unchanged' is not reported as complete"
+      ],
+      "commands": [
+        { "command": "node --test packages/project-recipes/test/currency.case.ts", "exit": 0, "tests": 8, "pass": 8 },
+        { "command": "node --test packages/project-recipes/test/freshness.case.ts", "exit": 0, "tests": 5, "pass": 5 }
+      ],
+      "remaining": ["main keeps the fresh server clock and the registered root"]
+    },
+    {
+      "id": "J4",
+      "title": "project re-identification on the current registration",
+      "status": "PASS_CANDIDATE_ONLY",
+      "implementation": ["packages/project-recipes/src/rebind.ts"],
+      "actualConsumer": "main's own { rootFor } mapping; CLI --previous-facts",
+      "positive": [
+        "same id on a new root: changed with field-level differences",
+        "same content in a new root: current, with the root identity explicitly left to the caller",
+        "different id with identical content: reidentified with no field changes and no reuse"
+      ],
+      "independentNegative": [
+        "no registered root -> unbound; an authorized-root violation is an error",
+        "malformed previous facts or invalid clock refused; no root/key/grant in the report"
+      ],
+      "commands": [{ "command": "node --test packages/project-recipes/test/rebind.case.ts", "exit": 0, "tests": 11, "pass": 11 }],
+      "remaining": ["main has not imported rebind.ts; no default migration surface"]
+    },
+    {
+      "id": "J5",
+      "title": "history and new authorization after a non-empty backup",
+      "status": "HELD_EXTERNAL_BUNDLE",
+      "implementation": ["tools/project-recipes/test/restore-continuity.case.ts"],
+      "actualConsumer": "same ProductStore/Application; registration of the moved root through main",
+      "positive": [
+        "a delivered work, its candidate and every artifact byte stay under the original project id after reopen",
+        "the moved root registers as a new id and receives its own fresh draft"
+      ],
+      "independentNegative": [
+        "the old draft cannot cross identities (stale facts)",
+        "rebind reports reidentified; the old result is not new permission"
+      ],
+      "held": {
+        "layer": "A/D real bundle backup -> restore -> new authorization",
+        "reason": "The authoritative bundle bytes belong to A/D; the J-side test reopens the same store and explicitly does not claim bundle restore.",
+        "next": "Once A/D publish a frozen cohort, the same consumer can be pointed at the restored store without changes."
+      },
+      "commands": [{ "command": "node --test tools/project-recipes/test/restore-continuity.case.ts", "exit": 0, "tests": 1, "pass": 1 }],
+      "remaining": ["real backup/restore cohort from A/D"]
+    },
+    {
+      "id": "J6",
+      "title": "capability description and version closure",
+      "status": "PASS_CANDIDATE_ONLY",
+      "implementation": ["packages/project-recipes/src/module.ts", "tools/project-recipes/cli.ts --describe"],
+      "actualConsumer": "CLI, main module calls and D inventories compare one identity",
+      "positive": [
+        "description now includes contracts { version, apiMajor } and capabilities; supportsCapability() detects an older package",
+        "CLI --describe prints exactly the library description"
+      ],
+      "independentNegative": [
+        "a description without rebind yields false instead of a crash",
+        "no path, credential or authority in the description"
+      ],
+      "commands": [
+        { "command": "node --test packages/project-recipes/test/module.case.ts", "exit": 0, "tests": 5, "pass": 5 },
+        { "command": "node tools/project-recipes/cli.ts --describe", "exit": 0 },
+        { "command": "npm pack --dry-run", "exit": 0, "observed": "42 files / 50,701 bytes" }
+      ],
+      "remaining": ["npm pack --dry-run is a listing, not deployable-product proof"]
+    },
+    {
+      "id": "J7",
+      "title": "versioned project configuration and daily editing",
+      "status": "HELD_NATIVE_SETTINGS",
+      "implementation": ["packages/project-recipes/src/preview.ts", "packages/project-recipes/src/match.ts"],
+      "actualConsumer": "main's ProjectSettings command (not exercised here)",
+      "positive": [
+        "J-side revalidation already treats configuration revision/schema/removal as distinct reasons, so a changed declaration invalidates old drafts"
+      ],
+      "independentNegative": [
+        "no hidden check registration or grant widening is performed by J"
+      ],
+      "held": {
+        "layer": "two projects edited through the product settings then re-previewed while old contracts stay isolated",
+        "reason": "In fixture mode the runtime normalizes every project to the fixed src/ scratch grant and derives criteria from the fixture check; ProductProjectSettings (the versioned declaration write path) is only constructed with a native configuration, which is outside the zero-native budget.",
+        "next": "main/H can run this with an admitted native config; J's currency reasons already cover the data side."
+      },
+      "commands": [],
+      "remaining": ["native-config settings evolution"]
+    },
+    {
+      "id": "J8",
+      "title": "portable tool and boundary behaviour",
+      "status": "PASS",
+      "implementation": ["packages/project-recipes/src/observe.ts", "tools/project-recipes/cli.ts"],
+      "actualConsumer": "the real CLI plus the same observer main uses",
+      "positive": [
+        "roots with spaces and Chinese characters observe and preview normally",
+        "read-only metadata files are readable; new reports are 0600 and exclusive"
+      ],
+      "independentNegative": [
+        "permission-denied and interrupted reads now return a bounded `unreadable` refusal instead of a raw fs error (fixed this wave)",
+        "an old facts protocol is refused with exit 5; existing output files are never overwritten"
+      ],
+      "commands": [
+        { "command": "node --test packages/project-recipes/test/observe.case.ts", "exit": 0, "tests": 24, "pass": 24 },
+        { "command": "node --test tools/project-recipes/test/cli.case.ts", "exit": 0, "tests": 12, "pass": 12 }
+      ],
+      "remaining": ["package listing is not an installed-product verdict"]
+    },
+    {
+      "id": "J9",
+      "title": "long-term hand-off on one selected runtime",
+      "status": "PASS_CONTROLLED",
+      "implementation": ["tools/project-recipes/test/two-project-delivery.case.ts"],
+      "actualConsumer": "same runtime: two works, a same-Work revision and a reopen",
+      "positive": [
+        "two projects deliver; one work is revised to contract revision 2 and delivered again on the same runtime",
+        "closing and reopening the state shows the delivered works and their artifacts"
+      ],
+      "independentNegative": [
+        "stale and cross-project accepts stay refused; no fixture registry substitutes a real Work"
+      ],
+      "commands": [{ "command": "node --test tools/project-recipes/test/two-project-delivery.case.ts", "exit": 0, "tests": 1, "pass": 1 }],
+      "remaining": ["D successor freeze and E installed verdict; cross-machine/restore/value stay separate"]
+    }
+  ],
+  "evidence": {
+    "package": { "typecheckExit": 0, "tests": 102, "pass": 102, "fail": 0, "buildExit": 0 },
+    "tools": { "typecheckExit": 0, "tests": 46, "pass": 46, "fail": 0 },
+    "exampleExit": 0,
+    "wave35VerifierExit": 0,
+    "mainIntegration": { "command": "node --test tests/integration/project-recipes.case.mjs", "exit": 0, "tests": 5, "pass": 5 },
+    "mainBrowser": { "command": "node tests/integration/project-recipes-browser.mjs reports/project-recipes/wave35-browser", "exit": 0, "cases": 9, "pass": 9, "sourceCommit": "5b1ef235", "sourceWorktreeClean": true, "acceptedWorks": 2 },
+    "packDryRun": { "files": 42, "bytes": 50701 }
+  },
+  "integration": {
+    "alreadyInMain": ["wave-30 J five sources", "0073/0077 preview and original form", "23d5a98e native callbacks/support", "distribution build list includes project-recipes"],
+    "candidateOnly": ["rebind.ts", "module.ts contracts/capabilities and --describe", "draftCurrency", "delivery/fail/restore tests"],
+    "minimalMainIntegration": "use draftCurrency reasons for revalidation UI and call rebindRegisteredProject with main's own rootFor when the migration surface is approved"
+  },
+  "packageIdentity": {
+    "R1": { "status": "PINNED_UNMODIFIED", "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2", "build": "8296720d8a25f38c", "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543", "bytes": 20481470, "entries": 6849, "installedByJ": false },
+    "R2": { "status": "SOURCE_READY_TAR_NOT_CREATED", "runtimeSource": "5b1ef235", "pack": { "files": 42, "bytes": 50701 } },
+    "installed": false,
+    "zip": "not created"
+  },
+  "layers": {
+    "source": "PASS (102 library / 46 tools / strict / build / example / wave-35 verifier)",
+    "controlled": "PASS (two roots delivery + same-Work revision + fail-recovery + restored-store continuity; main 5 integration + 9 browser)",
+    "installed": "NOT_REACHED (no tar/ZIP built or installed)",
+    "native": "NOT_APPLICABLE (real vendor/model/native 0)",
+    "recovered": "NOT_REACHED (B/I same-Work recovery and slots are outside this block)",
+    "value": "NOT_CLAIMED"
+  },
+  "held": [
+    "machine FAIL -> repair -> same-Work re-check (fixture check only; needs admitted native config)",
+    "A/D real bundle restore cohort",
+    "product settings evolution through ProjectSettings (native config only)"
+  ],
+  "remaining": [
+    "main re-import of rebind.ts/module.ts/preview.ts/match.ts/observe.ts",
+    "D successor freeze after the integrated runtime is determined, then E installed verdict on one exact tar",
+    "A/D bundle cohort and native verification for the two HELD layers"
+  ],
+  "limits": {
+    "realModelTurns": 0,
+    "nativeTurns": 0,
+    "vendorCalls": 0,
+    "dependencyInstalls": 0,
+    "executedProjectCommands": 0,
+    "checkRegistrations": 0,
+    "sqlWrites": 0,
+    "executionLifecycles": 0,
+    "userServicesTouched": 0,
+    "newWorktreesCreated": 0
+  },
+  "ownership": {
+    "owned": ["packages/project-recipes/", "tools/project-recipes/", "docs/project-recipes/", "reports/project-recipes/"],
+    "untouchedByDesign": ["pnpm-lock.yaml", "root package.json", "packages/contracts/", "apps/", "A/B/C/D/E/F/G/H/I paths"]
+  }
+}

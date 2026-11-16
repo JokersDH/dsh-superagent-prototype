@@ -2,7 +2,8 @@
 
 工作树 `/Users/hh/Desktop/joker/superagent-agent-j`，分支 `codex/g5-project-recipes`。
 
-- 当前（wave-34）机读状态：[wave34-status.json](wave34-status.json)
+- 当前（wave-35）机读状态：[wave35-status.json](wave35-status.json)
+- 历史（wave-34）：[wave34-status.json](wave34-status.json)
 - 历史（wave-33）：[wave33-status.json](wave33-status.json)
 - 历史（wave-32）：[wave32-status.json](wave32-status.json)
 - 历史（wave-31）：[wave31-status.json](wave31-status.json)
@@ -13,7 +14,51 @@
 
 ---
 
-# wave-34（2026-11-16）
+# wave-35（2026-11-16）
+
+起点 `db8647ea`，合并 `origin/main`（`5860da13`；含 `16b04abb` 与 `8cd709ca`，均为 main-owned，未改）后执行三个连续工程包、九个完整成果。
+
+## 包一：原项目日常交付
+
+- **J1 适用性**：普通 Node/npm/pnpm 三形态 × 三 kind；缺 atom → `needs_input`、未知项目 → `forbidden`；已声明 manager 但缺锁文件给可行动 note；脚本仍只是名字数据。
+- **J2 交付与失败恢复**：两注册根交付＋同 Work `revise_work` 到 revision 2 并再次 delivered＋重开复核；`fail-recovery.case.ts` 覆盖缺失输入修复、同 commandId 换 body 冲突、配置 revision 变化后旧 apply 失效、项目切换隔离。**机器 FAIL→修复→同 Work 重检 HELD**：`fail-layer-held.case.ts` 证明受控 fixture 的完成标准固定为 `check-fixture-output`，故意失败的测试套件仍会 delivered，因此该层未被冒充已测；真实 FAIL 由 main/H 的可信 verifier 承担。
+- **J3 结构化重验**：`draftCurrency()` 的封闭 reason code 与 `observationComplete`；同内容重读不失效，未来/过期/非法时钟绝不当 current。
+
+## 包二：迁移、身份与版本闭包
+
+- **J4 重识别**：同 id 换根/变内容 → `changed`；同内容换根 → `current`（根身份留给调用方）；不同 id 同内容 → `reidentified`（无差异也不复用）；无根 → `unbound`；越权根 → 错误。
+- **J5 非空恢复后的历史与新授权**：`restore-continuity.case.ts` 证明同一非空 Store 重开后旧 Work/候选/全部 artifact 字节按原 id 可核，搬迁树登记为新 id 后获得自己的 draft、旧 draft 跨 id 为 stale。**A/D 真实 bundle 恢复 HELD**，该测试明确不冒充 bundle 恢复。
+- **J6 版本闭包**：模块描述新增 `contracts { version, apiMajor }` 与 `capabilities`，`supportsCapability()` 让消费者识别旧包；CLI `--describe` 输出同一身份。
+
+## 包三：配置演进与同事交接
+
+- **J7 版本化声明与日常编辑 HELD**：fixture 模式把所有项目归一到固定 `src/` scratch grant，`ProductProjectSettings`（声明写入路径）只在 native 配置下构造；J 侧 currency 已覆盖数据面，运行面留给 main/H。
+- **J8 边界操作**：带空格与中文的根正常；只读文件可读；新报告 0600 且独占；**权限拒绝/读中断以前抛原始 EACCES，本轮修为有界 `unreadable`**（真实产品修复）；旧 facts 协议 exit 5。
+- **J9 长期交接**：同一 runtime 两 Work、同 Work 修订到 revision 2 并 delivered，重开后仍可核；D 冻结后继、E 独立验包仍属外部。
+
+## 实际验证
+
+| 命令 | exit | 结果 |
+| --- | --- | --- |
+| `./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.json` | 0 | strict |
+| `node --test packages/project-recipes/test/*.case.ts` | 0 | 102 tests / 102 pass |
+| `./node_modules/.bin/tsc -p packages/project-recipes/tsconfig.build.json` | 0 | dist |
+| `./node_modules/.bin/tsc -p tools/project-recipes/tsconfig.json` | 0 | strict |
+| `node --test tools/project-recipes/test/*.case.ts` | 0 | 46 tests / 46 pass |
+| `node --test tests/integration/project-recipes.case.mjs` | 0 | main 真实链路 5/5 |
+| `node tests/integration/project-recipes-browser.mjs reports/project-recipes/wave35-browser` | 0 | 9/9，clean source `5b1ef235`，2 个人工接受 |
+| `node agent-tasks/product-wave-35/verify.mjs` | 0 | 静态派工校验 |
+| `npm pack --dry-run` | 0 | 42 files / 50,701 B |
+
+## 已进 main / 仅候选 / 安装
+
+已在 main：wave-30 J 五源、0073/0077 预览与原表单、`23d5a98e` 原回调/support、发行构建列表含 `project-recipes`。仅候选：`rebind.ts`、`module.ts` 的 contracts/capabilities 与 `--describe`、`draftCurrency`、各类消费者测试。未安装：R1 829 原样保留（`82ee5b8f` / `8296720d8a25f38c` / tar `04926739…`）；R2 后继 source `5b1ef235` + dist + pack 列表，**tar/ZIP 未创建**。
+
+分层：source/controlled PASS；installed NOT_REACHED；native 0；recovered NOT_REACHED；value 不声称。HELD：机器 FAIL 层、A/D 真实 bundle、native 设置演进。
+
+---
+
+# 历史：wave-34（2026-11-16）
 
 起点 `f6a1bf59`，合并 `origin/main`（`6b306514`，合并为 `d8aca213`；含 `23d5a98e` 的原回调与 support 下载）后执行两个连续工程包、每包三个完整成果。
 
