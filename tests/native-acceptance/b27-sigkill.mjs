@@ -42,7 +42,7 @@ const runChild = (mode, registration) => new Promise(resolve => {
     setTimeout(() => {
       // Safe tooling: capture the complete birth identity, then signal only after a FRESH verification.
       // The probe's own spawn intent (executable + ordered argv), not a ps snapshot or pgrep link.
-      const captured = adoptSpawn(child.pid, { executable: process.execPath, argv: [process.execPath, CHILD_ENTRY], expectedChildren: [] })
+      const captured = adoptSpawn(child, { expectedChildren: [] })
       const sent = captured.ok ? signalOwned(captured.handle, 'SIGKILL') : { sent: false, refused: true, unknown: captured.unknown }
       writeFileSync(join(root, 'kill-proof.json'), JSON.stringify({ captured: captured.ok, sent }, null, 2))
     }, 1200)

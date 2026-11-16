@@ -83,28 +83,32 @@ function registerIntent(pid, intent) {
     capturedAt: new Date().toISOString(),
   })
   const handleId = randomUUID()
-  registry.set(handleId, { record: record, deps: deps })
-  return { ok: true, handle: Object.freeze({ handleId, record }), record }
+  const handle = Object.freeze({ handleId, record })
+  registry.set(handleId, { handle, record, deps })
+  return { ok: true, handle, record }
 }
 
 /** Spawn a process this probe owns and register its immutable spawn intent. */
 export function spawnOwned(executable, args, intent = {}) {
   const child = deps.spawn(executable, args, intent.spawnOptions ?? { stdio: ['ignore', 'pipe', 'pipe'] })
   if (!child || !Number.isSafeInteger(child.pid)) return { ok: false, unknown: 'spawn_failed', child }
-  const argv = [executable, ...args]
-  const registered = registerIntent(child.pid, { executable, argv, ...intent })
-  return { ...registered, child, argv }
+  const registered = adoptSpawn(child, intent)
+  return { ...registered, child, argv: [executable, ...args] }
 }
 
 /** Adopt a child the caller spawned itself, using the caller's spawn intent (never a ps-derived one). */
-export function adoptSpawn(childOrPid, intent) {
-  let pid = Number.isSafeInteger(childOrPid) ? childOrPid : childOrPid?.pid
+export function adoptSpawn(childOrPid, intent = {}) {
+  // A numeric pid is NEVER ownership: the caller must hand over the original ChildProcess object whose
+  // spawnfile/spawnargs are the process's own spawn metadata. ps-copied strings and bare pids are refused.
+  if (!childOrPid || typeof childOrPid !== 'object') return { ok: false, unknown: 'numeric_pid_not_accepted' }
+  const pid = childOrPid.pid
   if (!Number.isSafeInteger(pid) || pid <= 0) return { ok: false, unknown: 'invalid_pid' }
-  const executable = intent?.executable
-  const argv = intent?.argv
-  if (typeof executable !== 'string' || executable.length === 0) return { ok: false, unknown: 'no_spawn_executable' }
-  if (!Array.isArray(argv) || argv.length === 0) return { ok: false, unknown: 'no_spawn_argv' }
+  const executable = childOrPid.spawnfile
+  const argv = childOrPid.spawnargs
+  if (typeof executable !== 'string' || executable.length === 0) return { ok: false, unknown: 'not_a_child_process' }
+  if (!Array.isArray(argv) || argv.length === 0) return { ok: false, unknown: 'not_a_child_process' }
   if (argv[0] !== executable) return { ok: false, unknown: 'argv_executable_disagree' }
+  if (Array.isArray(intent.argv) && !sameTokens(intent.argv, argv)) return { ok: false, unknown: 'intent_differs_from_spawn' }
   // root/config/operation are captured from the spawn intent and must be tokens OF that intent; they are
   // never re-derived from the process being checked.
   for (const [name, value] of [['root', intent.root], ['config', intent.config], ['operation', intent.operation]]) {
@@ -119,7 +123,8 @@ export function born(pid, intent) { return adoptSpawn(pid, intent) }
 function lookup(handle) {
   if (!handle || typeof handle.handleId !== 'string') return { ok: false, unknown: 'no_handle' }
   const entry = registry.get(handle.handleId)
-  if (!entry || entry.record !== handle.record) return { ok: false, unknown: 'unknown_handle' }
+  // The capability is THIS handle object, not the id/record it carries: a copied object has no authority.
+  if (!entry || entry.handle !== handle) return { ok: false, unknown: 'unknown_handle' }
   if (entry.deps !== deps) return { ok: false, unknown: 'handle_from_other_tool' }
   return { ok: true, record: entry.record }
 }

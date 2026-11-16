@@ -81,7 +81,8 @@ try {
   const pidA = first.pid
   // Kill through the safe tool: capture A's complete birth identity, then signal once it is re-verified.
   // The probe's own spawn intent (executable + ordered argv); nothing is derived from the pid.
-  const aCaptured = adoptSpawn(pidA, { executable: process.execPath, argv: [process.execPath, CHILD], expectedChildren: [] })
+  // Authority comes from the original ChildProcess object (its own spawnfile/spawnargs), not the pid.
+  const aCaptured = adoptSpawn(first.child, { expectedChildren: [] })
   const aSent = aCaptured.ok ? signalOwned(aCaptured.handle, 'SIGKILL') : { sent: false, refused: true, unknown: aCaptured.unknown }
   let diedBy = null
   for (let index = 0; index < 100 && diedBy === null; index += 1) {
@@ -141,7 +142,7 @@ try {
 } finally {
   for (const child of children) {
     // Cleanup goes through the same tool, so even our own leftovers are identity-checked before a signal.
-    const captured = adoptSpawn(child.pid, { executable: process.execPath, argv: [process.execPath, CHILD], expectedChildren: [] })
+    const captured = adoptSpawn(child, { expectedChildren: [] })
     if (captured.ok) signalOwned(captured.handle, 'SIGKILL')
   }
   try { await runner?.close() } catch {}

@@ -16,15 +16,18 @@ import type { RuntimeProducer } from './contracts.ts'
 export type AttachedFact = z.infer<typeof CriticalFactSchema>
 export type AttachedCommand = z.infer<typeof RunnerCommandSchema>
 export type AttachedReceipt = { factId: string; persisted: true; seq: number }
-export type AttachedPayloadRequest = { requestId: string; ref: string; offset: number; length: number }
-export type AttachedPayloadChunk = { total: number; digest: string; base64: string; offset: number; length: number }
+/**
+ * The module's payload-read request carries `reference` (the immutable payload ref), never `ref`, and the
+ * reply `value` is the ORIGINAL payload itself - not a chunk envelope from a store reader.
+ */
+export type AttachedPayloadRequest = { requestId: string; reference: string; offset: number; length: number }
 export type AttachedNativeIntent = { id: string; command: AttachedCommand }
 
 export type AttachedAttemptCallbacks = {
   /** Durable ingress. Receipts come from the caller's original store; this module never synthesizes one. */
   fact(fact: AttachedFact): Promise<AttachedReceipt>
-  /** Original immutable payload store read; a caller without one leaves this undefined. */
-  payload?(request: AttachedPayloadRequest): Promise<AttachedPayloadChunk>
+  /** Original immutable payload store read; the returned value is the payload body itself. */
+  payload?(request: AttachedPayloadRequest): Promise<unknown>
   /** Original main/Broker fresh native-write guard. Undefined means every intent is refused. */
   nativeWrite?(intent: AttachedNativeIntent): Promise<{ allowed: boolean; reason?: string }>
 }
@@ -78,9 +81,16 @@ export function attachRunnerAttempt(input: AttachAttemptInput): AttachedAttempt 
       return
     }
     if (request.type === 'payload-read') {
-      if (!input.callbacks.payload) { served.refused += 1; await client.channelReply!(input.leaseId, { v: 1, type: 'payload-refused', id: (request as { requestId: string }).requestId, requestId: (request as { requestId: string }).requestId, reason: 'no_payload_store' }); return }
-      const chunk = await input.callbacks.payload({ requestId: (request as { requestId: string }).requestId, ref: (request as { ref?: string }).ref ?? '', offset: Number((request as { offset?: number }).offset ?? 0), length: Number((request as { length?: number }).length ?? 0) })
-      await client.channelReply!(input.leaseId, { v: 1, type: 'payload', id: (request as { requestId: string }).requestId, requestId: (request as { requestId: string }).requestId, value: chunk })
+      const requestId = (request as { requestId: string }).requestId
+      if (!input.callbacks.payload) { served.refused += 1; await client.channelReply!(input.leaseId, { v: 1, type: 'payload-refused', id: requestId, requestId, reason: 'no_payload_store' }); return }
+      // `reference` is the module's field name; `value` is the original payload body itself.
+      const value = await input.callbacks.payload({
+        requestId,
+        reference: (request as { reference?: string }).reference ?? '',
+        offset: Number((request as { offset?: number }).offset ?? 0),
+        length: Number((request as { length?: number }).length ?? 0),
+      })
+      await client.channelReply!(input.leaseId, { v: 1, type: 'payload', id: requestId, requestId, value })
       served.payloads += 1
       return
     }

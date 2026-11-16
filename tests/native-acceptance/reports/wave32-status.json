@@ -1,0 +1,79 @@
+{
+  "agent": "B",
+  "branch": "codex/g1-runtime",
+  "wave": 32,
+  "source": {
+    "B_merge_head": "09668899",
+    "main": "58b4e4c8",
+    "main_terminal_lease_change": "b72e935d (main) added terminal-lease revoke tests; B's runner-service now satisfies them (147/147)",
+    "I_attach_channel": "4d85cc3 subtree merged and unchanged; I files beyond it are not imported",
+    "changed_paths": [
+      "apps/runner/src/runner-service.ts",
+      "packages/execution/src/contracts.ts",
+      "packages/execution/src/attached-attempt.ts",
+      "docs/rfcs/WP-03/0002-wave32-attached-consumer-port.md",
+      "tests/native-acceptance/signal-guard.mjs",
+      "tests/native-acceptance/b28-signal.mjs",
+      "tests/native-acceptance/b27-sigkill.mjs",
+      "tests/native-acceptance/b27-chain.mjs",
+      "tests/native-acceptance/b31-attached-consumer.mjs",
+      "tests/native-acceptance/b32-terminal-late.mjs",
+      "tests/native-acceptance/tsconfig.attached.json"
+    ],
+    "tar": "NONE - B ships source only; no installable tar, no user-instance restart"
+  },
+  "dirtyPreserved": [
+    "reports/releases/wave11-admission/runtime.json",
+    "reports/releases/wave12-admission/runtime.json",
+    "tests/native-acceptance/b16-real-begin.mjs (untracked)"
+  ],
+  "delivered": {
+    "terminalLateCallback": {
+      "status": "IMPLEMENTED + REAL CONTROLLED PROCESS EVIDENCE",
+      "detail": "runner-service channelReply refuses after terminal shutdown by returning accepted:false, so the route answers 409 stale_lease; channelState stays a read that reports the last generation without reviving; channelNext/pull was already refused as stale_connection. The guard runs before the module is touched.",
+      "consumer": "apps/runner/test/terminal-lease-admission.test.ts (main-added) 10/10 and tests/native-acceptance/b32-terminal-late.mjs 3 PASS/0 FAIL/1 NT: a real fact was dispatched, shutdown followed, then the late receipt was refused (refused/stale_lease), a late poll refused (stale_connection), and the late state read only generation 2."
+    },
+    "payloadReferenceFix": {
+      "status": "IMPLEMENTED (unit/type level)",
+      "detail": "attached-attempt.ts now reads the module's `reference` field (never `ref`) and sends the ORIGINAL payload body as `value`, not a store chunk envelope {total,digest,base64}.",
+      "evidence": "npx tsc -p tests/native-acceptance/tsconfig.attached.json -> exit 0. The waiting-user fixture does not raise a payload-read callback, so runtime payload evidence is NOT_TESTED rather than claimed."
+    },
+    "signalAuthority": {
+      "status": "IMPLEMENTED + PURE CONTROLS",
+      "detail": "authority is now the original ChildProcess object (its own spawnfile/spawnargs): adoptSpawn rejects a numeric pid (numeric_pid_not_accepted) and objects without spawn metadata; the capability is the exact frozen handle object, so a copied {handleId, record} or edited record is unknown_handle. The complete child/resource plan is verified on every signal; UNKNOWN is retained and never exit.",
+      "evidence": "node tests/native-acceptance/b28-signal.mjs -> exit 0, 10 PASS/0 FAIL/1 NOT_TESTED; b27-sigkill 7/0/1 and b27-chain 4/0/1 now adopt the real ChildProcess."
+    },
+    "attachPortForMain": {
+      "status": "SOURCE_READY (candidate, needs main wiring)",
+      "detail": "packages/execution/src/contracts.ts publishes optional RunningAttempt.attachPort {registration, producer}; docs/rfcs/WP-03/0002-wave32-attached-consumer-port.md gives the minimal main diff (set attachPort after register()). The B-owned caller attachRunnerAttempt consumes it; main still owns the original Store ingress, payload body and Broker native guard.",
+      "consumer": "tests/native-acceptance/b31-attached-consumer.mjs 3 PASS/0 FAIL/1 NT: client A serves the original begin fact, client B takes the same attempt/process at generation 3 and serves the delivery fact, old lease refused stale_connection, stdio sink 0."
+    }
+  },
+  "verification": {
+    "root_tsc": "exit 0",
+    "attached_tsc": "exit 0",
+    "direct_strict": "exit 0",
+    "runner_tests": "147 pass / 0 fail (includes main's terminal-lease-admission 10/10)",
+    "b30_transport_owner": "2/0/1",
+    "b31_attached": "3/0/1",
+    "b32_late": "3/0/1",
+    "b28_signal": "10/0/1",
+    "b28_cas": "7/0/1",
+    "b28_budget": "4/0/1",
+    "b27_sigkill": "7/0/1",
+    "b27_chain": "4/0/1"
+  },
+  "outcomes": {
+    "originalProductExecutionConsumer": "PARTIAL: B-side attach caller + fixture dual-client evidence; needs main to set RunningAttempt.attachPort (RFC).",
+    "threeOriginalCallbacks": "PARTIAL: fact path proven through the real runner/lease; payload-read/native-write replies implemented+typed but not raised by the fixture; original A Store/Broker authority remains main-owned and unwired.",
+    "sameWorkCrashToCandidateManualAccept": "NOT_REACHED: requires the main-owned original authority wiring and the real recovery chain; no new Work/fixture registry is used as a substitute.",
+    "original2of4SlotResourceReturn": "NOT_REACHED: no original scheduler slot evidence produced this wave; ordinary scheduler fixtures are not relabelled."
+  },
+  "scope": {
+    "modelTurns": 0,
+    "nativeTurns": 0,
+    "cap4UnknownUnspendable": true,
+    "noNew": "no candidate table, ledger, second coordinator/lifecycle, migration, shared schema, HTTP/App/transport/main-owned edit",
+    "installed": "not installed; SOURCE_READY only, not a complete delivery"
+  }
+}

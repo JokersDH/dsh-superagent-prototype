@@ -23,7 +23,9 @@ function mockWorld() {
   const world = { nextPid: 4100, procs: new Map(), children: new Map(), kills: [], psCalls: 0 }
   world.add = (pid, argv, extra = {}) => world.procs.set(pid, { state: 'live', pid, uid: 501, ppid: 1, start: extra.start ?? 'Sat Nov 15 10:00:00 2026', argv: argv.join(' '), ...extra })
   configureSignalGuard({
-    spawn: () => ({ pid: world.nextPid++ }),
+    // A real ChildProcess carries its own spawnfile/spawnargs; the mock must too, because the tool now
+    // takes authority from that object and refuses a numeric pid outright.
+    spawn: (executable, args) => ({ pid: world.nextPid++, spawnfile: executable, spawnargs: [executable, ...args] }),
     ps: (pid) => { world.psCalls += 1; return world.procs.get(pid) ?? { state: 'gone', reason: 'silent_absence' } },
     pgrep: (pid) => world.children.get(pid) ?? { state: 'ok', children: [] },
     kill: (pid, signal) => { world.kills.push([pid, signal]) },
@@ -56,10 +58,10 @@ try {
     const impostor = world.nextPid++
     world.add(impostor, [process.execPath, '--root=/tmp/w31-root']) // same argv, same parent: still not owned
     const noHandle = signalOwned(null, 'SIGKILL')
-    const forged = adoptSpawn(impostor, { executable: process.execPath, argv: [process.execPath, '--root=/tmp/w31-root-other'], expectedChildren: [] })
+    const forged = adoptSpawn(impostor, { expectedChildren: [] })
     const forgedSent = forged.ok ? signalOwned(forged.handle, 'SIGKILL') : { sent: false, refused: true, unknown: forged.unknown }
     log.evidence({ refusedNoHandle: noHandle.refused, forged: forgedSent })
-    if (noHandle.refused && !forged.ok && world.kills.length === 0) log.pass('a second direct child with identical argv produced zero kill spy calls (no pid-derived authority)')
+    if (noHandle.refused && !forged.ok && forged.unknown === 'numeric_pid_not_accepted' && world.kills.length === 0) log.pass('a bare pid for a second direct child with identical argv was refused (numeric_pid_not_accepted) with zero kill calls')
     else log.fail(`an unregistered sibling was signalled: ${JSON.stringify({ noHandle, forged, kills: world.kills })}`)
   }
 
@@ -77,8 +79,9 @@ try {
   log.begin('B31-SIGNAL-METADATA-REFUSED', 'root/config/operation must be tokens of the spawn intent', 'pure_mock')
   {
     const world = mockWorld()
-    world.add(4200, [process.execPath, '--root=/tmp/w31-root'])
-    const wrongRoot = adoptSpawn(4200, { executable: process.execPath, argv: [process.execPath, '--root=/tmp/w31-other'], root: '--root=/tmp/w31-root', expectedChildren: [] })
+    world.add(4200, [process.execPath, '--root=/tmp/w31-other'])
+    const foreignChild = { pid: 4200, spawnfile: process.execPath, spawnargs: [process.execPath, '--root=/tmp/w31-other'] }
+    const wrongRoot = adoptSpawn(foreignChild, { root: '--root=/tmp/w31-root', expectedChildren: [] })
     log.evidence({ wrongRoot: wrongRoot.ok ? null : wrongRoot.unknown })
     if (!wrongRoot.ok && wrongRoot.unknown === 'spawn_root_not_in_argv' && world.kills.length === 0) log.pass('declaring a root that is not a token of the spawn argv was refused before registration')
     else log.fail(`inconsistent spawn metadata was accepted: ${JSON.stringify(wrongRoot)}`)
@@ -114,7 +117,8 @@ try {
   {
     const world = mockWorld()
     const spawned = mockSpawn(world, ['--root=/tmp/w31-root'], { root: '--root=/tmp/w31-root', expectedChildren: [] })
-    const copied = signalOwned({ ...spawned.handle, handleId: 'copied' }, 'SIGKILL')
+    const copiedId = signalOwned({ ...spawned.handle, handleId: 'copied' }, 'SIGKILL')
+    const copied = copiedId
     const retargeted = signalOwned({ handleId: spawned.handle.handleId, record: { ...spawned.handle.record, pid: process.pid } }, 'SIGKILL')
     world.procs.set(spawned.child.pid, { state: 'unknown', reason: 'ps_failed' })
     const unreadable = signalOwned(spawned.handle, 'SIGKILL')

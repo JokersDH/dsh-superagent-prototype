@@ -140,6 +140,8 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
   const artifacts = new AttemptArtifactManifest()
   let closed = false
   let businessClosed = false
+  /** Last generation observed on the channel; readable after terminal close without reviving it. */
+  let channelGeneration = 0
   let physicallyStopped = false
   const preparation = new AbortController()
   const processHost = options.processHost ?? new ProcessHost()
@@ -461,9 +463,12 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
               // so a legitimate large payload stays readable without widening the transport cap.
               // Read-only generation. It grants nothing: an attaching caller must present this exact
               // generation to CAS, and reading it binds no lease and starts no waiter.
+              // Reading the generation is a read, not a rebind: a terminal runner still reports the last
+              // generation it owned so a caller can observe refusal without reviving the channel.
               channelState: async producer => {
                 assertChannelProducer(producer)
-                return { generation: attach!.inspect().generation }
+                try { channelGeneration = attach!.inspect().generation } catch {}
+                return { generation: channelGeneration }
               },
               // Explicit CAS bind from the authenticated producer, then poll THAT connection's own queue.
               // A caller that already owns the live connection never rebinds: polling is read-only.
@@ -482,13 +487,20 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
                 }
                 const page = attach!.next(leaseId, producer as never)
                 if (!page.ok) throw channelError(page.refused, page.refused === 'identity_mismatch' ? 'foreign_producer' : 'lease_not_current')
+                channelGeneration = page.generation
                 // The page is the delivery for a remote pull connection; never mirror it onto stdio.
                 return { generation: page.generation, request: page.request, remainingMs: page.remainingMs }
               },
               channelReply: async (producer, reply, leaseId) => {
                 assertChannelProducer(producer)
+                // A receipt that arrives after terminal shutdown/attempt closure must never be accepted:
+                // the fact is already resolved on the original side, and accepting it would let a late
+                // ACK look like a newly-acknowledged callback. Returning accepted:false makes the route
+                // answer 409 stale_lease, before the module is touched.
+                if (closed || businessClosed) return { accepted: false, generation: channelGeneration }
                 const routed = attach!.receive(leaseId, asChannelReply(reply as object), producer as never)
                 if (routed.accepted) dispatched.delete(leaseId)
+                channelGeneration = routed.generation
                 return { accepted: routed.accepted, generation: routed.generation }
               },
               payload: async (ref, offset, length) => {
