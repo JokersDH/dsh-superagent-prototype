@@ -207,6 +207,16 @@ export async function stopOwned(root, { mockFile, birth = null, resources = null
       result.record = readRecord(config)
       // A packaged STOPPED is the product's claim, not an observation of this probe's resources. The
       // pre-stop set (recorded pids + caller set, captured before the call) must be re-observed.
+      // A known birth without the product's record and without a caller set is an incomplete set: an
+      // empty observation of it is NOT quiescence and must never release the root.
+      const completeSet = preStop.hadRecord || (Array.isArray(resources) && resources.length > 0)
+      if (birth !== null && !completeSet) {
+        result.retained = true
+        result.clean = false
+        result.reason = 'resources_unverified'
+        result.preStopSet = preStop.set
+        return finish(result)
+      }
       const observed = observeFixedSet(preStop.set)
       result.observedBeforePackage = observed
       const survivors = observed.filter(item => item.alive && item.sameIdentity === true)
@@ -239,7 +249,36 @@ export async function stopOwned(root, { mockFile, birth = null, resources = null
       result.reason = 'package_stop_refused'
       return finish(result)
       }
-      trace('package stop refused; attempting equivalent independent proof')
+      // A single retry of the product's own stop: a just-finished write can leave the coordinator
+      // briefly unverifiable. This re-invokes the product guard; it never bypasses it.
+      await new Promise(resolvePromise => setTimeout(resolvePromise, 600))
+      const retried = launcher(install, ['stop', '--json'], {
+        timeoutMs,
+        env: { ...(mockFile ? { PA_MODEL_CONFIG: mockFile } : {}), PA_CONFIG_ROOT: config, PA_DATA_ROOT: state },
+      })
+      const retryStatus = retried.json?.status ?? null
+      if (retried.status === 0 && (retryStatus === 'STOPPED' || retryStatus === 'STOPPED_ORPHAN')) {
+        result.packageStop = { status: retried.status, json: retried.json ?? null, stderr: retried.stderr, retried: true }
+        result.record = readRecord(config)
+        const completeSet = preStop.hadRecord || (Array.isArray(resources) && resources.length > 0)
+        if (birth !== null && !completeSet) {
+          result.retained = true; result.clean = false; result.reason = 'resources_unverified'; return finish(result)
+        }
+        const observed = observeFixedSet(preStop.set)
+        result.observedBeforePackage = observed
+        const survivors = observed.filter(item => item.alive && item.sameIdentity === true)
+        const unknown = observed.filter(item => item.alive && item.sameIdentity !== true)
+        if (survivors.length > 0 || unknown.length > 0) {
+          result.packageStopSawNoRecord = !result.record.present
+          result.retained = true; result.clean = false
+          result.reason = unknown.length > 0 ? 'known_resource_identity_unknown' : 'known_resource_alive_after_package_stop'
+          result.aliveAfter = survivors; result.unknownResources = unknown
+          return finish(result)
+        }
+        result.clean = true
+        return finish(result)
+      }
+      trace('package stop refused after retry; attempting equivalent independent proof')
     }
   }
   const record = readRecord(config)
@@ -261,6 +300,12 @@ export async function stopOwned(root, { mockFile, birth = null, resources = null
     // No discovery and no default cleanup: only the caller's complete immutable set can authorize a
     // signal; an incomplete or unobservable set is retained as UNKNOWN.
     if (!proofSignal && !equivalentProof) { result.retained = true; result.reason = 'record_missing_known_birth'; return finish(result) }
+    if (!Array.isArray(resources) || resources.length === 0) {
+      // The birth is known but the fixed set was never captured: UNKNOWN, retained, no signal.
+      result.retained = true
+      result.reason = 'resources_unverified'
+      return finish(result)
+    }
     return finish(await stopKnownSet(root, { birth, resources, result }))
   }
   if (record.error || !value || typeof value !== 'object') {

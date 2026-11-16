@@ -1,7 +1,7 @@
 import { execFileSync } from 'node:child_process'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { runCase, LAYERS } from '../lib/status.mjs'
+import { runCase, notTested, LAYERS } from '../lib/status.mjs'
 import { LocalProductClient } from '../lib/http-client.mjs'
 import { candidateModel } from '../../../tests/integration/fixtures/assistant-candidate-model.mjs'
 import { extractFrozen, freePort, launcher, liveIdentity, privateRoot, releaseRoot, retainMaterial, startOwned, stopOwned } from '../lib/packaged-instance.mjs'
@@ -98,7 +98,8 @@ export async function runJourney() {
         projectId: project.id, kind: 'regression_fix', allowedPaths: [atom], profileId: profile.id } })
       journey.projects.push({ index: index + 1, displayName: name, id: project.id, atom, path: dir,
         preview: { status: preview.status, bodyStatus: preview.body?.status ?? null, fields: preview.body?.fields ?? null,
-          issues: preview.body?.issues ?? null, authorization: preview.body?.authorization ?? null } })
+          issues: preview.body?.issues ?? null, authorization: preview.body?.authorization ?? null,
+          applicable: preview.body?.status === 'draft' && preview.body?.fields !== null } })
     }
     mark('phase A projects registered')
 
@@ -157,6 +158,12 @@ export async function runJourney() {
     const executionPool = fixtureConfiguration.projects.filter(item => item.dispatchAllowed === true)
     if (executionPool.length === 0) throw new Error('fixture configuration exposes no dispatchable project')
     journey.executionPool = executionPool.map(item => ({ id: item.id, displayName: item.displayName ?? null, profileIds: item.profileIds ?? [] }))
+    journey.originalProjectExecution = {
+      sameProject: executionPool.every(item => journey.projects.some(project => project.id === item.id)),
+      reason: executionPool.every(item => journey.projects.some(project => project.id === item.id)) ? null
+        : 'the controlled-fixture configuration exposes only its own project set; the personal-mode registered projects are not dispatchable there and personal mode has no executor',
+      executionPool: executionPool.map(item => item.id),
+      originalProjects: journey.projects.map(item => item.id) }
     for (const [position, project] of journey.projects.entries()) {
       const fixtureProject = executionPool[position] ?? executionPool[0]
       project.executionProjectId = fixtureProject.id
@@ -196,15 +203,17 @@ export async function runJourney() {
     if (stopB.clean !== true) throw new Error(`phase B stop not clean: ${stopB.reason}`)
 
     const [portC, apiC] = [await freePort(), await freePort()]
-    const reopened = startOwned(root, { ports: [portC, apiC], mockFile: mock.file, fixture: false, extraArgs: ['--discussion-only'], timeoutMs: 60_000 })
+    // Reopen in the same mode that owns the Work row, so the original Work/phase/artifacts are readable.
+    const reopened = startOwned(root, { ports: [portC, apiC], mockFile: mock.file, fixture: true, timeoutMs: 60_000 })
     const reopenedValue = await reopened.value
-    journey.reopen = { subject: journey.subject, status: reopenedValue.status, works: [] }
+    journey.reopen = { subject: journey.subject, status: reopenedValue.status, mode: 'fixture', works: [] }
     if (reopenedValue.status === 'RUNNING') {
       const client = new LocalProductClient({ baseURL: reopenedValue.instance.apiURL, stateDir: reopenedValue.instance.state, timeoutMs: 25_000 })
       for (const project of journey.projects) {
         const work = await client.work(project.workId).catch(() => null)
         const page = await client.conversation(`conv-w31-${project.index}`).catch(() => null)
-        journey.reopen.works.push({ id: project.workId, found: work !== null, phase: work?.phase ?? null, messages: page?.messages?.length ?? null })
+        journey.reopen.works.push({ id: project.workId, found: work !== null, phase: work?.phase ?? null,
+          artifacts: work?.artifactIds?.length ?? null, messages: page?.messages?.length ?? null })
       }
       journey.reopen.readiness = (await client.request('/v1/readiness')).status
       const beforeC = fixedSet(root.config)
@@ -283,13 +292,29 @@ export async function runJourney() {
     }
     const reopen = journey.reopen ?? {}
     // Reopened personal read returns the Work row; the fixture-phase field is recorded when present.
-    // Reopened personal read must still show both conversations; the Work view itself may be mode-bound.
+    // Reopened in the mode that owns the Work rows: the original Work id, phase and artifacts must be
+    // readable — a message count alone is not a recovery observation.
     assert('REOPEN_RUNNING', reopen.status === 'RUNNING' && Array.isArray(reopen.works) && reopen.works.length === 2 &&
-      reopen.works.every(item => (item.messages ?? 0) >= 1), JSON.stringify(reopen))
+      reopen.works.every(item => item.found === true && item.phase === 'delivered' && (item.artifacts ?? 0) >= 1 &&
+        (item.messages ?? 0) >= 1), JSON.stringify(reopen))
     assert('REOPEN_READINESS', reopen.readiness === 200, String(reopen.readiness))
     assert('REOPEN_STOP', reopen.stop?.clean === true && (reopen.stop?.package === 'STOPPED' || reopen.stop?.package === 'STOPPED_ORPHAN'),
       JSON.stringify(reopen.stop))
   }))
+
+  cases.push(notTested({ id: 'E32-ORIGINAL-PROJECT-APPLICABLE',
+    title: 'Each original registered project preview is directly applicable and its create/check/candidate/accept stay on that same project',
+    layer: LAYERS.INSTALLED, evidence: { journeyProjectScope: {
+      projects: journey.projects.map(project => ({ index: project.index, id: project.id, displayName: project.displayName,
+        previewStatus: project.preview?.bodyStatus ?? null, applicable: project.preview?.applicable === true,
+        issues: project.preview?.issues ?? null, executionProjectId: project.executionProjectId ?? null })),
+      originalProjectExecution: journey.originalProjectExecution ?? null } } },
+    (() => {
+      const applicable = journey.projects.length === 2 && journey.projects.every(project => project.preview?.applicable === true)
+      const same = journey.originalProjectExecution?.sameProject === true
+      if (applicable && same) return 'NOT_REACHED: both previews are applicable and the execution pool matched the original projects, but no same-project acceptance has been re-run in this checkout.'
+      return `NOT_REACHED: original-project previews reported ${journey.projects.map(project => project.preview?.bodyStatus ?? 'none').join('/')} (a fresh project has no facts/catalog, so no applicable draft), and the controlled-fixture configuration exposes only ${JSON.stringify(journey.originalProjectExecution?.executionPool ?? [])} while the registered projects are not dispatchable there. The executed Works are therefore bound to the fixture project, not the original project. This is a recorded product gap, not an acceptance pass.`
+    })()))
 
   return { cases, artifacts: {} }
 }

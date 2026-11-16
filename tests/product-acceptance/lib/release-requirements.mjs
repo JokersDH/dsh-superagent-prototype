@@ -86,6 +86,7 @@ export const SAFETY_CASES = [
  * window, a refused packaged stop, and idempotent repeat.
  */
 SAFETY_CASES.push(
+  case_('E1-LIFECYCLE-BIRTH-NO-SET', { layers: [LAYERS.READONLY], evidence: ['lifecycleBirthNoSet'] }),
   case_('E1-LIFECYCLE-STOPPED-KNOWN-CHILD', { layers: [LAYERS.READONLY], evidence: ['lifecycleStoppedChild'] }),
   case_('E1-LIFECYCLE-STOPPED-NO-RECORD-CHILD', { layers: [LAYERS.READONLY], evidence: ['lifecycleStoppedNoRecordChild'] }),
   case_('E1-LIFECYCLE-PARENT-GONE', { layers: [LAYERS.READONLY], evidence: ['lifecycleParentGone'] }),
@@ -198,6 +199,7 @@ export const INSTALL_CASES = [
   case_('E5-TWO-PROJECT-TEMPLATE-CREATE', { layers: [LAYERS.INSTALLED], evidence: ['journey'] }),
   case_('E7-JOURNEY-CONTEXT-SOURCE', { layers: [LAYERS.INSTALLED], evidence: ['journeyContext'] }),
   case_('E8-JOURNEY-STOP-REOPEN', { layers: [LAYERS.INSTALLED], evidence: ['journeyPhases', 'journeyReopen'] }),
+  case_('E32-ZIP-LIFECYCLE', { layers: [LAYERS.INSTALLED], evidence: ['zip'] }),
   // Tracked gaps: installed F identity fields and a wired G summary need successor frozen bytes.
   { id: 'E11-TRIAL-IDENTITY-FIELDS', required: false, layers: [LAYERS.INSTALLED], evidence: ['trialIdentity'] },
   { id: 'E13-G-SCOPED-SUMMARY', required: false, layers: [LAYERS.INSTALLED], evidence: ['gSummary'] },

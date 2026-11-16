@@ -515,5 +515,27 @@ export async function runLifecycle() {
         JSON.stringify(childPreflight))
     }))
 
+  cases.push(await runCase({ ...define('E1-LIFECYCLE-BIRTH-NO-SET', 'A known birth without the product record or a caller set is never released by an empty observation'), evidence: {} },
+    async ({ assert, evidence }) => {
+      const root = privateRoot('pa-e-life-birthnoset-')
+      const sleeper = spawnSleeper(root)
+      let stopped, released
+      try {
+        const identity = liveIdentity(sleeper.pid)
+        const birth = { pid: sleeper.pid, start: identity.start, uid: identity.uid, state: root.state, config: root.config, install: root.install }
+        mkdirSync(join(root.install, 'bin'), { recursive: true })
+        writeFileSync(join(root.install, 'bin/pa'), '#!/bin/sh\nprintf \'%s\\n\' \'{"status":"STOPPED"}\'\nexit 0\n', { mode: 0o755 })
+        stopped = await stopOwned(root, { birth, packageStop: true, equivalentProof: true })
+        released = releaseRoot(root, stopped)
+        evidence.lifecycleBirthNoSet = { clean: stopped.clean, reason: stopped.reason, retained: stopped.retained,
+          signals: stopped.signals, preStopSet: stopped.preStopSet ?? null, released: released.removed,
+          alive: liveIdentity(sleeper.pid).alive }
+      } finally { try { sleeper.child.kill('SIGKILL') } catch { /* gone */ } rmSync(root.own, { recursive: true, force: true }) }
+      assert('BIRTHNOSET_RETAINED', stopped?.clean !== true && stopped?.retained === true && stopped.reason === 'resources_unverified',
+        JSON.stringify({ reason: stopped?.reason, set: stopped?.preStopSet }))
+      assert('BIRTHNOSET_NO_SIGNAL', (stopped?.signals ?? []).length === 0, JSON.stringify(stopped?.signals))
+      assert('BIRTHNOSET_NOT_RELEASED', released?.removed === false && evidence.lifecycleBirthNoSet.alive === true, JSON.stringify(released))
+    }))
+
   return { cases, artifacts: {} }
 }

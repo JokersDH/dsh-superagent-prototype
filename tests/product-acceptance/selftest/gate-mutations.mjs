@@ -583,6 +583,8 @@ const evidenceFor = (key) => {
       return { desktop: { horizontalOverflow: false } }
     case 'catalog':
       return { conversations: 3, archived: 1 }
+    case 'lifecycleBirthNoSet':
+      return { clean: false, reason: 'resources_unverified', retained: true, signals: [], preStopSet: [], released: false, alive: true }
     case 'lifecycleStoppedChild':
       return { packageStatus: 'STOPPED', reason: 'known_resource_alive_after_package_stop', retained: true,
         aliveAfter: [{ pid: 2, expectedStart: 's', alive: true, sameIdentity: true }], childAlive: true, released: false,
@@ -663,6 +665,18 @@ const evidenceFor = (key) => {
       return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
         A: { stop: { clean: true, package: 'STOPPED' }, resources: { before: [{ pid: 1, start: 's' }], after: [{ pid: 1, expectedStart: 's', alive: false, sameIdentity: false }] } },
         B: { stop: { clean: true, package: 'STOPPED' }, resources: { before: [{ pid: 2, start: 's' }], after: [{ pid: 2, expectedStart: 's', alive: false, sameIdentity: false }] } } }
+    case 'zip':
+      return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
+        stage: 'reopen',
+        phases: { firstRun: { status: 0, result: null },
+          unconfigured: { readiness: { status: 200, body: { discussion: 'not_configured' } }, contextAvailable: false,
+            stop: { clean: true, package: 'STOPPED' }, resources: { after: [{ alive: false, sameIdentity: false }] } },
+          configured: { readiness: { body: { discussion: 'configuration_present' } }, contextAvailable: true, stop: { clean: true, package: 'STOPPED' } },
+          delivered: { stop: { clean: true, package: 'STOPPED' } } },
+        importProject: { status: 200, projectId: 'project-imported', echoedProjects: 2, readBack: 2 },
+        delivery: { receipt: 'recorded', workId: 'work-1', phase: 'delivered', accepted: 'recorded', artifacts: 2 },
+        backup: { status: 'CREATED', verify: 'VERIFIED', sha256: DIGEST },
+        reopen: { status: 'RUNNING', work: { found: true, phase: 'delivered', artifacts: 2 }, messages: 2, stop: { clean: true, package: 'STOPPED' } } }
     case 'journeyReopen':
       return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
         status: 'RUNNING', works: [{ messages: 2 }, { messages: 1 }], readiness: 200, stop: { clean: true, package: 'STOPPED' } }

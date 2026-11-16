@@ -507,6 +507,31 @@ export function stopFunctionalIssues(value) {
 }
 /** The recipe preview is read-only, echoes the exact selection and never writes a Work. */
 /** Two projects through the real preview/create/check/candidate/manual-accept chain. */
+/** One frozen distribution drives the whole local lifecycle, including the unconfigured degradation. */
+export function zipLifecycleIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (!value.subject || !HEX64(String(value.subject.tarSha256 ?? ''))) issues.push('subject')
+  const phases = value.phases ?? {}
+  if (phases.firstRun?.status !== 0) issues.push('first_run')
+  const unconfigured = phases.unconfigured ?? {}
+  if (unconfigured.readiness?.status !== 200 || unconfigured.contextAvailable !== false ||
+    unconfigured.readiness?.body?.discussion === 'configuration_present') issues.push('unconfigured')
+  if (unconfigured.stop?.clean !== true || !Array.isArray(unconfigured.resources?.after) ||
+    unconfigured.resources.after.some(item => item.alive === true && item.sameIdentity === true)) issues.push('unconfigured_stop')
+  const configured = phases.configured ?? {}
+  if (configured.readiness?.body?.discussion !== 'configuration_present' || configured.contextAvailable !== true) issues.push('configured')
+  if (configured.stop?.clean !== true) issues.push('configured_stop')
+  if (value.importProject?.status !== 200 || !isSubstantive(value.importProject?.projectId)) issues.push('import')
+  if (value.delivery?.receipt !== 'recorded' || value.delivery?.accepted !== 'recorded' ||
+    value.delivery?.phase !== 'delivered' || !(value.delivery?.artifacts >= 1)) issues.push('delivery')
+  if (value.backup?.status !== 'CREATED' || value.backup?.verify !== 'VERIFIED' || !HEX64(String(value.backup?.sha256 ?? ''))) issues.push('backup')
+  const reopen = value.reopen ?? {}
+  if (reopen.status !== 'RUNNING' || reopen.work?.found !== true || reopen.work?.phase !== 'delivered' ||
+    !(reopen.work?.artifacts >= 1) || !((reopen.messages ?? 0) >= 1)) issues.push('reopen')
+  if (reopen.stop?.clean !== true) issues.push('reopen_stop')
+  return issues
+}
 export function journeyIssues(value) {
   if (!value || typeof value !== 'object') return ['missing']
   const issues = []
@@ -618,6 +643,16 @@ export function packagedStopIssues(value) {
 /** A known birth without a record is UNKNOWN until a verified proof stops it. */
 /** A forced no-record proof without the spawn's complete immutable set is retained. */
 /** A packaged STOPPED that leaves a known live child is not quiescence. */
+/** A known birth with no fixed set is retained, never released by an empty observation. */
+export function lifecycleBirthNoSetIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (value.reason !== 'resources_unverified' || value.retained !== true || value.clean === true) issues.push('reason')
+  if (!Array.isArray(value.signals) || value.signals.length !== 0) issues.push('signalled')
+  if (value.released !== false) issues.push('released')
+  if (value.alive !== true) issues.push('killed')
+  return issues
+}
 export function lifecycleStoppedChildIssues(value) {
   if (!value || typeof value !== 'object') return ['missing']
   const issues = []
@@ -1542,7 +1577,7 @@ export function evaluateRelease({
         item.evidence?.scopeDiagnostics?.subject ?? item.evidence?.readiness?.subject ?? item.evidence?.trialUi?.subject ??
         item.evidence?.supportMaterial?.subject ?? item.evidence?.packagedStop?.subject ?? item.evidence?.insights?.subject ??
         item.evidence?.recipePreview?.subject ?? item.evidence?.journey?.subject ?? item.evidence?.journeyContext?.subject ??
-        item.evidence?.journeyPhases?.subject ?? item.evidence?.journeyReopen?.subject
+        item.evidence?.journeyPhases?.subject ?? item.evidence?.journeyReopen?.subject ?? item.evidence?.zip?.subject
       if (!subject || typeof subject !== 'object') {
         failures.push(fail('subject_missing', `Case ${id} has no frozen artifact subject`, id))
         continue
@@ -1602,8 +1637,8 @@ export function evaluateRelease({
           failures.push(fail('evidence_history_invalid', `Evidence history ${issue}`, entry.id))
       }
       for (const [key, fn] of [['contextUse', contextUseIssues], ['sse', contextSseIssues], ['guards', contextGuardIssues], ['sourceConfirm', sourceConfirmIssues], ['sourceConfirmRefusal', sourceConfirmRefusalIssues], ['candidateFlow', candidateFlowIssues], ['history', contextHistoryIssues], ['sources', contextSourcesIssues], ['contextUi', contextUiIssues], ['concurrency', concurrencyIssues], ['schemaMigration', schemaMigrationIssues], ['legacyMigration', legacyMigrationIssues], ['frozenScope', frozenScopeIssues], ['ownershipCopy', ownershipCopyIssues], ['ownershipMocks', ownershipMocksIssues], ['installedCandidates', installedCandidatesIssues], ['secondRoot', secondRootIssues], ['workflowFormats', workflowFormatsIssues], ['personalReview', personalReviewIssues], ['restoredReviewRefusals', restoredReviewRefusalsIssues], ['reviewReuse', reviewReuseIssues], ['scopeDiagnostics', scopeDiagnosticsIssues], ['readiness', readinessIssues], ['trialUi', trialUiIssues],
-      ['journey', journeyIssues], ['journeyContext', journeyContextIssues], ['journeyPhases', journeyPhasesIssues], ['journeyReopen', journeyReopenIssues],
-      ['recipePreview', recipePreviewIssues], ['packagedStop', packagedStopIssues], ['stopFunctional', stopFunctionalIssues], ['lifecycleOwn', lifecycleOwnIssues], ['lifecycleStoppedChild', lifecycleStoppedChildIssues], ['lifecycleStoppedNoRecordChild', lifecycleStoppedNoRecordChildIssues],
+      ['zip', zipLifecycleIssues], ['journey', journeyIssues], ['journeyContext', journeyContextIssues], ['journeyPhases', journeyPhasesIssues], ['journeyReopen', journeyReopenIssues],
+      ['recipePreview', recipePreviewIssues], ['packagedStop', packagedStopIssues], ['stopFunctional', stopFunctionalIssues], ['lifecycleOwn', lifecycleOwnIssues], ['lifecycleBirthNoSet', lifecycleBirthNoSetIssues], ['lifecycleStoppedChild', lifecycleStoppedChildIssues], ['lifecycleStoppedNoRecordChild', lifecycleStoppedNoRecordChildIssues],
       ['lifecycleParentGone', lifecycleParentGoneIssues], ['lifecycleNoRecordUnverified', lifecycleNoRecordUnverifiedIssues], ['lifecycleSetMismatch', lifecycleSetMismatchIssues],
       ['lifecycleBirthConfig', lifecycleBirthConfigIssues], ['lifecycleNoRecord', lifecycleNoRecordIssues], ['lifecycleNoRecordExit', lifecycleNoRecordExitIssues],
       ['lifecycleNoRecordReuse', lifecycleNoRecordReuseIssues], ['lifecycleStopNoRecord', lifecycleStopNoRecordIssues], ['lifecycleBirthRoot', lifecycleBirthRootIssues], ['lifecycleChildScope', lifecycleChildScopeIssues], ['lifecycleWrongStart', lifecycleWrongStartIssues], ['lifecycleSibling', lifecycleSiblingIssues],
