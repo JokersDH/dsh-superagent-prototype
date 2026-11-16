@@ -1,88 +1,128 @@
 /**
- * wave-31 I10 — shutdown and terminal states of the communication subsystem.
+ * wave-32 I2 — terminal close vs temporary detach, through the real service.
  *
- * Shutdown over the bridge closes admission, settles the in-flight callback (a fact fails closed, a
- * native intent is indeterminate) and terminates the service. It does not claim the child/socket/fd
- * are physically gone — that is B's process authority. A malformed frame is refused without changing
- * ownership.
+ * main's `finish()` now calls `attach.close(...)`, so a TERMINAL service closes every lease and
+ * pending callback: a pending fact fails `closed`, a pending native intent is `indeterminate`, and a
+ * late `next`/`reply` has zero effect. A malformed `shutdown` (no frame id) is refused as a protocol
+ * error instead of being executed — a distinction my wave-31 probe got wrong and this test pins.
  */
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import type { Json } from '../../../../packages/contracts/src/types.ts'
 import { startService } from './actual-harness.ts'
+import { answerCommand } from './fixtures.ts'
 
-test('I10: shutdown with a pending fact keeps it unknown and refuses later replies', { timeout: 30000 }, async t => {
+test('I2: terminal shutdown closes a pending fact and refuses late replies', { timeout: 30000 }, async t => {
   let factOutcome = 'pending'
   const h = await startService(t, {
     recovery: true,
     run: async ({ io }) => {
-      const ref = await io.payloads.store({ kind: 'turn.ended', value: { nativeTurnRef: 't-shutdown', outcome: 'completed', candidateAvailable: true, evidenceRefs: [] } } as Json, 'critical')
+      const ref = await io.payloads.store({ kind: 'turn.ended', value: { nativeTurnRef: 't-terminal', outcome: 'completed', candidateAvailable: true, evidenceRefs: [] } } as Json, 'critical')
       try {
-        await io.record(h.fact({ factId: 'fact-shutdown', kind: 'turn.ended', payloadRef: ref }))
+        await io.record(h.fact({ factId: 'fact-terminal', kind: 'turn.ended', payloadRef: ref }))
         factOutcome = 'ok'
       } catch (error) {
         factOutcome = (error as { code?: string }).code ?? 'rejected'
       }
-      return { reason: 'cancelled', evidenceRefs: ['shutdown'] }
+      return { reason: 'cancelled', evidenceRefs: ['terminal'] }
     },
   })
   h.boot()
   await h.waitFrame(frame => frame.type === 'ready', 'ready')
-  const a = await h.connect('lease-shutdown', 1)
-  h.command(h.begin('prepared-policy-i31-shutdown'))
-
-  // Observe the pending fact, then stop the attempt without answering it.
+  const a = await h.connect('lease-terminal', 1)
+  h.command(h.begin('prepared-policy-terminal'))
   for (let index = 0; index < 200; index += 1) {
-    const page: any = await a.client.channelNext!('lease-shutdown')
+    const page: any = await a.client.channelNext!('lease-terminal')
     if (page?.request) break
     await new Promise(resolve => setTimeout(resolve, 5))
   }
-  h.send({ type: 'shutdown' })
-
-  // The current service drops the transport leases; the module keeps the fact pending for succession,
-  // so the Driver must NOT be told "delivered" or "closed". It stays unknown until its deadline.
-  await new Promise(resolve => setTimeout(resolve, 150))
-  assert.equal(factOutcome, 'pending', 'shutdown must not fabricate a receipt or a closed failure')
-
-  // No receipt was fabricated for the pending fact.
-  assert.equal(h.framesOf('receipt').some(frame => frame.factId === 'fact-shutdown'), false)
-  // NOTE (reported to B, not asserted green here): the current service's `closeAdmission` only drops
-  // the fixed stdio/sink connection ids, so a remote lease id stays current after shutdown and a late
-  // reply could still settle the pending fact. The module-level guarantee (module.close refuses late
-  // replies) is covered by handover.test.ts; the service-side fix belongs to B.
-})
-
-test('I10: shutdown with no pending callback terminates the service', { timeout: 30000 }, async t => {
-  const h = await startService(t, {
-    recovery: true,
-    run: async () => ({ reason: 'cancelled', evidenceRefs: ['idle-shutdown'] }),
-  })
-  h.boot()
-  await h.waitFrame(frame => frame.type === 'ready', 'ready')
-  const a = await h.connect('lease-idle', 1)
-  h.command(h.begin('prepared-policy-i31-idle'))
+  h.send({ type: 'shutdown', id: 'shutdown-frame' })
   await h.done
+  assert.equal(factOutcome, 'closed', 'a terminal close fails the pending fact closed')
+
+  // Late poll/reply have zero effect on the closed channel.
+  await assert.rejects(async () => a.client.channelNext!('lease-terminal'))
   await assert.rejects(async () =>
-    a.client.channelReply!('lease-idle', { v: 1, type: 'receipt', id: 'fact-none', factId: 'fact-none', receipt: { factId: 'fact-none', persisted: true, seq: 1 } })
+    a.client.channelReply!('lease-terminal', { v: 1, type: 'receipt', id: 'fact-terminal', factId: 'fact-terminal', receipt: { factId: 'fact-terminal', persisted: true, seq: 1 } })
   )
+  // The read-only state probe remains readable but grants nothing; no approval can be inferred from it.
+  const state = await a.client.channelState!()
+  assert.ok(state.generation >= 1)
 })
 
-test('I10: a malformed frame is refused without changing the current owner', { timeout: 20000 }, async t => {
+test('I2: terminal shutdown makes a pending native intent indeterminate', { timeout: 30000 }, async t => {
+  let intentOutcome = 'pending'
   const h = await startService(t, {
     recovery: true,
-    run: async ({ io }) => {
-      const ref = await io.payloads.store({ kind: 'turn.ended', value: { nativeTurnRef: 't-malformed', outcome: 'completed', candidateAvailable: true, evidenceRefs: [] } } as Json, 'critical')
-      await new Promise(resolve => setTimeout(resolve, 500))
-      void ref
-      return { reason: 'terminal', evidenceRefs: ['malformed'] }
+    run: async ({ hooks }) => {
+      try {
+        await hooks.beforeNativeWrite(answerCommand('cmd-terminal'))
+        intentOutcome = 'ok'
+      } catch (error) {
+        intentOutcome = (error as { code?: string }).code ?? 'rejected'
+      }
+      return { reason: 'cancelled', evidenceRefs: ['terminal-intent'] }
     },
   })
   h.boot()
   await h.waitFrame(frame => frame.type === 'ready', 'ready')
-  const a = await h.connect('lease-malformed', 1)
-  const before = await a.client.channelState!()
-  h.send({ v: 2, type: 'progress', id: 'bad' })
+  const a = await h.connect('lease-intent', 1)
+  h.command(h.begin('prepared-policy-terminal-intent'))
+  let intentId: string | undefined
+  for (let index = 0; index < 200; index += 1) {
+    const page: any = await a.client.channelNext!('lease-intent')
+    if (page?.request?.type === 'native-write-intent') {
+      intentId = page.request.id
+      break
+    }
+    await new Promise(resolve => setTimeout(resolve, 5))
+  }
+  assert.ok(intentId)
+  h.send({ type: 'shutdown', id: 'shutdown-intent' })
+  await h.done
+  assert.equal(intentOutcome, 'indeterminate', 'an unknown native write is not "not sent"')
+  // Replaying the old correlation after terminal does nothing.
+  await assert.rejects(async () => a.client.channelReply!('lease-intent', { v: 1, type: 'write-admission', id: intentId, allowed: true }))
+})
+
+test('I2: a shutdown frame without an id is refused, not executed', { timeout: 30000 }, async t => {
+  let outcome = 'pending'
+  const h = await startService(t, {
+    recovery: true,
+    run: async ({ io }) => {
+      const ref = await io.payloads.store({ kind: 'turn.ended', value: { nativeTurnRef: 't-bad-shutdown', outcome: 'completed', candidateAvailable: true, evidenceRefs: [] } } as Json, 'critical')
+      try {
+        await io.record(h.fact({ factId: 'fact-bad-shutdown', kind: 'turn.ended', payloadRef: ref }))
+        outcome = 'ok'
+      } catch (error) {
+        outcome = (error as { code?: string }).code ?? 'rejected'
+      }
+      return { reason: 'terminal', evidenceRefs: ['bad-shutdown'] }
+    },
+  })
+  h.boot()
+  await h.waitFrame(frame => frame.type === 'ready', 'ready')
+  const a = await h.connect('lease-bad', 1)
+  h.command(h.begin('prepared-policy-bad'))
+  for (let index = 0; index < 200; index += 1) {
+    const page: any = await a.client.channelNext!('lease-bad')
+    if (page?.request) break
+    await new Promise(resolve => setTimeout(resolve, 5))
+  }
+  h.send({ type: 'shutdown' }) // no id: protocol error, never a terminal action
   await h.waitFrame(frame => frame.type === 'error', 'protocol error')
-  const after = await a.client.channelState!()
-  assert.equal(after.generation, before.generation)
+  const error = h.framesOf('error')[0] as { code?: string }
+  assert.equal(error.code, 'protocol_error')
+  // Still running: the pending fact can be served normally afterwards.
+  for (let index = 0; index < 200; index += 1) {
+    const page: any = await a.client.channelNext!('lease-bad')
+    if (page?.request?.type === 'fact') {
+      const factId = page.request.fact.factId
+      await a.client.channelReply!('lease-bad', { v: 1, type: 'receipt', id: factId, factId, receipt: { factId, persisted: true, seq: 1 } })
+      break
+    }
+    await new Promise(resolve => setTimeout(resolve, 5))
+  }
+  await h.done
+  assert.equal(outcome, 'ok')
 })

@@ -54,7 +54,7 @@ Native Driver ──facts/payloads──▶ AttemptIO
 
 ```bash
 cd apps/runner
-node --test --test-timeout=60000 test/attach-channel/*.test.ts     # 132/132
+node --test --test-timeout=60000 test/attach-channel/*.test.ts     # 136/136
 node_modules/.bin/tsc -p apps/runner/src/attach-channel/tsconfig.json
 ```
 
@@ -71,6 +71,8 @@ node_modules/.bin/tsc -p apps/runner/src/attach-channel/tsconfig.json
 | `actual-multislot.test.ts` | 4 个独立 attempt 端点：隔离、各自 generation | 2 例 |
 | `actual-shutdown.test.ts` | shutdown 后 pending 保持 unknown、不伪造 receipt；空载 shutdown 终止；malformed 不改 owner | 3 例 |
 | `actual-compatibility.test.ts` | 导出/契约面、v2/缺 id 拒绝、typed failure | 4 例 |
+| `actual-reattach.test.ts` | 临时 detach 后合法继任、未决写 indeterminate、旧 allowed 无效 | 2 例 |
+| `actual-transport-integration.test.ts` | journal 页游标、reference 帧、分块 payload digest、未匹配 ACK | 2 例 |
 
 ## 5. 错误处理示例
 
@@ -92,6 +94,10 @@ try {
 ```
 
 消费者扩宽自己的错误 union 用 `AttachFailureCode`，不要用 `as` 绕过。
+
+## 5.1 terminal 与 detach
+
+见 `fault-states.zh-CN.md`：终态（main `finish()` → `attach.close()`）关闭全部 lease/pending，pending fact 为 `closed`、未决 native 为 `indeterminate`、迟到 next/reply 零效果；仍 running 的临时 detach 可以合法继任，但旧 allowed 不迁移。wave-31 关于 shutdown 的相反观察来自缺 `id` 的无效帧，已纠正。
 
 ## 6. 分层结论（不要把模块绿灯读成产品恢复）
 
