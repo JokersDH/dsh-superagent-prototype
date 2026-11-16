@@ -1,0 +1,92 @@
+{
+  "protocol": "wave32-operator-docs-review/1",
+  "date": "2026-11-16",
+  "reviewedMain": "8deda18dd249c53f21a79b37b4683eebea9910c5",
+  "scope": "Narrow read-only review of operations and version statements in the two new operator documents. No startup, test execution, model/native command, signal, candidate modification or new task package.",
+  "documents": [
+    {
+      "path": "/Users/hh/Desktop/joker/superagent/docs/ASSISTANT-GUIDE.zh-CN.md",
+      "sha256": "932eadfe08d0cebfe95f0bf1785a61fbfb2fc463a31c9b9b0c0c27a3d5842f2c"
+    },
+    {
+      "path": "/Users/hh/Desktop/joker/superagent/docs/product/STATUS.zh-CN.md",
+      "sha256": "2d0845ecc7b15751db0ef84dae80479080ac12dc1839af5f9d196078e09fb9d8"
+    }
+  ],
+  "findings": [],
+  "checks": [
+    {
+      "id": "R1_R2_IDENTITIES_AND_TEMPORAL_SCOPE",
+      "result": "PASS",
+      "facts": [
+        "R1 source82ee/build829/tar049267 is the accurate independently measured ordinary/functional installed subject and does not contain main303 observation downloads.",
+        "R2 sourcec0a/build4dcd/tar405ecd contains main303 runtime and strictexport; D developer results and missing independent E same-R2 result are separately described.",
+        "The docs do not imply later A/C/F/G/J candidate sources automatically entered main or R2, or that historical5180-5191 services changed with repository HEAD.",
+        "Current main HEAD8deda follows runtime303 with dispatch documentation; the current source/version language matches this checkout."
+      ],
+      "evidence": ["reports/releases/wave32-admission/delivery.json", "git HEAD", "exact R1/R2 hashes and archive manifests independently checked in the preceding delivery audit"]
+    },
+    {
+      "id": "E_RECORDED_GATES_VERSUS_JOURNEY_SEMANTICS",
+      "result": "PASS",
+      "facts": [
+        "STATUS accurately states E288PASS/0FAIL/19NT and recorded ordinary195/functional196 gates, retaining actual complete-set normal/restored stops.",
+        "Both docs explicitly narrow the personal registration/context, singleproject-atlas two-Work delivery and conversation persistence evidence; they do not claim that two registered projects independently delivered or reopened original Work views.",
+        "R2 pending independent acceptance and real native/full-product limitations remain clear; aggregate completion estimates are not used to waive them."
+      ],
+      "evidence": ["delivery.json independent recorded oracle195/196 and pure journey mutation", "STATUS version table and E journey finding", "ASSISTANT-GUIDE version table and final limitations"]
+    },
+    {
+      "id": "INSTALL_ENTRY_AND_PRIVATE_ROOT_CONTINUITY",
+      "result": "PASS",
+      "facts": [
+        "The archive expands under install/ and the documented entry is install/bin/pa.",
+        "Fresh mktemp extraction and trial roots avoid overwriting an old install/state.",
+        "PA_CONFIG_ROOT,PA_DATA_ROOT,PA_CACHE_ROOT,PA_LOGS_ROOT andPA_WORKSPACE_ROOT match the actual wrapper and portability root map; all five remain selected for first-run/doctor/start/status/stop.",
+        "The docs correctly warn that a new terminal must reselect the same bin and roots, and that config-root alone does not implicitly carry all other overrides.",
+        "first-run on a fresh private config verifies and automatically adopts the actual same-package manifest; no forced --adopt-release is recommended."
+      ],
+      "sources": ["apps/launcher/lib/first-run.mjs", "apps/launcher/lib/context.mjs", "packages/portability/src/roots.ts", "previously verified R2 install/bin/pa"]
+    },
+    {
+      "id": "CLI_START_STOP_DOCTOR_AND_BACKUP_FLAGS",
+      "result": "PASS",
+      "facts": [
+        "Installed start supports --discussion-only,--port,--api-port and--open; status/doctor/stop use the same bin and roots.",
+        "Source pnpmstart/pnpmstop/pnpmdoctor accept the documented --state selection; source stop targets the selected recorded instance after launcher verification.",
+        "backup --out, verify-backup --bundle and restore --bundle --to exactly match the current parser and consumers.",
+        "The docs reject obsolete backup --output/restore --from and warn against overriding active state, consuming restored queues or inheriting old execution grants.",
+        "The support command uses --out for a new file and is not described as an arbitrary log/key dump.",
+        "The chosen example ports avoid the protected twelve pairs and explicitly require choosing different ports when occupied."
+      ],
+      "sources": ["apps/launcher/bin/pa.mjs commandSpecs and command handlers", "apps/launcher/lib/backup.mjs", "apps/launcher/lib/restore.mjs", "apps/launcher/lib/support.mjs", "tools/dev/start.mjs", "tools/dev/doctor.mjs"]
+    },
+    {
+      "id": "MODEL_PRIVATE_JSON_NOT_GUI_KEY_EDITOR",
+      "result": "PASS",
+      "facts": [
+        "Default ~/.config/superagent-personal/model.json and PA_MODEL_CONFIG match PrivateModelProvider.",
+        "Private directory0700/file0600 requirements and JSON baseURL/apiKey/model/allowedModels/allowInsecureHttp/maxOutputTokens match the actual strict schema.",
+        "The docs state that GUI selection only changes already allowed models and proposal settings; they do not promise an API-key/BaseURL editor.",
+        "Dialogue model credentials are distinguished from Codex execution authentication; no secret is included in the examples.",
+        "Historical admitted profileVersion is codex-cli0.164.0; the source guard actually compares the installed --version against that persisted evidence, consistent with the guide's constrained admission wording."
+      ],
+      "sources": ["apps/coordinator/product/model-provider.ts", "apps/coordinator/http/app.ts model-selection endpoint", "apps/coordinator/product/native-startup.ts", "reports/releases/native-mvp/native-product.json"]
+    },
+    {
+      "id": "COMPLETION_ESTIMATES_NOT_RELEASE_AUTHORITY",
+      "result": "PASS_WITH_EXPLICIT_SCOPE",
+      "facts": [
+        "The documented76/100 and55.7/100 are explicitly engineering estimates under previous frozen weights, not acceptance, stability probability or model benefit.",
+        "This narrow review did not re-audit innovation claims or recalculate the historical weighting."
+      ]
+    }
+  ],
+  "limitations": [
+    "Source and existing recorded artifact evidence were inspected; the installation instructions were not executed during this review.",
+    "No syntax-only or runtime tests were added or run. No service, root, model, executor or candidate worktree was changed.",
+    "The preceding independent delivery audit remains authoritative for open E lifecycle-tool and journey-oracle issues; this document review does not close them."
+  ],
+  "reviewerWrites": ["reports/releases/wave32-admission/docs-review.json"],
+  "status": "NO_ACTIONABLE_FINDINGS_IN_REVIEWED_OPERATIONS_AND_VERSION_SCOPE"
+}
