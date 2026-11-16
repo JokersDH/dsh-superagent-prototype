@@ -1,0 +1,12 @@
+{
+  "status": "STOPPED",
+  "installRoot": "/private/tmp/w33-colleague/PersonalAgent-Preview-f880e5b/install/app",
+  "roots": {
+    "install": "/private/tmp/w33-colleague/PersonalAgent-Preview-f880e5b/install/app",
+    "config": "/tmp/w33-home-run/Library/Application Support/PersonalAgent/Preview-f880e5bc9c6c1c57/config",
+    "data": "/tmp/w33-home-run/Library/Application Support/PersonalAgent/Preview-f880e5bc9c6c1c57/data",
+    "cache": "/tmp/w33-home-run/Library/Application Support/PersonalAgent/Preview-f880e5bc9c6c1c57/cache",
+    "logs": "/tmp/w33-home-run/Library/Application Support/PersonalAgent/Preview-f880e5bc9c6c1c57/logs",
+    "workspace": "/tmp/w33-home-run/Library/Application Support/PersonalAgent/Preview-f880e5bc9c6c1c57/workspaces"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "status": "BLOCKED",
+  "code": "unknown_live_resource",
+  "message": "An unregistered live process matches this state but is not owned by this operation; refusing to stop or switch anything",
+  "detail": {
+    "unknownLive": [
+      {
+        "pid": 78354,
+        "command": "bash -c /tmp/w33-rollback.sh >/tmp/w33-rollback.json 2>/tmp/w33-rollback.err; echo rollback=$?; head -c 1000 /tmp/w33-rollback.json; tail -3 /tmp/w33-rollback.err; node -e \"console.log('pointer',requi",
+        "unregistered": true
+      }
+    ]
+  }
+}

@@ -1,0 +1,132 @@
+{
+  "protocol": "wave33-upgrade-rollback-nonempty/1",
+  "baseline": {
+    "build": "88eb8c69b0671171",
+    "source": "e8348a864d7d192589e72b8099475520f841b1e5"
+  },
+  "target": {
+    "build": "f880e5bc9c6c1c57",
+    "source": "048f0184606202b0b39e7426b7747f3fe57541c1",
+    "schema": 18
+  },
+  "switch": {
+    "status": "CONFIRMED",
+    "backup": "95f0b779160a419633a4a2e52ea73c4ab253f9829ed0cb78d67e0bd0c5853deb",
+    "startedBuild": "f880e5bc9c6c1c57",
+    "health": "ok"
+  },
+  "postUpgradeRead": {
+    "protocol": "wave33-restore-read/1",
+    "status": "PASS",
+    "target": "/tmp/w33-upstate",
+    "sourceState": "/tmp/w33-nonempty/state",
+    "workId": "e9c9a0de8048124ad16d7a04bd979024",
+    "workProjectId": "project-wave33",
+    "acceptedEventSeq": 49,
+    "artifactCount": 4,
+    "artifacts": [
+      {
+        "id": "a1b28c94e2a5517e6cd0c14a14b9dea6c5eb22e7d6923a63c5e8ade459663360",
+        "bytes": 1143,
+        "sha256": "a1b28c94e2a5517e6cd0c14a14b9dea6c5eb22e7d6923a63c5e8ade459663360"
+      },
+      {
+        "id": "1822672fb21520769ab626ab4ff94bfe4563373368f291baefc4b31fec8ed7c5",
+        "bytes": 187,
+        "sha256": "1822672fb21520769ab626ab4ff94bfe4563373368f291baefc4b31fec8ed7c5"
+      },
+      {
+        "id": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+        "bytes": 24,
+        "sha256": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b"
+      },
+      {
+        "id": "adc73876b80165249a0650c825ab751527c925252bdcb2605c3b31db7e726e19",
+        "bytes": 380,
+        "sha256": "adc73876b80165249a0650c825ab751527c925252bdcb2605c3b31db7e726e19"
+      }
+    ],
+    "contractCount": 1,
+    "acceptanceCount": 1,
+    "restore": null,
+    "started": false,
+    "businessActions": 0,
+    "realVendorTurns": 0,
+    "realModelTurns": 0,
+    "realNativeTurns": 0
+  },
+  "pointerAfterRollback": "88eb8c69b0671171",
+  "postRollbackRead": {
+    "protocol": "wave33-restore-read/1",
+    "status": "PASS",
+    "target": "/tmp/w33-upstate",
+    "sourceState": "/tmp/w33-nonempty/state",
+    "workId": "e9c9a0de8048124ad16d7a04bd979024",
+    "workProjectId": "project-wave33",
+    "acceptedEventSeq": 49,
+    "artifactCount": 4,
+    "artifacts": [
+      {
+        "id": "a1b28c94e2a5517e6cd0c14a14b9dea6c5eb22e7d6923a63c5e8ade459663360",
+        "bytes": 1143,
+        "sha256": "a1b28c94e2a5517e6cd0c14a14b9dea6c5eb22e7d6923a63c5e8ade459663360"
+      },
+      {
+        "id": "1822672fb21520769ab626ab4ff94bfe4563373368f291baefc4b31fec8ed7c5",
+        "bytes": 187,
+        "sha256": "1822672fb21520769ab626ab4ff94bfe4563373368f291baefc4b31fec8ed7c5"
+      },
+      {
+        "id": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+        "bytes": 24,
+        "sha256": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b"
+      },
+      {
+        "id": "adc73876b80165249a0650c825ab751527c925252bdcb2605c3b31db7e726e19",
+        "bytes": 380,
+        "sha256": "adc73876b80165249a0650c825ab751527c925252bdcb2605c3b31db7e726e19"
+      }
+    ],
+    "contractCount": 1,
+    "acceptanceCount": 1,
+    "restore": null,
+    "started": false,
+    "businessActions": 0,
+    "realVendorTurns": 0,
+    "realModelTurns": 0,
+    "realNativeTurns": 0
+  },
+  "baselineInstalledReader": {
+    "status": "PASS",
+    "reader": "W32 installed ProductStore",
+    "work": "e9c9a0de8048124ad16d7a04bd979024",
+    "contractCount": 1,
+    "acceptanceCount": 1,
+    "artifacts": [
+      {
+        "id": "a1b28c94e2a5517e6cd0c14a14b9dea6c5eb22e7d6923a63c5e8ade459663360",
+        "sha256": "a1b28c94e2a5517e6cd0c14a14b9dea6c5eb22e7d6923a63c5e8ade459663360",
+        "bytes": 1143
+      },
+      {
+        "id": "1822672fb21520769ab626ab4ff94bfe4563373368f291baefc4b31fec8ed7c5",
+        "sha256": "1822672fb21520769ab626ab4ff94bfe4563373368f291baefc4b31fec8ed7c5",
+        "bytes": 187
+      },
+      {
+        "id": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+        "sha256": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+        "bytes": 24
+      },
+      {
+        "id": "adc73876b80165249a0650c825ab751527c925252bdcb2605c3b31db7e726e19",
+        "sha256": "adc73876b80165249a0650c825ab751527c925252bdcb2605c3b31db7e726e19",
+        "bytes": 380
+      }
+    ]
+  },
+  "dataRolledBack": false,
+  "realVendorTurns": 0,
+  "realModelTurns": 0,
+  "realNativeTurns": 0
+}

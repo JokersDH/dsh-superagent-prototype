@@ -1,0 +1,47 @@
+{
+  "protocol": "wave33-nonempty-recipe/1",
+  "source": "048f0184606202b0b39e7426b7747f3fe57541c1",
+  "dataRoot": "/tmp/w33-nonempty/state",
+  "workId": "e9c9a0de8048124ad16d7a04bd979024",
+  "questionId": "9e8ed53d06f3f14c23193905aa0110d1",
+  "deliveryStatus": "native_applied",
+  "candidateGeneration": 3,
+  "acceptedEventSeq": 51,
+  "artifactIds": [
+    "a1b28c94e2a5517e6cd0c14a14b9dea6c5eb22e7d6923a63c5e8ade459663360",
+    "1822672fb21520769ab626ab4ff94bfe4563373368f291baefc4b31fec8ed7c5",
+    "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+    "adc73876b80165249a0650c825ab751527c925252bdcb2605c3b31db7e726e19"
+  ],
+  "artifacts": [
+    {
+      "id": "a1b28c94e2a5517e6cd0c14a14b9dea6c5eb22e7d6923a63c5e8ade459663360",
+      "sha256": "a1b28c94e2a5517e6cd0c14a14b9dea6c5eb22e7d6923a63c5e8ade459663360",
+      "bytes": 1143,
+      "name": null
+    },
+    {
+      "id": "1822672fb21520769ab626ab4ff94bfe4563373368f291baefc4b31fec8ed7c5",
+      "sha256": "1822672fb21520769ab626ab4ff94bfe4563373368f291baefc4b31fec8ed7c5",
+      "bytes": 187,
+      "name": null
+    },
+    {
+      "id": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+      "sha256": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+      "bytes": 24,
+      "name": null
+    },
+    {
+      "id": "adc73876b80165249a0650c825ab751527c925252bdcb2605c3b31db7e726e19",
+      "sha256": "adc73876b80165249a0650c825ab751527c925252bdcb2605c3b31db7e726e19",
+      "bytes": 380,
+      "name": null
+    }
+  ],
+  "workspacePath": "/private/tmp/w33-nonempty/state/workspaces/attempts/attempt-4293a9d0-c32a-44dd-afe4-f5be32438a95",
+  "projectPath": "/private/tmp/w33-nonempty/project",
+  "realVendorTurns": 0,
+  "realModelTurns": 0,
+  "realNativeTurns": 0
+}

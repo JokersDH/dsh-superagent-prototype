@@ -1,0 +1,266 @@
+{
+  "protocol": "wave33-status/1",
+  "owner": "agent-d",
+  "branch": "codex/g3-local-distribution",
+  "state": "COMPLETE_CANDIDATE_PENDING_E",
+  "source": "048f0184606202b0b39e7426b7747f3fe57541c1",
+  "runtimeSource": "fc38bf65 (main attachPort + F consumers)",
+  "dirtyAtBuild": false,
+  "built": {
+    "protocol": "wave33-frozen-manifest/1",
+    "release": "W33",
+    "runtimeSource": "fc38bf65 (main attachPort + F consumers)",
+    "buildCheckout": "048f0184606202b0b39e7426b7747f3fe57541c1",
+    "source": "048f0184606202b0b39e7426b7747f3fe57541c1",
+    "buildId": "f880e5bc9c6c1c57",
+    "tarSha256": "ee45c92c7c5a8f2caa0449572b14bf97175b0392f1fd92c6f89d7a19464604e8",
+    "tarBytes": 20547728,
+    "files": 6867,
+    "tarEntries": 7424,
+    "closure": {
+      "records": 192,
+      "uniquePaths": 192,
+      "rawGroupedRecords": 204,
+      "deduplicated": true
+    },
+    "outer": {
+      "zip": "/Users/hh/Desktop/joker/pa-artifacts/wave33-preview-f880e5b/PersonalAgent-Preview-f880e5b.zip",
+      "zipSha256": "46e01c8c7b79818d19e019f6d2208ad54c5c9538674218f85455434eff8207f9",
+      "zipBytes": 63481603,
+      "manifestSha256": "13e46a1018abf9e431be87049ae267d7ad92f69469a3165aeb25f445e8847081",
+      "archiveEntries": 7435,
+      "runtime": {
+        "version": "24.21.0",
+        "sha256": "e4b5a3af0e05c75de2eae013904145f40fe7fc2a6e6f17510128bf45cca4e79b",
+        "licenseSha256": "5888dbb9a1d2b18f2c3e6c5f6af1b39de658372b402a0577b002777f14c62ace"
+      }
+    },
+    "environment": {
+      "node": "24.21.0",
+      "abi": "137",
+      "platform": "darwin",
+      "arch": "arm64",
+      "sqlite": "3.53.4",
+      "productSchema": 18
+    }
+  },
+  "outcomes": {
+    "O1": {
+      "status": "PASS",
+      "title": "真实普通运行与配置生命周期",
+      "consumer": "main unique Start/Stop/Settings Node wrapper + original pa + actual console",
+      "positive": [
+        "isolated HOME cold start RUNNING/health",
+        "same tuple second start reused same PID 13026, no second instance",
+        "Stop STOPPED/recordRemoved",
+        "restart new PID14468 and Stop",
+        "existing private model.json 0600 start in explicit discussion-only",
+        "window13/J6/F8 actual UI"
+      ],
+      "negative": [
+        "unsafe config mode 755 refused, state preserved",
+        "wrong outer build expectation exit1",
+        "executor absent degrades to discussion only, never fixture"
+      ],
+      "evidence": [
+        "reports/wave33/status-running.json",
+        "reports/wave33/status-reused.json",
+        "reports/wave33/status-final-stopped.json",
+        "reports/wave33/bad-permission.err",
+        "reports/wave33/window.json",
+        "reports/wave33/j.json",
+        "reports/wave33/f.json"
+      ]
+    },
+    "O2": {
+      "status": "PASS",
+      "title": "同版本非空业务备份与搬根只读恢复",
+      "consumer": "current controlled Product/Application + same W33 bin/pa backup/verify/restore + ProductStore/HTTP recovery reader",
+      "positive": {
+        "workId": "e9c9a0de8048124ad16d7a04bd979024",
+        "sourceState": "/tmp/w33-nonempty/state",
+        "backup": {
+          "status": "CREATED",
+          "bytes": 38939,
+          "artifacts": 20,
+          "acceptedEvents": 1,
+          "eventSeq": 51,
+          "sha256": "be40f037fe85e1328e07183bef014a40b1ae9c1af11d3a41f4b3b09396d48d21"
+        },
+        "restore": {
+          "status": "RESTORED",
+          "eventSeq": 51,
+          "integrity": "ok"
+        },
+        "read": {
+          "contracts": 1,
+          "acceptances": 1,
+          "artifacts": 4,
+          "acceptedEventSeq": 49
+        },
+        "readonly": {
+          "health": "recovery_readonly",
+          "forbiddenStatus": 403,
+          "stop": "STOPPED"
+        }
+      },
+      "negative": [
+        "same-length artifact tamper exit1",
+        "missing artifact exit1 ENOENT",
+        "non-private restore parent refused before write"
+      ],
+      "evidence": [
+        "reports/wave33/nonempty-recipe.json",
+        "reports/wave33/nonempty-backup.json",
+        "reports/wave33/nonempty-verify-backup.json",
+        "reports/wave33/nonempty-restore.json",
+        "reports/wave33/nonempty-read.json",
+        "reports/wave33/restored-health.json",
+        "reports/wave33/restored-403.json",
+        "reports/wave33/restored-stop.json"
+      ]
+    },
+    "O3": {
+      "status": "PASS_LIMITED_E",
+      "title": "升级回退、支持与唯一发行闭包",
+      "consumer": "W33 upgrade/pointer/journal + W32 installed ProductStore after rollback + support + main outer verifier",
+      "positive": {
+        "baseline": {
+          "build": "88eb8c69b0671171",
+          "source": "e8348a864d7d192589e72b8099475520f841b1e5"
+        },
+        "target": {
+          "build": "f880e5bc9c6c1c57",
+          "source": "048f0184606202b0b39e7426b7747f3fe57541c1",
+          "schema": 18
+        },
+        "switch": {
+          "status": "CONFIRMED",
+          "backup": "95f0b779160a419633a4a2e52ea73c4ab253f9829ed0cb78d67e0bd0c5853deb",
+          "startedBuild": "f880e5bc9c6c1c57",
+          "health": "ok"
+        },
+        "pointerAfterRollback": "88eb8c69b0671171",
+        "postUpgradeArtifacts": 4,
+        "postRollbackArtifacts": 4,
+        "outerZIP": {
+          "zip": "/Users/hh/Desktop/joker/pa-artifacts/wave33-preview-f880e5b/PersonalAgent-Preview-f880e5b.zip",
+          "zipSha256": "46e01c8c7b79818d19e019f6d2208ad54c5c9538674218f85455434eff8207f9",
+          "zipBytes": 63481603,
+          "manifestSha256": "13e46a1018abf9e431be87049ae267d7ad92f69469a3165aeb25f445e8847081",
+          "archiveEntries": 7435,
+          "runtime": {
+            "version": "24.21.0",
+            "sha256": "e4b5a3af0e05c75de2eae013904145f40fe7fc2a6e6f17510128bf45cca4e79b",
+            "licenseSha256": "5888dbb9a1d2b18f2c3e6c5f6af1b39de658372b402a0577b002777f14c62ace"
+          }
+        },
+        "closure": {
+          "records": 192,
+          "uniquePaths": 192,
+          "rawGroupedRecords": 204,
+          "deduplicated": true
+        }
+      },
+      "negative": [
+        "wrong target/outer build expectation exit1",
+        "support existing output REFUSED output_exists",
+        "same-length artifact tamper refused"
+      ],
+      "evidence": [
+        "reports/wave33/upgrade-nonempty.json",
+        "reports/wave33/upgrade-read.json",
+        "reports/wave33/rollback.json",
+        "reports/wave33/rollback-read.json",
+        "reports/wave33/w32-baseline-read.json",
+        "reports/wave33/support.json",
+        "reports/wave33/outer-verify.json",
+        "reports/wave33/ordinary-source-closure.json"
+      ]
+    }
+  },
+  "commands": [
+    {
+      "cmd": "build.mjs",
+      "exit": 0
+    },
+    {
+      "cmd": "freeze-install.mjs",
+      "exit": 0
+    },
+    {
+      "cmd": "package-personal-preview.mjs",
+      "exit": 0
+    },
+    {
+      "cmd": "verify-personal-preview pinned",
+      "exit": 0,
+      "result": "VERIFIED_STATIC"
+    },
+    {
+      "cmd": "Start.command cold/reuse/restart",
+      "exit": 0,
+      "result": "RUNNING same PID reuse; STOPPED"
+    },
+    {
+      "cmd": "pa backup/verify-backup/restore",
+      "exit": 0,
+      "result": "CREATED/VERIFIED/RESTORED"
+    },
+    {
+      "cmd": "verify-wave33-restore",
+      "exit": 0,
+      "result": "Work+contract+acceptance+4 artifacts"
+    },
+    {
+      "cmd": "pa upgrade nonempty W32->W33",
+      "exit": 0,
+      "result": "CONFIRMED"
+    },
+    {
+      "cmd": "pa rollback-install",
+      "exit": 0,
+      "result": "BINARY_ROLLED_BACK data retained"
+    },
+    {
+      "cmd": "support-bundle",
+      "exit": 0,
+      "result": "PASS 0600"
+    },
+    {
+      "cmd": "support-bundle duplicate",
+      "exit": 1,
+      "result": "REFUSED output_exists"
+    }
+  ],
+  "integrated": {
+    "inMain": [
+      "main tools/bootstrap packager/launcher/verifier and original pa lifecycle"
+    ],
+    "candidateOnly": [
+      "W33 inner tar/build f880",
+      "W33 outer ZIP",
+      "D nonempty recipe/reader and reports"
+    ]
+  },
+  "closure": {
+    "canonicalUnique": 192,
+    "rawGroupedRecords": 204,
+    "w32Historical": "197 records/192 unique",
+    "oldStatus209": "stale record count, not missing files"
+  },
+  "remaining": [
+    "E independent verdict for W33 outer/new inner",
+    "explicit allowed-model switch beyond existing private model config",
+    "cross-machine/signing/notarization/long soak",
+    "real native/vendor/model remains 0",
+    "CAC excluded"
+  ],
+  "limitations": [
+    "W33 uses fc38 source; W32/R1/R2 retained",
+    "backup evidence counters do not list Work rows; restored ProductStore read proves Work/contract/acceptance/artifact bytes",
+    "upgrade baseline state was copied from same schema nonempty W33 writer; no production migration claimed",
+    "status STOPPED exits 2 by original CLI semantics",
+    "outer unsigned/not notarized"
+  ]
+}

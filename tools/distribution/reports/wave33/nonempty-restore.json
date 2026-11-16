@@ -1,0 +1,118 @@
+{
+  "ok": true,
+  "status": "RESTORED",
+  "target": "/tmp/w33-home/restored",
+  "reportPath": "/tmp/w33-home/restored/restore-report.json",
+  "report": {
+    "protocol": "personal-restore/1",
+    "createdAt": "2026-11-16T06:42:23.306Z",
+    "bundle": {
+      "archiveSha256": "be40f037fe85e1328e07183bef014a40b1ae9c1af11d3a41f4b3b09396d48d21",
+      "manifestDigest": "f03575a0313aabe2a620c004d565de323ec8edfe569386b32795a18537776ad7",
+      "manifestCreatedAt": "2026-11-16T06:41:23.649Z",
+      "producer": {
+        "product": "dsh-superagent",
+        "version": "0.1.0",
+        "platform": "darwin",
+        "arch": "arm64",
+        "node": "24.21.0",
+        "sqlite": "3.53.4"
+      },
+      "sourceStateName": "state",
+      "fileName": "backup.tar"
+    },
+    "targetPath": "/tmp/w33-home/restored",
+    "entries": {
+      "count": 21,
+      "bytes": 697093
+    },
+    "database": {
+      "integrity": "ok",
+      "foreignKeyViolations": 0,
+      "productSchema": 18,
+      "eventSeq": 51
+    },
+    "pathMappings": {
+      "applied": [],
+      "pendingRebind": [],
+      "unmatchedMappings": []
+    },
+    "evidence": {
+      "status": "verified",
+      "digest": "b0cdb94b280994cdc4d9a91140e92151b45a52579e35a6c88c999565e9a9d202",
+      "counts": {
+        "projects": 0,
+        "works": 0,
+        "decisions": 0,
+        "assistantDecisions": 0,
+        "assistantProposals": 0,
+        "artifacts": 20,
+        "acceptedEvents": 1,
+        "routeAdvice": 0,
+        "reviewEvidence": 0,
+        "executionOutcomes": 0
+      },
+      "routingEvidence": {
+        "status": "included",
+        "reason": null,
+        "requiredPorts": [],
+        "advice": [],
+        "reviews": [],
+        "outcomes": [],
+        "artifactRefs": [],
+        "missingArtifactRefs": []
+      },
+      "reason": null,
+      "legacyFormat": false,
+      "migratedSchema": false,
+      "schema": {
+        "bundle": 18,
+        "restored": 18
+      }
+    },
+    "requiresRevalidation": [
+      "Native execution environment and policy evidence were not migrated; re-probe before dispatching.",
+      "Native authentication lives in the account home and is not part of the bundle; re-authenticate locally.",
+      "The old writer pid/nonce and runtime records are historical and never become authority on restore.",
+      "Project bindings not explicitly remapped stay pending and must be rebound to a local path."
+    ],
+    "excluded": [
+      {
+        "path": "receipts",
+        "reason": "unclassified-state-file"
+      },
+      {
+        "path": "state.sqlite",
+        "reason": "captured-as-consistent-snapshot"
+      },
+      {
+        "path": "state.sqlite-shm",
+        "reason": "captured-as-consistent-snapshot"
+      },
+      {
+        "path": "state.sqlite-wal",
+        "reason": "captured-as-consistent-snapshot"
+      },
+      {
+        "path": "workspaces",
+        "reason": "derived-worktrees"
+      },
+      {
+        "path": "artifacts",
+        "reason": "unreferenced-or-temporary-files:1"
+      }
+    ],
+    "limitations": [
+      "Account homes, model/API keys, native authentication, native session material and environment authority receipts are not included.",
+      "Project and worktree content is not included; only non-secret project bindings are carried and must be explicitly rebound/revalidated.",
+      "Runtime records, sockets, PIDs, caches and node_modules are not included.",
+      "Restoring into a new directory does not replay begin/deliver/answer and does not start the daemon.",
+      "Restore does not start the daemon, consume the durable queue, or resend begin/deliver/answer.",
+      "The restored instance has new local credentials; old runtime records and writer identity are not authority."
+    ]
+  },
+  "nextSteps": [
+    "核对 restore-report.json 的 requiresRevalidation 与 pendingRebind 后再启动。",
+    "node apps/launcher/bin/pa.mjs start --state /tmp/w33-home/restored"
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "status": "RUNNING",
+  "instance": {
+    "protocol": "personal-product-instance/1",
+    "pid": 13026,
+    "processStart": "Mon Nov 16 14:47:47 2026",
+    "apiPid": 13059,
+    "consolePid": 13026,
+    "apiURL": "http://127.0.0.1:58501",
+    "consoleURL": "http://127.0.0.1:58500",
+    "state": "/private/tmp/w33-home-run/Library/Application Support/PersonalAgent/Preview-f880e5bc9c6c1c57/data",
+    "install": "/private/tmp/w33-colleague/PersonalAgent-Preview-f880e5b/install/app",
+    "buildId": "f880e5bc9c6c1c57",
+    "mode": "personal",
+    "access": "local-development",
+    "startupMode": "normal",
+    "launcherArgv": [
+      "/private/tmp/w33-colleague/PersonalAgent-Preview-f880e5b/runtime/bin/node",
+      "/private/tmp/w33-colleague/PersonalAgent-Preview-f880e5b/install/app/apps/launcher/bin/pa.mjs",
+      "start",
+      "--port",
+      "58500",
+      "--api-port",
+      "58501",
+      "--open",
+      "--discussion-only"
+    ],
+    "launcherCwd": "/private/tmp/w33-colleague/PersonalAgent-Preview-f880e5b",
+    "apiArgv": [
+      "/private/tmp/w33-colleague/PersonalAgent-Preview-f880e5b/runtime/bin/node",
+      "/private/tmp/w33-colleague/PersonalAgent-Preview-f880e5b/install/app/apps/coordinator/product/demo.ts",
+      "--port",
+      "58501",
+      "--state",
+      "/private/tmp/w33-home-run/Library/Application Support/PersonalAgent/Preview-f880e5bc9c6c1c57/data",
+      "--console-origin",
+      "http://127.0.0.1:58500",
+      "--startup-mode",
+      "normal",
+      "--assistant",
+      "--discussion-only",
+      "--local-access"
+    ],
+    "apiProcessStart": "Mon Nov 16 14:47:48 2026",
+    "apiUid": 501,
+    "startedAt": "2026-11-16T06:47:49.033Z",
+    "configRoot": "/tmp/w33-home-run/Library/Application Support/PersonalAgent/Preview-f880e5bc9c6c1c57/config"
+  },
+  "checks": [
+    {
+      "id": "launcher_alive",
+      "ok": true
+    },
+    {
+      "id": "process_start",
+      "ok": true,
+      "detail": "Mon Nov 16 14:47:47 2026"
+    },
+    {
+      "id": "launcher_command",
+      "ok": true,
+      "detail": "exact_argv"
+    },
+    {
+      "id": "owner",
+      "ok": true
+    },
+    {
+      "id": "cwd",
+      "ok": true,
+      "detail": "cwd_checked"
+    },
+    {
+      "id": "install_identity",
+      "ok": true
+    },
+    {
+      "id": "api_argv",
+      "ok": true,
+      "detail": {
+        "exact": true,
+        "mismatches": []
+      }
+    },
+    {
+      "id": "api_process_start",
+      "ok": true,
+      "detail": {
+        "expected": "Mon Nov 16 14:47:48 2026",
+        "observed": "Mon Nov 16 14:47:48 2026"
+      }
+    },
+    {
+      "id": "api_owner",
+      "ok": true
+    },
+    {
+      "id": "api_parent",
+      "ok": true
+    },
+    {
+      "id": "api_cwd",
+      "ok": true
+    },
+    {
+      "id": "listeners",
+      "ok": true
+    },
+    {
+      "id": "health",
+      "ok": true,
+      "detail": "personal"
+    },
+    {
+      "id": "runtime_mode",
+      "ok": true,
+      "detail": {
+        "expected": "personal",
+        "observed": "personal"
+      }
+    },
+    {
+      "id": "startup_mode",
+      "ok": true,
+      "detail": {
+        "expected": "normal",
+        "observed": "normal"
+      }
+    }
+  ],
+  "recovery": {
+    "startupMode": "normal",
+    "markerPresent": false,
+    "markerValid": false,
+    "warning": null,
+    "requiresRevalidation": [],
+    "pendingRebind": []
+  },
+  "installRoot": "/private/tmp/w33-colleague/PersonalAgent-Preview-f880e5b/install/app",
+  "roots": {
+    "install": "/private/tmp/w33-colleague/PersonalAgent-Preview-f880e5b/install/app",
+    "config": "/tmp/w33-home-run/Library/Application Support/PersonalAgent/Preview-f880e5bc9c6c1c57/config",
+    "data": "/tmp/w33-home-run/Library/Application Support/PersonalAgent/Preview-f880e5bc9c6c1c57/data",
+    "cache": "/tmp/w33-home-run/Library/Application Support/PersonalAgent/Preview-f880e5bc9c6c1c57/cache",
+    "logs": "/tmp/w33-home-run/Library/Application Support/PersonalAgent/Preview-f880e5bc9c6c1c57/logs",
+    "workspace": "/tmp/w33-home-run/Library/Application Support/PersonalAgent/Preview-f880e5bc9c6c1c57/workspaces"
+  }
+}

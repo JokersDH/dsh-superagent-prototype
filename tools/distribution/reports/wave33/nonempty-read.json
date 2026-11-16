@@ -1,0 +1,46 @@
+{
+  "protocol": "wave33-restore-read/1",
+  "status": "PASS",
+  "target": "/tmp/w33-home/restored",
+  "sourceState": "/tmp/w33-nonempty/state",
+  "workId": "e9c9a0de8048124ad16d7a04bd979024",
+  "workProjectId": "project-wave33",
+  "acceptedEventSeq": 49,
+  "artifactCount": 4,
+  "artifacts": [
+    {
+      "id": "a1b28c94e2a5517e6cd0c14a14b9dea6c5eb22e7d6923a63c5e8ade459663360",
+      "bytes": 1143,
+      "sha256": "a1b28c94e2a5517e6cd0c14a14b9dea6c5eb22e7d6923a63c5e8ade459663360"
+    },
+    {
+      "id": "1822672fb21520769ab626ab4ff94bfe4563373368f291baefc4b31fec8ed7c5",
+      "bytes": 187,
+      "sha256": "1822672fb21520769ab626ab4ff94bfe4563373368f291baefc4b31fec8ed7c5"
+    },
+    {
+      "id": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+      "bytes": 24,
+      "sha256": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b"
+    },
+    {
+      "id": "adc73876b80165249a0650c825ab751527c925252bdcb2605c3b31db7e726e19",
+      "bytes": 380,
+      "sha256": "adc73876b80165249a0650c825ab751527c925252bdcb2605c3b31db7e726e19"
+    }
+  ],
+  "contractCount": 1,
+  "acceptanceCount": 1,
+  "restore": {
+    "protocol": "personal-restore/1",
+    "eventSeq": 51,
+    "schema": 18,
+    "integrity": "ok",
+    "evidence": "verified"
+  },
+  "started": false,
+  "businessActions": 0,
+  "realVendorTurns": 0,
+  "realModelTurns": 0,
+  "realNativeTurns": 0
+}

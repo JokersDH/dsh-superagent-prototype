@@ -1,0 +1,1 @@
+私有目录的类型、拥有者或权限不正确：/tmp/w33-home-run/Library/Application Support/PersonalAgent/Preview-f880e5bc9c6c1c57/config。请保留现有内容并人工核对。

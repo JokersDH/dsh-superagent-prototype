@@ -1,0 +1,60 @@
+{
+  "status": "PASS_ACTUAL_PROJECT_RECIPE_WORKFLOW",
+  "sourceCommit": "048f0184606202b0b39e7426b7747f3fe57541c1",
+  "sourceWorktreeClean": true,
+  "cases": [
+    {
+      "id": "PREVIEW-AND-APPLY-ONLY-PREFILL-ORIGINAL-FORM",
+      "status": "PASS"
+    },
+    {
+      "id": "CHANGED-FACTS-REFUSE-EXPLICIT-CREATION-UNTIL-REAPPLIED",
+      "status": "PASS"
+    },
+    {
+      "id": "SELECTION-AND-CONFIG-CHANGES-CANNOT-KEEP-HIDDEN-OLD-ATOMS",
+      "status": "PASS"
+    },
+    {
+      "id": "ERROR-AND-LEGACY-ABSENCE-KEEP-MANUAL-DELEGATION-AVAILABLE",
+      "status": "PASS"
+    },
+    {
+      "id": "TWO-EXPLICIT-TEMPLATE-WORKS-REACH-ORIGINAL-CANDIDATE-AND-MANUAL-ACCEPT",
+      "status": "PASS"
+    },
+    {
+      "id": "DESKTOP-MOBILE-TEMPLATE-CONTROLS-AND-TEXT-FIT",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "previewPosts": 13,
+  "unknownAfterRecorded": true,
+  "commands": [
+    {
+      "kind": "create_work",
+      "commandId": "cmd-work-5c5bdb1a-5ad6-464c-81bc-952bf0690092"
+    },
+    {
+      "kind": "create_work",
+      "commandId": "cmd-work-5c5bdb1a-5ad6-464c-81bc-952bf0690092"
+    },
+    {
+      "kind": "accept_candidate",
+      "commandId": "cmd-accept-cadf00f5-1fca-4fea-99a6-e215f3f51256"
+    },
+    {
+      "kind": "create_work",
+      "commandId": "cmd-work-5e53b480-3d13-4009-bc8b-fbb5a6daabdb"
+    },
+    {
+      "kind": "accept_candidate",
+      "commandId": "cmd-accept-e0a6ae75-941b-45de-8237-6d1652d79580"
+    }
+  ],
+  "acceptedWorks": 2,
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "scope": "Installed package static console + installed runtime/J observer/registered project/HTTP/Product/Broker/check/accept controlled workflow; no daemon/native/recovered admission"
+}
