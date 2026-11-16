@@ -133,10 +133,21 @@ proxy row is never read as a measurement and two currencies or layers never coll
 `rowCoverageMeaning(row)` states what a row's coverage does and does not establish: an enumerated
 source with no recorded value is *not* a measured zero.
 
-`describeDisplayDocument(served)` returns a sanitized support summary of a served `usage-observation/1`
-document: status, identity, window, scope, coverage, counts and one entry per row with its layer, unit,
-value-present flag and sample count. It copies **no** formatted value, label, detail or path, so a
-support ticket cannot be turned into a numeric claim. `renderSupportSummary` renders it as Markdown.
+`describeDisplayDocument(document)` returns a sanitized support summary: status, identity, window,
+scope, coverage, counts and one entry per row with its layer, unit, value-present flag and sample
+count. It accepts **both** the served `usage-observation/1` payload and the `usage-insights-display-export/1`
+file a user downloaded (`documentKind` says which), because the file is what a colleague actually has.
+It copies **no** formatted value, label, detail or path, so a support ticket cannot be turned into a
+numeric claim.
+
+`buildSupportReport({ observation, origin })` adds two blocks a trial report needs: `origin` (build id,
+source commit, package digest, capability flags, browser trigger, and the list of capabilities the
+package is missing) and `evidence` (`coverageState`, rows with/without a value, whether the observation
+is partial, and `absentFacts` — the things that are missing and must not be read as zero). Without a
+package the origin is `null` and `exportCapability` is `unverified`; a malformed capability block
+degrades to `unverified` instead of being read as "absent". `renderSupportSummary` / `renderSupportReport`
+render either as Markdown. The contract for D/E/H is in
+`reports/usage-insights/support-contract.zh-CN.md`.
 
 ## Compatibility with the product download
 

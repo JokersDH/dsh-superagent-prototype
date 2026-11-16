@@ -1,0 +1,192 @@
+{
+  "protocol": "wave32-usage-insights-status/1",
+  "agent": "G",
+  "branch": "codex/g4-usage-insights",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-g",
+  "origin": "https://github.com/JokersDH/dsh-superagent-prototype.git",
+  "fixedStart": "6dbb3440",
+  "mergedMain": "58b4e4c8",
+  "mergeCommit": "3f65d055",
+  "dirty": "clean before this file; only owned paths changed",
+  "generatedAt": "2026-11-15T16:10:00Z",
+  "block": {
+    "statement": "Let a user export the same scoped observation they are looking at, plus a secret-free support summary, so a real trial problem can be reported and located quickly.",
+    "tokenBudget": "none",
+    "deadline": "none",
+    "vendorModelNativeTurns": 0,
+    "blockedPilot": "E original 24turn/200000token/USD5 single-in-flight pilot remains BLOCKED; no reset, top-up, refund, replacement sample, price or billing-recipe research, no borrowed credentials.",
+    "scopeOfThisWave": [
+      "consume the real GET /v1/insights/export and the original public readers",
+      "deliver a scope-explicit support summary/CLI that D/E/H can actually use",
+      "re-verify optional absence, row/byte caps, false truncation, scope re-read and error behaviour on the integration version this branch now contains"
+    ],
+    "notIncluded": ["CAC and CAC-specific subteam experiments (later independent trial)", "temporary ZIP packaging sprint", "narrowing Scheme B"]
+  },
+  "ownership": {
+    "ownedPaths": ["packages/usage-insights/", "tools/usage-insights/", "reports/usage-insights/"],
+    "unchangedOwners": "main keeps root/contracts/config/lock/HTTP/provider/App/transport/globalCSS and tools/bootstrap; A migrations; E product assertions; I communication core",
+    "touchedOutsideOwnedPaths": "none (packages/contracts distributed files were rebuilt locally only; no commit outside the three paths)"
+  },
+  "mergedIntoMain": {
+    "mainCommit": "58b4e4c8",
+    "byteIdenticalInMain": [
+      "packages/usage-insights/src/analyze.ts",
+      "attention.ts",
+      "baseline.ts",
+      "browser.ts",
+      "crosscheck.ts",
+      "display-export.ts",
+      "export.ts",
+      "metrics.ts",
+      "node-composition.ts",
+      "protocol.ts",
+      "subject.ts"
+    ],
+    "candidateOnly": [
+      "packages/usage-insights/src/facing.ts (rowSemantics, rowCoverageMeaning)",
+      "packages/usage-insights/src/report.ts (Row id / Value state columns and the sample-basis note)",
+      "packages/usage-insights/src/index.ts (new exports)",
+      "packages/usage-insights/src/support.ts (support summary/report)",
+      "packages/usage-insights/test/support.case.ts",
+      "packages/usage-insights/test/download-route.case.ts",
+      "packages/usage-insights/test/row-semantics.case.ts",
+      "tools/usage-insights/lib/tar.mjs",
+      "tools/usage-insights/lib/package-surface.mjs",
+      "tools/usage-insights/cli.mjs (package, verify --dto/--package/--out, collect --days/--export)",
+      "tools/usage-insights/probe/observe-two-projects.mjs",
+      "reports/usage-insights/**"
+    ],
+    "note": "The product download route, the download contract and the six G sources main integrated at 303b2c6a are present; the support/report additions in this wave are source-only until main integrates them."
+  },
+  "artifacts": {
+    "r1": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave30-target/wave30-target-8296720.tar.gz",
+      "sha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "bytes": 20481470,
+      "buildId": "8296720d8a25f38c",
+      "sourceCommit": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "capabilities": { "pageObservation": true, "numericExport": false, "displayDownload": false },
+      "browserTrigger": "absent",
+      "consoleLayout": "bundle (0 references)",
+      "status": "fixed RC baseline; download genuinely absent; no E verdict is G's"
+    },
+    "r2": {
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave31-target/wave31-target-4dcd28f.tar.gz",
+      "sha256": "405ecd02fcbf288bac0855e17911ec4035521b54fe27d81fa0b28feaf5addcc6",
+      "bytes": 20540568,
+      "buildId": "4dcd28f758bbb265",
+      "sourceCommit": "c0a1f8975232b6397dfaf92d31ac5682df2dab36",
+      "capabilities": { "pageObservation": true, "numericExport": true, "displayDownload": true },
+      "browserTrigger": "present",
+      "consoleLayout": "bundle (6 references)",
+      "status": "this is the inner tar main's personal-preview tool packages by default; no E verdict and no installed admission is claimed here",
+      "correction": "wave31 reported displayDownload absent for this tar; that was a false negative from scanning only apps/console/src/transport.ts. The packaged build ships apps/console/dist/assets/*.js, and a layout-aware scan finds the download wiring. Both packages were re-inspected with the fixed scan: R1 stays absent, R2 is present."
+    }
+  },
+  "delivered": [
+    {
+      "item": "Support report (product consumer: CLI, and the JSON/Markdown a colleague attaches to a trial report)",
+      "implementation": [
+        "packages/usage-insights/src/support.ts: describeDisplayDocument accepts usage-observation/1 and usage-insights-display-export/1; buildSupportReport adds origin + evidence; renderSupportReport/renderSupportSummary",
+        "tools/usage-insights/cli.mjs: verify --dto <file> [--package <tar>] [--format json|markdown] [--out <file>]"
+      ],
+      "consumers": ["node tools/usage-insights/cli.mjs verify --dto <downloaded file> --package <frozen tar> --format markdown", "any Node caller of buildSupportReport (D/E/H)"],
+      "positives": [
+        "the downloaded file is accepted as input (documentKind display_export) and yields the same identity/scope/window/counts as the served DTO",
+        "with a package, origin names build 4dcd28f758bbb265, source c0a1f897…, digest 405ecd02…, capabilities and browserTrigger",
+        "evidence lists 4 unknown rows and partial coverage as missing facts, not zeros"
+      ],
+      "negatives": [
+        "no value, label, detail or path in JSON or Markdown (canary cases)",
+        "malformed capability block degrades to unverified, never to absent",
+        "unknown document → typed SupportFault, CLI exit 5",
+        "insufficient → exit 4; --input with --dto → exit 2; relative --package → exit 2",
+        "existing --out target is refused (0600 exclusive, no overwrite)"
+      ],
+      "exitCodes": { "ready": 0, "insufficient_data": 4, "unavailable_or_invalid": 5, "bad_arguments": 2 },
+      "evidence": "reports/usage-insights/probe/two-project-20261115T152615.support-report.json",
+      "contract": "reports/usage-insights/support-contract.zh-CN.md"
+    },
+    {
+      "item": "Package capability report (consumer: G's CLI; D/E/H reuse it for version/missing-feature location)",
+      "implementation": [
+        "tools/usage-insights/lib/tar.mjs: ustar/tar.gz reader, header checksums, archive budget by file size, separate inflation budget",
+        "tools/usage-insights/lib/package-surface.mjs: layout-aware scan of coordinator files and console source/bundle, capability derivation, browser trigger state",
+        "cli.mjs package --tar <abs> [--json] [--expect-sha256] [--expect-build] [--expect capability,...]"
+      ],
+      "positives": ["R2 reports page+numeric+download present, trigger present", "R1 reports page only, trigger absent"],
+      "negatives": [
+        "a console bundle without the download reference → trigger absent, download absent",
+        "no console at all → trigger unverifiable, server side decides",
+        "wrong digest/build → exit 5; expected-but-missing capability → exit 3; unknown capability name → exit 2",
+        "archive above the file budget → exit 5 before scanning; malformed archive → exit 5 naming no path"
+      ],
+      "evidence": "tools/usage-insights/test/package.case.mjs (7 cases, including the built-bundle layout that exposed the wave31 false negative)"
+    },
+    {
+      "item": "Export/limits/error re-verification on the merged integration version",
+      "implementation": ["no new code; the existing suites and probe were re-run against main 58b4e4c8"],
+      "positives": [
+        "GET /v1/insights/export → 200, no-store, digest of the delivered text, 12 rows, no numeric field",
+        "readonly startup serves both the page and the export",
+        "page and file agree 13/13; a repeat read is a new snapshot with identical row identities"
+      ],
+      "negatives": [
+        "401 no bearer; 403 foreign project; 400 invalid days/timezone/duplicate/unknown query",
+        "422 when the optional download port is absent and when no authorized scope exists",
+        "400/503 for a contradicting envelope; the contract rejects a hidden omission, a wrong filename and a changed byte count",
+        "false truncation is refused (an omitted row that would have fitted)",
+        "export and the following work read create 0 product events"
+      ],
+      "measured": {
+        "download": { "fileName": "observation-7d-fccec857a196.json", "sha256": "c45427bc356e9df6b2dfcbde1a9cdf9a8626554c6a81e090ae7b8d0eaaff0f50", "bytes": 5138, "rows": 12, "snapshotId": "fccec857a196d1e5bcc22c48d14a46a4c0c0669cbe1547f50191b15c65b5a2d6", "events": 0 },
+        "probe": { "collectMs": 201, "analyzeMs": 147, "note": "one machine, one bounded observation; not a soak or cross-machine claim" }
+      }
+    }
+  ],
+  "mainFindings": [
+    "The download contract (UsageObservationDownloadSchema) still does not recompute sha256 from text: a producer could advertise a wrong digest and the envelope would be accepted. G asserts the real digest separately.",
+    "The header coverageState still folds any partial row into partial, so a completely enumerated source is served as 'partial'. The support report surfaces this as 'the observation is partial', which is true of the served document.",
+    "main's personal-preview tool defaults to the 4dcd28f inner tar. That tar does include the download chain; wave31's 'absent' claim was G's scan bug, corrected here."
+  ],
+  "remaining": [
+    { "item": "main integrating the support report + row-semantics/report additions", "dependency": "main owns App/transport/HTTP; the sources are candidate-only and ready", "state": "SOURCE_READY" },
+    { "item": "D/E binding an installed tar that contains this wave's support/report sources", "dependency": "a frozen successor tar and E's independent verdict", "state": "NOT_REACHED; no installed claim is made" },
+    { "item": "operator long-term history, model cost baseline, value/benefit", "dependency": "real operator data", "state": "NOT_TESTED; no comparison or benefit figure" },
+    { "item": "actual_native execution", "dependency": "vendor/native budget", "state": "NOT_TESTED (0 turns)" },
+    { "item": "browser rendering of the download control and the support flow", "dependency": "F/main UI", "state": "not G-owned; G verified transport, file and report content" }
+  ],
+  "boundaries": {
+    "noSqlOrPrivateDb": true,
+    "noRuntimeHttpUiChanges": true,
+    "noNewCollector": true,
+    "noSecondLedger": true,
+    "noModelOrNativeCalls": true,
+    "noRootLockOrContractsChanges": true,
+    "noEAssertionsChanged": true,
+    "noBrowserNodeImports": true,
+    "noNumericReverseParsing": true,
+    "userServicesPreserved": "twelve 5180/8796 … 5191/8807 instances and all state/profile/tar/ledger/RUNS left untouched"
+  },
+  "verification": {
+    "commands": [
+      "packages/contracts/node_modules/.bin/tsc -p packages/contracts/tsconfig.build.json",
+      "packages/usage-insights/node_modules/.bin/tsc -p packages/usage-insights/tsconfig.json",
+      "packages/usage-insights/node_modules/.bin/tsc -p packages/usage-insights/tsconfig.build.json",
+      "node --test packages/usage-insights/test/*.case.ts",
+      "node --test tools/usage-insights/test/*.case.mjs",
+      "node tools/usage-insights/probe/observe-two-projects.mjs",
+      "node tools/usage-insights/cli.mjs package --tar <r1|r2>.tar.gz --json",
+      "node tools/usage-insights/cli.mjs verify --dto <download>.json --package <r2 tar> --out <support>.json"
+    ],
+    "results": {
+      "typecheck": "pass",
+      "build": "pass",
+      "packageTests": { "total": 156, "pass": 156, "fail": 0 },
+      "toolTests": { "total": 59, "pass": 59, "fail": 0 },
+      "probe": "pass (download 200 / 5138 bytes / 12 rows, page 13/13, repeat new snapshot, 0 events)",
+      "packageReport": "R1 exit 0 for page-only; R2 exit 0 with all three capabilities"
+    },
+    "staticChecksConfer": "no runtime, native or release admission"
+  }
+}

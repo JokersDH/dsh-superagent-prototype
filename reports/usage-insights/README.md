@@ -15,6 +15,8 @@ G（`codex/g4-usage-insights`）的只读观测证据。全部内容都是从已
 | [`probe/two-project-20261115T084148.crosscheck.json`](probe/two-project-20261115T084148.crosscheck.json) | 页面↔分析（`page`）与页面↔CLI 独立 HTTP 读（`http`）的逐行核对结果 |
 | [`probe/two-project-20261115T152615.download.json`](probe/two-project-20261115T152615.download.json) | 主线 `GET /v1/insights/export` 实际交付给用户的 display-only 文件（`usage-insights-display-export/1`，12 行、无数值字段） |
 | [`probe/two-project-20261115T152615.support.json`](probe/two-project-20261115T152615.support.json) | 同一次下载的 `verify --dto` 支持摘要：只有 scope/窗口/覆盖/行身份/是否有值，无 formatted 值 |
+| [`probe/two-project-20261115T152615.support-report.json`](probe/two-project-20261115T152615.support-report.json) | 同一观察 + 实际运行包（build `4dcd28f758bbb265`、包 digest `405ecd02…`）的支持报告：含 `origin`/`capabilities`/`evidence.absentFacts` |
+| [`support-contract.zh-CN.md`](support-contract.zh-CN.md) | 给 D/E/H 的支持摘要契约：字段、exit、明确不包含的内容与已知边界 |
 | [`f-integration/consumer-view.example.json`](f-integration/consumer-view.example.json) | 给 F 的稳定投影样例（`TrialInsightsView` 形状） |
 | [`f-integration/README.md`](f-integration/README.md) | F 接入契约与语义规则 |
 | [`wave26-status.json`](wave26-status.json) | 第二轮（G1–G16）范围/未知/硬界/流式预算的交付与实测值 |
@@ -23,6 +25,7 @@ G（`codex/g4-usage-insights`）的只读观测证据。全部内容都是从已
 | [`wave29-status.json`](wave29-status.json) | 第二十九轮（G1–G24）真实 `/v1/insights`、7/30 窗口、行语义与有界导出 |
 | [`wave30-status.json`](wave30-status.json) | 本轮（G1–G4 四成果）同授权窗口的报告/导出闭环、display-only 导出、跨读者逐行核对与快照连续性 |
 | [`wave31-status.json`](wave31-status.json) | 本轮三包 12 成果：R1 固定 RC 基线与包能力核对、R2 主线默认下载全链、R3 重复观察与支持 |
+| [`wave32-status.json`](wave32-status.json) | 本轮整块：排障用支持报告、构建布局能力核对修正、导出/限额/错误复核与余项 |
 
 ## 与主线的实际接线（2026-11-15）
 
