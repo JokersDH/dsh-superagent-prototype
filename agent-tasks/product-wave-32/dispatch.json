@@ -1,8 +1,8 @@
 {
-  "protocol": "installable-preview-dispatch/1",
+  "protocol": "whole-product-engineering-dispatch/1",
   "date": "2026-11-16",
   "status": "PLANNED_NOT_EXECUTED_BY_EXTERNAL_AGENTS",
-  "priority": "LOCAL_USE_AND_COLLEAGUE_INSTALLABLE_PREVIEW",
+  "priority": "ACCELERATE_WHOLE_SCHEME_B_ENGINEERING_THEN_PACKAGE_INTEGRATED_PRODUCT",
   "platform": "macOS Apple Silicon",
   "normalCadence": true,
   "calendarDeadline": null,
@@ -10,12 +10,17 @@
   "countingMicroPhases": false,
   "scope": {
     "cac": "DEFERRED_FUTURE_EXPERIMENT_EXCLUDED",
-    "firstPreviewDoesNotRequire": [
-      "multi-protocol",
-      "innovation-value",
-      "full-active-recovery",
-      "desktop"
+    "deliveryModel": "Complete product capability lines with continuous main integration; packaging is an integrated engineering subsystem and final handoff",
+    "wholeProductIncludes": [
+      "normal-workflow",
+      "runtime-control",
+      "same-original-work-recovery",
+      "durable-data-context-decisions",
+      "workbench-project-recipes-observations",
+      "reproducible-install-upgrade-backup-restore"
     ],
+    "independentEngineeringContinuesIfStudyBlocked": true,
+    "temporaryPreviewNotCompletionProxy": true,
     "unchangedSafetyAndNativeBudgets": true
   },
   "roles": {
@@ -58,7 +63,7 @@
         "apps/runner/src/attach-channel/",
         "apps/runner/test/attach-channel/"
       ],
-      "wholeOutcome": "让已准入的本机Codex在原Product/Store/Broker路径完成普通委托、问题、检查候选与人工交付，当前不把完整SIGKILL恢复当首包前提。"
+      "wholeOutcome": "在原Product/Store/Application/QuestionBroker中完整实现本机执行、原生问题/控制、同原Work故障恢复到候选/检查/人工接受和原两/四槽资源归还。"
     },
     "C": {
       "workdir": "/Users/hh/Desktop/joker/superagent-agent-c",
@@ -87,7 +92,7 @@
       ],
       "evidencePath": "tools/distribution/reports/wave32-status.json",
       "budgetMode": "zero_native_model_tasks_this_wave",
-      "wholeOutcome": "交出同事解压后可启动/停止/配置的准确ZIP，内置Node，不依赖开发仓、pnpm或全局Node。"
+      "wholeOutcome": "随整体工程并行交付可重复构建、安装、启停、升级/回滚、非空备份迁移恢复和支持能力，在选定集成版本上形成可本机使用、可分享同事的准确安装交付。"
     },
     "E": {
       "workdir": "/Users/hh/Desktop/joker/superagent-agent-e",
@@ -110,7 +115,7 @@
       "cliFallbackAllowed": false,
       "executionPolicy": "BLOCKED_CURRENT_RECIPE_NO_SEND_THIS_WAVE",
       "budgetMode": "zero_native_model_tasks_this_wave",
-      "wholeOutcome": "独立在准确ZIP/inner tar上完成新同事视角首次安装和日常流程，最终结论只由E的原oracle给出。"
+      "wholeOutcome": "独立验证整体产品的原项目正常工作、原生控制、故障恢复、重开、数据与准确安装流程，按证据层给结论，不以临时可启动ZIP替代工程完整性。"
     },
     "F": {
       "workdir": "/Users/hh/Desktop/joker/superagent-agent-f",
@@ -161,7 +166,7 @@
       "budgetMode": "zero_native_model_tasks_this_wave",
       "implementationStatus": "SOURCE_EXISTS_CONTINUE_COMPLETE_CAPABILITY",
       "candidate": "3ea07a7df1d969410547c6f7fc03a105977609d1",
-      "wholeOutcome": "提供新同事可直接运行的有界试用和排障流程，能保留现场、帮助定位阻断，减少主线交互。"
+      "wholeOutcome": "提供贯穿完整产品的有界试用、运行/故障支持和现场保留工具，独立消费原B/I/main真实端口与最终准确包，减少来回交互。"
     },
     "I": {
       "workdir": "/Users/hh/Desktop/joker/superagent-agent-i",
@@ -250,5 +255,6 @@
       5191,
       8807
     ]
-  ]
+  ],
+  "userClarification": "Do not rush a temporary installable preview. Accelerate the full engineering effort; package and use the integrated product afterward."
 }
