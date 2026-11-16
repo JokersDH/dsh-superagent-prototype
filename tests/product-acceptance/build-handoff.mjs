@@ -532,7 +532,7 @@ const handoff = `# Agent E 第三十三轮交付交接
 | --- | --- | --- |
 | 1. 两个原项目的真实完整旅程 | 模板正例 PASS；原项目同项目执行链 **NOT_REACHED**（不冒充 PASS） | E5-TWO-PROJECT-TEMPLATE-CREATE 记录两个原项目、预览、创建、候选、手动接受和执行身份连续性；最终 validator 拒绝 needs_input 却声称 applicable、跨项目 executionProjectId、scoped 403，以及重开缺 found/phase/artifacts。E32-ORIGINAL-PROJECT-APPLICABLE 仍是 NOT_REACHED：受控 fixture 中原登记项目不可派发，personal 无 executor。 |
 | 2. 唯一准确安装 cohort 与 actual outer ZIP | **PASS（两个命名 cohort）** | E33-OUTER-ZIP：ZIP 自身 SHA256SUMS 与 package-result（zip ${String(byId.get('E33-OUTER-ZIP')?.evidence?.outerZip?.zip?.sha256 ?? '').slice(0, 8)}…）、内层 install/runtime/license digest、bundled Node 版本/ABI、私有 HOME 下 Start/Stop/status、未配置与已配置、端口冲突拒绝、重开、停止后 status=2 STOPPED；cohort=zip-inner buildId ${byId.get('E33-OUTER-ZIP')?.evidence?.outerZip?.zip?.buildId ?? '?'}。 |
-| 3. 非空业务恢复、升级重开与完整停止 | **PASS（所测 cohort）**，其余保留 gap | E33-COHORT-RECOVERY：交付 Work + artifacts → backup CREATED/VERIFIED（eventSeq ${byId.get('E33-COHORT-RECOVERY')?.evidence?.cohortRecovery?.backup?.database?.eventSeq ?? '?'}）→ 新 root restore → recovery_readonly 读回相同 artifact 字节/历史、业务写 422、provider 0、篡改 bundle 拒绝、固定集停止；E4-UPGRADE-ROLLBACK 在 baseline/target 对保留升级后写入并回滚二进制。W32 的 D backup（eventSeq 0/artifacts 0）只算机制，不计非空。 |
+| 3. 非空业务恢复、升级重开与完整停止 | **PASS（所测 cohort）**，其余保留 gap | E33-COHORT-RECOVERY：交付 Work + artifacts → backup CREATED/VERIFIED（eventSeq ${byId.get('E33-COHORT-RECOVERY')?.evidence?.cohortRecovery?.backup?.database?.eventSeq ?? '?'}）→ 新 root restore → recovery_readonly 读回相同 artifact 字节/历史、业务写 422、provider 0、篡改 bundle 拒绝、固定集停止；E4-UPGRADE-ROLLBACK 在 baseline/target 对保留升级后写入并回滚二进制。W32 的 ZIP backup 记录了 20 个 artifact 但未恢复读回；非空恢复结论只由 E33-COHORT-RECOVERY 承担。 |
 
 ## 实际命令与结果
 
@@ -1384,10 +1384,12 @@ const wave33Status = {
   supersedes: 'wave32-status.json',
   subject: { ...wave32Status.subject, outerZip: outerZipEvidence?.subject ?? null },
   cohorts: [
-    { id: 'frozen-install-target', buildId: artifactTuple.target?.buildId ?? null, source: artifactTuple.target?.sourceCommit ?? null,
+    { id: 'frozen-install-target', buildId: artifactTuple.target?.buildId ?? null, source: artifactTuple.target?.sourceCommit ?? artifactTuple.target?.source ?? null,
+      schema: artifactTuple.target?.productSchema ?? artifactTuple.target?.schema ?? null,
       tarSha256: artifactTuple.target?.tarSha256 ?? null, tarBytes: artifactTuple.target?.tarBytes ?? null,
       cases: ['E4-INSTALL-ARTIFACT-IDENTITY', 'E7-READINESS', 'E3-TRIAL-WORKBENCH-UI', 'E5-TWO-PROJECT-TEMPLATE-CREATE', 'E32-ZIP-LIFECYCLE'] },
     { id: 'outer-zip-inner', buildId: outerZipEvidence?.subject?.buildId ?? null, source: outerZipEvidence?.subject?.source ?? null,
+      schema: outerZipEvidence?.subject?.schema ?? null,
       tarSha256: outerZipEvidence?.subject?.tarSha256 ?? null, tarBytes: outerZipEvidence?.subject?.tarBytes ?? null,
       zipSha256: outerZipEvidence?.zip?.sha256 ?? null, zipBytes: outerZipEvidence?.zip?.bytes ?? null,
       runtime: outerZipEvidence?.zip?.runtime ?? null,
@@ -1419,7 +1421,7 @@ const wave33Status = {
       upgradeReopen: 'E4-UPGRADE-ROLLBACK on the frozen baseline/target pair keeps a post-upgrade write and rolls the binary back; it is not a second lifecycle' },
     originalProjectApplicable: { status: byId.get('E32-ORIGINAL-PROJECT-APPLICABLE')?.status ?? 'MISSING',
       reason: byId.get('E32-ORIGINAL-PROJECT-APPLICABLE')?.reason ?? byId.get('E32-ORIGINAL-PROJECT-APPLICABLE')?.limitations?.[0] ?? null },
-    w32ZipBackup: 'E32-ZIP-LIFECYCLE backup is mechanism-only in that scope (eventSeq/artifacts recorded 0); non-empty business recovery is claimed only by E33-COHORT-RECOVERY' },
+    w32ZipBackup: 'E32-ZIP-LIFECYCLE records a CREATED/VERIFIED backup with 20 artifacts but never restores it; the non-empty restore and readonly read-back are claimed only by E33-COHORT-RECOVERY' },
   finalRun: { command: 'node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record',
     exitCode: 0, source: report.source },
 }
