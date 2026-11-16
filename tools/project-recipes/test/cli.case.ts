@@ -4,7 +4,7 @@
  */
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
-import { mkdtempSync, readFileSync, rmSync, statSync, symlinkSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
@@ -156,4 +156,28 @@ test('--describe prints the module identity the library reports', async () => {
   const { describeProjectRecipes } = await import('../../../packages/project-recipes/src/index.ts')
   assert.deepEqual(JSON.parse(result.stdout), JSON.parse(JSON.stringify(describeProjectRecipes())))
   assert.equal(result.stdout.includes('project-recipes-module/1'), true)
+})
+
+test('the CLI works on a root with spaces and Chinese characters', () => {
+  withTemp((dir) => {
+    const root = join(dir, '我的 项目')
+    mkdirSync(root)
+    writeFileSync(join(root, 'package.json'), JSON.stringify({ name: 'space-app', packageManager: 'pnpm@11.7.0', engines: { node: '>=24' }, scripts: { test: 'node --test' } }))
+    writeFileSync(join(root, 'pnpm-lock.yaml'), "lockfileVersion: '9.0'\n")
+    const result = run(['--config', fixture('configuration.json'), '--root', root, '--project', 'project-alpha', '--paths', 'src/', '--now', NOW])
+    assert.equal(result.status, 0, result.stderr)
+    const draft = JSON.parse(result.stdout)
+    assert.equal(draft.status, 'draft')
+    assert.equal(result.stdout.includes(root), false)
+  })
+})
+
+test('an old facts protocol is refused with exit 5 instead of being guessed', () => {
+  withTemp((dir) => {
+    const older = join(dir, 'older.json')
+    writeFileSync(older, JSON.stringify({ ...JSON.parse(readFileSync(fixture('facts-alpha.json'), 'utf8')), protocol: 'project-facts/0' }))
+    const result = run(['--config', fixture('configuration.json'), '--facts', older, '--now', NOW])
+    assert.equal(result.status, 5)
+    assert.match(result.stderr, /invalid_facts/)
+  })
 })

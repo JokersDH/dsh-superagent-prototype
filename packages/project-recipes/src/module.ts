@@ -5,6 +5,7 @@
  * between source and the installed artifact can tell whether the same contracts, catalog and issue
  * vocabulary are present. It carries no path, credential or authority.
  */
+import { CONTRACT_API_MAJOR, CONTRACT_VERSION } from '@personal-agent/contracts'
 import { RECIPE_KINDS } from './catalog.ts'
 import { RECIPE_DRAFT_PROTOCOL, RECIPE_ISSUE_CODES } from './draft.ts'
 import { PROJECT_FACTS_PROTOCOL } from './facts.ts'
@@ -23,6 +24,8 @@ export interface ProjectRecipesModuleDescription {
   readonly name: typeof MODULE_NAME
   readonly version: string
   readonly catalog: { readonly id: string; readonly version: number; readonly digest: string }
+  /** Wire contract identity this module was built against. */
+  readonly contracts: { readonly version: string; readonly apiMajor: number }
   readonly kinds: readonly string[]
   readonly protocols: {
     readonly facts: string
@@ -47,6 +50,7 @@ export function describeProjectRecipes(): ProjectRecipesModuleDescription {
     name: MODULE_NAME,
     version: MODULE_VERSION,
     catalog: Object.freeze({ id: 'project-recipes', version: 1, digest: catalogDigest() }),
+    contracts: Object.freeze({ version: CONTRACT_VERSION, apiMajor: CONTRACT_API_MAJOR }),
     kinds: Object.freeze([...RECIPE_KINDS]),
     protocols: Object.freeze({
       facts: PROJECT_FACTS_PROTOCOL,
@@ -61,4 +65,9 @@ export function describeProjectRecipes(): ProjectRecipesModuleDescription {
     configurationProtocols: Object.freeze(['application-configuration/1']),
     authority: 'none' as const,
   })
+}
+
+/** True only when the description advertises the capability; an older package is simply false. */
+export function supportsCapability(description: { readonly capabilities?: readonly string[] }, capability: string): boolean {
+  return (description.capabilities ?? []).includes(capability)
 }

@@ -13,6 +13,7 @@ import {
   RECIPE_KINDS,
   catalogDigest,
   describeProjectRecipes,
+  supportsCapability,
 } from '../src/index.ts'
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)))
@@ -34,6 +35,18 @@ test('the module description is deterministic and matches the code it describes'
 test('the reported version is the package version, not a guess', () => {
   const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')) as { version: string }
   assert.equal(describeProjectRecipes().version, pkg.version)
+})
+
+test('the description names the wire contract it was built against', () => {
+  const described = describeProjectRecipes()
+  assert.equal(described.contracts.version, '1.0.0')
+  assert.equal(described.contracts.apiMajor, 1)
+})
+
+test('a capability check distinguishes an older package from a current one', () => {
+  assert.equal(supportsCapability(describeProjectRecipes(), 'rebind'), true)
+  assert.equal(supportsCapability({ capabilities: ['match'] }, 'rebind'), false)
+  assert.equal(supportsCapability({}, 'rebind'), false)
 })
 
 test('the description carries no path, credential or authority field', () => {

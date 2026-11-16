@@ -154,7 +154,12 @@ function readBounded(root: string, name: MetadataName, maxBytes: number, budget:
   if (budget.files + 1 > limits.maxFiles) throw new MetadataRefused('budget_exceeded', name, 'metadata file budget exhausted')
   budget.files += 1
 
-  const fd = openSync(path, constants.O_RDONLY | (constants.O_NOFOLLOW ?? 0))
+  let fd: number
+  try {
+    fd = openSync(path, constants.O_RDONLY | (constants.O_NOFOLLOW ?? 0))
+  } catch {
+    throw new MetadataRefused('unreadable', name, 'metadata entry is not readable')
+  }
   try {
     const opened = fstatSync(fd)
     if (!opened.isFile()) throw new MetadataRefused('not_regular_file', name, 'metadata entry is not a regular file')
@@ -166,10 +171,15 @@ function readBounded(root: string, name: MetadataName, maxBytes: number, budget:
       throw new MetadataRefused('budget_exceeded', name, 'total metadata byte budget exhausted')
     const buffer = Buffer.alloc(opened.size)
     let offset = 0
-    while (offset < opened.size) {
-      const read = readSync(fd, buffer, offset, opened.size - offset, offset)
-      if (read <= 0) throw new MetadataRefused('unreadable', name, 'file shrank while being read')
-      offset += read
+    try {
+      while (offset < opened.size) {
+        const read = readSync(fd, buffer, offset, opened.size - offset, offset)
+        if (read <= 0) throw new MetadataRefused('unreadable', name, 'file shrank while being read')
+        offset += read
+      }
+    } catch (error) {
+      if (error instanceof MetadataRefused) throw error
+      throw new MetadataRefused('unreadable', name, 'metadata entry could not be read completely')
     }
     // A rewrite during the read must not be reported as a complete observation.
     const settled = fstatSync(fd)
@@ -198,17 +208,27 @@ export function readJsonFile(path: string, maxBytes = 2 * 1024 * 1024): unknown 
   if (stats.isSymbolicLink()) throw new MetadataRefused('symlink', basename(absolute), 'refusing to follow a symlink')
   if (!stats.isFile()) throw new MetadataRefused('not_regular_file', basename(absolute), 'not a regular file')
   if (stats.size > maxBytes) throw new MetadataRefused('too_large', basename(absolute), `file exceeds ${maxBytes} bytes`)
-  const fd = openSync(absolute, constants.O_RDONLY | (constants.O_NOFOLLOW ?? 0))
+  let fd: number
+  try {
+    fd = openSync(absolute, constants.O_RDONLY | (constants.O_NOFOLLOW ?? 0))
+  } catch {
+    throw new MetadataRefused('unreadable', basename(absolute), 'file is not readable')
+  }
   try {
     const opened = fstatSync(fd)
     if (opened.dev !== stats.dev || opened.ino !== stats.ino) throw new MetadataRefused('replaced', basename(absolute), 'file was replaced while being opened')
     if (opened.size !== stats.size) throw new MetadataRefused('changed_during_read', basename(absolute), 'file changed size while being opened')
     const buffer = Buffer.alloc(opened.size)
     let offset = 0
-    while (offset < opened.size) {
-      const read = readSync(fd, buffer, offset, opened.size - offset, offset)
-      if (read <= 0) throw new MetadataRefused('unreadable', basename(absolute), 'file shrank while being read')
-      offset += read
+    try {
+      while (offset < opened.size) {
+        const read = readSync(fd, buffer, offset, opened.size - offset, offset)
+        if (read <= 0) throw new MetadataRefused('unreadable', basename(absolute), 'file shrank while being read')
+        offset += read
+      }
+    } catch (error) {
+      if (error instanceof MetadataRefused) throw error
+      throw new MetadataRefused('unreadable', basename(absolute), 'file could not be read completely')
     }
     const settled = fstatSync(fd)
     if (settled.size !== opened.size || settled.mtimeMs !== opened.mtimeMs)

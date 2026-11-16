@@ -3,7 +3,7 @@
  * projection that carries names/digests/flags but never script bodies or absolute paths.
  */
 import assert from 'node:assert/strict'
-import { lstatSync, mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import { chmodSync, lstatSync, mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { homedir, tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
@@ -356,5 +356,36 @@ test('repeated observation of the same project under limits is deterministic and
     const second = observe(dir, { limits }).facts
     assert.equal(factsContentDigest(first), factsContentDigest(second))
     assert.deepEqual(first.omissions, [])
+  })
+})
+
+test('a root with spaces and Chinese characters is observed normally', () => {
+  withDir((dir) => {
+    const root = join(dir, '我的 项目 空间')
+    mkdirSync(root)
+    write(dir, 'placeholder', '')
+    writeFileSync(join(root, 'package.json'), JSON.stringify(packageJson))
+    writeFileSync(join(root, 'pnpm-lock.yaml'), "lockfileVersion: '9.0'\n")
+    const { facts } = observe(root)
+    assert.equal(facts.stack.kind, 'node')
+    assert.deepEqual(facts.manager, { kind: 'pnpm', declaredVersion: '11.7.0' })
+    assert.equal(JSON.stringify(facts).includes(root), false, 'the absolute root stays out of the facts')
+  })
+})
+
+test('a read-only metadata file is readable, while an unreadable one is refused with a bounded code', () => {
+  withDir((dir) => {
+    write(dir, 'package.json', JSON.stringify(packageJson))
+    chmodSync(join(dir, 'package.json'), 0o444)
+    assert.equal(observe(dir).facts.stack.kind, 'node', 'read-only is not a refusal')
+  })
+  withDir((dir) => {
+    write(dir, 'package.json', JSON.stringify(packageJson))
+    chmodSync(join(dir, 'package.json'), 0o000)
+    try {
+      assert.throws(() => observe(dir), (error: unknown) => error instanceof MetadataRefused && (error.code === 'unreadable' || error.code === 'not_regular_file'))
+    } finally {
+      chmodSync(join(dir, 'package.json'), 0o600)
+    }
   })
 })

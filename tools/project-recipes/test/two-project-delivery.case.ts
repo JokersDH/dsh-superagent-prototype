@@ -156,6 +156,37 @@ test('two original projects reach delivered work with readable artifacts and hon
     }
   }
 
+  // A second delegation on the same runtime: revise the same original Work and deliver revision 2.
+  const revisedWork = created[0]!
+  const currentContract = (await inspect(revisedWork.workId)).contract
+  const revised = await product.application.dispatch(
+    {
+      kind: 'revise_work',
+      commandId: 'delivery-revise-1',
+      conversationId: revisedWork.conversationId,
+      expected: { workId: currentContract.workId, revision: currentContract.revision, digest: currentContract.digest },
+      goal: '修订后的目标：完成同一项目的后续变更',
+      scope: currentContract.scope,
+      criteria: currentContract.criteria,
+    },
+    actor,
+  )
+  assert.equal(revised.status, 'recorded', JSON.stringify(revised))
+  const revReady = await until(
+    async () => (await product.application.inspect({ workId: revised.workId! })).works[0]!,
+    (work) => work.actions.available.includes('accept_candidate'),
+    'revision 2 readiness',
+  )
+  assert.equal(revReady.contract.revision, 2)
+  assert.ok(revReady.actions.currentCandidate)
+  const revAccepted = await product.application.dispatch(
+    { kind: 'accept_candidate', commandId: 'delivery-revise-accept', conversationId: revisedWork.conversationId, candidate: revReady.actions.currentCandidate! },
+    actor,
+  )
+  assert.equal(revAccepted.status, 'recorded')
+  assert.equal((await inspect(revised.workId!)).contract.revision, 2)
+  assert.equal((await inspect(revised.workId!)).phase, 'delivered')
+
   // Reopen the same state: the delivered works, candidates and artifact bytes are still verifiable.
   await product.close()
   store.close()
@@ -166,6 +197,7 @@ test('two original projects reach delivered work with readable artifacts and hon
     const reopened = (await product.application.inspect({ workId: entry.workId })).works[0]!
     assert.equal(reopened.phase, 'delivered')
     assert.equal(reopened.contract.scope.projectId, entry.projectId)
+    assert.ok(reopened.contract.revision >= 1)
     for (const artifactId of reopened.artifactIds) {
       const artifact = store.artifacts.read(artifactId)
       assert.ok(artifact, `artifact ${artifactId} survives reopen`)
