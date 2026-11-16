@@ -76,6 +76,7 @@ verify only
   --expect-digest <sha256>    Refuse when the bundle bytes do not match the pinned digest
   --dto <file>                Verify a served usage-observation/1 document instead of a bundle
   --package <absolute tar>    Also inspect a release archive and name the build and any missing capability
+  --install <absolute dir>    Also inspect the running installation (manifest + installed files) for identity
   --out <absolute path>       Write the support report to a new 0600 file instead of stdout
   --format json|markdown      Report format for verify (default json)
 
@@ -143,6 +144,7 @@ const SPECS = {
   verify: {
     input: flag(), 'max-input-bytes': flag(), 'max-records': flag(), 'max-works': flag(), 'max-pages': flag(),
     'expect-digest': flag(), dto: flag(), format: flag(), package: flag(), out: flag(), 'max-archive-bytes': flag(),
+    install: flag(),
   },
   package: {
     tar: flag(), 'expect-sha256': flag(), 'expect-build': flag(), expect: flag(), 'max-archive-bytes': flag(),
@@ -376,6 +378,8 @@ async function commandVerify(options, io) {
     // them as numbers here would invent precision the coordinator never recorded.
     const served = readBundle(requiredString(options.dto, 'dto'), maxBytes)
     let origin = null
+    if (options.package !== undefined && options.install !== undefined)
+      throw new UsageError('--package and --install are mutually exclusive')
     if (options.package !== undefined) {
       const tarPath = requiredString(options.package, 'package')
       if (!isAbsolute(tarPath)) throw new UsageError('--package must be an absolute path')
@@ -390,6 +394,19 @@ async function commandVerify(options, io) {
         browserTrigger: inspected.browserTrigger, missing: inspected.absent, archiveSha256: inspected.archive.sha256,
       })
     }
+    if (options.install !== undefined) {
+      const installRoot = requiredString(options.install, 'install')
+      if (!isAbsolute(installRoot)) throw new UsageError('--install must be an absolute path')
+      let identity
+      try {
+        identity = insights.inspectRuntimeIdentity({ installRoot })
+      } catch (error) {
+        if (error?.name === 'RuntimeIdentityFault') throw new UsageInsightsError('source_unavailable', error.message)
+        throw error
+      }
+      origin = identity.origin
+      io.stderr(`install=${identity.manifest.state} layout=${identity.layout} identity=${origin?.identitySource ?? 'unknown'} capabilities=${identity.capabilities === null ? 'unknown' : Object.entries(identity.capabilities).filter(([, present]) => present).map(([name]) => name).join(',') || 'none'}${identity.differences.length ? ` differences=${identity.differences.length}` : ''}\n`)
+    }
     let read
     try {
       read = insights.readSupportDocument(served.value, origin === null ? {} : { origin })
@@ -403,17 +420,21 @@ async function commandVerify(options, io) {
     if (!['json', 'markdown'].includes(format)) throw new UsageError('--format must be json or markdown for verify')
     const body = format === 'markdown'
       ? insights.renderSupportReport(report)
-      : `${JSON.stringify({ ...report, documentKind: read.documentKind, digestCheck: read.digest,
-          conservation: read.conservation, file: { bytes: served.bytes, sha256: served.digest } }, null, 2)}\n`
+      : `${JSON.stringify({ ...report, documentKind: read.documentKind, verification: read.verification,
+          contractValid: read.contractValid, digestCheck: read.digest, conservation: read.conservation,
+          file: { bytes: served.bytes, sha256: served.digest } }, null, 2)}\n`
     if (options.out !== undefined) {
       const written = writeExclusive(requiredString(options.out, 'out'), body)
       io.stdout(`wrote ${basename(written)} (${Buffer.byteLength(body)} bytes) format=${format}\n`)
     } else io.stdout(body)
     const status = report.status === 'ready' ? 'complete' : report.status === 'insufficient_data' ? 'insufficient_data' : 'unavailable'
-    io.stderr(`status=${status} coverage=${report.coverageState} rows=${report.counts.rows} unknown=${report.counts.unknown} export=${report.exportCapability} digest=${read.digest.state} display-only\n`)
+    io.stderr(`status=${status} coverage=${report.coverageState} rows=${report.counts.rows} unknown=${report.counts.unknown} export=${report.exportCapability} digest=${read.digest.state} document=${read.documentKind} verification=${read.verification} display-only\n`)
     // A downloaded envelope whose declared digest does not match its bytes is refused as an integrity
     // failure, even when the document inside would otherwise be ready.
     if (read.digest.state === 'mismatch') return EXIT.unavailable
+    // A document that is not contract-valid (an older shape, or one that fails the product contract)
+    // is reported as partial: the summary is useful, but nothing about it is fully verified.
+    if (read.contractValid === false) return EXIT.partial
     return report.status === 'ready' ? EXIT.ok : report.status === 'insufficient_data' ? EXIT.insufficient : EXIT.unavailable
   }
   const bundle = readBundle(requiredString(options.input, 'input'), maxBytes)

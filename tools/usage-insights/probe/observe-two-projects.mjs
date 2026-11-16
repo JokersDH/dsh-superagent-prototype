@@ -36,9 +36,10 @@ import { buildDisplayExport, displayExportDigest } from '../../../packages/usage
 import { crossCheckAnalysisWithDisplay } from '../../../packages/usage-insights/src/crosscheck.ts'
 import { describeDisplayDocument } from '../../../packages/usage-insights/src/support.ts'
 import { buildSupportFile, readSupportDocument, supportLabels, originFromManifest } from '../../../packages/usage-insights/src/support-port.ts'
-import { UsageObservationDownloadSchema } from '../../../packages/contracts/dist/index.js'
+import { UsageObservationDownloadSchema, UsageSupportDownloadSchema } from '../../../packages/contracts/dist/index.js'
 
 const CLI = fileURLToPath(new URL('../cli.mjs', import.meta.url))
+const detailNeedle = '"detail"'
 const principal = { userId: 'local-insights-probe', authorityRef: 'local-insights-authority' }
 const commandActor = { ...principal, source: 'local_cli' }
 const uiActor = { ...principal, source: 'local_ui' }
@@ -548,6 +549,51 @@ async function main() {
     { headers: { authorization: `Bearer ${API_TOKEN}` } })).status, 422)
   assert.equal((await exportApp.request('http://127.0.0.1/v1/insights/export?days=7')).status, 401)
 
+  // ---- W34: one real feedback loop on main's diagnostic download (outcome 4) --------------------
+  // The App's support download is main's route: an authorized scoped observation folded into the
+  // strict metadata DTO. G reads exactly that file and has to be able to say what it is missing.
+  const supportApp = createLocalHttpApp({
+    application: product.application,
+    principal,
+    apiToken: API_TOKEN,
+    bootstrapToken: 'b5'.repeat(32),
+    allowedOrigins: ['http://127.0.0.1:5173'],
+    mode: 'product',
+    read: { usageSupportDownload: query => new ProductUsageObservation(coordinatorReaders).support(query) },
+  })
+  const supportResponse = await supportApp.request('http://127.0.0.1/v1/insights/support?days=7&timezone=UTC',
+    { headers: { authorization: `Bearer ${API_TOKEN}` } })
+  assert.equal(supportResponse.status, 200, 'the default support route serves a diagnostic file')
+  const supportDownload = UsageSupportDownloadSchema.parse(await supportResponse.json())
+  const supportRead = readSupportDocument(supportDownload)
+  assert.equal(supportRead.documentKind, 'support')
+  assert.equal(supportRead.digest.state, 'verified', 'the file digest matches the delivered report')
+  assert.equal(supportRead.contractValid, true)
+  assert.equal(supportRead.report.summaryId, supportDownload.report.summaryId)
+  // The located gap: the shipped diagnostic has no installation identity, so a colleague cannot tell
+  // which build produced it. This is reported, not papered over.
+  assert.equal(supportDownload.report.origin, null)
+  assert.equal(supportRead.report.exportCapability, 'unverified')
+  // The note mentions "formatted strings" in prose; what must be absent are the fields themselves.
+  assert.equal(JSON.stringify(supportDownload).includes('"formatted":'), false, 'no formatted value is shipped')
+  assert.equal(JSON.stringify(supportDownload).includes(detailNeedle), false, 'no per-row detail text is shipped')
+  assert.equal(JSON.stringify(supportDownload).includes('"value":'), false, 'no numeric or string value is shipped')
+  // Same scope, read again: the observation changes, the missing identity does not.
+  await new Promise(resolveDelay => setTimeout(resolveDelay, 25))
+  const supportAgain = UsageSupportDownloadSchema.parse(await (await supportApp.request(
+    'http://127.0.0.1/v1/insights/support?days=7&timezone=UTC',
+    { headers: { authorization: `Bearer ${API_TOKEN}` } })).json())
+  assert.notEqual(supportAgain.report.summaryId, supportDownload.report.summaryId,
+    'a second download is a second observation')
+  assert.equal(supportAgain.report.origin, null, 'the identity gap is reproducible, not a one-off')
+  assert.deepEqual(supportAgain.report.rows.map(row => row.rowId), supportDownload.report.rows.map(row => row.rowId))
+  assert.equal(supportAgain.report.counts.unknown, supportDownload.report.counts.unknown)
+  // An app without the optional support port reports the feature as absent, and the page still works.
+  const noSupportPort = createLocalHttpApp({ application: product.application, principal, apiToken: API_TOKEN,
+    bootstrapToken: 'b6'.repeat(32), allowedOrigins: ['http://127.0.0.1:5173'], mode: 'product', read: {} })
+  assert.equal((await noSupportPort.request('http://127.0.0.1/v1/insights/support?days=7',
+    { headers: { authorization: `Bearer ${API_TOKEN}` } })).status, 422)
+
   // ---- W31 R3: a re-read is a new snapshot and never backfills the previous one (G9) ------------
   await new Promise(resolveDelay => setTimeout(resolveDelay, 25))
   const repeatFile = UsageObservationDownloadSchema.parse(await (await exportApp.request(
@@ -645,6 +691,7 @@ async function main() {
       download: join(directoryOut, `two-project-${stamp}.download.json`),
       downloadEnvelope: join(directoryOut, `two-project-${stamp}.download-envelope.json`),
       support: join(directoryOut, `two-project-${stamp}.support.json`),
+      supportDownload: join(directoryOut, `two-project-${stamp}.support-download.json`),
       crossCheck: join(directoryOut, `two-project-${stamp}.crosscheck.json`),
     }
     for (const [source, target] of [[bundlePath, published.bundle], [reportPath, published.report],
@@ -657,6 +704,7 @@ async function main() {
     writeFileSync(published.downloadEnvelope, `${JSON.stringify(download, null, 2)}\n`, { flag: 'wx', mode: 0o600 })
     writeFileSync(published.support, `${JSON.stringify(describeDisplayDocument(download.observation), null, 2)}\n`,
       { flag: 'wx', mode: 0o600 })
+    writeFileSync(published.supportDownload, `${JSON.stringify(supportDownload, null, 2)}\n`, { flag: 'wx', mode: 0o600 })
     writeFileSync(published.crossCheck, `${JSON.stringify({
       protocol: 'usage-insights-cross-check-evidence/1',
       servedSummaryId: served.summaryId,
@@ -720,6 +768,13 @@ async function main() {
       supportPort: { documentKind: portRead.documentKind, digest: portRead.digest.state,
         conservation: portRead.conservation, supportFile: supportFile.fileName,
         supportBytes: supportFile.bytes, labels },
+      feedbackLoop: { route: 'GET /v1/insights/support', status: supportResponse.status,
+        fileName: supportDownload.fileName, sha256: supportDownload.sha256, bytes: supportDownload.bytes,
+        documentKind: supportRead.documentKind, digest: supportRead.digest.state, contractValid: supportRead.contractValid,
+        origin: supportDownload.report.origin, exportCapability: supportRead.report.exportCapability,
+        locatedGap: 'the diagnostic file carries no installation identity (origin null)',
+        reReadSummaryChanged: supportAgain.report.summaryId !== supportDownload.report.summaryId,
+        reReadGapReproduced: supportAgain.report.origin === null },
     },
     digest: verified.digest,
     repeatedCollectionIdentical: true,
