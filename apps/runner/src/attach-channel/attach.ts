@@ -38,6 +38,13 @@ export type AttachOptions = {
 
 export type AttachRefusal = 'stale_connection' | 'identity_mismatch' | 'closed'
 
+/**
+ * Read-only projection of the current connection owner. It exists so a control path (command/cancel
+ * admission) can ask "is this lease the live connection?" without binding, polling or caching a second
+ * owner: `unbound` means no connection is bound yet, `stale_connection` means another lease owns it.
+ */
+export type AttachOwnership = 'owned' | 'unbound' | 'stale_connection' | 'identity_mismatch' | 'closed'
+
 export type AttachNext =
   | {
       readonly ok: true
@@ -187,6 +194,19 @@ export class RunnerAttachChannel {
 
   inspect(): ReturnType<CoordinatorChannelModule['inspect']> {
     return this.#channel.inspect()
+  }
+
+  /**
+   * Read-only ownership check used by control admission. It never binds, never polls and never
+   * replaces the lease; it reports what the channel already knows so a caller cannot turn an
+   * arbitrary lease id into authority while no connection (or another connection) owns the channel.
+   */
+  owns(connectionId: string, producer: CoordinatorChannelProducer = this.#channel.producer): AttachOwnership {
+    if (this.#channel.inspect().state === 'closed') return 'closed'
+    if (!this.#lease) return 'unbound'
+    if (this.#connectionId !== connectionId) return 'stale_connection'
+    if (!sameCoordinatorChannelProducer(producer, this.#channel.producer)) return 'identity_mismatch'
+    return 'owned'
   }
 
   /** Size of the outbound queue for the current generation (bounded by the module's pending caps). */

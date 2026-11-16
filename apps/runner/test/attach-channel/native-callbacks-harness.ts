@@ -14,6 +14,8 @@ import { key } from '../../../../packages/orchestrator-core/dist/index.js'
 import { JsonSchema } from '../../../../packages/contracts/src/schemas.ts'
 import { canonicalDigest } from '../../../../packages/contracts/src/canonical.ts'
 import type { CriticalFact, Json, RunnerCommand } from '../../../../packages/contracts/src/types.ts'
+import type { AttachedAttemptCallbacks } from '../../../../packages/execution/src/attached-attempt.ts'
+import type { RunningAttempt } from '../../../../packages/execution/src/contracts.ts'
 import { binding, producer } from '../../../../tests/integration/runtime-ingress-fixture.ts'
 import { makeAttemptSpec } from '../../../../packages/testing/src/index.ts'
 import { startService, type DriverContext } from './actual-harness.ts'
@@ -99,3 +101,28 @@ export async function startNativeCallbacks(
 }
 
 export type NativeCallbacksHarness = Awaited<ReturnType<typeof startNativeCallbacks>>
+
+/**
+ * Build the exact `RunningAttempt` shape `launch()` returns (handle + attachPort + attachCallbacks)
+ * around the injected component state. This is a launch-shaped fixture, not a launch: no child is
+ * spawned, and every test using it says so. It exists so consumers are written against the real
+ * returned shape instead of a private field. `registration` is overridable only for refusal tests.
+ */
+export function launchShape(
+  h: NativeCallbacksHarness,
+  overrides: { attemptId?: string; registration?: unknown; callbacks?: Partial<AttachedAttemptCallbacks> } = {},
+): RunningAttempt {
+  return {
+    attemptId: overrides.attemptId ?? h.spec.attemptId,
+    feed: async () => undefined,
+    waitExit: async () => ({ reason: 'terminal', evidenceRefs: ['launch-shape'] }),
+    stop: async () => ({ quiescence: 'confirmed', evidenceRefs: ['launch-shape'] }),
+    attachPort: { registration: overrides.registration ?? h.endpoint, producer: h.h.producer } as NonNullable<RunningAttempt['attachPort']>,
+    attachCallbacks: {
+      fact: fact => h.callbacks.recordFact(fact),
+      payload: request => h.callbacks.readPayload(request.reference),
+      nativeWrite: intent => h.callbacks.nativeWrite(intent.command),
+      ...overrides.callbacks,
+    },
+  }
+}

@@ -6,7 +6,14 @@
  */
 export { CoordinatorChannelModule, DEFAULT_LIMITS, sameCoordinatorChannelProducer } from './coordinator-channel.ts'
 export { RunnerAttachChannel } from './attach.ts'
-export type { AttachHooks, AttachNext, AttachOptions, AttachRefusal, AttachReply } from './attach.ts'
+export type { AttachHooks, AttachNext, AttachOptions, AttachOwnership, AttachRefusal, AttachReply } from './attach.ts'
+export { inspectRunningAttempt } from './running-attempt.ts'
+export type {
+  InspectedRunningAttempt,
+  RunningAttemptExpectation,
+  RunningAttemptInspection,
+  RunningAttemptRefusal,
+} from './running-attempt.ts'
 export { createCoordinatorSinkResponder } from './sink-responder.ts'
 export type { CoordinatorSinkResponder, CoordinatorSinkResponderOptions } from './sink-responder.ts'
 export { toAttachFailure, refusalFailure } from './refusals.ts'

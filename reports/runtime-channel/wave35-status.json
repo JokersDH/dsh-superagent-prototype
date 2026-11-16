@@ -1,0 +1,228 @@
+{
+  "wave": "product-wave-35",
+  "role": "I",
+  "title": "Real running-handle conformance, lease authority and same-run recovery source for the unique channel",
+  "date": "2026-11-16",
+  "workdir": "/Users/hh/Desktop/joker/superagent-agent-i",
+  "branch": "codex/g5-coordinator-channel",
+  "baseline": "9337348926277315fe43a0127549184d166e1d98",
+  "mergedOriginMain": "5860da13",
+  "mergedMainCommits": ["5860da13", "16b04abb", "8cd709ca", "c544781b", "4cde5883"],
+  "status": "SOURCE_READY_NINE_OUTCOMES_PASS_LAUNCH_RETURNED_HANDLE_APPLICATION_BROKER_RECOVERY_AND_PRODUCT_SLOTS_NOT_REACHED",
+  "statement": "Three continuous engineering packages, nine outcomes. The unique channel now has (1) a pure conformance guard for the object runtime.launch returns (handle/producer/registration/callbacks validated before any endpoint is touched), (2) per-intent guard decisions with no cached approval, (3) a read-only lease-ownership predicate for control admission, (4) takeover/terminal semantics through main's real attach caller, (5) cross-kind id namespace plus journal-descriptor/payload-body coexistence, (6) bounded capacity/control behaviour at product scope, (7) the Runner journal as the same-run recovery source with no duplicated effect, (8) four-slot channel isolation and a clean reopen, (9) adoption/handoff material. The channel module itself is unchanged; the additions are a new guard module and one read-only adapter projection. Real launch-returned handles (native spawn), original Application/QuestionBroker recovery to candidate/accept, original scheduler 2/4 resource release and installed bytes remain NOT_REACHED.",
+  "source": {
+    "moduleChangedThisWave": false,
+    "blobs": {
+      "coordinator-channel.ts": "d1ef81eb9d51b24417645151440eb1e262c20546",
+      "attach.ts": "3c1aea8a6b5f31865e3c506a5ee57008a1ebcacb",
+      "errors.ts": "ec8ce909d0f30ab1d96488db56cdf3b6a4ab7f49",
+      "index.ts": "8c594181b8d0ddf2c69bff7575bb8d1165d1d018",
+      "refusals.ts": "25ebcd26f1fb4aad583048dc672ec2bf09066b32",
+      "sink-responder.ts": "992a8cc0fceb55d7b2a9e2e8c8068202a892acb3",
+      "running-attempt.ts": "a7de9b16553d761fa3f6e2c14ebe7ea353826589"
+    },
+    "additionsThisWave": [
+      "running-attempt.ts: inspectRunningAttempt(running, expectation?) -> typed refusal before any socket/bind",
+      "attach.ts: RunnerAttachChannel.owns(connectionId, producer?) read-only ownership projection (no bind/poll/state copy)"
+    ],
+    "inMain": {
+      "module": true,
+      "pullAdapter": true,
+      "errors": true,
+      "index": true,
+      "runningAttemptGuard": false,
+      "leaseOwnershipPredicate": false
+    },
+    "mainConsumedSources": {
+      "nativeAttempt": { "path": "apps/coordinator/product/native-attempt.ts", "blob": "b3d6e6927f827af77b198e9192fc9cd8bdc03fd0" },
+      "attachedCaller": { "path": "packages/execution/src/attached-attempt.ts", "blob": "5a2f8731f61ca1e8cbb3a13c0d38b96a47ec322d" },
+      "executionContracts": { "path": "packages/execution/src/contracts.ts", "blob": "0b1a4a7cf9bbff848280ce372d79e9447fb30c30" },
+      "recoveryTransport": { "path": "packages/execution/src/recovery-transport.ts", "blob": "73752579e28009a50c7062b4d35d91bb9ccca816" },
+      "service": { "path": "apps/runner/src/runner-service.ts", "blob": "d728c548961263ef09f0163826465adb018617a7" }
+    },
+    "candidateOnly": [
+      "apps/runner/src/attach-channel/running-attempt.ts",
+      "apps/runner/src/attach-channel/attach.ts (owns)",
+      "apps/runner/src/attach-channel/index.ts (exports)",
+      "apps/runner/test/attach-channel/actual-running-attempt.test.ts",
+      "apps/runner/test/attach-channel/actual-guard-decisions.test.ts",
+      "apps/runner/test/attach-channel/actual-lease-authority.test.ts",
+      "apps/runner/test/attach-channel/actual-succession-helper.test.ts",
+      "apps/runner/test/attach-channel/actual-id-namespace.test.ts",
+      "apps/runner/test/attach-channel/actual-limits-diagnostics.test.ts",
+      "apps/runner/test/attach-channel/actual-recovery-source.test.ts",
+      "apps/runner/test/attach-channel/actual-slot-isolation.test.ts",
+      "apps/runner/test/attach-channel/native-callbacks-harness.ts (launchShape)",
+      "docs/runtime-channel/README.zh-CN.md",
+      "docs/runtime-channel/adoption-manual.zh-CN.md",
+      "reports/runtime-channel/wave35-status.json"
+    ]
+  },
+  "identity": {
+    "inner": {
+      "producer": {
+        "attempt": {
+          "ticketId": "ticket-1",
+          "assignmentId": "assignment-1",
+          "attemptId": "attempt-1",
+          "fenceEpoch": 1,
+          "contract": { "workId": "work-1", "revision": 1, "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" }
+        },
+        "source": "fixture-driver",
+        "runnerIdentityRef": "runner-1"
+      },
+      "factIds": ["fact-run", "fact-fresh", "factone", "facttwo", "payload-1", "factjournal", "burst1..burst65", "factrec1", "factrec2", "factslot0..3"],
+      "intentCorrelation": "intent-<module salt>-<n>; business command ids cmd-run-1/cmd-fresh/cmd-detach/cmd-fresh2/cmdlimit0..8 preserved",
+      "payloadRefs": "payload:<sha256 of canonical JSON>; journal descriptor digest == sha256(JSON bytes) verified by reconstruction"
+    },
+    "outer": {
+      "endpoint": "<recoveryRoot>/<attemptId>/runner.sock + runner.credential (dev/ino pinned)",
+      "leaseIds": [
+        "lease-run", "lease-fresh", "leaseowner", "leasewronggeneration",
+        "leasesuccessiona", "leasesuccessionb", "leaseids", "leasejournal",
+        "leaseflow", "leasewritecap", "leasereca", "leaserecb", "leaseslot0..3", "leasereopenone", "leasereopentwo"
+      ],
+      "generations": "1 (stdio bootstrap) -> 2 (first CAS) -> 3 (successor) -> 4 (successor-2 in I5 journal poll)"
+    }
+  },
+  "outcomes": [
+    {
+      "id": "I1",
+      "title": "Real RunningAttempt-shaped handle and original three callbacks",
+      "status": "PASS_LAUNCH_SHAPED_COMPONENT_SCOPE",
+      "implementation": "inspectRunningAttempt validates handle attemptId == producer attempt, full AttemptRef tuple, registration identity and the three callbacks before any endpoint use; main's attachRunnerAttempt consumes the validated port/callbacks",
+      "consumer": "actual-running-attempt.test.ts (2)",
+      "positive": "matching launch-shaped handle admitted; real service callbacks reach the original Store (row seq), the original payload body and one guard decision per intent",
+      "negative": "not-an-object/empty id/no port/incomplete registration/incomplete attempt/mismatched handle/missing callbacks/foreign binding refused with bounded messages; the same endpoint stays reachable for the real producer, so the refusal is identity not connectivity",
+      "notReached": "a handle actually returned by runtime.launch() (requires a native spawn, prohibited this wave); Application-created Work/QuestionBroker"
+    },
+    {
+      "id": "I2",
+      "title": "Fresh guard: per-intent decisions, no cached approval, ordered current",
+      "status": "PASS",
+      "implementation": "original nativeWriteDecision wrapper over beforeNativeWrite; deny does not poison a command, allow is consumed once, current is evaluated at decision time",
+      "consumer": "actual-guard-decisions.test.ts (2)",
+      "positive": "denied → allowed (after a live admission between intents) → consumed; a denial before the admission check does not consume it",
+      "negative": "after consumption the same command is refused; a later current flip refuses the next intent and only the next intent",
+      "notReached": "vendor/native effect observation; 30s channel timeout is not shortened (module-level timeout tests already cover it)"
+    },
+    {
+      "id": "I3",
+      "title": "First lease, legacy RPC and original command authority",
+      "status": "PASS_TRANSPORT_SCOPE_REFERENCE_INTEGRATION",
+      "implementation": "RunnerAttachChannel.owns() reports owned/unbound/stale_connection/identity_mismatch/closed without binding or polling; reference control consumer claims → owns → effect",
+      "consumer": "actual-lease-authority.test.ts (3)",
+      "positive": "legal CAS takes the next generation; owns() reports the live owner; a control path with the predicate allows exactly the owner",
+      "negative": "foreign producer refused and changes no owner; mismatched CAS refused and generation unchanged; terminal refuses new polls; never-bound/foreign lease claims refused with zero business effect",
+      "notReached": "B's runner-service controlRefusal still accepts a never-bound claimed lease before its own cache is set (B35-FIRST-CLAIMED-LEASE-IS-NOT-VALIDATED). I supplies the predicate and a reference integration; B must call it before command/cancel effects. Mixed-version cancel envelope remains B-owned."
+    },
+    {
+      "id": "I4",
+      "title": "Temporary detach vs terminal through two real attach consumers",
+      "status": "PASS_COMMUNICATION_SCOPE",
+      "implementation": "replaced lease settles the pending write as indeterminate and requeues fact/payload work with original ids for the successor; terminal closes every lease",
+      "consumer": "actual-succession-helper.test.ts (2)",
+      "positive": "successor continues the same run, one Store receipt per fact in Store order, fresh intent decided by the current guard",
+      "negative": "pending write reported indeterminate (not allowed/denied); old generation cannot rebind (generation unchanged); terminal refuses the next poll",
+      "notReached": "same original Work recovery to check/currentCandidate/manualaccept; physical child stop"
+    },
+    {
+      "id": "I5",
+      "title": "Original ids, kind namespace, journal descriptor and payload body",
+      "status": "PASS",
+      "implementation": "kind-namespaced correlation (fact:/payload:/write:) plus separate module maps; journal descriptor page vs immutable payload callback",
+      "consumer": "actual-id-namespace.test.ts (2)",
+      "positive": "fact payload-1 and payload request payload-1 settle concurrently and independently; 300-ref payload goes by reference, chunk bytes reproduce the descriptor digest and equal the callback body",
+      "negative": "duplicate receipt/payload replies refused (stale_lease); paging after the reported seq does not return the fact again; no settled request is redelivered",
+      "notReached": "payload chunking is read through main's existing /v1/payload; no new wire version"
+    },
+    {
+      "id": "I6",
+      "title": "Bounded capacity, control availability and honest diagnostics",
+      "status": "PASS",
+      "implementation": "module bounds unchanged; write capacity refused before send; fact flow stays one-at-a-time through the real Runner",
+      "consumer": "actual-limits-diagnostics.test.ts (2)",
+      "positive": "65-fact flow produces 65 unique monotonically increasing receipts and a payload read interleaved at fact 10; 9 concurrent intents → 8 guard decisions + 1 capacity refusal, then capacity returns",
+      "negative": "capacity refusal is typed `capacity`; denied intents are `NativeWriteDenied`; after the burst the next intent is decided again",
+      "notReached": "fact saturation (64 pending) is not reachable through the product fact path because the Runner awaits each receipt; the refusal-before-send bound for facts is proven at module scope in concurrency.test.ts and is reported as such, not as a product-scope observation"
+    },
+    {
+      "id": "I7",
+      "title": "Same-run recovery source without a second ledger",
+      "status": "PASS_SUPPORT_SCOPE",
+      "implementation": "the Runner's own journal is the recovery source; the channel requeues only unsettled work; the Store stays the single receipt authority",
+      "consumer": "actual-recovery-source.test.ts (1)",
+      "positive": "after takeover the journal page names the original fact once with its own durable seq; the successor persists the next fact; Store rows unchanged",
+      "negative": "pending intent becomes indeterminate, migrates no approval (a later direct decision is denied), and does not become a command result; paging past the seq does not replay the fact",
+      "notReached": "original Application/QuestionBroker question/answer/native_applied, recovered candidate, explicit manualaccept, slot release"
+    },
+    {
+      "id": "I8",
+      "title": "Slot isolation and a clean reopen",
+      "status": "PASS_CHANNEL_ISOLATION_SCOPE",
+      "implementation": "four independent services/endpoints/queues/leases; one lease cannot settle another slot; terminal channel closed; fresh Runner starts unbound",
+      "consumer": "actual-slot-isolation.test.ts (2)",
+      "positive": "each slot persists only its own fact; closing slot 2 leaves 0/1/3 serving; a fresh Runner binds generation 1 → 2 with an empty page",
+      "negative": "cross-slot reply refused; terminal refuses the next poll; no ghost request in the fresh channel",
+      "notReached": "original scheduler 2/4-slot capacity, fifth-item waiting, UNKNOWN occupancy and barrier-driven release (original core/queue/bindings); archive/non-empty state migration is main/B/D scope"
+    },
+    {
+      "id": "I9",
+      "title": "Adoption manual, exact source and handoff",
+      "status": "PASS_DOCUMENTATION",
+      "implementation": "docs/runtime-channel README + adoption manual updated with the real running shape, the identity guard, owns() and the layering rules; this status file separates source/controlled/installed/native/recovered/value",
+      "consumer": "this file plus the eight new test files and the two updated docs",
+      "positive": "call graph, authority ownership and error handling documented from the actual source",
+      "negative": "explicit NOT_REACHED list; no claim that module green equals product recovery",
+      "notReached": "installed exact package (D freeze → E final), native/vendor effects, value/benefit measurement"
+    }
+  ],
+  "handoff": [
+    {
+      "owner": "B",
+      "item": "First-lease control admission",
+      "detail": "B35-FIRST-CLAIMED-LEASE-IS-NOT-VALIDATED is unchanged in B source. RunnerAttachChannel.owns(leaseId, producer) is now the read-only predicate to call before command/cancel effects; the reference consumer in actual-lease-authority.test.ts shows the claim→owns→effect order with zero effect on refusal."
+    },
+    {
+      "owner": "B",
+      "item": "Attach-handle identity",
+      "detail": "B35-ATTACH-HANDLE-IDENTITY-NOT-MATCHED is unchanged in packages/execution/src/attached-attempt.ts. inspectRunningAttempt (apps/runner/src/attach-channel/running-attempt.ts) is the pure validator consumers can run first; it refuses handle.attemptId != producer.attempt.attemptId before any endpoint is opened."
+    },
+    {
+      "owner": "main/B",
+      "item": "Client channel arity vs port interface",
+      "detail": "packages/execution/src/recovery-transport.ts declares RecoveryRunnerPort.channelNext(producer, leaseId, expectedGeneration) for the server side, while connectRunnerRecovery()'s returned client takes (leaseId, expectedGeneration). A caller following the port type passes the producer as the lease and gets `invalid_lease`. Observed while writing actual-lease-authority.test.ts; documented with the runtime shape in that file. Needs a typed client interface so consumers cannot pass the wrong argument order."
+    },
+    {
+      "owner": "main",
+      "item": "Callback activation order",
+      "detail": "An attach consumer must bind (first channelNext) before business feed starts: a native intent that exists while the stdio lease is still current is settled indeterminate by the takeover, which is correct but surprising. Observed and documented in actual-guard-decisions.test.ts."
+    }
+  ],
+  "checks": [
+    { "command": "pnpm exec tsc -p apps/runner/src/attach-channel/tsconfig.json", "exit": 0, "scope": "module + all attach-channel consumers under strict/noUncheckedIndexedAccess/exactOptionalPropertyTypes" },
+    { "command": "cd apps/runner && node --test --test-timeout=90000 test/attach-channel/*.test.ts", "exit": 0, "tests": 175, "passed": 175, "failed": 0 },
+    { "command": "node --test packages/contracts/test/coordinator-channel.case.ts", "exit": 0, "tests": 5, "passed": 5 },
+    { "command": "node --test tests/integration/native-attach-callbacks.case.mjs tests/integration/attached-port.case.mjs (main)", "exit": 0, "tests": 15, "passed": 15 },
+    { "command": "node agent-tasks/product-wave-35/verify.mjs --workspaces", "exit": null, "scope": "not run by I; static ownership/DAG check is the dispatch tool's job, not a runtime/native admission" }
+  ],
+  "layers": {
+    "source": "PASS: new guard module, owns() projection, eight consumer test files, docs, this status",
+    "controlled": "PASS: real serveRunner service + real recovery endpoint + main attachRunnerAttempt + real ProductStore + original NativeProductAttempt methods",
+    "installed": "NOT_REACHED: no new tar; W33 R1 8296720d8a25f38c / tar 04926739… and R2 303b2c6a remain the last frozen subjects; D freeze → E final required",
+    "native": "NOT_REACHED: zero real vendor/model/native turns; no NativeProductAttempt.launch; no child spawned",
+    "recovered": "SUPPORT_ONLY: journal-source and unknown-window support; original Application/QuestionBroker recovery to candidate/accept NOT_REACHED",
+    "value": "NOT_MEASURED: no price/benefit/recipe research"
+  },
+  "preservation": {
+    "resetOrClear": false,
+    "upstreamPush": false,
+    "twelveInstancesAndStateTouched": 0,
+    "realVendorModelNativeTurns": 0,
+    "modelOrStudyBudgetCreated": 0,
+    "bCap4UnknownSpent": 0,
+    "ePilotResetOrToppedUp": 0,
+    "newDriverOrDesktopOrCac": 0,
+    "secondLifecycleOrLedger": 0
+  }
+}

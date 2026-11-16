@@ -150,7 +150,7 @@ main `23d5a98e` 把原 stdio 闭包提成 `NativeProductAttempt` 的方法，`Ru
 
 **分层规则**：`beforeNativeWrite` 的 void 成功只有在显式 wrapper（main 的 decision）里才变成 `{allowed:true}`；通信层收到裸 void 回调时必须视为**没有允许**（实测为主叫方 typed 拒绝，driver 零写）。错误对象形状保持不变（`NativeWriteDenied` 用 `instanceof`/`toAttachFailure` 判定），以免改变 main 现有消费者的观测字符串。
 
-**运行方式（测试/受控）**：`attachCallbacks` 只在 `launch()` 后返回，而 `launch()` 会 spawn 原生 Runner。I 的消费者因此直接构造同一个类，并把 in-process 服务已注册的 endpoint 注入为 post-registration 状态（等价于 `launch()` 已建立的状态），**不 spawn、不 launch**；生产接线仍由 main/B 负责。
+**运行方式（测试/受控）**：`attachCallbacks` 只在 `launch()` 后返回，而 `launch()` 会 spawn 原生 Runner。I 的消费者因此直接构造同一个类，并把 in-process 服务已注册的 endpoint 注入为 post-registration 状态（等价于 `launch()` 已建立的状态），**不 spawn、不 launch**；生产接线仍由 main/B 负责。wave-35 增加一层纯校验：`inspectRunningAttempt(running, expectation?)`（`apps/runner/src/attach-channel/running-attempt.ts`）在打开 endpoint 之前核对 handle `attemptId` 与 `producer.attempt.attemptId`、完整 `AttemptRef`（ticket/assignment/attempt/fence/contract）、registration（socket/credential/dev/ino）与三类 callback，拒绝原因是有限枚举（`handle_missing|port_missing|registration_incomplete|attempt_incomplete|handle_producer_mismatch|binding_mismatch|callbacks_missing`）。防错顺序：**launch 返回的 running → inspect → 通过后再 attachRunnerAttempt**；不要用 `NativeProductAttempt` 实例冒充 running，也不要用反射改 private endpoint 后宣称 factory 已接。真实 `launch()` 返回的 handle 需要 native spawn，本轮 NOT_REACHED。
 
 ## 5.0c 同 run handoff 记录
 
@@ -169,6 +169,25 @@ scope {applicationWork:NOT_REACHED, questionBroker:NOT_REACHED, native:NOT_TESTE
 
 核对点：`receiptSeq === storeRowSeq`、`nonce !== commandId`、generation 单调、guard 每意图一次；记录只陈述已观测事实，不给候选/接受/物理结论。
 
+## 5.0d 控制面的 lease 判定（`owns`）
+
+回调 generation 不是 business fence。控制路径（command/cancel admission）在产生副作用前应先问「这个 lease 现在是不是 owner」，而不是维护第二份 owner 缓存：
+
+```ts
+const ownership = attach.owns(leaseId, producer)
+// 'owned' | 'unbound' | 'stale_connection' | 'identity_mismatch' | 'closed'
+if (ownership !== 'owned') refuseBeforeEffect(ownership)
+// 只有 owned 才继续原 command/current/index/guard 检查
+```
+
+`owns` 只读：不 bind、不 poll、不推进 generation、不替换 lease。参考消费者 `actual-lease-authority.test.ts` 按 claim→owns→effect 顺序证明被拒声明零业务效果；真实 service 上用 foreign producer、错误 CAS generation 与 terminal 验证拒绝。
+
+**已知 B 侧缺口（未修，B-owned）**：`B35-FIRST-CLAIMED-LEASE-IS-NOT-VALIDATED` —— `runner-service.ts` 的 control admission 只在自身 `activeLease` 缓存为真时比较 lease，首次调用可被任意 never-bound lease 通过。I 交 predicate + 参考消费者，B 应在 command/cancel 效果前调用 `owns`。
+
+## 5.0e 同 run 恢复来源（journal）
+
+继任者的恢复来源是 Runner 自己的 durable journal，不是上一个协调者的内存：`connectRunnerRecovery(...).facts(since, maxBytes)` 的页按原 `seq` 前进，同一 fact 只出现一次；`payload(ref, offset, length)` 分块重组后的字节 sha256 与 descriptor 的 `payloadDigest` 一致，且等于原 payload callback 返回的 body。已结算的请求不会重新派发；未决 native 意图在换 lease 时是 `indeterminate`，既不迁移批准，也不会变成 command result。原 Application/QuestionBroker 到 check/currentCandidate/manualaccept 仍是 main/B 的事，NOT_REACHED。
+
 ## 5.1 terminal 与 detach
 
 见 `fault-states.zh-CN.md`：终态（main `finish()` → `attach.close()`）关闭全部 lease/pending，pending fact 为 `closed`、未决 native 为 `indeterminate`、迟到 next/reply 零效果；仍 running 的临时 detach 可以合法继任，但旧 allowed 不迁移。wave-31 关于 shutdown 的相反观察来自缺 `id` 的无效帧，已纠正。
@@ -180,14 +199,24 @@ scope {applicationWork:NOT_REACHED, questionBroker:NOT_REACHED, native:NOT_TESTE
 | 模块实现（100 例历史 + 32 例真实消费者） | PASS |
 | 真实 B service 采用、单 transport owner、sink guard、direct strict | PASS（见状态文件的 B 证据） |
 | 同 attempt 双 client、继任、ACK 窗口、背压、多槽隔离、shutdown 通信语义 | PASS（本轮 consumers） |
+| launch 形状 handle 的纯身份/完整性校验、lease owner 只读判定 | PASS（wave-35，`inspectRunningAttempt`/`owns`） |
+| 四槽通信隔离、journal 恢复来源、跨 kind id、写容量 | PASS（wave-35 consumers；非调度器证明） |
 | 原 A 持久 ingress（真实 ProductStore） | PASS（I2） |
 | 原 Broker 完整 `NativeProductAttempt`（需 spawned child） | NOT_REACHED；I3 用同一 store 上的等价检查 |
 | 原问题→`native_applied`→候选/manualaccept/slot 释放的恢复链 | NOT_REACHED（B/main） |
+| 真实 `runtime.launch()` 返回的 handle（需 native spawn） | NOT_REACHED |
+| 原调度器 2/4 槽、第五项等待、资源驱动释放 | NOT_REACHED（原 core/queue/bindings） |
 | 真实 vendor/model/native、installed artifact | NOT_TESTED（本轮 0） |
 
 ## 7. 已报告的跨 owner 缺口（B 修复）
 
 `runner-service` 的 `closeAdmission` 只 `drop` 固定的 stdio/sink connection id；远端 lease 在 shutdown 后仍是 current，因此迟到 reply 理论上仍可结算 pending（I10 观测到该行为，未作为绿灯断言）。B 终端关闭应改用 `attach.close()`（或同时 drop 当前 remote lease）。模块侧 `close()` 已保证迟到 reply 被拒（`handover.test.ts`）。
+
+wave-35 新增/保留三条精确交接（均在对方 owned 文件，I 未改）：
+
+- **B · first lease**：`B35-FIRST-CLAIMED-LEASE-IS-NOT-VALIDATED`。`RunnerAttachChannel.owns()` 是可直接调用的只读判定；参考消费者见 `actual-lease-authority.test.ts`。
+- **B · attach handle identity**：`packages/execution/src/attached-attempt.ts` 的 `attachRunnerAttempt` 只检查 attemptId 非空并 `as` producer。消费者可先跑 `inspectRunningAttempt`；它会在任何 endpoint 打开前拒绝 handle 与 producer 不一致。
+- **main/B · client 参数顺序**：`recovery-transport.ts` 用 `RecoveryRunnerPort` 描述服务端的 `channelNext(producer, leaseId, expectedGeneration)`，但 `connectRunnerRecovery()` 返回的客户端实际是 `channelNext(leaseId, expectedGeneration)`。按端口类型写调用方会把 producer 当 lease 传入并收到 `invalid_lease`（wave-35 实测）；需要一个与服务端一致的 typed client 接口。
 
 ## 8. R1/R2 与打包
 

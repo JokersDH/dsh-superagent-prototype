@@ -182,16 +182,25 @@ attach.drop(leaseRef, 'socket closed')
 # 严格类型（strict + noUncheckedIndexedAccess + exactOptionalPropertyTypes）
 node_modules/.bin/tsc -p apps/runner/src/attach-channel/tsconfig.json
 # 行为矩阵（注入时钟，无 sleep、无真实网络/模型）
-cd apps/runner && node --test --test-timeout=8000 test/attach-channel/*.test.ts   # 159/159
+cd apps/runner && node --test --test-timeout=90000 test/attach-channel/*.test.ts  # 175/175
 ```
 
-覆盖：模块既有 scope 之外，wave-31 增加了真实消费者：真实 `serveRunner`（原 fact id/fresh intent/重放拒绝）、真实 `ProductStore` ingress（receipt 回读）、真实 Broker 等价 guard、真实 endpoint 双 client 与继任、ACK 窗口、64 上限背压、4 槽隔离、shutdown/malformed、公开接口兼容。完整清单与调用图见 `adoption-manual.zh-CN.md`；terminal/detach 与页/块语义见 `fault-states.zh-CN.md`。wave-33 起同时消费 main 的 `RunningAttempt.attachPort` 数据形状与 `attachRunnerAttempt` caller；wave-34 进一步直接消费 `NativeProductAttempt` 的**原方法**（`recordFact`/`readPayload`/`nativeWriteDecision`，即 `attachCallbacks` 的实现）并给出同 run handoff 记录，见手册 §5.0/§5.0b。wave-27 的 44 个历史用例保留在原 scope 内。
+覆盖：模块既有 scope 之外，wave-31 增加了真实消费者：真实 `serveRunner`（原 fact id/fresh intent/重放拒绝）、真实 `ProductStore` ingress（receipt 回读）、真实 Broker 等价 guard、真实 endpoint 双 client 与继任、ACK 窗口、64 上限背压、4 槽隔离、shutdown/malformed、公开接口兼容。完整清单与调用图见 `adoption-manual.zh-CN.md`；terminal/detach 与页/块语义见 `fault-states.zh-CN.md`。wave-33 起同时消费 main 的 `RunningAttempt.attachPort` 数据形状与 `attachRunnerAttempt` caller；wave-34 进一步直接消费 `NativeProductAttempt` 的**原方法**（`recordFact`/`readPayload`/`nativeWriteDecision`，即 `attachCallbacks` 的实现）并给出同 run handoff 记录，见手册 §5.0/§5.0b。wave-35 增加 `inspectRunningAttempt`（launch 返回形状的纯身份/完整性校验）与 `RunnerAttachChannel.owns`（只读 owner 判定），并用 main 的 caller 覆盖继任/终止、跨 kind id、journal descriptor 与 payload body 共存、写容量、journal 恢复来源与四槽隔离；见 §8.0c 与手册 §5.0c/§5.0d。wave-27 的 44 个历史用例保留在原 scope 内。
+
+### 8.0c wave-35：launch 形状、lease 判定与同 run 恢复来源
+
+四个新增测试直接消费真实 service/endpoint、main 的 `attachRunnerAttempt` 与原 class 方法：
+
+- `actual-running-attempt.test.ts`：`inspectRunningAttempt(running, expectation)` 在**打开任何 endpoint 之前**校验 handle 的 `attemptId` 与 `producer.attempt.attemptId`、完整 `AttemptRef`（ticket/assignment/attempt/fence/contract）、registration（socket/credential/dev/ino）与三类 callback；缺字段、错 subject、错绑定、mismatched handle 全部拒绝且诊断有界。同一 endpoint 对真实 producer 仍可达，说明拒绝的是身份而不是连通性。真实 `runtime.launch()` 返回的 handle 需要 native spawn，本轮**未执行**。
+- `actual-lease-authority.test.ts`：`owns(connectionId, producer)` 只读返回 `owned|unbound|stale_connection|identity_mismatch|closed`，不 bind、不推进 generation；参考控制消费者按 claim→owns→effect 顺序证明被拒声明零业务效果。真实 service 上同时验证 foreign producer、错误 CAS generation 与 terminal 拒绝。B 的 first-claimed-lease 缺口仍在 B 源，已交 predicate + 参考消费者。
+- `actual-succession-helper.test.ts` / `actual-recovery-source.test.ts`：换 lease 时未决写变 `indeterminate`（不迁移批准），fact/payload 按原 id/ref 重排给继任；继任可通过 Runner 自己的 journal 页读到原 fact（一次、原 seq），Store 仍只有一份 receipt，旧 generation 无法用旧值重新占位。原 Application/QuestionBroker 到 candidate/accept 仍未达。
+- `actual-id-namespace.test.ts` / `actual-limits-diagnostics.test.ts` / `actual-slot-isolation.test.ts`：fact id 与 `payload-<n>` 同类互不结算；大 payload 走 descriptor + 分块，重组字节的 sha256 与 descriptor 一致并与原 callback body 相同；重复 receipt/payload 回复被拒；9 个并发写意图得到 8 个原 guard 决定 + 1 个 `capacity` 且随后恢复；四槽各自 endpoint/queue/lease 隔离，关一槽不影响其余。以上是**通信隔离**，不是原调度器 2/4 槽与资源归还证明。
 
 ## 9. 本文明确不证明的事
 
 - **B 已实际接入并闭合单 owner**（观察源 `fbc9331`）：B import `RunnerAttachChannel`，旧三张 waiter map 与自建 poll queue 已删除，sink 意图必须经过注入的 `beforeNativeWrite`（缺失/拒绝/抛错零效果）；remote 接管后旧 stdio 收到 0 帧（B 自己的 `b30-transport-owner` 探针与 focused 8/8、direct strict 0）。
 - 历史上"B 仍有 stale channel 编译错误"的观察属于中间 working tree（`1930278`），当前 source 不再成立，已从本文件与 adoption 清单删除。
-- 未证明：同 Runner 进程双 client、coordinator SIGKILL 后原问题→交付、跨 coordinator 崩溃恢复、durable exactly-once、物理 writer quiescence。
+- 未证明：`runtime.launch()` 实际返回的 handle（需 native spawn）、同 Runner 进程双 client 的原问题→候选→交付、coordinator SIGKILL 后原问题→交付、跨 coordinator 崩溃恢复、durable exactly-once、物理 writer quiescence、原调度器 2/4 槽与第五项等待/资源归还。
 - 测试中的 `DurableSink`/`ImmutablePayloads`/guard 都是契约/语义 double，不代表 A 的持久化 ingress 或 main/Broker 的真实许可。
 - `readPayload` 只承载 immutable payload **JSON 值**（受 `maxPayloadBytes` 约束），不替代 B 的 journal/descriptor 分块回放路线。
 - H 仍消费旧快照并在导入前因 source pin 拒绝（`NOT_REACHED_SOURCE_REFUSAL`）；它需要绑定当前 source 后独立执行。
