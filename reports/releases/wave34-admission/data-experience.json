@@ -1,0 +1,228 @@
+{
+  "protocol": "wave34-data-experience-admission/1",
+  "date": "2026-11-16",
+  "status": "REAL_SOURCE_PROGRESS_PRIOR_C_THREE_P2_CLOSED_NEW_A_BUDGET_AND_C_SNAPSHOT_P2",
+  "scope": "Read-only wave33 A/C/F acceptance, exact source-integration advice and six complete-outcome themes per role. No new task books, candidate edits, main production changes, archives, installations or user-service operations.",
+  "observedMain": "e05ee8d8164a010abf87e0f389382a3f94de2257",
+  "mainRuntimeCheckpoint": "fc38bf65b6a05a7771fc58829152c512255a6a29",
+  "fixedSources": {
+    "A": "6bbbea3875305f09b8efb3fd54bc3a9a806b23b5",
+    "C": "ecac059dc8c6e0365acd20dccc12ff6d77ca5caa",
+    "F": "69e14a08ff7e8135b2ac1a15cd5809397b792411"
+  },
+  "dirtyBeforeAndAfter": {
+    "A": [],
+    "C": ["pnpm-lock.yaml"],
+    "F": [],
+    "cLockNumstat": "3 additions / 0 deletions, preserved",
+    "mainExistingUntrackedPreserved": ["new-start.err", "new-start.json", "old-onnew.err", "old-onnew.json", "old-start2.json"]
+  },
+  "executed": [
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-a/packages/workflows",
+      "command": "node --test test/acceptance.case.ts test/wave33-continuation.case.ts test/wave32-persistent-two-project.case.ts",
+      "exitCode": 0,
+      "passed": 9,
+      "failed": 0,
+      "durationMs": 5684,
+      "scope": "Original strict historical/current separation and acceptance/UoW; production120 metadata rows ->50+50+20 unique keyset entries; two distinct registered scratch projects through original preview/Work/check/currentCandidate/manualaccept; same-Store reopen and separate Node reader of actual original artifact bytes. Controlled fixture executor, not real vendor/native."
+    },
+    { "cwd": "/Users/hh/Desktop/joker/superagent-agent-a", "command": "./node_modules/.bin/tsc --noEmit -p packages/storage/tsconfig.json", "exitCode": 0 },
+    { "cwd": "/Users/hh/Desktop/joker/superagent-agent-a", "command": "./node_modules/.bin/tsc --noEmit -p packages/workflows/tsconfig.json", "exitCode": 0 },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "command": "node --test packages/knowledge/test/decision-context-snapshot.case.ts packages/context/test/history-coverage.case.ts",
+      "exitCode": 0,
+      "passed": 3,
+      "failed": 0,
+      "scope": "Pure current/project/cap/version/revoke/supersession/source-change/expiry/scan-incomplete snapshot controls and previously fixed unknown coverage. No HTTP/model fixture or service started."
+    },
+    { "cwd": "/Users/hh/Desktop/joker/superagent-agent-c", "command": "./node_modules/.bin/tsc --noEmit -p packages/context/tsconfig.json", "exitCode": 0 },
+    { "cwd": "/Users/hh/Desktop/joker/superagent-agent-c", "command": "./node_modules/.bin/tsc --noEmit -p packages/knowledge/tsconfig.json", "exitCode": 0 },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-f/apps/console",
+      "command": "node --test test/trial/trial-view.case.ts test/trial/recipes.case.ts",
+      "exitCode": 0,
+      "passed": 20,
+      "failed": 0,
+      "scope": "Current readiness/actions/readonly/unknown,7/30 scope/window, restricted recipe selection and exclusions."
+    },
+    { "cwd": "/Users/hh/Desktop/joker/superagent-agent-f", "command": "./node_modules/.bin/tsc --noEmit -p apps/console/tsconfig.json", "exitCode": 0 },
+    {
+      "command": "Inline Node: actual C session CLI in child processes, fixed in-memory fetch response, self-owned temporary files",
+      "exitCode": 0,
+      "status": "PASS_PRIOR_DRAFT_P2_CONTROLS",
+      "cases": ["private0600 create", "private0600 update", "valid private load", "0644 destination refused and unchanged", "symlink refused and victim unchanged", "invalid expiry refused", "expired draft usable=false"],
+      "scope": "Closes the reported static symlink/permission/date counterexamples through the real CLI. No real network, credential or user file access."
+    },
+    {
+      "command": "Inline Node: actual A ProductStore/WorkflowIndex keyset with repeat, subject controls and append mutations",
+      "exitCode": 0,
+      "status": "PASS_KEYSET_SUBJECT_AND_APPEND_CONTROLS",
+      "result": { "originalRows": 60, "uniqueOriginalRows": 60, "continuedTotalWithNewOlder": 61, "repeatStable": true, "foreignProjectRefused": true, "foreignKindRefused": true, "lateNewerOnlyOnFreshStart": true, "newOlderVisibleOnContinuation": true },
+      "scope": "Proves a live keyset window: existing rows are not duplicated/omitted in this finite sequence; new rows behind the cursor may enter continuation, new rows ahead require a fresh start. This is not an immutable multi-page snapshot."
+    },
+    {
+      "command": "Inline Node: strict CompletionEvidenceStore verification accepted by existing schema, then actual A history byte-boundary calls",
+      "exitCode": 1,
+      "status": "FAIL_HISTORY_BUDGET_PROGRESS",
+      "positive": { "returned": 1, "hasMore": false, "coverage": "complete" },
+      "legalVerificationResultsBytes": 4395096,
+      "oversizedFirst": { "returned": 0, "available": 2, "hasMore": true, "nextCursor": null, "coverage": "truncated", "maxBytes": 4194304 },
+      "attemptPage": { "returned": 1, "coverage": "complete", "actualPageBytes": 4194883, "maxBytes": 4194304 },
+      "scope": "Actual source methods and a temporary DB. The large verification is accepted by CompletionEvidenceStore.recordVerification strict validation; the attempt uses RuntimeBindings.record's supported full JSON preservation. No fake additional executions are claimed."
+    },
+    {
+      "command": "Inline Node: actual C governance and snapshot capture/revalidate with scope/provenance mutations and independent normal negatives",
+      "exitCode": 1,
+      "status": "FAIL_SCOPE_AND_PROVENANCE_REVALIDATION",
+      "result": { "fresh": true, "capturedScopeDeepFrozen": false, "mutatedScopeValid": true, "forgedSourceMessageAndTimeValid": true, "changedVersionValid": false, "sourceStaleValid": false, "revokedValid": false, "authorization": "none" },
+      "scope": "Pure in-memory governed explicit decision. The original stored decision is unchanged; only the supposedly current snapshot is mutated. No main permission or execution bypass is claimed."
+    },
+    {
+      "command": "Inline Node: exact F trialSupportRows unknown and current capability projections",
+      "exitCode": 0,
+      "status": "PASS_F_CAPABILITY_PROJECTION",
+      "result": { "states": 2, "historyAvailability": true, "sourceAvailability": false, "noPackageIdentityFabricated": true },
+      "scope": "Actual new support mapping, not a new history/body UI or independent browser verdict."
+    }
+  ],
+  "previousFindingsClosed": [
+    { "id": "C33-CONTEXT-STRICT-MISSING-MJS-DECLARATION", "status": "CLOSED", "evidence": "history-coverage.d.mts supplies the real module interface; exact context strict now exits0, knowledge strict also0." },
+    { "id": "C33-DRAFT-SAVE-FOLLOWS-LINK-AND-KEEPS-PUBLIC-MODE", "status": "CLOSED_FOR_REPORTED_CONTROLS", "evidence": "Actual CLI refuses both0644 destination and symlink without modifying either original target. Private creation/update/load work with0600. Final rename avoids following the final target link. This does not claim a separate hostile concurrent-filesystem race audit." },
+    { "id": "C33-INVALID-DRAFT-EXPIRY-MARKED-USABLE", "status": "CLOSED", "evidence": "Actual loader refuses nonfinite invalid expiry; valid future and real past controls retain correct usable/stale behavior." }
+  ],
+  "newFindings": [
+    {
+      "id": "A34-HISTORY-BYTE-BOUND-AND-CONTINUATION-PROGRESS",
+      "priority": "P2_PRODUCTION_READER_BOUNDARY",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-a/packages/storage/src/workflows.ts",
+      "line": 906,
+      "relatedLines": [846, 864, 876, 910],
+      "problem": "For verifications/reviews, an otherwise schema-valid first entry larger than4MiB causes an empty truncated page with hasMore=true but nextCursor=null, so older rows cannot be reached. Attempts/acceptances/contracts skip the per-entry byte accounting entirely; the actual attempts control returns a page above its advertised maxBytes while labelling it complete.",
+      "evidence": "The exact failed boundary values and small-page positive are recorded in executed[]. A valid33-criterion verification with1024 legal long evidence IDs per criterion is4395096 bytes and is accepted through strict production evidence recording.",
+      "scopeLimit": "New A candidate reader, not yet the main public HTTP path at initiale05. No existing ProductCompletion/current/accept gate is bypassed. Normal120-row continuation remains real and passes.",
+      "requiredBehavior": "Apply a total serialized-page budget to every collection, including envelope/omissions. A too-large first item must explicitly refuse or provide a bounded, documented progress/omission mechanism; never return an unresumable more-page. Main must independently reject malformed/unbounded/nonprogress responses when exposing this port."
+    },
+    {
+      "id": "C34-SNAPSHOT-VALID-DOES-NOT-BIND-SCOPE-OR-PROVENANCE",
+      "priority": "P2_SNAPSHOT_INTEGRITY_BEFORE_MAIN_ADMISSION",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-c/packages/knowledge/src/decision-snapshot.ts",
+      "line": 108,
+      "relatedLines": [48, 93],
+      "problem": "The revalidator compares version, contentDigest, sourceTextDigest and project only. It does not bind the supplied full Scope, sourceMessageId or recordedAt to the current governed record. Captured nested Scope arrays are also mutable despite the outer Object.freeze. Widening allowedPaths/removing exclusions in the captured snapshot, or forging sourceMessageId/recordedAt in a clone, still returns valid=true.",
+      "evidence": "Actual governed capture is initially valid; both scope/provenance mutations remain valid. Changing version, changing the live source digest and revoking the original decision correctly return false, so this is not a missing-positive or inactive-fixture artifact.",
+      "scopeLimit": "Candidate data protocol with authorization=none; no default main authorization bypass is demonstrated. Do not interpret valid as a complete current scope/provenance assertion or bind new Work creation to it unchanged.",
+      "requiredBehavior": "Validate the complete snapshot shape and compare all represented scope/provenance/version fields against current trusted records, or reconstruct the canonical trusted snapshot and compare its structured identity. Deeply snapshot/freeze nested data. Main must continue using its current principal/Scope/source checks and original prepare/assert/confirmation lifecycle."
+    }
+  ],
+  "productionProgressAssessment": {
+    "A": {
+      "newProduction": "Real WorkflowIndex.completionHistory and ReadIndexPort continuation over existing tables, stable timestamp/ID or revision/ID or epoch/ID keys; no new migration/candidate table/ledger. The previous50-only source gap is substantively addressed for normal bounded rows.",
+      "sourceAndCallerSemantics": "available is the count for the physical subject/collection; reviews scan verification candidates and may have no classified review. It must not be displayed as a count of authentic reviews. coverage currently describes hasMore for the live window, not an immutable whole-history proof.",
+      "artifactProgress": "The updated two-project test now calls original ArtifactStore.read and explicitly hashes every data buffer against the stored digest after reopen. Its separate Node reader also invokes ArtifactStore.read, which verifies the digest. This is actual referenced content, beyond merely matching64hex metadata.",
+      "scopeLimits": "The child test field named sha256 contains a byte length, not a hash; the underlying read verification and parent explicit hash still establish the tested byte integrity. No packaged coordinator restart, real native or original live-Work crash takeover is inferred.",
+      "mainConsumer": "At initiale05 main has no new continuation HTTP/UI consumer; C's old tools still use capped arrays/local offset. A accurately marks its new consumer outcome partial/SOURCE_READY."
+    },
+    "C": {
+      "newProduction": "Typed coverage helper, safer persistent drafts, governance.getEffective and capture/revalidate decision-context-snapshot/1. Current/stale/revoked/version/expiry positives and negatives are substantive source behavior; two incomplete snapshot fields classes remain above.",
+      "actualSubmittedMainConsumer": "main-personal-decision-snapshot-consumer uses actual ProductStore governance and main /v1/context/preview. It explicitly creates a controlled Work, then sends work-scoped assistant context containing decisions; it checks frozen sources and later revocation.",
+      "importantLimit": "That consumer runs AFTER create_work. It does not pass the snapshot into original Work creation or prove creation-time prepare/assert/version binding. The test's decision ID/source assertions also do not turn revalidate into a complete scope/provenance check. No default main snapshot consumer exists at initiale05.",
+      "independentRuntimeScope": "This audit reruns the pure governance suite and real CLI draft controls, not the submitted long runtime/model-fixture consumer. Its source dataflow and original APIs were read, with the source/controlled/installed layers kept separate."
+    },
+    "F": {
+      "newProduction": "Only two support rows were added for contextHistory/contextSources availability. TrialWorkspace already matches the current main component; the previous first-use/retry/support/day-window/form composition was integrated atfc38.",
+      "actualConsumer": "Existing actual App accepts the same support props. New rows derive from parsed readiness capabilities and honestly show unobserved/unprovided, not a grant to read bodies. Pure projection, existing20 controls and console strict pass.",
+      "submittedEvidence": "Real App multiwork/FAIL/pending/draft/return tests and recipe retry evidence are useful regression expansion of existing product behavior. They are not new full history/source browsing production code or installed/native evidence.",
+      "admission": "The exact support.ts addition can be integrated as a small compatible source change. No new F P1/P2 found in this scope; full history/source/support body experience remains a whole-product result to deliver."
+    }
+  },
+  "minimalMainIntegration": {
+    "A": {
+      "sourceReferences": [
+        { "path": "packages/storage/src/workflows.ts", "bytes": 74385, "sha256": "1426c4c29b1db11f68b7a8a2e060086ac5233ac2052d5f89cd9dbde4172ac599" },
+        { "path": "packages/storage/src/index.ts", "bytes": 10322, "sha256": "56ef659c386b2094bca1f9b04ea5106c241e3d3a6098faac71dcd76e3cda53e9" },
+        { "path": "packages/workflows/src/ports.ts", "bytes": 8768, "sha256": "da2418e22bb1e78d0b0146826be7578e2647d78dd5b9851fd5d5fa07c8719513" }
+      ],
+      "exactHunkBoundary": "workflows.ts contains the cumulative readonly CompletionFacts/review classification plus new history types/helpers/method, with existing contract-schema imports. For storage/index.ts import only the completion types/productReviewCommandId exports: its unrelated content-proof.ts export references a file absent from maine05. For workflows/ports.ts take only completion type imports/exports and ReadIndexPort.completionHistory; retain main's own recoverySource structure instead of copying that unrelated cumulative delta.",
+      "stablePort": {
+        "call": "store.workflows.index.completionHistory(query) or createWorkflowPorts(store).index.completionHistory(query)",
+        "query": "{workId,projectIds:[exactCurrentProject],kind:reviews|verifications|acceptances|contracts|attempts,limit?:0..200,cursor?:string}",
+        "page": "{protocol:'completion-history/1',workId,projectId,kind,limit,returned,available,hasMore,nextCursor:string|null,coverage:'complete'|'truncated',entries:unknown[],unclassifiedReviews,limits:{maxLimit:200,maxBytes:4194304}}",
+        "cursor": "Internal base64url{v:1,workId,projectId,kind,key}; not a grant, public signature, expiry or immutable source snapshot.",
+        "entryProjection": "verification/acceptance wrappers, contract revision+digest, attempt raw binding, and verification candidates plus optional review/unclassified. Main must project strict permitted public fields, especially never forwarding the raw attempt binding wholesale."
+      },
+      "hostResponsibilities": "Resolve authenticated principal/current project and body Scope before calling; bound and sign any external cursor to current filters/auth identity; validate finite integer limits, typed row projection, total bytes and progress. Expose an honest live page, keep ProductCompletion current/preflight/accept unchanged. Source budget/progress P2 must be repaired or explicitly refused, not masked by a green completeness label.",
+      "usefulFirstConsumer": "A real authenticated history reader can start with properly bounded verification/contract metadata pages in the original Work/evidence surface, then grow into review/attempt detail. This must be actual main public-port consumption, not another report or new ledger."
+    },
+    "C": {
+      "sourceReferences": [
+        { "path": "packages/knowledge/src/decision-snapshot.ts", "bytes": 6076, "sha256": "c8fb5581a57bd061680bd927d802618704cf99bc9513fc0727d78f68b7a09b19" },
+        { "path": "packages/knowledge/src/governance.ts", "bytes": 13447, "sha256": "af2b09e3073ffc655f036cc6e13a677df9fe8cdddc7254d2c97028853b4130e5" },
+        { "path": "packages/knowledge/src/index.ts", "bytes": 1479, "sha256": "523d4e8812f8b08cc7faba3d696d950214d4a05ab7107894159968f89cc0f1c3" }
+      ],
+      "exactHunkBoundary": "New decision-snapshot.ts, governance.getEffective seven-line method and two barrel export lines. No root lock/dependency/migration is needed. Do not wholesale import the CLI or its tests into runtime packaging.",
+      "stablePort": {
+        "capture": "captureDecisionSnapshot(governance,{projectId,selectedDecisionIds?,max?,now?}) -> CurrentDecisionSnapshot",
+        "view": "{protocol:'decision-context-snapshot/1',capturedAt,projectId,authorization:'none',decisions:[{decisionId,version,contentDigest,scope,sourceMessageId,sourceTextDigest,recordedAt,expiresAt?}],coverage:{scan:'complete',callerTruncated,max}}",
+        "revalidate": "revalidateDecisionSnapshot(governance,snapshot,{projectId?,now?}) -> {valid,code?,decisions}; current false version/source/inactive checks are real, full supplied scope/provenance integrity is not admitted."
+      },
+      "hostResponsibilities": "Governance effectiveness does not replace current main authorization. Build the governance source from original trusted persisted messages, retain ProductContextPreview/ContextComposer current Scope filtering and source-before-use barriers, and use strictly selected IDs/current records rather than trusting a client snapshot as a grant. A readonly current-snapshot consumer is distinct from a creation-time prepared/asserted Work binding.",
+      "safeAdmissionBoundary": "Current read-only capture/projection can be useful after host authorization and canonical snapshot handling. Do not use the candidate valid boolean unchanged to authorize or certify a new Work's full scope/provenance. The original confirmation/Work schema remains main-owned."
+    },
+    "F": {
+      "sourceReferences": [
+        { "path": "apps/console/src/trial/support.ts", "bytes": 2701, "sha256": "c527700870e5809393310289154869838b07c8fa8a13f31f9cf1ecf0fac435c5" }
+      ],
+      "alreadyByteIdenticalToMain": { "path": "apps/console/src/trial/TrialWorkspace.tsx", "bytes": 27835, "sha256": "38e98fedada1e2b33698182abe0477640cda6f503ca13e1ae2b27c5b2d22d6c6" },
+      "props": "No new App prop or callback; the existing readiness.capabilities object supplies the two booleans. Keep fc38's7/30, original form, actual recipe reload and download callbacks. This addition is capability availability, not a new history body or source-authority UI."
+    }
+  },
+  "nextSixCompleteOutcomeThemes": {
+    "status": "TOPIC_SUGGESTIONS_ONLY_NOT_DISPATCHED_TASK_BOOKS",
+    "A": [
+      { "title": "All-Kind Bounded History Product", "scope": "Finish typed keyset collections, total byte/row/source budgets and explicit oversized-item progress/refusal; preserve historical/current distinction and stable mutation semantics." },
+      { "title": "Original Authenticated History Consumer", "scope": "Make main's original Work/evidence surface consume the production port with strict row DTOs, current Scope, safe public cursors and usable multi-page partial/error states." },
+      { "title": "Original Artifact Content And Comparison", "scope": "Deliver real authorized frozen bytes/metadata/download/digest/format relations across candidate/contract/attempt, including missing/corrupt content and current-versus-history consumers." },
+      { "title": "Nonempty Semantic Data Recovery", "scope": "Use original Work/Q&A/acceptance/source facts through both genuine snapshot formats, original-ID reopen and precise readonly readers without inheriting grants or creating new state authority." },
+      { "title": "Multi-Project Catalog And Read Completeness", "scope": "Complete bounded project/conversation/Work lookup, search and timeline consumers with source/caller coverage, compatibility and useful support diagnostics, without global SQL scans." },
+      { "title": "Integrated Durable Data Handoff", "scope": "Close producer/source/dist/public-port compatibility and bounded transaction/fault/readback behavior with same-source main consumers and maintenance guidance; installation remains part of the eventual integrated product." }
+    ],
+    "C": [
+      { "title": "Canonical Current Decision Snapshots", "scope": "Finish complete immutable scope/version/provenance snapshot validation and live effectiveness with typed explicit failures, then expose a real main-compatible current-decision consumer." },
+      { "title": "New Work Decision Confirmation", "scope": "Through main's original form and command authority, preview selected decision versions, freeze exact references into new Work context and revalidate source/Scope before the original write; no new grant or automatic learning." },
+      { "title": "Explicit Decision Governance Experience", "scope": "Complete record/supersede/revoke/source-invalid history and current applicability with actual user consumers, auditability and future-work invalidation that preserves frozen past content." },
+      { "title": "Safe Persistent Draft And Receipt Recovery", "scope": "Unify CLI/App draft DTOs, private bounded files, typed expiry/version/current-source repreview and original command-ID unknown reconciliation into repeatable daily behavior." },
+      { "title": "Selected Source Context Lifecycle", "scope": "Deliver the real original preview/prepare/assert/send/frozen-source chain across current project/contract/Scope/version changes, omissions and source budgets with no replacement model loop." },
+      { "title": "Multi-Project Reopen And Conflict Continuity", "scope": "Make several real conversations and Work contexts survive ordinary reopen/revocation/conflicts with original IDs/bytes, proper partial/readonly errors and main/F consumption rather than a CLI-only completion claim." }
+    ],
+    "F": [
+      { "title": "Daily Multi-Project Workbench", "scope": "Complete multiple conversations/works/questions/checks/candidates/acceptance/drafts and stable return-to-object behavior in the actual existing App, with clear pending/FAIL/unknown states." },
+      { "title": "Original Work Draft And Decision Selection", "scope": "Present real server preview, editable goal, selected decision/source versions and original explicit creation/revalidation errors while preserving main's form and write authority." },
+      { "title": "Usable History And Source Browsing", "scope": "Build actual nonempty multi-page historical/current/partial/withheld UI from A/C public DTOs, meaningful navigation and return behavior; capability badges alone are not this outcome." },
+      { "title": "Evidence And Human Review Workflow", "scope": "Make original artifact/check/patch/current candidate/history evidence inspectable and actionable with explicit human acceptance, correct stale/FAIL rules and original authorized downloads." },
+      { "title": "First Use And Error Recovery Product", "scope": "Complete real model/executor/auth/project/missing-input setup and recovery with current facts, original actions, bounded retry and understandable preserved input; no second shell or navigation product." },
+      { "title": "Accessible Mobile Support Experience", "scope": "Deliver keyboard/focus/mobile/long-text/zoom behavior and sanitized real support DTO use in the same actual App, honest deployment identity and accurate source/installed/unknown limits." }
+    ],
+    "constraints": "Same original roots/branches/ownership, A sole production migrations, E sole independent product assertions, CAC excluded, automatic real model/native0 and old blocked budgets unchanged. These are whole engineering outcomes, not six microfixes or repeated tests."
+  },
+  "preservation": {
+    "realVendorModelCalls": 0,
+    "realNativeTurns": 0,
+    "signals": 0,
+    "globalProcessOrSocketDiscovery": false,
+    "userServicesTouched": 0,
+    "persistentServicesStarted": 0,
+    "httpServicesStartedByThisAudit": 0,
+    "candidateSourcesAssertionsOrLocksEdited": false,
+    "mainProductionEditedByThisAudit": false,
+    "archivesOrPackagesConsumed": false,
+    "newTaskBooksOrThreads": false,
+    "allExecSessionsCompleted": true,
+    "budgetsLedgersStateProfilesTarsHistoryPreserved": true,
+    "onlyOutputFile": "reports/releases/wave34-admission/data-experience.json",
+    "sourceControlTestsDoNotProveInstalledNativeRecoveryOrValue": true,
+    "completionPercentageChangedByThisSubaudit": false,
+    "releaseApproved": false
+  }
+}

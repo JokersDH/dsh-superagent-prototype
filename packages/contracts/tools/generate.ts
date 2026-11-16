@@ -28,6 +28,7 @@ import { RecoverySourcePrepareSchema, RecoverySourcePreparedSchema, RecoverySour
 import { ContextHistoryQuerySchema, ContextHistoryEntrySchema, ContextHistorySchema, ContextSourcesSchema } from '../src/context-records.ts';
 import { TrialReadinessSchema } from '../src/trial-readiness.ts';
 import { UsageObservationQuerySchema, UsageObservationSchema, UsageObservationDownloadSchema } from '../src/usage-observation.ts';
+import { UsageSupportReportSchema, UsageSupportDownloadSchema } from '../src/usage-support.ts';
 import { ProjectRecipePreviewInputSchema, ProjectRecipePreviewSchema } from '../src/project-recipe-preview.ts';
 import { CoordinatorChannelProducerSchema, CoordinatorChannelRequestSchema, CoordinatorChannelReplySchema, CoordinatorChannelLimitsSchema } from '../src/coordinator-channel.ts';
 
@@ -116,6 +117,7 @@ outputs.set('generated/assistant-context-commands.manifest.json', canonical({ pr
 for (const [name, protocol, source, schemas] of [
   ['trial-readiness', 'trial-readiness/1', 'trial-readiness.ts', { TrialReadiness: TrialReadinessSchema }],
   ['usage-observation', 'usage-observation/1', 'usage-observation.ts', { UsageObservationQuery: UsageObservationQuerySchema, UsageObservation: UsageObservationSchema, UsageObservationDownload: UsageObservationDownloadSchema }],
+  ['usage-support', 'usage-support-download/1', 'usage-support.ts', { UsageSupportReport: UsageSupportReportSchema, UsageSupportDownload: UsageSupportDownloadSchema }],
   ['project-recipe-preview', 'project-recipe-preview/1', 'project-recipe-preview.ts', { ProjectRecipePreviewInput: ProjectRecipePreviewInputSchema, ProjectRecipePreview: ProjectRecipePreviewSchema }],
   ['coordinator-channel', 'coordinator-channel-local/1', 'coordinator-channel.ts', { CoordinatorChannelProducer: CoordinatorChannelProducerSchema, CoordinatorChannelRequest: CoordinatorChannelRequestSchema, CoordinatorChannelReply: CoordinatorChannelReplySchema, CoordinatorChannelLimits: CoordinatorChannelLimitsSchema }],
   ['assistant-candidates', 'assistant-candidates/1', 'assistant-candidates.ts', { AssistantCandidatePrepare: AssistantCandidatePrepareSchema, AssistantCandidates: AssistantCandidatesSchema }],
