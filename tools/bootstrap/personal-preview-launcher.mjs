@@ -45,7 +45,10 @@ function metadata() {
 }
 
 function privateDirectory(path) {
-  if (!existsSync(path)) mkdirSync(path, { mode: 0o700 })
+  if (!existsSync(path)) {
+    try { mkdirSync(path, { mode: 0o700 }) }
+    catch (error) { if (error.code !== 'EEXIST') throw error }
+  }
   const stat = lstatSync(path)
   if (!stat.isDirectory() || stat.isSymbolicLink() || (stat.mode & 0o077) !== 0 || stat.uid !== process.getuid?.())
     throw new Error(`私有目录的类型、拥有者或权限不正确：${path}。请保留现有内容并人工核对。`)
