@@ -53,10 +53,10 @@ export function extractFrozen(target, install) {
   return { tarSha256: target.tarSha256, tarBytes: target.tarBytes }
 }
 
-export function launcher(install, args, { env = {}, timeoutMs = 90_000 } = {}) {
+export function launcher(install, args, { env = {}, timeoutMs = 90_000, nodePath = null } = {}) {
   const result = spawnSync(join(install, 'bin/pa'), args, {
     cwd: dirname(install), encoding: 'utf8', timeout: timeoutMs,
-    env: { ...process.env, PA_NODE: process.execPath, ...env },
+    env: { ...process.env, PA_NODE: nodePath ?? process.execPath, ...env },
   })
   return { status: result.status, json: parseJson(result.stdout), stderr: String(result.stderr).slice(-600), stdout: String(result.stdout).slice(-600) }
 }
@@ -141,14 +141,14 @@ export function readRecord(config) {
  * silent success and never a deleted record.
  */
 export function startOwned(root, {
-  ports, mockFile, extraArgs = ['--discussion-only'], fixture = false, timeoutMs = 90_000, bin,
+  ports, mockFile, extraArgs = ['--discussion-only'], fixture = false, timeoutMs = 90_000, bin, nodePath = null,
 } = {}) {
   const install = root.install, config = root.config, state = root.state
   const [consolePort, apiPort] = ports ?? []
   const args = ['start', '--json', '--port', String(consolePort), '--api-port', String(apiPort), ...extraArgs]
   if (fixture) args.push('--fixture')
   const binPath = bin ?? join(install, 'bin/pa')
-  const env = { ...process.env, PA_NODE: process.execPath, ...(mockFile ? { PA_MODEL_CONFIG: mockFile } : {}), PA_CONFIG_ROOT: config, PA_DATA_ROOT: state }
+  const env = { ...process.env, PA_NODE: nodePath ?? process.execPath, ...(mockFile ? { PA_MODEL_CONFIG: mockFile } : {}), PA_CONFIG_ROOT: config, PA_DATA_ROOT: state }
   const child = spawn(binPath, args, { cwd: dirname(install), stdio: ['ignore', 'pipe', 'pipe'], env })
   // Birth facts are taken now, before any RUNNING/health wait and before the child can be reaped.
   const birth = {
@@ -189,7 +189,7 @@ export function startOwned(root, {
  * 3. `proofSignal` (only when explicitly allowed) signals one pid at a time and re-reads the start
  *    identity immediately before each TERM/KILL; every attempt is recorded.
  */
-export async function stopOwned(root, { mockFile, birth = null, resources = null, packageStop = true, proofSignal = false, equivalentProof = false, timeoutMs = 30_000 } = {}) {
+export async function stopOwned(root, { mockFile, birth = null, resources = null, packageStop = true, proofSignal = false, equivalentProof = false, timeoutMs = 30_000, nodePath = null } = {}) {
   const finish = value => { trace(`stop ${root.state} -> clean=${value.clean} reason=${value.reason ?? null} blocked=${JSON.stringify(value.blocked ?? null).slice(0, 160)} pkg=${value.packageStop?.json?.status ?? null}`); return value }
   const { install, config, state } = root
   const result = { install, state, config, attempts: [], signals: [], packageStop: null, record: null, clean: false, retained: false }
@@ -200,6 +200,7 @@ export async function stopOwned(root, { mockFile, birth = null, resources = null
     const stopped = launcher(install, ['stop', '--json'], {
       timeoutMs,
       env: { ...(mockFile ? { PA_MODEL_CONFIG: mockFile } : {}), PA_CONFIG_ROOT: config, PA_DATA_ROOT: state },
+      nodePath,
     })
     result.packageStop = { status: stopped.status, json: stopped.json ?? null, stderr: stopped.stderr }
     const status = stopped.json?.status ?? null
@@ -209,10 +210,10 @@ export async function stopOwned(root, { mockFile, birth = null, resources = null
       // pre-stop set (recorded pids + caller set, captured before the call) must be re-observed.
       // A known birth without the product's record and without a caller set is an incomplete set: an
       // empty observation of it is NOT quiescence and must never release the root.
-      // The missing-set rule protects a *live* known birth: when that launcher has already exited and the
-      // product reports a verified stop, there is no surviving resource to hold the root for.
+      // A known operation without its complete fixed set is UNKNOWN even when the launcher already
+      // exited: a dead parent never proves its children are static.
       const completeSet = preStop.hadRecord || (Array.isArray(resources) && resources.length > 0)
-      if (birth !== null && !completeSet && liveIdentity(birth.pid).alive) {
+      if (birth !== null && !completeSet) {
         result.retained = true
         result.clean = false
         result.reason = 'resources_unverified'
@@ -263,7 +264,7 @@ export async function stopOwned(root, { mockFile, birth = null, resources = null
         result.packageStop = { status: retried.status, json: retried.json ?? null, stderr: retried.stderr, retried: true }
         result.record = readRecord(config)
         const completeSet = preStop.hadRecord || (Array.isArray(resources) && resources.length > 0)
-        if (birth !== null && !completeSet && liveIdentity(birth.pid).alive) {
+        if (birth !== null && !completeSet) {
           result.retained = true; result.clean = false; result.reason = 'resources_unverified'; return finish(result)
         }
         const observed = observeFixedSet(preStop.set)

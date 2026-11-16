@@ -1,10 +1,10 @@
 {
   "schema": "product-acceptance-stages/1",
   "agent": "E",
-  "taskPackage": "agent-tasks/product-wave-32/README.zh-CN.md",
+  "taskPackage": "agent-tasks/product-wave-33/README.zh-CN.md",
   "branch": "codex/g3-product-acceptance",
-  "base": "3cbc648",
-  "checkpoint": "a933479",
+  "base": "84d03987",
+  "checkpoint": "PENDING",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -18,42 +18,42 @@
   "stages": [
     {
       "id": "E1",
-      "title": "Every stop path verifies the fixed resource set",
+      "title": "Package stop verifies the fixed set even after an exited launcher",
       "command": "node tests/product-acceptance/cases/w27-lifecycle.mjs",
       "notes": [
-        "A packaged STOPPED is checked against the fixed pre-stop set; a known live birth without that set stays retained."
+        "A known birth without a complete fixed set is resources_unverified UNKNOWN even when the launcher already exited; no discovery fallback."
       ]
     },
     {
       "id": "E2",
-      "title": "Journey oracle: original project identity",
+      "title": "Journey oracle: applicable preview, execution identity, recovery",
       "command": "node tests/product-acceptance/cases/w31-journey.mjs",
       "notes": [
-        "Previews must be applicable and the execution chain must stay on the original project; needs_input and fixture-pool substitution are recorded as gaps, not passes."
+        "The final validator rejects needs_input-with-applicable, a needs_input preview that claims fields, a foreign executionProjectId, a scoped 403, and a reopen without found/phase/artifacts; the legal narrowed fixture positive stays separate from the original-project gap."
       ]
     },
     {
       "id": "E3",
-      "title": "Journey oracle: recovery observation",
-      "command": "node tests/product-acceptance/cases/w31-journey.mjs",
+      "title": "Outer ZIP verified and driven by its own entries",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "Reopen must find the original Work id, phase and artifacts; a message count alone is not recovery evidence."
+        "SHA256SUMS, package-result, inner install/runtime/license digests, bundled Node/ABI, private HOME Start/Stop/status, port conflict, reopen and stop are observed on the real ZIP."
       ]
     },
     {
       "id": "E4",
-      "title": "ZIP/manifest lifecycle",
-      "command": "node tests/product-acceptance/cases/w32-zip.mjs",
+      "title": "Non-empty business recovery on the cohort",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "One frozen distribution drives first-run, unconfigured degradation, configured import, controlled delivery, fixed-set stop, reopen and verified backup."
+        "A delivered Work with 20 artifacts is backed up (eventSeq>0), restored into a new root, read back recovery-readonly with identical artifact bytes and history, business writes 422, no provider call, tampered bundle refused."
       ]
     },
     {
       "id": "E5",
-      "title": "R1 ordinary and functional",
+      "title": "Upgrade reopen and complete stop on the accurate pair",
       "command": "node tests/product-acceptance/run.mjs --tier=installed-functional",
       "notes": [
-        "R1 82ee5b8f/8296720d ordinary, functional, UI, readiness, recipe preview, insights and the journey all pass on its own bytes."
+        "R1 pair managed upgrade/rollback keeps post-upgrade data; cross-schema refusal is separate; every stage's fixed-set stop is re-observed."
       ]
     },
     {
@@ -61,7 +61,7 @@
       "title": "Layered conclusion and status",
       "command": "node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record",
       "notes": [
-        "wave32-status separates implemented/merged/candidate/installed/native and lists the remaining gates without a new oracle."
+        "wave33-status separates source/main/candidate/installed/native, names both admitted cohorts, and keeps the pilot and original-project gap BLOCKED/NOT_REACHED without a new oracle."
       ]
     }
   ]

@@ -653,8 +653,9 @@ const evidenceFor = (key) => {
     case 'journey':
       return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
         modes: ['personal:discussion_only', 'fixture:controlled_execution'],
-        projects: [1, 2].map(index => ({ index, displayName: `p${index}`, id: `project-${index}`, executionProjectId: `exec-${index}`,
-          preview: { status: 200, bodyStatus: 'draft', authorization: 'none' }, receipt: 'recorded', workId: `work-${index}`,
+        originalProjectExecution: { sameProject: true, reason: null, executionPool: ['project-1', 'project-2'], originalProjects: ['project-1', 'project-2'] },
+        projects: [1, 2].map(index => ({ index, displayName: `p${index}`, id: `project-${index}`, executionProjectId: `project-${index}`,
+          preview: { status: 200, bodyStatus: 'draft', authorization: 'none', applicable: true }, receipt: 'recorded', workId: `work-${index}`,
           phase: 'delivered', accepted: 'recorded', artifacts: 2,
           insights: { open: { seven: 200, thirty: 200, days: [7, 30] } } })) }
     case 'journeyContext':
@@ -679,7 +680,8 @@ const evidenceFor = (key) => {
         reopen: { status: 'RUNNING', work: { found: true, phase: 'delivered', artifacts: 2 }, messages: 2, stop: { clean: true, package: 'STOPPED' } } }
     case 'journeyReopen':
       return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
-        status: 'RUNNING', works: [{ messages: 2 }, { messages: 1 }], readiness: 200, stop: { clean: true, package: 'STOPPED' } }
+        status: 'RUNNING', works: [{ found: true, phase: 'delivered', artifacts: 2, messages: 2 }, { found: true, phase: 'delivered', artifacts: 1, messages: 1 }],
+        readiness: 200, stop: { clean: true, package: 'STOPPED' } }
     case 'recipePreview':
       return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
         capability: { '/v1/insights': true, 'recipes/preview': true }, projectId: 'project-1', profileId: 'profile-1', atom: 'src/',
@@ -692,6 +694,44 @@ const evidenceFor = (key) => {
         appended: true, verify: { status: 'ok', verified: 'ok' }, consumerContentBinding: 'NOT_AVAILABLE_IN_MAIN', reason: 'integrity-only' }
     case 'gSummary':
       return { modulePresent: false, wiredToConsole: false }
+    case 'outerZip': {
+      // The outer-ZIP inner build is a second, distinct cohort: it must never look like the frozen
+      // install target, or a foreign-subject substitution could match it by accident.
+      const tuple = { source: '9'.repeat(40), buildId: 'zip-build', schema: 18, tarSha256: '9'.repeat(64), tarBytes: 2, abi: '137', platform: 'darwin', arch: 'arm64' }
+      const dead = (pid) => ({ pid, expectedStart: 'Mon Nov 16 10:00:00 2026', alive: false, sameIdentity: false })
+      const before = (pid) => ({ pid, start: 'Mon Nov 16 10:00:00 2026', uid: 501, parentPid: null })
+      return { subject: tuple,
+        zip: { path: '/tmp/outer.zip', sha256: DIGEST, bytes: 1, sumsMatch: true, resultMatch: true,
+        source: '9'.repeat(40), buildId: 'zip-build', innerTarSha256: '9'.repeat(64), innerTarBytes: 2, installManifestSha256: DIGEST,
+        installManifestDigest: DIGEST, runtimeDigest: DIGEST, licenseDigest: DIGEST,
+        runtime: { version: '24.21.0', abi: '137', sha256: DIGEST, licenseSha256: DIGEST },
+        manifestProtocol: 'personal-agent-preview/1', secretScan: { status: 1, hits: 0 } },
+        runtimeNode: { version: 'v24.21.0', abi: '137' },
+        phases: {
+          unconfigured: { status: 'RUNNING', readiness: { status: 200, discussion: 'not_configured' }, contextAvailable: false,
+            stop: { status: 0, result: 'STOPPED' }, resources: { before: [before(101)], after: [dead(101)] } },
+          configured: { status: 'RUNNING', readiness: { status: 200, discussion: 'configuration_present' },
+            stop: { status: 0, result: 'STOPPED' }, resources: { before: [before(102)], after: [dead(102)] } },
+          reopen: { status: 'RUNNING', stop: { status: 0, result: 'STOPPED' }, resources: { before: [before(103)], after: [dead(103)] } } },
+        negatives: { portConflict: { outcome: 'EXITED', code: 1 }, statusStopped: { status: 2, result: 'STOPPED' } } }
+    }
+    case 'cohortRecovery': {
+      const tuple = { source: '9'.repeat(40), buildId: 'zip-build', schema: 18, tarSha256: '9'.repeat(64), tarBytes: 2, abi: '137', platform: 'darwin', arch: 'arm64' }
+      const dead = (pid) => ({ pid, expectedStart: 'Mon Nov 16 10:00:00 2026', alive: false, sameIdentity: false })
+      const before = (pid) => ({ pid, start: 'Mon Nov 16 10:00:00 2026', uid: 501, parentPid: null })
+      const shape = [{ role: 'user', provenance: 'trusted_user', text: 'goal' }]
+      return { subject: tuple, zip: { sumsMatch: true, resultMatch: true, digestsMatch: true },
+        seed: { workId: 'work-1', phase: 'delivered', accepted: 'recorded', artifacts: [{ id: 'a1', sha256: DIGEST, bytes: 1 }],
+          messages: 1, messageShape: shape },
+        backup: { status: 'CREATED', verify: 'VERIFIED', sha256: DIGEST, counts: { entries: 2, artifacts: 1 }, database: { eventSeq: 1 } },
+        restore: { status: 'RESTORED', marker: true, counts: { works: 1, artifacts: 1, messages: 1 },
+          recovery: { markerPresent: true, startupMode: 'recovery_readonly', authorization: 'BLOCKED' } },
+        readonly: { startupMode: 'recovery_readonly', work: { phase: 'delivered', artifactsEqual: true },
+          artifactBytesEqual: true, messages: 1, messagesEqual: true, goalVisible: true, messageShape: shape,
+          business: { status: 422 }, providerRequests: { afterSeed: 1, afterReads: 1 }, stop: { clean: true } },
+        negatives: { tamperedBundle: { status: 2, result: 'BLOCKED' }, fixtureOnRestored: { status: 'RUNNING', startupMode: 'recovery_readonly', business: 422 } },
+        resources: { seed: { stop: { clean: true }, after: [dead(104)] }, readonly: { after: [dead(105)] } } }
+    }
     default:
       throw new Error(`No synthetic evidence for ${key}`)
   }
@@ -700,7 +740,8 @@ const evidenceFor = (key) => {
 const buildCase = (entry, overrides = {}) => {
   const evidence = Object.fromEntries((entry.evidence ?? []).map((key) => [key, evidenceFor(key)]))
   const nested = ['subject', 'frozenScope', 'currentInstall', 'upgradeFaults', 'ownershipCopy', 'installedContext',
-    'backupContextReply', 'ownershipMocks', 'installedCandidates', 'secondRoot', 'installedSourceConfirm', 'installedStability']
+    'backupContextReply', 'ownershipMocks', 'installedCandidates', 'secondRoot', 'installedSourceConfirm', 'installedStability',
+    'outerZip', 'cohortRecovery']
     .some((key) => evidence[key] !== undefined)
   if ((entry.layers ?? []).includes(LAYERS.INSTALLED) && entry.id !== 'E4-INSTALL-ARTIFACT-IDENTITY' && !nested)
     evidence.subject = { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' }
@@ -1684,6 +1725,51 @@ const CASES = [
       }, 'lifecycleNoRecordExit_invalid'),
   },
   {
+    id: 'E33-MUTATE-JOURNEY-NEEDS-INPUT',
+    title: 'A needs_input preview cannot satisfy the applicable template journey',
+    check: ({ assert }) =>
+      rejectWith(assert, 'JOURNEY_NEEDS_INPUT', (report) => {
+        findCase(report, 'E5-TWO-PROJECT-TEMPLATE-CREATE').evidence.journey.projects[0].preview.bodyStatus = 'needs_input'
+        return report
+      }, 'journey_invalid'),
+  },
+  {
+    id: 'E33-MUTATE-JOURNEY-WRONG-PROJECT',
+    title: 'A Work executed on another project is rejected as an original-project journey',
+    check: ({ assert }) =>
+      rejectWith(assert, 'JOURNEY_WRONG_PROJECT', (report) => {
+        findCase(report, 'E5-TWO-PROJECT-TEMPLATE-CREATE').evidence.journey.projects[0].executionProjectId = 'project-atlas'
+        return report
+      }, 'journey_invalid'),
+  },
+  {
+    id: 'E33-MUTATE-CONTEXT-SCOPED-403',
+    title: 'A scoped 403 cannot stand in for the readable scoped observation',
+    check: ({ assert }) =>
+      rejectWith(assert, 'CONTEXT_SCOPED_403', (report) => {
+        findCase(report, 'E7-JOURNEY-CONTEXT-SOURCE').evidence.journeyContext.scoped = 403
+        return report
+      }, 'journeyContext_invalid'),
+  },
+  {
+    id: 'E33-MUTATE-REOPEN-NOT-FOUND',
+    title: 'A reopen that cannot find the original Work is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'REOPEN_NOT_FOUND', (report) => {
+        findCase(report, 'E8-JOURNEY-STOP-REOPEN').evidence.journeyReopen.works[0].found = false
+        return report
+      }, 'journeyReopen_invalid'),
+  },
+  {
+    id: 'E33-MUTATE-REOPEN-PHASE-NULL',
+    title: 'A reopen with a null phase or zero artifacts is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'REOPEN_PHASE', (report) => {
+        findCase(report, 'E8-JOURNEY-STOP-REOPEN').evidence.journeyReopen.works[1].phase = null
+        return report
+      }, 'journeyReopen_invalid'),
+  },
+  {
     id: 'E31-MUTATE-JOURNEY-AUTO-ACCEPT',
     title: 'A journey project without the explicit accept command is rejected',
     check: ({ assert }) =>
@@ -2228,6 +2314,89 @@ const ROUTING_CASES = [
       }, 'pilot_evidence_invalid'),
   },
   {
+    id: 'E33-MUTATE-OUTER-ZIP-WRONG-DIGEST',
+    title: 'An outer ZIP whose sha256 is not in SHA256SUMS is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'OUTER_SHA', (report) => {
+        findCase(report, 'E33-OUTER-ZIP').evidence.outerZip.zip.sumsMatch = false
+        return report
+      }, 'outerZip_invalid'),
+  },
+  {
+    id: 'E33-MUTATE-OUTER-ZIP-RUNTIME-MISMATCH',
+    title: 'A bundled Node digest or ABI that differs from the recorded runtime is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'OUTER_RUNTIME', (report) => {
+        findCase(report, 'E33-OUTER-ZIP').evidence.outerZip.zip.runtimeDigest = 'f'.repeat(64)
+        return report
+      }, 'outerZip_invalid'),
+  },
+  {
+    id: 'E33-MUTATE-OUTER-ZIP-LIVE-RESOURCE',
+    title: 'An outer ZIP stop that leaves a known resource alive is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'OUTER_ALIVE', (report) => {
+        findCase(report, 'E33-OUTER-ZIP').evidence.outerZip.phases.unconfigured.resources.after[0].alive = true
+        findCase(report, 'E33-OUTER-ZIP').evidence.outerZip.phases.unconfigured.resources.after[0].sameIdentity = true
+        return report
+      }, 'outerZip_invalid'),
+  },
+  {
+    id: 'E33-MUTATE-OUTER-ZIP-PORT-CONFLICT',
+    title: 'A second Start that is not refused on a live console port is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'OUTER_CONFLICT', (report) => {
+        findCase(report, 'E33-OUTER-ZIP').evidence.outerZip.negatives.portConflict.code = 0
+        return report
+      }, 'outerZip_invalid'),
+  },
+  {
+    id: 'E33-MUTATE-RECOVERY-EMPTY-BACKUP',
+    title: 'A backup with no business artifacts cannot satisfy non-empty recovery',
+    check: ({ assert }) =>
+      rejectWith(assert, 'RECOVERY_EMPTY', (report) => {
+        findCase(report, 'E33-COHORT-RECOVERY').evidence.cohortRecovery.backup.counts.artifacts = 0
+        return report
+      }, 'cohortRecovery_invalid'),
+  },
+  {
+    id: 'E33-MUTATE-RECOVERY-WRITE-ALLOWED',
+    title: 'A restored root that accepts a business write is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'RECOVERY_WRITE', (report) => {
+        findCase(report, 'E33-COHORT-RECOVERY').evidence.cohortRecovery.readonly.business.status = 200
+        return report
+      }, 'cohortRecovery_invalid'),
+  },
+  {
+    id: 'E33-MUTATE-RECOVERY-ARTIFACT-DRIFT',
+    title: 'Restored artifact bytes that differ from the seeded delivery are rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'RECOVERY_BYTES', (report) => {
+        findCase(report, 'E33-COHORT-RECOVERY').evidence.cohortRecovery.readonly.artifactBytesEqual = false
+        return report
+      }, 'cohortRecovery_invalid'),
+  },
+  {
+    id: 'E33-MUTATE-RECOVERY-PROVIDER-CALLED',
+    title: 'A provider request during readonly read-back is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'RECOVERY_PROVIDER', (report) => {
+        findCase(report, 'E33-COHORT-RECOVERY').evidence.cohortRecovery.readonly.providerRequests.afterReads = 2
+        return report
+      }, 'cohortRecovery_invalid'),
+  },
+  {
+    id: 'E33-MUTATE-RECOVERY-STOP-INCOMPLETE',
+    title: 'A recovery stage whose stop leaves a known resource alive is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'RECOVERY_STOP', (report) => {
+        findCase(report, 'E33-COHORT-RECOVERY').evidence.cohortRecovery.resources.readonly.after[0].alive = true
+        findCase(report, 'E33-COHORT-RECOVERY').evidence.cohortRecovery.resources.readonly.after[0].sameIdentity = true
+        return report
+      }, 'cohortRecovery_invalid'),
+  },
+  {
     id: 'E1-MUTATE-HETERO-NO-SUBJECT',
     title: 'Heterogeneous review without subject binding is rejected',
     check: ({ assert }) =>
@@ -2242,6 +2411,18 @@ const ROUTING_CASES = [
       ),
   },
 ]
+
+if (process.env.PA_E_DUMP) {
+  const report = buildReport((value) => {
+    findCase(value, 'E4-INSTALL-ARTIFACT-IDENTITY').evidence.artifact = { tuple: { target: {
+      sourceCommit: COMMIT, buildId: 'build-1', productSchema: 18, tarSha256: DIGEST, tarBytes: 1 } } }
+    findCase(value, 'E6-INSTALLED-CONTEXT').evidence.installedContext.subject = {
+      source: 'a'.repeat(40), buildId: 'build-1', schema: 18, tarSha256: DIGEST, tarBytes: 1 }
+    return value
+  })
+  const result = gate(report)
+  console.log(JSON.stringify(result.failures.map(item => `${item.code}:${item.detail}:${item.caseId ?? ''}`), null, 1))
+}
 
 export async function gateMutationCases() {
   const results = []

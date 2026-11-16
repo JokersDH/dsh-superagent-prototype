@@ -1205,9 +1205,7 @@ if (!existsSync(join(reports, 'wave24-status.json')))
     artifactTuple,
   }, null, 2) + '\n',
 )
-writeFileSync(
-  join(reports, 'wave32-status.json'),
-  JSON.stringify({
+const wave32Status = {
     ...executionStatus,
     schema: 'product-acceptance-wave32-status/1',
     taskPackage: 'agent-tasks/product-wave-32/README.zh-CN.md',
@@ -1364,9 +1362,62 @@ writeFileSync(
     productSource: { commit: artifactTuple.target?.sourceCommit ?? artifactTuple.target?.source ?? null, buildId: artifactTuple.target?.buildId ?? null, schema: artifactTuple.target?.productSchema ?? artifactTuple.target?.schema ?? null },
     mainSource: { commit: stages.base, schema: byId.get('E6-ARTIFACT-CURRENT-SCOPE')?.evidence?.frozenScope?.main?.schema ?? null },
     artifactTuple,
-  }, null, 2) + '\n',
-)
-// Historical wave06-31 status files are frozen inputs; wave32 supersedes them.
+}
+writeFileSync(join(reports, 'wave32-status.json'), JSON.stringify(wave32Status, null, 2) + '\n')
+
+// Wave-33 supersedes wave-32: it adds the verified outer ZIP and a non-empty business restore on that
+// cohort, tightens the journey recovery oracle, and keeps the original-project gap NOT_REACHED.
+const outerZipEvidence = byId.get('E33-OUTER-ZIP')?.evidence?.outerZip ?? null
+const cohortRecoveryEvidence = byId.get('E33-COHORT-RECOVERY')?.evidence?.cohortRecovery ?? null
+const wave33Status = {
+  ...wave32Status,
+  schema: 'product-acceptance-wave33-status/1',
+  taskPackage: 'agent-tasks/product-wave-33/README.zh-CN.md',
+  supersedes: 'wave32-status.json',
+  subject: { ...wave32Status.subject, outerZip: outerZipEvidence?.subject ?? null },
+  cohorts: [
+    { id: 'frozen-install-target', buildId: artifactTuple.target?.buildId ?? null, source: artifactTuple.target?.sourceCommit ?? null,
+      tarSha256: artifactTuple.target?.tarSha256 ?? null, tarBytes: artifactTuple.target?.tarBytes ?? null,
+      cases: ['E4-INSTALL-ARTIFACT-IDENTITY', 'E7-READINESS', 'E3-TRIAL-WORKBENCH-UI', 'E5-TWO-PROJECT-TEMPLATE-CREATE', 'E32-ZIP-LIFECYCLE'] },
+    { id: 'outer-zip-inner', buildId: outerZipEvidence?.subject?.buildId ?? null, source: outerZipEvidence?.subject?.source ?? null,
+      tarSha256: outerZipEvidence?.subject?.tarSha256 ?? null, tarBytes: outerZipEvidence?.subject?.tarBytes ?? null,
+      zipSha256: outerZipEvidence?.zip?.sha256 ?? null, zipBytes: outerZipEvidence?.zip?.bytes ?? null,
+      runtime: outerZipEvidence?.zip?.runtime ?? null,
+      cases: ['E33-OUTER-ZIP', 'E33-COHORT-RECOVERY'] },
+  ],
+  layers: { ...wave32Status.layers,
+    outerZip: byId.get('E33-OUTER-ZIP')?.status ?? 'MISSING',
+    cohortRecovery: byId.get('E33-COHORT-RECOVERY')?.status ?? 'MISSING' },
+  scopes: { ...wave32Status.scopes,
+    outerZip: { status: byId.get('E33-OUTER-ZIP')?.status ?? 'MISSING',
+      zip: outerZipEvidence?.zip ? { sha256: outerZipEvidence.zip.sha256, bytes: outerZipEvidence.zip.bytes,
+        sumsMatch: outerZipEvidence.zip.sumsMatch, resultMatch: outerZipEvidence.zip.resultMatch,
+        innerTarSha256: outerZipEvidence.zip.innerTarSha256, buildId: outerZipEvidence.zip.buildId,
+        source: outerZipEvidence.zip.source, installManifestDigest: outerZipEvidence.zip.installManifestDigest,
+        runtimeDigest: outerZipEvidence.zip.runtimeDigest, licenseDigest: outerZipEvidence.zip.licenseDigest } : null,
+      phases: outerZipEvidence?.phases ? { unconfigured: outerZipEvidence.phases.unconfigured?.status ?? null,
+        configured: outerZipEvidence.phases.configured?.status ?? null, reopen: outerZipEvidence.phases.reopen?.status ?? null,
+        statusStopped: outerZipEvidence.negatives?.statusStopped ?? null, portConflict: outerZipEvidence.negatives?.portConflict ?? null } : null },
+    cohortRecovery: { status: byId.get('E33-COHORT-RECOVERY')?.status ?? 'MISSING',
+      seed: cohortRecoveryEvidence?.seed ? { phase: cohortRecoveryEvidence.seed.phase, artifacts: cohortRecoveryEvidence.seed.artifacts?.length ?? 0,
+        messages: cohortRecoveryEvidence.seed.messages ?? 0 } : null,
+      backup: cohortRecoveryEvidence?.backup ? { status: cohortRecoveryEvidence.backup.status, verify: cohortRecoveryEvidence.backup.verify,
+        counts: cohortRecoveryEvidence.backup.counts, eventSeq: cohortRecoveryEvidence.backup.database?.eventSeq ?? null } : null,
+      restore: cohortRecoveryEvidence?.restore?.recovery ?? null,
+      readonly: cohortRecoveryEvidence?.readonly ? { startupMode: cohortRecoveryEvidence.readonly.startupMode,
+        work: cohortRecoveryEvidence.readonly.work, artifactBytesEqual: cohortRecoveryEvidence.readonly.artifactBytesEqual,
+        business: cohortRecoveryEvidence.readonly.business, providerRequests: cohortRecoveryEvidence.readonly.providerRequests } : null,
+      negatives: cohortRecoveryEvidence?.negatives ?? null,
+      upgradeReopen: 'E4-UPGRADE-ROLLBACK on the frozen baseline/target pair keeps a post-upgrade write and rolls the binary back; it is not a second lifecycle' },
+    originalProjectApplicable: { status: byId.get('E32-ORIGINAL-PROJECT-APPLICABLE')?.status ?? 'MISSING',
+      reason: byId.get('E32-ORIGINAL-PROJECT-APPLICABLE')?.reason ?? byId.get('E32-ORIGINAL-PROJECT-APPLICABLE')?.limitations?.[0] ?? null },
+    w32ZipBackup: 'E32-ZIP-LIFECYCLE backup is mechanism-only in that scope (eventSeq/artifacts recorded 0); non-empty business recovery is claimed only by E33-COHORT-RECOVERY' },
+  finalRun: { command: 'node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record',
+    exitCode: 0, source: report.source },
+}
+writeFileSync(join(reports, 'wave33-status.json'), JSON.stringify(wave33Status, null, 2) + '\n')
+
+// Historical wave06-32 status files are frozen inputs; wave33 supersedes them.
 
 writeFileSync(join(reports, 'handoff.zh-CN.md'), handoff)
 

@@ -532,6 +532,70 @@ export function zipLifecycleIssues(value) {
   if (reopen.stop?.clean !== true) issues.push('reopen_stop')
   return issues
 }
+const HEX40 = value => /^[a-f0-9]{40}$/u.test(String(value ?? ''))
+const deadAfter = after => Array.isArray(after) && after.length >= 1 &&
+  after.every(item => item && typeof item === 'object' && Number.isSafeInteger(item.pid) &&
+    typeof item.alive === 'boolean' && typeof item.sameIdentity === 'boolean' && !(item.alive === true && item.sameIdentity === true))
+
+/** The shareable outer ZIP is verified by its own sidecars and driven through the packaged entries. */
+export function outerZipIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  const zip = value.zip ?? {}
+  if (!value.subject || !HEX64(String(value.subject.tarSha256 ?? '')) || value.subject.tarBytes !== zip.innerTarBytes) issues.push('subject')
+  if (!HEX64(String(zip.sha256 ?? '')) || !(zip.bytes > 0)) issues.push('zip_digest')
+  if (zip.sumsMatch !== true || zip.resultMatch !== true) issues.push('zip_sidecars')
+  if (!HEX40(zip.source) || !isSubstantive(zip.buildId) || !HEX64(String(zip.innerTarSha256 ?? '')) || !(zip.innerTarBytes > 0)) issues.push('inner_identity')
+  if (zip.manifestProtocol !== 'personal-agent-preview/1') issues.push('protocol')
+  if (zip.installManifestDigest !== zip.installManifestSha256 || zip.runtimeDigest !== zip.runtime?.sha256 ||
+    zip.licenseDigest !== zip.runtime?.licenseSha256) issues.push('inner_digests')
+  if (zip.secretScan?.hits !== 0) issues.push('secrets')
+  if (value.runtimeNode?.version !== `v${zip.runtime?.version}` || value.runtimeNode?.abi !== zip.runtime?.abi) issues.push('bundled_node')
+  const unconfigured = value.phases?.unconfigured ?? {}
+  if (unconfigured.status !== 'RUNNING' || unconfigured.readiness?.status !== 200 ||
+    unconfigured.readiness?.discussion === 'configuration_present' || unconfigured.contextAvailable !== false) issues.push('unconfigured')
+  if (unconfigured.stop?.status !== 0 || unconfigured.stop?.result !== 'STOPPED') issues.push('unconfigured_stop')
+  if (!deadAfter(unconfigured.resources?.after) || unconfigured.resources.after.length !== unconfigured.resources.before?.length) issues.push('unconfigured_resources')
+  const configured = value.phases?.configured ?? {}
+  if (configured.status !== 'RUNNING' || configured.readiness?.discussion !== 'configuration_present') issues.push('configured')
+  if (configured.stop?.status !== 0 || configured.stop?.result !== 'STOPPED') issues.push('configured_stop')
+  if (!deadAfter(configured.resources?.after)) issues.push('configured_resources')
+  if (value.negatives?.portConflict?.outcome !== 'EXITED' || value.negatives?.portConflict?.code === 0) issues.push('port_conflict')
+  const reopen = value.phases?.reopen ?? {}
+  if (reopen.status !== 'RUNNING' || reopen.stop?.result !== 'STOPPED' || !deadAfter(reopen.resources?.after)) issues.push('reopen')
+  if (value.negatives?.statusStopped?.status !== 2 || value.negatives?.statusStopped?.result !== 'STOPPED') issues.push('status_stopped')
+  return issues
+}
+
+/** A non-empty business restore on the outer-ZIP cohort, read back recovery-readonly. */
+export function cohortRecoveryIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (!value.subject || !HEX64(String(value.subject.tarSha256 ?? '')) || !HEX40(value.subject.source)) issues.push('subject')
+  if (value.zip?.sumsMatch !== true || value.zip?.resultMatch !== true || value.zip?.digestsMatch !== true) issues.push('zip_identity')
+  const seed = value.seed ?? {}
+  if (seed.phase !== 'delivered' || seed.accepted !== 'recorded' || !(seed.artifacts?.length >= 1) || !(seed.artifacts.every(item => HEX64(item.sha256) && item.bytes > 0))) issues.push('seed')
+  if (value.backup?.status !== 'CREATED' || value.backup?.verify !== 'VERIFIED' || !HEX64(String(value.backup?.sha256 ?? '')) ||
+    !(value.backup?.counts?.artifacts >= 1) || !(value.backup?.database?.eventSeq >= 1) ||
+    !(value.restore?.counts?.works >= 1) || !(value.restore?.counts?.artifacts >= 1) || !(value.restore?.counts?.messages >= 1)) issues.push('backup')
+  if (value.negatives?.tamperedBundle?.result === 'VERIFIED') issues.push('tampered_accepted')
+  if (value.restore?.status !== 'RESTORED' || value.restore?.marker !== true) issues.push('restore')
+  const recovery = value.restore?.recovery ?? {}
+  if (recovery.markerPresent !== true || recovery.startupMode !== 'recovery_readonly' || recovery.authorization !== 'BLOCKED') issues.push('authorization')
+  const readonly = value.readonly ?? {}
+  if (readonly.startupMode !== 'recovery_readonly' || readonly.work?.phase !== 'delivered' || readonly.work?.artifactsEqual !== true) issues.push('readonly_work')
+  if (readonly.artifactBytesEqual !== true) issues.push('artifact_bytes')
+  if (readonly.messagesEqual !== true || readonly.goalVisible !== true || !((readonly.messages ?? 0) >= 1) ||
+    JSON.stringify(readonly.messageShape) !== JSON.stringify(seed.messageShape)) issues.push('history')
+  if (readonly.business?.status !== 422) issues.push('business_write')
+  if (readonly.providerRequests?.afterSeed !== readonly.providerRequests?.afterReads) issues.push('provider_called')
+  const refused = value.negatives?.fixtureOnRestored ?? {}
+  if (refused.status === 'RUNNING' && refused.business !== 422 && refused.startupMode !== 'recovery_readonly') issues.push('execution_mode')
+  if (value.resources?.seed?.stop?.clean !== true || readonly.stop?.clean !== true ||
+    !deadAfter(value.resources?.seed?.after) || !deadAfter(value.resources?.readonly?.after)) issues.push('stop_incomplete')
+  return issues
+}
+
 export function journeyIssues(value) {
   if (!value || typeof value !== 'object') return ['missing']
   const issues = []
@@ -546,6 +610,20 @@ export function journeyIssues(value) {
     const open = project.insights?.open ?? {}
     if (open.seven !== 200 || open.thirty !== 200 || open.days?.[0] !== 7 || open.days?.[1] !== 30) issues.push(`insights:${project.index}`)
     if (!isSubstantive(project.executionProjectId)) issues.push(`execution:${project.index}`)
+    // A needs_input preview is only the legal narrowed positive when it is not claimed applicable;
+    // an applicable preview must be a real draft with fields.
+    if (project.preview?.applicable === true && project.preview?.bodyStatus !== 'draft') issues.push(`preview_state:${project.index}`)
+    if (project.preview?.bodyStatus === 'needs_input' && project.preview?.fields !== null) issues.push(`preview_needs_input_fields:${project.index}`)
+  }
+  // The execution identity must be explicit: either it is the original project, or the evidence records
+  // that same-project execution is not reached and why.
+  const scope = value.originalProjectExecution
+  if (!scope || typeof scope !== 'object') issues.push('execution_scope')
+  else if (scope.sameProject === true) {
+    for (const project of value.projects)
+      if (project.executionProjectId !== project.id) issues.push(`execution_identity:${project.index}`)
+  } else if (!isSubstantive(scope.reason) || !Array.isArray(scope.executionPool) || !Array.isArray(scope.originalProjects)) {
+    issues.push('execution_gap')
   }
   return issues
 }
@@ -562,6 +640,8 @@ export function journeyContextIssues(value) {
     value.scopedProtocol === 'context-scope-review/1' ||
     (scoped && typeof scoped === 'object' && ('reasons' in scoped || 'partial' in scoped)))
   if (!scopedOk || !((value.sourceRows ?? 0) >= 1)) issues.push('sources')
+  // A scoped 403 is a real authorization boundary, never a substitute for the readable scoped view.
+  if (value.scoped === 403) issues.push('scoped_denied')
   return issues
 }
 /** Each phase stops with a fixed set, and the data root reopens. */
@@ -585,7 +665,13 @@ export function journeyReopenIssues(value) {
   if (!value || typeof value !== 'object') return ['missing']
   const issues = []
   if (value.status !== 'RUNNING') issues.push('status')
-  if (!Array.isArray(value.works) || value.works.length !== 2 || value.works.some(item => !((item.messages ?? 0) >= 1))) issues.push('works')
+  if (!Array.isArray(value.works) || value.works.length !== 2) issues.push('works')
+  else for (const [index, work] of value.works.entries()) {
+    if (work?.found !== true) issues.push(`not_found:${index}`)
+    if (work?.phase !== 'delivered') issues.push(`phase:${index}`)
+    if (!((work?.artifacts ?? 0) >= 1)) issues.push(`artifacts:${index}`)
+    if (!((work?.messages ?? 0) >= 1)) issues.push(`messages:${index}`)
+  }
   if (value.readiness !== 200) issues.push('readiness')
   if (value.stop?.clean !== true || (value.stop?.package !== 'STOPPED' && value.stop?.package !== 'STOPPED_ORPHAN')) issues.push('stop')
   return issues
@@ -1577,14 +1663,24 @@ export function evaluateRelease({
         item.evidence?.scopeDiagnostics?.subject ?? item.evidence?.readiness?.subject ?? item.evidence?.trialUi?.subject ??
         item.evidence?.supportMaterial?.subject ?? item.evidence?.packagedStop?.subject ?? item.evidence?.insights?.subject ??
         item.evidence?.recipePreview?.subject ?? item.evidence?.journey?.subject ?? item.evidence?.journeyContext?.subject ??
-        item.evidence?.journeyPhases?.subject ?? item.evidence?.journeyReopen?.subject ?? item.evidence?.zip?.subject
+        item.evidence?.journeyPhases?.subject ?? item.evidence?.journeyReopen?.subject ?? item.evidence?.zip?.subject ??
+        item.evidence?.outerZip?.subject ?? item.evidence?.cohortRecovery?.subject
       if (!subject || typeof subject !== 'object') {
         failures.push(fail('subject_missing', `Case ${id} has no frozen artifact subject`, id))
         continue
       }
-      for (const field of ['source', 'buildId', 'schema', 'tarSha256', 'tarBytes', 'abi', 'platform', 'arch']) {
-        if (String(normalize(subject, field) ?? '') !== String(normalize(canonicalTuple, field) ?? ''))
-          failures.push(fail('subject_mismatch', `Case ${id} ${field} differs from the tested artifact tuple`, id))
+      // Exactly two named cohorts are admitted: the frozen install target and the outer-ZIP inner
+      // build it was packaged from. A case must match one of them field by field; there is no
+      // "close enough" comparison and no third cohort.
+      const cohorts = [canonicalTuple, byId.get('E33-OUTER-ZIP')?.evidence?.outerZip?.subject].filter(Boolean)
+      const matched = cohorts.find(cohort =>
+        ['source', 'buildId', 'schema', 'tarSha256', 'tarBytes', 'abi', 'platform', 'arch'].every(field =>
+          String(normalize(subject, field) ?? '') === String(normalize(cohort, field) ?? '')))
+      if (!matched) {
+        for (const field of ['source', 'buildId', 'schema', 'tarSha256', 'tarBytes', 'abi', 'platform', 'arch']) {
+          if (cohorts.every(cohort => String(normalize(subject, field) ?? '') !== String(normalize(cohort, field) ?? '')))
+            failures.push(fail('subject_mismatch', `Case ${id} ${field} matches no admitted cohort`, id))
+        }
       }
     }
   }
@@ -1637,7 +1733,7 @@ export function evaluateRelease({
           failures.push(fail('evidence_history_invalid', `Evidence history ${issue}`, entry.id))
       }
       for (const [key, fn] of [['contextUse', contextUseIssues], ['sse', contextSseIssues], ['guards', contextGuardIssues], ['sourceConfirm', sourceConfirmIssues], ['sourceConfirmRefusal', sourceConfirmRefusalIssues], ['candidateFlow', candidateFlowIssues], ['history', contextHistoryIssues], ['sources', contextSourcesIssues], ['contextUi', contextUiIssues], ['concurrency', concurrencyIssues], ['schemaMigration', schemaMigrationIssues], ['legacyMigration', legacyMigrationIssues], ['frozenScope', frozenScopeIssues], ['ownershipCopy', ownershipCopyIssues], ['ownershipMocks', ownershipMocksIssues], ['installedCandidates', installedCandidatesIssues], ['secondRoot', secondRootIssues], ['workflowFormats', workflowFormatsIssues], ['personalReview', personalReviewIssues], ['restoredReviewRefusals', restoredReviewRefusalsIssues], ['reviewReuse', reviewReuseIssues], ['scopeDiagnostics', scopeDiagnosticsIssues], ['readiness', readinessIssues], ['trialUi', trialUiIssues],
-      ['zip', zipLifecycleIssues], ['journey', journeyIssues], ['journeyContext', journeyContextIssues], ['journeyPhases', journeyPhasesIssues], ['journeyReopen', journeyReopenIssues],
+      ['zip', zipLifecycleIssues], ['outerZip', outerZipIssues], ['cohortRecovery', cohortRecoveryIssues], ['journey', journeyIssues], ['journeyContext', journeyContextIssues], ['journeyPhases', journeyPhasesIssues], ['journeyReopen', journeyReopenIssues],
       ['recipePreview', recipePreviewIssues], ['packagedStop', packagedStopIssues], ['stopFunctional', stopFunctionalIssues], ['lifecycleOwn', lifecycleOwnIssues], ['lifecycleBirthNoSet', lifecycleBirthNoSetIssues], ['lifecycleStoppedChild', lifecycleStoppedChildIssues], ['lifecycleStoppedNoRecordChild', lifecycleStoppedNoRecordChildIssues],
       ['lifecycleParentGone', lifecycleParentGoneIssues], ['lifecycleNoRecordUnverified', lifecycleNoRecordUnverifiedIssues], ['lifecycleSetMismatch', lifecycleSetMismatchIssues],
       ['lifecycleBirthConfig', lifecycleBirthConfigIssues], ['lifecycleNoRecord', lifecycleNoRecordIssues], ['lifecycleNoRecordExit', lifecycleNoRecordExitIssues],

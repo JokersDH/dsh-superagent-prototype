@@ -80,7 +80,7 @@ function startPackage(install, { state, config, reviewFile, port, apiPort, mockF
  * Stops this probe-owned instance through the packaged `pa stop` boundary. A refusal or timeout keeps
  * the record and the process; nothing is force-killed by path similarity and no record is deleted.
  */
-async function stopOwned(install, { state, config, mockFile, birth = null }) {
+async function stopOwned(install, { state, config, mockFile, birth = null, resources = null }) {
   // The birth is the one this lane captured for the exact recorded pid/start, never simply the last
   // spawn on this state: a later instance must not lend its birth to an older record.
   const record = readRecord(config).value ?? null
@@ -89,7 +89,7 @@ async function stopOwned(install, { state, config, mockFile, birth = null }) {
   // it is what makes a missing record UNKNOWN instead of a silent clean.
   const matched = birth ?? (record ? candidates.find(item => item.pid === record.pid && item.start === record.processStart) ?? null : candidates.at(-1) ?? null)
   return stopOwnedInstance({ install, config, state, own: dirname(install) },
-    { mockFile, birth: matched, equivalentProof: true })
+    { mockFile, birth: matched, resources, equivalentProof: true })
 }
 
 function messageFacts(state) {
@@ -726,18 +726,30 @@ export async function runPersonalReview() {
         env: { ...process.env, PA_NODE: process.execPath, PA_MODEL_CONFIG: mock.file, PA_CONFIG_ROOT: config, PA_DATA_ROOT: started.birth.state },
       })
       let normal = null, restoredStop = null
+      const setFor = state => {
+        const record = readRecord(config)
+        const value = record.value ?? {}
+        const pids = [...new Set([value.pid, value.apiPid, value.consolePid])].filter(Number.isSafeInteger)
+        return pids.map(pid => { const identity = liveIdentity(pid)
+          return { pid, start: identity.start, parentPid: pid === value.pid ? null : value.pid } })
+      }
+      let normalSet = [], restoredSet = []
       try {
         const [p1, a1] = [await freePort(), await freePort()]
-        normal = await observe(directStop(observed.seedState, [p1, a1]))
+        const normalStart = directStop(observed.seedState, [p1, a1])
+        normalSet = setFor(observed.seedState)
+        normal = await observe(normalStart)
         const [p2, a2] = [await freePort(), await freePort()]
-        restoredStop = await observe(directStop(restored, [p2, a2]))
+        const restoredStart = directStop(restored, [p2, a2])
+        restoredSet = setFor(restored)
+        restoredStop = await observe(restoredStart)
       } catch (error) {
         evidence.stopFunctional = { error: String(error?.message ?? error).slice(0, 300) }
         throw error
       } finally {
-        // Only proven cleanup may follow; a refusal is retained and reported, never force-killed.
-        await stopOwned(install, { state: observed.seedState, config, mockFile: mock.file })
-        await stopOwned(install, { state: restored, config, mockFile: mock.file })
+        // Only proven cleanup may follow; the fixed set captured before each direct stop authorizes it.
+        await stopOwned(install, { state: observed.seedState, config, mockFile: mock.file, resources: normalSet })
+        await stopOwned(install, { state: restored, config, mockFile: mock.file, resources: restoredSet })
       }
       const functional = value => value?.packageStatus === 'STOPPED' || value?.packageStatus === 'STOPPED_ORPHAN'
       // Quiescence comes from re-observing the fixed pre-stop pids and starts, never from an empty array
@@ -764,12 +776,15 @@ export async function runPersonalReview() {
       const health = value.status === 'RUNNING' && value.instance?.apiURL
         ? await fetch(`${value.instance.apiURL}/v1/health`, { signal: AbortSignal.timeout(5_000) }).then(r => r.json()).catch(() => null) : null
       const record = (() => { try { return JSON.parse(readFileSync(join(config, 'instance.json'), 'utf8')) } catch { return null } })()
+      // The fixed set is captured before the direct stop so the cleanup can prove the same resources.
+      const preSet = record ? [...new Set([record.pid, record.apiPid, record.consolePid])].filter(Number.isSafeInteger)
+        .map(pid => { const identity = liveIdentity(pid); return { pid, start: identity.start, parentPid: pid === record.pid ? null : record.pid } }) : []
       const direct = value.status === 'RUNNING'
         ? spawnSync(join(install, 'bin/pa'), ['stop', '--json'], { cwd: join(install, '..'), encoding: 'utf8', timeout: 40_000,
           env: { ...process.env, PA_NODE: process.execPath, PA_CONFIG_ROOT: config, PA_DATA_ROOT: restored } })
         : null
       const stopJson = parseJson(direct?.stdout) ?? null
-      const cleaned = await stopOwned(install, { state: restored, config, mockFile: mock.file })
+      const cleaned = await stopOwned(install, { state: restored, config, mockFile: mock.file, resources: preSet })
       const finding = stopJson?.status === 'BLOCKED' ? { owner: 'main/D packaged launcher', code: stopJson.code,
         failures: stopJson.detail?.failures ?? [], expected: stopJson.detail?.checks?.find(c => c.id === 'runtime_mode')?.detail?.expected ?? record?.mode ?? null,
         observed: stopJson.detail?.checks?.find(c => c.id === 'runtime_mode')?.detail?.observed ?? health?.mode ?? null,

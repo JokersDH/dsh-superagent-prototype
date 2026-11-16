@@ -145,7 +145,7 @@ await collect('e3', async () => {
   }
 })
 await collect('e4', async () => {
-  const [stability, wave04, release, install, recoveryPreflight, replyDurability, sourceConfirm, installedRecovery, personalReview, trialUi, inputs, surfaces, journey, zipLifecycle] = await Promise.all([
+  const [stability, wave04, release, install, recoveryPreflight, replyDurability, sourceConfirm, installedRecovery, personalReview, trialUi, inputs, surfaces, journey, zipLifecycle, outerZip, cohortRecovery] = await Promise.all([
     import('./cases/e4-stability.mjs'),
     import('./cases/e4-wave04.mjs'),
     import('./cases/e5-release.mjs'),
@@ -160,6 +160,8 @@ await collect('e4', async () => {
     import('./cases/w29-surfaces.mjs'),
     import('./cases/w31-journey.mjs'),
     import('./cases/w32-zip.mjs'),
+    import('./cases/w33-outer-zip.mjs'),
+    import('./cases/w33-cohort-recovery.mjs'),
   ])
   const first = await stability.runE4({
     root,
@@ -180,8 +182,10 @@ await collect('e4', async () => {
   const thirteenth = await surfaces.runUserSurfaces({ root, runDirectory: run.directory })
   const fourteenth = await journey.runJourney({ root, runDirectory: run.directory })
   const fifteenth = await zipLifecycle.runZip({ root, runDirectory: run.directory })
+  const sixteenth = await outerZip.runOuterZip({ root, runDirectory: run.directory })
+  const seventeenth = await cohortRecovery.runCohortRecovery({ root, runDirectory: run.directory })
   return {
-    cases: [...first.cases, ...second.cases, ...third.cases, ...fourth.cases, ...fifth.cases, ...sixth.cases, ...seventh.cases, ...eighth.cases, ...ninth.cases, ...eleventh.cases, ...twelfth.cases, ...thirteenth.cases, ...fourteenth.cases, ...fifteenth.cases],
+    cases: [...first.cases, ...second.cases, ...third.cases, ...fourth.cases, ...fifth.cases, ...sixth.cases, ...seventh.cases, ...eighth.cases, ...ninth.cases, ...eleventh.cases, ...twelfth.cases, ...thirteenth.cases, ...fourteenth.cases, ...fifteenth.cases, ...sixteenth.cases, ...seventeenth.cases],
     artifacts: {
       screenshots: [
         ...(first.artifacts?.screenshots ?? []),
