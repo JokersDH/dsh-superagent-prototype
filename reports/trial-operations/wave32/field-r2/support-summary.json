@@ -1,0 +1,115 @@
+{
+  "protocol": "trial-field-summary/1",
+  "generatedAt": "2026-11-16T03:09:33.526Z",
+  "package": {
+    "name": "wave31-target-4dcd28f.tar.gz",
+    "archiveSha256": "405ecd02fcbf288bac0855e17911ec4035521b54fe27d81fa0b28feaf5addcc6",
+    "bytes": 20540568,
+    "buildId": "4dcd28f758bbb265",
+    "source": {
+      "commit": "c0a1f8975232b6397dfaf92d31ac5682df2dab36",
+      "dirty": false
+    },
+    "schema": 18
+  },
+  "result": "DEGRADED",
+  "machinecheckExit": 1,
+  "counts": {
+    "pass": 46,
+    "warn": 0,
+    "unknown": 3,
+    "fail": 0
+  },
+  "packageCli": [
+    {
+      "id": "help",
+      "exit": 0
+    },
+    {
+      "id": "status",
+      "exit": 2
+    },
+    {
+      "id": "doctor",
+      "exit": 1
+    }
+  ],
+  "readiness": {
+    "protocol": "trial-readiness/1",
+    "observedAt": "2026-11-16T03:09:23.139Z",
+    "configurationRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "mode": "fixture",
+    "startupMode": "normal",
+    "discussion": "not_configured",
+    "execution": {
+      "state": "unavailable",
+      "reason": "not_installed"
+    },
+    "development": "fixture_only",
+    "projects": {
+      "development": 0,
+      "discussion": 0,
+      "dispatchable": 0
+    },
+    "profiles": {
+      "native": 0,
+      "controlled": 1,
+      "admittedNative": 0,
+      "admittedControlled": 0
+    },
+    "capabilities": {
+      "contextHistory": false,
+      "contextSources": false,
+      "decisions": false,
+      "proposals": false
+    },
+    "authorization": "<redacted>"
+  },
+  "knownIssues": [
+    {
+      "id": "host_sqlite_unknown",
+      "level": "info",
+      "meaning": "preflight cannot execute the native SQLite binding; the package doctor verifies it at runtime",
+      "action": "run package doctor in a private root and keep the exit/check list"
+    },
+    {
+      "id": "readiness_no_package_identity",
+      "level": "info",
+      "meaning": "readiness reports configuration facts, not a package identity",
+      "action": "bind the report to the tar/build/source tuple manually"
+    },
+    {
+      "id": "support_not_supplied",
+      "level": "info",
+      "meaning": "pa support opens a database with write pragmas and is not run automatically",
+      "action": "run it yourself on a copy and pass --support"
+    },
+    {
+      "id": "doctor_warn:executor_codex",
+      "level": "warn",
+      "meaning": "unexpected package doctor warning",
+      "action": "inspect the doctor check detail"
+    },
+    {
+      "id": "instance_stopped",
+      "level": "info",
+      "meaning": "no managed instance is running in this private root",
+      "action": "this is expected for a fresh trial root; do not start without an explicit own target"
+    }
+  ],
+  "sourceConsumer": {
+    "ran": false
+  },
+  "layers": {
+    "installed": "exact tar preflight + package help/status/doctor in private roots",
+    "source": "not run",
+    "fixture": "readiness fixture (not a package daemon)",
+    "recovery": "NOT_REACHED in this kit",
+    "native": "NOT_MEASURED"
+  },
+  "reproduction": [
+    "node tools/trial-kit/bin/trial-field-kit.mjs --tar <exact.tar.gz> --artifact <install-artifact.json> --out <new-dir> --readiness-fixture",
+    "open machinecheck/machinecheck-report.json and diagnostics-bundle.json",
+    "never paste tokens, headers, conversation bodies or private database content"
+  ]
+}

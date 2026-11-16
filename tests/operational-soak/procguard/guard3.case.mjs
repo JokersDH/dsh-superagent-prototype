@@ -110,19 +110,19 @@ test('identity mismatch at birth retains the probe and sends no signal', async (
 test('a complete mocked birth signals only through the registered handle and kill injection', async () => {
   const root = mkdtempSync(join(tmpdir(), 'guard3-success-'))
   const spy = fakeSpawn({ writeBirth: true })
-  const observed = { state: 'alive', pid: 424242, ppid: process.pid, uid: process.getuid(), start: 'Sun Nov 15 10:00:00 2026', command: 'node fake' }
+  const observed = () => ({ state: 'alive', pid: 424242, ppid: process.pid, uid: process.getuid(), start: 'Sun Nov 15 10:00:00 2026', command: [process.execPath, ...spy.argv].join(' ') })
   try {
-    const probe = await spawnOwnProbe({ root, operation: 'h1-success', spawnImpl: spy.spawnImpl, observer: () => observed, killImpl: spy.killImpl, birthTimeoutMs: 100 })
+    const probe = await spawnOwnProbe({ root, operation: 'h1-success', spawnImpl: spy.spawnImpl, observer: observed, killImpl: spy.killImpl, birthTimeoutMs: 100 })
     assert.equal(probe.observation.executable, process.execPath)
     assert.deepEqual(probe.observation.launch.argv.slice(1), probe.observation.argv)
     assert.equal(probe.observation.launch.argv[0], probe.observation.executable)
-    const result = signalFresh({ handle: probe.handle, signal: 'SIGTERM', observer: () => observed, killImpl: spy.killImpl })
+    const result = signalFresh({ handle: probe.handle, signal: 'SIGTERM', observer: observed, killImpl: spy.killImpl })
     assert.equal(result.sent, true)
     assert.equal(spy.processKill, 1)
     assert.equal(spy.childKill, 0)
     probe.observation.pid = 1
     probe.observation.launch.argv = ['/bin/false']
-    const again = signalFresh({ handle: probe.handle, signal: 'SIGTERM', observer: () => observed, killImpl: spy.killImpl, dryRun: true })
+    const again = signalFresh({ handle: probe.handle, signal: 'SIGTERM', observer: observed, killImpl: spy.killImpl, dryRun: true })
     assert.equal(again.wouldSignal.pid, 424242)
   } finally {
     rmSync(root, { recursive: true, force: true })

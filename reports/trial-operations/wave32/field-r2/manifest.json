@@ -1,0 +1,54 @@
+{
+  "protocol": "trial-field-manifest/1",
+  "generatedAt": "2026-11-16T03:09:33.559Z",
+  "files": [
+    {
+      "path": "FIELD-NOTES.md",
+      "bytes": 1871,
+      "mode": "600",
+      "sha256": "df486c4d7cff6fa938a2a7e6e22083975190a30d335de0f24e6b2f3a63f8272b"
+    },
+    {
+      "path": "machinecheck/diagnostics-bundle.json",
+      "bytes": 24815,
+      "mode": "600",
+      "sha256": "9b206a14014afeb917e4690c8418693096bd3e678608d4ecbe1dc8133d28781a"
+    },
+    {
+      "path": "machinecheck/fixture/codex-fixture",
+      "bytes": 47,
+      "mode": "700",
+      "sha256": "5e2578d0c14f0a4bafa50af0fb87de8f9488a4aa1c43a36d6b200d9c3293a8cb"
+    },
+    {
+      "path": "machinecheck/fixture/executors.json",
+      "bytes": 49,
+      "mode": "600",
+      "sha256": "f19e62f3ea3593ee66f330ad7fcb69f6d07b6c523d3fbfcf6b00f7d9d451cb8d"
+    },
+    {
+      "path": "machinecheck/machinecheck-report.json",
+      "bytes": 27337,
+      "mode": "600",
+      "sha256": "5a1f68c4f03c61d53c247dfabc1faafdeeb83cace53254a39c836abceeeacfc3"
+    },
+    {
+      "path": "machinecheck/reproduce.txt",
+      "bytes": 523,
+      "mode": "600",
+      "sha256": "1f2a21dd02035822253e1f41f3ea478ac21bcfd12227d86d41c35a558839f6e2"
+    },
+    {
+      "path": "machinecheck/roots/config/release.json",
+      "bytes": 206477,
+      "mode": "600",
+      "sha256": "103ab15c186c89f52fbb562ce22eb8100c959c9f02fcd1f78248894c09da792d"
+    },
+    {
+      "path": "support-summary.json",
+      "bytes": 3351,
+      "mode": "600",
+      "sha256": "6fcb2f4c99291fe0d5ff69cff196131bd2f20f22daed69e159f5344db015b41d"
+    }
+  ]
+}

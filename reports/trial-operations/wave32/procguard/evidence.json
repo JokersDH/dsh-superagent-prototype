@@ -1,0 +1,117 @@
+{
+  "protocol": "trial-operations/wave32-h1/1",
+  "generatedAt": "2026-11-16T04:09:30.992Z",
+  "command": "node tests/operational-soak/procguard/produce3.mjs --out <new-private-root>",
+  "exitCode": 0,
+  "sources": {
+    "tests/operational-soak/procguard/guard3.mjs": "94c7d1f778860c01c57255efc2daee962172c66d3f3191ba5b10395fa446eb7f",
+    "tests/operational-soak/procguard/produce3.mjs": "dbb0500073ea2b6b870a7bdc953717ace2db19f376838bb12779e6af7866fe42",
+    "tests/operational-soak/procguard/guard3.case.mjs": "d4b4bf90fde662116edd18fda3d779661d3061c0c5397eb7973a56def617d329",
+    "reports/trial-operations/wave32/procguard/mock.json": "af48c9a2663281e31705328c1daffbf96e5eea4daa292e40026608f92a5bd17a",
+    "reports/trial-operations/wave32/procguard/failure.json": "068fbf4cb0d7c1c62efaae5df131799423d88e9afbd236eec4a8063f28b9d95f",
+    "reports/trial-operations/wave32/procguard/report.json": "ff22bcc2b15676e3c9cfe086a62291af0a7e3188b665598a1ca9211f002ef5a9"
+  },
+  "defectClosed": {
+    "id": "wave32-p1-launch-command-mismatch",
+    "was": "spawn launch/full argv was not compared with the observed OS command; a mismatched observed command could still register",
+    "now": "record.launch.command is the independent spawn executable+ordered argv; compare requires exact normalized equality, refuses ambiguous argv, missing launch/command and all mismatches before any signal"
+  },
+  "failure": {
+    "ok": true,
+    "cases": [
+      {
+        "id": "observation_unknown",
+        "reason": "observation_unknown",
+        "childKill": 0,
+        "processKill": 0
+      },
+      {
+        "id": "birth_report_missing",
+        "reason": "birth_report_missing",
+        "childKill": 0,
+        "processKill": 0
+      },
+      {
+        "id": "identity_mismatch",
+        "reason": "identity_mismatch",
+        "childKill": 0,
+        "processKill": 0
+      }
+    ],
+    "childKillCalls": 0,
+    "processKillCalls": 0
+  },
+  "mock": {
+    "ok": true,
+    "checks": 17,
+    "spawns": 0,
+    "signals": 0,
+    "ps": 0
+  },
+  "live": {
+    "status": "LIVE_OK",
+    "checks": [
+      {
+        "id": "born_normal",
+        "ok": true
+      },
+      {
+        "id": "returned_observation_is_copy",
+        "ok": true
+      },
+      {
+        "id": "caller_mutation_does_not_retarget",
+        "ok": true
+      },
+      {
+        "id": "pure_controls",
+        "ok": true
+      },
+      {
+        "id": "unknown_wait_not_gone",
+        "ok": true
+      },
+      {
+        "id": "first_signal_plan_verified",
+        "ok": true
+      },
+      {
+        "id": "normal_term_gone",
+        "ok": true
+      },
+      {
+        "id": "stubborn_survived_term",
+        "ok": true
+      },
+      {
+        "id": "stubborn_kill_gone",
+        "ok": true
+      }
+    ],
+    "signals": [
+      {
+        "target": "normal",
+        "step": "TERM",
+        "sent": true,
+        "pid": 42215
+      },
+      {
+        "target": "stubborn",
+        "step": "TERM",
+        "sent": true,
+        "pid": 42289
+      },
+      {
+        "target": "stubborn",
+        "step": "KILL",
+        "sent": true,
+        "pid": 42289
+      }
+    ]
+  },
+  "limits": [
+    "single own probe process only; no Runner/daemon/product lifecycle",
+    "no global discovery/foreign pid/signal before mock and failure controls",
+    "UNKNOWN material retained; launch path with spaces/quotes is refused as ambiguous"
+  ]
+}

@@ -1,0 +1,479 @@
+{
+  "protocol": "trial-operations-status/1",
+  "wave": "product-wave-32",
+  "owner": "H",
+  "branch": "codex/g4-trial-operations",
+  "base": "55766f412bde0a4bf3b7b2569e8ae9c5b4c5f3ec",
+  "mergedMain": "07ccd067",
+  "currentH": "PENDING_COMMIT",
+  "updatedAt": "2026-11-16T04:10:33.018Z",
+  "goal": {
+    "wholeSubsystem": "bounded trial, run/fault support and field retention across the full product",
+    "tokenBudget": null,
+    "deadline": null,
+    "sourceReady": true,
+    "complete": false
+  },
+  "ownedPaths": [
+    "tools/trial-kit/",
+    "tests/operational-soak/",
+    "docs/internal-trial/",
+    "reports/trial-operations/"
+  ],
+  "dirty": {
+    "H": "new wave32 source/evidence pending this commit; historical dirty preserved",
+    "B": [
+      "apps/runner/src/runner-link-client.ts",
+      "reports/releases/wave11-admission/runtime.json",
+      "reports/releases/wave12-admission/runtime.json",
+      "tests/native-acceptance/b27-chain.mjs",
+      "tests/native-acceptance/b27-sigkill.mjs",
+      "tests/native-acceptance/b28-signal.mjs",
+      "tests/native-acceptance/signal-guard.mjs",
+      "tests/native-acceptance/b16-real-begin.mjs (untracked)"
+    ],
+    "note": "B dirty files are not consumed; explicit commit fbc9331 is the source subject"
+  },
+  "sources": {
+    "H": {
+      "fixedBase": "55766f412bde0a4bf3b7b2569e8ae9c5b4c5f3ec",
+      "merge": "07ccd067"
+    },
+    "B": {
+      "commit": "fbc933166758f446ba8907ce93795d04d34d11d7",
+      "branch": "codex/g1-runtime"
+    },
+    "I": {
+      "commit": "4bce0673388f22952513b5e530381f7a95e7a794",
+      "branch": "codex/g5-coordinator-channel"
+    },
+    "main": {
+      "checkpoint": "303b2c6a",
+      "dispatch": "8deda18d",
+      "packageFix": "1498b07a",
+      "observedMerge": "07ccd067"
+    },
+    "R1": {
+      "tar": "wave30-target-8296720.tar.gz",
+      "sha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "buildId": "8296720d8a25f38c",
+      "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2"
+    },
+    "R2": {
+      "tar": "wave31-target-4dcd28f.tar.gz",
+      "sha256": "405ecd02fcbf288bac0855e17911ec4035521b54fe27d81fa0b28feaf5addcc6",
+      "buildId": "4dcd28f758bbb265",
+      "source": "c0a1f8975232b6397dfaf92d31ac5682df2dab36",
+      "note": "successor freeze after 303b2c6a"
+    }
+  },
+  "integratedInMain": {
+    "H": false,
+    "statement": "wave32 source is a candidate on the H branch; main has not merged these paths. Current B/I source consumer is independent of checkout fallback."
+  },
+  "deliverables": {
+    "safetyLaunchIdentity": {
+      "status": "COMPLETE",
+      "source": [
+        "tests/operational-soak/procguard/guard3.mjs",
+        "tests/operational-soak/procguard/produce3.mjs",
+        "tests/operational-soak/procguard/guard3.case.mjs"
+      ],
+      "command": "node tests/operational-soak/procguard/produce3.mjs --out <new-root>",
+      "exit": 0,
+      "defectClosed": {
+        "id": "wave32-p1-launch-command-mismatch",
+        "was": "spawn launch/full argv was not compared with the observed OS command; a mismatched observed command could still register",
+        "now": "record.launch.command is the independent spawn executable+ordered argv; compare requires exact normalized equality, refuses ambiguous argv, missing launch/command and all mismatches before any signal"
+      },
+      "mock": {
+        "ok": true,
+        "checks": 17,
+        "spawns": 0,
+        "signals": 0,
+        "ps": 0
+      },
+      "failure": {
+        "ok": true,
+        "cases": [
+          {
+            "id": "observation_unknown",
+            "reason": "observation_unknown",
+            "childKill": 0,
+            "processKill": 0
+          },
+          {
+            "id": "birth_report_missing",
+            "reason": "birth_report_missing",
+            "childKill": 0,
+            "processKill": 0
+          },
+          {
+            "id": "identity_mismatch",
+            "reason": "identity_mismatch",
+            "childKill": 0,
+            "processKill": 0
+          }
+        ],
+        "childKillCalls": 0,
+        "processKillCalls": 0
+      },
+      "live": {
+        "status": "LIVE_OK",
+        "checks": [
+          {
+            "id": "born_normal",
+            "ok": true
+          },
+          {
+            "id": "returned_observation_is_copy",
+            "ok": true
+          },
+          {
+            "id": "caller_mutation_does_not_retarget",
+            "ok": true
+          },
+          {
+            "id": "pure_controls",
+            "ok": true
+          },
+          {
+            "id": "unknown_wait_not_gone",
+            "ok": true
+          },
+          {
+            "id": "first_signal_plan_verified",
+            "ok": true
+          },
+          {
+            "id": "normal_term_gone",
+            "ok": true
+          },
+          {
+            "id": "stubborn_survived_term",
+            "ok": true
+          },
+          {
+            "id": "stubborn_kill_gone",
+            "ok": true
+          }
+        ],
+        "signals": [
+          {
+            "target": "normal",
+            "step": "TERM",
+            "sent": true,
+            "pid": 42215
+          },
+          {
+            "target": "stubborn",
+            "step": "TERM",
+            "sent": true,
+            "pid": 42289
+          },
+          {
+            "target": "stubborn",
+            "step": "KILL",
+            "sent": true,
+            "pid": 42289
+          }
+        ]
+      },
+      "evidence": "reports/trial-operations/wave32/procguard/evidence.json"
+    },
+    "packageLifecycle": {
+      "status": "PARTIAL_INSTALLED_ACCEPT_BLOCKED",
+      "source": [
+        "tests/operational-soak/package/lifecycle2.mjs",
+        "tests/operational-soak/package/produce-lifecycle2.mjs",
+        "tests/operational-soak/package/lifecycle.case.mjs"
+      ],
+      "command": "node tests/operational-soak/package/produce-lifecycle2.mjs --tar <R1|R2>",
+      "exit": 0,
+      "R1": {
+        "status": "OK",
+        "buildId": "8296720d8a25f38c",
+        "pid": 16006,
+        "apiPid": 16016,
+        "workId": "ca73397f13d97d6e419d8a4ca76cb205",
+        "phase": "needs_user",
+        "accept": "Trusted artifact review is unavailable",
+        "checks": {
+          "firstRunOk": true,
+          "startRunning": true,
+          "sameOwnInstance": true,
+          "readinessModeFixture": true,
+          "readinessAuthorizationNone": true,
+          "healthOk": true,
+          "consoleServed": true,
+          "sseConnected": true,
+          "snapshotVisible": true,
+          "configurationVisible": true,
+          "installedWorkCreated": true,
+          "installedCandidateSeen": true,
+          "staleCandidateRejected": true,
+          "installedAcceptBlockedByProductReview": true,
+          "reusedSamePid": true,
+          "reviewOnFixtureRefused": true,
+          "stoppedOwnInstance": true,
+          "stoppedStatus": true,
+          "stoppedNotServing": true,
+          "reopenedSameWork": true,
+          "noHSignal": true
+        }
+      },
+      "R2": {
+        "status": "OK",
+        "buildId": "4dcd28f758bbb265",
+        "pid": 17012,
+        "apiPid": 17025,
+        "workId": "ca73397f13d97d6e419d8a4ca76cb205",
+        "phase": "needs_user",
+        "accept": "Trusted artifact review is unavailable",
+        "checks": {
+          "firstRunOk": true,
+          "startRunning": true,
+          "sameOwnInstance": true,
+          "readinessModeFixture": true,
+          "readinessAuthorizationNone": true,
+          "healthOk": true,
+          "consoleServed": true,
+          "sseConnected": true,
+          "snapshotVisible": true,
+          "configurationVisible": true,
+          "installedWorkCreated": true,
+          "installedCandidateSeen": true,
+          "staleCandidateRejected": true,
+          "installedAcceptBlockedByProductReview": true,
+          "reusedSamePid": true,
+          "reviewOnFixtureRefused": true,
+          "stoppedOwnInstance": true,
+          "stoppedStatus": true,
+          "stoppedNotServing": true,
+          "reopenedSameWork": true,
+          "noHSignal": true
+        }
+      },
+      "evidence": "reports/trial-operations/wave32/lifecycle-r1/ and lifecycle-r2/"
+    },
+    "fieldKit": {
+      "status": "COMPLETE_TOOL_R1_R2",
+      "source": [
+        "tools/trial-kit/lib/field-kit.mjs",
+        "tools/trial-kit/bin/trial-field-kit.mjs",
+        "tests/operational-soak/package/field-kit.case.mjs"
+      ],
+      "command": "node tools/trial-kit/bin/trial-field-kit.mjs --tar <R1|R2> --artifact <json> --out <new-dir> [--source-consumer]",
+      "R1": {
+        "result": "DEGRADED",
+        "counts": {
+          "pass": 46,
+          "warn": 0,
+          "unknown": 3,
+          "fail": 0
+        },
+        "sourceConsumerExit": 0,
+        "knownIssues": [
+          "host_sqlite_unknown",
+          "readiness_no_package_identity",
+          "support_not_supplied",
+          "doctor_warn:executor_codex",
+          "instance_stopped"
+        ],
+        "layers": {
+          "installed": "exact tar preflight + package help/status/doctor in private roots",
+          "source": "current I/B source consumer, in-process only",
+          "fixture": "readiness fixture (not a package daemon)",
+          "recovery": "NOT_REACHED in this kit",
+          "native": "NOT_MEASURED"
+        }
+      },
+      "R2": {
+        "result": "DEGRADED",
+        "counts": {
+          "pass": 46,
+          "warn": 0,
+          "unknown": 3,
+          "fail": 0
+        },
+        "sourceConsumerExit": null,
+        "knownIssues": [
+          "host_sqlite_unknown",
+          "readiness_no_package_identity",
+          "support_not_supplied",
+          "doctor_warn:executor_codex",
+          "instance_stopped"
+        ],
+        "layers": {
+          "installed": "exact tar preflight + package help/status/doctor in private roots",
+          "source": "not run",
+          "fixture": "readiness fixture (not a package daemon)",
+          "recovery": "NOT_REACHED in this kit",
+          "native": "NOT_MEASURED"
+        }
+      },
+      "evidence": "reports/trial-operations/wave32/field-r1/ and field-r2/"
+    },
+    "currentSourceConsumer": {
+      "status": "COMPLETE_SOURCE_SCOPE",
+      "source": [
+        "tests/operational-soak/selected/source2.mjs",
+        "tests/operational-soak/selected/i-consumer2.mjs",
+        "tests/operational-soak/selected/b-service-consumer2.mjs"
+      ],
+      "B": "fbc933166758",
+      "I": "4bce0673388f",
+      "iChecks": "12/12",
+      "bChecks": "8/8",
+      "notInMain": true,
+      "evidence": "reports/trial-operations/wave32/field-r1/support-summary.json sourceConsumer"
+    },
+    "originalStoreAndDelivery": {
+      "status": "PARTIAL_SOURCE_ONLY",
+      "sources": [
+        "tests/operational-soak/selected/same-store-join2.mjs",
+        "tests/operational-soak/recovery/successor2.mjs",
+        "tests/operational-soak/delivery/windows2.mjs",
+        "tests/operational-soak/delivery/consumer.mjs"
+      ],
+      "notes": [
+        "original Store receiver join and foreign-subject refusal pass; B callback join NOT_REACHED",
+        "new-process same-Store readback pass; B coordinator/Runner recovery NOT_REACHED",
+        "ACK windows 8 and resource ledger pass; B crash windows/native 2/4 NOT_REACHED",
+        "ordinary delivery accepted; recovered same-Work accept NOT_REACHED"
+      ],
+      "evidence": "reports/trial-operations/wave31/{join,successor,windows,delivery}/"
+    },
+    "packageR1R2": {
+      "status": "COMPLETE_READONLY_AND_RESTORE",
+      "preflight": {
+        "R1": {
+          "result": "DEGRADED",
+          "pass": 32,
+          "unknown": 1,
+          "fail": 0
+        },
+        "R2": {
+          "result": "DEGRADED",
+          "pass": 32,
+          "unknown": 1,
+          "fail": 0
+        }
+      },
+      "machinecheck": {
+        "R1": {
+          "pass": 46,
+          "unknown": 3,
+          "fail": 0
+        },
+        "R2": {
+          "pass": 46,
+          "unknown": 3,
+          "fail": 0
+        }
+      },
+      "restore": {
+        "R1": "OK_WITH_NOT_REACHED",
+        "R2": "OK_WITH_NOT_REACHED"
+      },
+      "evidence": "reports/trial-operations/wave31/package*/"
+    },
+    "docsChecklist": {
+      "status": "COMPLETE",
+      "source": [
+        "docs/internal-trial/wave32-trial-checklist.zh-CN.md",
+        "docs/internal-trial/README.zh-CN.md"
+      ],
+      "includes": [
+        "one-page checklist",
+        "fault tree",
+        "known issues",
+        "share/no-share material",
+        "reproduction commands"
+      ]
+    }
+  },
+  "commands": [
+    {
+      "command": "node tests/operational-soak/package/produce-lifecycle2.mjs --tar <R1>",
+      "exit": 0,
+      "result": "OK"
+    },
+    {
+      "command": "node tests/operational-soak/package/produce-lifecycle2.mjs --tar <R2>",
+      "exit": 0,
+      "result": "OK"
+    },
+    {
+      "command": "node tools/trial-kit/bin/trial-field-kit.mjs ...R1 --source-consumer",
+      "exit": 1,
+      "result": "DEGRADED 46/3/0; source consumer exit 0"
+    },
+    {
+      "command": "node tools/trial-kit/bin/trial-field-kit.mjs ...R2",
+      "exit": 1,
+      "result": "DEGRADED 46/3/0"
+    },
+    {
+      "command": "node --test wave32 new cases",
+      "exit": 0,
+      "result": "14 pass / 0 fail"
+    }
+  ],
+  "tests": {
+    "wave32New": {
+      "passed": 14,
+      "failed": 0
+    },
+    "files": [
+      "guard3 7",
+      "field-kit 1",
+      "lifecycle 1",
+      "join 1",
+      "successor 1",
+      "windows2 3"
+    ]
+  },
+  "remaining": [
+    "installed fixture Work accept: R1/R2 return verification_failed \"Trusted artifact review is unavailable\"; source controlled accept is a different layer",
+    "B same-Runner product callback join into the original question/answer ingress",
+    "B coordinator SIGKILL -> original A question/answer/ACK in a new process with Runner continuation",
+    "recovered same-Work candidate/accept/delivered and native 2/4 slot release",
+    "main NativeProductAttempt beforeNativeWrite actual guard join",
+    "review-restored startup/REUSED and package business/review content beyond fixture",
+    "E independent R2 verdict, vendor/native/installed release, research value",
+    "source H/B/I changes not merged into main; only candidate branch evidence"
+  ],
+  "usage": {
+    "modelCalls": 0,
+    "vendorTurns": 0,
+    "nativeTurns": 0,
+    "tokenBudget": null,
+    "userServices": "5180/8796..5191/8807 untouched",
+    "globalDiscovery": false,
+    "foreignSignals": 0,
+    "ownProbeSignals": 3,
+    "packageInstances": "private /tmp roots only; stopped by package own-path"
+  },
+  "errors": [
+    {
+      "id": "spawnSync-start-blocked",
+      "observed": "spawnSync(pa start) blocked until the daemon stopped because the daemon retained the launcher pipe; status looked STOPPED and readiness failed",
+      "fix": "start/restart use detached async spawn with ignored stdio and waitStatus polling; daemon stays alive, then package stop returns STOPPED/stillAlive=false/verification.ok",
+      "sourceChanged": true
+    },
+    {
+      "id": "installed-accept-review-unavailable",
+      "observed": "installed fixture Work creates and currentCandidate appears, but accept_candidate returns verification_failed: Trusted artifact review is unavailable on R1 and R2",
+      "disposition": "left as a product limitation/owner reproduction; no state forced",
+      "sourceChanged": false
+    }
+  ],
+  "hashes": {
+    "reports/trial-operations/wave32/procguard/evidence.json": "bbc909337aa7dfc526f03751281e7a429e61421137610742735a2d5331632e21",
+    "reports/trial-operations/wave32/lifecycle-r1/report.json": "dbac563396f1ef3a3e7ccc70b5254f9790c706a233c790a9a713cf8fcbfd918d",
+    "reports/trial-operations/wave32/lifecycle-r2/report.json": "902942077ff6da78512c6f5854e613bdd8754ca78c9dc7af412019a176f71691",
+    "reports/trial-operations/wave32/field-r1/support-summary.json": "720d919cb771bce0b97177b02ee7bb3530ca218598c76fb046bbc80aa178681a",
+    "reports/trial-operations/wave32/field-r2/support-summary.json": "6fcb2f4c99291fe0d5ff69cff196131bd2f20f22daed69e159f5344db015b41d"
+  }
+}

@@ -62,6 +62,9 @@ export function compareRecord3(record, observed) {
     if (!Array.isArray(record.launch.argv) || record.launch.argv.length < 2 || record.launch.argv[0] !== record.executable) issues.push('launch_argv_missing')
     else if (record.launch.argv.length !== record.argv.length + 1 || !record.argv.every((value, index) => value === record.launch.argv[index + 1])) issues.push('launch_argv_mismatch')
     if (record.launch.cwd === undefined || record.launch.cwd === null) issues.push('launch_cwd_missing')
+    if (record.launch.ambiguous === true) issues.push('launch_argv_ambiguous')
+    if (typeof record.launch.command !== 'string' || record.launch.command.length === 0) issues.push('launch_command_missing')
+    else if (String(record.command ?? '').replace(/\s+/g, ' ').trim() !== record.launch.command.replace(/\s+/g, ' ').trim()) issues.push('launch_command_mismatch')
   }
   if (record.birth === undefined || record.birth === null) issues.push('record_birth_missing')
   if (record.birth?.source !== 'child_report+ps+spawn') issues.push('birth_source_invalid')
@@ -127,11 +130,13 @@ export async function spawnOwnProbe({
     error.retained = retained(observed === null ? 'observation_missing' : observed.state === 'unknown' ? 'observation_unknown' : birth === null ? 'birth_report_missing' : 'observation_not_alive')
     throw error
   }
+  const launchArgv = [process.execPath, ...argv]
+  const launchAmbiguous = launchArgv.some((value) => /\s/.test(value) || value.includes('"') || value.includes("'") || value.includes('\\'))
   const facts = deepFreeze({
     pid: child.pid, ppid: process.pid, uid: process.getuid?.() ?? null, start: observed.start,
     command: observed.command, root: probeDir, config, operation,
     executable: process.execPath,
-    launch: deepFreeze({ executable: process.execPath, argv: deepFreeze([process.execPath, ...argv]), cwd: process.cwd(), operation, root: probeDir, config, launchedAt }),
+    launch: deepFreeze({ executable: process.execPath, argv: deepFreeze(launchArgv), command: launchArgv.join(' '), ambiguous: launchAmbiguous, cwd: process.cwd(), operation, root: probeDir, config, launchedAt }),
     argv: deepFreeze([...argv]),
     birth: deepFreeze({ source: 'child_report+ps+spawn', argv: birth.argv, pid: birth.pid, ppid: birth.ppid, uid: birth.uid, cwd: birth.cwd, root: probeDir, config, operation }),
     resources: deepFreeze([{ kind: 'own_probe', pid: child.pid, start: observed.start, uid: observed.uid ?? (process.getuid?.() ?? null), root: probeDir, config, operation }]),
@@ -219,6 +224,8 @@ export function pureControls(handle) {
     missing_resources: clone(facts),
     missing_launch: clone(facts),
     mutated_launch: clone(facts),
+    launch_command_mismatch: clone(facts),
+    launch_ambiguous: clone(facts),
     foreign_uid: clone(facts),
     recycled_start: clone(facts),
     sibling_pid: clone(facts),
@@ -230,6 +237,8 @@ export function pureControls(handle) {
   variants.missing_resources.plan = { complete: false, resourceCount: 0, verified: 'forged' }
   delete variants.missing_launch.launch
   variants.mutated_launch.launch.argv = ['/bin/false']
+  variants.launch_command_mismatch.launch.command = ['/usr/bin/node', ...facts.argv, '--extra'].join(' ')
+  variants.launch_ambiguous.launch.ambiguous = true
   variants.foreign_uid.uid = facts.uid + 1
   variants.recycled_start.start = 'Mon Jan  1 00:00:00 2001'
   variants.sibling_pid.pid = facts.pid + 1
@@ -301,7 +310,7 @@ export function mockSuite() {
     pid: 501, ppid: 1, uid: 501, start: 'Sun Nov 15 10:00:00 2026', command: `/usr/bin/node ${argv.join(' ')}`,
     root: '/tmp/own/probe', config: '/tmp/own/probe/config.json', operation: 'own-op', argv: deepFreeze([...argv]),
     executable: '/usr/bin/node',
-    launch: deepFreeze({ executable: '/usr/bin/node', argv: deepFreeze(['/usr/bin/node', ...argv]), cwd: '/tmp/own', operation: 'own-op', root: '/tmp/own/probe', config: '/tmp/own/probe/config.json', launchedAt: '2026-11-15T10:00:00.000Z' }),
+    launch: deepFreeze({ executable: '/usr/bin/node', argv: deepFreeze(['/usr/bin/node', ...argv]), command: ['/usr/bin/node', ...argv].join(' '), ambiguous: false, cwd: '/tmp/own', operation: 'own-op', root: '/tmp/own/probe', config: '/tmp/own/probe/config.json', launchedAt: '2026-11-15T10:00:00.000Z' }),
     birth: deepFreeze({ source: 'child_report+ps+spawn', argv: [...argv], pid: 501, ppid: 1, uid: 501, cwd: '/tmp/own', root: '/tmp/own/probe', config: '/tmp/own/probe/config.json', operation: 'own-op' }),
     resources: deepFreeze([{ kind: 'own_probe', pid: 501, start: 'Sun Nov 15 10:00:00 2026', uid: 501, root: '/tmp/own/probe', config: '/tmp/own/probe/config.json', operation: 'own-op' }]),
     plan: deepFreeze({ complete: true, resourceCount: 1, children: 1, verified: 'birth' }),

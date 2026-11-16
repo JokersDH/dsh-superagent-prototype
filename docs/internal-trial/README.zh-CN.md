@@ -141,3 +141,11 @@ H 的材料是原始观测。E 会按自己的 required 断言独立核验；不
 - **只读/多根（H10）**：`package/produce-readonly2.mjs` 在两个新私有根运行包内 `status`/`recovery-status`，根隔离、STOPPED、marker absent 不等于授权、queue never；包内实际 HTTP/SSE 内容入口未启动，标 NOT_REACHED。5 秒 fixture soak 只作独立 SSE 工具观察，不是包 daemon。
 
 所有材料在 `reports/trial-operations/wave31/`；R1/R2 结论分列。H 观察不是 E required、安装准入、native 兼容或 release 结论。
+
+## 3e. wave-32 现场工具与完整工程试用
+
+- `tools/trial-kit/bin/trial-field-kit.mjs` 把准确包 machinecheck、可选当前 I/B source consumer、脱敏 `support-summary.json`、`FIELD-NOTES.md` 和 `manifest.json` 收在一个新根；不安装/启动/停止/迁移，恢复与 native 明确 NOT_REACHED/NOT_MEASURED。
+- 一键流程与故障树见 [wave32-trial-checklist.zh-CN.md](wave32-trial-checklist.zh-CN.md)。R1/R2 的 tuple、已知 UNKNOWN 和可分享/不可分享材料已写在该页。
+- 新 P1 已封闭：guard3 现在要求独立 launch executable/有序 full argv 与观测 `command` 完全一致；缺失、前缀、ambiguous、观测失败均拒绝登记，出生失败不发送任何信号。
+- 当前 I/B source consumer 仍是进程内证据；安装包内 B/I 端口、原 Work 恢复、scheduler 2/4 槽和 review 启动没有因 field kit 变成已支持。
+- wave-32 安装态 lifecycle（R1/R2）已实际 first-run/start/readiness/health/console/SSE/REUSED/同一 Work 重开/stop；但包内 `accept_candidate` 对 fixture Work 返回 `Trusted artifact review is unavailable`，安装态人工接受仍 NOT_REACHED。

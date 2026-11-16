@@ -1,0 +1,66 @@
+{
+  "status": "OK",
+  "failed": [],
+  "checks": {
+    "firstRunOk": true,
+    "startRunning": true,
+    "sameOwnInstance": true,
+    "readinessModeFixture": true,
+    "readinessAuthorizationNone": true,
+    "healthOk": true,
+    "consoleServed": true,
+    "sseConnected": true,
+    "snapshotVisible": true,
+    "configurationVisible": true,
+    "installedWorkCreated": true,
+    "installedCandidateSeen": true,
+    "staleCandidateRejected": true,
+    "installedAcceptBlockedByProductReview": true,
+    "reusedSamePid": true,
+    "reviewOnFixtureRefused": true,
+    "stoppedOwnInstance": true,
+    "stoppedStatus": true,
+    "stoppedNotServing": true,
+    "reopenedSameWork": true,
+    "noHSignal": true
+  },
+  "statuses": {
+    "firstRun": "OK",
+    "start": "STARTED",
+    "status": "RUNNING",
+    "restart": "REUSED_OR_RUNNING",
+    "reviewNegative": "BLOCKED",
+    "stop": "STOPPED",
+    "afterStop": "STOPPED"
+  },
+  "ports": {
+    "console": 65073,
+    "api": 65074
+  },
+  "instance": {
+    "pid": 17012,
+    "apiPid": 17025,
+    "consolePid": 17012,
+    "buildId": "4dcd28f758bbb265",
+    "mode": "fixture",
+    "startupMode": "normal"
+  },
+  "readiness": {
+    "mode": "fixture",
+    "startupMode": "normal",
+    "authorization": "none"
+  },
+  "sse": {
+    "status": 200,
+    "contentType": "text/event-stream",
+    "events": 0,
+    "bytes": 0,
+    "endedBy": "bounded_abort_or_stream"
+  },
+  "limits": [
+    "fixture/discussion-only, no model or native turn",
+    "private fake codex is used only for first-run detection",
+    "H sends no signal; stop is the package verified own-path",
+    "SSE is bounded to 1200ms and may emit zero events"
+  ]
+}
