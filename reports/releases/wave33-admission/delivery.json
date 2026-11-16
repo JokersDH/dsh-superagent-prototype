@@ -1,0 +1,217 @@
+{
+  "protocol": "wave33-delivery-admission/1",
+  "date": "2026-11-16",
+  "scope": "Read-only acceptance of completed wave32 D/E engineering: exact submitted inner/outer artifacts, source and structured console sourcemap, actual E subject and recorded release oracle, bounded pure lifecycle controls and H's submitted accept observation. No new packaging, startup, stop, real signals, global process discovery, model/native call or candidate/assertion edit.",
+  "fixedInputs": {
+    "main": "58b4e4c804291cf414c91a76b4b784a917d2dfba",
+    "D": "bb6b5b1132020c209c2c28671698090474c53d32",
+    "DDirtyBeforeAndAfter": false,
+    "DBuildSource": "e8348a864d7d192589e72b8099475520f841b1e5",
+    "E": "84d039871bd4168ff684aa0b3bd11b9bbab373d1",
+    "EDirtyBeforeAndAfter": false,
+    "EMeasuredTestSource": "a933479b7ae8cd591f9e2032d70c9b2dcdd356bd",
+    "EMeasuredSourceDirty": false,
+    "HReadOnlyReferenceHead": "0cc2db471dd2f40954300104a8c60e2853cc507b",
+    "EActualRun": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T04-28-56-718Z/report.json",
+    "ECheckedAt": "2026-11-16T04:37:07.940Z"
+  },
+  "newDArtifact": {
+    "name": "W32 integrated engineering candidate",
+    "source": "e8348a864d7d192589e72b8099475520f841b1e5",
+    "runtimeCheckpoint": "main58b4e4c8",
+    "buildId": "88eb8c69b0671171",
+    "tar": "/Users/hh/Desktop/joker/pa-artifacts/wave32-target/wave32-target-88eb8c6.tar.gz",
+    "tarSha256": "65c386d108d385c1e8463de33b801a1865925d5dd752a7b82a0c57974b8453ac",
+    "tarBytes": 20543106,
+    "tarEntries": 7423,
+    "innerManifestEntries": 6866,
+    "innerRegularFiles": 6843,
+    "internalLinks": 23,
+    "innerManifestSha256": "0f22678f74a2a3a5a7530dcdfc8fe58d051061108b15e123c6ad03e6b2f2bd71",
+    "zip": "/Users/hh/Desktop/joker/pa-artifacts/wave32-preview-88eb8c6/PersonalAgent-Preview-88eb8c6.zip",
+    "zipSha256": "0a46cd3620e00154ea13e7286dcc73e40ffad4df4522f2339e229ffcb027bc06",
+    "zipBytes": 63475809,
+    "archiveEntries": 7434,
+    "outerManifestSha256": "c93e3450561bbb2f669fdf3c4429e8df8c36e74d03f1b3d65f329b4abe10765f",
+    "outerInventoryEntries": 6874,
+    "outerRegularFiles": 6851,
+    "runtime": {
+      "node": "24.21.0",
+      "abi": "137",
+      "platform": "darwin",
+      "arch": "arm64",
+      "sqlite": "3.53.4",
+      "schema": 18,
+      "nodeSha256": "e4b5a3af0e05c75de2eae013904145f40fe7fc2a6e6f17510128bf45cca4e79b",
+      "fullNodeLicenseSha256": "5888dbb9a1d2b18f2c3e6c5f6af1b39de658372b402a0577b002777f14c62ace"
+    },
+    "independentStaticChecks": {
+      "tarShaBytesManifestAndSafeMemberNames": "PASS",
+      "actualInnerTarFreshExtraction": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-wave33-inner-u6ZEna/install",
+      "actualInnerTarAll6866FilesAndLinks": "PASS_WITH_ZERO_MISMATCHES",
+      "actualTarManifestMatchesOuterInstallManifestSha": true,
+      "zipCheckCommand": "node tools/bootstrap/verify-personal-preview.mjs --zip <exactW32> --expect-source e8348a864d7d192589e72b8099475520f841b1e5 --expect-build-id 88eb8c69b0671171 --expect-zip-sha256 0a46cd3620e00154ea13e7286dcc73e40ffad4df4522f2339e229ffcb027bc06",
+      "exit": 0,
+      "result": "VERIFIED_STATIC",
+      "archiveCRCAndBoundedStandardUnpack": true,
+      "allOuterAndInnerFilesLinksAndModes": "PASS",
+      "runtimeLicenseAndOriginalCommandTemplates": "PASS",
+      "reviewedHelperSha256": "8de31c59d8c9afe90d6464a9b9208d3757a57e76ea49d7af20e473b90360c5dc",
+      "knownUserDataAndCredentialPathChecks": "PASS",
+      "releaseApproved": false,
+      "packageCodeExecuted": false
+    },
+    "sourceClosure": {
+      "reportedStatusCount": "209/209",
+      "actualClosureJsonRecords": 197,
+      "uniqueSourcePaths": 192,
+      "independentAllRecordedGitSourceHashes": "PASS",
+      "mismatches": [],
+      "note": "The status/manifest209 is a stale count. The actual new closure JSON has197 matching records, including192 unique paths. This is a reporting-count correction, not an inner-manifest missing-file defect."
+    },
+    "sourceComposition": {
+      "diffMain58b4ToBuildE834AppsPackages": "EMPTY",
+      "mainTerminalLeaseFixB72IsAncestor": true,
+      "installedGuide1498IsAncestor": true,
+      "interpretation": "This is a genuine successor to4dcd R2, with main terminal-lease repair and packaged guide, not a relabelled predecessor. It does not automatically include later A/C/F/G/J candidate changes."
+    },
+    "actualPackagedSourcemap": {
+      "method": "Hash each immutable console sourcemap against install.json; parse structured sources/sourcesContent for App/TrialWorkspace/transport/download hook only",
+      "App": ["download callback", "7/30 window callback"],
+      "TrialWorkspace": ["download callback", "7/30 window callback"],
+      "transport": ["downloadUsageObservation", "/v1/insights/export"],
+      "downloadHook": ["downloadUsageObservation"],
+      "installedGuideEntryPresent": true
+    },
+    "DSubmittedDeveloperResults": {
+      "newOuterColdHome": "Submitted Start.command discussion-only, health and original Stop.command records",
+      "installedWindowExport": "13/13",
+      "installedJ": "6/6",
+      "installedF": "8/8",
+      "upgradeR2ToW32": "7/7 including binary rollback without data loss",
+      "upgradeLimits": "Same schema and no seeded business rows; not a schema-migration or nonempty business-preservation proof",
+      "newOuterBackup": { "status": "CREATED", "entries": 1, "artifacts": 0, "databaseEventSeq": 0 },
+      "newOuterRestore": { "status": "RESTORED", "entries": 1, "databaseEventSeq": 0, "pendingRebind": 0 },
+      "backupLimit": "Current W32 records prove backup/restore mechanics over an eventSeq0 database, not the status's claimed nonempty business/artifact recovery. Keep old R2 nonempty controlled relocation evidence under its original subject.",
+      "scope": "D candidate/developer evidence; this audit repeated only static/hash/source checks, no live lifecycle or browser flow"
+    },
+    "independentEOnThisInnerOrOuter": "NOT_REACHED",
+    "admission": "Coherent, statically verified newer engineering candidate with actual package-byte developer consumers; complete product, same-subject independent functional acceptance, nonempty business recovery, native and cross-machine admission remain separate."
+  },
+  "actualEProgress": {
+    "counts": { "PASS": 290, "FAIL": 0, "NOT_TESTED": 20 },
+    "actualSubject": {
+      "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "buildId": "8296720d8a25f38c",
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "tarBytes": 20481470,
+      "name": "R1"
+    },
+    "independentRecordedOracle": {
+      "method": "Actual E evaluateRelease/tier/resolveFixtureDigest with complete real report, clean measured source and recorded checkedAt; no freshness renewal",
+      "ordinary": { "tier": "installed-alpha", "required": 197, "ok": true },
+      "functional": { "tier": "installed-functional", "required": 198, "ok": true },
+      "fullProduct": { "required": 199, "ok": false, "failures": ["E5-NATIVE-DELIVERY missing", "E5-NATIVE-CONTROL not executed/native evidence absent"] }
+    },
+    "newTarLifecycleConsumer": {
+      "case": "E32-ZIP-LIFECYCLE",
+      "actualEntry": "tests/product-acceptance/cases/w32-zip.mjs runZip -> loadFrozenArtifact target -> extractFrozen tar -> original bin/pa",
+      "actuallyConsumesOuterZip": false,
+      "rawLimitation": "The distribution is installed from the frozen tar into a private directory; no other ZIP is produced or consumed.",
+      "positive": "Same R1 tar first-run, model-unconfigured and local-mock-configured discussion, project import, one controlled fixture delivery, original stop, nonempty backup22entries/20artifacts and same-fixture reopened delivered Work4artifacts are actual new recorded progress.",
+      "notProven": "W32 inner88eb, the new outer ZIP and bundled Node/Start/Settings/Stop entry lifecycle are not independently measured by this case."
+    },
+    "journeyProducerProgress": {
+      "personalProjectPreviews": ["needs_input", "needs_input"],
+      "executions": ["project-atlas", "project-atlas"],
+      "personalScopedObservationStatus": [403, 403],
+      "newExplicitOriginalProjectCase": "E32-ORIGINAL-PROJECT-APPLICABLE NOT_TESTED, with honest same-project limitation",
+      "reopenChangedToFixture": true,
+      "actualSameFixtureWorkFound": [true, true],
+      "actualSameFixtureWorkPhase": ["delivered", "delivered"],
+      "actualSameFixtureWorkArtifacts": [4, 4],
+      "interpretation": "Same-fixture Work persistence is now truly demonstrated. The broader original registered-project journey remains unimplemented/unmeasured; the new NOT_TESTED entry is recognition, not completion."
+    }
+  },
+  "pureRechecks": {
+    "method": "Actual E packaged-instance with mocked child_process/ps/package result and captured process.kill; only synthetic private root data. Actual complete recorded oracle mutations separately evaluated without runtime.",
+    "originalKnownLiveBirthNoSet": { "clean": false, "retained": true, "reason": "resources_unverified", "signals": [], "status": "ORIGINAL_COUNTEREXAMPLE_CLOSED" },
+    "parentExitedKnownChildFullSet": { "clean": false, "retained": true, "reason": "known_resource_alive_after_package_stop", "signals": [], "status": "PRESERVED" },
+    "parentExitedMissingSetUnknownChild": { "clean": true, "retained": false, "preStopSet": 0, "syntheticOwnChildStillAlive": true, "signals": [], "status": "INCOMPLETE_SET_POLICY_STILL_OPEN" },
+    "oldJourneyNeedsInput403SingleFixtureMutation": "FULL_RECORDED_FUNCTIONAL_ORACLE_STILL_PASS198",
+    "reopenFoundFalsePhaseNullArtifacts0Mutation": "FULL_RECORDED_FUNCTIONAL_ORACLE_STILL_PASS198",
+    "newZipLifecycleEmptyPostStopArraysMutation": "FULL_RECORDED_FUNCTIONAL_ORACLE_STILL_PASS198",
+    "globalPsCalls": 0,
+    "realSignals": 0
+  },
+  "HInstalledAcceptObservation": {
+    "sources": ["/Users/hh/Desktop/joker/superagent-agent-h/tests/operational-soak/package/lifecycle2.mjs", "/Users/hh/Desktop/joker/superagent-agent-h/reports/trial-operations/wave32/lifecycle-r1/lifecycle.json", "/Users/hh/Desktop/joker/superagent-agent-h/reports/trial-operations/wave32/lifecycle-r2/lifecycle.json"],
+    "actualSubjects": ["R1:8296720d8a25f38c", "R2:4dcd28f758bbb265"],
+    "notTheNewW32Subject": true,
+    "actualReply": "accept_candidate rejected verification_failed: Trusted artifact review is unavailable",
+    "triggerSourceLine": 170,
+    "trigger": "Wait only for actions.currentCandidate, then immediately accept; no requirement for actions.available to contain accept_candidate",
+    "productContract": {
+      "file": "/Users/hh/Desktop/joker/superagent/packages/application/src/service.ts",
+      "line": 871,
+      "acceptAvailability": "candidate plus trusted review plus passing required machine checks plus safeForNewWriter",
+      "candidatePresence": "currentCandidate is returned earlier even while phase is verifying; it is not a ready-to-accept grant",
+      "preflight": "ProductCompletion.preflight correctly refuses when its trusted current review is unavailable"
+    },
+    "comparison": "E on the same R1 waits for actions.available.includes(accept_candidate), records actual accepted/delivered fixture Works, and now reopens those fixture Works with artifacts. H's final snapshot has4 artifactIds but does not record available actions/verification state or a ready-then-accept retry.",
+    "interpretation": "H's early guard refusal is real, but a persistent installed-package accept defect is not established. Its harness can race review completion and its stale-generation rejection is intercepted by the same missing-review guard. Do not weaken that guard or conflate this with source-only acceptance. Inspect original verification status and wait for the original ready action before classifying a product defect.",
+    "liveReproductionByReviewer": false
+  },
+  "findingsOrdered": [
+    {
+      "id": "E_MISSING_RESOURCE_SET_STILL_RELEASES_AFTER_PARENT_EXIT",
+      "priority": "P1_TEST_TOOL_MATERIAL_SAFETY",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/lib/packaged-instance.mjs",
+      "line": 214,
+      "summary": "The original live-birth/no-set counterexample is fixed, but the policy is narrowed to a live launcher. If birth has exited, package STOPPED plus an empty pre-stop set still yields clean, despite unknown descendants. A dead launcher is not proof that its full operation resource set is quiescent.",
+      "reproduction": "Synthetic parent101 exited, its own child102 remains alive, no record/resources=null, package STOPPED_exit0 -> cleantrue/retainedfalse/preStop0; zero real process action",
+      "narrowCorrection": "Missing complete resource evidence for a known operation remains UNKNOWN/retained independent of parent liveness; preserve the original live-birth and complete known-child fixes. Do not discover or signal an unknown child to repair the proof.",
+      "scope": "Acceptance-tool cleanup only; it does not negate recorded package stops with complete observed resource sets."
+    },
+    {
+      "id": "E_JOURNEY_AGGREGATE_STILL_ACCEPTS_OLD_FALSE_SEMANTICS",
+      "priority": "P2_ACCEPTANCE_SEMANTICS",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/lib/release.mjs",
+      "lines": [535, 584],
+      "summary": "The producer honestly records original-project NOT_TESTED and now actually reopens fixture Works. However journeyIssues still accepts needs_input, different executionProjectId and unscoped-only observations; journeyReopenIssues still checks messages instead of found/phase/artifacts. Stronger producer assertions do not make the final report oracle reject contradictory evidence.",
+      "independentMutation": "Old needs_input/403/single-fixture and foundfalse/phasenull/artifacts0 evidence each leave the complete installed-functional198 gate passing",
+      "narrowCorrection": "Define the proven narrow fixture tier separately from original-project completion. Bind the intended original-project identity/applicable draft/scoped observations and reopened Work fields in the actual final validators, with a valid positive and independent negatives. Keep honest original-project NOT_REACHED until its consumer exists."
+    },
+    {
+      "id": "E_NEW_LIFECYCLE_ORACLE_ACCEPTS_EMPTY_POSTSTOP_EVIDENCE",
+      "priority": "P2_ACCEPTANCE_EVIDENCE_COMPLETENESS",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/lib/release.mjs",
+      "line": 511,
+      "summary": "zipLifecycleIssues does not reuse the strict fixed-set checks used by stopFunctionalIssues: empty unconfigured after arrays and absent configured/reopen observations can satisfy clean flags. The complete oracle accepts replacing all these post-stop arrays with empty arrays.",
+      "narrowCorrection": "Apply exact pre/post pid/start/explicit-liveness/identity coverage to every lifecycle phase and require original package status/exit, instead of accepting clean as sufficient. Retain the genuine submitted complete positive sets."
+    }
+  ],
+  "minimalNextWholeOutcome": {
+    "goal": "One frozen integrated product subject independently completes its actual external entry, original-project work, persistence and recovery-data lifecycle with reliable resource/evidence semantics.",
+    "scope": [
+      "Consume the already-existing exact W32 ZIP/manifest and bundled original entry; do not create another wrapper or use the old R1 tar to certify it.",
+      "Close missing-set cleanup and lifecycle oracle gaps before broad live runs, preserving UNKNOWN materials and original stop authority.",
+      "Use each original project with a truly applicable draft and same-project create/check/candidate/manual acceptance; observe that selected project's7/30 data and reopen the exact Work/phase/artifacts. Keep unsupported original-project mode paths honestly blocked.",
+      "On that same subject seed real controlled business/answer/artifact data, then nonempty backup, verify, second-root read-only content and no-resend checks. The W32 eventSeq0 backup is a mechanics positive, not that outcome."
+    ],
+    "notNewTaskDispatch": true,
+    "noNewBudgetOrNativeAuthorization": true
+  },
+  "limits": {
+    "newServicesStarted": 0,
+    "startStopCommandsExecuted": 0,
+    "realSignals": 0,
+    "globalProcessDiscovery": 0,
+    "realModelVendorNativeTurns": 0,
+    "newTarsOrZips": 0,
+    "candidateOrAssertionEdits": 0,
+    "allReviewerExecSessionsCompleted": true,
+    "preserved": "All twelve user service pairs and every candidate/state/profile/tar/ledger/history/run",
+    "completion": "No completion percentage or full engineering admission is inferred from additional PASS counts or package existence."
+  }
+}

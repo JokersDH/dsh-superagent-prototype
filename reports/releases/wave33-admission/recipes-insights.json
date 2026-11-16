@@ -1,0 +1,44 @@
+{
+  "protocol": "wave33-recipes-insights/1",
+  "date": "2026-11-16",
+  "fixedSources": {
+    "G": "76decf93e7f6ed6d1901d6b70851e47a6e4a5c12",
+    "J": "0c67e3b79c0a6425e657740b1187b18532448c29"
+  },
+  "checks": [
+    {
+      "role": "G",
+      "command": "node --test packages/usage-insights/test/support.case.ts packages/usage-insights/test/report-semantics.case.ts",
+      "exit": 0,
+      "passed": 11,
+      "scope": "actual display DTO/support metadata, no values/labels/details/paths, unknown origin and row/source coverage"
+    },
+    {
+      "role": "G",
+      "command": "node --test --test-name-pattern='verify --dto reports metadata|tool runs from an unrelated directory' tools/usage-insights/test/cli.case.mjs",
+      "exit": 0,
+      "passed": 2,
+      "scope": "actual private-file readonly CLI; no browser/runtime/model"
+    },
+    {
+      "role": "J",
+      "command": "node --test tools/project-recipes/test/first-user.case.ts packages/project-recipes/test/rebind.case.ts",
+      "exit": 0,
+      "passed": 10,
+      "scope": "actual NativeProjectRegistry/coordinator recipe fields/original create_work plus reidentified metadata; not full installed execution/accept/reopen"
+    }
+  ],
+  "sourceStatus": {
+    "GSupport": "SOURCE_READY_CANDIDATE_ONLY",
+    "JRebind": "SOURCE_READY_CANDIDATE_ONLY",
+    "mainExistingRecipeAndDownload": "Already implemented; not missing",
+    "mainFConsumer": "Now integrated on fc38bf65b6a05a7771fc58829152c512255a6a29"
+  },
+  "corrections": [
+    "G main schema crypto absence is not an accepted browser mismatch: Product computes exact digest and actual transport recomputes it; same-runtime download negatives pass.",
+    "J field create evidence is genuine controlled create, not complete two-root native coding/check/manualaccept/reopen."
+  ],
+  "realVendorModelNativeStarts": 0,
+  "candidateEdits": false,
+  "releaseApproved": false
+}
