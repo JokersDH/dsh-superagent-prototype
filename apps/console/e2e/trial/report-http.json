@@ -41,37 +41,37 @@
     "1440x900",
     "390x844"
   ],
-  "generatedAt": "2026-11-16T06:43:30.707Z",
+  "generatedAt": "2026-11-16T12:01:21.497Z",
   "stateRootKind": "private temporary root (not committed)",
   "results": [
     {
       "id": "HTTP-READINESS-RENDER",
       "status": "PASS",
-      "ms": 852,
+      "ms": 793,
       "detail": "real HTTP readiness and configuration render the same facts as the API"
     },
     {
       "id": "HTTP-REQUEST-BUDGET",
       "status": "PASS",
-      "ms": 4,
+      "ms": 2,
       "detail": "the page performs only bootstrap, readiness and configuration reads"
     },
     {
       "id": "HTTP-ACTION-NO-REQUEST",
       "status": "PASS",
-      "ms": 274,
+      "ms": 242,
       "detail": "navigation is a callback, not a command or a read"
     },
     {
       "id": "HTTP-RELOAD-ONE-READ",
       "status": "PASS",
-      "ms": 327,
+      "ms": 334,
       "detail": "reload is one bounded re-read with no command"
     },
     {
       "id": "HTTP-MOBILE",
       "status": "PASS",
-      "ms": 769,
+      "ms": 816,
       "detail": "the real HTTP state is usable at 390px"
     },
     {

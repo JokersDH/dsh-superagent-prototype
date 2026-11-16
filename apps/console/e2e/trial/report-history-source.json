@@ -1,0 +1,61 @@
+{
+  "subject": "trial history/source panel (controlled public-DTO fixtures; read-only; not a release verdict)",
+  "generatedAt": "2026-11-16T12:01:18.203Z",
+  "results": [
+    {
+      "id": "NON-EMPTY-ROWS",
+      "status": "PASS",
+      "ms": 694,
+      "detail": "non-empty history"
+    },
+    {
+      "id": "VERIFIED-SOURCE-BODY",
+      "status": "PASS",
+      "ms": 44,
+      "detail": "frozen body and scope review"
+    },
+    {
+      "id": "MISSING-SOURCE-IS-EXPLICIT",
+      "status": "PASS",
+      "ms": 29,
+      "detail": "missing body"
+    },
+    {
+      "id": "LIVE-CONTINUATION",
+      "status": "PASS",
+      "ms": 618,
+      "detail": "continuation merge"
+    },
+    {
+      "id": "FOREIGN-PAGE-REFUSED",
+      "status": "PASS",
+      "ms": 575,
+      "detail": "foreign project refusal"
+    },
+    {
+      "id": "SCOPE-CHANGED-BODY-WITHHELD",
+      "status": "PASS",
+      "ms": 588,
+      "detail": "scope_changed state"
+    },
+    {
+      "id": "KEYBOARD-AND-RETURN",
+      "status": "PASS",
+      "ms": 631,
+      "detail": "keyboard selection and return"
+    },
+    {
+      "id": "MOBILE-NO-OVERFLOW",
+      "status": "PASS",
+      "ms": 662,
+      "detail": "390px layout"
+    },
+    {
+      "id": "NO-UNEXPECTED-ERRORS",
+      "status": "PASS",
+      "ms": 0,
+      "detail": "page errors"
+    }
+  ],
+  "failed": []
+}

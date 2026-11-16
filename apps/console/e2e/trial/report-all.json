@@ -1,14 +1,14 @@
 {
   "subject": "trial experience suites (controlled fixtures / isolated services; not a release verdict)",
-  "generatedAt": "2026-11-16T06:43:53.415Z",
+  "generatedAt": "2026-11-16T12:01:43.190Z",
   "results": [
     {
       "id": "unit-mapping",
-      "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node --test test/trial/trial-view.case.ts test/trial/recipes.case.ts",
+      "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node --test test/trial/trial-view.case.ts test/trial/recipes.case.ts test/trial/model-connection.case.ts test/trial/history-source.case.ts",
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 120000,
-      "ms": 156
+      "ms": 200
     },
     {
       "id": "typecheck-app",
@@ -16,7 +16,7 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 240000,
-      "ms": 2197
+      "ms": 2950
     },
     {
       "id": "typecheck-e2e",
@@ -24,7 +24,7 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 240000,
-      "ms": 2080
+      "ms": 2570
     },
     {
       "id": "build",
@@ -32,7 +32,7 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 240000,
-      "ms": 525
+      "ms": 618
     },
     {
       "id": "hook-async",
@@ -40,7 +40,7 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 420000,
-      "ms": 5882
+      "ms": 5990
     },
     {
       "id": "browser-states",
@@ -48,7 +48,23 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 420000,
-      "ms": 45994
+      "ms": 45322
+    },
+    {
+      "id": "model-connection",
+      "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node e2e/trial/model-connection.mjs",
+      "exitCode": 0,
+      "signal": null,
+      "timeoutMs": 420000,
+      "ms": 6460
+    },
+    {
+      "id": "history-source",
+      "command": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node e2e/trial/history-source.mjs",
+      "exitCode": 0,
+      "signal": null,
+      "timeoutMs": 420000,
+      "ms": 4456
     },
     {
       "id": "http-journey",
@@ -56,7 +72,7 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 420000,
-      "ms": 3508
+      "ms": 3306
     },
     {
       "id": "app-targets",
@@ -64,7 +80,7 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 420000,
-      "ms": 9571
+      "ms": 8306
     },
     {
       "id": "app-two-projects",
@@ -72,7 +88,7 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 420000,
-      "ms": 2761
+      "ms": 2693
     },
     {
       "id": "app-daily-flow",
@@ -80,7 +96,7 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 600000,
-      "ms": 10348
+      "ms": 10664
     }
   ],
   "failed": []

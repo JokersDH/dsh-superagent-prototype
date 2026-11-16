@@ -46,3 +46,11 @@ export function trialSupportRows(input: {
     { label: '来源', value: info?.sourceLabel === undefined ? '未声明' : bounded(info.sourceLabel, 200) },
   ]
 }
+
+
+/** The support file is user-held material, not an automatic upload or a capability proof. */
+export const trialSupportBoundary = {
+  included: '当前项目、窗口、时间与覆盖的准入元数据、脱敏原因',
+  excluded: '原文、密钥或令牌、私有路径、用户状态',
+  sharing: '由你主动保存并分享；不会自动上传',
+} as const

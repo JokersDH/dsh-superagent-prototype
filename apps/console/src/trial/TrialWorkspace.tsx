@@ -14,7 +14,7 @@ import { trialInsightsAdmission, trialInsightsCount } from './insights.ts'
 import type { TrialRecipeSelection, TrialRecipeSuggestion } from './recipes.ts'
 import { trialRecipeContext, trialRecipeOutcome } from './recipes.ts'
 import type { TrialSupportInfo } from './support.ts'
-import { trialSupportRows } from './support.ts'
+import { trialSupportBoundary, trialSupportRows } from './support.ts'
 import type { TrialStatusValue, TrialTone } from './trial-view.ts'
 import { formatObservedAt, shortRevision, trialActions, trialHeadline, trialProjectValue, trialStrip } from './trial-view.ts'
 import './trial.css'
@@ -492,12 +492,17 @@ export function TrialWorkspace({
 
         <details className="trial-support" aria-labelledby={supportId}>
           <summary id={supportId}>支持与诊断</summary>
-          {onDownloadSupport !== undefined && <button type="button" className="icon-button" title="导出当前范围的诊断摘要"
-            aria-label="导出诊断摘要" disabled={supportDownloading} aria-busy={supportDownloading} onClick={onDownloadSupport}>
+          {onDownloadSupport !== undefined && <button type="button" className="icon-button"
+            title={supportDownloadError === undefined ? '导出当前范围的诊断摘要' : '重试导出诊断摘要'}
+            aria-label="导出诊断摘要"
+            aria-describedby={`${supportId}-scope`} disabled={supportDownloading} aria-busy={supportDownloading} onClick={onDownloadSupport}>
             <Download size={16} aria-hidden="true" />
           </button>}
-          {supportDownloading && <p className="trial-muted" role="status">正在导出诊断摘要…</p>}
-          {supportDownloadError && <p className="trial-muted" role="alert">{supportDownloadError}</p>}
+          {supportDownloading && <p className="trial-muted" role="status">正在读取当前范围并生成诊断摘要…</p>}
+          {supportDownloadError && <div className="trial-support-error">
+            <p className="trial-muted" role="alert">{supportDownloadError}</p>
+            {onDownloadSupport !== undefined && <button type="button" className="quiet" disabled={supportDownloading} onClick={onDownloadSupport}>重试</button>}
+          </div>}
           <dl className="trial-support-rows">
             {supportRows.map(row => (
               <div key={row.label} className="trial-fact">
@@ -506,6 +511,12 @@ export function TrialWorkspace({
               </div>
             ))}
           </dl>
+          <ul className="trial-support-boundary" id={`${supportId}-scope`}>
+            <li><strong>包含</strong>{trialSupportBoundary.included}</li>
+            <li><strong>不包含</strong>{trialSupportBoundary.excluded}</li>
+            <li><strong>分享</strong>{trialSupportBoundary.sharing}</li>
+          </ul>
+          <p className="trial-note">诊断摘要每次按当前项目、窗口与时间重新读取；它是可复现材料，不是执行、质量或收益证明。</p>
           {support?.note !== undefined && <p className="trial-note">{support.note}</p>}
         </details>
 

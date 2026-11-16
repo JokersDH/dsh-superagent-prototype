@@ -16,84 +16,93 @@
   "posts": [
     "/v1/commands",
     "/v1/commands",
-    "/v1/works/84cede29cdc6408bf1d757b02930ac61/review-activity",
+    "/v1/works/4b13b0359be856f99c8228d3e4d59a94/review-activity",
     "/v1/commands",
-    "/v1/works/84cede29cdc6408bf1d757b02930ac61/review-activity",
-    "/v1/projects/project-3c844cd129c02a1af5748607/recipes/preview",
-    "/v1/projects/project-3c844cd129c02a1af5748607/recipes/preview",
-    "/v1/projects/project-3c844cd129c02a1af5748607/recipes/preview",
+    "/v1/works/4b13b0359be856f99c8228d3e4d59a94/review-activity",
+    "/v1/projects/project-988e7da0cb484b81c4faf4f2/recipes/preview",
+    "/v1/projects/project-988e7da0cb484b81c4faf4f2/recipes/preview",
+    "/v1/projects/project-988e7da0cb484b81c4faf4f2/recipes/preview",
     "/v1/commands",
-    "/v1/works/d70bf5d535849c0a5627ccbc41f639b0/review-activity",
+    "/v1/works/6420704865e57d7a01b93dee19043fb0/review-activity",
     "/v1/commands",
-    "/v1/works/d70bf5d535849c0a5627ccbc41f639b0/review-activity",
-    "/v1/projects/project-e5a07bae83e61154570bebe2/recipes/preview",
-    "/v1/projects/project-e5a07bae83e61154570bebe2/recipes/preview",
-    "/v1/projects/project-e5a07bae83e61154570bebe2/recipes/preview",
+    "/v1/works/6420704865e57d7a01b93dee19043fb0/review-activity",
+    "/v1/projects/project-9e282ff00f6d4de8e09c373c/recipes/preview",
+    "/v1/projects/project-9e282ff00f6d4de8e09c373c/recipes/preview",
+    "/v1/projects/project-9e282ff00f6d4de8e09c373c/recipes/preview",
     "/v1/commands",
-    "/v1/works/f6262b21e3a71a838a5a82b22b9113f9/review-activity",
+    "/v1/works/46225d8109a5e8fc90bec8e72193e266/review-activity",
     "/v1/commands",
-    "/v1/projects/project-e5a07bae83e61154570bebe2/recipes/preview",
-    "/v1/projects/project-e5a07bae83e61154570bebe2/recipes/preview",
-    "/v1/projects/project-e5a07bae83e61154570bebe2/recipes/preview",
-    "/v1/projects/project-e5a07bae83e61154570bebe2/recipes/preview",
-    "/v1/projects/project-e5a07bae83e61154570bebe2/recipes/preview",
-    "/v1/projects/project-e5a07bae83e61154570bebe2/recipes/preview",
-    "/v1/projects/project-e5a07bae83e61154570bebe2/recipes/preview",
-    "/v1/projects/project-e5a07bae83e61154570bebe2/recipes/preview",
-    "/v1/projects/project-e5a07bae83e61154570bebe2/recipes/preview"
+    "/v1/projects/project-9e282ff00f6d4de8e09c373c/recipes/preview",
+    "/v1/projects/project-9e282ff00f6d4de8e09c373c/recipes/preview",
+    "/v1/projects/project-9e282ff00f6d4de8e09c373c/recipes/preview",
+    "/v1/projects/project-9e282ff00f6d4de8e09c373c/recipes/preview",
+    "/v1/projects/project-9e282ff00f6d4de8e09c373c/recipes/preview",
+    "/v1/projects/project-9e282ff00f6d4de8e09c373c/recipes/preview",
+    "/v1/projects/project-9e282ff00f6d4de8e09c373c/recipes/preview",
+    "/v1/projects/project-9e282ff00f6d4de8e09c373c/recipes/preview",
+    "/v1/projects/project-9e282ff00f6d4de8e09c373c/recipes/preview",
+    "/v1/projects/project-9e282ff00f6d4de8e09c373c/recipes/preview",
+    "/v1/projects/project-9e282ff00f6d4de8e09c373c/recipes/preview",
+    "/v1/projects/project-9e282ff00f6d4de8e09c373c/recipes/preview"
   ],
   "modelCalls": 0,
   "reviewActivityConflicts": 2,
   "expectedPreviewAborts": 3,
-  "generatedAt": "2026-11-16T06:43:53.310Z",
+  "generatedAt": "2026-11-16T12:01:43.089Z",
   "results": [
     {
       "id": "ALPHA-QUESTION-VERIFY-EVIDENCE-ACCEPT",
       "status": "PASS",
-      "ms": 1537,
+      "ms": 2117,
       "detail": "Alpha delegation, native question, answer, PASS verification, evidence and acceptance"
     },
     {
       "id": "ALPHA-TRIAL-IDENTITY",
       "status": "PASS",
-      "ms": 134,
+      "ms": 136,
       "detail": "the trial view shows the Alpha project, conversation and fixture execution honestly"
     },
     {
       "id": "BETA-DRAFT-AND-DELIVERY",
       "status": "PASS",
-      "ms": 1847,
+      "ms": 1429,
       "detail": "Beta delegation runs the pass fixture through verification and acceptance"
     },
     {
       "id": "BETA-TRIAL-AND-DRAFT-PRESERVED",
       "status": "PASS",
-      "ms": 195,
+      "ms": 198,
       "detail": "the second project keeps its own conversation, draft and delivery"
     },
     {
       "id": "MULTI-WORK-STATES",
       "status": "PASS",
-      "ms": 3110,
+      "ms": 3128,
       "detail": "failed, pending-question, delivered and accepted works stay distinct and correctly scoped"
     },
     {
       "id": "TRIAL-RECIPE-RETRY",
       "status": "PASS",
-      "ms": 162,
+      "ms": 191,
       "detail": "recipe failure and retry work in the actual App without a hidden business write"
     },
     {
       "id": "DAILY-VIEWS-RETURN-TO-ORIGINAL",
       "status": "PASS",
-      "ms": 152,
+      "ms": 151,
       "detail": "decisions/works/delivery return to the original work without losing the draft"
     },
     {
       "id": "RELOAD-AND-EXISTING-HISTORY",
       "status": "PASS",
-      "ms": 1100,
+      "ms": 1135,
       "detail": "reload keeps delivered history/evidence and honest project identity; drafts are not invented"
+    },
+    {
+      "id": "MOBILE-390-KEYBOARD-AND-RETURN",
+      "status": "PASS",
+      "ms": 205,
+      "detail": "390px, keyboard reachability and return to the original conversation"
     },
     {
       "id": "NO-MODEL-NO-UNEXPECTED-POSTS",

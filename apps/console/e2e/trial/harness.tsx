@@ -7,9 +7,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { createRoot } from 'react-dom/client'
-import type { ApplicationConfiguration, TrialReadiness, TrialNavigationAction } from '@personal-agent/contracts'
+import type { ApplicationConfiguration, ContextHistory, TrialReadiness, TrialNavigationAction } from '@personal-agent/contracts'
 import { HttpTransport } from '../../src/transport.ts'
 import { TrialWorkspace } from '../../src/trial/TrialWorkspace.tsx'
+import { TrialModelConnectionForm } from '../../src/trial/ModelConnectionForm.tsx'
+import { HistorySourcePanel } from '../../src/trial/HistorySourcePanel.tsx'
+import { trialHistoryMerge } from '../../src/trial/history-source.ts'
 import { useTrialReadiness } from '../../src/trial/useTrialReadiness.ts'
 import type { TrialHarnessState } from './fixtures.ts'
 import { trialHarnessProps, trialProbePair, trialStates } from './fixtures.ts'
@@ -35,6 +38,7 @@ declare global {
     __TRIAL_EXPORTS__?: number
     __TRIAL_RECIPE_RELOADS__?: number
     __TRIAL_SAME_READS__?: number
+    __TRIAL_MODEL_CALLS__?: { endpoint: string; model: string; apiKey: string }[]
   }
 }
 
@@ -51,6 +55,7 @@ window.__TRIAL_RECIPES__ = []
 window.__TRIAL_WINDOWS__ = []
 window.__TRIAL_EXPORTS__ = 0
 window.__TRIAL_RECIPE_RELOADS__ = 0
+window.__TRIAL_MODEL_CALLS__ = []
 const nativeFetch = window.fetch.bind(window)
 window.fetch = ((input: RequestInfo | URL, init?: RequestInit) => {
   requests.push(typeof input === 'string' ? input : input instanceof URL ? input.href : input.url)
@@ -380,6 +385,108 @@ function AuthExpiryHarness() {
   )
 }
 
+function ModelFormHarness() {
+  const params = new URLSearchParams(window.location.search)
+  const outcome = params.get('outcome') ?? 'connected'
+  const [identity, setIdentity] = useState<'a' | 'b'>('a')
+  const [mounted, setMounted] = useState(true)
+  return (
+    <HarnessFrame controls={(
+      <>
+        <span data-harness-identity>{identity}</span>
+        <button type="button" data-harness="switch" onClick={() => setIdentity(value => value === 'a' ? 'b' : 'a')}>切换身份</button>
+        <button type="button" data-harness="unmount" onClick={() => setMounted(false)}>卸载表单</button>
+      </>
+    )}>
+      {mounted ? <TrialModelConnectionForm identity={identity} availability={outcome === 'unavailable' ? { enabled: false, reason: '当前设置未提供模型连接' } : { enabled: true }}
+        onCancel={() => writeLog('cancel')}
+        onConnect={async draft => {
+          window.__TRIAL_MODEL_CALLS__?.push({ ...draft })
+          if (outcome === 'slow') await new Promise(resolve => setTimeout(resolve, 1200))
+          if (outcome === 'leak') return { status: 'failed', message: `provider rejected ${draft.apiKey} at /Users/private/key` }
+          if (outcome === 'failed') return { status: 'failed', message: '端点拒绝连接，请检查密钥。' }
+          return { status: 'connected', message: '连接已由主程序确认。' }
+        }} /> : <p data-unmounted="true">unmounted</p>}
+    </HarnessFrame>
+  )
+}
+
+function HistoryHarness() {
+  const params = new URLSearchParams(window.location.search)
+  const scenario = params.get('scenario') ?? 'verified'
+  const [selected, setSelected] = useState('msg-1')
+  const [more, setMore] = useState(false)
+  const [page, setPage] = useState<ContextHistory>({
+    protocol: 'context-history/1' as const, projectId: scenario === 'foreign' ? 'project-beta' : 'project-atlas',
+    conversationId: 'conv-alpha', observedAt: '2026-11-16T00:10:00.000Z',
+    entries: [
+      { messageId: 'msg-1', projectId: scenario === 'foreign' ? 'project-beta' : 'project-atlas', conversationId: 'conv-alpha',
+        confirmedAt: '2026-11-16T00:01:00.000Z', expiresAt: '2026-11-16T00:06:00.000Z', selections: ['work'] as const,
+        sourceCount: 2, message: { state: 'available' as const, text: '为项目补充回归检查，并保留原范围。', truncated: false } },
+      { messageId: 'msg-2', projectId: scenario === 'foreign' ? 'project-beta' : 'project-atlas', conversationId: 'conv-alpha',
+        confirmedAt: '2026-11-16T00:02:00.000Z', expiresAt: '2026-11-16T00:07:00.000Z', selections: ['work'] as const,
+        sourceCount: 1, message: { state: 'missing' as const, truncated: false } },
+    ],
+    hasMore: !more, ...(more ? {} : { nextCursor: 'cursor-1' }),
+  } as ContextHistory)
+  const baseState = scenario === 'missing' ? 'missing' : scenario === 'scopechanged' ? 'scope_changed' : 'verified'
+  const sourceState = selected === 'msg-2' && baseState === 'verified' ? 'missing' : baseState
+  const sources = sourceState === 'verified' ? {
+    protocol: 'context-sources/1', observedAt: '2026-11-16T00:11:00.000Z', state: 'verified',
+    binding: { protocol: 'assistant-context-binding/1', commandId: 'cmd-1', messageId: selected, requestId: 'req-1',
+      projectId: 'project-atlas', conversationId: 'conv-alpha', userTextDigest: 'a'.repeat(64),
+      principal: { userId: 'user-1', authorityRef: 'auth-1' }, purpose: 'conversation_discussion',
+      scope: { projectId: 'project-atlas', allowedPaths: ['src/'], excludedPaths: [], externalActions: [] },
+      selections: ['work'], bundleRef: 'bundle-1', bundleDigest: 'b'.repeat(64),
+      sources: [{ sourceId: 'source-1', kind: 'work', sourceDigest: 'c'.repeat(64), previewDigest: 'd'.repeat(64), truncated: false }],
+      confirmedAt: '2026-11-16T00:01:00.000Z', expiresAt: '2026-11-16T00:06:00.000Z' },
+    sources: [{ sourceId: 'source-1', kind: 'work', title: '工作合同摘要', path: 'work.json', content: JSON.stringify({ work: { title: '补充回归检查' }, criteria: [{ description: '现有检查通过' }] }),
+      sourceDigest: 'c'.repeat(64), previewDigest: 'd'.repeat(64), bytes: 2048, estimatedTokens: 300, truncated: false }],
+    omitted: [], injectionFlags: [], scopeReview: { protocol: 'context-scope-review/1', reasons: ['selection_narrowed'], partial: false, withheldSourceCount: 0, authorization: 'none' },
+  } as unknown as import('@personal-agent/contracts').ContextSources : {
+    protocol: 'context-sources/1', observedAt: '2026-11-16T00:11:00.000Z', state: sourceState,
+    binding: { protocol: 'assistant-context-binding/1', commandId: 'cmd-1', messageId: selected, requestId: 'req-1',
+      projectId: 'project-atlas', conversationId: 'conv-alpha', userTextDigest: 'a'.repeat(64),
+      principal: { userId: 'user-1', authorityRef: 'auth-1' }, purpose: 'conversation_discussion',
+      scope: { projectId: 'project-atlas', allowedPaths: ['src/'], excludedPaths: [], externalActions: [] },
+      selections: ['work'], bundleRef: 'bundle-1', bundleDigest: 'b'.repeat(64),
+      sources: [{ sourceId: 'source-1', kind: 'work', sourceDigest: 'c'.repeat(64), previewDigest: 'd'.repeat(64), truncated: false }],
+      confirmedAt: '2026-11-16T00:01:00.000Z', expiresAt: '2026-11-16T00:06:00.000Z' },
+    sources: [], omitted: [], injectionFlags: [], scopeReview: { protocol: 'context-scope-review/1', reasons: [], partial: true, withheldSourceCount: 1, authorization: 'none' },
+  } as unknown as import('@personal-agent/contracts').ContextSources
+  return (
+    <HarnessFrame controls={(
+      <>
+        <button type="button" data-harness="load-more" onClick={() => {
+          const next = { ...page, entries: [...page.entries, { messageId: 'msg-3', projectId: page.projectId, conversationId: 'conv-alpha',
+            confirmedAt: '2026-11-16T00:03:00.000Z', expiresAt: '2026-11-16T00:08:00.000Z', selections: ['work'] as const,
+            sourceCount: 1, message: { state: 'available' as const, text: '第三条历史记录', truncated: false } }], hasMore: false }
+          setPage(next)
+          setMore(true)
+        }}>读取更多</button>
+        <button type="button" data-harness="select-second" onClick={() => setSelected('msg-2')}>选择第二条</button>
+      </>
+    )}>
+      <HistorySourcePanel history={page} scope={{ projectId: 'project-atlas', conversationId: 'conv-alpha' }}
+        selectedMessageId={selected} sources={sources} onSelect={entry => setSelected(entry.messageId)} onLoadMore={() => {
+          // Exercise the pure merge guard through the same state update the real handler uses.
+          const previous = { entries: page.entries, hasMore: page.hasMore, observedAt: page.observedAt, ...(page.nextCursor ? { nextCursor: page.nextCursor } : {}) }
+          const merged = trialHistoryMerge(previous, {
+            protocol: page.protocol, projectId: page.projectId, conversationId: page.conversationId, observedAt: page.observedAt,
+            entries: [{ messageId: 'msg-3', projectId: page.projectId, conversationId: 'conv-alpha',
+              confirmedAt: '2026-11-16T00:03:00.000Z', expiresAt: '2026-11-16T00:08:00.000Z', selections: ['work'] as const,
+              sourceCount: 1, message: { state: 'available' as const, text: '第三条历史记录', truncated: false } }], hasMore: false,
+          })
+          if (merged.ok) {
+            const { nextCursor: omitted, ...rest } = page
+            void omitted
+            setPage({ ...rest, entries: merged.page.entries, hasMore: merged.page.hasMore })
+          }
+        }} onOpenConversation={() => writeLog('open-conversation')} />
+    </HarnessFrame>
+  )
+}
+
 function App() {
   const params = new URLSearchParams(window.location.search)
   const mode = params.get('mode') ?? 'props'
@@ -393,6 +500,8 @@ function App() {
   if (mode === 'identity-same') return <SameTransportIdentityHarness />
   if (mode === 'disabled') return <DisabledHarness />
   if (mode === 'auth-expiry') return <AuthExpiryHarness />
+  if (mode === 'model-form') return <ModelFormHarness />
+  if (mode === 'history') return <HistoryHarness />
   return <PropsHarness state={state} />
 }
 

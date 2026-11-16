@@ -1,0 +1,79 @@
+{
+  "subject": "trial model connection form (controlled local callback; no model/native request; not a release verdict)",
+  "generatedAt": "2026-11-16T12:01:13.748Z",
+  "results": [
+    {
+      "id": "FIELDS-AND-PASSWORD",
+      "status": "PASS",
+      "ms": 697,
+      "detail": "controlled form fields"
+    },
+    {
+      "id": "NO-PREMATURE-SIDE-EFFECT",
+      "status": "PASS",
+      "ms": 69,
+      "detail": "no storage/url/fetch before submit"
+    },
+    {
+      "id": "SUBMIT-CLEARS-AND-CALLS-ONCE",
+      "status": "PASS",
+      "ms": 35,
+      "detail": "transient key lifecycle"
+    },
+    {
+      "id": "LEAKY-FEEDBACK-IS-REFUSED",
+      "status": "PASS",
+      "ms": 652,
+      "detail": "sanitised failure"
+    },
+    {
+      "id": "FAILED-CONNECTION-KEEPS-EDITABLE-FORM",
+      "status": "PASS",
+      "ms": 664,
+      "detail": "failure remains recoverable"
+    },
+    {
+      "id": "IDENTITY-CHANGE-CLEARS-SECRET",
+      "status": "PASS",
+      "ms": 649,
+      "detail": "secret lifecycle across identity"
+    },
+    {
+      "id": "UNMOUNT-CLEARS-AND-DOES-NOT-SUBMIT",
+      "status": "PASS",
+      "ms": 621,
+      "detail": "unmount lifecycle"
+    },
+    {
+      "id": "UNAVAILABLE-ENTRY",
+      "status": "PASS",
+      "ms": 586,
+      "detail": "old API / no callback fallback"
+    },
+    {
+      "id": "CANCEL-IS-NAVIGATION-ONLY",
+      "status": "PASS",
+      "ms": 618,
+      "detail": "explicit cancel"
+    },
+    {
+      "id": "KEYBOARD-ORDER",
+      "status": "PASS",
+      "ms": 585,
+      "detail": "bounded keyboard path"
+    },
+    {
+      "id": "MOBILE-NO-OVERFLOW",
+      "status": "PASS",
+      "ms": 673,
+      "detail": "390px layout"
+    },
+    {
+      "id": "NO-UNEXPECTED-ERRORS",
+      "status": "PASS",
+      "ms": 0,
+      "detail": "page errors"
+    }
+  ],
+  "failed": []
+}

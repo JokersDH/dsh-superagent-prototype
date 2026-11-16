@@ -303,6 +303,47 @@ try {
     check(await page.locator('.composer textarea').inputValue() === '', 'an unsent in-memory draft is not fabricated after a full reload')
   }, 'reload keeps delivered history/evidence and honest project identity; drafts are not invented')
 
+  await step('MOBILE-390-KEYBOARD-AND-RETURN', async () => {
+    await page.setViewportSize({ width: 390, height: 844 })
+    await openTrial()
+    const trial = page.locator('.trial-view')
+    await trial.waitFor()
+    const layout = await page.evaluate(() => {
+      const view = document.querySelector('.trial-view')
+      const actions = [...document.querySelectorAll('.trial-actions button')]
+      return {
+        overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        viewWidth: view?.getBoundingClientRect().width ?? 0,
+        viewport: document.documentElement.clientWidth,
+        actionHeights: actions.map(button => button.getBoundingClientRect().height),
+        actionWidths: actions.map(button => button.getBoundingClientRect().width),
+      }
+    })
+    check(layout.overflow <= 1, `mobile trial view has no horizontal overflow (${layout.overflow})`)
+    check(layout.viewWidth > 0 && layout.viewWidth <= layout.viewport, 'the trial view fits the 390px viewport')
+    check(layout.actionHeights.every(height => height >= 32), `action targets keep a usable height: ${JSON.stringify(layout.actionHeights)}`)
+    check(layout.actionWidths.every(width => width > 0), 'action targets are not collapsed')
+    const primary = trial.locator('.trial-actions button').first()
+    await primary.focus()
+    await page.keyboard.press('Tab')
+    const focusName = await page.evaluate(() => {
+      const element = document.activeElement
+      return element?.textContent?.trim() ?? ''
+    })
+    check(focusName.length > 0, 'Tab moves to a named control')
+    await trial.locator('.trial-support summary').click()
+    const support = await trial.locator('.trial-support').innerText()
+    check(support.includes('包含') && support.includes('不包含') && support.includes('不会自动上传'), 'support scope and sharing boundary are explicit on mobile')
+    const details = page.locator('.trial-support summary')
+    await details.focus()
+    await page.keyboard.press('Enter')
+    check(!(await trial.locator('.trial-support-rows').isVisible()), 'keyboard can collapse the diagnostics again')
+    await page.locator('.trial-view').screenshot({ path: join(screenshots, 'daily-flow-390.png') })
+    await page.locator('.rail-button[aria-label="主对话视图"]').click()
+    check(await page.locator('.composer textarea').count() === 1, 'mobile keyboard navigation returns to the original conversation')
+    await page.setViewportSize({ width: 1440, height: 900 })
+  }, '390px, keyboard reachability and return to the original conversation')
+
   await step('NO-MODEL-NO-UNEXPECTED-POSTS', async () => {
     check(modelCalls === 0, 'no model call was made')
     const unexpected = posts.filter(path => path !== '/v1/commands' && path !== '/v1/session' &&

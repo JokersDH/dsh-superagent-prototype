@@ -6,18 +6,18 @@
   },
   "viewport": "1440x900",
   "stateRootKind": "private temporary root (not committed)",
-  "generatedAt": "2026-11-16T06:43:40.274Z",
+  "generatedAt": "2026-11-16T12:01:29.807Z",
   "results": [
     {
       "id": "SHELL",
       "status": "PASS",
-      "ms": 39,
+      "ms": 34,
       "detail": "chat, works, decisions, executors, model settings and import entries all exist"
     },
     {
       "id": "TARGET-INSPECT-EXECUTOR",
       "status": "PASS",
-      "ms": 47,
+      "ms": 43,
       "detail": "inspect_executor opens the real executor directory"
     },
     {
@@ -29,13 +29,13 @@
     {
       "id": "TARGET-CONFIGURE-MODEL",
       "status": "PASS",
-      "ms": 194,
+      "ms": 200,
       "detail": "configure_model opens the real model settings panel"
     },
     {
       "id": "TARGET-CONVERSATION",
       "status": "PASS",
-      "ms": 43,
+      "ms": 41,
       "detail": "open_conversation returns to the real main conversation"
     },
     {

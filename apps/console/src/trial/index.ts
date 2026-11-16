@@ -10,7 +10,7 @@ export type { TrialAction, TrialActionsInput, TrialProjectValue, TrialStatusStri
 export { trialInsightsAdmission, trialInsightsCount, trialInsightsScopeLabel } from './insights.ts'
 export { trialRecipeContext, trialRecipeOutcome } from './recipes.ts'
 export type { TrialSupportInfo, TrialSupportRow } from './support.ts'
-export { trialSupportRows } from './support.ts'
+export { trialSupportBoundary, trialSupportRows } from './support.ts'
 export type {
   TrialRecipeCheckRef, TrialRecipeCheckView, TrialRecipeContext, TrialRecipeContextProject, TrialRecipeKind,
   TrialRecipeMissingInput, TrialRecipeOutcome, TrialRecipeProfileRef, TrialRecipeProfileView, TrialRecipeProject,
@@ -19,3 +19,17 @@ export type {
 export type {
   TrialInsightsAdmission, TrialInsightsLayer, TrialInsightsMetric, TrialInsightsScope, TrialInsightsView,
 } from './insights.ts'
+export { TrialModelConnectionForm } from './ModelConnectionForm.tsx'
+export type { TrialModelConnectionFormProps } from './ModelConnectionForm.tsx'
+export { trialConnectionMessage, trialModelConnectionDraft, trialModelConnectionFallback } from './model-connection.ts'
+export type {
+  TrialModelConnectionDraft, TrialModelConnectionFailure, TrialModelConnectionField, TrialModelConnectionLimit,
+  TrialModelConnectionResult, TrialModelConnectionValidation,
+} from './model-connection.ts'
+export { HistorySourcePanel } from './HistorySourcePanel.tsx'
+export type { HistorySourcePanelProps } from './HistorySourcePanel.tsx'
+export {
+  trialHistoryAdmission, trialHistoryMerge, trialScopeReasonLabel, trialSourceExcerpt, trialSourceKindLabel,
+  trialSourceStateLabel, trialSourcesAdmission,
+} from './history-source.ts'
+export type { TrialHistoryAdmission, TrialHistoryPage, TrialHistoryReason, TrialHistoryScope, TrialSourceReason } from './history-source.ts'

@@ -1,0 +1,239 @@
+{
+  "schemaVersion": 10,
+  "owner": "F",
+  "wave": "product-wave-34",
+  "goal": "one whole goal over two continuous engineering packages: (1) multi-project/multi-Work daily flow, safe first-use model connection, error/identity/draft recovery; (2) real history/source body browsing, reproducible support feedback, mobile/keyboard/WebKit/perf quality",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-f",
+  "branch": "codex/g4-trial-experience",
+  "fixedStart": "69e14a08",
+  "baseMain": "6b306514",
+  "mergedMain": "6b306514",
+  "mergeCommit": "2abf562e",
+  "merge": "git fetch origin && git merge origin/main -> exit 0, no conflicts; main head 6b306514",
+  "dirty": "owned trial src/test/e2e + docs/user-guide + reports/trial-experience only; main-owned reports/releases changes produced by main browser tests were restored with git checkout",
+  "state": "TWO_PACKAGES_SOURCE_AND_CONTROLLED_DELIVERED; WHOLE_GOAL_NOT_COMPLETE: F2 form and F4 panel are not mounted by main App yet, and WebKit/200%/screen-reader remain untested",
+  "source": {
+    "new": [
+      "apps/console/src/trial/model-connection.ts",
+      "apps/console/src/trial/ModelConnectionForm.tsx",
+      "apps/console/src/trial/history-source.ts",
+      "apps/console/src/trial/HistorySourcePanel.tsx",
+      "apps/console/test/trial/model-connection.case.ts",
+      "apps/console/test/trial/history-source.case.ts",
+      "apps/console/e2e/trial/model-connection.mjs",
+      "apps/console/e2e/trial/history-source.mjs",
+      "reports/trial-experience/wave34-f2-model-connection-handoff.md",
+      "reports/trial-experience/wave34-f4-history-source-handoff.md",
+      "reports/trial-experience/wave34-webkit.json"
+    ],
+    "changed": [
+      "apps/console/src/trial/TrialWorkspace.tsx (support boundary, retry action, stable export label)",
+      "apps/console/src/trial/support.ts (trialSupportBoundary)",
+      "apps/console/src/trial/trial.css (model/history/support styles)",
+      "apps/console/src/trial/index.ts (exports)",
+      "apps/console/e2e/trial/harness.tsx (model-form/history controlled harnesses)",
+      "apps/console/e2e/trial/app-daily-flow.mjs (actual App 390/keyboard/support step)",
+      "apps/console/e2e/trial/run-all.mjs (12 suites)",
+      "docs/user-guide/README.zh-CN.md",
+      "docs/user-guide/03-trial-readiness.zh-CN.md"
+    ]
+  },
+  "outcomes": {
+    "F1": {
+      "status": "DELIVERED_ACTUAL_CONTROLLED",
+      "production": "existing TrialWorkspace + main App/original Work/form; this wave revalidated two projects, two conversations, multiple Works, pending question, machine FAIL, accepted/delivered and unknown states in the real App",
+      "consumer": "actual App via controlled Product/Broker/SQLite/HTTP runtime; report-daily-flow.json",
+      "positive_negative": "app-daily-flow 10/10: ALPHA question/verify/accept, BETA draft/delivery/draft preservation, MULTI-WORK-STATES, recipe retry, daily views return, reload history, no hidden POST/model",
+      "evidence": [
+        "apps/console/e2e/trial/report-daily-flow.json"
+      ]
+    },
+    "F2": {
+      "status": "SOURCE_READY_ACTUAL_CONSUMER_HELD",
+      "production": "transient ModelConnectionForm + pure validation/secret-lifecycle helpers; password input, no storage/url/console/DOM text, clear before await and on identity/unmount, sanitised feedback refuses the submitted secret and absolute paths",
+      "consumer": "NOT mounted in main App. Exact props/onConnect contract and fallback are in the handoff; main owns model wire, private save, RootHTTP/auth/origin",
+      "positive_negative": "unit 9/9; browser 12/12 (fields/password, no premature side effect, submit clear, leaky feedback refused, failure retry, identity clear, unmount, unavailable, cancel, keyboard, 390)",
+      "evidence": [
+        "apps/console/e2e/trial/report-model-connection.json",
+        "reports/trial-experience/wave34-f2-model-connection-handoff.md"
+      ]
+    },
+    "F3": {
+      "status": "DELIVERED_ACTUAL_CONTROLLED",
+      "production": "existing identity-aware readiness/probe, recipe/insight/support retry and draft-preserving navigation; model form adds identity/unmount secret cleanup",
+      "consumer": "actual App daily flow + trial async/identity/stale suites",
+      "positive_negative": "stale response, same-transport identity, inline identity, disabled, auth-expiry, unmount in flight, reload/draft preservation; no late/foreign data overwrite",
+      "evidence": [
+        "apps/console/e2e/trial/report-async.json",
+        "apps/console/e2e/trial/report-daily-flow.json"
+      ]
+    },
+    "F4": {
+      "status": "SOURCE_READY_CANDIDATE_ACTUAL_MAIN_BROWSER_VERIFIED",
+      "production": "compact read-only HistorySourcePanel + pure admission/merge/source-binding rules over ContextHistory/ContextSources; bounded body excerpt (1200 chars), live continuation, missing/scope_changed/withheld explicit, foreign page refused",
+      "consumer": "F panel is not mounted in App. Main's existing ContextHistoryPanel/ContextSources already provides actual non-empty history/source browsing and was verified in the real App; exact minimal wiring is in the handoff",
+      "positive_negative": "unit 10/10; browser 9/9; main tests/integration/context-history-browser.mjs exit 0",
+      "evidence": [
+        "apps/console/e2e/trial/report-history-source.json",
+        "reports/trial-experience/wave34-f4-history-source-handoff.md"
+      ]
+    },
+    "F5": {
+      "status": "DELIVERED_ACTUAL_CONTROLLED",
+      "production": "support details now state included/excluded/sharing boundary and re-read semantics; failed export keeps stable 导出诊断摘要 label with an in-place retry; no new collector/pipeline",
+      "consumer": "actual App consumes main GET /v1/insights/support and scoped download hook; main usage-observation browser exit 0 after fixing F's error wrapper/label regression",
+      "positive_negative": "support normal/partial/unknown/error/retry, scope/keyboard/mobile boundary in app daily flow and main usage suite; no auto upload, no secrets/raw paths",
+      "evidence": [
+        "apps/console/e2e/trial/report-daily-flow.json",
+        "tests/integration/usage-observation-browser.mjs (exit 0 final)"
+      ]
+    },
+    "F6": {
+      "status": "PARTIAL_CHROMIUM_ONLY",
+      "production": "flat fixed-height controls, 390px layout, keyboard focus/Tab/Enter, long text and support/history panels; no global theme change",
+      "consumer": "actual App 390 step and controlled harness 390 layouts; Chromium 1440/390",
+      "positive_negative": "MOBILE-390-KEYBOARD-AND-RETURN pass; model/history 390 no overflow; main App no browser errors",
+      "not_tested": [
+        "WebKit binary absent",
+        "real 200% browser zoom",
+        "screen reader",
+        "long-duration performance/48h",
+        "installed artifact"
+      ]
+    }
+  },
+  "commands": [
+    {
+      "id": "unit",
+      "command": "node --test test/trial/trial-view.case.ts test/trial/recipes.case.ts test/trial/model-connection.case.ts test/trial/history-source.case.ts",
+      "exit": 0,
+      "summary": "39/39"
+    },
+    {
+      "id": "typecheck-app",
+      "command": "npx tsc -p apps/console/tsconfig.json --noEmit",
+      "exit": 0
+    },
+    {
+      "id": "typecheck-e2e",
+      "command": "npx tsc -p apps/console/e2e/trial/tsconfig.json --noEmit",
+      "exit": 0
+    },
+    {
+      "id": "build",
+      "command": "npx vite build",
+      "exit": 0,
+      "note": "existing >500kB chunk advisory retained"
+    },
+    {
+      "id": "all-trial-suites",
+      "command": "node apps/console/e2e/trial/run-all.mjs",
+      "exit": 0,
+      "summary": "12/12 suites"
+    },
+    {
+      "id": "model-connection-browser",
+      "command": "node apps/console/e2e/trial/model-connection.mjs",
+      "exit": 0,
+      "summary": "12/12"
+    },
+    {
+      "id": "history-source-browser",
+      "command": "node apps/console/e2e/trial/history-source.mjs",
+      "exit": 0,
+      "summary": "9/9"
+    },
+    {
+      "id": "actual-daily-flow",
+      "command": "node apps/console/e2e/trial/app-daily-flow.mjs",
+      "exit": 0,
+      "summary": "10/10"
+    },
+    {
+      "id": "main-trial-workbench",
+      "command": "node tests/integration/trial-workbench-browser.mjs",
+      "exit": 0
+    },
+    {
+      "id": "main-usage-observation",
+      "command": "node tests/integration/usage-observation-browser.mjs",
+      "exit": 0,
+      "note": "first run FAILED because F changed the support alert wrapper/aria-label; fixed without loosening main assertions, then 13/13"
+    },
+    {
+      "id": "main-context-history",
+      "command": "node tests/integration/context-history-browser.mjs",
+      "exit": 0
+    },
+    {
+      "id": "main-project-recipes",
+      "command": "node tests/integration/project-recipes-browser.mjs",
+      "exit": 0
+    },
+    {
+      "id": "webkit-probe",
+      "command": "node - (Playwright webkit.executablePath/launch)",
+      "exit": 0,
+      "summary": "NOT_TESTED: executable missing; see wave34-webkit.json"
+    }
+  ],
+  "actualObjects": {
+    "projects": [
+      "项目 Alpha (temporary controlled Git project)",
+      "项目 Beta (temporary controlled Git project)"
+    ],
+    "conversations": [
+      "conv-alpha-daily",
+      "conv-beta-daily"
+    ],
+    "works": [
+      "Alpha：固定流程问答与交付",
+      "Beta：固定流程交付",
+      "FAIL work",
+      "pending-question work",
+      "ephemeral IDs in report-daily-flow.json"
+    ],
+    "profiles": [
+      "profile-fixture-question",
+      "profile-fixture-pass"
+    ],
+    "modelTurns": 0,
+    "nativeTurns": 0,
+    "businessPosts": "only explicit /v1/commands plus known main review-activity conflicts (2) and preview aborts (3) recorded separately"
+  },
+  "mainMergedVsCandidate": {
+    "mergedMain": "23d5a98e support GET/strict DTO/original-scope download and G metadata consumer are already in the merged main; F consumed them, did not duplicate the pipeline",
+    "mergedFromFThisWave": "none; branch is uncommitted and not merged",
+    "candidate": [
+      "ModelConnectionForm",
+      "HistorySourcePanel",
+      "support boundary/retry wording",
+      "new test/evidence files"
+    ],
+    "needsMain": [
+      "mount ModelConnectionForm in the original model settings surface with availability/identity/onConnect",
+      "mount HistorySourcePanel (or keep existing ContextHistoryPanel) with main DTOs/selection/continuation",
+      "provide a formal package/source label for support if desired"
+    ]
+  },
+  "layers": {
+    "source": "DELIVERED for F2/F4/F5/F6 owned source; F1/F3 regression-revalidated",
+    "controlled": "DELIVERED (actual App 1440/390 + controlled harnesses)",
+    "installed": "NOT_TESTED by F in this wave; R1 8296720 does not contain the support GET/this source",
+    "native": "0 turns; no Native.launch or vendor model",
+    "recovery": "not claimed; no original Work recovery or 2/4 slot evidence",
+    "value": "no efficiency/benefit claim; UI activity remains a proxy"
+  },
+  "remaining": [
+    "main wire F2 ModelConnectionForm and F4 HistorySourcePanel into the actual settings/history surfaces; rerun the same 1440/390 journeys",
+    "WebKit actual page test once a WebKit binary is available; 200% zoom, screen reader, forced-colors and long auth expiry remain untested",
+    "E independent installed/whole-product verdict on a fixed source/tar; F does not self-admit",
+    "no claim that history/source readability or support download is an execution/quality/benefit grant"
+  ],
+  "preserved": [
+    "all ten original roots/branches/ownership and dirty/history",
+    "twelve user services 5180-5191 / 8796-8807 and all state/profile/tar/ledger/runs/five user logs",
+    "no global process discovery, substring kill, credential borrowing, real CLI fallback, new Driver/CAC/desktop/auto-accept/second lifecycle",
+    "automatic real vendor/model/native turns 0; B cap4 UNKNOWN unspent; E blocked pilot unchanged"
+  ]
+}
