@@ -1,0 +1,72 @@
+{
+  "protocol": "wave34-two-works-read/1",
+  "status": "PASS",
+  "target": "/tmp/w35-home/restored",
+  "report": {
+    "eventSeq": 105,
+    "integrity": "ok",
+    "schema": 18
+  },
+  "works": [
+    {
+      "id": "e9c9a0de8048124ad16d7a04bd979024",
+      "projectId": "project-wave33",
+      "contracts": 1,
+      "acceptedEventSeq": 49,
+      "artifacts": [
+        {
+          "id": "a1b28c94e2a5517e6cd0c14a14b9dea6c5eb22e7d6923a63c5e8ade459663360",
+          "bytes": 1143,
+          "sha256": "a1b28c94e2a5517e6cd0c14a14b9dea6c5eb22e7d6923a63c5e8ade459663360"
+        },
+        {
+          "id": "1822672fb21520769ab626ab4ff94bfe4563373368f291baefc4b31fec8ed7c5",
+          "bytes": 187,
+          "sha256": "1822672fb21520769ab626ab4ff94bfe4563373368f291baefc4b31fec8ed7c5"
+        },
+        {
+          "id": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+          "bytes": 24,
+          "sha256": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b"
+        },
+        {
+          "id": "adc73876b80165249a0650c825ab751527c925252bdcb2605c3b31db7e726e19",
+          "bytes": 380,
+          "sha256": "adc73876b80165249a0650c825ab751527c925252bdcb2605c3b31db7e726e19"
+        }
+      ]
+    },
+    {
+      "id": "76a82043b8c7e1495e27748f4381e5d1",
+      "projectId": "project-wave33",
+      "contracts": 1,
+      "acceptedEventSeq": 101,
+      "artifacts": [
+        {
+          "id": "1f672d1e38ff122436243ed3c841ca36e1a149b3b759bf3d7a3c588e26f0880e",
+          "bytes": 1143,
+          "sha256": "1f672d1e38ff122436243ed3c841ca36e1a149b3b759bf3d7a3c588e26f0880e"
+        },
+        {
+          "id": "1822672fb21520769ab626ab4ff94bfe4563373368f291baefc4b31fec8ed7c5",
+          "bytes": 187,
+          "sha256": "1822672fb21520769ab626ab4ff94bfe4563373368f291baefc4b31fec8ed7c5"
+        },
+        {
+          "id": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+          "bytes": 24,
+          "sha256": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b"
+        },
+        {
+          "id": "de4bcc6608d1c9b75dd93864bc35c90ce75adca1af30d36d52de05cce6b997dc",
+          "bytes": 380,
+          "sha256": "de4bcc6608d1c9b75dd93864bc35c90ce75adca1af30d36d52de05cce6b997dc"
+        }
+      ]
+    }
+  ],
+  "completionAcceptances": 2,
+  "realVendorTurns": 0,
+  "realModelTurns": 0,
+  "realNativeTurns": 0
+}

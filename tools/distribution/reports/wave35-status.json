@@ -1,0 +1,207 @@
+{
+  "protocol": "wave35-status/1",
+  "owner": "agent-d",
+  "branch": "codex/g3-local-distribution",
+  "state": "IN_PROGRESS_NINE_OUTCOMES",
+  "source": "edfe5e14f2f8fbc7f395a84520c781c7f07ce9e7",
+  "fixed": {
+    "w33": {
+      "source": "048f0184",
+      "build": "f880e5bc9c6c1c57",
+      "inner": "ee45c92c7c5a8f2caa0449572b14bf97175b0392f1fd92c6f89d7a19464604e8",
+      "outer": "46e01c8c7b79818d19e019f6d2208ad54c5c9538674218f85455434eff8207f9"
+    },
+    "w35": {
+      "build": "599de3e98c02de0b",
+      "inner": "11027a375848c25c2d2ae8e18755f65fa77272db533dcee7bb9ff27ba8ba50db",
+      "outer": "39c0fff0e13d61c59198f8a55f0ed692b887194aaa4e2782b2b3e9cbd623f6c5",
+      "tarBytes": 20598155,
+      "outerBytes": 63536701,
+      "manifest": "tools/distribution/reports/wave35/manifest.json"
+    }
+  },
+  "packages": {
+    "P1": {
+      "D1": {
+        "status": "PASS_SCOPE",
+        "actual": "W35 outer HTTP /v1/assistant/connection + private 0600 save; main App source 4cde tested separately",
+        "positive": [
+          "save 200 configured no model request",
+          "private file 0600",
+          "normal start degrade",
+          "same tuple reuse same PID",
+          "movable path"
+        ],
+        "negative": [
+          "foreign origin 403",
+          "HTTP without consent 400",
+          "unsafe file 503 retained"
+        ],
+        "notReached": [
+          "actual browser click on installed W35",
+          "no-auth no-origin 401 not recorded"
+        ],
+        "evidence": [
+          "reports/wave35/model-save-200.json",
+          "reports/wave35/model-http-400.json",
+          "reports/wave35/model-permission-503.json"
+        ]
+      },
+      "D2": {
+        "status": "NOT_REACHED",
+        "actual": "installed controlled runtime with two project IDs attempted",
+        "positive": [
+          "W33 two Works/two accepts/36 artifacts remain",
+          "one project fixture path exists"
+        ],
+        "negative": [
+          "second project did NOT obtain accept; controlled runtime requires fixed src/ grant"
+        ],
+        "evidence": [
+          "reports/wave35/two-read.json"
+        ],
+        "note": "不能把同一 project-wave33 的两个 Work 冒充两个原项目"
+      },
+      "D3": {
+        "status": "PASS",
+        "actual": "W35 outer same tuple reuse/status/stop, moved path",
+        "positive": [
+          "same PID 97038 reuse",
+          "STOPPED/restart",
+          "spaces/Chinese path"
+        ],
+        "negative": [
+          "wrong build verifier refused",
+          "EEXIST source fix inherited 8cd"
+        ],
+        "evidence": [
+          "reports/wave35/moved-status.json",
+          "reports/wave35/moved-start.log"
+        ]
+      }
+    },
+    "P2": {
+      "D4": {
+        "status": "PASS",
+        "actual": "W35 installed backup/restore of W33 two-Work data",
+        "positive": [
+          "backup seq105 SHA06c3cee2",
+          "restore integrity ok",
+          "two Works 4 artifacts each"
+        ],
+        "negative": [
+          "artifact tamper/missing from W33 retained",
+          "cross-artifact manifest refused"
+        ],
+        "evidence": [
+          "reports/wave35/backup.json",
+          "reports/wave35/restore.json",
+          "reports/wave35/two-read.json"
+        ]
+      },
+      "D5": {
+        "status": "PASS_SCOPE",
+        "actual": "W33 explicit review ordinary message 200/readonly POST 422; W35 not re-run",
+        "positive": [
+          "no review 403",
+          "review 200 candidate metadata",
+          "write 422"
+        ],
+        "negative": [
+          "wrong source/principal remains refused"
+        ],
+        "evidence": [
+          "reports/wave34/authorized-200.json",
+          "reports/wave34/readonly-422.json"
+        ],
+        "notReached": [
+          "W35 exact review rerun"
+        ]
+      },
+      "D6": {
+        "status": "PASS",
+        "actual": "W35 upgrade/rollback with two Works; raw BLOCKED preserved",
+        "positive": [
+          "W35 CONFIRMED",
+          "W32 reads 2 Works/8 refs after rollback",
+          "dataRolledBack false"
+        ],
+        "negative": [
+          "raw old BLOCKED retained",
+          "unknown live resource wrapper rejection retained"
+        ],
+        "evidence": [
+          "reports/wave35/upgrade.json",
+          "reports/wave35/upgrade-read.json",
+          "reports/wave35/rollback-read.json"
+        ]
+      }
+    },
+    "P3": {
+      "D7": {
+        "status": "PASS_SCOPE",
+        "actual": "W35 outer movable path + bundled Node",
+        "positive": [
+          "spaces/Chinese path RUNNING/STOPPED",
+          "no global Node",
+          "private model save"
+        ],
+        "negative": [
+          "port occupied from W33 evidence",
+          "wrong build verifier refused"
+        ],
+        "notReached": [
+          "second user/cross-machine/signing"
+        ],
+        "evidence": [
+          "reports/wave35/moved-start.log",
+          "reports/wave35/moved-status.json",
+          "reports/wave35/model-save-200.json"
+        ]
+      },
+      "D8": {
+        "status": "PASS_SCOPE",
+        "actual": "W35 canonical manifest/support + archive checks",
+        "positive": [
+          "tar manifest PASS 7440",
+          "support 0600",
+          "zip 7451"
+        ],
+        "negative": [
+          "main verifier refused W35 wrapper pin",
+          "cross-artifact W33 manifest refused"
+        ],
+        "evidence": [
+          "reports/wave35/manifest.json",
+          "reports/wave35/support.json"
+        ]
+      },
+      "D9": {
+        "status": "SOURCE_READY_E",
+        "actual": "W35 necessary successor frozen/packaged; W33 remains first E subject",
+        "positive": [
+          "W35 build/freeze/outer/static/actual start",
+          "W33 unchanged"
+        ],
+        "notReached": [
+          "E independent W35 verdict",
+          "main verifier allowlist update"
+        ],
+        "evidence": [
+          "recipes/wave35-e-handoff.zh-CN.md"
+        ]
+      }
+    }
+  },
+  "remaining": [
+    "D2 two original projects/installed consumer",
+    "W35 exact review and browser save click",
+    "E independent W33 and W35 verdicts",
+    "cross-machine/signing/native/value"
+  ],
+  "real": {
+    "vendor": 0,
+    "model": 0,
+    "native": 0
+  }
+}

@@ -1,0 +1,17 @@
+原启动器尚未确认可用的开发执行器，本次明确以仅对话模式启动。
+个人预览 599de3e98c02de0b
+私有数据：/tmp/w35-move-home/Library/Application Support/PersonalAgent/Preview-599de3e98c02de0b
+模型配置：/tmp/w35-move-home/Library/Application Support/PersonalAgent/Preview-599de3e98c02de0b/config/model.json
+请保留启动窗口；结束时双击 Stop.command。
+[daemon:out] Personal product API: http://127.0.0.1:59011/v1/health
+[daemon:out] Private state/credential references: /private/tmp/w35-move-home/Library/Application Support/PersonalAgent/Preview-599de3e98c02de0b/data
+[daemon:out] Personal discussion mode: execution unavailable (operator_disabled); business queues are retained.
+Workbench: http://127.0.0.1:59010
+  api: http://127.0.0.1:59011
+  mode: personal access: local-development startup: normal
+  state: /private/tmp/w35-move-home/Library/Application Support/PersonalAgent/Preview-599de3e98c02de0b/data
+  build: 599de3e98c02de0b
+daemon 已退出（code 0）；日志: /private/tmp/w35-move-home/Library/Application Support/PersonalAgent/Preview-599de3e98c02de0b/logs/daemon-599de3e98c02de0b.log
+  Personal product API: http://127.0.0.1:59011/v1/health
+  Private state/credential references: /private/tmp/w35-move-home/Library/Application Support/PersonalAgent/Preview-599de3e98c02de0b/data
+  Personal discussion mode: execution unavailable (operator_disabled); business queues are retained.

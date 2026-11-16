@@ -1,0 +1,16 @@
+{
+  "status": "BLOCKED",
+  "code": "unknown_live_resource",
+  "message": "A registered resource is still alive or cannot be proven to belong to this operation; the install pointer is unchanged",
+  "detail": {
+    "remaining": [],
+    "unknownLive": [
+      {
+        "pid": 13833,
+        "command": "bash -c /tmp/w35-upgrade.sh >/tmp/w35-upgrade.json 2>/tmp/w35-upgrade.err; echo upgrade=$?; head -c 500 /tmp/w35-upgrade.json; tail -3 /tmp/w35-upgrade.err; node -e \"console.log(require('/tmp/w33-upcfg/release.json').buildId)\"",
+        "unregistered": true
+      }
+    ],
+    "considered": 0
+  }
+}

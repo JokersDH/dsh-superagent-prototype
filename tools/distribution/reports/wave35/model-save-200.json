@@ -1,0 +1,1 @@
+{"protocol":"assistant-provider/1","configured":true,"baseURL":"https://gateway.invalid/v1","model":"model-one","models":["model-one"],"state":"configured","secureTransport":true,"suggestionsEnabled":false}

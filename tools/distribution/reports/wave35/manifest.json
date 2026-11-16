@@ -1,0 +1,38 @@
+{
+  "protocol": "wave35-frozen-manifest/1",
+  "release": "W35",
+  "buildCheckout": "edfe5e14f2f8fbc7f395a84520c781c7f07ce9e7",
+  "source": "edfe5e14f2f8fbc7f395a84520c781c7f07ce9e7",
+  "buildId": "599de3e98c02de0b",
+  "tarSha256": "11027a375848c25c2d2ae8e18755f65fa77272db533dcee7bb9ff27ba8ba50db",
+  "tarBytes": 20598155,
+  "files": 6883,
+  "tarEntries": 7440,
+  "outer": {
+    "zip": "/Users/hh/Desktop/joker/pa-artifacts/wave35-preview-599de3e/PersonalAgent-Preview-599de3e.zip",
+    "zipSha256": "39c0fff0e13d61c59198f8a55f0ed692b887194aaa4e2782b2b3e9cbd623f6c5",
+    "zipBytes": 63536701,
+    "manifestSha256": "8a8021397318788dedb007cd8ff96da00b4f1af78e369a0bf2aecca7f3e2cb22",
+    "archiveEntries": 7451,
+    "runtime": {
+      "name": "Node.js",
+      "version": "24.21.0",
+      "abi": "137",
+      "platform": "darwin",
+      "arch": "arm64",
+      "bytes": 122129232,
+      "sha256": "e4b5a3af0e05c75de2eae013904145f40fe7fc2a6e6f17510128bf45cca4e79b",
+      "licenseBytes": 157609,
+      "licenseSha256": "5888dbb9a1d2b18f2c3e6c5f6af1b39de658372b402a0577b002777f14c62ace"
+    }
+  },
+  "environment": {
+    "node": "24.21.0",
+    "abi": "137",
+    "platform": "darwin",
+    "arch": "arm64",
+    "sqlite": "3.53.4",
+    "productSchema": 18
+  },
+  "predecessor": "W33 f880e5bc9c6c1c57"
+}

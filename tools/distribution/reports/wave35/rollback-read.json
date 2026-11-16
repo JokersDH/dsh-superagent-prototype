@@ -1,0 +1,20 @@
+{
+  "protocol": "wave34-w32-two-read/1",
+  "status": "PASS",
+  "reader": "W32 installed ProductStore",
+  "works": [
+    {
+      "id": "e9c9a0de8048124ad16d7a04bd979024",
+      "contracts": 1,
+      "acceptedEventSeq": 49,
+      "artifactCount": 4
+    },
+    {
+      "id": "76a82043b8c7e1495e27748f4381e5d1",
+      "contracts": 1,
+      "acceptedEventSeq": 101,
+      "artifactCount": 4
+    }
+  ],
+  "eventSeq": 105
+}
