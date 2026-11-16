@@ -3,12 +3,12 @@
   "tier": "full-product",
   "status": "FAIL",
   "ok": false,
-  "checkedAt": "2026-11-16T09:07:27.321Z",
+  "checkedAt": "2026-11-16T13:30:44.119Z",
   "source": {
-    "commit": "c2568908c327590ca5756d9040b03a8997b701ca",
+    "commit": "7e269fff38e4a80b64a347261ab1095efe1c557a",
     "dirty": false
   },
-  "expectedSource": "c2568908c327590ca5756d9040b03a8997b701ca",
+  "expectedSource": "7e269fff38e4a80b64a347261ab1095efe1c557a",
   "requirements": [
     {
       "id": "E1-GATE-CONTROL",
@@ -911,6 +911,11 @@
       "status": "PASS"
     },
     {
+      "id": "E5-COHORT-UPGRADE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
       "id": "E11-TRIAL-IDENTITY-FIELDS",
       "required": false,
       "status": "NOT_TESTED"
@@ -1046,7 +1051,7 @@
   "claimedBy": {
     "status": "PASS",
     "tier": "controlled-product-workflow",
-    "decidedAt": "2026-11-16T09:02:00.349Z",
+    "decidedAt": "2026-11-16T13:23:36.609Z",
     "failureCodes": []
   },
   "notes": [

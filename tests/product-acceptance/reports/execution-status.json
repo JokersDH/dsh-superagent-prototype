@@ -2,11 +2,11 @@
   "schema": "agent-execution-status/1",
   "agent": "E",
   "branch": "codex/g3-product-acceptance",
-  "base": "84d03987",
+  "base": "6b306514",
   "checkpoint": "PENDING",
-  "head": "c2568908c327590ca5756d9040b03a8997b701ca",
+  "head": "7e269fff38e4a80b64a347261ab1095efe1c557a",
   "worktreeDirtyAtRun": false,
-  "checkedAt": "2026-11-16T09:02:00.331Z",
+  "checkedAt": "2026-11-16T13:23:36.592Z",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -20,14 +20,14 @@
   "stages": [
     {
       "id": "E1",
-      "title": "Package stop verifies the fixed set even after an exited launcher",
-      "command": "node tests/product-acceptance/cases/w27-lifecycle.mjs",
+      "title": "Caller finally keeps the complete material set",
+      "command": "node tests/product-acceptance/run.mjs --suites=selftest",
       "notes": [
-        "A known birth without a complete fixed set is resources_unverified UNKNOWN even when the launcher already exited; no discovery fallback."
+        "One shared operation protocol drives the w33 outer/cohort callers; a complete exited observation is required before any release, and UNKNOWN keeps install/state/HOME."
       ],
       "result": "PASS",
       "counts": {
-        "PASS": 137
+        "PASS": 147
       },
       "cases": [
         {
@@ -714,22 +714,97 @@
           "id": "E1-LIFECYCLE-BIRTH-NO-SET",
           "status": "PASS",
           "reason": null
+        },
+        {
+          "id": "E1-CALLER-RETAIN-PREVENTS-RELEASE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-CALLER-COMPLETE-RELEASE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-CALLER-INCOMPLETE-SET",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-CALLER-DUPLICATE-AND-FOREIGN",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-CALLER-EXPECTED-START-MISMATCH",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-CALLER-PARENT-DEAD-CHILD-ALIVE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-CALLER-SIGNAL-REFUSES-STALE-IDENTITY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-CALLER-ASSERT-FAILURE-RETAINS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-CALLER-NO-FORCE-API",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E1-CALLER-SOURCE-DISCIPLINE",
+          "status": "PASS",
+          "reason": null
         }
       ]
     },
     {
       "id": "E2",
-      "title": "Journey oracle: applicable preview, execution identity, recovery",
-      "command": "node tests/product-acceptance/cases/w31-journey.mjs",
+      "title": "Complete resource mapping oracle for every cohort",
+      "command": "node tests/product-acceptance/run.mjs --suites=selftest",
       "notes": [
-        "The final validator rejects needs_input-with-applicable, a needs_input preview that claims fields, a foreign executionProjectId, a scoped 403, and a reopen without found/phase/artifacts; the legal narrowed fixture positive stays separate from the original-project gap."
+        "resourceRowsIssues binds pid/start/uid/argv/root/config/op and 1:1 post rows; full-report mutations reject empty after, foreign pid, alive, cardinality and wrong start."
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
-        "PASS": 25,
+        "PASS": 30,
         "NOT_TESTED": 3
       },
       "cases": [
+        {
+          "id": "E2-MUTATE-E32-EMPTY-AFTER",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-MUTATE-FOREIGN-PID-MISSING-START",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-MUTATE-RESOURCE-ALIVE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-MUTATE-COHORT-CARDINALITY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-MUTATE-JOURNEY-PHASE-EXPECTED-START",
+          "status": "PASS",
+          "reason": null
+        },
         {
           "id": "E2-AUTH-AND-ORIGIN",
           "status": "PASS",
@@ -874,17 +949,32 @@
     },
     {
       "id": "E3",
-      "title": "Outer ZIP verified and driven by its own entries",
+      "title": "Two original projects scoped journey and reopen",
       "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "SHA256SUMS, package-result, inner install/runtime/license digests, bundled Node/ABI, private HOME Start/Stop/status, port conflict, reopen and stop are observed on the real ZIP."
+        "Accept readiness is verification-based; reopen compares Work id, phase, artifact ids and every byte; a sameProject claim over scoped 403 is rejected by the final oracle."
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
-        "PASS": 28,
+        "PASS": 31,
         "NOT_TESTED": 6
       },
       "cases": [
+        {
+          "id": "E3-MUTATE-SAME-PROJECT-SCOPED-403",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-MUTATE-SAME-PROJECT-NO-DRAFT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-MUTATE-INSIGHTS-WINDOW",
+          "status": "PASS",
+          "reason": null
+        },
         {
           "id": "E3-DESKTOP-GEOMETRY",
           "status": "PASS",
@@ -1059,10 +1149,10 @@
     },
     {
       "id": "E4",
-      "title": "Non-empty business recovery on the cohort",
+      "title": "Locked W33 outer ZIP product entry",
       "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "A delivered Work with 20 artifacts is backed up (eventSeq>0), restored into a new root, read back recovery-readonly with identical artifact bytes and history, business writes 422, no provider call, tampered bundle refused."
+        "Outer 46e verified by its own hashes and driven with bundled Node through unconfigured/configured/import/reopen/stop; Settings template is contractual and its GUI stays HELD."
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
@@ -1194,15 +1284,15 @@
     },
     {
       "id": "E5",
-      "title": "Upgrade reopen and complete stop on the accurate pair",
-      "command": "node tests/product-acceptance/run.mjs --tier=installed-functional",
+      "title": "Same-cohort non-empty recovery and upgrade",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "R1 pair managed upgrade/rollback keeps post-upgrade data; cross-schema refusal is separate; every stage's fixed-set stop is re-observed."
+        "All artifact bytes, both Works, held question rows, direct Store registry, auth policy and no-provider read-back; managed W32→W33 upgrade with binary-only rollback."
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
         "NOT_TESTED": 2,
-        "PASS": 7
+        "PASS": 8
       },
       "cases": [
         {
@@ -1249,15 +1339,20 @@
           "id": "E5-TWO-PROJECT-TEMPLATE-CREATE",
           "status": "PASS",
           "reason": null
+        },
+        {
+          "id": "E5-COHORT-UPGRADE",
+          "status": "PASS",
+          "reason": null
         }
       ]
     },
     {
       "id": "E6",
-      "title": "Layered conclusion and status",
+      "title": "Overall tier and handoff",
       "command": "node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record",
       "notes": [
-        "wave33-status separates source/main/candidate/installed/native, names both admitted cohorts, and keeps the pilot and original-project gap BLOCKED/NOT_REACHED without a new oracle."
+        "wave34-status separates source/controlled/installed/native/recovered/value and keeps the pilot BLOCKED."
       ],
       "result": "PASS_WITH_GAPS",
       "counts": {
@@ -1313,12 +1408,12 @@
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-16T09:02:00.349Z",
+    "checkedAt": "2026-11-16T13:23:36.609Z",
     "source": {
-      "commit": "c2568908c327590ca5756d9040b03a8997b701ca",
+      "commit": "7e269fff38e4a80b64a347261ab1095efe1c557a",
       "dirty": false
     },
-    "expectedSource": "c2568908c327590ca5756d9040b03a8997b701ca",
+    "expectedSource": "7e269fff38e4a80b64a347261ab1095efe1c557a",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -2103,31 +2198,31 @@
       "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability; there is no allow-gap switch."
     ]
   },
-  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T08-53-56-787Z",
+  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T13-14-54-426Z",
   "evidence": {
-    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T08-53-56-787Z/report.json",
-    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T08-53-56-787Z/release.json",
+    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T13-14-54-426Z/report.json",
+    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T13-14-54-426Z/release.json",
     "screenshots": [
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T08-53-56-787Z/screenshots/desktop-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T08-53-56-787Z/screenshots/notebook-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T08-53-56-787Z/screenshots/mobile-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T08-53-56-787Z/screenshots/mobile-navigation.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T08-53-56-787Z/screenshots/mobile-detail.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T08-53-56-787Z/screenshots/desktop-delivered.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T08-53-56-787Z/screenshots/desktop-error.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T08-53-56-787Z/screenshots/desktop-offline.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T08-53-56-787Z/screenshots/desktop-keyboard.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T08-53-56-787Z/screenshots/mobile-conversations.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T08-53-56-787Z/screenshots/desktop-verification-blocked.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T08-53-56-787Z/screenshots/desktop-verification-recovered.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T08-53-56-787Z/screenshots/desktop-review-activity.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T08-53-56-787Z/screenshots/mobile-attention-inbox.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T08-53-56-787Z/proposal-preview-desktop.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T08-53-56-787Z/proposal-preview-notebook.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T08-53-56-787Z/proposal-preview-mobile.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T08-53-56-787Z/screenshots/context-confirm-desktop.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T08-53-56-787Z/screenshots/context-confirm-mobile.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T08-53-56-787Z/screenshots/context-history-mobile.png"
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T13-14-54-426Z/screenshots/desktop-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T13-14-54-426Z/screenshots/notebook-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T13-14-54-426Z/screenshots/mobile-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T13-14-54-426Z/screenshots/mobile-navigation.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T13-14-54-426Z/screenshots/mobile-detail.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T13-14-54-426Z/screenshots/desktop-delivered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T13-14-54-426Z/screenshots/desktop-error.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T13-14-54-426Z/screenshots/desktop-offline.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T13-14-54-426Z/screenshots/desktop-keyboard.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T13-14-54-426Z/screenshots/mobile-conversations.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T13-14-54-426Z/screenshots/desktop-verification-blocked.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T13-14-54-426Z/screenshots/desktop-verification-recovered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T13-14-54-426Z/screenshots/desktop-review-activity.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T13-14-54-426Z/screenshots/mobile-attention-inbox.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T13-14-54-426Z/proposal-preview-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T13-14-54-426Z/proposal-preview-notebook.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T13-14-54-426Z/proposal-preview-mobile.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T13-14-54-426Z/screenshots/context-confirm-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T13-14-54-426Z/screenshots/context-confirm-mobile.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T13-14-54-426Z/screenshots/context-history-mobile.png"
     ],
     "matrix": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/release-matrix.json",
     "executionStatus": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/execution-status.json",

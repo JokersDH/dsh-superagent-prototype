@@ -546,7 +546,7 @@ const handoff = `# Agent E 第三十四轮交付交接
 | E3 两个原项目 scoped 旅程 | ${byId.get('E5-TWO-PROJECT-TEMPLATE-CREATE')?.status ?? 'MISSING'}；原项目执行 NOT_REACHED | 两项目 preview/create/candidate/verification accept；重开同 Work/phase/artifact IDs 与全部 bytes；sameProject 仅在 scoped 可读且 draft 完整时成立，scoped403 由最终 oracle 拒绝；接受面无 candidate 身份，stale-candidate 反例记 NOT_REACHED。 |
 | E4 锁定 outer ZIP | ${byId.get('E33-OUTER-ZIP')?.status ?? 'MISSING'} | W33 outer 46e（${String(w34outer?.zip?.sha256 ?? '').slice(0, 8)}…，${w34outer?.zip?.bytes ?? '?'} bytes）自身校验+包内 Node：未配置/已配置/导入/重开、端口冲突拒绝、status STOPPED、Settings 模板契约（GUI HELD 未启动）。 |
 | E5 非空恢复/升级 | ${byId.get('E33-COHORT-RECOVERY')?.status ?? 'MISSING'} + ${byId.get('E5-COHORT-UPGRADE')?.status ?? 'MISSING'} | 全部 artifact bytes（${w34rec?.seed?.artifacts?.length ?? '?'}）与 history、${w34rec?.restore?.counts?.works ?? '?'} Work/问题行、effect 行不变、冻结 Store registry ${w34rec?.directRead?.registry?.length ?? '?'}、错 bearer 401、业务/回答 422、provider 0；W32→W33 CONFIRMED 升级与仅二进制回退（post 数据保留）。D 提交的 rollback raw BLOCKED 与 summary 冲突，NOT_ADMITTED。 |
-| E6 整体 tier/交接 | 见 release/tier 表 | 分层结论；原生/试点仍 0/BLOCKED。 |
+| E6 整体 tier/交接 | controlled=${release.status}；installed-alpha=${tierVerdicts['installed-alpha']?.status ?? '?'}；installed-functional=${tierVerdicts['installed-functional']?.status ?? '?'} | 分层结论；full-product 仅因原生缺失 FAIL（${[...new Set((tierVerdicts['full-product']?.failures ?? []).map(item => item.code))].join(', ') || 'none'}）；原生/试点仍 0/BLOCKED。 |
 
 ## 第三十三轮三项成果
 
@@ -1513,6 +1513,11 @@ const wave34Status = {
       schema: w34up?.pair?.baseline?.schema ?? null, tarSha256: w34up?.pair?.baseline?.tarSha256 ?? null,
       cases: ['E5-COHORT-UPGRADE'] },
   ],
+  tiers: { controlled: release.status, installedAlpha: tierVerdicts['installed-alpha']?.status ?? 'MISSING',
+    installedFunctional: tierVerdicts['installed-functional']?.status ?? 'MISSING',
+    localAlpha: tierVerdicts['local-alpha']?.status ?? 'MISSING',
+    fullProduct: tierVerdicts['full-product']?.status ?? 'MISSING',
+    fullProductFailures: [...new Set((tierVerdicts['full-product']?.failures ?? []).map(item => item.code))] },
   layers: { ...wave33Status.layers,
     callerSafety: callerIds.every(id => byId.get(id)?.status === 'PASS') ? 'PASS' : 'INCOMPLETE',
     outerZip: byId.get('E33-OUTER-ZIP')?.status ?? 'MISSING',

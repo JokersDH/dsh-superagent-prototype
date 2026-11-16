@@ -1,29 +1,40 @@
-# Agent E 第三十三轮交付交接
+# Agent E 第三十四轮交付交接
 
-- 分支 `codex/g3-product-acceptance`，基线 `84d03987`，检查点 `PENDING`，本次证据源 `c2568908c327590ca5756d9040b03a8997b701ca`（干净工作树）。证据文件随源提交之后的提交一起交付；`git log` 的分支头即最终交付提交。
+- 分支 `codex/g3-product-acceptance`，基线 `6b306514`，检查点 `PENDING`，本次证据源 `7e269fff38e4a80b64a347261ab1095efe1c557a`（干净工作树）。证据文件随源提交之后的提交一起交付；`git log` 的分支头即最终交付提交。
 - 拥有路径：`tests/product-acceptance/`。未修改生产实现、root manifest/lock、公共 schema 或迁移。
 - 模型预算：0 个真实模型任务；唯一模型对端是本机 loopback mock。原生执行：0。
+
+## 第三十四轮六成果（两个连续工程包）
+
+| 成果 | 结论 | 依据 |
+| --- | --- | --- |
+| E1 caller finally 完整资源 | PASS | 共享 operation 协议（完整 birth/每次 fresh/粘性 UNKNOWN/仅完整退出后 release）；outer=true，cohort=true；10 个纯控制含 retain 拒 release、parent 死 child 活、伪造 start、assert 失败保留、无 force API、caller 源码零直接删除。 |
+| E2 完整资源映射 oracle | PASS | resourceRowsIssues 绑定 pid/start/uid/argv/root/config/op 与 1:1 同序 post 观察，应用于 outer/cohort/E32/journey；全 report 变异覆盖空 after、foreign pid、alive 行、cardinality、错 start。 |
+| E3 两个原项目 scoped 旅程 | PASS；原项目执行 NOT_REACHED | 两项目 preview/create/candidate/verification accept；重开同 Work/phase/artifact IDs 与全部 bytes；sameProject 仅在 scoped 可读且 draft 完整时成立，scoped403 由最终 oracle 拒绝；接受面无 candidate 身份，stale-candidate 反例记 NOT_REACHED。 |
+| E4 锁定 outer ZIP | PASS | W33 outer 46e（46e01c8c…，63481603 bytes）自身校验+包内 Node：未配置/已配置/导入/重开、端口冲突拒绝、status STOPPED、Settings 模板契约（GUI HELD 未启动）。 |
+| E5 非空恢复/升级 | PASS + PASS | 全部 artifact bytes（4）与 history、2 Work/问题行、effect 行不变、冻结 Store registry 26、错 bearer 401、业务/回答 422、provider 0；W32→W33 CONFIRMED 升级与仅二进制回退（post 数据保留）。D 提交的 rollback raw BLOCKED 与 summary 冲突，NOT_ADMITTED。 |
+| E6 整体 tier/交接 | controlled=PASS；installed-alpha=PASS；installed-functional=PASS | 分层结论；full-product 仅因原生缺失 FAIL（missing_required_case, case_not_pass, layer_not_allowed, required_evidence_missing）；原生/试点仍 0/BLOCKED。 |
 
 ## 第三十三轮三项成果
 
 | 成果 | 结论 | 依据 |
 | --- | --- | --- |
 | 1. 两个原项目的真实完整旅程 | 模板正例 PASS；原项目同项目执行链 **NOT_REACHED**（不冒充 PASS） | E5-TWO-PROJECT-TEMPLATE-CREATE 记录两个原项目、预览、创建、候选、手动接受和执行身份连续性；最终 validator 拒绝 needs_input 却声称 applicable、跨项目 executionProjectId、scoped 403，以及重开缺 found/phase/artifacts。E32-ORIGINAL-PROJECT-APPLICABLE 仍是 NOT_REACHED：受控 fixture 中原登记项目不可派发，personal 无 executor。 |
-| 2. 唯一准确安装 cohort 与 actual outer ZIP | **PASS（两个命名 cohort）** | E33-OUTER-ZIP：ZIP 自身 SHA256SUMS 与 package-result（zip 0a46cd36…）、内层 install/runtime/license digest、bundled Node 版本/ABI、私有 HOME 下 Start/Stop/status、未配置与已配置、端口冲突拒绝、重开、停止后 status=2 STOPPED；cohort=zip-inner buildId 88eb8c69b0671171。 |
-| 3. 非空业务恢复、升级重开与完整停止 | **PASS（所测 cohort）**，其余保留 gap | E33-COHORT-RECOVERY：交付 Work + artifacts → backup CREATED/VERIFIED（eventSeq 51）→ 新 root restore → recovery_readonly 读回相同 artifact 字节/历史、业务写 422、provider 0、篡改 bundle 拒绝、固定集停止；E4-UPGRADE-ROLLBACK 在 baseline/target 对保留升级后写入并回滚二进制。W32 的 ZIP backup 记录了 20 个 artifact 但未恢复读回；非空恢复结论只由 E33-COHORT-RECOVERY 承担。 |
+| 2. 唯一准确安装 cohort 与 actual outer ZIP | **PASS（两个命名 cohort）** | E33-OUTER-ZIP：ZIP 自身 SHA256SUMS 与 package-result（zip 46e01c8c…）、内层 install/runtime/license digest、bundled Node 版本/ABI、私有 HOME 下 Start/Stop/status、未配置与已配置、端口冲突拒绝、重开、停止后 status=2 STOPPED；cohort=zip-inner buildId f880e5bc9c6c1c57。 |
+| 3. 非空业务恢复、升级重开与完整停止 | **PASS（所测 cohort）**，其余保留 gap | E33-COHORT-RECOVERY：交付 Work + artifacts → backup CREATED/VERIFIED（eventSeq 73）→ 新 root restore → recovery_readonly 读回相同 artifact 字节/历史、业务写 422、provider 0、篡改 bundle 拒绝、固定集停止；E4-UPGRADE-ROLLBACK 在 baseline/target 对保留升级后写入并回滚二进制。W32 的 ZIP backup 记录了 20 个 artifact 但未恢复读回；非空恢复结论只由 E33-COHORT-RECOVERY 承担。 |
 
 ## 实际命令与结果
 
 | 真实命令 | 覆盖病例 | 结果 |
 | --- | --- | --- |
 | `node tests/product-acceptance/pilot/harness.mjs --preflight` | 冻结输入/价格/ledger | BLOCKED（adapter_missing）；runner selftest 66/17 |
-| `node tests/product-acceptance/run.mjs --suites=selftest --tier=harness-only` | E1-* | PASS 137 |
-| `node tests/product-acceptance/run.mjs --suites=e2 --tier=e2-controlled-workflow` | E2-* | PASS 25 + NOT_TESTED 3 |
-| `node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui` | E3-* | PASS 28 + NOT_TESTED 6 |
+| `node tests/product-acceptance/run.mjs --suites=selftest --tier=harness-only` | E1-* | PASS 147 |
+| `node tests/product-acceptance/run.mjs --suites=e2 --tier=e2-controlled-workflow` | E2-* | PASS 30 + NOT_TESTED 3 |
+| `node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui` | E3-* | PASS 31 + NOT_TESTED 6 |
 | `node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha` | E4-* / E5-NATIVE-CONTROL / E6-REVIEW-PILOT | PASS 21 + NOT_TESTED 5 |
-| `node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record` | 全部 326 | PASS 306 + FAIL 0 + SKIPPED 0 + NOT_TESTED 20 + BLOCKED 0 + UNKNOWN 0 |
+| `node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record` | 全部 345 | PASS 325 + FAIL 0 + SKIPPED 0 + NOT_TESTED 20 + BLOCKED 0 + UNKNOWN 0 |
 
-本次聚合：**PASS**（tier `controlled-product-workflow`）。证据目录 `/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T08-53-56-787Z`。
+本次聚合：**PASS**（tier `controlled-product-workflow`）。证据目录 `/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T13-14-54-426Z`。
 
 ## 矩阵摘要
 
@@ -90,7 +101,7 @@
 | --- | --- | --- |
 | 研究价值（独立会话复核是否值得继续） | **BLOCKED — 无价值结论** | 8 例三组一例未发；adapter_missing（无经准入的实际 adapter/整 turn 上界/隔离/材料/main 准入）；0/24 turn。BLOCKED 不是 no-go，也不是正收益。 |
 | 产品准入（普通受控工作流） | 见 `controlled-product-workflow` tier | 真实 HTTP/SQLite/受控执行，不依赖试点。 |
-| 安装准入（个人 Alpha） | **PASS（仅所测 tuple）**：cold personal、fixture 安装版 context、non-empty default-off→建议、候选 GET/prepare/confirm/replay/reject、非空第二根 readonly（候选/context/history/held work/原 body）、同包 source prepare/confirm/audit/进程重开、篡改拒绝、requested-data-root/copied-record stop、legacy16→18 迁移、跨 schema 拒绝 | E3-PERSONAL-COLD-START、E6-INSTALLED-CONTEXT、E7-BACKUP-CONTEXT-REPLY、E4-INSTALL-*、E4-BACKUP-RESTORE、E4-UPGRADE-CROSS-SCHEMA、E8-LEGACY16-MIGRATION、E7-OWNERSHIP-COPY；E33-OUTER-ZIP=PASS、E33-COHORT-RECOVERY=PASS。tuple=8296720d8a25f38c/schema 18，main schema 18；current-main install=PASS (actual personal discussion-only + mock provider HTTP context/history/source/reply)；E4-UPGRADE-ROLLBACK/FAULTS/CROSS、E7 copy/wrong-install、非空 backup 已执行；M1/discussionReadiness=true；D safety mocks=PASS（helper 从 ee tar 提取并核对文件 hash；旧97仅mock失败对照）；candidate installed=PASS；second root=PASS（probeScope=fixture+recovery_readonly）；installed source confirm=PASS；installed stability=PASS；workflow formats=PASS（按包能力：default1+explicit2）；personal review=PASS（consumerOrigin=package，digest=ec6159d8…，scopeDiagnostics=present）；refusals=PASS；review reuse=PASS（same=REUSED，digestSame=true，different=BLOCKED）。personal旧项目只读重绑定未到，对应项NOT_REACHED，403不自动放宽。 |
+| 安装准入（个人 Alpha） | **PASS（仅所测 tuple）**：cold personal、fixture 安装版 context、non-empty default-off→建议、候选 GET/prepare/confirm/replay/reject、非空第二根 readonly（候选/context/history/held work/原 body）、同包 source prepare/confirm/audit/进程重开、篡改拒绝、requested-data-root/copied-record stop、legacy16→18 迁移、跨 schema 拒绝 | E3-PERSONAL-COLD-START、E6-INSTALLED-CONTEXT、E7-BACKUP-CONTEXT-REPLY、E4-INSTALL-*、E4-BACKUP-RESTORE、E4-UPGRADE-CROSS-SCHEMA、E8-LEGACY16-MIGRATION、E7-OWNERSHIP-COPY；E33-OUTER-ZIP=PASS、E33-COHORT-RECOVERY=PASS。tuple=8296720d8a25f38c/schema 18，main schema 18；current-main install=PASS (actual personal discussion-only + mock provider HTTP context/history/source/reply)；E4-UPGRADE-ROLLBACK/FAULTS/CROSS、E7 copy/wrong-install、非空 backup 已执行；M1/discussionReadiness=true；D safety mocks=PASS（helper 从 ee tar 提取并核对文件 hash；旧97仅mock失败对照）；candidate installed=PASS；second root=PASS（probeScope=fixture+recovery_readonly）；installed source confirm=PASS；installed stability=PASS；workflow formats=PASS（按包能力：default1+explicit2）；personal review=PASS（consumerOrigin=package，digest=bfe93921…，scopeDiagnostics=present）；refusals=PASS；review reuse=PASS（same=REUSED，digestSame=true，different=BLOCKED）。personal旧项目只读重绑定未到，对应项NOT_REACHED，403不自动放宽。 |
 
 安装物身份（从本轮真实 tar tuple 读取，位置可用 PA_E_INSTALL_*_DIR 覆盖）：baseline buildId `2d94a7c31ef97b57` / schema 18 / tar `daee1a94…` / source `1fbaf940`；target buildId `8296720d8a25f38c` / schema 18 / tar `04926739…` / source `82ee5b8f`。均为 darwin/arm64、Node 24.21.0、SQLite ABI 137。verdict 只对所测 tuple 成立，旧版本结果未改标签。
 
