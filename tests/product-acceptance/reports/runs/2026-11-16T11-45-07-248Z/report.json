@@ -1,0 +1,175 @@
+{
+  "schema": "product-acceptance/1",
+  "suites": [
+    "e4"
+  ],
+  "branch": "codex/g3-product-acceptance",
+  "source": {
+    "commit": "83f6cbede3f514c730f9d4f0d818711f162963de",
+    "dirty": true
+  },
+  "environment": {
+    "node": "v24.21.0",
+    "platform": "darwin",
+    "architecture": "arm64",
+    "os": "Darwin 25.6.0"
+  },
+  "startedAt": "2026-11-16T11:45:07.248Z",
+  "finishedAt": "2026-11-16T11:45:08.429Z",
+  "checkedAt": "2026-11-16T11:45:08.429Z",
+  "counts": {
+    "PASS": 0,
+    "FAIL": 0,
+    "SKIPPED": 0,
+    "NOT_TESTED": 0,
+    "BLOCKED": 1,
+    "UNKNOWN": 0
+  },
+  "artifacts": {
+    "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T11-45-07-248Z",
+    "screenshots": []
+  },
+  "cases": [
+    {
+      "id": "SUITE-E4-LOAD",
+      "title": "Suite e4 failed to load",
+      "layer": "readonly",
+      "status": "BLOCKED",
+      "reason": "The requested module '@personal-agent/contracts' does not provide an export named 'UsageSupportDownloadSchema'",
+      "assertions": [],
+      "evidence": {},
+      "limitations": [],
+      "source": {
+        "commit": "83f6cbede3f514c730f9d4f0d818711f162963de"
+      }
+    }
+  ],
+  "declaredGaps": [
+    {
+      "id": "SUITE-E4-LOAD",
+      "status": "BLOCKED",
+      "reason": "The requested module '@personal-agent/contracts' does not provide an export named 'UsageSupportDownloadSchema'"
+    }
+  ],
+  "release": {
+    "schema": "product-acceptance-release/1",
+    "tier": "e4-bounded-stability",
+    "status": "FAIL",
+    "ok": false,
+    "checkedAt": "2026-11-16T11:45:08.442Z",
+    "source": {
+      "commit": "83f6cbede3f514c730f9d4f0d818711f162963de",
+      "dirty": true
+    },
+    "expectedSource": "83f6cbede3f514c730f9d4f0d818711f162963de",
+    "requirements": [
+      {
+        "id": "E4-CANDIDATE-FLOW",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E4-SOURCE-CONFIRM",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E4-SOURCE-CONFIRM-REFUSAL",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E4-COMPLETED-REPLY",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E4-BOUNDED-CYCLES",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E4-PORTABILITY-CHECKLIST",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E4-RECOVERY-PREFLIGHT",
+        "required": true,
+        "status": "MISSING"
+      },
+      {
+        "id": "E4-RECOVERY-READONLY",
+        "required": true,
+        "status": "MISSING"
+      }
+    ],
+    "failures": [
+      {
+        "code": "source_dirty",
+        "detail": "Release evidence requires a clean source worktree"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E4-CANDIDATE-FLOW is absent",
+        "caseId": "E4-CANDIDATE-FLOW"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E4-SOURCE-CONFIRM is absent",
+        "caseId": "E4-SOURCE-CONFIRM"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E4-SOURCE-CONFIRM-REFUSAL is absent",
+        "caseId": "E4-SOURCE-CONFIRM-REFUSAL"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E4-COMPLETED-REPLY is absent",
+        "caseId": "E4-COMPLETED-REPLY"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E4-BOUNDED-CYCLES is absent",
+        "caseId": "E4-BOUNDED-CYCLES"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E4-PORTABILITY-CHECKLIST is absent",
+        "caseId": "E4-PORTABILITY-CHECKLIST"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E4-RECOVERY-PREFLIGHT is absent",
+        "caseId": "E4-RECOVERY-PREFLIGHT"
+      },
+      {
+        "code": "missing_required_case",
+        "detail": "Required case E4-RECOVERY-READONLY is absent",
+        "caseId": "E4-RECOVERY-READONLY"
+      }
+    ],
+    "claimedBy": null,
+    "notes": [
+      "Controlled fixture, SDK mock, readonly and installed evidence never substitute for actual-native execution.",
+      "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability; there is no allow-gap switch."
+    ]
+  },
+  "claim": {
+    "status": "FAIL",
+    "tier": "e4-bounded-stability",
+    "decidedAt": "2026-11-16T11:45:08.442Z",
+    "failureCodes": [
+      "source_dirty",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case",
+      "missing_required_case"
+    ]
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "schema": "product-acceptance-release/1",
+  "tier": "e4-bounded-stability",
+  "status": "FAIL",
+  "ok": false,
+  "checkedAt": "2026-11-16T12:00:39.524Z",
+  "source": {
+    "commit": "83f6cbede3f514c730f9d4f0d818711f162963de",
+    "dirty": true
+  },
+  "expectedSource": "83f6cbede3f514c730f9d4f0d818711f162963de",
+  "requirements": [
+    {
+      "id": "E4-CANDIDATE-FLOW",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E4-SOURCE-CONFIRM",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E4-SOURCE-CONFIRM-REFUSAL",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E4-COMPLETED-REPLY",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E4-BOUNDED-CYCLES",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E4-PORTABILITY-CHECKLIST",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E4-RECOVERY-PREFLIGHT",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E4-RECOVERY-READONLY",
+      "required": true,
+      "status": "PASS"
+    }
+  ],
+  "failures": [
+    {
+      "code": "source_dirty",
+      "detail": "Release evidence requires a clean source worktree"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E4-CANDIDATE-FLOW is absent",
+      "caseId": "E4-CANDIDATE-FLOW"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E4-COMPLETED-REPLY is absent",
+      "caseId": "E4-COMPLETED-REPLY"
+    }
+  ],
+  "claimedBy": null,
+  "notes": [
+    "Controlled fixture, SDK mock, readonly and installed evidence never substitute for actual-native execution.",
+    "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability; there is no allow-gap switch."
+  ]
+}

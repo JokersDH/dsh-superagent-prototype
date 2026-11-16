@@ -520,11 +520,22 @@ const commandSummary = (prefixes) => {
     .join(' + ')
 }
 
-const handoff = `# Agent E 第三十三轮交付交接
+const handoff = `# Agent E 第三十四轮交付交接
 
 - 分支 \`${stages.branch}\`，基线 \`${stages.base}\`，检查点 \`${stages.checkpoint}\`，本次证据源 \`${report.source.commit}\`${report.source.dirty ? '（运行时尚有未提交文件，最终提交包含它们）' : '（干净工作树）'}。证据文件随源提交之后的提交一起交付；\`git log\` 的分支头即最终交付提交。
 - 拥有路径：\`tests/product-acceptance/\`。未修改生产实现、root manifest/lock、公共 schema 或迁移。
 - 模型预算：0 个真实模型任务；唯一模型对端是本机 loopback mock。原生执行：0。
+
+## 第三十四轮六成果（两个连续工程包）
+
+| 成果 | 结论 | 依据 |
+| --- | --- | --- |
+| E1 caller finally 完整资源 | ${callerIds.every(id => byId.get(id)?.status === 'PASS') ? 'PASS' : 'INCOMPLETE'} | 共享 operation 协议（完整 birth/每次 fresh/粘性 UNKNOWN/仅完整退出后 release）；outer=${byId.get('E33-OUTER-ZIP')?.evidence?.outerZip?.operation?.verdict?.allowed}，cohort=${byId.get('E33-COHORT-RECOVERY')?.evidence?.cohortRecovery?.operation?.verdict?.allowed}；10 个纯控制含 retain 拒 release、parent 死 child 活、伪造 start、assert 失败保留、无 force API、caller 源码零直接删除。 |
+| E2 完整资源映射 oracle | ${oracleMutations.every(id => byId.get(id)?.status === 'PASS') ? 'PASS' : 'INCOMPLETE'} | resourceRowsIssues 绑定 pid/start/uid/argv/root/config/op 与 1:1 同序 post 观察，应用于 outer/cohort/E32/journey；全 report 变异覆盖空 after、foreign pid、alive 行、cardinality、错 start。 |
+| E3 两个原项目 scoped 旅程 | ${byId.get('E5-TWO-PROJECT-TEMPLATE-CREATE')?.status ?? 'MISSING'}；原项目执行 NOT_REACHED | 两项目 preview/create/candidate/verification accept；重开同 Work/phase/artifact IDs 与全部 bytes；sameProject 仅在 scoped 可读且 draft 完整时成立，scoped403 由最终 oracle 拒绝；接受面无 candidate 身份，stale-candidate 反例记 NOT_REACHED。 |
+| E4 锁定 outer ZIP | ${byId.get('E33-OUTER-ZIP')?.status ?? 'MISSING'} | W33 outer 46e（${String(w34outer?.zip?.sha256 ?? '').slice(0, 8)}…，${w34outer?.zip?.bytes ?? '?'} bytes）自身校验+包内 Node：未配置/已配置/导入/重开、端口冲突拒绝、status STOPPED、Settings 模板契约（GUI HELD 未启动）。 |
+| E5 非空恢复/升级 | ${byId.get('E33-COHORT-RECOVERY')?.status ?? 'MISSING'} + ${byId.get('E5-COHORT-UPGRADE')?.status ?? 'MISSING'} | 全部 artifact bytes（${w34rec?.seed?.artifacts?.length ?? '?'}）与 history、${w34rec?.restore?.counts?.works ?? '?'} Work/问题行、effect 行不变、冻结 Store registry ${w34rec?.directRead?.registry?.length ?? '?'}、错 bearer 401、业务/回答 422、provider 0；W32→W33 CONFIRMED 升级与仅二进制回退（post 数据保留）。D 提交的 rollback raw BLOCKED 与 summary 冲突，NOT_ADMITTED。 |
+| E6 整体 tier/交接 | 见 release/tier 表 | 分层结论；原生/试点仍 0/BLOCKED。 |
 
 ## 第三十三轮三项成果
 
@@ -1426,6 +1437,91 @@ const wave33Status = {
     exitCode: 0, source: report.source },
 }
 writeFileSync(join(reports, 'wave33-status.json'), JSON.stringify(wave33Status, null, 2) + '\n')
+
+const w34outer = byId.get('E33-OUTER-ZIP')?.evidence?.outerZip ?? null
+const w34rec = byId.get('E33-COHORT-RECOVERY')?.evidence?.cohortRecovery ?? null
+const w34up = byId.get('E5-COHORT-UPGRADE')?.evidence?.cohortUpgrade ?? null
+const w34journey = byId.get('E5-TWO-PROJECT-TEMPLATE-CREATE')?.evidence?.journey ?? null
+const callerIds = ['E1-CALLER-RETAIN-PREVENTS-RELEASE', 'E1-CALLER-COMPLETE-RELEASE', 'E1-CALLER-INCOMPLETE-SET',
+  'E1-CALLER-DUPLICATE-AND-FOREIGN', 'E1-CALLER-EXPECTED-START-MISMATCH', 'E1-CALLER-PARENT-DEAD-CHILD-ALIVE',
+  'E1-CALLER-SIGNAL-REFUSES-STALE-IDENTITY', 'E1-CALLER-ASSERT-FAILURE-RETAINS', 'E1-CALLER-NO-FORCE-API', 'E1-CALLER-SOURCE-DISCIPLINE']
+const oracleMutations = ['E2-MUTATE-E32-EMPTY-AFTER', 'E2-MUTATE-FOREIGN-PID-MISSING-START', 'E2-MUTATE-RESOURCE-ALIVE',
+  'E2-MUTATE-COHORT-CARDINALITY', 'E2-MUTATE-JOURNEY-PHASE-EXPECTED-START', 'E3-MUTATE-SAME-PROJECT-SCOPED-403',
+  'E3-MUTATE-SAME-PROJECT-NO-DRAFT', 'E3-MUTATE-INSIGHTS-WINDOW']
+const wave34Status = {
+  ...wave33Status,
+  schema: 'product-acceptance-wave34-status/1',
+  taskPackage: 'agent-tasks/product-wave-34/README.zh-CN.md',
+  supersedes: 'wave33-status.json',
+  fixedInputs: {
+    testSource: report.source.commit,
+    testSourceDirty: report.source.dirty,
+    mainRuntime: '23d5a98e6e75a3b0fb08168431260a9935cf5674 (main callbacks/support, consumed as source only)',
+    lockedCohort: { inner: w34rec?.subject?.buildId ?? w34outer?.subject?.buildId ?? null,
+      source: w34rec?.subject?.source ?? w34outer?.subject?.source ?? null,
+      tarSha256: w34rec?.subject?.tarSha256 ?? w34outer?.subject?.tarSha256 ?? null,
+      zipSha256: w34outer?.zip?.sha256 ?? null, zipBytes: w34outer?.zip?.bytes ?? null },
+    upgradeBaseline: w34up?.pair?.baseline ?? null,
+  },
+  sixOutcomes: [
+    { id: 'E1', title: 'caller finally 的完整资源与材料保留', status: callerIds.every(id => byId.get(id)?.status === 'PASS') ? 'PASS' : 'INCOMPLETE',
+      cases: callerIds.map(id => ({ id, status: byId.get(id)?.status ?? 'MISSING' })),
+      operation: { outer: w34outer?.operation ?? null, cohort: w34rec?.operation ?? null },
+      notes: 'w33 outer/cohort callers consume one shared operation protocol: complete birth set, fresh per-signal identity, sticky UNKNOWN, release only on a complete exited observation; a failed assertion or refused stop keeps the whole private HOME/install/state.' },
+    { id: 'E2', title: '所有 cohort 的完整资源映射与最终 oracle', status: oracleMutations.every(id => byId.get(id)?.status === 'PASS') ? 'PASS' : 'INCOMPLETE',
+      mutations: oracleMutations.map(id => ({ id, status: byId.get(id)?.status ?? 'MISSING' })),
+      notes: 'resourceRowsIssues requires pid/start/uid/argv digest/root/config/op before, one same-order post row per pid with explicit observation, and is applied to the outer ZIP, the W33 cohort, the E32 tar lifecycle and journey phases; full-report mutations cover empty after, foreign pid, alive row, cardinality and wrong start.' },
+    { id: 'E3', title: '两个原项目的真实 scoped 旅程与重开', status: byId.get('E5-TWO-PROJECT-TEMPLATE-CREATE')?.status ?? 'MISSING',
+      journey: { sameProject: w34journey?.originalProjectExecution?.sameProject ?? null,
+        acceptReadiness: w34journey?.projects?.map(item => item.acceptReadiness) ?? null,
+        staleScope: w34journey?.acceptStaleScope ?? null },
+      originalProjectApplicable: byId.get('E32-ORIGINAL-PROJECT-APPLICABLE')?.status ?? 'MISSING',
+      notes: 'both registered projects run preview/create/candidate/verification accept; reopen reads the same Work id, phase, artifact ids and every artifact byte; sameProject stays false because the fixture exposes only its own project, and a sameProject claim over a scoped 403 is rejected by the final report oracle.' },
+    { id: 'E4', title: 'actual outer ZIP 的当前产品安装与再启', status: byId.get('E33-OUTER-ZIP')?.status ?? 'MISSING',
+      zip: w34outer?.zip ? { sha256: w34outer.zip.sha256, bytes: w34outer.zip.bytes, buildId: w34outer.zip.buildId,
+        source: w34outer.zip.source, innerTarSha256: w34outer.zip.innerTarSha256, installManifestDigest: w34outer.zip.installManifestDigest,
+        runtimeDigest: w34outer.zip.runtimeDigest, licenseDigest: w34outer.zip.licenseDigest } : null,
+      phases: w34outer?.phases ? Object.fromEntries(Object.entries(w34outer.phases).map(([key, value]) => [key, value?.status ?? null])) : null,
+      import: w34outer?.phases?.import?.imported ?? null,
+      settings: w34outer?.settings ?? null,
+      notes: 'the locked outer ZIP is verified by its own sidecars and driven with its bundled Node: unconfigured/configured/import/reopen phases, port-conflict refusal, status STOPPED, and the Settings template contract (GUI HELD, never launched unattended).' },
+    { id: 'E5', title: '同 cohort 非空恢复、升级与回退字节证明', status: [byId.get('E33-COHORT-RECOVERY')?.status, byId.get('E5-COHORT-UPGRADE')?.status].every(value => value === 'PASS') ? 'PASS' : 'INCOMPLETE',
+      recovery: { seedArtifacts: w34rec?.seed?.artifacts?.length ?? null, artifactBytesEqual: w34rec?.readonly?.artifactsEqual ?? null,
+        works: w34rec?.restore?.counts?.works ?? null, questions: w34rec?.restore?.counts?.questions ?? null,
+        pendingRecorded: w34rec?.readonly?.pending?.questionsRecorded ?? null, queueHeld: w34rec?.readonly?.pending?.held ?? null,
+        directStore: w34rec?.directRead?.available ?? null, registry: w34rec?.directRead?.registry?.length ?? null,
+        unauthorized: w34rec?.readonly?.unauthorized ?? null, wrongToken: w34rec?.readonly?.wrongToken ?? null,
+        business: w34rec?.readonly?.business ?? null, provider: w34rec?.readonly?.providerRequests ?? null },
+      upgrade: w34up ? { from: w34up.upgrade?.from ?? null, to: w34up.upgrade?.to ?? null,
+        rollback: w34up.rollback ?? null, postKept: w34up.probe?.postKept ?? null,
+        dSubmitted: w34up.dSubmitted ? { raw: w34up.dSubmitted.bothRawResults ?? null, admission: w34up.dSubmitted.admission ?? null } : null } : null,
+      notes: 'the same locked cohort backs up a delivered Work with all referenced artifact bytes and a recorded question, restores into a new root, reads identical bytes/history and direct Store registry rows, refuses answer/business writes with no provider call, and a managed W32→W33 upgrade keeps post-upgrade data with a binary-only rollback. D’s submitted rollback summary contradicts its raw BLOCKED result and is NOT_ADMITTED.' },
+    { id: 'E6', title: '整体 tier、独立 negative 与完整可消费交接', status: release.status,
+      finalRun: { command: 'node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record', source: report.source, counts: report.counts },
+      notes: 'source/controlled/installed/native/recovered/value are separated; no real vendor/model/native send; the E pilot stays BLOCKED with its original ledger.' },
+  ],
+  cohorts: [
+    { id: 'frozen-install-target', buildId: artifactTuple.target?.buildId ?? null, source: artifactTuple.target?.sourceCommit ?? null,
+      schema: artifactTuple.target?.productSchema ?? null, tarSha256: artifactTuple.target?.tarSha256 ?? null, tarBytes: artifactTuple.target?.tarBytes ?? null,
+      cases: ['E4-INSTALL-ARTIFACT-IDENTITY', 'E7-READINESS', 'E3-TRIAL-WORKBENCH-UI', 'E5-TWO-PROJECT-TEMPLATE-CREATE', 'E32-ZIP-LIFECYCLE'] },
+    { id: 'locked-w33-cohort', buildId: w34rec?.subject?.buildId ?? null, source: w34rec?.subject?.source ?? null,
+      schema: w34rec?.subject?.schema ?? null, tarSha256: w34rec?.subject?.tarSha256 ?? null, tarBytes: w34rec?.subject?.tarBytes ?? null,
+      zipSha256: w34outer?.zip?.sha256 ?? null, zipBytes: w34outer?.zip?.bytes ?? null, runtime: w34outer?.zip?.runtime ?? null,
+      cases: ['E33-OUTER-ZIP', 'E33-COHORT-RECOVERY'] },
+    { id: 'w32-upgrade-baseline', buildId: w34up?.pair?.baseline?.buildId ?? null, source: w34up?.pair?.baseline?.source ?? null,
+      schema: w34up?.pair?.baseline?.schema ?? null, tarSha256: w34up?.pair?.baseline?.tarSha256 ?? null,
+      cases: ['E5-COHORT-UPGRADE'] },
+  ],
+  layers: { ...wave33Status.layers,
+    callerSafety: callerIds.every(id => byId.get(id)?.status === 'PASS') ? 'PASS' : 'INCOMPLETE',
+    outerZip: byId.get('E33-OUTER-ZIP')?.status ?? 'MISSING',
+    cohortRecovery: byId.get('E33-COHORT-RECOVERY')?.status ?? 'MISSING',
+    cohortUpgrade: byId.get('E5-COHORT-UPGRADE')?.status ?? 'MISSING',
+    journey: byId.get('E5-TWO-PROJECT-TEMPLATE-CREATE')?.status ?? 'MISSING',
+    originalProjectApplicable: byId.get('E32-ORIGINAL-PROJECT-APPLICABLE')?.status ?? 'MISSING' },
+  finalRun: { command: 'node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record', exitCode: 0, source: report.source },
+}
+writeFileSync(join(reports, 'wave34-status.json'), JSON.stringify(wave34Status, null, 2) + '\n')
 
 // Historical wave06-32 status files are frozen inputs; wave33 supersedes them.
 

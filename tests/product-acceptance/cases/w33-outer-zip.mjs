@@ -1,5 +1,5 @@
 import { execFileSync, spawn, spawnSync } from 'node:child_process'
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { DatabaseSync } from 'node:sqlite'
 import { dirname, join } from 'node:path'
 import { runCase, LAYERS } from '../lib/status.mjs'
@@ -120,6 +120,18 @@ export async function runOuterZip() {
     const secretScan = spawnSync('grep', ['-rIl', '-E', '(sk-[A-Za-z0-9]{20,}|api[_-]?key["\u0027]?\\s*[:=]\\s*["\u0027][A-Za-z0-9]{16,})', join(root, 'install/app/apps')], { encoding: 'utf8', timeout: 60_000 })
     evidence.zip.secretScan = { status: secretScan.status, hits: String(secretScan.stdout ?? '').split('\n').filter(Boolean).length }
 
+    // Settings: the supported entry launches a GUI editor through an absolute /usr/bin/open, which E
+    // must not trigger unattended. Its template contract is read from the frozen launcher bytes.
+    const launcherSource = readFileSync(join(root, 'personal-preview-launcher.mjs'), 'utf8')
+    evidence.settings = {
+      entry: 'Settings.command',
+      template: { mode0600: /mode:\s*0o600/u.test(launcherSource), exclusive: /flag:\s*'wx'/u.test(launcherSource),
+        keys: ['baseURL', 'apiKey', 'model', 'allowedModels', 'allowInsecureHttp', 'maxOutputTokens']
+          .filter(key => launcherSource.includes(`'${key}'`) || launcherSource.includes(`${key}:`)) },
+      gui: 'HELD',
+      reason: 'Settings.command opens TextEdit through the absolute /usr/bin/open; E does not launch a GUI editor unattended.',
+    }
+
     runnerFn = runner(root, home)
     const recordPath = indexPath(root, home, manifest)
 
@@ -195,6 +207,40 @@ export async function runOuterZip() {
       readiness: readinessB ? { status: readinessB.status, discussion: readinessB.body?.discussion ?? null } : null,
       stop: { status: stop2.status, result: stop2.json?.status ?? null }, resources: { before: setB, after: afterB } }
     await waitExited(configuredStart.child.pid)
+    await new Promise(resolvePromise => setTimeout(resolvePromise, 600))
+
+    // Phase 2b: project import in the normal (non-discussion) personal surface of the same ZIP.
+    const [p2b, a2b] = [await freePort(), await freePort()]
+    const importStart = await startAsync(root, home, ['--port', String(p2b), '--api-port', String(a2b)], { PA_MODEL_CONFIG: mock.file })
+    track('import:launcher', importStart.child.pid, { role: 'launcher' })
+    const status2b = await waitStatus(runnerFn)
+    const importExit = await Promise.race([
+      new Promise(resolvePromise => importStart.child.once('exit', code => resolvePromise({ code }))),
+      new Promise(resolvePromise => setTimeout(() => resolvePromise({ code: 'RUNNING' }), 1_000)),
+    ])
+    const setImport = capture('import', recordPath)
+    let imported = { status: null, projectId: null, readBack: null }
+    if (status2b?.json?.status === 'RUNNING' && status2b.json.instance?.apiURL) {
+      const key = readFileSync(join(dirname(recordPath), '..', 'data', 'api.key'), 'utf8').trim()
+      const projectDir = join(home, 'imported-project')
+      mkdirSync(join(projectDir, 'src'), { recursive: true })
+      writeFileSync(join(projectDir, 'index.mjs'), 'export const ok = true\n')
+      const git = args => execFileSync('git', args, { cwd: projectDir, stdio: 'pipe' })
+      git(['init', '-q']); git(['add', 'index.mjs'])
+      git(['-c', 'core.hooksPath=/dev/null', '-c', 'commit.gpgsign=false', '-c', 'user.name=Fixture', '-c', 'user.email=fixture@localhost', 'commit', '-qm', 'zip import'])
+      const response = await fetch(`${status2b.json.instance.apiURL}/v1/projects`, { method: 'POST',
+        headers: { authorization: `Bearer ${key}`, 'content-type': 'application/json' },
+        body: JSON.stringify({ path: projectDir, displayName: 'W33 导入项目', check: 'node_test' }), signal: AbortSignal.timeout(20_000) })
+        .then(async value => ({ status: value.status, body: await value.json().catch(() => null) }))
+        .catch(error => ({ status: 0, error: String(error.message) }))
+      const echoed = (response.body?.projects ?? []).filter(item => item.displayName === 'W33 导入项目')[0] ?? null
+      imported = { status: response.status, projectId: echoed?.id ?? null, readBack: (response.body?.projects ?? []).length }
+    }
+    const stopImport = runnerFn(['stop'], { timeoutMs: 40_000 })
+    evidence.phases.import = { consolePort: p2b, apiPort: a2b, startExit: importExit, status: status2b?.json?.status ?? null,
+      imported, stop: { status: stopImport.status, result: stopImport.json?.status ?? null },
+      resources: { before: setImport, after: rollout(setImport) } }
+    await waitExited(importStart.child.pid)
     await new Promise(resolvePromise => setTimeout(resolvePromise, 600))
 
     // Phase 3: reopen through the packaged Start again (same private roots).
@@ -275,6 +321,11 @@ export async function runOuterZip() {
       JSON.stringify(evidence.phases.reopen))
     assert('ZIP_STATUS_STOPPED', evidence.negatives.statusStopped?.status === 2 && evidence.negatives.statusStopped?.result === 'STOPPED',
       JSON.stringify(evidence.negatives.statusStopped))
+    assert('ZIP_IMPORT', evidence.phases.import?.imported?.status === 200 && typeof evidence.phases.import?.imported?.projectId === 'string' &&
+      evidence.phases.import?.stop?.result === 'STOPPED', JSON.stringify(evidence.phases.import?.imported))
+    assert('ZIP_SETTINGS_CONTRACT', evidence.settings?.template?.mode0600 === true && evidence.settings?.template?.exclusive === true &&
+      evidence.settings?.template?.keys?.length === 6 && evidence.settings?.gui === 'HELD',
+      JSON.stringify(evidence.settings))
     assert('ZIP_OPERATION_RELEASED', evidence.operation?.verdict?.allowed === true && evidence.operation.released.length === 1 &&
       evidence.operation.retained.length === 0 && evidence.operation.signals.length === 0,
       JSON.stringify({ verdict: evidence.operation?.verdict, signals: evidence.operation?.signals?.length, retained: evidence.operation?.retained }))

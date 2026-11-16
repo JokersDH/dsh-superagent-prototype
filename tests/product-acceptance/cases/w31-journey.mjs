@@ -155,6 +155,9 @@ export async function runJourney() {
     const executionPool = fixtureConfiguration.projects.filter(item => item.dispatchAllowed === true)
     if (executionPool.length === 0) throw new Error('fixture configuration exposes no dispatchable project')
     journey.executionPool = executionPool.map(item => ({ id: item.id, displayName: item.displayName ?? null, profileIds: item.profileIds ?? [] }))
+    // The accept surface carries a verification identity but no candidate object in this build, so a
+    // stale-candidate negative cannot be derived without inventing a second product contract.
+    journey.acceptStaleScope = 'NOT_REACHED: accept_candidate exposes no candidate identity (currentCandidate is null); accept readiness is verification-based and a stale-candidate negative is not expressible'
     journey.originalProjectExecution = {
       sameProject: executionPool.every(item => journey.projects.some(project => project.id === item.id)),
       reason: executionPool.every(item => journey.projects.some(project => project.id === item.id)) ? null
@@ -177,8 +180,12 @@ export async function runJourney() {
       const candidate = view?.actions?.currentCandidate ?? null
       const verification = view?.actions?.currentVerificationId
         ? await fixtureClient.verification(view.actions.currentVerificationId).catch(() => null) : null
+      const results = Array.isArray(verification?.results) ? verification.results : null
       project.acceptReadiness = { available: view?.actions?.available ?? [], candidateId: candidate?.id ?? null,
-        verificationId: view?.actions?.currentVerificationId ?? null, verificationState: verification?.state ?? null }
+        verificationId: view?.actions?.currentVerificationId ?? null,
+        verificationResults: results?.length ?? null,
+        verificationState: results && results.length > 0 ? (results.every(item => item.outcome === 'PASS') ? 'pass' : 'fail')
+          : (verification?.state ?? null) }
       // A stale candidate on the same still-acceptable state must be refused; the valid accept follows.
       let staleAccept = null
       if (candidate?.id) {
@@ -198,7 +205,13 @@ export async function runJourney() {
       // The public reader may scope insights by its own authorization; the open window is recorded too.
       const open7 = await fixtureClient.request('/v1/insights?days=7')
       const open30 = await fixtureClient.request('/v1/insights?days=30')
+      const deliveredArtifacts = []
+      for (const artifactId of delivered?.artifactIds ?? []) {
+        const value = await fixtureClient.artifact(artifactId).catch(() => null)
+        if (value) deliveredArtifacts.push({ id: artifactId, sha256: value.sha256, bytes: value.bytes.byteLength })
+      }
       Object.assign(project, { executionProjectId: fixtureProject.id, receipt: created.receipt?.status ?? null, workId, phase: delivered?.phase ?? null,
+        deliveredArtifacts,
         candidate: view?.actions?.currentCandidate ?? null, accepted: accepted?.receipt?.status ?? null,
         acceptReadiness: project.acceptReadiness, staleAccept: staleAccept ?? null,
         artifacts: delivered?.artifactIds?.length ?? 0,
@@ -230,8 +243,15 @@ export async function runJourney() {
       for (const project of journey.projects) {
         const work = await client.work(project.workId).catch(() => null)
         const page = await client.conversation(`conv-w31-${project.index}`).catch(() => null)
+        const reopenedArtifacts = []
+        for (const artifactId of work?.artifactIds ?? []) {
+          const value = await client.artifact(artifactId).catch(() => null)
+          if (value) reopenedArtifacts.push({ id: artifactId, sha256: value.sha256, bytes: value.bytes.byteLength })
+        }
         journey.reopen.works.push({ id: project.workId, found: work !== null, phase: work?.phase ?? null,
-          artifacts: work?.artifactIds?.length ?? null, messages: page?.messages?.length ?? null })
+          artifacts: work?.artifactIds?.length ?? null, messages: page?.messages?.length ?? null,
+          artifactIdsEqual: JSON.stringify(work?.artifactIds ?? []) === JSON.stringify((project.deliveredArtifacts ?? []).map(item => item.id)),
+          artifactBytesEqual: JSON.stringify(reopenedArtifacts) === JSON.stringify(project.deliveredArtifacts ?? []) })
       }
       journey.reopen.readiness = (await client.request('/v1/readiness')).status
       const beforeC = fixedSet(root.config, root, 'journey:reopen')

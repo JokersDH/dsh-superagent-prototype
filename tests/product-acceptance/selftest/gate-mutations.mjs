@@ -671,7 +671,7 @@ const evidenceFor = (key) => {
         projects: [1, 2].map(index => ({ index, displayName: `p${index}`, id: `project-${index}`, executionProjectId: `project-${index}`,
           preview: { status: 200, bodyStatus: 'draft', authorization: 'none', applicable: true, fieldsCount: 3 }, receipt: 'recorded', workId: `work-${index}`,
           phase: 'delivered', accepted: 'recorded', artifacts: 2,
-          acceptReadiness: { available: ['accept_candidate'], candidateId: `candidate-${index}`, verificationId: `verification-${index}`, verificationState: 'finished' },
+          acceptReadiness: { available: ['accept_candidate'], candidateId: `candidate-${index}`, verificationId: `verification-${index}`, verificationResults: 3, verificationState: 'pass' },
           staleAccept: { status: 'refused', code: 'candidate_unknown' },
           insights: { open: { seven: 200, thirty: 200, days: [7, 30] } } })) }
     case 'journeyContext':
@@ -698,7 +698,7 @@ const evidenceFor = (key) => {
           stop: { clean: true, package: 'STOPPED' }, resources: resourcePair(15, 'zip:reopen') } }
     case 'journeyReopen':
       return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
-        status: 'RUNNING', works: [{ found: true, phase: 'delivered', artifacts: 2, messages: 2 }, { found: true, phase: 'delivered', artifacts: 1, messages: 1 }],
+        status: 'RUNNING', works: [{ found: true, phase: 'delivered', artifacts: 2, artifactIdsEqual: true, artifactBytesEqual: true, messages: 2 }, { found: true, phase: 'delivered', artifacts: 1, artifactIdsEqual: true, artifactBytesEqual: true, messages: 1 }],
         readiness: 200, stop: { clean: true, package: 'STOPPED', resources: resourcePair(16, 'journey:reopen') } }
     case 'recipePreview':
       return { subject: { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' },
@@ -728,7 +728,11 @@ const evidenceFor = (key) => {
             stop: { status: 0, result: 'STOPPED' }, resources: resourcePair(101, 'outer:unconfigured') },
           configured: { status: 'RUNNING', readiness: { status: 200, discussion: 'configuration_present' },
             stop: { status: 0, result: 'STOPPED' }, resources: resourcePair(102, 'outer:configured') },
-          reopen: { status: 'RUNNING', stop: { status: 0, result: 'STOPPED' }, resources: resourcePair(103, 'outer:reopen') } },
+          reopen: { status: 'RUNNING', stop: { status: 0, result: 'STOPPED' }, resources: resourcePair(103, 'outer:reopen') },
+          import: { status: 'RUNNING', imported: { status: 200, projectId: 'project-imported' }, stop: { status: 0, result: 'STOPPED' },
+            resources: resourcePair(106, 'outer:import') } },
+        settings: { entry: 'Settings.command', gui: 'HELD',
+          template: { mode0600: true, exclusive: true, keys: ['baseURL', 'apiKey', 'model', 'allowedModels', 'allowInsecureHttp', 'maxOutputTokens'] } },
         negatives: { portConflict: { outcome: 'EXITED', code: 1 }, statusStopped: { status: 2, result: 'STOPPED' } } }
     }
     case 'cohortUpgrade': {

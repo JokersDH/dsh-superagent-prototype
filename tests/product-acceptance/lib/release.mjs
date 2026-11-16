@@ -569,6 +569,11 @@ export function outerZipIssues(value) {
   if (reopen.status !== 'RUNNING' || reopen.stop?.result !== 'STOPPED') issues.push('reopen')
   for (const issue of resourceRowsIssues(reopen.resources?.before, reopen.resources?.after)) issues.push(`reopen_${issue}`)
   if (value.negatives?.statusStopped?.status !== 2 || value.negatives?.statusStopped?.result !== 'STOPPED') issues.push('status_stopped')
+  if (value.settings?.template?.mode0600 !== true || value.settings?.template?.exclusive !== true ||
+    !(value.settings?.template?.keys?.length === 6)) issues.push('settings_template')
+  if (value.phases?.import?.imported?.status !== 200 || !isSubstantive(value.phases?.import?.imported?.projectId) ||
+    value.phases?.import?.stop?.result !== 'STOPPED') issues.push('import')
+  for (const issue of resourceRowsIssues(value.phases?.import?.resources?.before, value.phases?.import?.resources?.after)) issues.push(`import_${issue}`)
   return issues
 }
 
@@ -639,8 +644,8 @@ export function journeyIssues(value) {
     if (project.accepted !== 'recorded' || project.phase !== 'delivered' || !(project.artifacts >= 1)) issues.push(`accept:${project.index}`)
     const readiness = project.acceptReadiness ?? {}
     if (project.accepted === 'recorded') {
-      if (!readiness.available?.includes('accept_candidate') || !isSubstantive(readiness.candidateId) ||
-        !['finished', 'passed'].includes(String(readiness.verificationState ?? ''))) issues.push(`accept_readiness:${project.index}`)
+      if (!readiness.available?.includes('accept_candidate') || !isSubstantive(readiness.verificationId) ||
+        readiness.verificationState !== 'pass' || !((readiness.verificationResults ?? 0) >= 1)) issues.push(`accept_readiness:${project.index}`)
       if (project.staleAccept && project.staleAccept.status === 'recorded') issues.push(`stale_accepted:${project.index}`)
     }
     const open = project.insights?.open ?? {}
@@ -709,6 +714,7 @@ export function journeyReopenIssues(value) {
     if (work?.found !== true) issues.push(`not_found:${index}`)
     if (work?.phase !== 'delivered') issues.push(`phase:${index}`)
     if (!((work?.artifacts ?? 0) >= 1)) issues.push(`artifacts:${index}`)
+    if (work?.artifactIdsEqual !== true || work?.artifactBytesEqual !== true) issues.push(`artifact_bytes:${index}`)
     if (!((work?.messages ?? 0) >= 1)) issues.push(`messages:${index}`)
   }
   if (value.readiness !== 200) issues.push('readiness')

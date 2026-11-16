@@ -1,10 +1,10 @@
 {
   "schema": "product-acceptance-stages/1",
   "agent": "E",
-  "taskPackage": "agent-tasks/product-wave-33/README.zh-CN.md",
+  "taskPackage": "agent-tasks/product-wave-34/README.zh-CN.md",
   "branch": "codex/g3-product-acceptance",
-  "base": "84d03987",
-  "checkpoint": "c2568908",
+  "base": "6b306514",
+  "checkpoint": "PENDING",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -18,50 +18,50 @@
   "stages": [
     {
       "id": "E1",
-      "title": "Package stop verifies the fixed set even after an exited launcher",
-      "command": "node tests/product-acceptance/cases/w27-lifecycle.mjs",
+      "title": "Caller finally keeps the complete material set",
+      "command": "node tests/product-acceptance/run.mjs --suites=selftest",
       "notes": [
-        "A known birth without a complete fixed set is resources_unverified UNKNOWN even when the launcher already exited; no discovery fallback."
+        "One shared operation protocol drives the w33 outer/cohort callers; a complete exited observation is required before any release, and UNKNOWN keeps install/state/HOME."
       ]
     },
     {
       "id": "E2",
-      "title": "Journey oracle: applicable preview, execution identity, recovery",
-      "command": "node tests/product-acceptance/cases/w31-journey.mjs",
+      "title": "Complete resource mapping oracle for every cohort",
+      "command": "node tests/product-acceptance/run.mjs --suites=selftest",
       "notes": [
-        "The final validator rejects needs_input-with-applicable, a needs_input preview that claims fields, a foreign executionProjectId, a scoped 403, and a reopen without found/phase/artifacts; the legal narrowed fixture positive stays separate from the original-project gap."
+        "resourceRowsIssues binds pid/start/uid/argv/root/config/op and 1:1 post rows; full-report mutations reject empty after, foreign pid, alive, cardinality and wrong start."
       ]
     },
     {
       "id": "E3",
-      "title": "Outer ZIP verified and driven by its own entries",
+      "title": "Two original projects scoped journey and reopen",
       "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "SHA256SUMS, package-result, inner install/runtime/license digests, bundled Node/ABI, private HOME Start/Stop/status, port conflict, reopen and stop are observed on the real ZIP."
+        "Accept readiness is verification-based; reopen compares Work id, phase, artifact ids and every byte; a sameProject claim over scoped 403 is rejected by the final oracle."
       ]
     },
     {
       "id": "E4",
-      "title": "Non-empty business recovery on the cohort",
+      "title": "Locked W33 outer ZIP product entry",
       "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "A delivered Work with 20 artifacts is backed up (eventSeq>0), restored into a new root, read back recovery-readonly with identical artifact bytes and history, business writes 422, no provider call, tampered bundle refused."
+        "Outer 46e verified by its own hashes and driven with bundled Node through unconfigured/configured/import/reopen/stop; Settings template is contractual and its GUI stays HELD."
       ]
     },
     {
       "id": "E5",
-      "title": "Upgrade reopen and complete stop on the accurate pair",
-      "command": "node tests/product-acceptance/run.mjs --tier=installed-functional",
+      "title": "Same-cohort non-empty recovery and upgrade",
+      "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "R1 pair managed upgrade/rollback keeps post-upgrade data; cross-schema refusal is separate; every stage's fixed-set stop is re-observed."
+        "All artifact bytes, both Works, held question rows, direct Store registry, auth policy and no-provider read-back; managed W32→W33 upgrade with binary-only rollback."
       ]
     },
     {
       "id": "E6",
-      "title": "Layered conclusion and status",
+      "title": "Overall tier and handoff",
       "command": "node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record",
       "notes": [
-        "wave33-status separates source/main/candidate/installed/native, names both admitted cohorts, and keeps the pilot and original-project gap BLOCKED/NOT_REACHED without a new oracle."
+        "wave34-status separates source/controlled/installed/native/recovered/value and keeps the pilot BLOCKED."
       ]
     }
   ]
