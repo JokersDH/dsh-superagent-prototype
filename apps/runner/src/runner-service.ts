@@ -142,6 +142,8 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
   let businessClosed = false
   /** Last generation observed on the channel; readable after terminal close without reviving it. */
   let channelGeneration = 0
+  /** The one lease that currently owns callbacks; control actions from any older lease are refused. */
+  let activeLease: string | undefined
   let physicallyStopped = false
   const preparation = new AbortController()
   const processHost = options.processHost ?? new ProcessHost()
@@ -232,6 +234,18 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
   const channelError = (code: string, reason: string, message = reason): Error =>
     Object.assign(new Error(message), { code, reason })
   const asChannelReply = (frame: object): unknown => ({ v: 1, ...frame })
+  /**
+   * Control admission is checked BEFORE a feed/cancel reaches any effect: terminal/stopped service,
+   * foreign producer and an old callback lease are all refused by name. The business fence still runs
+   * afterwards for commands; this only fences the transport-level caller.
+   */
+  const controlRefusal = (auth?: { producer?: unknown; leaseId?: string | null }, options: { allowBusinessClosed?: boolean } = {}): { code: string; reason: string } | null => {
+    if (closed) return { code: 'stale_connection', reason: 'channel_closed' }
+    if (businessClosed && !options.allowBusinessClosed) return { code: 'stale_connection', reason: 'admission_closed' }
+    if (auth?.producer && channelProducer && !sameCoordinatorChannelProducer(auth.producer as never, channelProducer)) return { code: 'identity_mismatch', reason: 'foreign_producer' }
+    if (auth?.leaseId && activeLease && auth.leaseId !== activeLease) return { code: 'stale_connection', reason: 'stale_lease' }
+    return null
+  }
   // A foreign registration is refused before any bind/CAS, so its poll changes nothing (no generation bump).
   const assertChannelProducer = (producer: unknown): void => {
     if (!channelProducer || !sameCoordinatorChannelProducer(producer, channelProducer)) {
@@ -420,7 +434,12 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
               source: frame.producer.source,
               resources: () => processHost.inventory(),
               state: () => physicallyStopped ? 'terminated' : businessClosed ? 'unknown' : 'serving',
-              cancel: async command => {
+              cancel: async (command, auth) => {
+                // Identity/lease is certified BEFORE the physical stop mutates anything; a foreign cancel
+                // is refused here without running stopPhysical. A legitimate stop after admission closed
+                // is still allowed, but a terminal service is not revived.
+                const fence = controlRefusal(auth, { allowBusinessClosed: true })
+                if (fence) throw Object.assign(new Error(fence.reason), fence)
                 // Cancel closes admission first (the endpoint does that) and then stops owned work.
                 await stopPhysical()
                 void command
@@ -488,6 +507,7 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
                 const page = attach!.next(leaseId, producer as never)
                 if (!page.ok) throw channelError(page.refused, page.refused === 'identity_mismatch' ? 'foreign_producer' : 'lease_not_current')
                 channelGeneration = page.generation
+                activeLease = leaseId
                 // The page is the delivery for a remote pull connection; never mirror it onto stdio.
                 return { generation: page.generation, request: page.request, remainingMs: page.remainingMs }
               },
@@ -499,7 +519,7 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
                 // answer 409 stale_lease, before the module is touched.
                 if (closed || businessClosed) return { accepted: false, generation: channelGeneration }
                 const routed = attach!.receive(leaseId, asChannelReply(reply as object), producer as never)
-                if (routed.accepted) dispatched.delete(leaseId)
+                if (routed.accepted) { dispatched.delete(leaseId); activeLease = leaseId }
                 channelGeneration = routed.generation
                 return { accepted: routed.accepted, generation: routed.generation }
               },
@@ -512,7 +532,9 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
                 return { total: bytes.length, digest, base64: slice.toString('base64') }
               },
               // Business commands are admitted to the SAME attempt and child through the existing feed.
-              command: async command => {
+              command: async (command, auth) => {
+                const fence = controlRefusal(auth)
+                if (fence) throw Object.assign(new Error(fence.reason), fence)
                 const refusal = await admitCommand(command, command.id)
                 if (refusal) throw Object.assign(new Error(refusal.message), { code: refusal.code, reason: refusal.reason })
               },

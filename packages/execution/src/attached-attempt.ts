@@ -32,6 +32,20 @@ export type AttachedAttemptCallbacks = {
   nativeWrite?(intent: AttachedNativeIntent): Promise<{ allowed: boolean; reason?: string }>
 }
 
+/**
+ * The original host handle main actually publishes: the registered port plus its shared original
+ * callbacks. Attaching through this helper guarantees both come from the SAME original attempt, so a
+ * caller cannot pair a port with a different store/guard.
+ */
+export type AttachableRunningAttempt = {
+  readonly attemptId: string
+  readonly attachPort?: {
+    readonly registration: { socketPath: string; credentialPath: string; socketIdentity: { dev: number; ino: number } }
+    readonly producer: unknown
+  }
+  readonly attachCallbacks?: AttachedAttemptCallbacks
+}
+
 export type AttachedAttempt = {
   leaseId: string
   generation: number
@@ -74,6 +88,23 @@ export async function resolveNativeDecision(guard: AttachedAttemptCallbacks['nat
   } catch (error) {
     return { allowed: false, reason: `guard_threw:${String((error as { message?: string })?.message ?? error).slice(0, 120)}` }
   }
+}
+
+/**
+ * Attach to the ORIGINAL RunningAttempt main exposes. The registration, producer and callbacks are all
+ * read from that one handle; missing pieces are refused rather than substituted with local defaults.
+ */
+export function attachRunningAttempt(handle: AttachableRunningAttempt, leaseId: string, options: { timeoutMs?: number } = {}): AttachedAttempt {
+  if (!handle?.attachPort) throw new Error('The original Runner has no registered attachPort yet')
+  if (!handle.attachCallbacks) throw new Error('The original Runner exposes no shared attachCallbacks')
+  if (!handle.attemptId) throw new Error('The original Runner handle has no attempt identity')
+  return attachRunnerAttempt({
+    endpoint: handle.attachPort.registration,
+    producer: handle.attachPort.producer as AttachAttemptInput['producer'],
+    leaseId,
+    callbacks: handle.attachCallbacks,
+    ...(options.timeoutMs === undefined ? {} : { timeoutMs: options.timeoutMs }),
+  })
 }
 
 export function attachRunnerAttempt(input: AttachAttemptInput): AttachedAttempt {
@@ -157,11 +188,11 @@ export function attachRunnerAttempt(input: AttachAttemptInput): AttachedAttempt 
     inspect: () => client.inspect(),
     feed: async command => {
       if (!client.command) throw new Error('Runner does not expose the original command feed')
-      return client.command(command)
+      return client.command(command, input.leaseId)
     },
     cancel: async command => {
       if (!client.cancel) throw new Error('Runner does not expose the original cancel transport')
-      return client.cancel(command)
+      return client.cancel(command, input.leaseId)
     },
   }
 }

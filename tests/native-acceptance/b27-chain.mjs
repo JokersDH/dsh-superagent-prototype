@@ -12,7 +12,8 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { CaseLog, writeReport } from './harness.mjs'
-import { adoptSpawn, observe, signalOwned } from './signal-guard.mjs'
+import { createSpawnFactory, observe, signalOwned } from './signal-guard.mjs'
+const owned = createSpawnFactory()
 import { RunnerLink } from '../../apps/runner/src/runner-link-client.ts'
 import { makeAttemptSpec, makeCommand } from '../../packages/testing/src/index.ts'
 import { endpointDirectory } from '../../apps/runner/src/recovery-endpoint.ts'
@@ -26,13 +27,15 @@ const CHILD = fileURLToPath(new URL('./b27-coordinator-child.mjs', import.meta.u
 const producer = { source: 'codex-native', runnerIdentityRef: 'b27-chain-runner' }
 const children = []
 const serve = registration => new Promise(resolve => {
-  const child = spawn(process.execPath, [CHILD], { env: { ...process.env, PA_W27_REGISTRATION: registration, PA_W27_MODE: 'serve' }, stdio: ['ignore', 'pipe', 'pipe'] })
+  const handler = owned.spawn(process.execPath, [CHILD], { spawnOptions: { env: { ...process.env, PA_W27_REGISTRATION: registration, PA_W27_MODE: 'serve' }, stdio: ['ignore', 'pipe', 'pipe'] }, expectedChildren: [] })
+  const child = handler.child
   const lines = []
   child.stdout.on('data', chunk => { for (const line of String(chunk).split('\n').filter(Boolean)) { try { lines.push(JSON.parse(line)) } catch {} } })
   child.stderr.on('data', () => {})
-  child.on('exit', (code, signal) => resolve({ pid: child.pid, code, signal, lines, child }))
+  child.on('exit', (code, signal) => resolve({ pid: child.pid, code, signal, lines, child, handler }))
+  child.__handler = handler
   children.push(child)
-  setTimeout(() => resolve({ pid: child.pid, lines, child, running: true }), 900)
+  setTimeout(() => resolve({ pid: child.pid, lines, child, handler, running: true }), 900)
 })
 let runner
 try {
@@ -81,9 +84,8 @@ try {
   const pidA = first.pid
   // Kill through the safe tool: capture A's complete birth identity, then signal once it is re-verified.
   // The probe's own spawn intent (executable + ordered argv); nothing is derived from the pid.
-  // Authority comes from the original ChildProcess object (its own spawnfile/spawnargs), not the pid.
-  const aCaptured = adoptSpawn(first.child, { expectedChildren: [] })
-  const aSent = aCaptured.ok ? signalOwned(aCaptured.handle, 'SIGKILL') : { sent: false, refused: true, unknown: aCaptured.unknown }
+  // Authority is the capability this factory issued for the child it spawned, not a pid or a copied object.
+  const aSent = first.handler?.ok ? signalOwned(first.handler.handle, 'SIGKILL') : { sent: false, refused: true }
   let diedBy = null
   for (let index = 0; index < 100 && diedBy === null; index += 1) {
     const observed = observe(pidA)
@@ -91,7 +93,7 @@ try {
     if (diedBy === null) await new Promise(resolve => setTimeout(resolve, 20))
   }
   const runnerAlive = observe(runnerPid).state === 'live'
-  log.evidence({ pidA, diedBy, sent: aSent.sent, refused: aSent.refused ?? false, markers: aCaptured.ok ? aCaptured.record.markers : null, runnerPid, runnerAlive })
+  log.evidence({ pidA, diedBy, sent: aSent.sent, refused: aSent.refused ?? false, markers: first.handler?.ok ? first.handler.record.markers : null, runnerPid, runnerAlive })
   if (diedBy === 'SIGKILL' && runnerAlive) log.pass(`coordinator ${pidA} died by SIGKILL while Runner ${runnerPid} kept running`)
   else log.fail(`the kill window is not what was claimed: ${JSON.stringify({ diedBy, runnerAlive })}`)
 
@@ -142,8 +144,7 @@ try {
 } finally {
   for (const child of children) {
     // Cleanup goes through the same tool, so even our own leftovers are identity-checked before a signal.
-    const captured = adoptSpawn(child, { expectedChildren: [] })
-    if (captured.ok) signalOwned(captured.handle, 'SIGKILL')
+    if (child.__handler?.ok) signalOwned(child.__handler.handle, 'SIGKILL')
   }
   try { await runner?.close() } catch {}
   delete process.env.PA_RUNNER_RECOVERY_ROOT

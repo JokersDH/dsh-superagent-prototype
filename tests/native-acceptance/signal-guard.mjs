@@ -89,56 +89,86 @@ function registerIntent(pid, intent) {
 }
 
 /** Spawn a process this probe owns and register its immutable spawn intent. */
-export function spawnOwned(executable, args, intent = {}) {
-  const child = deps.spawn(executable, args, intent.spawnOptions ?? { stdio: ['ignore', 'pipe', 'pipe'] })
+/** Private provenance: a spawn capability is issued only by the factory that performed the spawn. */
+function issueSpawn(store, spawnFn, executable, args, intent = {}) {
+  // Resolve the spawner at call time so a configured test factory replaces it deterministically.
+  const child = (spawnFn ?? deps.spawn)(executable, args, intent.spawnOptions ?? { stdio: ['ignore', 'pipe', 'pipe'] })
   if (!child || !Number.isSafeInteger(child.pid)) return { ok: false, unknown: 'spawn_failed', child }
-  // spawnOwned performed this spawn itself, so it registers the intent it just issued; it never needs
-  // to re-adopt its own child. Adoption from callers is the guarded path below.
   const argv = [executable, ...args]
   for (const [name, value] of [['root', intent.root], ['config', intent.config], ['operation', intent.operation]]) {
     if (value !== undefined && value !== null && !argv.includes(value)) return { ok: false, unknown: `spawn_${name}_not_in_argv`, child }
   }
-  const registered = registerIntent(child.pid, { executable, argv, ...intent })
+  const provenance = deepFreeze(structuredClone({
+    executable, argv,
+    ...(intent.root === undefined ? {} : { root: intent.root }),
+    ...(intent.config === undefined ? {} : { config: intent.config }),
+    ...(intent.operation === undefined ? {} : { operation: intent.operation }),
+  }))
+  store.set(child, provenance)
+  const registered = registerIntent(child.pid, {
+    executable, argv,
+    ...(provenance.root === undefined ? {} : { root: provenance.root }),
+    ...(provenance.config === undefined ? {} : { config: provenance.config }),
+    ...(provenance.operation === undefined ? {} : { operation: provenance.operation }),
+    ...(intent.expectedChildren === undefined ? {} : { expectedChildren: intent.expectedChildren }),
+  })
   return { ...registered, child, argv }
 }
 
-/** Adopt a child the caller spawned itself, using the caller's spawn intent (never a ps-derived one). */
-export function adoptSpawn(childOrPid, intent = {}) {
-  // A numeric pid is NEVER ownership: the caller must hand over the original ChildProcess object whose
-  // spawnfile/spawnargs are the process's own spawn metadata. ps-copied strings and bare pids are refused.
+function adoptWithProvenance(store, childOrPid, intent = {}) {
   if (!childOrPid || typeof childOrPid !== 'object') return { ok: false, unknown: 'numeric_pid_not_accepted' }
-  // A plain object with copied spawnfile/spawnargs is NOT the original ChildProcess: the spawn metadata
-  // must belong to a real child object this process created.
-  if (!(childOrPid instanceof ChildProcess)) return { ok: false, unknown: 'not_a_child_process' }
-  const pid = childOrPid.pid
-  if (!Number.isSafeInteger(pid) || pid <= 0) return { ok: false, unknown: 'invalid_pid' }
-  const executable = childOrPid.spawnfile
-  const argv = childOrPid.spawnargs
-  if (typeof executable !== 'string' || executable.length === 0) return { ok: false, unknown: 'not_a_child_process' }
-  if (!Array.isArray(argv) || argv.length === 0) return { ok: false, unknown: 'not_a_child_process' }
-  if (argv[0] !== executable) return { ok: false, unknown: 'argv_executable_disagree' }
-  if (Array.isArray(intent.argv) && !sameTokens(intent.argv, argv)) return { ok: false, unknown: 'intent_differs_from_spawn' }
-  // root/config/operation are captured from the spawn intent and must be tokens OF that intent; they are
-  // never re-derived from the process being checked.
+  const provenance = store.get(childOrPid)
+  // No provenance means this factory never spawned this object: a plain object, a copied ChildProcess,
+  // Object.create(ChildProcess.prototype), new ChildProcess() and a foreign process all fail here.
+  if (!provenance) return { ok: false, unknown: 'foreign_spawn' }
+  if (Array.isArray(intent.argv) && !sameTokens(intent.argv, provenance.argv)) return { ok: false, unknown: 'intent_differs_from_spawn' }
+  if (typeof intent.executable === 'string' && intent.executable !== provenance.executable) return { ok: false, unknown: 'intent_differs_from_spawn' }
   for (const [name, value] of [['root', intent.root], ['config', intent.config], ['operation', intent.operation]]) {
-    if (value !== undefined && value !== null && !argv.includes(value)) return { ok: false, unknown: `spawn_${name}_not_in_argv` }
+    if (value !== undefined && value !== null && !provenance.argv.includes(value)) return { ok: false, unknown: `spawn_${name}_not_in_argv` }
   }
-  return registerIntent(pid, { ...intent, executable, argv })
+  const registered = registerIntent(childOrPid.pid, {
+    executable: provenance.executable,
+    argv: provenance.argv,
+    ...(provenance.root === undefined ? {} : { root: provenance.root }),
+    ...(provenance.config === undefined ? {} : { config: provenance.config }),
+    ...(provenance.operation === undefined ? {} : { operation: provenance.operation }),
+    ...(intent.expectedChildren === undefined ? {} : { expectedChildren: intent.expectedChildren }),
+  })
+  return { ...registered, child: childOrPid, argv: provenance.argv }
 }
 
-/** Back-compat alias used by existing harnesses: adopt, never discover. */
-export function born(pid, intent) { return adoptSpawn(pid, intent) }
-
+/**
+ * An explicit original factory. Only children returned by THIS factory's `spawn` can be adopted by it;
+ * the provenance WeakMap is private, so an external ChildProcess cannot be recollected into authority.
+ */
 function lookup(handle) {
-  if (!handle || typeof handle.handleId !== 'string') return { ok: false, unknown: 'no_handle' }
+  if (!handle || typeof handle !== 'object') return null
   const entry = registry.get(handle.handleId)
-  // The capability is THIS handle object, not the id/record it carries: a copied object has no authority.
-  if (!entry || entry.handle !== handle) return { ok: false, unknown: 'unknown_handle' }
-  if (entry.deps !== deps) return { ok: false, unknown: 'handle_from_other_tool' }
-  return { ok: true, record: entry.record }
+  // The capability is the exact frozen handle object, not the id/record it carries.
+  if (!entry || entry.handle !== handle) return null
+  return { ok: true, ...entry }
 }
 
-/** Read-only observation. UNKNOWN is distinct from gone; `alive` is false for both by construction. */
+export function createSpawnFactory(spawnFn) {
+  const store = new WeakMap()
+  return Object.freeze({
+    spawn: (executable, args, intent = {}) => issueSpawn(store, spawnFn, executable, args, intent),
+    adopt: (childOrPid, intent = {}) => adoptWithProvenance(store, childOrPid, intent),
+  })
+}
+
+const defaultFactory = createSpawnFactory()
+
+/** Spawn through the module's default factory and return its capability for that child. */
+export function spawnOwned(executable, args, intent = {}) {
+  return defaultFactory.spawn(executable, args, intent)
+}
+
+/** Adopt only a child this module's default factory itself spawned; numeric/plain/foreign are refused. */
+export function adoptSpawn(childOrPid, intent = {}) {
+  return defaultFactory.adopt(childOrPid, intent)
+}
+
 export function observe(pid) {
   const live = snapshot(pid)
   return { ...live, alive: live.state === 'live' }
@@ -147,7 +177,7 @@ export function observe(pid) {
 /** Re-read the live process and compare it with the registered spawn intent. */
 export function verify(handle) {
   const owned = lookup(handle)
-  if (!owned.ok) return { ok: false, unknown: owned.unknown }
+  if (!owned?.ok) return { ok: false, unknown: 'unknown_handle' }
   const record = owned.record
   const live = snapshot(record.pid)
   if (live.state === 'unknown') return { ok: false, unknown: live.reason ?? 'unreadable', live }
@@ -163,7 +193,7 @@ export function verify(handle) {
 /** The declared child set must match on EVERY signal, not only the first. */
 export function verifyResources(handle) {
   const owned = lookup(handle)
-  if (!owned.ok) return { ok: false, unknown: owned.unknown }
+  if (!owned?.ok) return { ok: false, unknown: 'unknown_handle' }
   const observed = deps.pgrep(owned.record.pid)
   if (observed.state !== 'ok') return { ok: false, unknown: observed.reason ?? 'children_unreadable' }
   const declared = [...owned.record.expectedChildren].sort((a, b) => a - b)

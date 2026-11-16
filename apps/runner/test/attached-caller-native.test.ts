@@ -6,7 +6,7 @@
  */
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { resolveNativeDecision } from '../../../packages/execution/src/attached-attempt.ts'
+import { attachRunningAttempt, resolveNativeDecision } from '../../../packages/execution/src/attached-attempt.ts'
 import { makeCommand } from '../../../packages/testing/src/index.ts'
 
 const intent = { id: 'intent-1', command: makeCommand('answer', { nativeBindingRef: 'binding-1', answerRef: 'answer-1' }) }
@@ -30,4 +30,11 @@ test('the guard is awaited, not treated as a cached boolean', async () => {
   assert.equal((await resolveNativeDecision(guard, intent)).allowed, true)
   assert.equal((await resolveNativeDecision(guard, intent)).allowed, false)
   assert.equal(calls, 2)
+})
+
+test('attaching to the original handle requires both its port and its shared callbacks', () => {
+  const callbacks = { fact: async () => ({ factId: 'f', persisted: true, seq: 1 }) }
+  assert.throws(() => attachRunningAttempt({ attemptId: 'attempt-1', attachCallbacks: callbacks }, 'lease-1'), /attachPort/)
+  assert.throws(() => attachRunningAttempt({ attemptId: 'attempt-1', attachPort: { registration: { socketPath: '/tmp/x', credentialPath: '/tmp/x.c', socketIdentity: { dev: 1, ino: 2 } }, producer: {} } }, 'lease-1'), /attachCallbacks/)
+  assert.throws(() => attachRunningAttempt({ attemptId: '', attachPort: { registration: { socketPath: '/tmp/x', credentialPath: '/tmp/x.c', socketIdentity: { dev: 1, ino: 2 } }, producer: {} }, attachCallbacks: callbacks }, 'lease-1'), /attempt identity/)
 })

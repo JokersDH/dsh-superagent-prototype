@@ -75,6 +75,13 @@ try {
   if (!lateReply.ok) log.pass(`the late receipt was refused (${lateReply.code}: ${lateReply.message}) after terminal shutdown`)
   else log.fail(`a late receipt was accepted: ${JSON.stringify(lateReply)}`)
 
+  log.begin('B32-STOPPED-FEED-REFUSED-BEFORE-EFFECT', 'a business feed after terminal shutdown is refused before admission', 'controlled_process')
+  const stoppedFeed = await client.command(makeCommand('deliver', { id: 'cmd-stopped-feed', inputRef: 'input-after-stop' }))
+    .then(() => ({ ok: true })).catch(error => ({ ok: false, code: error?.code ?? null, serverError: error?.serverError ?? null, reason: error?.reason ?? null }))
+  log.evidence({ stoppedFeed })
+  if (!stoppedFeed.ok && stoppedFeed.serverError === 'stale_connection') log.pass('the stopped Runner refused the raw feed (stale_connection) instead of admitting it')
+  else log.fail(`stopped feed was admitted: ${JSON.stringify(stoppedFeed)}`)
+
   log.begin('B32-LATE-STATE-READONLY-AND-POLL-REFUSED', 'late state reads the last generation without reviving; a late poll is refused', 'controlled_process')
   // The terminal channel keeps its last generation readable (a read is not a rebind); a poll/pull would
   // revive delivery and must be refused.

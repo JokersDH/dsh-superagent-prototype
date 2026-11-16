@@ -6,10 +6,10 @@
  * refused handle may not produce even one signal. One limited live positive then exercises the same code
  * with the real /bin/ps on a probe-owned fixture.
  */
-import { spawn as realSpawn } from 'node:child_process'
+import { ChildProcess, spawn as realSpawn } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { CaseLog, writeReport } from './harness.mjs'
-import { adoptSpawn, confirmExit, configureSignalGuard, escalate, resetSignalGuard, signalOwned, spawnOwned, verify } from './signal-guard.mjs'
+import { adoptSpawn, confirmExit, configureSignalGuard, createSpawnFactory, escalate, resetSignalGuard, signalOwned, spawnOwned, verify } from './signal-guard.mjs'
 
 const log = new CaseLog()
 const FIXTURE = fileURLToPath(new URL('./signal-child-fixture.mjs', import.meta.url))
@@ -61,7 +61,7 @@ try {
     const forged = adoptSpawn(impostor, { expectedChildren: [] })
     const forgedSent = forged.ok ? signalOwned(forged.handle, 'SIGKILL') : { sent: false, refused: true, unknown: forged.unknown }
     log.evidence({ refusedNoHandle: noHandle.refused, forged: forgedSent })
-    if (noHandle.refused && !forged.ok && (forged.unknown === 'numeric_pid_not_accepted' || forged.unknown === 'not_a_child_process') && world.kills.length === 0) log.pass('a bare pid (and a plain object) for a second direct child with identical argv was refused with zero kill calls')
+    if (noHandle.refused && !forged.ok && (forged.unknown === 'numeric_pid_not_accepted' || forged.unknown === 'foreign_spawn') && world.kills.length === 0) log.pass('a bare pid (and a plain object) for a second direct child with identical argv was refused with zero kill calls')
     else log.fail(`an unregistered sibling was signalled: ${JSON.stringify({ noHandle, forged, kills: world.kills })}`)
   }
 
@@ -85,8 +85,24 @@ try {
     // Even the tool's own spawn refuses a metadata token that is not in the argv it issued.
     const wrongRoot = spawnOwned(process.execPath, ['--root=/tmp/w31-root'], { root: '--root=/tmp/w31-other', expectedChildren: [] })
     log.evidence({ copiedAdopt: copiedAdopt.ok ? null : copiedAdopt.unknown, wrongRoot: wrongRoot.ok ? null : wrongRoot.unknown })
-    if (!copiedAdopt.ok && copiedAdopt.unknown === 'not_a_child_process' && !wrongRoot.ok && wrongRoot.unknown === 'spawn_root_not_in_argv' && world.kills.length === 0) log.pass('a plain object with copied spawn metadata was refused (not_a_child_process) and a root outside the issued argv was refused before registration')
+    if (!copiedAdopt.ok && copiedAdopt.unknown === 'foreign_spawn' && !wrongRoot.ok && wrongRoot.unknown === 'spawn_root_not_in_argv' && world.kills.length === 0) log.pass('a plain object with copied spawn metadata was refused (not_a_child_process) and a root outside the issued argv was refused before registration')
     else log.fail(`inconsistent spawn metadata was accepted: ${JSON.stringify({ copiedAdopt, wrongRoot })}`)
+  }
+
+  log.begin('B31-SIGNAL-FACTORY-OWN-POSITIVE-AND-PROTOTYPE-NEGATIVE', 'only the spawning factory confers authority; prototype/never-spawn do not', 'pure_mock')
+  {
+    const world = mockWorld()
+    const factory = createSpawnFactory((executable, args) => { const child = { pid: world.nextPid++, spawnfile: executable, spawnargs: [executable, ...args] }; world.add(child.pid, [executable, ...args]); return child })
+    const spawned = factory.spawn(process.execPath, ['--serve'], { expectedChildren: [] })
+    const adopted = spawned.ok ? factory.adopt(spawned.child, { expectedChildren: [] }) : { ok: false, unknown: 'spawn_failed' }
+    const sent = adopted.ok ? signalOwned(adopted.handle, 'SIGKILL') : { sent: false, refused: true }
+    const prototypeChild = Object.create(ChildProcess.prototype); prototypeChild.pid = 4400; prototypeChild.spawnfile = process.execPath; prototypeChild.spawnargs = [process.execPath]
+    const prototypeAdopt = factory.adopt(prototypeChild, { expectedChildren: [] })
+    let neverSpawn
+    try { neverSpawn = factory.adopt(new ChildProcess(), { expectedChildren: [] }) } catch (error) { neverSpawn = { ok: false, unknown: 'constructor_refused' } }
+    log.evidence({ spawnedOk: spawned.ok, adoptedOk: adopted.ok, killed: world.kills.length, prototype: prototypeAdopt, neverSpawn })
+    if (spawned.ok && adopted.ok && sent.sent && world.kills.length === 1 && !prototypeAdopt.ok && prototypeAdopt.unknown === 'foreign_spawn' && !neverSpawn.ok) log.pass('the factory could signal exactly its own child (spy 1) while a prototype-shaped and a never-spawned ChildProcess were refused')
+    else log.fail(`factory provenance controls are wrong: ${JSON.stringify({ spawned, adopted, sent, world: world.kills.length, prototypeAdopt, neverSpawn })}`)
   }
 
   log.begin('B31-SIGNAL-IDENTITY-UID-START', 'uid/start changes end ownership', 'pure_mock')

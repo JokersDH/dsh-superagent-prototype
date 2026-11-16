@@ -1,0 +1,92 @@
+{
+  "agent": "B",
+  "branch": "codex/g1-runtime",
+  "wave": 34,
+  "source": {
+    "B_merge_head": "f67d21d3",
+    "main_merged": "23d5a98e line (merged as f67d21d3); attachPort + shared attachCallbacks source consumed; main class11 and attached realStore4 re-run here",
+    "changed_paths": [
+      "tests/native-acceptance/signal-guard.mjs",
+      "tests/native-acceptance/b28-signal.mjs",
+      "tests/native-acceptance/b27-sigkill.mjs",
+      "tests/native-acceptance/b27-chain.mjs",
+      "tests/native-acceptance/b31-attached-consumer.mjs",
+      "tests/native-acceptance/b32-terminal-late.mjs",
+      "packages/execution/src/attached-attempt.ts",
+      "packages/execution/src/recovery-transport.ts",
+      "apps/runner/src/runner-service.ts",
+      "apps/runner/src/recovery-endpoint.ts",
+      "apps/runner/test/recovery-endpoint.test.ts",
+      "apps/runner/test/recovery-interop.test.ts",
+      "apps/runner/test/attached-caller-native.test.ts"
+    ],
+    "tar": "NONE - source only; no installed tar/ZIP and no user-instance restart"
+  },
+  "dirtyPreserved": [
+    "reports/releases/wave11-admission/runtime.json",
+    "reports/releases/wave12-admission/runtime.json",
+    "tests/native-acceptance/b16-real-begin.mjs (untracked)"
+  ],
+  "outcomes": {
+    "B1_spawn_provenance": {
+      "status": "COMPLETE (tool scope; not native/release admission)",
+      "implementation": "Authority is now a PRIVATE WeakMap owned by the spawning factory. spawnOwned/createSpawnFactory issue the capability for the child they spawned; adoptSpawn only accepts a child present in that factory's map. Numeric pid, plain {pid,spawnfile,spawnargs}, Object.create(ChildProcess.prototype), new ChildProcess(), copied metadata and foreign processes are all refused (foreign_spawn/numeric_pid_not_accepted); exact handle object identity remains required; every signal rechecks complete pid/start/UID/parent/ordered argv/root/config/op and child plan; UNKNOWN retains material.",
+      "consumer": "tests/native-acceptance/b28-signal.mjs (12 cases: factory own positive spy1, prototype/never-spawn/plain/foreign negatives spy0, partial argv, recycled identity, full resource plan, copied handle/retargeted record, mock TERM->fresh->KILL, one limited live own positive) -> 11 PASS/0 FAIL/1 NOT_TESTED. b27-sigkill 7/0/1 and b27-chain 4/0/1 now spawn and signal through the factory.",
+      "notClaimed": "No live SIGKILL/procguard proof and no admission of native capability."
+    },
+    "B2_original_three_callbacks": {
+      "status": "PARTIAL: main shared callbacks consumed by a B caller helper; original Application-created Work/Broker recovery NOT_REACHED",
+      "implementation": "packages/execution/src/attached-attempt.ts adds attachRunningAttempt(handle, leaseId): it requires the ORIGINAL handle's attachPort AND attachCallbacks and pairs them from the same attempt (missing port/callbacks/identity refused; no local fallback). The three callback kinds continue through attachRunnerAttempt (fact receipt from caller store, payload original reference/body, nativeWrite fail-closed only on awaited explicit allowed).",
+      "evidence": [
+        "main tests/integration/native-attach-callbacks.case.mjs 11/11 PASS re-run on this merge",
+        "main tests/integration/attached-port.case.mjs 4/4 PASS (real ProductStore ingress + stored payload + controlled guard)",
+        "apps/runner/test/attached-caller-native.test.ts 4/4 (fail-closed awaited guard and attachRunningAttempt port/callback/identity requirements)"
+      ],
+      "notClaimed": "No original Application QuestionBroker live question/answer or original delivery; fixtures are controlled."
+    },
+    "B3_feed_cancel_after_identity": {
+      "status": "IMPLEMENTED at transport (candidate; main has not admitted raw feed/cancel into the default business path)",
+      "implementation": "The endpoint now requires the stated producer BEFORE any cancel effect (bare cancel -> 409 missing_producer, foreign producer -> 409 identity_mismatch, spy proves stopped no cancel); cancel admission only flips closed after a successful original cancel. runner-service tracks the one active callback lease and fences command/cancel control: terminal/stopped feed -> stale_connection channel_closed, old lease -> stale_connection stale_lease, foreign producer -> identity_mismatch, all before admitCommand/stopPhysical. Attached feed/cancel carry their lease.",
+      "evidence": [
+        "apps/runner/test/recovery-endpoint.test.ts 10/10 incl. 'cancel without a stated producer is refused before the physical stop' (onCancel spy false) and only-cancel-kind 403",
+        "b31-attached-consumer: old lease feed refused stale_connection, no extra callback -> 4 PASS/0 FAIL/1 NOT_TESTED",
+        "b32-terminal-late: stopped raw feed refused stale_connection before admission -> 4 PASS/0 FAIL/1 NOT_TESTED",
+        "runner suite 152/152"
+      ]
+    },
+    "B4_same_work_recovery_to_delivery": {
+      "status": "NOT_REACHED",
+      "detail": "The original Application/QuestionBroker completion, current binding restore and candidate/check/manualaccept are not wired to an attached consumer in this checkout; main states its attached fixtures are preseeded, not Native.launch/original Work recovery. B did not construct a substitute Work/fixture ledger."
+    },
+    "B5_original_scheduler_2_4_slots": {
+      "status": "PARTIAL: B-owned accounting validated on real ProductStore bindings; NOT the original core queue",
+      "implementation": "packages/execution/src/attempt-slots.ts (candidate) starts at 2 slots, queues boundedly, opens to 4, releases only on confirmed quiescence, retains indeterminate as occupied, cancels queued attempts without a running slot, restores from original Store binding states (ended->released, active->running, stopping->indeterminate, duplicates once), refuses shrink/duplicate/overflow.",
+      "evidence": "tests/native-acceptance/b33-slots.mjs 7/7 on real ProductStore tickets/bindings read back from Store",
+      "notClaimed": "Main owns the original scheduler; this module is not composed into it and is not a second authority."
+    },
+    "B6_full_resource_return_and_reopen": {
+      "status": "NOT_REACHED",
+      "detail": "Original barrier-driven slot release, mixed cancel/unknown retention, late ACK and one-slot failure isolation against the product scheduler were not run; only the accounting restore path is candidate evidence."
+    }
+  },
+  "verification": {
+    "root_tsc": "exit 0",
+    "attached_tsc": "exit 0",
+    "runner_tests": "152 pass / 0 fail",
+    "main_native_attach_callbacks": "11/11",
+    "main_attached_port": "4/4",
+    "b28_signal": "11/0/1",
+    "b27_sigkill": "7/0/1",
+    "b27_chain": "4/0/1",
+    "b31_attach": "4/0/1",
+    "b32_late": "4/0/1",
+    "b33_slots": "7/7"
+  },
+  "scope": {
+    "modelTurns": 0,
+    "nativeTurns": 0,
+    "cap4UnknownUnspendable": true,
+    "noNew": "no second coordinator/ledger/candidate table/Work/migration/shared schema/HTTP/App/transport edit; no new Driver/CAC/desktop/auto-accept/writer racing/DAG/second lifecycle",
+    "installed": "not installed; SOURCE_READY/PARTIAL only, not a complete product delivery"
+  }
+}

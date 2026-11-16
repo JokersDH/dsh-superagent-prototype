@@ -79,6 +79,13 @@ try {
   const nativeObserved = clientB.served.nativeWrites
   clientB.stop(); await runB.catch(() => undefined)
 
+  log.begin('B31-ATTACH-OLD-LEASE-FEED-REFUSED', 'a business feed from the superseded lease is refused before any effect', 'controlled_process')
+  const oldFeed = await clientA.feed(makeCommand('deliver', { id: 'cmd-old-lease-feed', inputRef: 'input-attach-old' }))
+    .then(() => ({ ok: true })).catch(error => ({ ok: false, code: error?.code ?? null, serverError: error?.serverError ?? null }))
+  log.evidence({ oldFeed, served: clientB.served })
+  if (!oldFeed.ok && oldFeed.serverError === 'stale_connection' && clientB.served.facts === 1) log.pass('the old lease feed was refused (stale_connection) and no additional callback was delivered')
+  else log.fail(`old lease feed was not fenced: ${JSON.stringify({ oldFeed, served: clientB.served })}`)
+
   log.begin('B31-ATTACH-NATIVE-AND-STORE-SCOPE', 'native-write callback and original A Store are not claimed here', 'controlled_process')
   log.evidence({ nativeWritesObserved: nativeObserved, storeAuthority: 'main-owned' })
   log.notTested(`the waiting-user fixture raised no native-write intent (observed ${nativeObserved}); the original A durable Store/Broker ingress is main-owned and not wired in this fixture`)

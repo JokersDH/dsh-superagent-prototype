@@ -15,7 +15,8 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { CaseLog, writeReport } from './harness.mjs'
-import { adoptSpawn, confirmExit, observe, signalOwned } from './signal-guard.mjs'
+import { confirmExit, createSpawnFactory, observe, signalOwned } from './signal-guard.mjs'
+const owned = createSpawnFactory()
 const CHILD_ENTRY = fileURLToPath(new URL('./b27-coordinator-child.mjs', import.meta.url))
 import { RunnerLink } from '../../apps/runner/src/runner-link-client.ts'
 import { makeAttemptSpec, makeCommand } from '../../packages/testing/src/index.ts'
@@ -32,7 +33,8 @@ let runner
 let childA
 let childB
 const runChild = (mode, registration) => new Promise(resolve => {
-  const child = spawn(process.execPath, [CHILD], { env: { ...process.env, PA_W27_REGISTRATION: registration, PA_W27_MODE: mode }, stdio: ['ignore', 'pipe', 'pipe'] })
+  const handler = owned.spawn(process.execPath, [CHILD], { spawnOptions: { env: { ...process.env, PA_W27_REGISTRATION: registration, PA_W27_MODE: mode }, stdio: ['ignore', 'pipe', 'pipe'] }, expectedChildren: [] })
+  const child = handler.child
   let out = ''
   child.stdout.on('data', chunk => { out += chunk })
   child.stderr.on('data', () => {})
@@ -42,9 +44,8 @@ const runChild = (mode, registration) => new Promise(resolve => {
     setTimeout(() => {
       // Safe tooling: capture the complete birth identity, then signal only after a FRESH verification.
       // The probe's own spawn intent (executable + ordered argv), not a ps snapshot or pgrep link.
-      const captured = adoptSpawn(child, { expectedChildren: [] })
-      const sent = captured.ok ? signalOwned(captured.handle, 'SIGKILL') : { sent: false, refused: true, unknown: captured.unknown }
-      writeFileSync(join(root, 'kill-proof.json'), JSON.stringify({ captured: captured.ok, sent }, null, 2))
+      const sent = handler.ok ? signalOwned(handler.handle, 'SIGKILL') : { sent: false, refused: true, unknown: handler.unknown }
+      writeFileSync(join(root, 'kill-proof.json'), JSON.stringify({ captured: handler.ok, sent }, null, 2))
     }, 1200)
   }
   else childB = child
