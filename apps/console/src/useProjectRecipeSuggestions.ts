@@ -11,9 +11,10 @@ export function useProjectRecipeSuggestions(transport: ConsoleTransport, options
   enabled: boolean; identity: string; configuration: ApplicationConfiguration | undefined; projectId: string | undefined
 }) {
   const { configuration, projectId } = options
+  const [reloadRevision, setReloadRevision] = useState(0)
   const project = configuration?.projects.find(value => value.id === projectId)
   const profileId = project?.defaultProfileId
-  const key = JSON.stringify([options.identity, configuration?.revision, projectId])
+  const key = JSON.stringify([options.identity, configuration?.revision, projectId, reloadRevision])
   const [state, setState] = useState<{ key: string; rows?: readonly TrialRecipeSuggestion[]; error?: string }>({ key })
   const [pending, setPending] = useState<string>()
   const available = transport.previewProjectRecipe !== undefined
@@ -49,5 +50,6 @@ export function useProjectRecipeSuggestions(transport: ConsoleTransport, options
     return () => controller.abort()
   }, [options.enabled, available, key, project, profileId, configuration?.revision, transport])
   const visible = state.key === key && available && !!project?.dispatchAllowed ? state : undefined
-  return { rows: visible?.rows, error: visible?.error, loading: options.enabled && pending === key }
+  return { rows: visible?.rows, error: visible?.error, loading: options.enabled && pending === key,
+    reload: () => setReloadRevision(value => value + 1) }
 }

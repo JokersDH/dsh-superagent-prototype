@@ -13,6 +13,8 @@ import type { TrialInsightsLayer, TrialInsightsView } from './insights.ts'
 import { trialInsightsAdmission, trialInsightsCount } from './insights.ts'
 import type { TrialRecipeSelection, TrialRecipeSuggestion } from './recipes.ts'
 import { trialRecipeContext, trialRecipeOutcome } from './recipes.ts'
+import type { TrialSupportInfo } from './support.ts'
+import { trialSupportRows } from './support.ts'
 import type { TrialStatusValue, TrialTone } from './trial-view.ts'
 import { formatObservedAt, shortRevision, trialActions, trialHeadline, trialProjectValue, trialStrip } from './trial-view.ts'
 import './trial.css'
@@ -34,9 +36,11 @@ export interface TrialWorkspaceProps {
   readonly onDownloadInsights?: (() => void) | undefined
   readonly insightsDownloading?: boolean | undefined
   readonly insightsDownloadError?: string | undefined
+  readonly support?: TrialSupportInfo | undefined
   readonly recipes?: readonly TrialRecipeSuggestion[] | undefined
   readonly recipesLoading?: boolean | undefined
   readonly recipesError?: string | undefined
+  readonly onReloadRecipes?: (() => void) | undefined
   readonly onOpenRecipe?: ((selection: TrialRecipeSelection) => void) | undefined
   readonly onAction: (action: TrialNavigationAction) => void
   readonly onReload?: (() => void) | undefined
@@ -95,7 +99,7 @@ export function TrialWorkspace({
   readiness, loading = false, error, unavailable = false, configuration, activeProjectId,
   activeConversationTitle, insights, insightWindow, onSelectInsightWindow, insightsLoading = false,
   insightsError, onReloadInsights, onDownloadInsights, insightsDownloading = false, insightsDownloadError,
-  recipes, recipesLoading = false, recipesError, onOpenRecipe,
+  support, recipes, recipesLoading = false, recipesError, onReloadRecipes, onOpenRecipe,
   onAction, onReload, headingLevel = 2, className,
 }: TrialWorkspaceProps) {
   const base = useId()
@@ -104,6 +108,7 @@ export function TrialWorkspace({
   const projectsId = `${base}-projects`
   const executorsId = `${base}-executors`
   const insightsId = `${base}-insights`
+  const supportId = `${base}-support`
   const recipesId = `${base}-recipes`
   const Heading = headingLevel === 3 ? 'h3' : 'h2'
   const strip = readiness === undefined ? undefined : trialStrip(readiness)
@@ -125,9 +130,17 @@ export function TrialWorkspace({
   const capabilities = readiness?.capabilities
   const insightAdmission = insights === undefined ? undefined : trialInsightsAdmission(insights, activeProjectId, insightWindow)
   const insightDays = insightWindow ?? insights?.days
+  const exportDisabledReason = insightsDownloading ? '正在导出…'
+    : insightsLoading ? '正在读取当前范围'
+      : insights === undefined ? '当前范围尚未读取'
+        : insights.status === 'unavailable' ? '当前范围没有可导出的观察' : undefined
   const activeProjectLabel = activeProjectId === undefined
     ? '全部项目'
     : configuration?.projects.find(project => project.id === activeProjectId)?.displayName ?? '当前项目（名称未读取）'
+  const supportRows = trialSupportRows({
+    readiness, projectLabel: activeProjectLabel, conversationLabel: activeConversationTitle ?? '主对话',
+    windowDays: insightDays, info: support,
+  })
   const recipeContext = trialRecipeContext(configuration, activeProjectId)
   const recipeRows = recipes?.slice(0, 6).map(suggestion => ({ suggestion, outcome: trialRecipeOutcome(suggestion, recipeContext) }))
   const recipeTotal = recipes?.length
@@ -258,7 +271,14 @@ export function TrialWorkspace({
             {configuration === undefined
               ? <p className="trial-muted">项目明细尚未读取。</p>
               : configuration.projects.length === 0
-                ? <p className="trial-muted">还没有项目。导入后即可在对话中明确委托开发。</p>
+                ? (
+                  <div className="trial-empty-project">
+                    <p className="trial-muted">还没有项目。首次使用先导入一个本地 Git 项目，之后即可在对话中明确委托开发。</p>
+                    {actions.some(item => item.action === 'import_project') && (
+                      <button type="button" className="quiet" aria-label="在项目列表导入第一个项目" onClick={() => run('import_project')}>导入项目</button>
+                    )}
+                  </div>
+                )
                 : (
                   <ul className="trial-projects" aria-label="已配置项目">
                     {configuration.projects.map(project => {
@@ -313,6 +333,7 @@ export function TrialWorkspace({
                 {insights === undefined ? '等待读取' : trialInsightsCount(insights)}
                 {' · '}{insights?.windowLabel ?? '窗口未声明'}
                 {' · '}{insights?.coverage ?? '覆盖未声明'}
+                {insights?.observedAt === undefined ? '' : ` · 观察于 ${formatObservedAt(insights.observedAt)}`}
               </span>
             </div>
             <div className="trial-observation-toolbar">
@@ -326,13 +347,23 @@ export function TrialWorkspace({
               </div>
             )}
             {onDownloadInsights !== undefined && (
-              <button type="button" className="icon-button" title="重新读取当前范围并导出新快照" aria-label="导出当前范围观察"
-                disabled={insightsDownloading || insightsLoading || insights === undefined || insights.status === 'unavailable'} onClick={onDownloadInsights}>
+              <button type="button" className="icon-button"
+                title={exportDisabledReason ?? '重新读取当前范围并导出新快照'} aria-label="导出当前范围观察"
+                disabled={exportDisabledReason !== undefined} onClick={onDownloadInsights}>
                 <Download size={16} aria-hidden="true" />
               </button>
             )}
+            {insightsDownloading && <span className="trial-export-status" role="status">正在导出…</span>}
             </div>
-            {insightsDownloadError && <p className="trial-muted" role="alert">{insightsDownloadError}</p>}
+            {insightsDownloadError && (
+              <div className="trial-banner trial-banner-danger" role="alert">
+                <TriangleAlert size={17} aria-hidden="true" />
+                <p><strong>导出未完成</strong><span>{insightsDownloadError}</span></p>
+                {onDownloadInsights !== undefined && (
+                  <button type="button" className="quiet" disabled={insightsDownloading} onClick={onDownloadInsights}>重试</button>
+                )}
+              </div>
+            )}
             {insightsError !== undefined && (
               <div className="trial-banner trial-banner-danger" role="alert">
                 <TriangleAlert size={17} aria-hidden="true" />
@@ -354,7 +385,9 @@ export function TrialWorkspace({
                     : insights.scope?.aggregation === 'cross_project' ? '跨项目聚合'
                       : insights.scope?.aggregation === 'single_project' ? '单项目' : '聚合未声明'}
                   {' · '}
-                  {insights.unknownCount === undefined || insights.unknownCount === null ? '未知数未声明' : `${insights.unknownCount} 个未知`}
+                  {insights.sources !== undefined
+                    ? `来源已知 ${insights.sources.known ?? '未知'} · 未知 ${insights.sources.unknown ?? '未知'}`
+                    : insights.unknownCount === undefined || insights.unknownCount === null ? '未知数未声明' : `${insights.unknownCount} 个未知`}
                 </dd>
               </div>
             </dl>
@@ -366,7 +399,7 @@ export function TrialWorkspace({
                     <div key={metric.id} className="trial-insight-row">
                       <dt>{metric.label}</dt>
                       <dd className={metric.value === null ? 'trial-unknown' : undefined}>
-                        <span className="trial-metric-value">{metric.value ?? '未知'}{metric.unit && <small>{metric.unit}</small>}</span>
+                        <span className="trial-metric-value">{metric.value ?? '未知'}{metric.unit && <small>{metric.unit}</small>}{metric.currency && <small>{metric.currency}</small>}</span>
                         <span className="trial-metric-meta">
                           {metric.layer !== undefined && <small>{layerLabel[metric.layer]}</small>}
                           {metric.sampleCount !== undefined && <small>{metric.sampleCount === null ? '样本未知' : `${metric.sampleCount} 个样本`}</small>}
@@ -382,6 +415,9 @@ export function TrialWorkspace({
                 {insights.limitations.map(limit => <li key={limit}>{limit}</li>)}
               </ul>
             )}
+            {onDownloadInsights !== undefined && (
+              <p className="trial-note">导出会重新读取当前项目/窗口的观察；文件只含展示数据，不是执行或收益证明。</p>
+            )}
             </>}
           </section>
         )}
@@ -392,7 +428,15 @@ export function TrialWorkspace({
               <h3 id={recipesId} className="trial-section-title"><ClipboardList size={15} aria-hidden="true" />配方草案</h3>
               <span className="trial-panel-meta">只读声明 · 不执行</span>
             </div>
-            {recipesError !== undefined && <p className="trial-muted" role="alert">配方草案暂时无法读取；原委托表单仍可使用。</p>}
+            {recipesError !== undefined && (
+              <div className="trial-banner trial-banner-danger" role="alert">
+                <TriangleAlert size={17} aria-hidden="true" />
+                <p><strong>配方草案暂时无法读取</strong><span>{recipesError} 原委托表单仍可使用。</span></p>
+                {onReloadRecipes !== undefined && (
+                  <button type="button" className="quiet" onClick={onReloadRecipes}>重试</button>
+                )}
+              </div>
+            )}
             {recipesLoading && <p className="trial-muted" role="status">正在读取项目声明…</p>}
             {!recipesLoading && recipesError === undefined && recipes !== undefined && recipes.length === 0 && (
               <p className="trial-muted">该项目没有可用的声明草案。</p>
@@ -441,6 +485,19 @@ export function TrialWorkspace({
             <p className="trial-note">这里只显示声明并带上受限选择；完整字段由原表单的模板预览给出，创建、检查与执行仍由你在原确认页决定。</p>
           </section>
         )}
+
+        <details className="trial-support" aria-labelledby={supportId}>
+          <summary id={supportId}>支持与诊断</summary>
+          <dl className="trial-support-rows">
+            {supportRows.map(row => (
+              <div key={row.label} className="trial-fact">
+                <dt>{row.label}</dt>
+                <dd>{row.value}</dd>
+              </div>
+            ))}
+          </dl>
+          {support?.note !== undefined && <p className="trial-note">{support.note}</p>}
+        </details>
 
         <footer className="trial-boundary">
           <span>只读配置观察</span>

@@ -152,8 +152,11 @@ export class NativeProductAttempt {
       clearTimeout(timeout)
     }
     if (!this.current()) throw new Error('Work changed during native preparation')
+    const endpoint = this.endpoint
+    if (!endpoint) throw new Error('Native Runner registration is unavailable')
     return {
       attemptId: this.spec.attemptId,
+      attachPort: structuredClone({ registration: endpoint, producer: this.producer }),
       feed: (command) => this.feed(command),
       waitExit: async () => (await this.child!.waitExit()).exit,
       stop: async () => {
