@@ -1,0 +1,170 @@
+{
+  "protocol": "usage-insights-support-summary/1",
+  "observationProtocol": "usage-observation/1",
+  "documentKind": "support",
+  "status": "ready",
+  "summaryId": "754b931da4dfc8adfb53e934a242fbf73c02210a641bde9247f36c10b2d611b0",
+  "days": 7,
+  "timezone": "UTC",
+  "coverageState": "partial",
+  "counts": {
+    "rows": 12,
+    "withValue": 8,
+    "unknown": 4,
+    "sampleCount": 2
+  },
+  "rows": [
+    {
+      "rowId": "execution.durationMs@controlled@",
+      "layer": "controlled",
+      "unit": "ms",
+      "hasValue": false,
+      "sampleCount": 0
+    },
+    {
+      "rowId": "interventions.acceptances@product@",
+      "layer": "observed",
+      "unit": "",
+      "hasValue": true,
+      "sampleCount": 2
+    },
+    {
+      "rowId": "interventions.answers@product@",
+      "layer": "observed",
+      "unit": "",
+      "hasValue": true,
+      "sampleCount": 2
+    },
+    {
+      "rowId": "interventions.questions@product@",
+      "layer": "observed",
+      "unit": "",
+      "hasValue": true,
+      "sampleCount": 2
+    },
+    {
+      "rowId": "interventions.total@product@",
+      "layer": "observed",
+      "unit": "",
+      "hasValue": true,
+      "sampleCount": 2
+    },
+    {
+      "rowId": "outcomes.accepted@controlled@",
+      "layer": "controlled",
+      "unit": "",
+      "hasValue": true,
+      "sampleCount": 2
+    },
+    {
+      "rowId": "outcomes.count@controlled@",
+      "layer": "controlled",
+      "unit": "",
+      "hasValue": true,
+      "sampleCount": 2
+    },
+    {
+      "rowId": "queue.waitMs@controlled@",
+      "layer": "controlled",
+      "unit": "ms",
+      "hasValue": false,
+      "sampleCount": 0
+    },
+    {
+      "rowId": "review.activeMs@controlled@",
+      "layer": "controlled",
+      "unit": "ms",
+      "hasValue": true,
+      "sampleCount": 2
+    },
+    {
+      "rowId": "review.readyToAcceptanceMs@controlled@",
+      "layer": "controlled",
+      "unit": "ms",
+      "hasValue": true,
+      "sampleCount": 2
+    },
+    {
+      "rowId": "usage.inputTokens@controlled@",
+      "layer": "controlled",
+      "unit": "tokens",
+      "hasValue": false,
+      "sampleCount": 0
+    },
+    {
+      "rowId": "usage.outputTokens@controlled@",
+      "layer": "controlled",
+      "unit": "tokens",
+      "hasValue": false,
+      "sampleCount": 0
+    }
+  ],
+  "origin": {
+    "kind": "runtime",
+    "identitySource": "install-manifest",
+    "buildId": "4dcd28f758bbb265",
+    "sourceCommit": "c0a1f8975232b6397dfaf92d31ac5682df2dab36",
+    "archiveSha256": null,
+    "capabilities": {
+      "pageObservation": true,
+      "numericExport": true,
+      "displayDownload": true
+    },
+    "browserTrigger": "present",
+    "missing": []
+  },
+  "evidence": {
+    "coverageState": "partial",
+    "rowsWithValue": 8,
+    "rowsWithoutValue": 4,
+    "sampleCount": 2,
+    "partial": true,
+    "absentFacts": [
+      "4 row(s) have no observed value",
+      "the observation is partial"
+    ]
+  },
+  "exportCapability": "present",
+  "numericValues": false,
+  "authorization": "none",
+  "observedAt": "2026-11-16T11:21:19.141Z",
+  "window": {
+    "from": "2026-11-09T11:21:19.141Z",
+    "to": "2026-11-16T11:21:19.141Z"
+  },
+  "scope": {
+    "projectIds": [
+      "project-arcade",
+      "project-beacon"
+    ],
+    "aggregation": "declared_multi_project",
+    "label": "本次 2 个项目"
+  },
+  "coverage": "部分覆盖",
+  "limitations": [
+    "部分指标没有可核对值。",
+    "当前观察不完整。"
+  ],
+  "note": "Display document: the served values are formatted strings. This summary carries metadata only; it is not a numeric analysis result.",
+  "verification": "contract-digest",
+  "contractValid": true,
+  "digestCheck": {
+    "declared": "ed777f078761fba3f4201c778c84288b5c07b04940aa389491520973d6aa5db5",
+    "actual": "ed777f078761fba3f4201c778c84288b5c07b04940aa389491520973d6aa5db5",
+    "verified": true,
+    "state": "verified"
+  },
+  "conservation": {
+    "rowsMatch": false,
+    "scopeMatches": false,
+    "windowMatches": false,
+    "headerMatches": false,
+    "notCompared": [
+      "a support file carries one report, so there is no second document to compare"
+    ]
+  },
+  "file": {
+    "bytes": 7793,
+    "sha256": "a5be2f551d4425c8633f8bb7a745e8b418dfd4ac8780cd43586978952a9ef208"
+  }
+}

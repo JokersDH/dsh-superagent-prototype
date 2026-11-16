@@ -179,6 +179,23 @@ and parses the real contract, so such a change fails there first.
   them is `incomplete-manifest` with the rest `null`; neither is `null`. A branch name, a path or a
   bundle keyword never becomes a commit hash.
 
+## Runtime identity
+
+`runtime-identity.ts` answers "what is running", not "what was shipped": it reads the installation
+directory (`install/install.json` plus the installed usage-insights/coordinator/console files) and
+reports build, source commit, dirty flag, declared file count and per-capability evidence. A manifest
+claim cannot make a missing route look present; a missing or partial manifest stays
+`incomplete-manifest`/`unknown`; a branch name or path never becomes a commit hash; and an archive
+digest is only reported when a file was actually hashed (a declared expected value with no archive to
+hash leaves the comparison `null`, because comparing a value with itself proves nothing). Mismatches
+against expected values are returned as `differences`, so an old installation compared with a newer
+source keeps both facts.
+
+`readSupportDocument` reports `verification` (`contract-digest`, `digest-only`, `shape-only`) so a
+consumer can tell what was proven; documents with unknown fields are refused rather than silently
+stripped; and `readSupportFile` degrades an older support file (`schema: 'legacy'` + `missingFields`)
+instead of refusing it or trusting it.
+
 ## CLI
 
 ```sh

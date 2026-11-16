@@ -1,0 +1,211 @@
+{
+  "protocol": "wave34-usage-insights-status/1",
+  "agent": "G",
+  "branch": "codex/g4-usage-insights",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-g",
+  "origin": "https://github.com/JokersDH/dsh-superagent-prototype.git",
+  "fixedStart": "76467c33",
+  "mergedMain": "6b306514",
+  "mergeCommit": "35689730",
+  "dirty": "clean before this file; only owned paths changed",
+  "generatedAt": "2026-11-16T11:40:00Z",
+  "goal": {
+    "statement": "Two continuous packages, six complete outcomes: an explainable observation/diagnostic boundary, an evidence-based install identity, and one real feedback loop that locates a gap and verifies the difference.",
+    "packages": 2,
+    "outcomes": 6,
+    "tokenBudget": "none",
+    "deadline": "none",
+    "vendorModelNativeTurns": 0,
+    "blockedPilot": "E original 24turn/200000token/USD5 single-in-flight pilot remains BLOCKED; no reset, top-up, refund, replacement sample, borrowed credential or price research.",
+    "notIncluded": ["CAC and CAC-specific subteam experiments", "temporary ZIP sprint", "narrowing Scheme B"]
+  },
+  "adoptedMainSource": {
+    "commit": "23d5a98e",
+    "whatIsConsumed": [
+      "GET /v1/insights/support → ProductUsageObservation.support(query) → buildSupportReport/buildSupportFile (main already calls the port)",
+      "contracts UsageSupportReportSchema / UsageSupportDownloadSchema (strict metadata DTO and file envelope)",
+      "GET /v1/insights/export and the display-download chain from wave 31",
+      "apps/console/src/trial/support.ts trialSupportRows wiring (F renders the labels G produces)"
+    ],
+    "notReclaimed": [
+      "the original native-attempt callbacks and the registered runner port are not treated as authorization or as recovered delivery",
+      "no claim about any closed runner/recovery gap; no auto-attach is proposed"
+    ]
+  },
+  "layers": {
+    "source": "G sources in this branch; main has integrated support.ts and eleven other src files byte-identical, the rest are candidate-only",
+    "controlled": "the probe drives the real product runtime with the fixed fixture driver (0 vendor/model/native turns)",
+    "installed": "NOT_REACHED: no E verdict for any tar; identity was read from a materialized install tree, which is not an installation verdict",
+    "native": "NOT_TESTED (0 turns)",
+    "recovery": "NOT_APPLICABLE to G: G does not touch original Work recovery",
+    "value": "NOT_TESTED: no operator baseline, no benefit figure"
+  },
+  "outcomes": [
+    {
+      "id": "1",
+      "package": 1,
+      "title": "Complete production observation semantics and data boundary",
+      "state": "delivered (candidate sources) with main's reader unchanged",
+      "implementation": [
+        "observation-facts.case.ts drives main's real ProductUsageObservation with replays, conflicts, out-of-window facts, empty scopes and bounded sources",
+        "header works vs row samples, per-layer/currency rows, unknown-not-zero and partial-vs-complete are asserted on the served DTO"
+      ],
+      "consumer": ["main's authorized reader (imported, not modified)", "the CLI"],
+      "positives": ["a replayed receipt counts once", "an empty complete scope is a measured zero with no invented value rows", "header sample 2 vs outcome row sample 1 is explainable"],
+      "negatives": ["a contradictory identity makes the summary unavailable rather than zero", "facts outside the window contribute no row and no fabricated zero", "a bounded source carries no header sample count"],
+      "note": "no production change was needed in main's reader; the tests document its actual boundary",
+      "remaining": ["a 2 s deadline case is bounded by construction in main and is not exercised as a timing race here"]
+    },
+    {
+      "id": "2",
+      "package": 1,
+      "title": "Trust boundary of the diagnostic file",
+      "state": "delivered",
+      "implementation": [
+        "readSupportDocument verifies sha256(text) for envelopes (shape validity is a different check), reports verification: contract-digest | digest-only | shape-only",
+        "field conservation rowsMatch/scopeMatches/windowMatches/headerMatches; contractValid marks an envelope that fails the product contract",
+        "unknown fields are refused (typed invalid_document) instead of being dropped and reported as clean"
+      ],
+      "consumer": ["main's strict schema (imported)", "the CLI", "any Node caller"],
+      "positives": ["the real envelope from GET /v1/insights/export verifies digest and conservation 4/4", "the real support download from GET /v1/insights/support verifies its digest and contract"],
+      "negatives": ["a shape-valid envelope with a wrong digest → mismatch and exit 5", "row drift → rowsMatch false with contractValid false", "an extra prompt/secret field → refusal", "a bare document is shape-only and never claims a digest"],
+      "locatedGap": "the download contract does not recompute its own digest; this port is the only cryptographic check a colleague can run"
+    },
+    {
+      "id": "3",
+      "package": 1,
+      "title": "Running identity combined with the support summary, on evidence",
+      "state": "delivered (source) + real evidence; main wiring pending (SOURCE_READY)",
+      "implementation": [
+        "runtime-identity.ts: install/install.json + installed-file capability evidence; manifest claim cannot make a missing route present",
+        "identitySource install-manifest / incomplete-manifest / null; branch names and paths never become a commit; archive digest only when a file was hashed (declared-only leaves the comparison null)",
+        "mismatches vs expected values are returned as differences (old install + newer source keeps both facts)"
+      ],
+      "consumer": ["CLI verify --dto --install <dir> (delivered)", "main can call inspectRuntimeIdentity for its DTO origin (not wired)"],
+      "positives": [
+        "materialized install tree (from the R2 tar, not installed or started): layout app, manifest parsed, build 4dcd28f758bbb265, source c0a1f897…, capabilities pageObservation+numericExport+displayDownload(+supportSummary in the runtime report)"
+      ],
+      "negatives": ["missing manifest → origin null", "partial manifest → incomplete-manifest with nulls", "capability absent despite a manifest claim", "symlinked manifest refused", "declared archive digest with no archive → comparison null"],
+      "identity": {
+        "installTree": "/private/tmp/w34-install/install (materialized from wave31-target-4dcd28f.tar.gz; not installed, not started)",
+        "buildId": "4dcd28f758bbb265",
+        "sourceCommit": "c0a1f8975232b6397dfaf92d31ac5682df2dab36",
+        "archiveSha256": null,
+        "note": "the archive digest stays null for this call: no archive was hashed, and borrowing the tar digest would confuse shipped bytes with running bytes"
+      }
+    },
+    {
+      "id": "4",
+      "package": 2,
+      "title": "One complete problem feedback → location → confirmation",
+      "state": "delivered for the locate-and-confirm half; the upstream fix is main's (SOURCE_READY)",
+      "implementation": [
+        "probe calls main's real GET /v1/insights/support, reads the returned file with G's port, and re-reads the same scope after a delay",
+        "same document read twice: before (no identity) and after (identity from installed files) with the CLI"
+      ],
+      "consumer": ["probe over the real route", "CLI verify --dto <support file> [--install]"],
+      "positives": [
+        "download 200: support-7d-754b931da4df-unknown-build.json, 3566 bytes, digest verified, contract valid",
+        "the same file plus --install reports identitySource install-manifest and exportCapability present"
+      ],
+      "negatives": ["the second download has a new summaryId and the same missing identity (reproducible, not a one-off)", "an app without the support port returns 422 while the page still works"],
+      "locatedGap": "main's diagnostic file carries no installation identity (origin null → exportCapability unverified)",
+      "evidence": {
+        "download": "reports/usage-insights/probe/two-project-20261116T112118.support-download.json",
+        "gap": "reports/usage-insights/probe/two-project-20261116T112118.support-gap.json",
+        "withIdentity": "reports/usage-insights/probe/two-project-20261116T112118.support-with-runtime-identity.json"
+      },
+      "remaining": ["independent consumption by H or main is NOT_REACHED; the workflow and both endpoints are ready"]
+    },
+    {
+      "id": "5",
+      "package": 2,
+      "title": "Explainable waiting and review facts",
+      "state": "delivered (facts and negatives); the benefit study stays BLOCKED",
+      "implementation": [
+        "observation-facts.case.ts separates a recorded zero wait, a missing interval, the review visibility proxy and a comparability gap",
+        "the metric catalogue defines no human-effort or benefit metric"
+      ],
+      "consumer": ["analyze/report/export", "the CLI"],
+      "positives": ["a recorded zero interval is a value with a sample", "ready-to-acceptance wait is complete when both timestamps exist"],
+      "negatives": ["missing interval → null with timing_missing", "the UI proxy stays partial", "no baseline → not_requested with null delta/ratio"],
+      "operatorBaseline": "an imported baseline stays observation-only; no percentage is produced and manual data is never mixed into automatic records"
+    },
+    {
+      "id": "6",
+      "package": 2,
+      "title": "Long-term compatibility and maintainable delivery",
+      "state": "delivered",
+      "implementation": [
+        "readSupportFile degrades an older support file (schema legacy + missingFields) instead of refusing or trusting it",
+        "readSupportDocument accepts observation / display export / observation envelope / support download / legacy bare summary",
+        "main-imports.case.ts imports exactly the symbols main imports and validates the result with main's own contract"
+      ],
+      "consumer": ["main's import surface (guarded by test)", "a colleague reading an old file (CLI exit 3 with an explicit marker)"],
+      "positives": ["the fixed wave-32 support artifact from the repository is readable as legacy and degrades explicitly", "the current support download round-trips"],
+      "negatives": ["a non-support file is refused with a typed fault", "an optional port missing returns 422 without breaking the page"],
+      "compatibility": {
+        "exportsGuarded": ["buildSupportReport", "buildSupportFile", "readSupportDocument", "readSupportFile", "supportLabels"],
+        "exitCodes": { "readyAndContractValid": 0, "notContractValidOrLegacy": 3, "insufficient": 4, "invalidOrDigestMismatch": 5, "badArguments": 2 }
+      }
+    }
+  ],
+  "mergedIntoMain": {
+    "byteIdenticalInMain": [
+      "src/analyze.ts", "src/attention.ts", "src/baseline.ts", "src/browser.ts", "src/crosscheck.ts", "src/display-export.ts",
+      "src/export.ts", "src/metrics.ts", "src/node-composition.ts", "src/protocol.ts", "src/subject.ts", "src/support.ts"
+    ],
+    "candidateOnly": [
+      "src/support-port.ts", "src/runtime-identity.ts", "src/facing.ts", "src/report.ts", "src/index.ts",
+      "packages/usage-insights/test/{observation-facts,support-port,runtime-identity,main-imports}.case.ts",
+      "tools/usage-insights/**", "reports/usage-insights/**"
+    ],
+    "note": "main already consumes buildSupportReport/buildSupportFile; the port additions (verification markers, legacy degradation, runtime identity) are source-only and ready to compose."
+  },
+  "mainFindings": [
+    "main's support DTO carries origin: null on every download, so a colleague cannot tell which build produced the file. inspectRuntimeIdentity supplies that evidence; main must wire it.",
+    "The support and download envelopes still do not verify their own sha256 (the contract checks shape only); G's port does the cryptographic check and reports mismatch.",
+    "The served header coverageState still folds a partial row into 'partial' for a completely enumerated source, so every support report says 'the observation is partial'.",
+    "The install manifest embeds the full inventory (~1.46 MB); a small parse guard made identity look absent earlier, so the guard is 8 MiB with an explicit manifestState."
+  ],
+  "remaining": [
+    { "item": "main wiring inspectRuntimeIdentity into the support DTO origin", "dependency": "main owns HTTP/App/transport", "state": "SOURCE_READY" },
+    { "item": "H or main independently consuming one support report", "dependency": "an independent owner", "state": "NOT_REACHED" },
+    { "item": "an installed package with these sources and an E verdict", "dependency": "a frozen successor tar", "state": "NOT_REACHED; the materialized install tree is not an installation verdict" },
+    { "item": "operator long-term baseline and value", "dependency": "real operator data", "state": "NOT_TESTED" },
+    { "item": "actual native execution", "dependency": "vendor/native budget", "state": "NOT_TESTED (0 turns)" }
+  ],
+  "boundaries": {
+    "noSqlOrPrivateDb": true,
+    "noRuntimeHttpUiChanges": true,
+    "noNewCollector": true,
+    "noSecondLedger": true,
+    "noModelOrNativeCalls": true,
+    "noRootLockOrContractsChanges": true,
+    "noEAssertionsChanged": true,
+    "noBrowserNodeImports": true,
+    "noNumericReverseParsing": true,
+    "noInstallOrStart": "the install tree was extracted to a temp directory for identity inspection only; nothing was installed, started or attached",
+    "userServicesPreserved": "twelve 5180/8796 … 5191/8807 instances and all state/profile/tar/ledger/runs left untouched"
+  },
+  "verification": {
+    "commands": [
+      "packages/contracts/node_modules/.bin/tsc -p packages/contracts/tsconfig.build.json",
+      "packages/usage-insights/node_modules/.bin/tsc -p packages/usage-insights/tsconfig.json",
+      "packages/usage-insights/node_modules/.bin/tsc -p packages/usage-insights/tsconfig.build.json",
+      "node --test packages/usage-insights/test/*.case.ts",
+      "node --test tools/usage-insights/test/*.case.mjs",
+      "node tools/usage-insights/probe/observe-two-projects.mjs --keep",
+      "node tools/usage-insights/cli.mjs verify --dto <support-download>.json [--install /private/tmp/w34-install/install] --out <report>.json"
+    ],
+    "results": {
+      "typecheck": "pass",
+      "build": "pass",
+      "packageTests": { "total": 185, "pass": 185, "fail": 0 },
+      "toolTests": { "total": 59, "pass": 59, "fail": 0 },
+      "probe": "pass (support download 200 / 3566 bytes / digest verified / origin null located; export 200; page 13/13; 0 events)",
+      "supportReport": "gap exit 0 with origin null; with --install exit 0 with install-manifest identity"
+    },
+    "staticChecksConfer": "no runtime, native or release admission"
+  }
+}

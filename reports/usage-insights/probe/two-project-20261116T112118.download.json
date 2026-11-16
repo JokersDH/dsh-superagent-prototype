@@ -1,0 +1,172 @@
+{
+  "protocol": "usage-insights-display-export/1",
+  "exportedFrom": {
+    "observationProtocol": "usage-observation/1",
+    "observedAt": "2026-11-16T11:21:19.129Z",
+    "days": 7,
+    "timezone": "UTC",
+    "reader": "the coordinator document served by GET /v1/insights"
+  },
+  "snapshot": {
+    "snapshotId": "b0bf2020ed18be4b565e66f57b20dfcf8a595dc93017c5303d37e8472a4099c4",
+    "capturedAt": "2026-11-16T11:21:19.129Z",
+    "continuity": "first_observation",
+    "previous": null,
+    "note": null
+  },
+  "window": {
+    "from": "2026-11-09T11:21:19.129Z",
+    "to": "2026-11-16T11:21:19.129Z"
+  },
+  "scope": {
+    "projectIds": [
+      "project-arcade",
+      "project-beacon"
+    ],
+    "aggregation": "declared_multi_project",
+    "label": "本次 2 个项目"
+  },
+  "header": {
+    "status": "ready",
+    "windowLabel": "近 7 天 · GMT+0",
+    "coverage": "部分覆盖",
+    "coverageState": "partial",
+    "sampleCount": 2,
+    "unknownCount": null
+  },
+  "sourceIdentity": {
+    "kind": "display_dto",
+    "numericValues": false,
+    "note": "The served document carries formatted strings only. This export preserves them verbatim and deliberately has no numeric field, so no number is reverse-parsed or presented as an analysis result."
+  },
+  "crossCheck": {
+    "numericValuesAvailable": false,
+    "reason": "Only the served strings are available; a numeric cross-check needs the authorization-scoped analysis summary."
+  },
+  "limitations": [
+    "The served document carries formatted strings only. This export preserves them verbatim and deliberately has no numeric field, so no number is reverse-parsed or presented as an analysis result.",
+    "The served document does not include the current attention snapshot; pending item counts are unavailable here.",
+    "仅统计现有工作证据；未记录的执行耗时、排队、用量与成本保持未知。",
+    "界面可见审阅时长是部分活动代理，不是人工工时或效率收益。"
+  ],
+  "authorization": "none",
+  "rows": [
+    {
+      "rowId": "execution.durationMs@controlled@",
+      "label": "平均记录执行耗时",
+      "layer": "controlled",
+      "unit": "ms",
+      "formatted": null,
+      "sampleCount": 0,
+      "detail": "未知 2 · 完整 · controlled"
+    },
+    {
+      "rowId": "interventions.acceptances@product@",
+      "label": "接受事实",
+      "layer": "observed",
+      "unit": "",
+      "formatted": "2",
+      "sampleCount": 2,
+      "detail": "未知 0 · 完整"
+    },
+    {
+      "rowId": "interventions.answers@product@",
+      "label": "明确回答",
+      "layer": "observed",
+      "unit": "",
+      "formatted": "2",
+      "sampleCount": 2,
+      "detail": "未知 0 · 完整"
+    },
+    {
+      "rowId": "interventions.questions@product@",
+      "label": "提出问题",
+      "layer": "observed",
+      "unit": "",
+      "formatted": "2",
+      "sampleCount": 2,
+      "detail": "未知 0 · 完整"
+    },
+    {
+      "rowId": "interventions.total@product@",
+      "label": "人工介入事实",
+      "layer": "observed",
+      "unit": "",
+      "formatted": "6",
+      "sampleCount": 2,
+      "detail": "未知 0 · 完整"
+    },
+    {
+      "rowId": "outcomes.accepted@controlled@",
+      "label": "已接受交付",
+      "layer": "controlled",
+      "unit": "",
+      "formatted": "2",
+      "sampleCount": 2,
+      "detail": "未知 0 · 完整 · controlled"
+    },
+    {
+      "rowId": "outcomes.count@controlled@",
+      "label": "已观察执行次数",
+      "layer": "controlled",
+      "unit": "",
+      "formatted": "2",
+      "sampleCount": 2,
+      "detail": "未知 0 · 完整 · controlled"
+    },
+    {
+      "rowId": "queue.waitMs@controlled@",
+      "label": "平均记录排队耗时",
+      "layer": "controlled",
+      "unit": "ms",
+      "formatted": null,
+      "sampleCount": 0,
+      "detail": "未知 2 · 完整 · controlled"
+    },
+    {
+      "rowId": "review.activeMs@controlled@",
+      "label": "平均界面可见时长（部分代理）",
+      "layer": "controlled",
+      "unit": "ms",
+      "formatted": "700",
+      "sampleCount": 2,
+      "detail": "未知 0 · 部分或缺失 · controlled"
+    },
+    {
+      "rowId": "review.readyToAcceptanceMs@controlled@",
+      "label": "平均候选就绪到接受",
+      "layer": "controlled",
+      "unit": "ms",
+      "formatted": "810.5",
+      "sampleCount": 2,
+      "detail": "未知 0 · 完整 · controlled"
+    },
+    {
+      "rowId": "usage.inputTokens@controlled@",
+      "label": "已知输入 token",
+      "layer": "controlled",
+      "unit": "tokens",
+      "formatted": null,
+      "sampleCount": 0,
+      "detail": "未知 2 · 完整 · controlled"
+    },
+    {
+      "rowId": "usage.outputTokens@controlled@",
+      "label": "已知输出 token",
+      "layer": "controlled",
+      "unit": "tokens",
+      "formatted": null,
+      "sampleCount": 0,
+      "detail": "未知 2 · 完整 · controlled"
+    }
+  ],
+  "truncation": {
+    "byRows": false,
+    "byBytes": false,
+    "totalRows": 12,
+    "includedRows": 12,
+    "maxRows": 32,
+    "maxBytes": 65536,
+    "bytes": 5140
+  }
+}

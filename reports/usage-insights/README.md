@@ -18,7 +18,10 @@ G（`codex/g4-usage-insights`）的只读观测证据。全部内容都是从已
 | [`probe/two-project-20261115T152615.support-report.json`](probe/two-project-20261115T152615.support-report.json) | 同一观察 + 实际运行包（build `4dcd28f758bbb265`、包 digest `405ecd02…`）的支持报告：含 `origin`/`capabilities`/`evidence.absentFacts` |
 | [`probe/two-project-20261116T064839.download-envelope.json`](probe/two-project-20261116T064839.download-envelope.json) | 主线 `GET /v1/insights/export` 的真实外壳（observation + text + sha256） |
 | [`probe/two-project-20261116T064839.support-report.json`](probe/two-project-20261116T064839.support-report.json) | 由该外壳 + 实际运行包生成的支持报告：`digest=verified`、守恒 4/4、`identitySource=install-manifest` |
-| [`support-contract.zh-CN.md`](support-contract.zh-CN.md) | 给 D/E/H 的支持契约：port/handler/文件/标签、digest 与守恒语义、exit、明确不包含与已知边界 |
+| [`probe/two-project-20261116T112118.support-download.json`](probe/two-project-20261116T112118.support-download.json) | main 真实 `GET /v1/insights/support` 下载的诊断文件（无安装身份，`unknown-build`） |
+| [`probe/two-project-20261116T112118.support-gap.json`](probe/two-project-20261116T112118.support-gap.json) | 同一文件的读取结果：`origin: null`、`exportCapability: unverified`（定位到的缺口） |
+| [`probe/two-project-20261116T112118.support-with-runtime-identity.json`](probe/two-project-20261116T112118.support-with-runtime-identity.json) | 同一文件 + `--install`：`identitySource: install-manifest`、build `4dcd28f758bbb265`、`exportCapability: present` |
+| [`support-contract.zh-CN.md`](support-contract.zh-CN.md) | 给 D/E/H 的支持契约：port/handler/文件/标签、运行身份、校验强度、exit、明确不包含与已知边界 |
 | [`f-integration/consumer-view.example.json`](f-integration/consumer-view.example.json) | 给 F 的稳定投影样例（`TrialInsightsView` 形状） |
 | [`f-integration/README.md`](f-integration/README.md) | F 接入契约与语义规则 |
 | [`wave26-status.json`](wave26-status.json) | 第二轮（G1–G16）范围/未知/硬界/流式预算的交付与实测值 |
@@ -28,7 +31,8 @@ G（`codex/g4-usage-insights`）的只读观测证据。全部内容都是从已
 | [`wave30-status.json`](wave30-status.json) | 本轮（G1–G4 四成果）同授权窗口的报告/导出闭环、display-only 导出、跨读者逐行核对与快照连续性 |
 | [`wave31-status.json`](wave31-status.json) | 本轮三包 12 成果：R1 固定 RC 基线与包能力核对、R2 主线默认下载全链、R3 重复观察与支持 |
 | [`wave32-status.json`](wave32-status.json) | 上一轮整块：排障用支持报告、构建布局能力核对修正、导出/限额/错误复核与余项 |
-| [`wave33-status.json`](wave33-status.json) | 本轮三成果：支持 port/默认消费、观察语义与兼容、问题反馈闭环与余项 |
+| [`wave33-status.json`](wave33-status.json) | 上一轮三成果：支持 port/默认消费、观察语义与兼容、问题反馈闭环与余项 |
+| [`wave34-status.json`](wave34-status.json) | 本轮两包六成果：观察/诊断边界、运行身份、真实反馈闭环、等待与审阅事实、兼容矩阵 |
 
 ## 与主线的实际接线（2026-11-15）
 

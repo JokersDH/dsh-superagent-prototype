@@ -1,0 +1,147 @@
+{
+  "protocol": "usage-observation-download/1",
+  "observation": {
+    "protocol": "usage-observation/1",
+    "observedAt": "2026-11-16T11:21:19.129Z",
+    "status": "ready",
+    "summaryId": "b0bf2020ed18be4b565e66f57b20dfcf8a595dc93017c5303d37e8472a4099c4",
+    "days": 7,
+    "timezone": "UTC",
+    "window": {
+      "from": "2026-11-09T11:21:19.129Z",
+      "to": "2026-11-16T11:21:19.129Z"
+    },
+    "windowLabel": "近 7 天 · GMT+0",
+    "coverage": "部分覆盖",
+    "coverageState": "partial",
+    "scope": {
+      "projectIds": [
+        "project-arcade",
+        "project-beacon"
+      ],
+      "aggregation": "declared_multi_project",
+      "label": "本次 2 个项目"
+    },
+    "sampleCount": 2,
+    "unknownCount": null,
+    "metrics": [
+      {
+        "id": "execution.durationMs@controlled@",
+        "label": "平均记录执行耗时",
+        "value": null,
+        "detail": "未知 2 · 完整 · controlled",
+        "unit": "ms",
+        "layer": "controlled",
+        "sampleCount": 0
+      },
+      {
+        "id": "interventions.acceptances@product@",
+        "label": "接受事实",
+        "value": "2",
+        "detail": "未知 0 · 完整",
+        "unit": "",
+        "layer": "observed",
+        "sampleCount": 2
+      },
+      {
+        "id": "interventions.answers@product@",
+        "label": "明确回答",
+        "value": "2",
+        "detail": "未知 0 · 完整",
+        "unit": "",
+        "layer": "observed",
+        "sampleCount": 2
+      },
+      {
+        "id": "interventions.questions@product@",
+        "label": "提出问题",
+        "value": "2",
+        "detail": "未知 0 · 完整",
+        "unit": "",
+        "layer": "observed",
+        "sampleCount": 2
+      },
+      {
+        "id": "interventions.total@product@",
+        "label": "人工介入事实",
+        "value": "6",
+        "detail": "未知 0 · 完整",
+        "unit": "",
+        "layer": "observed",
+        "sampleCount": 2
+      },
+      {
+        "id": "outcomes.accepted@controlled@",
+        "label": "已接受交付",
+        "value": "2",
+        "detail": "未知 0 · 完整 · controlled",
+        "unit": "",
+        "layer": "controlled",
+        "sampleCount": 2
+      },
+      {
+        "id": "outcomes.count@controlled@",
+        "label": "已观察执行次数",
+        "value": "2",
+        "detail": "未知 0 · 完整 · controlled",
+        "unit": "",
+        "layer": "controlled",
+        "sampleCount": 2
+      },
+      {
+        "id": "queue.waitMs@controlled@",
+        "label": "平均记录排队耗时",
+        "value": null,
+        "detail": "未知 2 · 完整 · controlled",
+        "unit": "ms",
+        "layer": "controlled",
+        "sampleCount": 0
+      },
+      {
+        "id": "review.activeMs@controlled@",
+        "label": "平均界面可见时长（部分代理）",
+        "value": "700",
+        "detail": "未知 0 · 部分或缺失 · controlled",
+        "unit": "ms",
+        "layer": "controlled",
+        "sampleCount": 2
+      },
+      {
+        "id": "review.readyToAcceptanceMs@controlled@",
+        "label": "平均候选就绪到接受",
+        "value": "810.5",
+        "detail": "未知 0 · 完整 · controlled",
+        "unit": "ms",
+        "layer": "controlled",
+        "sampleCount": 2
+      },
+      {
+        "id": "usage.inputTokens@controlled@",
+        "label": "已知输入 token",
+        "value": null,
+        "detail": "未知 2 · 完整 · controlled",
+        "unit": "tokens",
+        "layer": "controlled",
+        "sampleCount": 0
+      },
+      {
+        "id": "usage.outputTokens@controlled@",
+        "label": "已知输出 token",
+        "value": null,
+        "detail": "未知 2 · 完整 · controlled",
+        "unit": "tokens",
+        "layer": "controlled",
+        "sampleCount": 0
+      }
+    ],
+    "limitations": [
+      "仅统计现有工作证据；未记录的执行耗时、排队、用量与成本保持未知。",
+      "界面可见审阅时长是部分活动代理，不是人工工时或效率收益。"
+    ],
+    "authorization": "none"
+  },
+  "fileName": "observation-7d-b0bf2020ed18.json",
+  "mediaType": "application/json",
+  "text": "{\n  \"protocol\": \"usage-insights-display-export/1\",\n  \"exportedFrom\": {\n    \"observationProtocol\": \"usage-observation/1\",\n    \"observedAt\": \"2026-11-16T11:21:19.129Z\",\n    \"days\": 7,\n    \"timezone\": \"UTC\",\n    \"reader\": \"the coordinator document served by GET /v1/insights\"\n  },\n  \"snapshot\": {\n    \"snapshotId\": \"b0bf2020ed18be4b565e66f57b20dfcf8a595dc93017c5303d37e8472a4099c4\",\n    \"capturedAt\": \"2026-11-16T11:21:19.129Z\",\n    \"continuity\": \"first_observation\",\n    \"previous\": null,\n    \"note\": null\n  },\n  \"window\": {\n    \"from\": \"2026-11-09T11:21:19.129Z\",\n    \"to\": \"2026-11-16T11:21:19.129Z\"\n  },\n  \"scope\": {\n    \"projectIds\": [\n      \"project-arcade\",\n      \"project-beacon\"\n    ],\n    \"aggregation\": \"declared_multi_project\",\n    \"label\": \"本次 2 个项目\"\n  },\n  \"header\": {\n    \"status\": \"ready\",\n    \"windowLabel\": \"近 7 天 · GMT+0\",\n    \"coverage\": \"部分覆盖\",\n    \"coverageState\": \"partial\",\n    \"sampleCount\": 2,\n    \"unknownCount\": null\n  },\n  \"sourceIdentity\": {\n    \"kind\": \"display_dto\",\n    \"numericValues\": false,\n    \"note\": \"The served document carries formatted strings only. This export preserves them verbatim and deliberately has no numeric field, so no number is reverse-parsed or presented as an analysis result.\"\n  },\n  \"crossCheck\": {\n    \"numericValuesAvailable\": false,\n    \"reason\": \"Only the served strings are available; a numeric cross-check needs the authorization-scoped analysis summary.\"\n  },\n  \"limitations\": [\n    \"The served document carries formatted strings only. This export preserves them verbatim and deliberately has no numeric field, so no number is reverse-parsed or presented as an analysis result.\",\n    \"The served document does not include the current attention snapshot; pending item counts are unavailable here.\",\n    \"仅统计现有工作证据；未记录的执行耗时、排队、用量与成本保持未知。\",\n    \"界面可见审阅时长是部分活动代理，不是人工工时或效率收益。\"\n  ],\n  \"authorization\": \"none\",\n  \"rows\": [\n    {\n      \"rowId\": \"execution.durationMs@controlled@\",\n      \"label\": \"平均记录执行耗时\",\n      \"layer\": \"controlled\",\n      \"unit\": \"ms\",\n      \"formatted\": null,\n      \"sampleCount\": 0,\n      \"detail\": \"未知 2 · 完整 · controlled\"\n    },\n    {\n      \"rowId\": \"interventions.acceptances@product@\",\n      \"label\": \"接受事实\",\n      \"layer\": \"observed\",\n      \"unit\": \"\",\n      \"formatted\": \"2\",\n      \"sampleCount\": 2,\n      \"detail\": \"未知 0 · 完整\"\n    },\n    {\n      \"rowId\": \"interventions.answers@product@\",\n      \"label\": \"明确回答\",\n      \"layer\": \"observed\",\n      \"unit\": \"\",\n      \"formatted\": \"2\",\n      \"sampleCount\": 2,\n      \"detail\": \"未知 0 · 完整\"\n    },\n    {\n      \"rowId\": \"interventions.questions@product@\",\n      \"label\": \"提出问题\",\n      \"layer\": \"observed\",\n      \"unit\": \"\",\n      \"formatted\": \"2\",\n      \"sampleCount\": 2,\n      \"detail\": \"未知 0 · 完整\"\n    },\n    {\n      \"rowId\": \"interventions.total@product@\",\n      \"label\": \"人工介入事实\",\n      \"layer\": \"observed\",\n      \"unit\": \"\",\n      \"formatted\": \"6\",\n      \"sampleCount\": 2,\n      \"detail\": \"未知 0 · 完整\"\n    },\n    {\n      \"rowId\": \"outcomes.accepted@controlled@\",\n      \"label\": \"已接受交付\",\n      \"layer\": \"controlled\",\n      \"unit\": \"\",\n      \"formatted\": \"2\",\n      \"sampleCount\": 2,\n      \"detail\": \"未知 0 · 完整 · controlled\"\n    },\n    {\n      \"rowId\": \"outcomes.count@controlled@\",\n      \"label\": \"已观察执行次数\",\n      \"layer\": \"controlled\",\n      \"unit\": \"\",\n      \"formatted\": \"2\",\n      \"sampleCount\": 2,\n      \"detail\": \"未知 0 · 完整 · controlled\"\n    },\n    {\n      \"rowId\": \"queue.waitMs@controlled@\",\n      \"label\": \"平均记录排队耗时\",\n      \"layer\": \"controlled\",\n      \"unit\": \"ms\",\n      \"formatted\": null,\n      \"sampleCount\": 0,\n      \"detail\": \"未知 2 · 完整 · controlled\"\n    },\n    {\n      \"rowId\": \"review.activeMs@controlled@\",\n      \"label\": \"平均界面可见时长（部分代理）\",\n      \"layer\": \"controlled\",\n      \"unit\": \"ms\",\n      \"formatted\": \"700\",\n      \"sampleCount\": 2,\n      \"detail\": \"未知 0 · 部分或缺失 · controlled\"\n    },\n    {\n      \"rowId\": \"review.readyToAcceptanceMs@controlled@\",\n      \"label\": \"平均候选就绪到接受\",\n      \"layer\": \"controlled\",\n      \"unit\": \"ms\",\n      \"formatted\": \"810.5\",\n      \"sampleCount\": 2,\n      \"detail\": \"未知 0 · 完整 · controlled\"\n    },\n    {\n      \"rowId\": \"usage.inputTokens@controlled@\",\n      \"label\": \"已知输入 token\",\n      \"layer\": \"controlled\",\n      \"unit\": \"tokens\",\n      \"formatted\": null,\n      \"sampleCount\": 0,\n      \"detail\": \"未知 2 · 完整 · controlled\"\n    },\n    {\n      \"rowId\": \"usage.outputTokens@controlled@\",\n      \"label\": \"已知输出 token\",\n      \"layer\": \"controlled\",\n      \"unit\": \"tokens\",\n      \"formatted\": null,\n      \"sampleCount\": 0,\n      \"detail\": \"未知 2 · 完整 · controlled\"\n    }\n  ],\n  \"truncation\": {\n    \"byRows\": false,\n    \"byBytes\": false,\n    \"totalRows\": 12,\n    \"includedRows\": 12,\n    \"maxRows\": 32,\n    \"maxBytes\": 65536,\n    \"bytes\": 5140\n  }\n}\n",
+  "sha256": "9bf43949be68e59a56a212b688d8694b5d31d1f47a9dddfc7decd0479de14268"
+}

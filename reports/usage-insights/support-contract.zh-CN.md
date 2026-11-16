@@ -63,10 +63,24 @@ node tools/usage-insights/cli.mjs verify --dto /abs/observation-….json \
 
 | exit | 含义 |
 | --- | --- |
-| 0 | 报告生成且观察为 `ready` |
+| 0 | 报告生成、观察 `ready`、文档通过自己的 contract（裸观察/展示文档也算，只是没有 payload digest） |
+| 3 | 外壳没过产品 contract 或旧文件（`contractValid: false`）：摘要可用但未完全验证 |
 | 4 | 观察为 `insufficient_data`（缺来源/未采集） |
-| 5 | 文档不合法、观察为 `unavailable`、归档不可读或摘要不符 |
-| 2 | 参数错误（相对路径、`--input` 与 `--dto` 同时给等） |
+| 5 | 文档不合法、摘要不符（`digest: mismatch`）、观察为 `unavailable`、归档/安装不可读 |
+| 2 | 参数错误（相对路径、`--input` 与 `--dto` 同时给、`--package` 与 `--install` 同时给等） |
+
+## 一次真实定位（本轮证据）
+
+同一份 main 诊断下载文件（`GET /v1/insights/support`，`support-7d-…-unknown-build.json`）：
+
+1. 直接读：`origin: null`、`exportCapability: unverified` —— **定位到的缺口**：诊断文件没有安装身份。
+2. 同一文件加 `--install <安装目录>` 再读：`origin.identitySource: install-manifest`、build
+   `4dcd28f758bbb265`、`exportCapability: present`、`missing: []` —— 身份由已安装文件与 manifest 证据补上。
+3. 同 scope 再下载一次：`summaryId` 变化（新观察），身份缺口仍复现 —— 说明这是稳定缺口而非偶发。
+
+两份报告分别在 `reports/usage-insights/probe/two-project-20261116T112118.support-gap.json` 与
+`.support-with-runtime-identity.json`。默认产品输出仍未带身份（main 尚未接 `inspectRuntimeIdentity`），
+这一项保持 SOURCE_READY。
 
 `--out` 以 0600 独占创建、不覆盖；不给 `--out` 时只写 stdout。
 
@@ -86,6 +100,35 @@ node tools/usage-insights/cli.mjs verify --dto /abs/observation-….json \
 `readSupportDocument` 返回的 `digest.state` 三态：`verified` / `mismatch` / `absent`（裸文档没有声明摘要，
 `absent` 不是通过）。`conservation` 报告 `rowsMatch`/`scopeMatches`/`windowMatches`/`headerMatches`；
 `contractValid: false` 表示这份外壳没过产品自己的 contract（旧版或被重写），但仍可给出摘要与守恒诊断。
+
+## 运行身份（`inspectRuntimeIdentity`）
+
+归档摘要只说明"发出的是哪些字节"，不说明"正在运行的是不是它"。`runtime-identity.ts` 读**安装目录本身**：
+
+- `install/install.json`（与 D/main 同一输入）：build、40 位 source commit、dirty、files 数量；
+  缺或只有一部分时 `identitySource` 为 `incomplete-manifest` 且缺项保持 `null`，没有声明就是
+  `origin: null`；分支名、路径、仓库 HEAD 都不会变成 commit。
+- 已安装文件的能力证据：usage-insights `dist/index.js` 的导出、coordinator 的
+  `/v1/insights`、`/v1/insights/export`、`/v1/insights/support`、console 的下载引用。
+  **manifest 声明不能把缺失能力变存在**。
+- `archive.sha256` 只在显式给了 `--archive`/归档路径时才算；只给 expected 而无归档可算时
+  `checks.archiveMatches` 为 `null`（自比不算证明），并在 `unknown` 里说明。
+- `checks`（build/source/archive 是否与 expected 一致）与 `differences` 保留旧安装配新 source 的差异。
+
+## 校验强度与旧文件
+
+`readSupportDocument` 返回 `verification`：
+
+| 值 | 含义 |
+| --- | --- |
+| `contract-digest` | 产品 contract 通过，且声明的 sha256 与文本一致 |
+| `digest-only` | 字节与声明摘要一致，但外壳没过产品 contract（`contractValid: false`） |
+| `shape-only` | 没有声明摘要可核（裸文档/旧摘要），只做了形状与严格重投影 |
+
+**未知字段一律拒绝**（typed `invalid_document`），不做"丢弃后声称已清干净"。旧版支持文件
+（wave-32 形态，缺 `origin`/`evidence`/`exportCapability`/`documentKind`）不拒收也不当可信：
+`readSupportFile` 返回 `schema: 'legacy'` + `missingFields`，缺的字段按 unknown 补齐，
+`exportCapability: 'unverified'`，CLI exit 3。
 
 ## 给 D/E/H 的最小使用约定
 

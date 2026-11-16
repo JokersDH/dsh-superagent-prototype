@@ -1,0 +1,144 @@
+{
+  "protocol": "usage-support-download/1",
+  "report": {
+    "protocol": "usage-insights-support-summary/1",
+    "observationProtocol": "usage-observation/1",
+    "documentKind": "observation",
+    "status": "ready",
+    "summaryId": "754b931da4dfc8adfb53e934a242fbf73c02210a641bde9247f36c10b2d611b0",
+    "observedAt": "2026-11-16T11:21:19.141Z",
+    "days": 7,
+    "timezone": "UTC",
+    "window": {
+      "from": "2026-11-09T11:21:19.141Z",
+      "to": "2026-11-16T11:21:19.141Z"
+    },
+    "scope": {
+      "projectIds": [
+        "project-arcade",
+        "project-beacon"
+      ],
+      "aggregation": "declared_multi_project",
+      "label": "本次 2 个项目"
+    },
+    "coverage": "部分覆盖",
+    "coverageState": "partial",
+    "counts": {
+      "rows": 12,
+      "withValue": 8,
+      "unknown": 4,
+      "sampleCount": 2
+    },
+    "rows": [
+      {
+        "rowId": "execution.durationMs@controlled@",
+        "layer": "controlled",
+        "unit": "ms",
+        "hasValue": false,
+        "sampleCount": 0
+      },
+      {
+        "rowId": "interventions.acceptances@product@",
+        "layer": "observed",
+        "unit": "",
+        "hasValue": true,
+        "sampleCount": 2
+      },
+      {
+        "rowId": "interventions.answers@product@",
+        "layer": "observed",
+        "unit": "",
+        "hasValue": true,
+        "sampleCount": 2
+      },
+      {
+        "rowId": "interventions.questions@product@",
+        "layer": "observed",
+        "unit": "",
+        "hasValue": true,
+        "sampleCount": 2
+      },
+      {
+        "rowId": "interventions.total@product@",
+        "layer": "observed",
+        "unit": "",
+        "hasValue": true,
+        "sampleCount": 2
+      },
+      {
+        "rowId": "outcomes.accepted@controlled@",
+        "layer": "controlled",
+        "unit": "",
+        "hasValue": true,
+        "sampleCount": 2
+      },
+      {
+        "rowId": "outcomes.count@controlled@",
+        "layer": "controlled",
+        "unit": "",
+        "hasValue": true,
+        "sampleCount": 2
+      },
+      {
+        "rowId": "queue.waitMs@controlled@",
+        "layer": "controlled",
+        "unit": "ms",
+        "hasValue": false,
+        "sampleCount": 0
+      },
+      {
+        "rowId": "review.activeMs@controlled@",
+        "layer": "controlled",
+        "unit": "ms",
+        "hasValue": true,
+        "sampleCount": 2
+      },
+      {
+        "rowId": "review.readyToAcceptanceMs@controlled@",
+        "layer": "controlled",
+        "unit": "ms",
+        "hasValue": true,
+        "sampleCount": 2
+      },
+      {
+        "rowId": "usage.inputTokens@controlled@",
+        "layer": "controlled",
+        "unit": "tokens",
+        "hasValue": false,
+        "sampleCount": 0
+      },
+      {
+        "rowId": "usage.outputTokens@controlled@",
+        "layer": "controlled",
+        "unit": "tokens",
+        "hasValue": false,
+        "sampleCount": 0
+      }
+    ],
+    "limitations": [
+      "部分指标没有可核对值。",
+      "当前观察不完整。"
+    ],
+    "numericValues": false,
+    "note": "Display document: the served values are formatted strings. This summary carries metadata only; it is not a numeric analysis result.",
+    "authorization": "none",
+    "origin": null,
+    "evidence": {
+      "coverageState": "partial",
+      "rowsWithValue": 8,
+      "rowsWithoutValue": 4,
+      "sampleCount": 2,
+      "partial": true,
+      "absentFacts": [
+        "4 row(s) have no observed value",
+        "the observation is partial"
+      ]
+    },
+    "exportCapability": "unverified"
+  },
+  "fileName": "support-7d-754b931da4df-unknown-build.json",
+  "mediaType": "application/json",
+  "text": "{\n  \"protocol\": \"usage-insights-support/1\",\n  \"report\": {\n    \"protocol\": \"usage-insights-support-summary/1\",\n    \"observationProtocol\": \"usage-observation/1\",\n    \"documentKind\": \"observation\",\n    \"status\": \"ready\",\n    \"summaryId\": \"754b931da4dfc8adfb53e934a242fbf73c02210a641bde9247f36c10b2d611b0\",\n    \"observedAt\": \"2026-11-16T11:21:19.141Z\",\n    \"days\": 7,\n    \"timezone\": \"UTC\",\n    \"window\": {\n      \"from\": \"2026-11-09T11:21:19.141Z\",\n      \"to\": \"2026-11-16T11:21:19.141Z\"\n    },\n    \"scope\": {\n      \"projectIds\": [\n        \"project-arcade\",\n        \"project-beacon\"\n      ],\n      \"aggregation\": \"declared_multi_project\",\n      \"label\": \"本次 2 个项目\"\n    },\n    \"coverage\": \"部分覆盖\",\n    \"coverageState\": \"partial\",\n    \"counts\": {\n      \"rows\": 12,\n      \"withValue\": 8,\n      \"unknown\": 4,\n      \"sampleCount\": 2\n    },\n    \"rows\": [\n      {\n        \"rowId\": \"execution.durationMs@controlled@\",\n        \"layer\": \"controlled\",\n        \"unit\": \"ms\",\n        \"hasValue\": false,\n        \"sampleCount\": 0\n      },\n      {\n        \"rowId\": \"interventions.acceptances@product@\",\n        \"layer\": \"observed\",\n        \"unit\": \"\",\n        \"hasValue\": true,\n        \"sampleCount\": 2\n      },\n      {\n        \"rowId\": \"interventions.answers@product@\",\n        \"layer\": \"observed\",\n        \"unit\": \"\",\n        \"hasValue\": true,\n        \"sampleCount\": 2\n      },\n      {\n        \"rowId\": \"interventions.questions@product@\",\n        \"layer\": \"observed\",\n        \"unit\": \"\",\n        \"hasValue\": true,\n        \"sampleCount\": 2\n      },\n      {\n        \"rowId\": \"interventions.total@product@\",\n        \"layer\": \"observed\",\n        \"unit\": \"\",\n        \"hasValue\": true,\n        \"sampleCount\": 2\n      },\n      {\n        \"rowId\": \"outcomes.accepted@controlled@\",\n        \"layer\": \"controlled\",\n        \"unit\": \"\",\n        \"hasValue\": true,\n        \"sampleCount\": 2\n      },\n      {\n        \"rowId\": \"outcomes.count@controlled@\",\n        \"layer\": \"controlled\",\n        \"unit\": \"\",\n        \"hasValue\": true,\n        \"sampleCount\": 2\n      },\n      {\n        \"rowId\": \"queue.waitMs@controlled@\",\n        \"layer\": \"controlled\",\n        \"unit\": \"ms\",\n        \"hasValue\": false,\n        \"sampleCount\": 0\n      },\n      {\n        \"rowId\": \"review.activeMs@controlled@\",\n        \"layer\": \"controlled\",\n        \"unit\": \"ms\",\n        \"hasValue\": true,\n        \"sampleCount\": 2\n      },\n      {\n        \"rowId\": \"review.readyToAcceptanceMs@controlled@\",\n        \"layer\": \"controlled\",\n        \"unit\": \"ms\",\n        \"hasValue\": true,\n        \"sampleCount\": 2\n      },\n      {\n        \"rowId\": \"usage.inputTokens@controlled@\",\n        \"layer\": \"controlled\",\n        \"unit\": \"tokens\",\n        \"hasValue\": false,\n        \"sampleCount\": 0\n      },\n      {\n        \"rowId\": \"usage.outputTokens@controlled@\",\n        \"layer\": \"controlled\",\n        \"unit\": \"tokens\",\n        \"hasValue\": false,\n        \"sampleCount\": 0\n      }\n    ],\n    \"limitations\": [\n      \"部分指标没有可核对值。\",\n      \"当前观察不完整。\"\n    ],\n    \"numericValues\": false,\n    \"note\": \"Display document: the served values are formatted strings. This summary carries metadata only; it is not a numeric analysis result.\",\n    \"authorization\": \"none\",\n    \"origin\": null,\n    \"evidence\": {\n      \"coverageState\": \"partial\",\n      \"rowsWithValue\": 8,\n      \"rowsWithoutValue\": 4,\n      \"sampleCount\": 2,\n      \"partial\": true,\n      \"absentFacts\": [\n        \"4 row(s) have no observed value\",\n        \"the observation is partial\"\n      ]\n    },\n    \"exportCapability\": \"unverified\"\n  }\n}\n",
+  "bytes": 3566,
+  "sha256": "ed777f078761fba3f4201c778c84288b5c07b04940aa389491520973d6aa5db5"
+}
