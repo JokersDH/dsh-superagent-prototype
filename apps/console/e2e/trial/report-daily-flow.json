@@ -16,67 +16,89 @@
   "posts": [
     "/v1/commands",
     "/v1/commands",
-    "/v1/works/37eceda6e68f5c5ff38db962f729c771/review-activity",
+    "/v1/works/84cede29cdc6408bf1d757b02930ac61/review-activity",
     "/v1/commands",
-    "/v1/works/37eceda6e68f5c5ff38db962f729c771/review-activity",
-    "/v1/projects/project-ea14463d38ff0bede985f789/recipes/preview",
-    "/v1/projects/project-ea14463d38ff0bede985f789/recipes/preview",
-    "/v1/projects/project-ea14463d38ff0bede985f789/recipes/preview",
+    "/v1/works/84cede29cdc6408bf1d757b02930ac61/review-activity",
+    "/v1/projects/project-3c844cd129c02a1af5748607/recipes/preview",
+    "/v1/projects/project-3c844cd129c02a1af5748607/recipes/preview",
+    "/v1/projects/project-3c844cd129c02a1af5748607/recipes/preview",
     "/v1/commands",
-    "/v1/works/2b05b99a4dc62c0eb288f76f5436dc5c/review-activity",
+    "/v1/works/d70bf5d535849c0a5627ccbc41f639b0/review-activity",
     "/v1/commands",
-    "/v1/works/2b05b99a4dc62c0eb288f76f5436dc5c/review-activity",
-    "/v1/projects/project-513ae02c1a30aadec17c58d3/recipes/preview",
-    "/v1/projects/project-513ae02c1a30aadec17c58d3/recipes/preview",
-    "/v1/projects/project-513ae02c1a30aadec17c58d3/recipes/preview",
-    "/v1/projects/project-513ae02c1a30aadec17c58d3/recipes/preview",
-    "/v1/projects/project-513ae02c1a30aadec17c58d3/recipes/preview",
-    "/v1/projects/project-513ae02c1a30aadec17c58d3/recipes/preview"
+    "/v1/works/d70bf5d535849c0a5627ccbc41f639b0/review-activity",
+    "/v1/projects/project-e5a07bae83e61154570bebe2/recipes/preview",
+    "/v1/projects/project-e5a07bae83e61154570bebe2/recipes/preview",
+    "/v1/projects/project-e5a07bae83e61154570bebe2/recipes/preview",
+    "/v1/commands",
+    "/v1/works/f6262b21e3a71a838a5a82b22b9113f9/review-activity",
+    "/v1/commands",
+    "/v1/projects/project-e5a07bae83e61154570bebe2/recipes/preview",
+    "/v1/projects/project-e5a07bae83e61154570bebe2/recipes/preview",
+    "/v1/projects/project-e5a07bae83e61154570bebe2/recipes/preview",
+    "/v1/projects/project-e5a07bae83e61154570bebe2/recipes/preview",
+    "/v1/projects/project-e5a07bae83e61154570bebe2/recipes/preview",
+    "/v1/projects/project-e5a07bae83e61154570bebe2/recipes/preview",
+    "/v1/projects/project-e5a07bae83e61154570bebe2/recipes/preview",
+    "/v1/projects/project-e5a07bae83e61154570bebe2/recipes/preview",
+    "/v1/projects/project-e5a07bae83e61154570bebe2/recipes/preview"
   ],
   "modelCalls": 0,
   "reviewActivityConflicts": 2,
-  "generatedAt": "2026-11-16T03:03:00.450Z",
+  "expectedPreviewAborts": 3,
+  "generatedAt": "2026-11-16T06:43:53.310Z",
   "results": [
     {
       "id": "ALPHA-QUESTION-VERIFY-EVIDENCE-ACCEPT",
       "status": "PASS",
-      "ms": 3386,
+      "ms": 1537,
       "detail": "Alpha delegation, native question, answer, PASS verification, evidence and acceptance"
     },
     {
       "id": "ALPHA-TRIAL-IDENTITY",
       "status": "PASS",
-      "ms": 135,
+      "ms": 134,
       "detail": "the trial view shows the Alpha project, conversation and fixture execution honestly"
     },
     {
       "id": "BETA-DRAFT-AND-DELIVERY",
       "status": "PASS",
-      "ms": 1945,
+      "ms": 1847,
       "detail": "Beta delegation runs the pass fixture through verification and acceptance"
     },
     {
       "id": "BETA-TRIAL-AND-DRAFT-PRESERVED",
       "status": "PASS",
-      "ms": 131,
+      "ms": 195,
       "detail": "the second project keeps its own conversation, draft and delivery"
+    },
+    {
+      "id": "MULTI-WORK-STATES",
+      "status": "PASS",
+      "ms": 3110,
+      "detail": "failed, pending-question, delivered and accepted works stay distinct and correctly scoped"
+    },
+    {
+      "id": "TRIAL-RECIPE-RETRY",
+      "status": "PASS",
+      "ms": 162,
+      "detail": "recipe failure and retry work in the actual App without a hidden business write"
     },
     {
       "id": "DAILY-VIEWS-RETURN-TO-ORIGINAL",
       "status": "PASS",
-      "ms": 157,
+      "ms": 152,
       "detail": "decisions/works/delivery return to the original work without losing the draft"
     },
     {
       "id": "RELOAD-AND-EXISTING-HISTORY",
       "status": "PASS",
-      "ms": 1226,
+      "ms": 1100,
       "detail": "reload keeps delivered history/evidence and honest project identity; drafts are not invented"
     },
     {
       "id": "NO-MODEL-NO-UNEXPECTED-POSTS",
       "status": "PASS",
-      "ms": 1,
+      "ms": 0,
       "detail": "only explicit product commands were sent; no model or hidden write occurred"
     }
   ],

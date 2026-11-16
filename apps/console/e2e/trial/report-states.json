@@ -5,114 +5,114 @@
     "1440x900",
     "390x844"
   ],
-  "generatedAt": "2026-11-16T03:06:08.530Z",
+  "generatedAt": "2026-11-16T06:43:27.200Z",
   "results": [
     {
       "id": "CONFIGURED",
       "status": "PASS",
-      "ms": 1063,
+      "ms": 776,
       "detail": "configured state shows facts only and one navigation action"
     },
     {
       "id": "UNCONFIGURED",
       "status": "PASS",
-      "ms": 746,
+      "ms": 664,
       "detail": "missing model configuration is separated from execution readiness"
     },
     {
       "id": "BLOCKED",
       "status": "PASS",
-      "ms": 688,
+      "ms": 624,
       "detail": "execution blockage names the reason instead of a bare red error"
     },
     {
       "id": "NEEDS-PROJECT",
       "status": "PASS",
-      "ms": 672,
+      "ms": 643,
       "detail": "a missing project is actionable and does not claim readiness"
     },
     {
       "id": "NO-PROJECTS",
       "status": "PASS",
-      "ms": 819,
+      "ms": 781,
       "detail": "an empty project set is an actionable state, not a blank panel"
     },
     {
       "id": "FIXTURE",
       "status": "PASS",
-      "ms": 689,
+      "ms": 643,
       "detail": "controlled fixture path is never mistaken for native readiness"
     },
     {
       "id": "UNKNOWN",
       "status": "PASS",
-      "ms": 686,
+      "ms": 643,
       "detail": "unknown stays unknown and never turns green"
     },
     {
       "id": "READONLY",
       "status": "PASS",
-      "ms": 700,
+      "ms": 625,
       "detail": "recovery read-only keeps readable navigation and hides approval/write entries"
     },
     {
       "id": "NOREDINESS",
       "status": "PASS",
-      "ms": 727,
+      "ms": 642,
       "detail": "an unread readiness is not guessed from other data"
     },
     {
       "id": "LOADING",
       "status": "PASS",
-      "ms": 705,
+      "ms": 666,
       "detail": "first load announces progress and blocks no navigation"
     },
     {
       "id": "UNAVAILABLE",
       "status": "PASS",
-      "ms": 706,
+      "ms": 668,
       "detail": "an old backend degrades explicitly"
     },
     {
       "id": "ERROR-AND-RETRY",
       "status": "PASS",
-      "ms": 886,
+      "ms": 833,
       "detail": "retry re-reads status without clearing valid data or sending a command"
     },
     {
       "id": "LONG-CONTENT",
       "status": "PASS",
-      "ms": 694,
+      "ms": 656,
       "detail": "long Chinese/English content wraps without horizontal overflow"
     },
     {
       "id": "VISUAL-AUDIT",
       "status": "PASS",
-      "ms": 2382,
+      "ms": 2397,
       "detail": "geometry, overflow, contrast, radii, shadows and semantic dot colours are verified programmatically"
     },
     {
       "id": "INSIGHTS-EMPTY",
       "status": "PASS",
-      "ms": 632,
+      "ms": 687,
       "detail": "optional insights cannot invent efficiency numbers"
     },
     {
       "id": "INSIGHTS-UNSCOPED",
       "status": "PASS",
-      "ms": 662,
+      "ms": 626,
       "detail": "ready-looking metrics without a declared scope are not shown"
     },
     {
       "id": "INSIGHTS-WRONG-PROJECT",
       "status": "PASS",
-      "ms": 648,
+      "ms": 651,
       "detail": "a summary for another project cannot be read as the current project result"
     },
     {
       "id": "INSIGHTS-TRUNCATED-AND-PARTIAL",
       "status": "PASS",
-      "ms": 1234,
+      "ms": 1216,
       "detail": "truncated complete metrics are refused while declared partial metrics remain visible"
     },
     {
@@ -124,13 +124,13 @@
     {
       "id": "RECIPES-SCOPE-AND-ROLES",
       "status": "PASS",
-      "ms": 649,
+      "ms": 660,
       "detail": "project-local scope/check/profile rules gate preparation"
     },
     {
       "id": "RECIPES-PROJECT-STATE",
       "status": "PASS",
-      "ms": 2375,
+      "ms": 2355,
       "detail": "blocked/expired projects and dropped exclusions cannot open the template entry"
     },
     {
@@ -142,67 +142,67 @@
     {
       "id": "INSIGHTS-WINDOW",
       "status": "PASS",
-      "ms": 1927,
+      "ms": 1893,
       "detail": "7/30-day selection is delegated to main and stale-window values are hidden"
     },
     {
       "id": "EXPORT-TOOLBAR",
       "status": "PASS",
-      "ms": 2606,
+      "ms": 2617,
       "detail": "export is explicit, display-only, cancellable by scope and degrades without the endpoint"
     },
     {
       "id": "SUPPORT-PANEL",
       "status": "PASS",
-      "ms": 731,
+      "ms": 749,
       "detail": "support/diagnostics expose only a bounded read-only summary on demand"
     },
     {
       "id": "RECIPES-LOADING-AND-ERROR",
       "status": "PASS",
-      "ms": 1343,
+      "ms": 1334,
       "detail": "recipe loading/failure keep the workspace usable and show no stale rows"
     },
     {
       "id": "NAVIGATION-CALLBACKS",
       "status": "PASS",
-      "ms": 2697,
+      "ms": 2726,
       "detail": "each of the four navigation names is reachable and recorded once"
     },
     {
       "id": "DOUBLE-CLICK-GUARD",
       "status": "PASS",
-      "ms": 1276,
+      "ms": 1265,
       "detail": "rapid duplicate activation does not duplicate navigation"
     },
     {
       "id": "KEYBOARD",
       "status": "PASS",
-      "ms": 1378,
+      "ms": 1379,
       "detail": "the main journey is operable by keyboard with visible focus and names"
     },
     {
       "id": "MOBILE",
       "status": "PASS",
-      "ms": 14115,
+      "ms": 12716,
       "detail": "narrow viewport keeps every action reachable without horizontal overflow"
     },
     {
       "id": "STALE-RESPONSE",
       "status": "PASS",
-      "ms": 1023,
+      "ms": 932,
       "detail": "out-of-order responses keep the newest identity"
     },
     {
       "id": "UNMOUNT-IN-FLIGHT",
       "status": "PASS",
-      "ms": 958,
+      "ms": 877,
       "detail": "a response after unmount updates no state"
     },
     {
       "id": "BROWSER-ERRORS",
       "status": "PASS",
-      "ms": 0,
+      "ms": 1,
       "detail": "no page or console errors across the suite"
     }
   ],

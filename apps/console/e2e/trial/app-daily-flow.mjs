@@ -107,6 +107,7 @@ try {
   page.setDefaultTimeout(20000)
   const errors = []
   const reviewActivityConflicts = []
+  const expectedPreviewAborts = []
   const posts = []
   page.on('pageerror', error => errors.push(`pageerror: ${error.message}`))
   page.on('console', message => {
@@ -114,6 +115,8 @@ try {
     const location = message.location().url ?? ''
     // A known main-owned review-timing conflict is recorded separately, not as an F regression.
     if (location.includes('/review-activity')) { reviewActivityConflicts.push(location); return }
+    // The recipe-retry step intentionally aborts preview requests; record that separately.
+    if (location.includes('/recipes/preview')) { expectedPreviewAborts.push(location); return }
     errors.push(`console: ${message.text()}`)
   })
   page.on('request', request => {
@@ -202,12 +205,66 @@ try {
     await openTrial()
     const facts = await trial().locator('.trial-facts').innerText()
     check(facts.includes('项目 Beta') && facts.includes('Beta 日常会话'), 'trial names the Beta project and conversation')
+    const summary = trial().locator('.trial-support summary')
+    await summary.click()
+    const support = await trial().locator('.trial-support').innerText()
+    check(support.includes('运行模式') && support.includes('配置') && support.includes('观察时间'), 'support diagnostics are available in the real App')
+    await summary.click()
     check(await trial().locator('.trial-project').count() === 2, 'both projects remain listed')
     check((await trial().locator('.trial-project[aria-current="true"]').innerText()).includes('项目 Beta'), 'the current project marker follows the filter')
     await backToConversation()
     check(await page.locator('.composer textarea').inputValue() === 'Beta 未发送草稿：保持到返回', 'the unsent draft survives the daily flow and trial round trip')
     await page.screenshot({ path: join(screenshots, 'daily-two-projects.png') })
   }, 'the second project keeps its own conversation, draft and delivery')
+
+  await step('MULTI-WORK-STATES', async () => {
+    await selectProject('项目 Alpha')
+    await selectConversation('Alpha 日常会话', 'conv-alpha-daily')
+    await createWork('Alpha：失败检查', 'profile-fixture-fail')
+    await page.locator('.verification .outcome-FAIL').waitFor({ timeout: 30000 })
+    check(await page.getByRole('button', { name: '接受当前候选', exact: true }).count() === 0, 'a machine FAIL offers no acceptance')
+    check((await page.locator('.detail .phase').textContent()) !== '已交付', 'a failed work is not delivered')
+    const alphaFail = page.locator('.work-card').filter({ hasText: 'Alpha：失败检查' })
+    check(await alphaFail.count() === 1, 'the failed work remains in its own project conversation')
+    await selectProject('项目 Beta')
+    await selectConversation('Beta 日常会话', 'conv-beta-daily')
+    await createWork('Beta：待回答问题', 'profile-fixture-question')
+    await page.locator('.question-card').first().waitFor({ timeout: 30000 })
+    check(await page.locator('.work-card').filter({ hasText: 'Alpha：失败检查' }).count() === 0, 'another project work is not mixed into the Beta conversation')
+    await page.getByRole('button', { name: '待我决定', exact: true }).click()
+    await page.locator('.attention-view').waitFor()
+    await page.waitForFunction(() => {
+      const view = document.querySelector('.attention-view')
+      return !!view && (view.textContent?.includes('Allow the controlled fixture') || !!view.querySelector('.question-card, .attention-row'))
+    }, null, { timeout: 15000 })
+    const decisionsText = await page.locator('.attention-view').innerText()
+    check(decisionsText.includes('Allow the controlled fixture') || decisionsText.includes('待回答') || decisionsText.includes('Beta'), 'the pending question is visible in the decisions view')
+    await page.getByRole('button', { name: '主对话视图', exact: true }).click()
+    await page.locator('.conversation-surface').waitFor()
+    check(await page.locator('.work-card').filter({ hasText: 'Beta：固定流程交付' }).count() === 1, 'the delivered Beta work stays present beside the pending one')
+    check(await page.locator('.work-card').filter({ hasText: 'Beta：待回答问题' }).count() === 1, 'the pending-question work stays visible beside the delivered one')
+    await selectProject('项目 Alpha')
+    await selectConversation('Alpha 日常会话', 'conv-alpha-daily')
+    check((await page.locator('.work-card').filter({ hasText: 'Alpha：固定流程问答与交付' }).innerText()).includes('已交付'), 'the accepted Alpha work remains delivered')
+    await selectProject('项目 Beta')
+    await selectConversation('Beta 日常会话', 'conv-beta-daily')
+    check(await page.locator('.composer textarea').inputValue() === 'Beta 未发送草稿：保持到返回', 'multi-work operations keep the Beta draft')
+  }, 'failed, pending-question, delivered and accepted works stay distinct and correctly scoped')
+
+  await step('TRIAL-RECIPE-RETRY', async () => {
+    const before = posts.length
+    await page.route('**/recipes/preview', route => route.abort())
+    await openTrial()
+    const alert = trial().locator('.trial-recipes [role=alert]')
+    await alert.waitFor({ timeout: 20000 })
+    check(await alert.getByRole('button', { name: '重试', exact: true }).count() === 1, 'the real App exposes the recipe retry')
+    await page.unroute('**/recipes/preview')
+    await alert.getByRole('button', { name: '重试', exact: true }).click()
+    await trial().locator('.trial-recipe').first().waitFor({ timeout: 20000 })
+    check(await trial().locator('.trial-recipe').count() >= 1, 'recipe previews recover after retry')
+    check(!posts.slice(before).some(path => path === '/v1/commands'), 'recipe retry sends no business command')
+    await backToConversation()
+  }, 'recipe failure and retry work in the actual App without a hidden business write')
 
   await step('DAILY-VIEWS-RETURN-TO-ORIGINAL', async () => {
     await page.getByRole('button', { name: '待我决定', exact: true }).click()
@@ -255,6 +312,7 @@ try {
     check(posts.filter(path => path === '/v1/commands').length >= 5, `expected product commands were sent: ${JSON.stringify(posts)}`)
     check(errors.length === 0, `browser errors: ${errors.join('; ')}`)
     check(reviewActivityConflicts.length <= 4, `unexpected review-activity conflicts: ${reviewActivityConflicts.length}`)
+    check(expectedPreviewAborts.length <= 6, `unexpected preview abort errors: ${expectedPreviewAborts.length}`)
   }, 'only explicit product commands were sent; no model or hidden write occurred')
 
   await browser.close()
@@ -265,6 +323,7 @@ try {
     conversations: ['conv-alpha-daily', 'conv-beta-daily'],
     profileUsed: ['profile-fixture-question', 'profile-fixture-pass'],
     posts, modelCalls, reviewActivityConflicts: reviewActivityConflicts.length,
+    expectedPreviewAborts: expectedPreviewAborts.length,
     generatedAt: new Date().toISOString(), results, failures,
   }, null, 2))
   console.log(`${failures.length === 0 ? 'PASS' : 'FAIL'} trial-daily-flow: ${results.filter(item => item.status === 'PASS').length}/${results.length}`)

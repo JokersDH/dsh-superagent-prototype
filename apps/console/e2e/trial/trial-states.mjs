@@ -463,7 +463,7 @@ try {
     await page.keyboard.press('Enter')
     await page.waitForTimeout(80)
     const text = await support.innerText()
-    for (const label of ['运行模式', '当前项目', '当前对话', '观察窗口', '配置', '观察时间', '包', '来源']) assert(text.includes(label), `support lists ${label}`)
+    for (const label of ['运行模式', '当前项目', '当前对话', '观察窗口', '配置', '上下文历史', '来源审阅', '观察时间', '包', '来源']) assert(text.includes(label), `support lists ${label}`)
     assert(text.includes('8296720') && text.includes('main 303b2c6a'), 'package and source labels are shown when provided')
     assert(!text.includes('/Users') && !text.includes('token'), 'support summary never contains private paths or tokens')
     const violations = await layoutAudit(page)

@@ -97,7 +97,7 @@ main 自有测试在本包改动后重跑：trial App 8/8、真实观察 6/6、0
 
 ## 6. 明确未达
 
-- main 已接入 0077 原表单模板与 0076 7/30 观察；本轮 F 新增可选 `onReloadRecipes`（main 未传时错误条只说明、不显示重试）与空项目内联导入按钮（复用原 `onAction('import_project')`，accessible name 唯一，避免与工具栏重复）。D 的准确安装验收仍由 E 负责。
+- main fc38 已接入 0077 原表单模板、0076 7/30、`onReloadRecipes` 与支持摘要；F 的空项目内联导入仍复用 `onAction('import_project')`（accessible name 唯一）。支持摘要新增“上下文历史/来源审阅”是否提供的只读行；正文仍由原历史/来源组件负责。Node attachPort 不被 F 当作执行授权或恢复证明。
 - J/G 模块未进入本仓库默认产品；F 只有 typed consumer、fixtures 与校验。
 - 真实 vendor/model/native 0；`app-daily-flow` 使用 controlled fixture（固定 scratch 写入），不是原生或安装包证明。
 - 非 Chromium、人工屏幕阅读器、真实服务端会话中途过期未测。

@@ -3,7 +3,7 @@
   "viewport": "1440x900",
   "projects": [
     {
-      "id": "project-6ef76ca637fc0d5dee7cb934",
+      "id": "project-9cd21b8404124241294c7f8b",
       "displayName": "项目 Alpha"
     },
     {
@@ -20,36 +20,36 @@
     "/v1/projects"
   ],
   "modelCalls": 0,
-  "generatedAt": "2026-11-16T03:02:51.244Z",
+  "generatedAt": "2026-11-16T06:43:43.040Z",
   "results": [
     {
       "id": "DEFAULT-CONVERSATION-AND-NO-EAGER-READ",
       "status": "PASS",
-      "ms": 2,
+      "ms": 1,
       "detail": "the real app keeps the main conversation default and reads readiness only on demand"
     },
     {
       "id": "TWO-REAL-CONVERSATIONS-SWITCH",
       "status": "PASS",
-      "ms": 209,
+      "ms": 191,
       "detail": "two real conversations keep separate drafts keyed by conversation identity"
     },
     {
       "id": "TRIAL-SHOWS-CURRENT-CONVERSATION-AND-PRESERVES-DRAFT",
       "status": "PASS",
-      "ms": 164,
+      "ms": 180,
       "detail": "trial round trips preserve draft, project and conversation identity with one read per open"
     },
     {
       "id": "IMPORT-SECOND-PROJECT-THROUGH-THE-REAL-FORM",
       "status": "PASS",
-      "ms": 163,
+      "ms": 182,
       "detail": "the real import form adds the second project and keeps the unsent draft"
     },
     {
       "id": "TRIAL-TWO-PROJECT-IDENTITY",
       "status": "PASS",
-      "ms": 167,
+      "ms": 182,
       "detail": "the trial view names the imported project and marks it current without inventing readiness"
     },
     {
@@ -61,7 +61,7 @@
     {
       "id": "EXECUTOR-ROUND-TRIP-KEEPS-IDENTITY",
       "status": "PASS",
-      "ms": 133,
+      "ms": 134,
       "detail": "executor check and return keep the same project, conversation and draft"
     },
     {

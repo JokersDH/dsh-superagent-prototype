@@ -35,9 +35,9 @@ F 不处理：安装命令、原生 profile 配置、数据库修复、恢复授
 ## 试用交班清单
 
 - 分支：`codex/g4-trial-experience`；自有路径：`apps/console/src/trial/`、`test/trial/`、`e2e/trial/`、`docs/user-guide/`、`reports/trial-experience/`。
-- 源码与范围：`reports/trial-experience/wave32-status.json`。
-- 当前 App 接线：main `58b4e4c8`/App `303b2c6a`（导出、模板、7/30、打包）；F 的试用准备/模板/观察/导出/支持消费者已接。
+- 源码与范围：`reports/trial-experience/wave33-status.json`。
+- 当前 App 接线：main `fc38bf65`（注册端口/工作台消费者、六源、模板 retry、支持摘要）；F 的试用准备/模板/观察/导出/支持消费者已接，`onReloadRecipes` 已由 main 传入。
 - 证据：`apps/console/e2e/trial/report-all.json` 及各 `report-*.json`、`screenshots/`。
-- 未达依赖：R1 829 包无导出；当前另行准备好的个人预览/后继包未由 F 安装验收；installed 与原生/E 最终验收不在 F 范围。
+- 未达依赖：R1 829 包无导出；current 安装/后继包未由 F 安装验收；installed、原生/E 最终验收不在 F 范围；Node attachPort 不是新授权或完整恢复。
 
 交接时只交源代码、文档和可复现证据，不交任何状态目录、凭据或用户数据。

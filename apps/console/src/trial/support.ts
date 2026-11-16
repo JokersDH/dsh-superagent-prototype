@@ -39,6 +39,8 @@ export function trialSupportRows(input: {
     { label: '当前对话', value: input.conversationLabel },
     { label: '观察窗口', value: input.windowDays === undefined ? '未选择' : `${input.windowDays} 天` },
     { label: '配置', value: readiness === undefined ? '未观察' : readiness.configurationRevision.slice(0, 8) },
+    { label: '上下文历史', value: readiness === undefined ? '未观察' : readiness.capabilities.contextHistory ? '已提供' : '未提供' },
+    { label: '来源审阅', value: readiness === undefined ? '未观察' : readiness.capabilities.contextSources ? '已提供' : '未提供' },
     { label: '观察时间', value: readiness === undefined ? '未观察' : readiness.observedAt },
     { label: '包', value: info?.packageLabel === undefined ? '未提供' : bounded(info.packageLabel, 200) },
     { label: '来源', value: info?.sourceLabel === undefined ? '未声明' : bounded(info.sourceLabel, 200) },
