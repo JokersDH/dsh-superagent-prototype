@@ -88,7 +88,9 @@
           "returned": 1,
           "available": 1,
           "mode": "live_keyset"
-        }
+        },
+        "w36TarPersistent": "pa-artifacts/wave36-target/wave36-target-14a6b45.tar.gz",
+        "w36TarSha": "13798190ae43b28628eaf7131dfb8192bdb786b9bcfe4e1e0b6f9217ab33a8af"
       },
       "negative": [
         "third wrapper hash refused",
