@@ -6,7 +6,7 @@
   "base": "e14c9597d1df3f084b21048de5e9338f24de54c8",
   "mergedMain": "296254d8",
   "currentH": "78b62ce3",
-  "updatedAt": "2026-11-17T08:11:32.317Z",
+  "updatedAt": "2026-11-17T08:13:50.559Z",
   "goal": {
     "wholeSubsystem": true,
     "closures": 4,
@@ -485,6 +485,8 @@
     "forwardPath": {
       "attempted": false,
       "reason": "answer_rejected"
-    }
+    },
+    "commit": "8b64320d",
+    "evidenceCommit": "8b64320d"
   }
 }
