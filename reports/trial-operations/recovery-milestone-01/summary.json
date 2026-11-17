@@ -1,0 +1,76 @@
+{
+  "protocol": "recovery-milestone-01-h/1",
+  "generatedAt": "2026-11-17T08:10:57.454Z",
+  "source": {
+    "H": "74b4166a",
+    "main": "42f6daab",
+    "mainMerge": "d4ddd0d1",
+    "B": "88e472e6",
+    "I": "b21698fa"
+  },
+  "command": "node --test --test-timeout=60000 tests/operational-soak/recovery/reopen-native.case.mjs",
+  "exitCode": 0,
+  "original": {
+    "workId": "06a3c0e5001df608a488aea1a039439f",
+    "attemptId": "attempt-b81c0690-5a3c-4630-856a-58aae3b04a9f",
+    "questionId": "codex-question-2c6144e61b50259fe1d44500d5dee1f21013fd45ccf4d91e",
+    "version": 1,
+    "contract": {
+      "workId": "06a3c0e5001df608a488aea1a039439f",
+      "revision": 1,
+      "digest": "29b1093b206583890751265da9b87b5389e00bd7d25844f2ae7e918ac4227563"
+    }
+  },
+  "observed": {
+    "afterCloseBinding": "ended",
+    "reopenPhase": "working",
+    "reopenQuestions": [],
+    "answerStatus": "rejected",
+    "answerError": {
+      "code": "stale_binding",
+      "message": "Question targets require current native bindings",
+      "retry": "reconcile"
+    },
+    "deliveries": [],
+    "bindingAfterAnswer": "ended",
+    "virtualNativeEffects": 0,
+    "newBegin": false,
+    "newWork": false,
+    "recoveryPath": {
+      "attempted": false,
+      "reason": "answer_rejected"
+    }
+  },
+  "checks": {
+    "originalQuestionOpened": true,
+    "originalAnswerNativeAppliedAfterRestart": false,
+    "originalQuestionStillOpen": false,
+    "bindingNotStopping": true,
+    "bindingEndedOrActive": true,
+    "noNewBeginCommand": true,
+    "sameAttempt": true,
+    "noVirtualNativeEffectAfterRestart": true,
+    "noSyntheticNewWork": true,
+    "recoveredAcceptDelivered": false
+  },
+  "gap": {
+    "stage": "reopen/answer",
+    "firstRealMissingEntry": "new coordinator does not project/authorize the original open question and its native target binding after the first coordinator closes",
+    "required": "original Store/Application/QuestionBroker recovery entry retains same Work/attempt/contract/question/command; no new begin or synthetic Work",
+    "owner": "main (B/I support as needed)"
+  },
+  "layers": {
+    "source": "actual main ProductRuntime/Application/Store",
+    "controlled": "virtual ProcessHost; no OS process",
+    "native": "0",
+    "recovered": "NOT_REACHED",
+    "installed": "not used",
+    "physical": "NOT_TESTED"
+  },
+  "limits": [
+    "virtual ProcessHost only",
+    "no model/vendor/native turn",
+    "no real signal",
+    "no second coordinator/ledger"
+  ]
+}
