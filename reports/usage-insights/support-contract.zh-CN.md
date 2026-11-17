@@ -130,8 +130,12 @@ node tools/usage-insights/cli.mjs verify --dto /abs/observation-….json \
   差异逐条列出；不再"因为 manifest 合法就是已验证"。
 - 能力判定扫描**去掉注释**后的代码：仅写在注释里的路由不算能力；扫描覆盖整个 dist 闭包，
   因为符号可能从兄弟模块 re-export。
-- `running` 只是**输入**（`{root, pid?, startedAt?}`），本模块只做 root 相等比较，不做进程发现；
-  root 不同 → `rootMatches: false` + `unknown` 说明，文件级证据保留但不升级。
+- 运行证据必须来自 main/D 的**原始 start record**（`{source:'main-start-record', entry, root, pid,
+  startedAt, uid, argv, config}`）：G 只做一致性核对——entry 在 root 内且是本包 `bin/pa`、
+  `argv[0]` 等于 entry、config 在安装或私有区内。裸 `{root}` 字符串只用于比较，`provenance` 记为
+  `caller-string`，**永不升级**为 `running_confirmed`。
+- G **不验证进程存活**（macOS 上等于全局发现），所以 `running_confirmed` 的含义是"这条 start record
+  与这棵安装树一致"，不是"此刻该进程在运行"。
 - `--install` 且 `evidence: self_declared` 时 CLI 打 `unverified_identity` 并 exit 3。
 
 ## 校验强度与旧文件

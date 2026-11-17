@@ -1,0 +1,135 @@
+{
+  "protocol": "wave36-usage-insights-status/1",
+  "agent": "G",
+  "branch": "codex/g4-usage-insights",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-g",
+  "fixedStart": "d09e155d3e8aad74d1238cbafdaec063802221fe",
+  "mergedMain": "7e550991",
+  "mergeCommit": "3dba8267",
+  "dirty": "clean before this file; only owned paths changed",
+  "generatedAt": "2026-11-17T00:30:00Z",
+  "goal": {
+    "statement": "Four larger end-to-end closures: trusted install facts into a running-support identity, same-scope observation into strict diagnosis with proxy facts, real download feedback into localisation, and a private-operator/CLI same-version support surface. The original nine acceptance points are retained, not reset.",
+    "closures": 4,
+    "priorAcceptance": "wave-35 nine outcomes retained and re-run in this wave's sweep",
+    "tokenBudget": "none",
+    "deadline": "none",
+    "vendorModelNativeTurns": 0,
+    "blockedPilot": "E original 24turn/200000token/USD5 single-in-flight pilot remains BLOCKED; no reset, top-up, refund, replacement sample, borrowed credential or price research.",
+    "notIncluded": ["CAC and CAC-specific subteam experiments", "temporary ZIP sprint", "narrowing Scheme B"]
+  },
+  "closures": [
+    {
+      "id": "C1",
+      "title": "Trusted install facts → current running-support identity",
+      "state": "delivered (source) with the running-confirmed contract; main wiring is the remaining item",
+      "newImplementation": [
+        "RuntimeStartRecord input contract {source:'main-start-record', entry, root, pid, startedAt, uid, argv, config}",
+        "consistency checks: entry is a file inside the inspected root AND is the launcher this package ships (bin/pa), argv[0] equals that entry, config is inside the install or the private app-support root",
+        "a bare caller-supplied {root} is recorded as provenance 'caller-string' and can never promote the evidence level",
+        "paths are resolved through existing ancestors, so macOS /var → /private/var cannot make a correct record look foreign"
+      ],
+      "consumer": ["CLI verify --dto --install <dir> --start-record <json> (delivered)", "main may supply its own start record to inspectRuntimeIdentity"],
+      "positives": [
+        "real R2 install tree + a start record: evidence running_confirmed, inventory complete with 6841 files hashed and 0 mismatches, entry/argv/config all consistent, capabilities pageObservation+numericExport+displayDownload"
+      ],
+      "negatives": [
+        "forged manifest digest → self_declared",
+        "file listed but missing on disk → mismatch",
+        "route only in a comment → capability absent",
+        "entry outside the root, argv head mismatch, config outside both roots, or a record naming another root → inventory_verified at most, with the reason listed",
+        "verify:none → self_declared"
+      ],
+      "honesty": "G does not verify process liveness (that would require the global discovery this work forbids): running_confirmed means the record is consistent with this tree, not that a live process was observed.",
+      "foundFact": "the R2 package reports supportSummary=false: it predates the support module, so source support is not an installed capability there",
+      "remaining": ["main wiring the verified origin/start record into its support DTO"]
+    },
+    {
+      "id": "C2",
+      "title": "Same-scope observation → strict diagnosis and human-proxy facts",
+      "state": "delivered (wave-35 coverage retained and re-run)",
+      "implementation": [
+        "header works vs row samples, layers/currencies/units, unknown-not-zero, partial vs complete, conflicts and out-of-window facts (observation-facts.case.ts through main's real reader)",
+        "strict diagnostics: digest recomputation, conservation (rows/scope/window/header), verification levels, unknown-field refusal, legacy degradation",
+        "waiting facts: recorded zero vs missing interval vs UI proxy vs no-baseline conclusion"
+      ],
+      "consumer": ["main's page/export/support chain", "CLI"],
+      "positives": ["replayed receipts count once", "a complete empty scope is a measured zero", "the real support download verifies its digest"],
+      "negatives": ["conflict → unavailable", "out-of-window → no row", "bounded source → no header sample", "wrong digest → exit 5", "extra secret field → refusal", "no baseline → not_requested with null delta/ratio"],
+      "remaining": ["main's header coverageState still folds a partial row into 'partial'"]
+    },
+    {
+      "id": "C3",
+      "title": "Real download feedback → localisation and re-read",
+      "state": "delivered for locate/confirm; the upstream fix is main's (SOURCE_READY)",
+      "implementation": ["probe reads main's GET /v1/insights/support file with G's port, locates the missing identity, re-reads the same scope after a delay", "the same file with an install identity reports the difference"],
+      "consumer": ["probe", "CLI", "H/E can reuse the CLI"],
+      "positives": ["200 / 3566 bytes / digest verified; the gap is reproducible across two reads"],
+      "negatives": ["an absent support port returns 422 while the page works", "the second read has a new summaryId and the same gap"],
+      "locatedGap": "main's diagnostic file carries origin:null",
+      "remaining": ["independent consumption by H or main is NOT_REACHED"]
+    },
+    {
+      "id": "C4",
+      "title": "Private operator / CLI → same-version maintainable delivery",
+      "state": "delivered",
+      "implementation": ["operator-baseline import with unit/aggregation/currency/window validation; 0600 exclusive output; legacy file degradation; optional-module absence; readonly and normal startup", "support contract + main-import guard"],
+      "consumer": ["CLI", "main's imported surface (guarded)", "a colleague reading an old file"],
+      "positives": ["a legal manual baseline compares observationally", "the fixed old support artifact degrades with named missing fields"],
+      "negatives": ["wrong unit/currency/window refused or not compared", "no operator data → tool usable, value NOT_MEASURED", "a non-support file is refused"],
+      "remaining": ["D freeze and E verdict for any successor tar; distinguishing the W33 artefact from a model-GUI successor is D/E's call"]
+    }
+  ],
+  "layers": {
+    "source": "G sources in this branch; main has byte-identical analyze/export/display-export/crosscheck/support.ts, the rest candidate-only",
+    "controlled": "probe over the real product runtime with the fixed fixture driver (0 vendor/model/native turns)",
+    "installed": "NOT_REACHED: no E verdict; the extracted install tree is inspected, not installed or started",
+    "native": "NOT_TESTED (0 turns)",
+    "recovery": "NOT_APPLICABLE to G",
+    "value": "NOT_TESTED: no operator baseline, no benefit figure"
+  },
+  "mergedIntoMain": {
+    "byteIdenticalInMain": ["analyze.ts", "attention.ts", "baseline.ts", "browser.ts", "crosscheck.ts", "display-export.ts", "export.ts", "metrics.ts", "node-composition.ts", "protocol.ts", "subject.ts", "support.ts"],
+    "candidateOnly": ["support-port.ts", "runtime-identity.ts", "facing.ts", "report.ts", "index.ts", "tests/**", "tools/usage-insights/**", "reports/usage-insights/**"]
+  },
+  "mainFindings": [
+    "main's support DTO still ships origin:null; the start-record path now makes a verified identity available for it to consume.",
+    "Neither the download nor the support envelope verifies its own sha256; G's port does and reports mismatch.",
+    "The served header coverageState still folds a partial row into 'partial' for a completely enumerated source.",
+    "main's completion-history work (A exact source → strict three-kind → HMAC cursor) is a different subsystem; G neither consumes nor duplicates it, and the human-criterion acceptance in main is not an overall delivery acceptance."
+  ],
+  "remaining": [
+    { "item": "main wiring the verified origin (and optionally its start record) into the support DTO", "state": "SOURCE_READY" },
+    { "item": "a real live process record from main/D to run the same checks against a running instance", "dependency": "main/D start facts", "state": "NOT_REACHED (contract and checks delivered)" },
+    { "item": "H/E independent consumption of one support report", "state": "NOT_REACHED" },
+    { "item": "D freeze + E verdict for a successor tar", "state": "NOT_REACHED" },
+    { "item": "operator long-term baseline and value; native execution", "state": "NOT_TESTED" }
+  ],
+  "boundaries": {
+    "noSqlOrPrivateDb": true, "noRuntimeHttpUiChanges": true, "noNewCollector": true, "noSecondLedger": true,
+    "noModelOrNativeCalls": true, "noRootLockOrContractsChanges": true, "noEAssertionsChanged": true,
+    "noBrowserNodeImports": true, "noNumericReverseParsing": true,
+    "noInstallOrStart": "the install tree was extracted to a temp directory for identity inspection only",
+    "noProcessDiscovery": "the start record is an input; no ps/proc scan, no signal, no liveness claim",
+    "userServicesPreserved": "twelve 5180/8796 … 5191/8807 instances and all state/profile/tar/ledger/runs left untouched"
+  },
+  "verification": {
+    "commands": [
+      "packages/contracts/node_modules/.bin/tsc -p packages/contracts/tsconfig.build.json",
+      "packages/usage-insights/node_modules/.bin/tsc -p packages/usage-insights/tsconfig.json",
+      "packages/usage-insights/node_modules/.bin/tsc -p packages/usage-insights/tsconfig.build.json",
+      "node --test packages/usage-insights/test/*.case.ts",
+      "node --test tools/usage-insights/test/*.case.mjs",
+      "node tools/usage-insights/probe/observe-two-projects.mjs",
+      "node tools/usage-insights/cli.mjs verify --dto <support-download>.json --install <tree> --start-record <json> --out <report>.json"
+    ],
+    "results": {
+      "typecheck": "pass", "build": "pass",
+      "packageTests": { "total": 192, "pass": 192, "fail": 0 },
+      "toolTests": { "total": 59, "pass": 59, "fail": 0 },
+      "probe": "pass (support download 200 / digest verified / origin null located; page 13/13; 0 events)",
+      "identity": "running_confirmed on the real tree with a start record; inventory complete 6841 hashed, 0 mismatches"
+    },
+    "staticChecksConfer": "no runtime, native or release admission"
+  }
+}
