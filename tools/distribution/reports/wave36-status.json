@@ -80,17 +80,27 @@
         "w35Static": "VERIFIED_STATIC 7451/6883",
         "w36Static": "VERIFIED_STATIC 7457/6889",
         "closure": 199,
-        "w36Actual": "start/status/stop0"
+        "w36Actual": "start/status/stop0",
+        "w36History": {
+          "http": 200,
+          "protocol": "work-completion-history/1",
+          "kind": "verifications",
+          "returned": 1,
+          "available": 1,
+          "mode": "live_keyset"
+        }
       },
       "negative": [
         "third wrapper hash refused",
-        "cross-artifact refused"
+        "cross-artifact refused",
+        "unreviewed history? no"
       ],
-      "limitation": "W36 selected audit not full inventory; E independent W35/W36 pending",
+      "limitation": "W36 selected audit not full inventory; E independent W35/W36 pending; App history click not exercised",
       "evidence": [
         "reports/wave36/w35-static-verified.json",
         "reports/wave36/w36-static-verified.json",
-        "reports/wave36/source-closure.json"
+        "reports/wave36/source-closure.json",
+        "reports/wave36/history-read-200.json"
       ]
     }
   },
@@ -106,9 +116,9 @@
     "D9": "SOURCE_READY_E"
   },
   "remaining": [
+    "default two-project dispatch/applicability (main/native held)",
     "E independent W35/W36 verdicts",
-    "default two-project dispatch/applicability",
-    "W36 installed history UI acceptance",
+    "W36 installed App history click",
     "cross-machine/signing/native/value"
   ],
   "real": {
