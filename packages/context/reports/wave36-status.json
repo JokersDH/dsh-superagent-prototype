@@ -1,0 +1,84 @@
+{
+  "protocol": "wave36-status/1",
+  "agent": "C",
+  "branch": "codex/g3-assistant-context",
+  "base": { "mergeCommit": "6f8b9a31", "originMain": "7e550991", "rfcs": ["WP-16/0092", "WP-16/0093", "WP-16/0094"] },
+  "wave": 36,
+  "wholeGoal": "current explicit decisions reliably selected, confirmed and bound in the original create transaction, and usable through ordinary source governance/draft reopen",
+  "sources": {
+    "aHead": "49082c5bd9502494f0372fa399ed800567f00460",
+    "snapshot": "packages/knowledge/src/decision-snapshot.ts",
+    "preparation": "packages/knowledge/src/decision-preparation.ts",
+    "cli": "packages/context/tools/assistant-context-cli.mjs"
+  },
+  "dirty": [
+    "packages/knowledge/src/decision-preparation.ts (status/digest/shape sync guard)",
+    "packages/knowledge/test/main-personal-decision-work-confirmation.case.ts (trusted reader, supersede/digest/refusal/replay)",
+    "docs/reports for wave36"
+  ],
+  "loops": {
+    "loop1": {
+      "status": "complete-source",
+      "source": ["captureDecisionSnapshot window/selected", "revalidateDecisionSnapshot", "assertDecisionSelectionBindingCurrentSync"],
+      "consumer": "unit plus main-compatible governance over ProductStore/AssistantDecisionStore",
+      "commands": ["pnpm --filter @personal-agent/knowledge test", "node --experimental-strip-types --test packages/knowledge/test/decision-context-snapshot.case.ts"],
+      "exit": 0,
+      "positive": ["40 current decisions, selected outside window found", "active binding current", "deep-frozen full scope"],
+      "negative": ["superseded status -> inactive (even same version)", "swapped snapshotDigest -> invalid_binding", "swapped refs -> invalid_binding", "forged protocol/project mismatch", "window callerTruncated"],
+      "evidence": ["packages/context/reports/wave36-decision-context-snapshot.tap", "packages/context/reports/wave36-decision-work-confirmation.tap"]
+    },
+    "loop2": {
+      "status": "partial-main-integration",
+      "source": ["bindDecisionSelection", "assertDecisionSelectionBindingCurrentSync inside store.uow.atomic", "prepareCommand/commitPrepared"],
+      "consumer": "main-compatible transaction test; main default create handler not wired",
+      "commands": ["node --experimental-strip-types --test packages/knowledge/test/main-personal-decision-work-confirmation.case.ts"],
+      "exit": 0,
+      "positive": ["guard in same UoW as commitPrepared", "work created once", "guard failure leaves no receipt/Work", "replay of committed command returns same Work", "ordinary no-selection Work works"],
+      "negative": ["revoke/supersede after prepare -> guard inactive", "invalid binding shape/digest refused", "narrow scope/foreign project refused"],
+      "remaining": ["main persist binding refs into Work/contract/artifact context", "main call sync guard inside default create transaction", "App selection UI"],
+      "evidence": ["packages/context/reports/wave36-decision-work-confirmation.tap"]
+    },
+    "loop3": {
+      "status": "complete-source",
+      "source": ["DecisionGovernance", "session CLI preview/send/sources/decide/draft"],
+      "consumer": "actual main HTTP + two-project reopen",
+      "commands": ["node --experimental-strip-types --test packages/knowledge/test/main-personal-context-session-cli.case.ts"],
+      "exit": 0,
+      "positive": ["record/supersede/revoke", "draft revalidate before/after source change", "reopen original sources", "readonly sources readable"],
+      "negative": ["replayed confirm refused", "cross-project refused", "0644/symlink/invalid expiry/oversized draft refused", "readonly writes refused"],
+      "evidence": ["packages/context/reports/wave36-context-session-cli.tap"]
+    },
+    "loop4": {
+      "status": "partial-main-integration",
+      "source": ["exports/types", "WAVE36-SUBSYSTEM-GUIDE.md", "wave36-ui-input.json"],
+      "consumer": "main/F not yet wired",
+      "commands": ["strict tsc", "pnpm -r build"],
+      "exit": 0,
+      "positive": ["stable typed contract and DTO boundary documented", "provider/composer share governance"],
+      "negative": ["no installed/App/native claim"],
+      "remaining": ["main App/HTTP default form consumption", "F rendering", "installed version frozen by D then E independent acceptance"]
+    }
+  },
+  "legacyNine": "wave35 C1-C9 mapped to loops: C1-C2->loop1, C3->loop2, C4-C6->loop3, C7-C9->loop4; original evidence retained",
+  "suites": {
+    "context": { "tests": 130, "pass": 130, "fail": 0 },
+    "proposals": { "tests": 41, "pass": 41, "fail": 0 },
+    "knowledge": { "tests": 139, "pass": 139, "fail": 0 },
+    "routing": { "tests": 44, "pass": 44, "fail": 0 },
+    "total": { "tests": 354, "pass": 354, "fail": 0 },
+    "typecheck": "pass (context/proposals/knowledge/routing)",
+    "build": "pnpm -r --workspace-concurrency=4 run build exit 0"
+  },
+  "layers": {
+    "source": "verified", "controlled": "verified", "installed": "NOT_TESTED", "native": "0",
+    "recovery": "readonly only", "value": "NOT_MEASURED", "mainIntegration": "partial (loop2/loop4)"
+  },
+  "remaining": [
+    "main to persist decision-selection binding refs in Work/contract and call sync guard in default create",
+    "main/F to consume snapshot/preparation DTOs in App/UI",
+    "D stable freeze then E independent W36 verdict; legacy history/successor subjects separate",
+    "installed/native/active recovery/value, CAC, soak unverified"
+  ],
+  "preserved": ["pnpm-lock.yaml diff uncommitted", "twelve services 5180-5191/8796-8807", "all state/profile/tar/ledger/dirty/runs", "no control of user instances"],
+  "budgets": { "realVendorModelTurns": 0, "realNativeTurns": 0, "bCap4": "UNKNOWN unspendable", "ePilot": "BLOCKED, not reset/top-up/refund/replaced" }
+}

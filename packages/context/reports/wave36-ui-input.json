@@ -1,0 +1,13 @@
+{
+  "protocol": "wave36-ui-input/1",
+  "owner": "C supplies typed canonical data/guards; main/F own App, HTTP, form persistence and authorization",
+  "selection": { "coverage": ["mode:window|selected", "scan:complete|selected_ids", "callerTruncated", "max"], "copy": "selected 逐条读取当前记录；window 必须显示 callerTruncated" },
+  "binding": {
+    "protocol": "decision-selection-binding/1",
+    "fields": ["projectId", "boundAt", "authorization:'none'", "snapshotDigest", "decisions[].{decisionId,version,contentDigest,scope,sourceMessageId,sourceTextDigest,recordedAt}"],
+    "guard": ["assertDecisionSelectionBindingCurrentSync", "current", "code(invalid_binding|project_mismatch|version_changed|content_changed|inactive|source_stale|expired)"],
+    "copy": "guard 无 await，用于 main 的 create 事务；binding 必须在 Work/contract 持久化后才算确认完成，当前 main 尚未接线"
+  },
+  "governance": ["preview", "record/supersede/revoke", "draft save/load --revalidate", "frozen source reopen", "readonly sources readable"],
+  "layers": { "source": "verified", "controlled": "verified", "loop1": "complete-source", "loop2": "partial-main-integration", "loop3": "complete-source", "loop4": "partial-main-integration", "installed": "NOT_TESTED", "native": "0", "recovery": "readonly only", "value": "NOT_MEASURED" }
+}
