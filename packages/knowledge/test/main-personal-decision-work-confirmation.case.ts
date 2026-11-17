@@ -66,9 +66,10 @@ test('an explicit decision preparation is asserted before and after the original
   }
   const messageA = await chat(projectA, 'wave34-conv-a')
   const messageB = await chat(projectB, 'wave34-conv-b')
-  const recordDecision = async (projectId: string, conversationId: string, messageId: string, content: string, commandId: string) => {
+  const recordDecision = async (projectId: string, conversationId: string, messageId: string, content: string, commandId: string, supersedes?: string) => {
     const prepared = (await (await app.request('/v1/decisions/prepare', { method: 'POST', headers, body: JSON.stringify({
-      projectId, conversationId, sourceMessageId: messageId, content, scope: decisionScope(projectId) }) })).json()) as Record<string, any>
+      projectId, conversationId, sourceMessageId: messageId, content, scope: decisionScope(projectId),
+      ...(supersedes ? { supersedes } : {}) }) })).json()) as Record<string, any>
     const receipt = (await (await app.request('/v1/decisions/commands', { method: 'POST', headers, body: JSON.stringify({
       kind: 'record_decision', commandId, projectId, conversationId, token: prepared.token }) })).json()) as Record<string, any>
     assert.equal(receipt.status, 'recorded')
@@ -114,8 +115,9 @@ test('an explicit decision preparation is asserted before and after the original
   assert.equal(binding.authorization, 'none')
   assert.match(binding.snapshotDigest, /^[a-f0-9]{64}$/)
   assert.equal(binding.decisions[0]!.decisionId, decisionA)
+  const decisionRecords = new AssistantDecisionStore(store.workflows.assistant)
   const reader = {
-    getDecision: (id: string) => store.workflows.assistant.get(id) as never,
+    getDecision: (id: string) => decisionRecords.getSync(id),
     sourceTextDigest: (id: string) => store.workflows.index.sourceMessage(id, [projectA, projectB])?.textDigest,
   }
   const command = { kind: 'create_work' as const, commandId: 'wave34-work-a', conversationId: 'wave34-conv-a',
@@ -159,6 +161,41 @@ test('an explicit decision preparation is asserted before and after the original
   const forgedBinding = { ...binding, protocol: 'decision-selection-binding/2' }
   assert.equal(assertDecisionSelectionBindingCurrentSync(forgedBinding as never, reader).code, 'invalid_binding')
   assert.equal(assertDecisionSelectionBindingCurrentSync(binding, reader, { projectId: projectB }).code, 'project_mismatch')
+  // The canonical digest and nested refs are part of the binding, not a decorative string.
+  assert.equal(assertDecisionSelectionBindingCurrentSync({ ...binding, snapshotDigest: 'f'.repeat(64) }, reader).code, 'invalid_binding')
+  const swappedRefs = { ...binding, decisions: binding.decisions.map((decision) => ({ ...decision, version: decision.version + 1 })) }
+  assert.equal(assertDecisionSelectionBindingCurrentSync(swappedRefs as never, reader).code, 'invalid_binding')
+  assert.equal(assertDecisionSelectionBindingCurrentSync({ ...binding, decisions: [] }, reader).code, 'invalid_binding')
+
+  // A superseded predecessor fails even though its own version/revokedAt did not change.
+  const supersededId = await recordDecision(projectA, 'wave34-conv-a', messageA, '将被替代。', 'wave34-decision-superseded')
+  const supersededPreparation = await prepareDecisionSelection(governance, { projectId: projectA, selectedDecisionIds: [supersededId],
+    projectScope: runtimeScope(projectA) })
+  const supersededBinding = await bindDecisionSelection(governance, supersededPreparation, { projectId: projectA, projectScope: runtimeScope(projectA) })
+  assert.equal(assertDecisionSelectionBindingCurrentSync(supersededBinding, reader, { projectId: projectA }).current, true)
+  await recordDecision(projectA, 'wave34-conv-a', messageA, '替代版本。', 'wave34-decision-replacement', supersededId)
+  const supersededNow = assertDecisionSelectionBindingCurrentSync(supersededBinding, reader, { projectId: projectA })
+  assert.equal(supersededNow.current, false)
+  assert.equal(supersededNow.code, 'inactive')
+  assert.equal((await assertDecisionSelectionCurrent(governance, supersededPreparation, { projectId: projectA })).code, 'inactive')
+
+  // A guard failure inside the transaction leaves no receipt and no Work.
+  const refusedCommand = { ...command, commandId: 'wave36-guard-refused' }
+  const refusedPrepared = await product.application.prepareCommand(refusedCommand as never, actor)
+  const beforeGuardFailure = ((await (await app.request('/v1/snapshot', { headers })).json()) as { works: unknown[] }).works.length
+  store.uow.atomic(() => {
+    const guarded = assertDecisionSelectionBindingCurrentSync(supersededBinding, reader, { projectId: projectA })
+    assert.equal(guarded.current, false)
+    assert.equal(guarded.code, 'inactive')
+  })
+  assert.equal(store.commands.get('wave36-guard-refused'), undefined)
+  assert.equal(((await (await app.request('/v1/snapshot', { headers })).json()) as { works: unknown[] }).works.length, beforeGuardFailure)
+  assert.equal(typeof refusedPrepared, 'object')
+
+  // Replaying an already committed create command returns the original Work even after later changes.
+  const replayed = (await product.application.dispatch(command as never, actor)) as unknown as { workId: string }
+  assert.equal(replayed.workId, created.workId)
+  assert.equal(((await (await app.request('/v1/snapshot', { headers })).json()) as { works: unknown[] }).works.length, beforeGuardFailure)
 
   // A narrower project scope or a mismatched project cannot claim the preparation is current.
   const decisionC = await recordDecision(projectA, 'wave34-conv-a', messageA, '另一条决定。', 'wave34-decision-c')

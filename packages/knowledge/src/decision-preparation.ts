@@ -10,6 +10,13 @@ import type { CurrentDecisionSnapshot } from './decision-snapshot.ts'
 export const DECISION_SELECTION_PREPARATION_PROTOCOL = 'decision-selection-preparation/1' as const
 export const DECISION_SELECTION_BINDING_PROTOCOL = 'decision-selection-binding/1' as const
 const sha256 = (value: string): string => createHash('sha256').update(value).digest('hex')
+const ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/
+const DIGEST = /^[a-f0-9]{64}$/
+const isTime = (value: unknown): value is string => typeof value === 'string' && Number.isFinite(Date.parse(value))
+const bindingDigest = (decisions: DecisionSelectionBinding['decisions']): string => sha256(JSON.stringify(decisions.map((decision) => ({
+  decisionId: decision.decisionId, version: decision.version, contentDigest: decision.contentDigest,
+  scope: decision.scope, sourceMessageId: decision.sourceMessageId, sourceTextDigest: decision.sourceTextDigest,
+  recordedAt: decision.recordedAt }))))
 const scopeKey = (scope: ScopeType): string => JSON.stringify({ projectId: scope.projectId,
   allowedPaths: [...scope.allowedPaths].sort(), excludedPaths: [...scope.excludedPaths].sort(),
   externalActions: [...scope.externalActions].sort(), expiresAt: scope.expiresAt ?? null })
@@ -56,7 +63,7 @@ export interface SyncDecisionBindingReader {
 
 export interface DecisionSelectionBindingAssertion {
   readonly current: boolean
-  readonly code?: 'invalid_binding' | 'project_mismatch' | 'version_changed' | 'content_changed' | 'source_stale' | 'expired'
+  readonly code?: 'invalid_binding' | 'project_mismatch' | 'version_changed' | 'content_changed' | 'source_stale' | 'expired' | 'inactive'
   readonly decisions: readonly { readonly decisionId: string; readonly valid: boolean; readonly code?: string }[]
 }
 
@@ -174,7 +181,22 @@ export function assertDecisionSelectionBindingCurrentSync(
   input: { readonly projectId?: string; readonly projectScope?: ScopeType; readonly now?: Date } = {},
 ): DecisionSelectionBindingAssertion {
   if (!binding || binding.protocol !== DECISION_SELECTION_BINDING_PROTOCOL || binding.authorization !== 'none' ||
-    !Array.isArray(binding.decisions) || binding.decisions.length === 0 || typeof binding.snapshotDigest !== 'string')
+    typeof binding.projectId !== 'string' || !ID_PATTERN.test(binding.projectId) || !isTime(binding.boundAt) ||
+    typeof binding.snapshotDigest !== 'string' || !DIGEST.test(binding.snapshotDigest) ||
+    !Array.isArray(binding.decisions) || binding.decisions.length === 0 || binding.decisions.length > 200 ||
+    new Set(binding.decisions.map((decision) => decision?.decisionId)).size !== binding.decisions.length)
+    return { current: false, code: 'invalid_binding', decisions: [] }
+  for (const decision of binding.decisions) {
+    if (!decision || typeof decision.decisionId !== 'string' || !ID_PATTERN.test(decision.decisionId) ||
+      !Number.isInteger(decision.version) || decision.version < 1 ||
+      typeof decision.contentDigest !== 'string' || !DIGEST.test(decision.contentDigest) ||
+      typeof decision.sourceMessageId !== 'string' || !ID_PATTERN.test(decision.sourceMessageId) ||
+      typeof decision.sourceTextDigest !== 'string' || !DIGEST.test(decision.sourceTextDigest) ||
+      !isTime(decision.recordedAt) || !decision.scope || decision.scope.projectId !== binding.projectId)
+      return { current: false, code: 'invalid_binding', decisions: [] }
+  }
+  // Canonical identity must match the refs it claims to protect; a swapped digest is not stored trust.
+  if (bindingDigest(binding.decisions) !== binding.snapshotDigest)
     return { current: false, code: 'invalid_binding', decisions: [] }
   if (input.projectId && input.projectId !== binding.projectId)
     return { current: false, code: 'project_mismatch', decisions: [] }
@@ -185,6 +207,7 @@ export function assertDecisionSelectionBindingCurrentSync(
     const record = reader.getDecision(decision.decisionId)
     if (!record) { results.push({ decisionId: decision.decisionId, valid: false, code: 'source_stale' }); continue }
     if (record.decision.scope.projectId !== binding.projectId) { results.push({ decisionId: decision.decisionId, valid: false, code: 'project_mismatch' }); continue }
+    if (record.status !== 'active') { results.push({ decisionId: decision.decisionId, valid: false, code: 'inactive' }); continue }
     if (record.decision.version !== decision.version) { results.push({ decisionId: decision.decisionId, valid: false, code: 'version_changed' }); continue }
     if (record.decision.revokedAt) { results.push({ decisionId: decision.decisionId, valid: false, code: 'source_stale' }); continue }
     const expired = (decision.scope.expiresAt && Date.parse(decision.scope.expiresAt) <= now.getTime()) ||
