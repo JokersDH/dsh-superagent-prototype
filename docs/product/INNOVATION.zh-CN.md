@@ -4,6 +4,8 @@
 
 当前范围不含CAC接入及CAC专属协作实验，二者后续独立探索。明确决定、注意力排序、独立复核价值与跨Harness迁移验证仍按自身产品/实验门槛推进，不以接入CAC为前提，也不为未来CAC预建专用层。
 
+2026-11-17：默认工作分类历史和准确W35静态校验已交，是可追溯性与可用性工程进展，不当学习/独立复核/多协议收益。四条整子系统交付线延续旧九项，当前创新计分与blocked试点不因接口或测试数变化；见[最新验收](../../reports/releases/wave36-admission/README.zh-CN.md)。
+
 Wave35新增网页私有模型配置、修StrictMode/身份迟到和启动竞争，D/E有准确W33与真实非空回退证据。这些是可用性和可靠性进展，不当创新收益；[本轮验收](../../reports/releases/wave35-admission/README.zh-CN.md)与[连续工程程序](../rfcs/WP-16/0091-wave-35-continuous-subsystem-program.md)保留研究未知/blocked和原完成度口径。
 
 Wave35增加实际网页模型私有配置和启动竞争修复；D/E同W33非空生命周期证据也推进。这些是产品易用性/可靠性进展，不能替代第二协议或创新收益实验。[最新验收](../../reports/releases/wave35-admission/README.zh-CN.md)继续分层，原blocked试点预算不变。

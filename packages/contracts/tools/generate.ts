@@ -17,6 +17,7 @@ import { ReviewTimingSchema, ReviewActivitySchema } from '../src/review-timing.t
 import { AttentionItemSchema, AttentionPageSchema, AttentionQuerySchema, AttentionRankSchema } from '../src/attention.ts';
 import { DecisionPrepareSchema, DecisionPreviewSchema, DecisionCommandSchema, DecisionQuerySchema, DecisionViewSchema, DecisionPageSchema } from '../src/decision-commands.ts';
 import { WorkEvidenceSchema, WorkEvidenceHistorySchema, WorkEvidenceHistoryQuerySchema } from '../src/work-evidence.ts';
+import { WorkCompletionHistorySchema, WorkCompletionHistoryQuerySchema } from '../src/completion-history.ts';
 import { RecoveryInspectionSchema, RecoveryPrepareSchema, RecoveryPlanSchema } from '../src/recovery-state.ts';
 import { RecoveryActivationIntentSchema, RecoveryActivationCommitSchema, RecoveryActivationRecordSchema } from '../src/recovery-activation.ts';
 import { ProposalPrepareSchema, ProposalPreviewSchema, ProposalCommandSchema } from '../src/proposal-commands.ts';
@@ -116,6 +117,7 @@ const assistantContextCommandsText = canonical({ $schema: 'https://json-schema.o
 outputs.set('generated/assistant-context-commands.schema.json', assistantContextCommandsText);
 outputs.set('generated/assistant-context-commands.manifest.json', canonical({ protocol: 'assistant-context-command/1', schemaHash: digest(assistantContextCommandsText), sourceHash: digest(readFileSync(resolve(root, 'src/assistant-context.ts'), 'utf8')), runtimeContractSchemaHash: schemaHash, runtimeValidationRequired: true }));
 for (const [name, protocol, source, schemas] of [
+  ['completion-history', 'work-completion-history/1', 'completion-history.ts', { WorkCompletionHistory: WorkCompletionHistorySchema, WorkCompletionHistoryQuery: WorkCompletionHistoryQuerySchema }],
   ['assistant-connection', 'assistant-connection/1', 'assistant-connection.ts', { AssistantConnectionInput: AssistantConnectionInputSchema }],
   ['trial-readiness', 'trial-readiness/1', 'trial-readiness.ts', { TrialReadiness: TrialReadinessSchema }],
   ['usage-observation', 'usage-observation/1', 'usage-observation.ts', { UsageObservationQuery: UsageObservationQuerySchema, UsageObservation: UsageObservationSchema, UsageObservationDownload: UsageObservationDownloadSchema }],

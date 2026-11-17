@@ -89,6 +89,7 @@ import { TrialModelConnectionForm } from './trial/ModelConnectionForm.tsx'
 import type { TrialModelConnectionDraft, TrialModelConnectionResult } from './trial/model-connection.ts'
 import { ContextSourceRecord } from './ContextSources.tsx'
 import { WorkEvidencePanel } from './WorkEvidencePanel.tsx'
+import { CompletionHistoryPanel } from './CompletionHistoryPanel.tsx'
 import { blockedLabel, executionUnavailableLabel } from './configuration-labels.ts'
 import type { FixtureAdapter } from './fixture.ts'
 import { conversationId as defaultConversationId } from './config.ts'
@@ -1225,6 +1226,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
               </div>}
               <WorkDetail
                 transport={transport}
+                historyIdentity={`${trialIdentity}:${configuration?.revision ?? ''}`}
                 work={selectedWork}
                 location={workLocation}
                 environment={workEnvironment}
@@ -2813,6 +2815,7 @@ function QuestionCard({
 
 function WorkDetail({
   transport,
+  historyIdentity,
   work,
   location,
   environment,
@@ -2831,6 +2834,7 @@ function WorkDetail({
   onRevise,
 }: {
   transport: ConsoleTransport
+  historyIdentity: string
   work: WorkView | undefined
   location: WorkLocation | undefined
   environment: WorkEnvironment | undefined
@@ -3008,6 +3012,7 @@ function WorkDetail({
       <h4>当前候选产物</h4>
       <Artifacts ids={work.artifactIds} reader={artifactReader} />
       <WorkEvidencePanel key={work.work.id} work={work} transport={transport} />
+      <CompletionHistoryPanel key={`${historyIdentity}:${work.work.id}`} work={work} transport={transport} identity={historyIdentity} />
       <h4>可用动作</h4>
       <div className="actions">
         {available.includes('accept_candidate') && work.actions.currentCandidate && (

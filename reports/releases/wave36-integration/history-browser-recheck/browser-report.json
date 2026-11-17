@@ -1,0 +1,20 @@
+{
+  "status": "FAIL",
+  "cases": [
+    {
+      "id": "ORIGINAL-WORK-DETAIL-READS-REAL-COMPLETION-PAGES-ONLY-ON-DEMAND",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "historyReads": 4,
+  "businessPosts": 0,
+  "eventDelta": 0,
+  "acceptedWorks": 2,
+  "additionalMetadataFixtures": 14,
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "sourceCommit": "19954ce325b8d93c66815a01d76a32e6c6586a6b",
+  "sourceWorktreeClean": true,
+  "scope": "Actual App/HTTP/A production keyset/original controlled Work/check/manualaccept; additional historical rows are explicit metadata fixtures, no installed/native/recovery/value admission"
+}
