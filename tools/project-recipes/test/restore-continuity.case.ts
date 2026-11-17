@@ -139,6 +139,14 @@ test('a restored non-empty state keeps the old identity while a moved project is
     assert.deepEqual(Buffer.from(artifact!.data), bytesBefore[index], 'original bytes are unchanged')
   }
 
+  // The restored original history stays readable under the original identity through main's reader.
+  const restoredHistory = await product.read.workCompletionHistory!(created.workId!, { kind: 'contracts', limit: 20 })
+  assert.equal(restoredHistory.status, 'ok')
+  assert.equal(restoredHistory.workId, created.workId)
+  assert.equal(restoredHistory.projectId, originalRecord.id)
+  assert.ok(restoredHistory.entries.length >= 1)
+  assert.ok(restoredHistory.entries.every((row) => row.kind === 'contracts'))
+
   // 5. The new project gets its own fresh suggestion; the old draft never applies to it.
   const fresh = await product.read.projectRecipePreview!({ projectId: movedRecord.id, kind: 'scoped_change', allowedPaths: ['src/'], profileId: PROFILE })
   assert.equal(fresh.status, 'draft')

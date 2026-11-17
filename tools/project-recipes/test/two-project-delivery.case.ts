@@ -187,6 +187,35 @@ test('two original projects reach delivered work with readable artifacts and hon
   assert.equal((await inspect(revised.workId!)).contract.revision, 2)
   assert.equal((await inspect(revised.workId!)).phase, 'delivered')
 
+  // The original completion history (A facts via main's scoped reader) is readable for the revised
+  // work: two contract revisions, its verification rows and the human criterion acceptance.
+  const history = product.read.workCompletionHistory!
+  const contracts = await history(revised.workId!, { kind: 'contracts', limit: 1 })
+  assert.equal(contracts.status, 'ok')
+  assert.equal(contracts.kind, 'contracts')
+  assert.ok(contracts.available >= 2)
+  assert.equal(contracts.returned, 1)
+  assert.equal(contracts.hasMore, true)
+  assert.ok(contracts.nextCursor)
+  // The cursor binds kind/limit/current contract, so a continuation repeats the same limit.
+  const nextPage = await history(revised.workId!, { kind: 'contracts', limit: 1, cursor: contracts.nextCursor! })
+  assert.equal(nextPage.status, 'ok')
+  assert.deepEqual(
+    [...contracts.entries, ...nextPage.entries].map((row) => (row.kind === 'contracts' ? row.revision : -1)).sort((a, b) => a - b),
+    [1, 2],
+  )
+  await assert.rejects(
+    history(revised.workId!, { kind: 'contracts', limit: 1, cursor: `${contracts.nextCursor!.slice(0, -2)}xy` }),
+    (error: unknown) => (error as { error?: { code?: string } }).error?.code === 'conflict',
+  )
+  const verifications = await history(revised.workId!, { kind: 'verifications', limit: 20 })
+  assert.equal(verifications.status, 'ok')
+  assert.ok(verifications.entries.length >= 1)
+  assert.ok(verifications.entries.every((row) => row.kind === 'verifications'))
+  const acceptances = await history(revised.workId!, { kind: 'acceptances', limit: 20 })
+  assert.equal(acceptances.status, 'ok')
+  assert.ok(acceptances.entries.every((row) => row.kind === 'acceptances'))
+
   // Reopen the same state: the delivered works, candidates and artifact bytes are still verifiable.
   await product.close()
   store.close()
@@ -198,6 +227,9 @@ test('two original projects reach delivered work with readable artifacts and hon
     assert.equal(reopened.phase, 'delivered')
     assert.equal(reopened.contract.scope.projectId, entry.projectId)
     assert.ok(reopened.contract.revision >= 1)
+    const reopenedHistory = await product.read.workCompletionHistory!(entry.workId, { kind: 'contracts', limit: 20 })
+    assert.equal(reopenedHistory.status, 'ok')
+    assert.equal(reopenedHistory.projectId, entry.projectId)
     for (const artifactId of reopened.artifactIds) {
       const artifact = store.artifacts.read(artifactId)
       assert.ok(artifact, `artifact ${artifactId} survives reopen`)

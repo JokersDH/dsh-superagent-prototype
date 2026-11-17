@@ -52,6 +52,7 @@ const HELP = `project-recipes — 只读的项目任务/检查声明建议（不
   node tools/project-recipes/cli.ts --config <config.json> (--facts <facts.json> | --root <项目根>)
       [--previous-facts <facts.json> --root <项目根>]   # 迁移/重绑对比模式
       [--describe]                                       # 打印模块身份（contracts/catalog/版本）
+      [--self-check]                                     # 校验模块身份不变量（供 D/H/E 核版本）
       [--project <id>] [--kind <${HELP_KINDS.join('|')}>] [--paths <a,b>] [--exclude <a,b>]
       [--criteria <x,y>] [--profile <id>] [--now <ISO>] [--max-facts-age-ms <n>] [--output <新文件>]
 
@@ -82,6 +83,7 @@ const HELP = `project-recipes — 只读的项目任务/检查声明建议（不
 type Parsed = {
   help: boolean
   describe?: boolean
+  selfCheck?: boolean
   previousFacts?: string
   config?: string
   facts?: string
@@ -112,6 +114,10 @@ export function parseArgs(argv: readonly string[]): Parsed {
     }
     if (arg === '--describe') {
       parsed.describe = true
+      continue
+    }
+    if (arg === '--self-check') {
+      parsed.selfCheck = true
       continue
     }
     if (!arg.startsWith('--')) throw new UsageError(`unexpected argument: ${arg}`)
@@ -174,6 +180,25 @@ export async function main(argv: readonly string[], io: { stdout: (text: string)
   if (parsed.help) {
     io.stdout(HELP)
     return EXIT.draft
+  }
+  if (parsed.selfCheck === true) {
+    try {
+      const library = await loadLibrary()
+      const described = library.describeProjectRecipes()
+      const checks = [
+        { id: 'protocol', ok: described.protocol === 'project-recipes-module/1' },
+        { id: 'catalog-digest', ok: described.catalog.digest === library.catalogDigest() },
+        { id: 'capabilities', ok: ['match', 'preview-fields', 'observe'].every((name) => library.supportsCapability(described, name)) },
+        { id: 'contracts', ok: described.contracts.apiMajor === 1 && described.contracts.version.length > 0 },
+        { id: 'kinds', ok: described.kinds.length === 3 },
+      ]
+      const ok = checks.every((check) => check.ok)
+      io.stdout(`${JSON.stringify({ protocol: 'project-recipes-self-check/1', ok, checks }, null, 2)}\n`)
+      return ok ? EXIT.draft : EXIT.refused
+    } catch (error) {
+      io.stderr(`refused: ${(error as Error).message}\n`)
+      return EXIT.refused
+    }
   }
   if (parsed.describe === true) {
     try {

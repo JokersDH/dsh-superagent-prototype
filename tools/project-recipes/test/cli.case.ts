@@ -181,3 +181,12 @@ test('an old facts protocol is refused with exit 5 instead of being guessed', ()
     assert.match(result.stderr, /invalid_facts/)
   })
 })
+
+test('--self-check reports the same identity invariants the library exposes', async () => {
+  const result = run(['--self-check'])
+  assert.equal(result.status, 0, result.stderr)
+  const report = JSON.parse(result.stdout)
+  assert.equal(report.protocol, 'project-recipes-self-check/1')
+  assert.equal(report.ok, true)
+  assert.ok(report.checks.every((check: { ok: boolean }) => check.ok === true))
+})
