@@ -53,6 +53,8 @@ import {
   WorkEvidenceSchema,
   WorkEvidenceHistorySchema,
   WorkEvidenceHistoryQuerySchema,
+  WorkCompletionHistoryQuerySchema,
+  WorkCompletionHistorySchema,
   RecoveryInspectionSchema,
   RecoveryPrepareSchema,
   RecoveryPlanSchema,
@@ -102,6 +104,8 @@ import type {
   WorkEnvironment,
   AppError,
   ApplicationService,
+  WorkCompletionHistory,
+  WorkCompletionHistoryQuery,
   TrustedActor,
   Verification,
   CommandReceipt,
@@ -236,6 +240,7 @@ export interface LocalHttpOptions {
     workVerification?(workId: string): Promise<WorkVerificationStatus>
     workEvidence?(workId: string): Promise<WorkEvidence>
     workEvidenceHistory?(workId: string, query: WorkEvidenceHistoryQuery): Promise<WorkEvidenceHistory>
+    workCompletionHistory?(workId: string, query: WorkCompletionHistoryQuery): Promise<WorkCompletionHistory>
     configuration?(): Promise<ApplicationConfiguration>
     verification?(id: string): Promise<Verification | undefined>
     deliveries?(questionId: string): Promise<readonly AnswerDelivery[]>
@@ -675,6 +680,24 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
     const receipt = CommandReceiptSchema.parse(await options.operations.projectSettings(command, c.get('actor')))
     if (receipt.commandId !== command.commandId) throw new ApplicationFault('storage_unavailable', 'Project settings receipt identity mismatch', 'none')
     return c.json(receipt)
+  })
+  app.get('/v1/works/:id/completion-history', async c => {
+    if (!options.read?.workCompletionHistory) throw new ApplicationFault('unsupported_capability', 'Completion history is not connected', 'none')
+    const input = { ...c.req.query() } as Record<string, unknown>
+    if (Object.values(c.req.queries()).some(values => values.length > 1))
+      throw new ApplicationFault('invalid_request', 'Repeated history parameters are not accepted', 'none')
+    if ('limit' in input) {
+      if (typeof input.limit !== 'string' || !/^[1-9][0-9]?$/.test(input.limit))
+        throw new ApplicationFault('invalid_request', 'Invalid history page size', 'none')
+      input.limit = Number(input.limit)
+    }
+    const query = WorkCompletionHistoryQuerySchema.safeParse(input)
+    if (!query.success) throw new ApplicationFault('invalid_request', 'Invalid history query', 'none')
+    const id = IdSchema.parse(c.req.param('id'))
+    const page = WorkCompletionHistorySchema.parse(await options.read.workCompletionHistory(id, query.data))
+    if (page.workId !== id || page.kind !== query.data.kind || page.limit !== query.data.limit)
+      throw new ApplicationFault('storage_unavailable', 'History response identity mismatch', 'none')
+    return c.json(page)
   })
   app.get('/v1/works/:id/evidence/history', async (c) => {
     if (!options.read?.workEvidenceHistory) throw new ApplicationFault('unsupported_capability', 'Work history reader is not connected')
