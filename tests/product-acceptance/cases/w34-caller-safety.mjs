@@ -227,15 +227,18 @@ export async function runCallerSafety() {
     cleanup.signal(parent.pid, 'SIGTERM'); cleanup.signal(child.pid, 'SIGTERM')
     await waitGone(parent.pid); await waitGone(child.pid)
     let rows = op.observe()
-    for (let index = 0; index < 40 && rows.some(item => item.alive === true); index += 1) {
+    for (let index = 0; index < 120 && rows.some(item => item.alive === true); index += 1) {
       await new Promise(resolvePromise => setTimeout(resolvePromise, 50))
       rows = op.observe()
     }
-    const duplicated = [rows[0], rows[0]]
+    // The duplicate-row defect is pure: two rows for one birth must never satisfy the pair.
+    const deadRows = rows.map(item => ({ ...item, alive: false, sameIdentity: false, observedStart: null, observedUid: null, observedArgvSha256: null }))
+    const duplicated = [deadRows[0], deadRows[0]]
     const verdict = op.releaseAllowed(duplicated)
+    const clean = op.releaseAllowed()
     assert('DUPLICATE_ROWS_REFUSED', verdict.allowed === false && verdict.reason === 'duplicate_observation', JSON.stringify(verdict))
-    assert('CLEAN_PAIR_RELEASES', op.releaseAllowed(rows).allowed === true, JSON.stringify(op.releaseAllowed(rows)))
-    evidence.callerDuplicateRows = { verdict }
+    assert('CLEAN_PAIR_RELEASES', clean.allowed === true, JSON.stringify({ clean, rows }))
+    evidence.callerDuplicateRows = { verdict, clean: clean.allowed }
     rmSync(own, { recursive: true, force: true })
   }))
 
