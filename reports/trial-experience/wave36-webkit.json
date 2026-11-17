@@ -1,0 +1,14 @@
+{
+  "status": "NOT_TESTED",
+  "executable": "/Users/hh/Library/Caches/ms-playwright/webkit-2388/pw_run.sh",
+  "reason": "browserType.launch: Executable doesn't exist at /Users/hh/Library/Caches/ms-playwright/webkit-2388/pw_run.sh",
+  "productPageTested": false,
+  "checkedAt": "2026-11-17",
+  "scope": "WebKit binary availability only; no App page executed.",
+  "notTested": [
+    "WebKit App journey",
+    "real 200% browser zoom",
+    "screen reader",
+    "Safari-specific focus"
+  ]
+}

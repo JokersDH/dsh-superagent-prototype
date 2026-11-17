@@ -1,0 +1,285 @@
+{
+  "schemaVersion": 12,
+  "owner": "F",
+  "wave": "product-wave-36",
+  "goal": "one whole-subsystem goal over four end-to-end product closures: (1) multi-project/multi-Work daily flow and error/draft recovery; (2) original evidence plus A classified completion history and decision confirmation; (3) integrated model configuration full lifecycle; (4) accessible support and same-version actual-App handoff",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-f",
+  "branch": "codex/g4-trial-experience",
+  "fixedStart": "d515a9d4",
+  "baseMain": "7e550991",
+  "mergedMain": "7e550991",
+  "mergeCommit": "8405714e",
+  "mergeNote": "fetch/merge origin/main clean; inherited main completion-history consumer and model GUI; no reset/clean; six untracked main screenshots preserved",
+  "mainInputs": {
+    "classifiedHistory": "main 0092: original Work detail -> authenticated GET /v1/works/:id/completion-history -> strict three-kind metadata/HMAC cursor/128KiB; original WorkEvidence timeline remains",
+    "modelConfiguration": "main ModelPanel -> typed transport -> authenticated POST -> PrivateModelProvider private save; saved != connected",
+    "callbacksSupport": "main 23d5 attachCallbacks and support GET/download remain",
+    "notProvided": "no B default control import, no original Work/Broker recovery, no native/target admission"
+  },
+  "state": "FOUR PRODUCT CLOSURES IMPLEMENTED AND EXERCISED IN THE ACTUAL APP; WHOLE-SUBSYSTEM GOAL NOT FULLY CLOSED: accessibility closure is Chromium/forced-colors only (WebKit binary absent, real 200% zoom and screen reader untested), and installed/native/recovery remain separate. F's classified-history panel now consumes the new protocol; main's actual CompletionHistoryPanel is the default consumer. F candidate decision/review panels are not mounted, while main's actual DecisionWorkspace/WorkEvidencePanel are.",
+  "source": {
+    "newOrChanged": [
+      "apps/console/src/trial/work-review.ts (new WorkCompletionHistory three-kind admission/merge; old WorkEvidenceHistory rules removed)",
+      "apps/console/src/trial/WorkReviewPanels.tsx (WorkCompletionHistoryPanel replaces old timeline panel; decision/review panels retained)",
+      "apps/console/test/trial/work-review.case.ts (new protocol/foreign/blocked/overlap/kind tests)",
+      "apps/console/e2e/trial/work-review.mjs (new protocol, continuation, decision, review, forced colors)",
+      "apps/console/e2e/trial/harness.tsx (review mode uses new classified page)",
+      "apps/console/src/trial/index.ts (exports renamed to completion-history types)",
+      "docs/user-guide/README.zh-CN.md",
+      "docs/user-guide/05-review-and-handoff.zh-CN.md",
+      "reports/trial-experience/wave36-webkit.json"
+    ],
+    "inheritedFromMain": [
+      "apps/console/src/CompletionHistoryPanel.tsx + transport.workCompletionHistory",
+      "apps/console/src/trial/ModelConnectionForm.tsx and model-connection.ts integrated/saved/HTTP-opt-in version"
+    ]
+  },
+  "closures": {
+    "C1_daily_and_recovery": {
+      "status": "DELIVERED_ACTUAL_CONTROLLED",
+      "production": "multi-project/multi-conversation/multiple original Works, pending question, machine FAIL, current candidate, accepted/delivered/unknown, template/original form, identity/filter isolation and draft return",
+      "defaultConsumer": "actual App controlled Product/Broker/SQLite/HTTP runtime",
+      "positiveNegative": "daily 10/10; stale/identity/disabled/auth-expiry/unmount suites; double/late/unknown do not create, approve, accept or call a model",
+      "oldPoints": [
+        "F1",
+        "F3"
+      ],
+      "evidence": [
+        "apps/console/e2e/trial/report-daily-flow.json",
+        "apps/console/e2e/trial/report-async.json"
+      ]
+    },
+    "C2_evidence_history_decision": {
+      "status": "DELIVERED_ACTUAL_MAIN",
+      "production": "main original Work detail reads A contracts/verifications/acceptances classified metadata with live keyset, HMAC cursor, blocked/partial/source totals; original evidence timeline, artifacts, manual accept and DecisionWorkspace remain",
+      "defaultConsumer": "actual App CompletionHistoryPanel + WorkEvidencePanel + DecisionWorkspace; main completion 8, evidence 8, decision 4, context-history 13 actual cases PASS",
+      "FContribution": "F WorkCompletionHistoryPanel and pure rules consume the same new protocol for local display; old F WorkEvidenceHistory timeline panel was removed/renamed, not relabeled as A history",
+      "positiveNegative": "main: wrong work/cursor/scope/blocked/readonly, machine FAIL, manual criterion acceptance vs overall acceptance, current/history decision; F: foreign work/project/kind/stale/blocked/overlap/kind drift",
+      "oldPoints": [
+        "F4",
+        "F5",
+        "F6"
+      ],
+      "limits": "F panel is a candidate and not mounted; main's actual viewers are canonical. attempts/reviews remain unexposed; no raw binding/content/download via metadata",
+      "evidence": [
+        "/tmp/f36-completion-history-browser.log",
+        "/tmp/f36-evidence-workbench-browser.log",
+        "/tmp/f36-decision-workbench-browser.log",
+        "apps/console/e2e/trial/report-work-review.json"
+      ]
+    },
+    "C3_model_configuration": {
+      "status": "DELIVERED_ACTUAL_MAIN",
+      "production": "original ModelPanel web form: endpoint/model/password key, explicit save, authenticated private write, saved/connected/failed/unsupported, HTTP opt-in, identity/generation/StrictMode/late-result/double-submit protection",
+      "defaultConsumer": "actual StrictMode App + HTTP/Product/private provider; 6 main cases PASS, 0 model requests",
+      "positiveNegative": "F 17/17 incl. saved != connected, HTTP opt-in, leaky feedback refusal, identity/unmount clear, unsupported, double click; unit 9/9 validation",
+      "oldPoints": [
+        "F2"
+      ],
+      "evidence": [
+        "/tmp/f36-model-connection-browser.log",
+        "apps/console/e2e/trial/report-model-connection.json"
+      ]
+    },
+    "C4_access_support_handoff": {
+      "status": "PARTIAL_CHROMIUM",
+      "production": "support scope/included/excluded/share/retry; 1440/390 keyboard/forced-colors; guides for save, daily work, classified history, decisions, evidence and support; no new shell/theme",
+      "defaultConsumer": "actual App support/trial workbench + controlled review/model/history harnesses",
+      "positiveNegative": "usage 16, trial 8, daily mobile 390/keyboard; review 390/forced-colors; no overflow; WebKit/200%/reader untested",
+      "oldPoints": [
+        "F7",
+        "F8",
+        "F9"
+      ],
+      "limits": "WebKit binary missing; real 200% zoom, screen reader and forced-colors across all screens not tested; installed artifact not tested by F",
+      "evidence": [
+        "/tmp/f36-usage-observation-browser.log",
+        "/tmp/f36-trial-workbench-browser.log",
+        "apps/console/e2e/trial/report-work-review.json",
+        "reports/trial-experience/wave36-webkit.json"
+      ]
+    }
+  },
+  "oldNineMapping": {
+    "F1": "C1",
+    "F2": "C3",
+    "F3": "C1",
+    "F4": "C2 (main actual classified history; F new-protocol candidate)",
+    "F5": "C2 (main actual decision workspace; F candidate reference panel)",
+    "F6": "C2 (main actual evidence/review; F candidate summary)",
+    "F7": "C4 (actual support)",
+    "F8": "C4 partial (Chromium only)",
+    "F9": "C4 partial (docs/source; all-level closure not claimed)"
+  },
+  "commands": [
+    {
+      "id": "unit",
+      "command": "node --test test/trial/*.case.ts",
+      "exit": 0,
+      "summary": "50/50"
+    },
+    {
+      "id": "trial-suites",
+      "command": "node apps/console/e2e/trial/run-all.mjs",
+      "exit": 0,
+      "summary": "13/13"
+    },
+    {
+      "id": "work-review",
+      "command": "node apps/console/e2e/trial/work-review.mjs",
+      "exit": 0,
+      "summary": "8/8"
+    },
+    {
+      "id": "model-browser",
+      "command": "node apps/console/e2e/trial/model-connection.mjs",
+      "exit": 0,
+      "summary": "17/17"
+    },
+    {
+      "id": "daily-flow",
+      "command": "node apps/console/e2e/trial/app-daily-flow.mjs",
+      "exit": 0,
+      "summary": "10/10"
+    },
+    {
+      "id": "typecheck-app",
+      "command": "npx tsc -p apps/console/tsconfig.json --noEmit",
+      "exit": 0
+    },
+    {
+      "id": "typecheck-e2e",
+      "command": "npx tsc -p apps/console/e2e/trial/tsconfig.json --noEmit",
+      "exit": 0
+    },
+    {
+      "id": "build",
+      "command": "npx vite build",
+      "exit": 0,
+      "note": "existing >500kB advisory retained"
+    },
+    {
+      "id": "main-completion-history",
+      "command": "node tests/integration/completion-history-browser.mjs",
+      "exit": 0,
+      "summary": "8 actual cases PASS after pnpm packages build",
+      "note": "first run FAILED before workspace dist rebuild (15-source text timeout); retained, then PASS after build; not relabeled"
+    },
+    {
+      "id": "main-evidence",
+      "command": "node tests/integration/evidence-workbench-browser.mjs",
+      "exit": 0,
+      "summary": "8 cases"
+    },
+    {
+      "id": "main-decision",
+      "command": "node tests/integration/decision-workbench-browser.mjs",
+      "exit": 0,
+      "summary": "4 cases"
+    },
+    {
+      "id": "main-context-history",
+      "command": "node tests/integration/context-history-browser.mjs",
+      "exit": 0,
+      "summary": "13 cases"
+    },
+    {
+      "id": "main-model",
+      "command": "node tests/integration/model-connection-browser.mjs",
+      "exit": 0,
+      "summary": "6 cases, 0 model requests"
+    },
+    {
+      "id": "main-usage",
+      "command": "node tests/integration/usage-observation-browser.mjs",
+      "exit": 0,
+      "summary": "16 cases"
+    },
+    {
+      "id": "main-trial",
+      "command": "node tests/integration/trial-workbench-browser.mjs",
+      "exit": 0,
+      "summary": "8 cases"
+    },
+    {
+      "id": "main-recipes",
+      "command": "node tests/integration/project-recipes-browser.mjs",
+      "exit": 0,
+      "summary": "9 cases"
+    },
+    {
+      "id": "webkit-probe",
+      "command": "node - (Playwright webkit launch probe)",
+      "exit": 0,
+      "summary": "NOT_TESTED: executable missing"
+    }
+  ],
+  "actualObjects": {
+    "daily": {
+      "projects": [
+        "项目 Alpha",
+        "项目 Beta"
+      ],
+      "conversations": [
+        "conv-alpha-daily",
+        "conv-beta-daily"
+      ],
+      "works": [
+        "Alpha：固定流程问答与交付",
+        "Beta：固定流程交付",
+        "FAIL work",
+        "pending-question work"
+      ]
+    },
+    "completionHistory": {
+      "originalControlledWorks": 2,
+      "additionalMetadataFixtures": 14,
+      "kinds": [
+        "contracts",
+        "verifications",
+        "acceptances"
+      ],
+      "note": "14 rows are explicit controlled metadata fixtures, not 14 model executions"
+    },
+    "mainTestSourceCommit": "8405714e70f5ec815294984d844df72dedab1112",
+    "modelTurns": 0,
+    "nativeTurns": 0
+  },
+  "mainMergedVsCandidate": {
+    "mergedMain": "0092 completion history + default ModelPanel/private save + callbacks/support + actual WorkEvidence/Decision/ContextHistory viewers",
+    "mergedFromF": "F history protocol update, review/decision candidates, docs/evidence",
+    "candidate": [
+      "WorkCompletionHistoryPanel",
+      "DecisionReferencePanel",
+      "ReviewEvidencePanel"
+    ],
+    "notNeeded": "main actual CompletionHistoryPanel/WorkEvidencePanel/DecisionWorkspace already cover C2; F does not duplicate/replace them",
+    "needsMain": [
+      "no new DTO for C2",
+      "only a decision if F compact panels should be mounted; otherwise keep actual main viewers",
+      "WebKit binary for full C4"
+    ]
+  },
+  "layers": {
+    "source": "DELIVERED for F update + inherited main default consumers",
+    "controlled": "DELIVERED (actual App controlled runtime; 13/13 trial + main actual cases)",
+    "installed": "NOT_TESTED by F; no W36 install/upgrade/rollback; D/E remain separate",
+    "native": "0 turns",
+    "recovery": "not claimed; original Work/Broker crash recovery and 2/4 resources remain unproven",
+    "value": "no efficiency/benefit claim; review timing/UI activity are proxies"
+  },
+  "remaining": [
+    "WebKit actual page, real 200% zoom and screen reader; forced-colors only exercised on review harness",
+    "F9 default-product closure across all four lines: main actual viewers already used, optional F compact panels not mounted",
+    "D/E independent installed/successor verdict; F does not self-admit",
+    "B original Work/Broker recovery and 2/4 resources remain out of scope",
+    "no claim that classified metadata, criterion acceptance or support material grants execution/acceptance/value"
+  ],
+  "preserved": [
+    "six untracked main screenshots under reports/releases untouched; main reports restored after tests",
+    "ten original roots/branches/ownership, all dirty/history/state/report",
+    "twelve services 5180-5191/8796-8807 and all state/profile/tar/ledger/runs/five logs",
+    "real vendor/model/native 0; B cap4 UNKNOWN unspent; E pilot unchanged",
+    "no global discovery/substring kill/credential borrowing/CLI fallback/new Driver/CAC/desktop/auto-accept/second lifecycle"
+  ]
+}

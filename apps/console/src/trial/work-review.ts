@@ -1,73 +1,94 @@
 /**
- * Read-only rules for the original Work review surfaces: deliverable history, decision references and
- * acceptance evidence. They consume public DTOs from main and never fetch, apply a decision, accept a
- * candidate or widen a Scope. "eligible" here only means displayable for explicit navigation; the
- * original form/Application guard remains the only authority.
+ * Read-only rules for the original Work review surfaces: A's classified completion history, decision
+ * references and acceptance evidence. They consume public DTOs from main and never fetch, apply a
+ * decision, accept a candidate or widen a Scope. "selectable" only means displayable for explicit
+ * navigation; the original form/Application guard remains the only authority.
  */
 import type {
-  DecisionPage, DecisionView, ExecutionOutcome, WorkEvidence, WorkEvidenceHistory, WorkVerificationStatus, WorkView,
+  DecisionPage, DecisionView, ExecutionOutcome, WorkCompletionHistory, WorkEvidence, WorkVerificationStatus, WorkView,
 } from '@personal-agent/contracts'
 
-export type TrialWorkHistoryReason = 'foreign_work' | 'stale_contract' | 'invalid_continuation' | 'duplicate_entry' | 'page_limit'
+export type TrialCompletionHistoryReason =
+  | 'foreign_work' | 'foreign_project' | 'stale_contract' | 'kind_mismatch' | 'duplicate_entry'
+  | 'invalid_continuation' | 'page_limit' | 'blocked'
 
-export interface TrialWorkHistoryScope {
+export interface TrialCompletionHistoryScope {
   readonly workId: string
+  readonly projectId: string
+  readonly kind: WorkCompletionHistory['kind']
   readonly revision?: number | undefined
   readonly digest?: string | undefined
 }
 
-export interface TrialWorkHistoryPage {
-  readonly contract: WorkEvidenceHistory['contract']
+export interface TrialCompletionHistoryPage {
+  readonly currentContract: WorkCompletionHistory['currentContract']
+  readonly projectId: string
+  readonly kind: WorkCompletionHistory['kind']
   readonly observedAt: string
-  readonly entries: WorkEvidenceHistory['entries']
+  readonly entries: WorkCompletionHistory['entries']
+  readonly status: WorkCompletionHistory['status']
+  readonly reason: WorkCompletionHistory['reason']
+  readonly available: number
+  readonly returned: number
   readonly hasMore: boolean
   readonly nextCursor?: string | undefined
-  readonly window: WorkEvidenceHistory['window']
-  readonly sourcesCapped: WorkEvidenceHistory['sourcesCapped']
+  readonly coverage: WorkCompletionHistory['coverage']
 }
 
-const historyEntryIdentity = (entry: WorkEvidenceHistory['entries'][number]) => JSON.stringify([entry.at, entry.kind, entry.sourceRef])
-const mergedLimit = 300
+const mergedLimit = 200
 
-export function trialWorkHistoryAdmission(
-  history: WorkEvidenceHistory,
-  scope: TrialWorkHistoryScope,
-): { readonly ok: true; readonly page: TrialWorkHistoryPage } | { readonly ok: false; readonly reason: TrialWorkHistoryReason } {
-  if (history.workId !== scope.workId || history.contract.workId !== scope.workId) return { ok: false, reason: 'foreign_work' }
-  if ((scope.revision !== undefined && history.contract.revision !== scope.revision) ||
-    (scope.digest !== undefined && history.contract.digest !== scope.digest)) return { ok: false, reason: 'stale_contract' }
-  if (history.entries.length > 100 || new Set(history.entries.map(historyEntryIdentity)).size !== history.entries.length)
-    return { ok: false, reason: history.entries.length > 100 ? 'page_limit' : 'duplicate_entry' }
-  if (history.hasMore !== (history.nextCursor !== undefined)) return { ok: false, reason: 'invalid_continuation' }
+export function trialCompletionHistoryAdmission(
+  page: WorkCompletionHistory,
+  scope: TrialCompletionHistoryScope,
+): { readonly ok: true; readonly page: TrialCompletionHistoryPage } | { readonly ok: false; readonly reason: TrialCompletionHistoryReason } {
+  if (page.workId !== scope.workId || page.currentContract.workId !== scope.workId) return { ok: false, reason: 'foreign_work' }
+  if (page.projectId !== scope.projectId) return { ok: false, reason: 'foreign_project' }
+  if (page.kind !== scope.kind || page.entries.some(row => row.kind !== scope.kind)) return { ok: false, reason: 'kind_mismatch' }
+  if ((scope.revision !== undefined && page.currentContract.revision !== scope.revision) ||
+    (scope.digest !== undefined && page.currentContract.digest !== scope.digest)) return { ok: false, reason: 'stale_contract' }
+  if (page.status === 'blocked') return { ok: false, reason: 'blocked' }
+  if (page.returned !== page.entries.length || page.available < page.returned || page.entries.length > page.limit)
+    return { ok: false, reason: 'page_limit' }
+  if (new Set(page.entries.map(row => row.id)).size !== page.entries.length) return { ok: false, reason: 'duplicate_entry' }
+  if (page.hasMore !== (page.nextCursor !== undefined) || page.coverage !== (page.hasMore ? 'partial' : 'complete'))
+    return { ok: false, reason: 'invalid_continuation' }
+  if (!page.hasMore && page.reason !== null) return { ok: false, reason: 'invalid_continuation' }
   return {
     ok: true,
     page: {
-      contract: history.contract, observedAt: history.observedAt, entries: history.entries,
-      hasMore: history.hasMore, window: history.window, sourcesCapped: history.sourcesCapped,
-      ...(history.nextCursor === undefined ? {} : { nextCursor: history.nextCursor }),
+      currentContract: page.currentContract, projectId: page.projectId, kind: page.kind, observedAt: page.observedAt,
+      entries: page.entries, status: page.status, reason: page.reason, available: page.available,
+      returned: page.returned, hasMore: page.hasMore, coverage: page.coverage,
+      ...(page.nextCursor === undefined ? {} : { nextCursor: page.nextCursor }),
     },
   }
 }
 
-export function trialWorkHistoryMerge(
-  previous: TrialWorkHistoryPage,
-  next: WorkEvidenceHistory,
-  scope: TrialWorkHistoryScope,
-): { readonly ok: true; readonly page: TrialWorkHistoryPage } | { readonly ok: false; readonly reason: TrialWorkHistoryReason } {
-  const admission = trialWorkHistoryAdmission(next, scope)
+export function trialCompletionHistoryMerge(
+  previous: TrialCompletionHistoryPage,
+  next: WorkCompletionHistory,
+  scope: TrialCompletionHistoryScope,
+): { readonly ok: true; readonly page: TrialCompletionHistoryPage } | { readonly ok: false; readonly reason: TrialCompletionHistoryReason } {
+  const admission = trialCompletionHistoryAdmission(next, scope)
   if (!admission.ok) return admission
-  if (admission.page.contract.revision !== previous.contract.revision || admission.page.contract.digest !== previous.contract.digest)
-    return { ok: false, reason: 'stale_contract' }
-  const known = new Set(previous.entries.map(historyEntryIdentity))
-  if (admission.page.entries.some(entry => known.has(historyEntryIdentity(entry)))) return { ok: false, reason: 'duplicate_entry' }
+  if (admission.page.kind !== previous.kind) return { ok: false, reason: 'kind_mismatch' }
+  if (admission.page.currentContract.revision !== previous.currentContract.revision ||
+    admission.page.currentContract.digest !== previous.currentContract.digest) return { ok: false, reason: 'stale_contract' }
+  const known = new Set(previous.entries.map(row => row.id))
+  if (admission.page.entries.some(row => known.has(row.id))) return { ok: false, reason: 'duplicate_entry' }
   const entries = [...previous.entries, ...admission.page.entries]
   if (entries.length > mergedLimit) return { ok: false, reason: 'page_limit' }
-  return {
-    ok: true,
-    page: {
-      ...admission.page, entries,
-    },
-  }
+  return { ok: true, page: { ...admission.page, entries } }
+}
+
+export const trialCompletionKindLabel: Record<WorkCompletionHistory['kind'], string> = {
+  contracts: '合同版本', verifications: '检查记录', acceptances: '人工标准验收',
+}
+
+export const trialCompletionReasonLabel: Record<TrialCompletionHistoryReason, string> = {
+  foreign_work: '属于另一个原工作', foreign_project: '属于另一个项目', stale_contract: '当前合同已变化',
+  kind_mismatch: '类别与请求不一致', duplicate_entry: '记录包含重复标识', invalid_continuation: '续页信息不完整',
+  page_limit: '记录超过单页上限', blocked: '单条记录超过读取上限',
 }
 
 export type TrialDecisionReason =

@@ -1,10 +1,10 @@
 import { BookmarkCheck, CheckCircle2, ChevronDown, Clock3, FileCheck2, History, RefreshCw, ShieldCheck, TriangleAlert } from 'lucide-react'
 import type {
-  DecisionPage, DecisionPreview, WorkEvidence, WorkEvidenceHistory, WorkVerificationStatus, WorkView,
+  DecisionPage, DecisionPreview, WorkCompletionHistory, WorkEvidence, WorkVerificationStatus, WorkView,
 } from '@personal-agent/contracts'
-import type { TrialWorkHistoryPage, TrialWorkHistoryScope } from './work-review.ts'
+import type { TrialCompletionHistoryScope } from './work-review.ts'
 import {
-  trialDecisionReasonLabel, trialDecisionRows, trialReviewSnapshot, trialWorkHistoryAdmission,
+  trialCompletionHistoryAdmission, trialCompletionKindLabel, trialCompletionReasonLabel, trialDecisionReasonLabel, trialDecisionRows, trialReviewSnapshot,
 } from './work-review.ts'
 import './trial.css'
 
@@ -14,9 +14,6 @@ const phaseLabel: Record<WorkView['phase'], string> = {
 }
 const verificationLabel: Record<WorkVerificationStatus['state'], string> = {
   not_ready: '尚未就绪', queued: '排队检查', running: '检查中', retry_wait: '等待重试', blocked: '机器检查失败', finished: '检查完成',
-}
-const windowLabel: Record<WorkEvidenceHistory['window'], string> = {
-  complete: '窗口完整', caller_limit: '调用方上限，仍有较早记录', storage_cap: '存储上限，部分来源受限',
 }
 const acceptanceLabel: Record<string, string> = { not_requested: '未请求接受', accepted: '已人工接受', rejected: '已拒绝', unknown: '接受结果未知', unobserved: '未观察' }
 const projectionLabel: Record<WorkEvidence['projection'] | 'unobserved', string> = {
@@ -28,55 +25,64 @@ const format = (value: string) => {
   return Number.isFinite(date.getTime()) ? date.toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '时间未读取'
 }
 
-export interface WorkHistoryPanelProps {
-  readonly history?: WorkEvidenceHistory | undefined
-  readonly scope: TrialWorkHistoryScope
+export interface WorkCompletionHistoryPanelProps {
+  readonly page?: WorkCompletionHistory | undefined
+  readonly scope: TrialCompletionHistoryScope
   readonly loading?: boolean | undefined
   readonly loadingMore?: boolean | undefined
   readonly error?: string | undefined
+  readonly onSelectKind?: ((kind: WorkCompletionHistory['kind']) => void) | undefined
   readonly onLoadMore?: (() => void) | undefined
   readonly onRetry?: (() => void) | undefined
   readonly onOpenWork?: (() => void) | undefined
   readonly headingLevel?: 2 | 3 | undefined
 }
 
-/** Original Work/contract evidence history. Distinct from the message ContextHistory browser. */
-export function WorkHistoryPanel({
-  history, scope, loading = false, loadingMore = false, error, onLoadMore, onRetry, onOpenWork, headingLevel = 3,
-}: WorkHistoryPanelProps) {
+/** A's classified completion metadata (contracts/verifications/acceptances). Not a frozen snapshot. */
+export function WorkCompletionHistoryPanel({
+  page: raw, scope, loading = false, loadingMore = false, error, onSelectKind, onLoadMore, onRetry, onOpenWork, headingLevel = 3,
+}: WorkCompletionHistoryPanelProps) {
   const Heading = headingLevel === 3 ? 'h3' : 'h2'
-  const admission = history === undefined ? undefined : trialWorkHistoryAdmission(history, scope)
-  const page: TrialWorkHistoryPage | undefined = admission?.ok === true ? admission.page : undefined
+  const admission = raw === undefined ? undefined : trialCompletionHistoryAdmission(raw, scope)
+  const page = admission?.ok === true ? admission.page : undefined
+  const kind = scope.kind
   return (
-    <section className="trial-work-history" aria-label="原工作交付历史" aria-busy={loading || loadingMore}>
+    <section className="trial-work-history" aria-label="原工作分类历史" aria-busy={loading || loadingMore}>
       <header className="trial-work-history-head">
-        <div><Heading className="trial-history-title"><History size={15} aria-hidden="true" />原工作交付历史</Heading>
-          <p className="trial-note">原 Work/合同/检查记录，不是消息上下文历史；只读且不授予接受。</p></div>
-        {onRetry !== undefined && <button type="button" className="icon-button" aria-label="重新读取交付历史" title="重新读取交付历史" disabled={loading} onClick={onRetry}><RefreshCw size={15} /></button>}
+        <div><Heading className="trial-history-title"><History size={15} aria-hidden="true" />原工作分类历史</Heading>
+          <p className="trial-note">合同版本、检查记录与人工标准验收的只读 metadata；原时间线保留整体交付接受。</p></div>
+        {onRetry !== undefined && <button type="button" className="icon-button" aria-label="重新读取分类历史" title="重新读取分类历史" disabled={loading} onClick={onRetry}><RefreshCw size={15} /></button>}
       </header>
+      {onSelectKind !== undefined && <div className="trial-work-history-kinds" role="group" aria-label="分类历史类别">
+        {(['contracts', 'verifications', 'acceptances'] as const).map(value => <button key={value} type="button" className="quiet"
+          aria-pressed={kind === value} disabled={loading} onClick={() => onSelectKind(value)}>{trialCompletionKindLabel[value]}</button>)}
+      </div>}
       {admission !== undefined && admission.ok === false && <p className="trial-history-status" role="alert">
-        {admission.reason === 'foreign_work' ? '这批记录属于另一个原工作，已拒绝显示。'
-          : admission.reason === 'stale_contract' ? '记录合同与当前合同不一致，已拒绝显示。'
-            : admission.reason === 'duplicate_entry' ? '记录包含重复事件，已拒绝显示。'
-              : admission.reason === 'page_limit' ? '记录超过单页上限，请缩小窗口。' : '记录续页不完整，已拒绝显示。'}
+        {admission.reason === 'blocked' ? '单条历史超过读取上限，较早记录暂不可达；这不是完整的零条记录。'
+          : `${trialCompletionReasonLabel[admission.reason]}，已拒绝显示。`}
       </p>}
       {error !== undefined && <p className="trial-history-status" role="alert">{error}{onRetry !== undefined && <button type="button" className="quiet" onClick={onRetry}>重试</button>}</p>}
-      {loading && page === undefined && <p className="trial-history-status" role="status">正在读取交付历史…</p>}
+      {loading && page === undefined && <p className="trial-history-status" role="status">正在读取分类历史…</p>}
       {page !== undefined && <>
-        <div className="trial-work-history-meta"><span>合同版本 {page.contract.revision}</span><span>{windowLabel[page.window]}</span><span>更新于 {format(page.observedAt)}</span></div>
-        {page.entries.length === 0 ? <p className="trial-history-status" role="status">当前合同暂无交付历史。</p> : <ol className="trial-work-history-list">
-          {page.entries.map(entry => <li key={`${entry.at}/${entry.kind}/${entry.sourceRef}`}>
-            <span className="trial-work-event"><FileCheck2 size={13} aria-hidden="true" />{entry.kind.startsWith('runtime.') ? '执行状态已记录' : entry.kind}</span>
-            <time dateTime={entry.at}>{format(entry.at)}</time><span className="trial-note">来源引用已记录</span>
+        <div className="trial-work-history-meta"><span>当前合同版本 {page.currentContract.revision}</span><span>{trialCompletionKindLabel[page.kind]}</span>
+          <span>来源 {page.available} 条 · 已显示 {page.returned} 条</span><span>{page.coverage === 'complete' ? '窗口完整' : '部分记录'}</span>
+          <span>live keyset</span><span>更新于 {format(page.observedAt)}</span></div>
+        {page.entries.length === 0 ? <p className="trial-history-status" role="status">本类暂无记录。</p> : <ol className="trial-work-history-list">
+          {page.entries.map(row => <li key={row.id}>
+            <span className="trial-work-event"><FileCheck2 size={13} aria-hidden="true" />
+              {row.kind === 'contracts' ? `合同版本 ${row.revision}` : row.kind === 'verifications' ? `第 ${row.generation} 代检查记录` : `第 ${row.generation} 代人工标准验收`}</span>
+            {'at' in row && <time dateTime={row.at}>{format(row.at)}</time>}
+            <span className="trial-note">{row.kind === 'contracts' ? `摘要 ${row.digest.slice(0, 12)}…` : row.kind === 'verifications' ? `标准摘要 ${row.criteriaDigest.slice(0, 12)}…` : `${row.criterionCount} 项人工标准`}</span>
+            <span className="trial-note trial-mono">记录 {row.id}</span>
           </li>)}
         </ol>}
         <div className="trial-work-history-foot">
-          {page.hasMore && page.entries.length < 300
+          {page.hasMore && page.entries.length < 200
             ? <button type="button" className="quiet" disabled={loadingMore || error !== undefined || onLoadMore === undefined} onClick={onLoadMore}><ChevronDown size={14} />{loadingMore ? '读取中…' : '较早记录'}</button>
-            : <span className="trial-note">已显示 {page.entries.length} 条{page.hasMore ? '，达到上限' : '，没有更早记录'}。</span>}
-          {page.sourcesCapped.length > 0 && <span className="trial-note" role="status">{page.sourcesCapped.length} 个来源因存储上限未展开</span>}
+            : <span className="trial-note">已显示 {page.entries.length} 条{page.hasMore ? '，达到 200 条上限' : '，没有更早记录'}。</span>}
           {onOpenWork !== undefined && <button type="button" className="quiet" onClick={onOpenWork}>回到原工作</button>}
         </div>
+        <p className="trial-note">人工标准验收是逐条 criteria 记录，不等于整体交付接受；整体接受仍看原时间线/候选。</p>
       </>}
     </section>
   )

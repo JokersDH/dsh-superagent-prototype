@@ -33,13 +33,13 @@ export {
   trialSourceStateLabel, trialSourcesAdmission,
 } from './history-source.ts'
 export type { TrialHistoryAdmission, TrialHistoryPage, TrialHistoryReason, TrialHistoryScope, TrialSourceReason } from './history-source.ts'
-export { DecisionReferencePanel, ReviewEvidencePanel, WorkHistoryPanel } from './WorkReviewPanels.tsx'
-export type { DecisionReferencePanelProps, ReviewEvidencePanelProps, WorkHistoryPanelProps } from './WorkReviewPanels.tsx'
+export { DecisionReferencePanel, ReviewEvidencePanel, WorkCompletionHistoryPanel } from './WorkReviewPanels.tsx'
+export type { DecisionReferencePanelProps, ReviewEvidencePanelProps, WorkCompletionHistoryPanelProps } from './WorkReviewPanels.tsx'
 export {
   trialDecisionReasonLabel, trialDecisionRows, trialDecisionSourceLabel, trialDecisionStatusLabel,
-  trialReviewSnapshot, trialWorkHistoryAdmission, trialWorkHistoryMerge,
+  trialCompletionHistoryAdmission, trialCompletionHistoryMerge, trialReviewSnapshot,
 } from './work-review.ts'
 export type {
-  TrialDecisionReason, TrialDecisionRow, TrialReviewReason, TrialReviewSnapshot, TrialWorkHistoryPage,
-  TrialWorkHistoryReason, TrialWorkHistoryScope,
+  TrialCompletionHistoryPage, TrialCompletionHistoryReason, TrialCompletionHistoryScope,
+  TrialDecisionReason, TrialDecisionRow, TrialReviewReason, TrialReviewSnapshot,
 } from './work-review.ts'

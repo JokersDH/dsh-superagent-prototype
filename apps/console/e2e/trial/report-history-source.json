@@ -1,53 +1,53 @@
 {
   "subject": "trial history/source panel (controlled public-DTO fixtures; read-only; not a release verdict)",
-  "generatedAt": "2026-11-16T15:25:01.519Z",
+  "generatedAt": "2026-11-17T03:42:47.853Z",
   "results": [
     {
       "id": "NON-EMPTY-ROWS",
       "status": "PASS",
-      "ms": 696,
+      "ms": 724,
       "detail": "non-empty history"
     },
     {
       "id": "VERIFIED-SOURCE-BODY",
       "status": "PASS",
-      "ms": 43,
+      "ms": 54,
       "detail": "frozen body and scope review"
     },
     {
       "id": "MISSING-SOURCE-IS-EXPLICIT",
       "status": "PASS",
-      "ms": 30,
+      "ms": 45,
       "detail": "missing body"
     },
     {
       "id": "LIVE-CONTINUATION",
       "status": "PASS",
-      "ms": 625,
+      "ms": 621,
       "detail": "continuation merge"
     },
     {
       "id": "FOREIGN-PAGE-REFUSED",
       "status": "PASS",
-      "ms": 601,
+      "ms": 577,
       "detail": "foreign project refusal"
     },
     {
       "id": "SCOPE-CHANGED-BODY-WITHHELD",
       "status": "PASS",
-      "ms": 593,
+      "ms": 577,
       "detail": "scope_changed state"
     },
     {
       "id": "KEYBOARD-AND-RETURN",
       "status": "PASS",
-      "ms": 634,
+      "ms": 616,
       "detail": "keyboard selection and return"
     },
     {
       "id": "MOBILE-NO-OVERFLOW",
       "status": "PASS",
-      "ms": 649,
+      "ms": 642,
       "detail": "390px layout"
     },
     {

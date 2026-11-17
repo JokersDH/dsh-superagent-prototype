@@ -3,7 +3,7 @@
   "viewport": "1440x900",
   "projects": [
     {
-      "id": "project-ada05f6341335beb1720c6f5",
+      "id": "project-676d3d3afe6b5dec1afeb147",
       "displayName": "项目 Alpha"
     },
     {
@@ -20,48 +20,48 @@
     "/v1/projects"
   ],
   "modelCalls": 0,
-  "generatedAt": "2026-11-16T15:25:18.037Z",
+  "generatedAt": "2026-11-17T03:43:18.052Z",
   "results": [
     {
       "id": "DEFAULT-CONVERSATION-AND-NO-EAGER-READ",
       "status": "PASS",
-      "ms": 3,
+      "ms": 2,
       "detail": "the real app keeps the main conversation default and reads readiness only on demand"
     },
     {
       "id": "TWO-REAL-CONVERSATIONS-SWITCH",
       "status": "PASS",
-      "ms": 255,
+      "ms": 223,
       "detail": "two real conversations keep separate drafts keyed by conversation identity"
     },
     {
       "id": "TRIAL-SHOWS-CURRENT-CONVERSATION-AND-PRESERVES-DRAFT",
       "status": "PASS",
-      "ms": 179,
+      "ms": 230,
       "detail": "trial round trips preserve draft, project and conversation identity with one read per open"
     },
     {
       "id": "IMPORT-SECOND-PROJECT-THROUGH-THE-REAL-FORM",
       "status": "PASS",
-      "ms": 148,
+      "ms": 181,
       "detail": "the real import form adds the second project and keeps the unsent draft"
     },
     {
       "id": "TRIAL-TWO-PROJECT-IDENTITY",
       "status": "PASS",
-      "ms": 168,
+      "ms": 164,
       "detail": "the trial view names the imported project and marks it current without inventing readiness"
     },
     {
       "id": "DELEGATION-DRAFT-NOT-SUBMITTED",
       "status": "PASS",
-      "ms": 71,
+      "ms": 72,
       "detail": "the delegation draft is inspectable, disabled without an admitted executor, and never submitted"
     },
     {
       "id": "EXECUTOR-ROUND-TRIP-KEEPS-IDENTITY",
       "status": "PASS",
-      "ms": 129,
+      "ms": 147,
       "detail": "executor check and return keep the same project, conversation and draft"
     },
     {

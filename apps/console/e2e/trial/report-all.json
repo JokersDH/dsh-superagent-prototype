@@ -1,6 +1,6 @@
 {
   "subject": "trial experience suites (controlled fixtures / isolated services; not a release verdict)",
-  "generatedAt": "2026-11-16T15:25:28.630Z",
+  "generatedAt": "2026-11-17T03:43:30.244Z",
   "results": [
     {
       "id": "unit-mapping",
@@ -8,7 +8,7 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 120000,
-      "ms": 223
+      "ms": 190
     },
     {
       "id": "typecheck-app",
@@ -16,7 +16,7 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 240000,
-      "ms": 2653
+      "ms": 3038
     },
     {
       "id": "typecheck-e2e",
@@ -24,7 +24,7 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 240000,
-      "ms": 2128
+      "ms": 3333
     },
     {
       "id": "build",
@@ -32,7 +32,7 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 240000,
-      "ms": 492
+      "ms": 638
     },
     {
       "id": "hook-async",
@@ -40,7 +40,7 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 420000,
-      "ms": 6040
+      "ms": 5970
     },
     {
       "id": "browser-states",
@@ -48,7 +48,7 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 420000,
-      "ms": 46802
+      "ms": 45902
     },
     {
       "id": "model-connection",
@@ -56,7 +56,7 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 420000,
-      "ms": 12694
+      "ms": 12247
     },
     {
       "id": "history-source",
@@ -64,7 +64,7 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 420000,
-      "ms": 4486
+      "ms": 4513
     },
     {
       "id": "work-review",
@@ -72,7 +72,7 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 420000,
-      "ms": 2696
+      "ms": 2743
     },
     {
       "id": "http-journey",
@@ -80,7 +80,7 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 420000,
-      "ms": 3447
+      "ms": 4211
     },
     {
       "id": "app-targets",
@@ -88,7 +88,7 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 420000,
-      "ms": 7677
+      "ms": 20093
     },
     {
       "id": "app-two-projects",
@@ -96,7 +96,7 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 420000,
-      "ms": 2701
+      "ms": 3166
     },
     {
       "id": "app-daily-flow",
@@ -104,7 +104,7 @@
       "exitCode": 0,
       "signal": null,
       "timeoutMs": 600000,
-      "ms": 10567
+      "ms": 12161
     }
   ],
   "failed": []

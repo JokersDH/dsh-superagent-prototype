@@ -7,13 +7,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { createRoot } from 'react-dom/client'
-import type { ApplicationConfiguration, ContextHistory, TrialReadiness, TrialNavigationAction } from '@personal-agent/contracts'
+import type { ApplicationConfiguration, ContextHistory, TrialReadiness, TrialNavigationAction, WorkCompletionHistory } from '@personal-agent/contracts'
 import { HttpTransport } from '../../src/transport.ts'
 import { TrialWorkspace } from '../../src/trial/TrialWorkspace.tsx'
 import { TrialModelConnectionForm } from '../../src/trial/ModelConnectionForm.tsx'
 import { HistorySourcePanel } from '../../src/trial/HistorySourcePanel.tsx'
 import { trialHistoryMerge } from '../../src/trial/history-source.ts'
-import { DecisionReferencePanel, ReviewEvidencePanel, WorkHistoryPanel } from '../../src/trial/WorkReviewPanels.tsx'
+import { DecisionReferencePanel, ReviewEvidencePanel, WorkCompletionHistoryPanel } from '../../src/trial/WorkReviewPanels.tsx'
 import { useTrialReadiness } from '../../src/trial/useTrialReadiness.ts'
 import type { TrialHarnessState } from './fixtures.ts'
 import { trialHarnessProps, trialProbePair, trialStates } from './fixtures.ts'
@@ -495,24 +495,25 @@ function HistoryHarness() {
 }
 
 function ReviewHarness() {
-  const contract = { workId: 'work-1', revision: 2, digest: 'a'.repeat(64), scope: { projectId: 'project-atlas', allowedPaths: ['src/'], excludedPaths: [], externalActions: [] } }
+  const contract = { workId: 'work-1', revision: 2, digest: 'a'.repeat(64) }
   const work = {
     work: { id: 'work-1', projectId: 'project-atlas', conversationId: 'conv-alpha', title: '交付检查', createdAt: '2026-11-16T00:00:00.000Z' },
-    contract, links: [], phase: 'delivered', coreSnapshotRef: 'core', openQuestionIds: [], artifactIds: ['artifact-1', 'artifact-2'],
+    contract: { ...contract, scope: { projectId: 'project-atlas', allowedPaths: ['src/'], excludedPaths: [], externalActions: [] } },
+    links: [], phase: 'delivered', coreSnapshotRef: 'core', openQuestionIds: [], artifactIds: ['artifact-1', 'artifact-2'],
     resourceStatus: 'quiescent', evidenceRefs: [],
     actions: { dispatchHold: { paused: false, revision: 0 }, currentCandidate: { ticketId: 'ticket-1', assignmentId: 'assignment-1', contract, candidateGeneration: 1 },
       currentVerificationId: 'verify-1', available: ['accept_candidate'] },
   } as unknown as import('@personal-agent/contracts').WorkView
-  const [entries, setEntries] = useState([
-    { at: '2026-11-16T00:01:00.000Z', kind: 'work.created', sourceRef: 'ref-1', detail: {} },
-    { at: '2026-11-16T00:02:00.000Z', kind: 'verification.recorded', sourceRef: 'ref-2', detail: { revision: 2 } },
-  ])
-  const [historyPage, setHistoryPage] = useState({ protocol: 'work-evidence-history/1' as const, workId: 'work-1', contract,
-    observedAt: '2026-11-16T00:10:00.000Z', entries, hasMore: true, nextCursor: 'cursor-1', window: 'caller_limit' as const, sourcesCapped: [] })
+  const row = (id: string, generation: number) => ({ kind: 'verifications' as const, id, ticketId: 'ticket-1', assignmentId: 'assignment-1',
+    generation, artifactDigest: 'b'.repeat(64), at: '2026-11-16T00:01:00.000Z', criteriaDigest: 'c'.repeat(64) })
+  const [page, setPage] = useState<WorkCompletionHistory>({ protocol: 'work-completion-history/1' as const, workId: 'work-1', projectId: 'project-atlas',
+    currentContract: contract, kind: 'verifications' as const, observedAt: '2026-11-16T00:10:00.000Z', mode: 'live_keyset' as const,
+    authorization: 'none' as const, status: 'ok' as const, reason: null, limit: 10, returned: 1, available: 3,
+    entries: [row('verify-1', 1)], hasMore: true, nextCursor: 'cursor-1', coverage: 'partial' as const, maxBytes: 131072 as const })
   const [failure, setFailure] = useState(false)
   const verification = { protocol: 'work-verification/1', workId: 'work-1', state: failure ? 'blocked' : 'finished',
     ...(failure ? { failure: { id: 'failure-1', code: 'verification_failed', failureCount: 2 } } : { verificationId: 'verify-1' }),
-    retryAvailable: failure, ...(failure ? {} : {}) } as unknown as import('@personal-agent/contracts').WorkVerificationStatus
+    retryAvailable: failure } as unknown as import('@personal-agent/contracts').WorkVerificationStatus
   const evidence = { protocol: 'work-evidence/1', workId: 'work-1', projection: 'recorded', entries: [], outcomes: [], truncated: false } as unknown as import('@personal-agent/contracts').WorkEvidence
   const decisions = { protocol: 'decision-catalog/1', decisions: [
     { record: { decision: { id: 'decision-1', version: 1, content: '采用标准检查', authorityRef: 'auth', scope: { projectId: 'project-atlas', allowedPaths: ['src/'], excludedPaths: [], externalActions: [] } },
@@ -523,20 +524,15 @@ function ReviewHarness() {
   return (
     <HarnessFrame controls={(
       <>
-        <button type="button" data-harness="load-history" onClick={() => {
-          const next = { ...historyPage, entries: [...entries, { at: '2026-11-16T00:03:00.000Z', kind: 'acceptance.recorded', sourceRef: 'ref-3', detail: {} }], hasMore: false }
-          delete (next as { nextCursor?: string }).nextCursor
-          setEntries(next.entries); setHistoryPage(next); window.__TRIAL_WORK_HISTORY_LOADS__ = (window.__TRIAL_WORK_HISTORY_LOADS__ ?? 0) + 1
-        }}>较早记录</button>
         <button type="button" data-harness="fail-verification" onClick={() => setFailure(value => !value)}>切换机器失败</button>
       </>
     )}>
-      <WorkHistoryPanel history={historyPage} scope={{ workId: 'work-1', revision: 2 }} onLoadMore={() => {
-        const nextEntries = [...entries, { at: '2026-11-16T00:03:00.000Z', kind: 'acceptance.recorded', sourceRef: 'ref-3', detail: {} }]
-        const next = { ...historyPage, entries: nextEntries, hasMore: false }
-        delete (next as { nextCursor?: string }).nextCursor
-        setEntries(nextEntries); setHistoryPage(next); window.__TRIAL_WORK_HISTORY_LOADS__ = (window.__TRIAL_WORK_HISTORY_LOADS__ ?? 0) + 1
-      }} onOpenWork={() => writeLog('open-work')} />
+      <WorkCompletionHistoryPanel page={page} scope={{ workId: 'work-1', projectId: 'project-atlas', kind: 'verifications', revision: 2 }}
+        onLoadMore={() => {
+          const next = { ...page, entries: [...page.entries, row('verify-2', 2)], hasMore: false, returned: 2, coverage: 'complete' as const }
+          delete (next as { nextCursor?: string }).nextCursor
+          setPage(next)
+        }} onOpenWork={() => writeLog('open-work')} />
       <DecisionReferencePanel page={decisions} projectId="project-atlas" now={Date.parse('2026-11-16T01:00:00.000Z')}
         onSelect={id => { window.__TRIAL_DECISION_SELECT__?.push(id); writeLog(`decision: ${id}`) }} />
       <ReviewEvidencePanel work={work} verification={verification} evidence={evidence} onOpenWork={() => writeLog('open-review-work')} />

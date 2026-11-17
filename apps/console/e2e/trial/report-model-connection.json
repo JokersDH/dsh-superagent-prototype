@@ -1,101 +1,101 @@
 {
   "subject": "trial model connection form (controlled local callback; no model/native request; not a release verdict)",
-  "generatedAt": "2026-11-16T15:24:57.033Z",
+  "generatedAt": "2026-11-17T03:42:43.337Z",
   "results": [
     {
       "id": "FIELDS-AND-PASSWORD",
       "status": "PASS",
-      "ms": 689,
+      "ms": 718,
       "detail": "controlled form fields"
     },
     {
       "id": "NO-PREMATURE-SIDE-EFFECT",
       "status": "PASS",
-      "ms": 46,
+      "ms": 42,
       "detail": "no storage/url/fetch before submit"
     },
     {
       "id": "SUBMIT-CLEARS-AND-CALLS-ONCE",
       "status": "PASS",
-      "ms": 35,
+      "ms": 33,
       "detail": "transient key lifecycle"
     },
     {
       "id": "LEAKY-FEEDBACK-IS-REFUSED",
       "status": "PASS",
-      "ms": 672,
+      "ms": 624,
       "detail": "sanitised failure"
     },
     {
       "id": "FAILED-CONNECTION-KEEPS-EDITABLE-FORM",
       "status": "PASS",
-      "ms": 707,
+      "ms": 650,
       "detail": "failure remains recoverable"
     },
     {
       "id": "SAVED-IS-NOT-CONNECTION",
       "status": "PASS",
-      "ms": 640,
+      "ms": 614,
       "detail": "saved vs connected"
     },
     {
       "id": "HTTP-REQUIRES-OPT-IN",
       "status": "PASS",
-      "ms": 725,
+      "ms": 679,
       "detail": "explicit insecure transport"
     },
     {
       "id": "DOUBLE-CLICK-SAVES-ONCE",
       "status": "PASS",
-      "ms": 1930,
+      "ms": 1899,
       "detail": "duplicate submit guard"
     },
     {
       "id": "LATE-RESULT-AFTER-IDENTITY-CHANGE",
       "status": "PASS",
-      "ms": 2105,
+      "ms": 2066,
       "detail": "stale result isolation"
     },
     {
       "id": "UNSUPPORTED-OLD-SERVICE",
       "status": "PASS",
-      "ms": 659,
+      "ms": 621,
       "detail": "unsupported capability"
     },
     {
       "id": "IDENTITY-CHANGE-CLEARS-SECRET",
       "status": "PASS",
-      "ms": 668,
+      "ms": 646,
       "detail": "secret lifecycle across identity"
     },
     {
       "id": "UNMOUNT-CLEARS-AND-DOES-NOT-SUBMIT",
       "status": "PASS",
-      "ms": 639,
+      "ms": 601,
       "detail": "unmount lifecycle"
     },
     {
       "id": "UNAVAILABLE-ENTRY",
       "status": "PASS",
-      "ms": 597,
+      "ms": 561,
       "detail": "old API / no callback fallback"
     },
     {
       "id": "CANCEL-IS-NAVIGATION-ONLY",
       "status": "PASS",
-      "ms": 632,
+      "ms": 595,
       "detail": "explicit cancel"
     },
     {
       "id": "KEYBOARD-ORDER",
       "status": "PASS",
-      "ms": 602,
+      "ms": 586,
       "detail": "bounded keyboard path"
     },
     {
       "id": "MOBILE-NO-OVERFLOW",
       "status": "PASS",
-      "ms": 693,
+      "ms": 687,
       "detail": "390px layout"
     },
     {

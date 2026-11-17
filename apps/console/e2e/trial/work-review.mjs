@@ -43,16 +43,18 @@ try {
 
   await step('WORK-HISTORY-NON-EMPTY', async () => {
     await open()
-    assert((await page.locator('.trial-work-history').innerText()).includes('合同版本 2'), 'contract revision is shown')
-    assert((await page.locator('.trial-work-history').innerText()).includes('调用方上限'), 'coverage window is explicit')
-    assert(await page.locator('.trial-work-history-list li').count() === 2, 'both original events are shown')
-    assert((await page.locator('.trial-work-history').innerText()).includes('不是消息上下文历史'), 'work history is distinguished from message context history')
+    assert((await page.locator('.trial-work-history').innerText()).includes('当前合同版本 2'), 'current contract revision is shown')
+    assert((await page.locator('.trial-work-history').innerText()).includes('部分记录'), 'partial coverage is explicit')
+    assert(await page.locator('.trial-work-history-list li').count() === 1, 'the classified metadata row is shown')
+    assert((await page.locator('.trial-work-history').innerText()).includes('来源 3 条'), 'source total is shown')
+    assert((await page.locator('.trial-work-history').innerText()).includes('人工标准验收是逐条'), 'criterion acceptance is distinguished from overall acceptance')
+    assert((await page.locator('.trial-work-history').innerText()).includes('原时间线保留整体交付接受'), 'classified metadata is distinguished from the overall delivery timeline')
   }, 'non-empty work history')
 
   await step('WORK-HISTORY-CONTINUATION', async () => {
     await page.locator('.trial-work-history').getByRole('button', { name: '较早记录' }).click()
-    await page.waitForFunction(() => document.querySelectorAll('.trial-work-history-list li').length === 3)
-    assert((await page.locator('.trial-work-history').innerText()).includes('没有更早记录'), 'the end of the history is stated')
+    await page.waitForFunction(() => document.querySelectorAll('.trial-work-history-list li').length === 2)
+    assert((await page.locator('.trial-work-history').innerText()).includes('没有更早记录'), 'the end of the live keyset is stated')
   }, 'continuation')
 
   await step('DECISION-CURRENT-AND-REFUSED', async () => {

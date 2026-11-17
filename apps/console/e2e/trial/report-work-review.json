@@ -1,23 +1,23 @@
 {
   "subject": "trial work history/decision reference/review evidence (controlled DTOs, read-only, not a release verdict)",
-  "generatedAt": "2026-11-16T15:25:04.216Z",
+  "generatedAt": "2026-11-17T03:42:50.593Z",
   "results": [
     {
       "id": "WORK-HISTORY-NON-EMPTY",
       "status": "PASS",
-      "ms": 685,
+      "ms": 702,
       "detail": "non-empty work history"
     },
     {
       "id": "WORK-HISTORY-CONTINUATION",
       "status": "PASS",
-      "ms": 19,
+      "ms": 20,
       "detail": "continuation"
     },
     {
       "id": "DECISION-CURRENT-AND-REFUSED",
       "status": "PASS",
-      "ms": 60,
+      "ms": 45,
       "detail": "decision reference eligibility"
     },
     {
@@ -29,19 +29,19 @@
     {
       "id": "MACHINE-FAILURE-IS-EXPLICIT",
       "status": "PASS",
-      "ms": 47,
+      "ms": 32,
       "detail": "machine failure"
     },
     {
       "id": "KEYBOARD-AND-MOBILE",
       "status": "PASS",
-      "ms": 703,
+      "ms": 701,
       "detail": "keyboard and 390px"
     },
     {
       "id": "FORCED-COLORS",
       "status": "PASS",
-      "ms": 601,
+      "ms": 587,
       "detail": "forced-colors rendering"
     },
     {
