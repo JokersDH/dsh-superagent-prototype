@@ -8,6 +8,16 @@ export { CoordinatorChannelModule, DEFAULT_LIMITS, sameCoordinatorChannelProduce
 export { RunnerAttachChannel } from './attach.ts'
 export type { AttachHooks, AttachNext, AttachOptions, AttachOwnership, AttachRefusal, AttachReply } from './attach.ts'
 export { inspectRunningAttempt } from './running-attempt.ts'
+export { InProcessRunnerHost, createInProcessHost } from './inprocess-host.ts'
+export { openAttachClient } from './typed-client.ts'
+export type {
+  AttachClient,
+  AttachFactsPage,
+  AttachPage,
+  AttachPayloadChunk,
+  AttachReplyResult,
+} from './typed-client.ts'
+export type { InProcessHostOptions, InProcessRegistration, InProcessRunning } from './inprocess-host.ts'
 export type {
   InspectedRunningAttempt,
   RunningAttemptExpectation,

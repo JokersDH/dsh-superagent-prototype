@@ -1,0 +1,163 @@
+{
+  "wave": "product-wave-36",
+  "role": "I",
+  "title": "Four end-to-end closures: sole-channel contract, real launch-shaped running, durable ACK succession, bounded versioned client",
+  "date": "2026-11-17",
+  "workdir": "/Users/hh/Desktop/joker/superagent-agent-i",
+  "branch": "codex/g5-coordinator-channel",
+  "baseline": "b21698fa5c4418b9670f3b97907971d8e03c1a0e",
+  "mergedOriginMain": "7e550991",
+  "mergedMainCommits": ["7e550991", "f32a64ff", "b454c0fd", "f71cad58"],
+  "status": "SOURCE_READY_FOUR_CLOSURES_WITH_DEFAULT_CONSUMERS_NATIVE_FACTORY_CALLBACKS_APPLICATION_BROKER_RECOVERY_AND_PRODUCT_SLOTS_NOT_REACHED",
+  "statement": "One whole-subsystem goal with four larger end-to-end product closures, preserving all nine wave-35 acceptance points. (1) The sole channel's lease/guard/RPC contract is pinned at the real service boundary, including the separation between a closed callback channel and physical finalization. (2) An in-process RunnerHost at the existing RunnerHost boundary returns a real RunningAttempt (feed/stop/waitExit/attachPort/attachCallbacks) consumed through the unique channel with zero native spawn; NativeProductAttempt.launch's own class callbacks remain NOT_REACHED. (3) A lost receipt is reconciled from the Runner journal plus the original Store with the same fact id and same row sequence, so durable ACK needs no second ledger. (4) A typed client fixes the client/server argument order, and compatibility refusals are bounded and non-settling. Channel module unchanged; new additions are two production modules (in-process host, typed client).",
+  "source": {
+    "moduleChangedThisWave": false,
+    "blobs": {
+      "coordinator-channel.ts": "d1ef81eb9d51b24417645151440eb1e262c20546",
+      "attach.ts": "3c1aea8a6b5f31865e3c506a5ee57008a1ebcacb",
+      "errors.ts": "ec8ce909d0f30ab1d96488db56cdf3b6a4ab7f49",
+      "index.ts": "3992a9d4473be2b41b6e47d63248d985bb9811f0",
+      "refusals.ts": "25ebcd26f1fb4aad583048dc672ec2bf09066b32",
+      "sink-responder.ts": "992a8cc0fceb55d7b2a9e2e8c8068202a892acb3",
+      "running-attempt.ts": "a7de9b16553d761fa3f6e2c14ebe7ea353826589",
+      "inprocess-host.ts": "8ac2991ddab4fc7e16844f71cb5f4a711fc59e54",
+      "typed-client.ts": "274ad0fa93c3fd03872fd919054e26e5ea22d3b3"
+    },
+    "additionsThisWave": [
+      "inprocess-host.ts: InProcessRunnerHost/createInProcessHost implement RunnerHost.launch over the real serveRunner/endpoint with a caller-supplied driver and callbacks; stop() reports indeterminate unless the caller confirms",
+      "typed-client.ts: openAttachClient binds producer at connect time and exposes state/next/reply/inspect/cancel/command/facts/payload with the real client arity"
+    ],
+    "inMain": {
+      "module": true,
+      "pullAdapter": true,
+      "errors": true,
+      "runningAttemptGuard": false,
+      "inprocessHost": false,
+      "typedClient": false
+    },
+    "mainConsumedSources": {
+      "nativeAttempt": { "path": "apps/coordinator/product/native-attempt.ts", "blob": "b3d6e6927f827af77b198e9192fc9cd8bdc03fd0" },
+      "attachedCaller": { "path": "packages/execution/src/attached-attempt.ts", "blob": "5a2f8731f61ca1e8cbb3a13c0d38b96a47ec322d" },
+      "executionContracts": { "path": "packages/execution/src/contracts.ts", "blob": "0b1a4a7cf9bbff848280ce372d79e9447fb30c30" },
+      "recoveryTransport": { "path": "packages/execution/src/recovery-transport.ts", "blob": "73752579e28009a50c7062b4d35d91bb9ccca816" },
+      "service": { "path": "apps/runner/src/runner-service.ts", "blob": "d728c548961263ef09f0163826465adb018617a7" }
+    },
+    "candidateOnly": [
+      "apps/runner/src/attach-channel/inprocess-host.ts",
+      "apps/runner/src/attach-channel/typed-client.ts",
+      "apps/runner/src/attach-channel/index.ts (exports)",
+      "apps/runner/test/attach-channel/actual-terminal-finalize.test.ts",
+      "apps/runner/test/attach-channel/actual-inprocess-host.test.ts",
+      "apps/runner/test/attach-channel/actual-durable-ack.test.ts",
+      "apps/runner/test/attach-channel/actual-client-compat.test.ts",
+      "docs/runtime-channel/README.zh-CN.md",
+      "docs/runtime-channel/adoption-manual.zh-CN.md",
+      "reports/runtime-channel/wave36-status.json"
+    ]
+  },
+  "closures": [
+    {
+      "line": "1",
+      "title": "Sole channel lease, original guard and RPC production contract",
+      "status": "PASS_CONTRACT_SCOPE",
+      "implementation": "RunnerAttachChannel.owns (read-only owner projection) from wave-35 plus the real service RPC surface; the terminal/physical-finalize separation is now pinned by a consumer rather than assumed",
+      "consumer": "actual-lease-authority.test.ts (3, carried) + actual-terminal-finalize.test.ts (1)",
+      "positive": "natural terminal: owner poll refused, inspect reports state=terminated/admission=open, explicit cancel finalizes admission closed and is idempotent, generation observation stays read-only",
+      "negative": "post-terminal lease claims (owner and foreign) refused; a refused callback lease never authorizes physical control or claims quiescence",
+      "maintenance": "B's post-exit quiesce compatibility (candidate refuses no-lease cancel after natural terminal) is a B-owned contract fix; I does not relax terminal guards. Mixed-version cancel remains B's matrix.",
+      "notReached": "default product command/cancel path is B-owned; no B/main source edited"
+    },
+    {
+      "line": "2",
+      "title": "Real launch-returned running consumed by the unique channel",
+      "status": "PASS_EMBEDDED_HOST_SCOPE",
+      "implementation": "InProcessRunnerHost implements RunnerHost.launch over real serveRunner + recovery endpoint + bootstrap/journal; returns feed/stop/waitExit/attachPort/attachCallbacks",
+      "consumer": "actual-inprocess-host.test.ts (2)",
+      "positive": "inspectRunningAttempt accepts the returned handle; three callbacks reach the real Store (row seq), original payload body and per-intent guard; running.feed(begin) drives the real service; exit frame observed",
+      "negative": "foreign binding expectation refused (binding_mismatch); stop() reports indeterminate, never fabricates confirmed; shutdown is idempotent; no native child spawned",
+      "maintenance": "typed options and a documented call order (inspect → then bind → then feed); host is a real implementation of the existing interface, reusable by main",
+      "notReached": "NativeProductAttempt.launch itself (hard-coded native RunnerLink spawn). Needs a main-side transport/host injection seam; RFC handed off. Original Application/Broker recovery unchanged."
+    },
+    {
+      "line": "3",
+      "title": "Unknown, succession and durable ACK coordination",
+      "status": "PASS_RECONCILIATION_SCOPE",
+      "implementation": "no new state: the Runner journal plus the original Store are the reconciliation sources; unsettled facts are requeued with their original ids",
+      "consumer": "actual-durable-ack.test.ts (1) plus carried actual-succession-helper/actual-recovery-source (3)",
+      "positive": "persisted fact with a lost receipt is re-read by the successor with the same id/body and acknowledged once with the same Store seq; journal holds one entry",
+      "negative": "no new fact id, no duplicate row, no automatic resend of settled work; pending native intent stays indeterminate (wave-35 evidence carried)",
+      "maintenance": "recipe documented (manual §5.0g): journal + Store match means already applied; UNKNOWN retains its id and material",
+      "notReached": "original Application/QuestionBroker recovery to frozen artifact/check/currentCandidate/available accept; slot release"
+    },
+    {
+      "line": "4",
+      "title": "Bounded backpressure, same-version compatibility and B/H/main handoff",
+      "status": "PASS_COMPATIBILITY_SCOPE",
+      "implementation": "openAttachClient (typed client) + carried module bounds; refusals stay typed and bounded",
+      "consumer": "actual-client-compat.test.ts (1) plus carried actual-limits-diagnostics/actual-id-namespace/actual-slot-isolation (5)",
+      "positive": "lease/producer argument order is fixed at the type level; owner polling, page budgets and replies work through the adapter",
+      "negative": "producer-as-lease, unknown reply kind, wrong correlation id and foreign producer all refused without settling the pending request; page budget <1024 rejected before the request; messages <=200 chars",
+      "maintenance": "compatibility matrix documented (manual §5.0h); no frozen wire change; no new grant",
+      "notReached": "old/new mixed-version server pairs are B's matrix; I only pins the client shape and refusals"
+    }
+  ],
+  "oldAcceptanceMapping": {
+    "I1": { "wave35": "launch-shaped three callbacks", "wave36": "closure 2 adds a real host launch() and its negatives", "status": "PASS" },
+    "I2": { "wave35": "per-intent guard decisions", "wave36": "carried; still exercised by closure 2 consumer", "status": "PASS" },
+    "I3": { "wave35": "lease authority", "wave36": "closure 1 pins the terminal/physical separation; typed client in closure 4", "status": "PASS" },
+    "I4": { "wave35": "detach/terminal succession", "wave36": "closure 3 lost-reply variant; closure 1 terminal projection", "status": "PASS" },
+    "I5": { "wave35": "kind namespace and journal/payload coexistence", "wave36": "carried unchanged", "status": "PASS" },
+    "I6": { "wave35": "capacity and control availability", "wave36": "carried; client budget validation added", "status": "PASS" },
+    "I7": { "wave35": "journal-sourced recovery", "wave36": "closure 3 durable ACK with same row", "status": "PASS" },
+    "I8": { "wave35": "slot isolation and reopen", "wave36": "carried unchanged", "status": "PASS" },
+    "I9": { "wave35": "adoption manual and exact source", "wave36": "manual §5.0f–§5.0h and this status", "status": "PASS" }
+  },
+  "handoff": [
+    {
+      "owner": "main",
+      "item": "Host injection seam for NativeProductAttempt.launch",
+      "detail": "To obtain the original class callbacks from a real launch without a native spawn, main should accept an injectable transport/host in launch (the shape InProcessRunnerHost already implements: RunnerHost.launch returning RunningAttempt). Until then the class-callback path stays NOT_REACHED and the embedded host is the only zero-native real-launch consumer."
+    },
+    {
+      "owner": "B",
+      "item": "Post-exit physical finalization compatibility",
+      "detail": "Natural terminal leaves admission open until an explicit cancel; the candidate's no-lease cancel refusal breaks main's waitExit→quiesce completion. I evidence: actual-terminal-finalize.test.ts. Fix belongs to B's control admission; do not relax terminal callback guards."
+    },
+    {
+      "owner": "main/B",
+      "item": "Client arity mismatch",
+      "detail": "RecoveryRunnerPort documents server-side (producer, leaseId, generation) while connectRunnerRecovery's client takes (leaseId, generation). openAttachClient in apps/runner/src/attach-channel/typed-client.ts is the typed workaround; a typed client interface in packages/execution should replace the implicit shape."
+    },
+    {
+      "owner": "B/main",
+      "item": "Callback bind-before-feed ordering",
+      "detail": "A native intent created while the stdio lease is still current is settled indeterminate by the attach takeover (correct, but surprising). Main must bind (first channelNext) before feeding begin; documented in the manual §5.0f code sample."
+    }
+  ],
+  "checks": [
+    { "command": "pnpm exec tsc -p apps/runner/src/attach-channel/tsconfig.json", "exit": 0, "scope": "module + new host/client + all attach-channel consumers under strict/exactOptional" },
+    { "command": "cd apps/runner && node --test --test-concurrency=2 --test-timeout=120000 test/attach-channel/*.test.ts", "exit": 0, "tests": 180, "passed": 180, "failed": 0, "durationMs": 185008 },
+    { "command": "node --test packages/contracts/test/coordinator-channel.case.ts", "exit": 0, "tests": 5, "passed": 5 },
+    { "command": "node --test tests/integration/native-attach-callbacks.case.mjs tests/integration/attached-port.case.mjs (main)", "exit": 0, "tests": 15, "passed": 15 }
+  ],
+  "layers": {
+    "source": "PASS: two new production modules, four new consumer suites, docs, this status",
+    "controlled": "PASS: real serveRunner service, real recovery endpoint + typed client, main attachRunnerAttempt, real ProductStore, scripted in-process driver",
+    "installed": "NOT_REACHED: no new tar; W33 R1 8296720d8a25f38c/tar 04926739…, R2 303b2c6a, W35 599d/11027/39c remain the frozen subjects; D freeze → E final required",
+    "native": "NOT_REACHED: zero real vendor/model/native turns and zero child spawns; NativeProductAttempt.launch not executed",
+    "recovered": "SUPPORT_ONLY: journal+Store durable-ACK reconciliation and unknown-window support; original Application/QuestionBroker recovery to candidate/accept NOT_REACHED",
+    "value": "NOT_MEASURED: no price/benefit research"
+  },
+  "preservation": {
+    "resetOrClear": false,
+    "upstreamPush": false,
+    "twelveInstancesAndStateTouched": 0,
+    "realVendorModelNativeTurns": 0,
+    "realSignals": 0,
+    "modelOrStudyBudgetCreated": 0,
+    "bCap4UnknownSpent": 0,
+    "ePilotResetOrToppedUp": 0,
+    "newDriverOrDesktopOrCac": 0,
+    "secondLifecycleOrLedger": 0
+  }
+}

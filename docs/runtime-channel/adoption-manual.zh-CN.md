@@ -188,9 +188,59 @@ if (ownership !== 'owned') refuseBeforeEffect(ownership)
 
 继任者的恢复来源是 Runner 自己的 durable journal，不是上一个协调者的内存：`connectRunnerRecovery(...).facts(since, maxBytes)` 的页按原 `seq` 前进，同一 fact 只出现一次；`payload(ref, offset, length)` 分块重组后的字节 sha256 与 descriptor 的 `payloadDigest` 一致，且等于原 payload callback 返回的 body。已结算的请求不会重新派发；未决 native 意图在换 lease 时是 `indeterminate`，既不迁移批准，也不会变成 command result。原 Application/QuestionBroker 到 check/currentCandidate/manualaccept 仍是 main/B 的事，NOT_REACHED。
 
+## 5.0f 零 native 的真实 launch 形状（in-process host）
+
+`apps/runner/src/attach-channel/inprocess-host.ts` 在既有 `RunnerHost` 边界实现 `launch(spec)`：
+
+```ts
+const host = createInProcessHost({
+  createDriver: (_spec, hooks) => ({ inspect, reconcile, serve }),   // 真实服务里的脚本 driver
+  callbacks: port => ({ fact, payload, nativeWrite }),               // 调用方的真实回执/payload/guard
+  payloads: { read: ref => store.read(ref) },                        // 原 immutable payload 读取
+})
+const running = await host.launch(spec)      // feed / stop / waitExit / attachPort / attachCallbacks
+const checked = inspectRunningAttempt(running, { ticketId, assignmentId, attemptId, fenceEpoch, contract })
+const attached = attachRunnerAttempt({ endpoint: checked.value.port.registration, producer: checked.value.port.producer, leaseId, callbacks: checked.value.callbacks })
+await attached.pollOnce()                    // 先 bind，再发 begin
+await running.feed(beginCommand)
+```
+
+边界与诚实性：
+
+- 它返回的是**真实 host 的** `RunningAttempt`，不是手写 shape，也不是反射 private endpoint；`registration` 来自真实 endpoint 的 dev/ino，`done` 来自真实 `exited` 帧。
+- `stop(deadlineMs)` 只发送 shutdown 并等待 bounded 时间，返回 `quiescence: 'indeterminate'`；**不**从 channel 关闭推断 process/child/fd/journal 完成。要 `confirmed` 必须由调用方自己的资源 barrier 给出。
+- 这不是 `NativeProductAttempt.launch`：后者硬编码 native `RunnerLink` spawn。要让它也返回零 native 的真实 handle，需要 main 在 `launch` 上开一个 transport/host 注入缝（RFC 已随状态文件交接）；本轮不反射、不复制第二生命周期。
+
+## 5.0g lost-reply 下的 durable ACK 对账
+
+`actual-durable-ack.test.ts` 的 recipe：
+
+1. consumer A `next` 拿到 fact 请求，调用原 Store ingress 记录（得到 seq），**不回执**即离开。
+2. 继任 consumer B 用新 generation CAS 接管；module 把未结算 fact 按原 id 重排给 B。
+3. B 收到**同一** fact id/body，再次记录返回**同一** seq（原 Store 幂等），只发一次 receipt。
+4. 校验：Store 一行、journal 一条、driver 收到的 seq 与首次一致。
+
+因此“已持久但回执丢失”的结论来自 journal + Store 对账，而不是新 fact id、新 command 或第二条 receipt 账本；UNKNOWN 仍保留原 id 与材料。
+
+## 5.0h typed client 与同版本兼容矩阵
+
+`openAttachClient(endpoint, producer, timeoutMs?)` 固定了参数顺序：
+
+| 操作 | client 形状（本 adapter） | 服务端 port 形状（`RecoveryRunnerPort`） |
+| --- | --- | --- |
+| 读 generation | `state()` | `channelState(producer)` |
+| CAS + poll | `next(leaseId, expectedGeneration)` | `channelNext(producer, leaseId, expectedGeneration)` |
+| reply | `reply(leaseId, reply)` | `channelReply(producer, reply, leaseId)` |
+| 物理控制 | `cancel(command)` / `command(command)` | `cancel(command)`（producer 在认证头） |
+| 恢复读取 | `facts(since, maxBytes)` / `payload(ref, offset, length)` | 同形（认证头带 producer） |
+
+历史坑：直接按 `RecoveryRunnerPort` 写调用方会把 producer 当 lease 传给 client，服务端返回 `invalid_lease`（`unknown_outcome` 分类）。adapter 让这个错误在类型层不可能发生；`facts` 要求 `maxBytes >= 1024`，在发请求前就拒绝。
+
 ## 5.1 terminal 与 detach
 
 见 `fault-states.zh-CN.md`：终态（main `finish()` → `attach.close()`）关闭全部 lease/pending，pending fact 为 `closed`、未决 native 为 `indeterminate`、迟到 next/reply 零效果；仍 running 的临时 detach 可以合法继任，但旧 allowed 不迁移。wave-31 关于 shutdown 的相反观察来自缺 `id` 的无效帧，已纠正。
+
+wave-36 补充：**callback channel 关闭 ≠ 物理完成**。自然 terminal 后 `inspect()` 仍报 `state=terminated, admission=open`，只有显式 cancel 才 `admission=closed`（幂等）。B 的 post-exit quiesce 兼容（候选版无 lease cancel 被拒）必须由 B 在原 owner 内修，I 不放松终态 guard，也不把 `closed` 当 `confirmed`。
 
 ## 6. 分层结论（不要把模块绿灯读成产品恢复）
 
