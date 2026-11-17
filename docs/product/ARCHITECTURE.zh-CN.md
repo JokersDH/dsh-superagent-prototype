@@ -7,7 +7,7 @@
 | 项目 | 当前事实 |
 | --- | --- |
 | 仓库 | `https://github.com/JokersDH/dsh-superagent-prototype` |
-| 本文基线 | 2026-11-16；模型配置4cde5883、launcher8cd709ca；原回调/诊断见0086，新配置见0089，原恢复仍单独验 |
+| 本文基线 | 2026-11-17；分类历史f71/b454/最终API f32；原模型/回调/诊断保持，原恢复仍单独验 |
 | 首个用户界面 | React网页工作台；本机CLI负责启停/发行，暂无桌面壳 |
 | 技术栈 | TypeScript、Node24、pnpm workspace、React18/Vite、Hono、Zod、SQLite、Git worktree |
 | 原生执行 | 当前生产路径为Codex app-server；历史准入版本`codex-cli 0.164.0`，新版本需重新验证 |
@@ -41,6 +41,8 @@ flowchart LR
 ```
 
 ## 运行形态
+
+最新[0092](../rfcs/WP-16/0092-main-completion-history-consumer.md)复用A production keyset，在原Application/UoW授权后投影合同/检查/人工标准验收metadata，认证GET和HMAC当前Scope游标进入原WorkDetail。它不是新history ledger，旧timeline/当前接受gate保持；新控制/Csync未准入，见[0093](../rfcs/WP-16/0093-wave-36-reviewed-architecture.md)。
 
 网页模型配置已沿原ModelPanel/typedtransport/认证POST接到原PrivateModelProvider原子私有写；保存不发送模型请求，原后续SDK streaming仍唯一对话调用。F组件在main修复StrictMode/身份迟到后消费，未新增设置中心/模型循环。[0089](../rfcs/WP-16/0089-main-model-configuration-consumer.md)列出契约和边界。
 

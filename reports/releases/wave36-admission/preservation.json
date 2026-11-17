@@ -1,0 +1,81 @@
+{
+  "protocol": "wave36-preservation/1",
+  "date": "2026-11-17",
+  "roles": [
+    {
+      "id": "A",
+      "head": "eac2c9d812d9ddf2c630a2fcd00e4fde1ac876b2",
+      "headUnchanged": true,
+      "branchUnchanged": true,
+      "dirtyUnchanged": true
+    },
+    {
+      "id": "B",
+      "head": "88e472e67555c3f64716ce6dc457edc1c188f37a",
+      "headUnchanged": true,
+      "branchUnchanged": true,
+      "dirtyUnchanged": true
+    },
+    {
+      "id": "C",
+      "head": "01177e1db6ac40ef053f12cbbc634a6a73752976",
+      "headUnchanged": true,
+      "branchUnchanged": true,
+      "dirtyUnchanged": true
+    },
+    {
+      "id": "D",
+      "head": "397332d55799784cf676dba41e6c570f66d91db0",
+      "headUnchanged": true,
+      "branchUnchanged": true,
+      "dirtyUnchanged": true
+    },
+    {
+      "id": "E",
+      "head": "2644d23feb6fda39bb22012f48064c3bce90e10c",
+      "headUnchanged": true,
+      "branchUnchanged": true,
+      "dirtyUnchanged": true
+    },
+    {
+      "id": "F",
+      "head": "d515a9d4ed726c3e20ab847e3d6770bf81610066",
+      "headUnchanged": true,
+      "branchUnchanged": true,
+      "dirtyUnchanged": true
+    },
+    {
+      "id": "G",
+      "head": "d09e155d3e8aad74d1238cbafdaec063802221fe",
+      "headUnchanged": true,
+      "branchUnchanged": true,
+      "dirtyUnchanged": true
+    },
+    {
+      "id": "H",
+      "head": "e14c9597d1df3f084b21048de5e9338f24de54c8",
+      "headUnchanged": true,
+      "branchUnchanged": true,
+      "dirtyUnchanged": true
+    },
+    {
+      "id": "I",
+      "head": "b21698fa5c4418b9670f3b97907971d8e03c1a0e",
+      "headUnchanged": true,
+      "branchUnchanged": true,
+      "dirtyUnchanged": true
+    },
+    {
+      "id": "J",
+      "head": "807c8e00b1e431c0f33cdcdf60a091a01be9c015",
+      "headUnchanged": true,
+      "branchUnchanged": true,
+      "dirtyUnchanged": true
+    }
+  ],
+  "candidateSourceEdits": 0,
+  "userServicesTouched": 0,
+  "newDistributionArchives": 0,
+  "realVendorModelNative": 0,
+  "verification": "Actual original git HEAD/branch/status comparison completed successfully after integration; no candidate edits."
+}

@@ -14,7 +14,10 @@ import { parseArgs } from 'node:util'
 const NODE_SHA = 'e4b5a3af0e05c75de2eae013904145f40fe7fc2a6e6f17510128bf45cca4e79b'
 const NODE_LICENSE_SHA = '5888dbb9a1d2b18f2c3e6c5f6af1b39de658372b402a0577b002777f14c62ace'
 // Independently read and reviewed: original pa CLI, private Settings, no second lifecycle or signals.
-const WRAPPER_SHA = '8de31c59d8c9afe90d6464a9b9208d3757a57e76ea49d7af20e473b90360c5dc'
+const REVIEWED_WRAPPERS = new Set([
+  '8de31c59d8c9afe90d6464a9b9208d3757a57e76ea49d7af20e473b90360c5dc',
+  '339bdac0912a05da701d04de0670e7b6cd49cc1d86687536fb809f45396d866c',
+])
 const MAX_FILE = 256 * 1024 * 1024
 const MAX_TOTAL = 1024 * 1024 * 1024
 const MAX_ENTRIES = 30000
@@ -141,7 +144,7 @@ function scriptCheck(root, source) {
     demand(file.bytes.toString('utf8') === shellEntry(action) && (file.mode & 0o111) !== 0, 'command_template_mismatch', `${name}.command`)
   }
   const wrapper = regular(join(root, 'personal-preview-launcher.mjs'), 128 * 1024)
-  demand(wrapper.sha256 === WRAPPER_SHA && source?.wrapperSha256 === WRAPPER_SHA, 'unreviewed_launcher_bytes')
+  demand(REVIEWED_WRAPPERS.has(wrapper.sha256) && source?.wrapperSha256 === wrapper.sha256, 'unreviewed_launcher_bytes')
   demand(HEX64.test(source?.packagerSha256), 'invalid_packager_provenance')
 }
 
@@ -204,7 +207,7 @@ export function verifyDirectory(input, expected = {}) {
     inner: { entries: inner.entries, regularFiles: inner.regularFiles, internalLinks: inner.internalLinks, manifestSha256: install.sha256,
       originalTarSha256: outer.inner.tarSha256, originalTarBytes: outer.inner.tarBytes },
     runtime: { version: runtime.version, abi: runtime.abi, arch: runtime.arch, sha256: node.sha256, licenseSha256: license.sha256 },
-    commandTemplatesExact: true, reviewedLauncherSha256: WRAPPER_SHA, userDataPathsAndKnownCredentialFormsChecked: true,
+    commandTemplatesExact: true, reviewedLauncherSha256: outer.source.wrapperSha256, userDataPathsAndKnownCredentialFormsChecked: true,
     limitation: 'Static integrity, pinned entry/runtime bytes and manifest consistency only. Original tar identity is recorded, not re-derived from an expanded directory. No package code, runtime version probe, service, model or native task was executed. This is not a signature, release approval or functional startup verdict.',
     servicesStarted: 0, modelNativeTurns: 0, signals: 0, releaseApproved: false }
 }
