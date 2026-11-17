@@ -1,0 +1,191 @@
+{
+  "protocol": "project-recipes-wave36-status/1",
+  "owner": "J",
+  "date": "2026-11-17",
+  "branch": "codex/g5-project-recipes",
+  "worktree": "/Users/hh/Desktop/joker/superagent-agent-j",
+  "baseline": "807c8e00b1e431c0f33cdcdf60a091a01be9c015",
+  "mergedOriginMain": "7e550991 merged locally; includes main f32a64ff/b454c0fd/effe85c2/f71cad58 (completion history + workbench)",
+  "dirty": { "state": "clean at runtime source 56fdb46a", "note": "Owned paths only; no reset, no state clearing." },
+  "goal": "Whole-subsystem goal with four end-to-end product closures and the original nine acceptance points retained.",
+  "closures": [
+    {
+      "id": "C1",
+      "title": "original project metadata and configuration to a confirmable delegation",
+      "status": "PASS_CONTROLLED",
+      "implementation": [
+        "packages/project-recipes/src/match.ts / scope.ts / preview.ts (declared atoms, structure reasons)",
+        "tools/project-recipes/test/config-evolution.case.ts (new)"
+      ],
+      "defaultConsumer": "authenticated main preview -> original NewWorkForm -> original Application",
+      "positive": [
+        "plain Node/npm/pnpm single packages get drafts for all three kinds; declared atoms/exclusions/expiry preserved",
+        "after a runtime restart with a changed configuration revision the delivered work keeps its original contract and a fresh preview serves the new revision",
+        "the old draft reports configuration_changed; the old Work's completion history stays readable"
+      ],
+      "independentNegative": [
+        "undeclared atom -> needs_input, unknown project -> forbidden",
+        "permission-denied metadata -> bounded needs_input/unreadable, never a guessed support",
+        "scripts are names-only; no install/run/register"
+      ],
+      "commands": [
+        { "command": "node --test tools/project-recipes/test/config-evolution.case.ts", "exit": 0, "tests": 1, "pass": 1 },
+        { "command": "node --test packages/project-recipes/test/*.case.ts", "exit": 0, "tests": 102, "pass": 102 }
+      ],
+      "remaining": ["versioned project settings write path still requires an admitted native config (main-owned); J supplies the revalidation reasons"]
+    },
+    {
+      "id": "C2",
+      "title": "two original projects to real checks, repair and reopened delivery",
+      "status": "PASS_CONTROLLED_WITH_FAIL_LAYER_HELD",
+      "implementation": [
+        "tools/project-recipes/test/two-project-delivery.case.ts",
+        "tools/project-recipes/test/fail-recovery.case.ts",
+        "tools/project-recipes/test/fail-layer-held.case.ts"
+      ],
+      "defaultConsumer": "original Application/Store/check/currentCandidate/manualaccept and main's completion-history reader",
+      "positive": [
+        "two registered roots deliver; one work is revised to revision 2 on the same runtime and delivered again",
+        "completion history: contracts paging with a signed cursor (kind/limit/contract bound), verifications and human criterion acceptances readable",
+        "artifact bytes readable; reopen verifies works, artifacts and history"
+      ],
+      "independentNegative": [
+        "accept not offered before readiness; cross-project candidate rejected; replay after legal accept is stale",
+        "tampered/limit-mismatched history cursor -> conflict; foreign work id -> conflict",
+        "same commandId with a different body refused as conflict"
+      ],
+      "held": {
+        "layer": "machine FAIL -> repair -> same-Work re-check",
+        "reason": "fixture mode's completion contract is the product's own check-fixture-output; project settings/authorize and the project check exist only with an admitted native configuration",
+        "evidence": "fail-layer-held.case.ts deliberately delivers with a failing project suite, proving the layer is untested rather than faked"
+      },
+      "commands": [
+        { "command": "node --test tools/project-recipes/test/two-project-delivery.case.ts", "exit": 0, "tests": 1, "pass": 1 },
+        { "command": "node --test tools/project-recipes/test/fail-recovery.case.ts", "exit": 0, "tests": 3, "pass": 3 },
+        { "command": "node --test tests/integration/project-recipes.case.mjs", "exit": 0, "tests": 5, "pass": 5 },
+        { "command": "node tests/integration/project-recipes-browser.mjs reports/project-recipes/wave36-browser", "exit": 0, "cases": 9, "pass": 9, "sourceCommit": "56fdb46a", "sourceWorktreeClean": true, "acceptedWorks": 2 }
+      ],
+      "remaining": ["real vendor/model/native turns remain 0; E oracle untouched"]
+    },
+    {
+      "id": "C3",
+      "title": "non-empty restore and re-identification to original history and new authorization",
+      "status": "PASS_CONTROLLED_WITH_BUNDLE_HELD",
+      "implementation": [
+        "packages/project-recipes/src/rebind.ts",
+        "tools/project-recipes/test/restore-continuity.case.ts"
+      ],
+      "defaultConsumer": "main's registered rootFor mapping, original store/Application and completion-history reader",
+      "positive": [
+        "reopen of the non-empty state keeps the delivered work, every artifact byte and its completion history under the original project id",
+        "the moved root registers as a new id, gets its own fresh draft, and rebind reports reidentified with previousProjectId"
+      ],
+      "independentNegative": [
+        "the old draft cannot cross identities (stale facts); the old result is not new permission",
+        "unbound/unreadable/unauthorized roots stay distinct (unbound vs error); replaced metadata is a change"
+      ],
+      "held": {
+        "layer": "A/D real two-format bundle backup -> restore -> new authorization",
+        "reason": "authoritative bundle bytes belong to A/D; this test reopens the same store and explicitly does not claim bundle restore",
+        "next": "point the same consumer at a frozen A/D cohort when published"
+      },
+      "commands": [
+        { "command": "node --test tools/project-recipes/test/restore-continuity.case.ts", "exit": 0, "tests": 1, "pass": 1 },
+        { "command": "node --test packages/project-recipes/test/rebind.case.ts", "exit": 0, "tests": 11, "pass": 11 }
+      ],
+      "remaining": ["A/D bundle cohort", "readonly marker release requires the real restore path"]
+    },
+    {
+      "id": "C4",
+      "title": "formal module and CLI to a colleague-maintainable version",
+      "status": "PASS_CANDIDATE_ONLY",
+      "implementation": [
+        "packages/project-recipes/src/module.ts",
+        "tools/project-recipes/cli.ts (--describe, --self-check, 0600 exclusive output)"
+      ],
+      "defaultConsumer": "CLI, main module calls, D inventories, H/E package checks",
+      "positive": [
+        "deterministic description with contracts {version, apiMajor}, catalog digest, capabilities and version",
+        "--self-check validates protocol/catalog/capabilities/contracts/kinds without producing a draft (exit 0/5)",
+        "spaces and Chinese roots, read-only files, old facts protocol and existing output files behave predictably"
+      ],
+      "independentNegative": [
+        "supportsCapability returns false for an older package instead of invoking a missing surface",
+        "no path, credential or authority in the description; permission failures return bounded codes"
+      ],
+      "commands": [
+        { "command": "node tools/project-recipes/cli.ts --self-check", "exit": 0 },
+        { "command": "node --test packages/project-recipes/test/module.case.ts", "exit": 0, "tests": 5, "pass": 5 },
+        { "command": "node --test tools/project-recipes/test/cli.case.ts", "exit": 0, "tests": 13, "pass": 13 },
+        { "command": "npm pack --dry-run", "exit": 0, "observed": "42 files / 50,701 bytes" }
+      ],
+      "remaining": ["D successor freeze and E/H in-package verification of one exact tar"]
+    }
+  ],
+  "originalNinePoints": {
+    "J1": "PASS_CONTROLLED (closure C1)",
+    "J2": "PASS_CONTROLLED + FAIL layer HELD (closure C2)",
+    "J3": "PASS (structured currency in closure C1)",
+    "J4": "PASS_CANDIDATE_ONLY (closure C3)",
+    "J5": "PASS_CONTROLLED on store reopen; A/D bundle HELD (closure C3)",
+    "J6": "PASS_CANDIDATE_ONLY (closure C4)",
+    "J7": "config evolution proven at the projection level (closure C1); versioned settings write path HELD on native config",
+    "J8": "PASS (closure C4)",
+    "J9": "PASS_CONTROLLED (closure C2/C3 reopen)"
+  },
+  "evidence": {
+    "package": { "typecheckExit": 0, "tests": 102, "pass": 102, "fail": 0, "buildExit": 0 },
+    "tools": { "typecheckExit": 0, "tests": 48, "pass": 48, "fail": 0 },
+    "exampleExit": 0,
+    "wave36VerifierExit": 0,
+    "mainIntegration": { "command": "node --test tests/integration/project-recipes.case.mjs", "exit": 0, "tests": 5, "pass": 5 },
+    "mainBrowser": { "command": "node tests/integration/project-recipes-browser.mjs reports/project-recipes/wave36-browser", "exit": 0, "cases": 9, "pass": 9, "sourceCommit": "56fdb46a", "sourceWorktreeClean": true, "acceptedWorks": 2 },
+    "completionHistory": { "contractsPaging": "cursor bound to kind/limit/current contract; tampered cursor conflict", "verifications": "readable", "acceptances": "human criterion acceptances readable", "afterReopen": "readable under the original work id" },
+    "packDryRun": { "files": 42, "bytes": 50701 }
+  },
+  "integration": {
+    "alreadyInMain": ["wave-30 J five sources", "0073/0077 preview and original form", "23d5a98e native callbacks/support", "completion-history consumer (0092)", "distribution build list includes project-recipes"],
+    "candidateOnly": ["rebind.ts", "module.ts contracts/capabilities, --describe/--self-check", "draftCurrency", "config-evolution/delivery/history/restore tests"],
+    "minimalMainIntegration": "render draftCurrency reasons in the original flow; call rebindRegisteredProject with main's rootFor when a migration surface is approved; compare describeProjectRecipes() in D/H/E"
+  },
+  "packageIdentity": {
+    "R1": { "status": "PINNED_UNMODIFIED", "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2", "build": "8296720d8a25f38c", "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543", "bytes": 20481470, "entries": 6849, "installedByJ": false },
+    "R2": { "status": "SOURCE_READY_TAR_NOT_CREATED", "runtimeSource": "56fdb46a", "pack": { "files": 42, "bytes": 50701 } },
+    "installed": false,
+    "zip": "not created"
+  },
+  "layers": {
+    "source": "PASS (102 library / 48 tools / strict / build / example / wave-36 verifier)",
+    "controlled": "PASS (config evolution with preserved contract; two-root delivery with revision 2; completion-history consumption; restored-store continuity)",
+    "installed": "NOT_REACHED (no tar/ZIP built or installed)",
+    "native": "NOT_APPLICABLE (real vendor/model/native 0)",
+    "recovered": "NOT_REACHED (B/I same-Work recovery and slots outside this block)",
+    "value": "NOT_CLAIMED"
+  },
+  "held": [
+    "machine FAIL -> repair -> same-Work re-check (fixture check only; needs admitted native config)",
+    "A/D real bundle restore cohort and readonly marker release",
+    "versioned project settings write path (native config only)"
+  ],
+  "remaining": [
+    "main re-import of rebind.ts/module.ts/preview.ts/match.ts/observe.ts",
+    "D successor freeze then E/H installed verification of one exact tar",
+    "A/D bundle cohort and native verification for the HELD layers"
+  ],
+  "limits": {
+    "realModelTurns": 0,
+    "nativeTurns": 0,
+    "vendorCalls": 0,
+    "dependencyInstalls": 0,
+    "executedProjectCommands": 0,
+    "checkRegistrations": 0,
+    "sqlWrites": 0,
+    "executionLifecycles": 0,
+    "userServicesTouched": 0,
+    "newWorktreesCreated": 0
+  },
+  "ownership": {
+    "owned": ["packages/project-recipes/", "tools/project-recipes/", "docs/project-recipes/", "reports/project-recipes/"],
+    "untouchedByDesign": ["pnpm-lock.yaml", "root package.json", "packages/contracts/", "apps/", "A/B/C/D/E/F/G/H/I paths"]
+  }
+}

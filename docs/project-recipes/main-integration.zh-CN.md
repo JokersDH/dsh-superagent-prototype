@@ -129,7 +129,7 @@ node tools/project-recipes/cli.ts --config <config.json> --root <绝对项目根
 | 项 | 状态 |
 | --- | --- |
 | 纯库 `matchRecipe` / 结果 schema / revision 校验 / 原子 scope / 内容摘要 / 时间与预算校验 / 结构化重验 / 迁移对比 / 版本描述 | 已实现并通过 102 项库测试 |
-| 只读 facts observer（注册根 port，无任意 root）+ CLI（迁移对比 / `--describe` / 私有输出） | 已实现并通过测试；CLI 46 项 |
+| 只读 facts observer（注册根 port，无任意 root）+ CLI（迁移对比 / `--describe` / `--self-check` / 私有输出） | 已实现并通过测试；CLI 48 项 |
 | `create_work` 命令候选 + 过期保护（精确 staleInputs） | 已实现 |
 | 真实 `createProductApplication` 消费者（same-config dispatch） | 已实现：`recorded`；子路径原子 `forbidden` |
 | main 实际 HTTP/App 组合 | **已接入**（0073/0076/0077：`POST /v1/projects/:id/recipes/preview`、工作台建议、原 NewWorkForm 预填、创建前重验、两项目原委托/人工接受；本轮 clean-source 8/8 浏览器流程） |
@@ -139,7 +139,10 @@ node tools/project-recipes/cli.ts --config <config.json> --root <绝对项目根
 | 两项目原交付 | `two-project-delivery.case.ts`：preview→create→原检查/候选→ready 后 accept→delivered→artifact 字节→同 Work `revise_work` 到 revision 2→重开复核；就绪前/跨项目/重复接受均被拒 |
 | 机器 FAIL 层 | **HELD**：fixture 模式完成标准固定为 `check-fixture-output`，项目检查/authorize 仅在 native 配置下存在；`fail-layer-held.case.ts` 证明失败的测试套件不会成为产品 FAIL，真实 FAIL 由 main/H 承担 |
 | 可修复失败与切换 | `fail-recovery.case.ts`：缺失 atom→改正→交付；同 commandId 不同 body 冲突拒绝；配置 revision 变化后旧 apply 失效并重读；A/B 切换互不串用 |
-| 恢复后重新登记 | `restore-continuity.case.ts`：关闭重开非空 state→旧 Work/artifact 原身份与字节可核→移动到新根重新登记（新 id）→新项目获得自己的 draft，旧 draft 不能跨 id 应用，rebind 报 `reidentified` |
+| 恢复后重新登记 | `restore-continuity.case.ts`：关闭重开非空 state→旧 Work/artifact 原身份与字节可核→移动到新根重新登记（新 id）→新项目获得自己的 draft，旧 draft 不能跨 id 应用，rebind 报 `reidentified`；旧 Work 的 completion-history 仍按原 id 可读 |
+| 原工作历史 | `two-project-delivery.case.ts` 使用 main 的 `workCompletionHistory`：同一 Work 修订到 revision 2 后 contracts 分页（limit 绑定、篡改游标 conflict）、verifications 与人工 criterion acceptances 可读，重开后仍可核 |
+| 配置演进 | `config-evolution.case.ts`：新配置 revision 下旧 Work 保留原合同、旧草稿 `configuration_changed`、新预览生效、旧历史可读 |
+| 包身份自检 | `--describe` 与 `--self-check` 供 D/H/E 核对同一版本 |
 | 结构化重验 | `draftCurrency()` 的封闭 reason code + `observationComplete`；`assertDraftCurrent` 共用同一政策 |
 | 同一版本交接 | `describeProjectRecipes()`：contracts/catalog/词表/版本的可比较描述，供 D 冻结与 E 绑定同一 tar |
 | R1 固定包（829） | 未修改；能力基线由 `r1-baseline.case.ts` 从 R1 source 核对，后续 fresh 边界不在 R1 |

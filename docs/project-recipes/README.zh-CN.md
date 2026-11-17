@@ -62,6 +62,8 @@ fixture 与 native 的区分由配置决定，本模块不参与判定，但保�
 4. **明确创建**：创建前 main 会重新读取同一 preview，比较配置 revision、facts 内容摘要、catalog 与字段；变化要求重新应用。之后发送原 `create_work`，由原 Application 再校验 scope/criteria/profile，再走原检查/候选/人工接受。
 5. **迁移/重绑**：搬目录或重新登记后，用 `--previous-facts` 或 `rebindRegisteredProject` 对比旧观察；身份变化（新 id）报 `reidentified`，只给迁移差异、不复用旧建议。
 6. **交付与重开**：`tools/project-recipes/test/two-project-delivery.case.ts` 在真实组合上跑完两个独立原项目的 preview→create→原检查/候选→明确 accept→delivered，并验证候选就绪前不接受、跨项目候选被拒、同一候选重复接受为 stale；接受后 Work/候选/全部 artifact 字节可读，关闭重开同一 state 后仍可核。
+7. **原工作历史（主线条目）**：交付后通过 main 的只读 completion-history（contracts/verifications/acceptances，签名游标绑定 kind/limit/current contract）读取同一 Work 的历史；同一 Work 修订到 revision 2 后分页可取到两条合同，篡改游标被拒；重开后历史仍按原 Work id 可读。
+8. **配置演进**：产品以新的配置 revision 重启后，已交付 Work 仍保留原合同（revision/digest 不变），旧草稿报 `configuration_changed`，新预览立即使用新配置；旧 Work 历史继续可读（`config-evolution.case.ts`）。
 
 限制：只支持 Node/npm/pnpm 单包与显式声明的 monorepo 原子；不安装依赖、不执行 scripts/版本命令、不自动注册检查、不猜成员/父目录；未知语言或布局保持 `unsupported`/`needs_input`。
 
