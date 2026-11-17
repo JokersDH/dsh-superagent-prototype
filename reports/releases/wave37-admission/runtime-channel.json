@@ -1,0 +1,185 @@
+{
+  "protocol": "wave37-runtime-channel-admission/1",
+  "date": "2026-11-17",
+  "status": "B_CONTROL_CLOSURE_ADMITTED_FOR_ORIGINAL_GUARDED_CONSUMER_OLD_TWO_CASES_CLOSED_I_HOST_NOT_NATIVE_FACTORY_AND_PARENT_CLEANUP_UNSAFE",
+  "mainBaseline": "7e5509914d0749ccd01ed83cf11ae30f864591d0",
+  "fixedCandidates": {
+    "B": {
+      "root": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "source": "579c40bca3a2fc06f5510f468e0f6ab19f693fd7",
+      "branch": "codex/g1-runtime",
+      "dirtyPreserved": ["reports/releases/wave11-admission/runtime.json", "reports/releases/wave12-admission/runtime.json", "tests/native-acceptance/b16-real-begin.mjs (untracked)"]
+    },
+    "H": { "root": "/Users/hh/Desktop/joker/superagent-agent-h", "source": "74b4166a063d213882f30c54f6860b44bab2e71b", "branch": "codex/g4-trial-operations", "dirty": [] },
+    "I": { "root": "/Users/hh/Desktop/joker/superagent-agent-i", "source": "14ea58c70730ad50032415257e0b77eb5ff2c654", "branch": "codex/g5-coordinator-channel", "dirty": [] }
+  },
+  "priorityAdmission": {
+    "BControl": "ADMITTED_AS_COMPLETE_SOURCE_CLOSURE_FOR_ORIGINAL_GUARDED_MAIN_CONSUMER: actual9-case control/compatibility matrix and the original Store registration/barrier path pass, with all four production files strict/exactOptional0. This does not activate an Application/Broker consumer or certify native OS writers.",
+    "physicalBarrierScope": "The positive uses real ProductStore/registerRecoveryRunner/confirmOwnedQuiescence over a real authenticated in-process service with a known empty managed-OS-writer set. It exercises the complete original barrier function, not a fabricated confirmed string; it is not a nonempty native resource proof.",
+    "BTools": "The exact old constant PID-reuse re-adoption negative is closed, but validation and registerIntent use separate snapshots; an independent controlled interleaving still renews birth. Tool is not admitted for live fault tests.",
+    "IHost": "NOT_ADMITTED_FOR_NATIVE_FACTORY_OR_BORROWED_STATE_ROOT: it implements a real embedded RunnerHost, but has a different ABI/preparation/path contract from NativeProductAttempt.launch and deletes the provided parent stateRoot during shutdown, even with no run launched.",
+    "ITypedClient": "Useful channel-client arity facade, not a drop-in original physical-barrier client or native link. It projects control results to plain RunnerState and has no attach lease parameter on command/cancel; retain original low-level verified proof/control methods for main barriers.",
+    "defaultProduct": "Original main callbacks/RunningAttempt data are already available. The next actual product step is a real Native factory/controlled link injection and original Application/QuestionBroker activation, not another data port or launch-shaped fixture."
+  },
+  "oldClosure": [
+    {
+      "id": "B36-TERMINAL-FENCE-BLOCKS-ORIGINAL-POST-EXIT-QUIESCE",
+      "status": "CLOSED_FOR_ORIGINAL_NO_LEASE_PHYSICAL_FINALIZATION",
+      "evidence": "Natural terminal inspect is terminated/open, original authenticated no-lease cancel now returns terminated/closed and the original real-Store barrier returns scope registered_owned_resources_only/proofRef/manifest/confirmedEventSeq3. Terminal business feed and claimed stale leases remain refused."
+    },
+    {
+      "id": "B36-READOPTION-RENEWS-AN-EXITED-CHILDS-REUSED-PID-BIRTH",
+      "status": "CLOSED_FOR_PREEXISTING_MISMATCH_CASE",
+      "evidence": "Private provenance now stores full original pid/uid/parent/start/argv. An already-exited child with a constantly reused PID identity refuses birth_mismatch, and public PID mutation/prototype/plain/copy/UNKNOWN negatives still signal0. Snapshot interleaving is a separate new residual below."
+    },
+    { "id": "B35-UNBOUND_LEASE_AND_HANDLE_IDENTITY", "status": "REMAINS_CLOSED", "evidence": "Actual never-bound feed and mismatched handle/producer refuse before any receiver/bind." },
+    { "id": "B34-FOREIGN_CANCEL_AND_OLD_LEASE", "status": "REMAINS_CLOSED", "evidence": "Foreign cancel leaves admission open/serving; replaced lease feed reaches no receiver; valid stale epoch1 vs current2 and terminal new feed refuse." },
+    { "id": "MAIN_TERMINAL_CALLBACK_FENCE", "status": "REMAINS_CLOSED", "evidence": "No callback/feed/rebind revival was introduced to restore physical finalization. Do not reassign the original terminal callback repair." },
+    { "id": "H_ACCEPT_ACTION_WAIT_AND_H_BIRTH_COMMAND", "status": "REMAINS_CLOSED", "evidence": "New H source does not change the previously verified accept-action helper; pure UNKNOWN/full-command mismatch controls remain negative with signal0." }
+  ],
+  "checks": [
+    {
+      "command": "node /tmp/pa-wave34-feed-control.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "metadata": "Updated exact B579/main7e subjects; historical temporary filename, fresh output",
+      "exitCode": 0,
+      "passed": 9,
+      "failed": 0,
+      "scope": "Actual new B service/endpoint/client/caller plus original main registration/barrier and exact old/new compatibility pairs; scripted in-process Driver, no native child",
+      "observed": {
+        "normalFeedCancel": "same attempt/ids and original command reader",
+        "staleBusinessEpoch": "valid1 vs current2 refused before receiver",
+        "foreignFeedCancel": "refused before effects, original admission stays open/serving",
+        "oldAndNeverBoundLease": "refused, receiver0",
+        "mismatchedHandle": "refused before bind",
+        "naturalFinalization": { "beforeState": "terminated", "beforeAdmission": "open", "afterAdmission": "closed", "barrierScope": "registered_owned_resources_only", "barrierAttemptId": "attempt-1", "confirmedEventSeq": 3, "resourceManifestDigest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945" },
+        "mixedVersion": "new envelope->old server unknown_outcome/no effect; old bare->new server identity_mismatch/no effect; explicit matching old control works, no automatic downgrade"
+      },
+      "probeCorrection": "Initial barrier assertion expected a nonexistent quiescence field. The original barrier returns its registered-resource confirmation record; the corrected assertion validates its scope/attempt/positive event sequence. No product failure was inferred from that temporary assertion mistake.",
+      "realSpawns": 0,
+      "realSignals": 0,
+      "vendorNativeCalls": 0
+    },
+    {
+      "command": "pnpm exec tsc -p /tmp/pa-wave36-control.tsconfig.json",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "exitCode": 0,
+      "scope": "All four latest actual control production files together, strict/exactOptional; independent of concurrent main storage/history changes"
+    },
+    {
+      "command": "node /tmp/pa-wave32-signal-pure.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "metadata": "Updated exact B579/H74 subjects",
+      "exitCode": 1,
+      "passed": 12,
+      "failed": 1,
+      "scope": "Factory spawn/ps/pgrep/kill fully mocked; exact private fake birth files only",
+      "observed": {
+        "oldCases": "Own positive plus numeric/plain/prototype/copied/public-pid/constant-reused-birth/changed-argv/UNKNOWN/H full-command cases all pass",
+        "snapshotInterleaving": { "psCalls": 4, "originalStart": "Mon Nov 16 10:00:00 2026", "readoptedStart": "Mon Nov 16 11:00:00 2026", "readoptAccepted": true, "mockSignal": "SIGKILL", "target": 45101 }
+      },
+      "realSpawns": 0,
+      "realSignals": 0,
+      "globalPsOrDiscovery": 0
+    },
+    {
+      "command": "node /tmp/pa-wave37-host-parent.mjs",
+      "cwd": "/Users/hh/Desktop/joker/superagent",
+      "exitCode": 1,
+      "scope": "Constructor and shutdown only against a new exact private fixture parent; no host launch/Driver/callback factory/service. Only a test sentinel was removed, never a user's state.",
+      "observed": { "inputParentExisted": true, "launchedRuns": 0, "callerSentinelPreserved": false },
+      "realSpawns": 0,
+      "realSignals": 0,
+      "modelNativeCalls": 0
+    },
+    {
+      "command": "node --test --test-timeout=12000 apps/runner/test/attach-channel/actual-client-compat.test.ts apps/runner/test/attach-channel/actual-durable-ack.test.ts",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-i",
+      "exitCode": 0,
+      "passed": 2,
+      "failed": 0,
+      "scope": "Typed callback client arity/refusals and lost-receipt reconciliation through existing in-process service/real Store fixture. Not NativeProductAttempt.launch/Application recovery."
+    },
+    {
+      "command": "pnpm exec tsc -p apps/runner/src/attach-channel/tsconfig.json",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-i",
+      "exitCode": 0,
+      "scope": "Module, new host/client and all attach-channel consumers, strict/exactOptional. A correct RunnerHost type does not make it a RunnerLink-compatible native factory."
+    }
+  ],
+  "findings": [
+    {
+      "id": "I37-HOST-SHUTDOWN-DELETES-BORROWED-PARENT-STATE",
+      "priority": 1,
+      "file": "/Users/hh/Desktop/joker/superagent-agent-i/apps/runner/src/attach-channel/inprocess-host.ts",
+      "line": 200,
+      "scope": "New candidate host, not merged main and no actual user state touched by audit",
+      "detail": "stateRoot is documented and used as the parent for newly created inprocess-* run directories. Host shutdown closes its run list and then recursively removes the entire supplied stateRoot. A caller-provided existing parent containing unrelated state loses that state even when zero runs were launched.",
+      "direction": "Track and remove only exact run/host directories the instance created and owns. Never delete a borrowed parent; distinguish convenience-factory-owned temporary roots explicitly. Also retain unknown/unconfirmed runtime evidence instead of using broad root deletion as cleanup. Do not pass Native's original stateRoot to this host before repair."
+    },
+    {
+      "id": "B37-READOPTION-SECOND-SNAPSHOT-REBASES-ORIGINAL-BIRTH",
+      "priority": 1,
+      "file": "/Users/hh/Desktop/joker/superagent-agent-b/tests/native-acceptance/signal-guard.mjs",
+      "line": 132,
+      "scope": "Signal acceptance tool only, separate from admitted control production source",
+      "detail": "adoptWithProvenance first snapshots and compares the old birth, then registerIntent snapshots again and trusts that second result as the new immutable record. With old identity at validation and PID-reused identity at registration, the new handle is rebased to a foreign start/parent and a later signal verifies against that foreign baseline. The constant mismatch old counterexample is fixed, but re-adoption can still renew birth under this controlled interleaving.",
+      "direction": "Issue any re-adopted capability from the original immutable private birth/record, or validate every registration snapshot against that same birth before recording it. Do not adopt a second snapshot as a new authority. Fresh signal checks must continue to compare the original birth."
+    }
+  ],
+  "controlSourceClosure": {
+    "admission": "Ready for complete source import into the original guarded main consumer; no default activation/native/installed claim. Original post-exit quiesce contract now passes.",
+    "files": [
+      { "path": "packages/execution/src/attached-attempt.ts", "blob": "ae69eb2f64d7dde6a2edf5cbcb1ddf2b2a09ad53" },
+      { "path": "packages/execution/src/recovery-transport.ts", "blob": "dbfb5df48dbf94d356967b37525c838de5ba4f02" },
+      { "path": "apps/runner/src/recovery-endpoint.ts", "blob": "ebbaf2a6a2ff940a6f0996cfcaf8dd7567196dd3" },
+      { "path": "apps/runner/src/runner-service.ts", "blob": "bf9c800157ea66e1ad40ac021616eda7f11e089c" }
+    ],
+    "dependencies": "Existing main contracts/shared callbacks and I's existing next API suffice. New owns/host/client/index modules are not required for these four files.",
+    "compatibility": "Import client/server/endpoint/caller together. The private cancel body now requires producer envelope; mixed old/new pairs fail closed and must be explicit, never silently fall back to bare cancel. Preserve original stdio command path and original physical owner barrier/current command authority.",
+    "testsForMain": "Retain active cancellation, natural waitExit->original no-lease quiesce->real Store barrier, terminal feed/callback/rebind refusal, first/old/foreign lease, producer/epoch/body identity, idempotent same-ID receipt vs new effect, plus explicit mixed-version negatives.",
+    "exclude": ["B signal tooling/live scripts", "AttemptSlotScheduler records/queue as product authority", "I borrowed-parent-deleting host", "Unrelated DriverKit review/send/budget modules", "All historical reports/source branches wholesale"]
+  },
+  "originalNativeFactoryAdvice": {
+    "existingGap": "Main NativeProductAttempt.launch still directly constructs RunnerLink and calls spawnAttempt. InProcessRunnerHost implements the different RunnerHost.launch -> RunningAttempt contract; it does not execute NativeProductAttempt.launch or supply the original class callbacks automatically.",
+    "minimalDependencySeam": "A Node-only createRunnerLink(options) dependency at the existing new RunnerLink call, defaulting to the unchanged real RunnerLink, can return the existing spawnAttempt(spec, originalFactSink) contract. No new data/permission/HTTP port is needed.",
+    "requiredControlledAdapter": [
+      "Use the real serveRunner/bootstrap/recovery endpoint, same options.stateRoot/payloadRoot/journalPath and options.env.PA_RUNNER_RECOVERY_ROOT; producer must be the original options.producer/spec.",
+      "Preserve original Bridge coordinator responders for payload-read, fact and native-write-intent, calling supplied options.payloads.read, the original fact sink and supplied beforeNativeWrite. Do not directly inject serveRunner.sink and assume it serves external coordinator references; its payload sink path reads local payloads only.",
+      "Provide eager pre-begin preparation/policy.prepared through the original recordFact/register/policy-ready sequence. Native.launch waits for policy-ready before begin; I host currently has no eagerPrepare/prepare option, so a simple cast/adapter around its launch would deadlock or skip the original sequence.",
+      "Return the existing SpawnedRunner ABI: command(), Bridge exited-frame waitExit(), close(), pid, stateRoot, journalPath, receipts and progress. I RunningAttempt instead has feed()/ServeExit/stop()/shutdown(), so it is not directly interchangeable.",
+      "Then call the real NativeProductAttempt.launch without reflection. Consume its actual returned attachPort/attachCallbacks, await callback bind before business begin, and preserve ProductExecution nativeFence->index->allowAnswer->send->runtime.feed and original quiesce/barrier.",
+      "Use only scripted/existing fake-driver/policy fixtures and known controlled host resources; no installed vendor CLI, environment fallback or real model. Respect borrowed roots and retain original state/journal after teardown."
+    ],
+    "actualProductConsumer": "Use that actual factory through the original Application-created Work and QuestionBroker question/answer, then original freeze/check/currentCandidate/available accept. The original lower-level callback tests are a useful base, not the completed product journey.",
+    "typedClientLimit": "openAttachClient fixes next/reply arity but returns plain RunnerState for inspect/cancel and supplies no lease on command/cancel. It cannot replace main's VerifiedRunnerInspection resource-barrier client or current attached business feed as-is. Keep the original lower-level verified control/proof until a precise typed contract supports it.",
+    "newPort": "Not requested or necessary; activate the original running and original methods instead of another shaped handle or registration DTO."
+  },
+  "scopeAndProgress": {
+    "B": "Old default terminal/quiesce incompatibility is genuinely repaired. Control source can progress independently of remaining signal-tool readoption race. B itself still marks actual launch-returned original App/Broker activation and original same-Work delivery/2&4 scheduler NOT_REACHED.",
+    "I": "New embedded RunnerHost really returns a RunningAttempt and is better than a manually shaped object for its own interface. It remains an embedded host, not NativeProductAttempt.launch; cleanup P1 prevents production adoption, and its stop always returns indeterminate rather than fabricating physical confirmation. Typed client/durable ACK consumer tests pass at callback/Store scope.",
+    "sameOriginalWorkRecovery": "NOT_REACHED: no original Application/QuestionBroker task through interruption, original answer/native_applied, frozen artifact/check/currentCandidate/explicit manualaccept.",
+    "originalTwoFourSlots": "NOT_REACHED: separate memory accounting and four-channel isolation are not original core queue/fifth-item waiting/UNKNOWN occupancy/complete resource-driven release.",
+    "H": "Fixed source pins are B88/Ib216/main5860; they predate current B579/I14ea/main7e and must not be relabelled latest. Support now uses the actual W35 install folder/manifest, not preserved inner tar or consumed outer ZIP; E independent W35 verdict/review/upgrade/human value and original recovery remain explicitly outside scope. No H package/user instance was run here.",
+    "completion": "No completion-rate or native/release/value admission from component counts. The material next result is an actual original factory/App/Broker controlled journey on the admitted compatible source."
+  },
+  "largerProductDirections": [
+    "One compatible default runtime/control implementation with the original factory, callbacks and physical barrier, actual consumers and immutable process/root ownership; new negative fixes are only part of that closure.",
+    "Actual original Application/QuestionBroker normal Work question-answer-input through check/currentCandidate/available explicit acceptance, with the real launch-returned callbacks and no reflected factory substitute.",
+    "Same original Work controlled interruption/unknown ACK continuation plus original2/4 queue/resource retention/release and nonempty restart, without a second queue/ledger or replacement task.",
+    "Same-version usable installation/diagnostics/field maintenance and independent H/I/E evidence, preserving original state and all measured source/controlled/native/recovered/installed/value layers."
+  ],
+  "preservation": {
+    "candidateSourceAssertionsLockEdits": 0,
+    "mainProductionEdits": 0,
+    "newTaskPackages": 0,
+    "newPersistentArtifact": "reports/releases/wave37-admission/runtime-channel.json",
+    "realVendorModelNativeCalls": 0,
+    "realOSChildSpawnsByRuntimeProbes": 0,
+    "realSignals": 0,
+    "globalProcessSocketDiscovery": 0,
+    "newTarOrUserServiceOperation": 0,
+    "kept": "Twelve5180/8796 through5191/8807 instances and all state/profile/tar/ledger/history; B two old reports+b16 and other dirty preserved; B UNKNOWN cap4 and E BLOCKED pilot unchanged",
+    "cleanup": "Exact direct probe socket/file roots removed and all exec sessions completed. The parent-root deletion negative used only newly created test-owned files; no user directory or instance was supplied. No unsafe b27/b28/procguard live script executed."
+  }
+}

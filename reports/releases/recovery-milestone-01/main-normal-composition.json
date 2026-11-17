@@ -1,0 +1,49 @@
+{
+  "protocol": "original-work-composition-evidence/1",
+  "date": "2026-11-17",
+  "base": "7e5509914d0749ccd01ed83cf11ae30f864591d0",
+  "candidateB": "579c40bca3a2fc06f5510f468e0f6ab19f693fd7",
+  "status": "CONTROLLED_ORIGINAL_NORMAL_FLOW_PASS_RECOVERY_NOT_REACHED",
+  "implementation": {
+    "entry": "Original NativeProductAttempt.launch through original ProductExecution and createProductRuntime",
+    "callbacks": "Actual returned RunningAttempt, attachRunningAttempt, first bind before begin, attempt-owned polling and bounded stop without automatic rebind",
+    "factory": "Trusted Node-only RunnerLink dependency; default real RunnerLink unchanged, no HTTP/profile/env switch",
+    "fourControlFiles": "Byte-exact reviewed B source; related endpoint/interop tests imported together",
+    "excluded": ["I inprocess-host", "B signal tooling", "new scheduler/ledger/Driver", "other candidate features"]
+  },
+  "checks": [
+    {
+      "command": "node --test tests/integration/original-native-callback-flow.case.mjs tests/integration/native-attach-callbacks.case.mjs tests/integration/attached-port.case.mjs",
+      "exitCode": 0,
+      "passed": 17,
+      "failed": 0,
+      "positive": "Original HTTP Work/question/answer, same-command replay, native_applied, actual isolated file, registered Node machine check, current candidate, manual acceptance, delivered, three nonempty artifacts and original Store reopen",
+      "negative": "Original authority revoked after question: original answer rejected, zero virtual write and no native_applied; prior one-shot/missing/late/foreign guards retained",
+      "observed": { "callbackGeneration": 2, "stdioFacts": ["writer.observed", "policy.prepared"], "stdioPayloads": 1, "stdioNativeGuards": 0, "virtualNativeEffects": 1, "artifacts": 3, "suppressedVerifierSignalCalls": 1 }
+    },
+    {
+      "command": "node --test apps/runner/test/recovery-endpoint.test.ts apps/runner/test/recovery-interop.test.ts",
+      "exitCode": 0,
+      "passed": 13,
+      "failed": 0,
+      "scope": "Authenticated original endpoint/client, producer envelope required before effects, original cancel closes admission, wrong credentials and missing producer refused"
+    },
+    { "command": "pnpm exec tsc -p apps/coordinator/tsconfig.json --noEmit", "exitCode": 0 },
+    { "command": "pnpm exec tsc -p apps/coordinator/tsconfig.product.json --noEmit", "exitCode": 0 }
+  ],
+  "evidenceLayers": {
+    "source": "Implemented and controlled actual original consumer passed",
+    "controlled": "Real service and production Codex driver with scripted protocol peer and virtual ProcessHost, authenticated UDS callbacks and real Store",
+    "ordinaryProcesses": "Test Git and original registered Node check actually executed; verifier signal calls suppressed by test spy",
+    "installed": "NOT_TESTED for this source",
+    "realVendorModelNativeTurns": 0,
+    "realSignals": 0,
+    "globalProcessDiscovery": 0,
+    "physicalQuiescenceProven": false,
+    "crashRecoveryProven": false,
+    "originalSchedulerTwoFourSlotsProven": false,
+    "value": "NOT_MEASURED",
+    "releaseApproved": false
+  },
+  "preservation": "No user service/state/profile/tar/ledger operation, new budget, dependency, public contract or migration. Candidate working trees untouched. External review and externally removed root logs are not this implementation's changes."
+}

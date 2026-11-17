@@ -7,7 +7,7 @@
 | 项目 | 当前事实 |
 | --- | --- |
 | 仓库 | `https://github.com/JokersDH/dsh-superagent-prototype` |
-| 本文基线 | 2026-11-17；分类历史f71/b454/最终API f32；原模型/回调/诊断保持，原恢复仍单独验 |
+| 本文基线 | 2026-11-17；main42f6daab原Native.launch回调已实接受控正常Work；分类历史/模型GUI/诊断保持，故障恢复仍单独验 |
 | 首个用户界面 | React网页工作台；本机CLI负责启停/发行，暂无桌面壳 |
 | 技术栈 | TypeScript、Node24、pnpm workspace、React18/Vite、Hono、Zod、SQLite、Git worktree |
 | 原生执行 | 当前生产路径为Codex app-server；历史准入版本`codex-cli 0.164.0`，新版本需重新验证 |
@@ -46,7 +46,9 @@ flowchart LR
 
 网页模型配置已沿原ModelPanel/typedtransport/认证POST接到原PrivateModelProvider原子私有写；保存不发送模型请求，原后续SDK streaming仍唯一对话调用。F组件在main修复StrictMode/身份迟到后消费，未新增设置中心/模型循环。[0089](../rfcs/WP-16/0089-main-model-configuration-consumer.md)列出契约和边界。
 
-最新接线见[0086](../rfcs/WP-16/0086-main-native-callbacks-and-support-consumer.md)：原NativeProductAttempt三类回调与stdio共用同一guard/载荷/Store；Gmetadata支持已从认证只读GET接到真实App下载。内部回调非公开授权，未知安装身份保持null；这不等于原Work故障恢复已完成。[当前验收边界](../rfcs/WP-16/0087-wave-34-reviewed-architecture.md)另列。
+最新接线见[0095](../rfcs/WP-16/0095-main-original-running-callback-composition.md)：原NativeProductAttempt.launch登记与policy-ready后，从实际返回的RunningAttempt取同源port/callbacks，bind完成后才返回发送begin；原attempt持有poll任务，lease丢失即停，不自动重绑/业务重放。fact/payload/native-write共用原Store和一次性guard，stdio业务命令与原物理屏障保留。Node-only RunnerLink依赖默认仍是原真实连接，不能由HTTP/profile/env切换。
+
+该原入口的受控Work已实际问答、native_applied、注册Node检查、当前候选、人工接受及三产物重开；撤销授权反例零效果。ProcessHost/协议对端为受控虚拟资源，verifier信号被屏蔽，不能充当崩溃恢复/真实物理/原2&4槽证明。Gmetadata支持仍是认证只读GET到App下载；候选新runtime-identity未采用，未知安装身份保持null。
 
 ```mermaid
 flowchart TB
@@ -194,7 +196,7 @@ HTTP仅loopback，使用本机session/Bearer和origin校验；恢复只读单独
 
 ## 风险与未决项
 
-原Work恢复纵链、完整原生审批/steer/停止与版本兼容、R2独立安装、可信两项目重开、真实跨机/长时间运行及研究收益仍缺实证。本轮新B/H工具、B新attach caller与terminal lease、C未知coverage、E清理/旅程oracle问题见[验收](../../reports/releases/wave32-admission/README.zh-CN.md)。工具问题与默认产品问题按实际受影响路径区分。
+原Work故障恢复纵链、完整原生审批/steer/停止与版本兼容、固定W36独立安装、可信两项目重开及跨机/长期运行仍缺实证。本轮已关闭的旧问题、新B重登记/I借用状态树/G身份晋级及Dselected audit缺口见[验收](../../reports/releases/wave37-admission/README.zh-CN.md)。工具问题与默认产品问题按实际受影响路径区分。用户已确认本阶段不推进复核价值、第二协议复核与路由收益研究；原设计/ledger保留、价值未测。
 
 ## Evidence Index
 

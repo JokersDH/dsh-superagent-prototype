@@ -1,0 +1,166 @@
+{
+  "protocol": "wave37-delivery-admission/1",
+  "date": "2026-11-17",
+  "scope": "Independent read-only wave36 D/E acceptance, exact archives and selected source audit, original upgrade/history evidence, actual shared-module pure controls and complete recorded release oracle. No live service start/stop, signal, process discovery, model/native execution, archive generation or candidate/assertion edit.",
+  "fixedInputs": {
+    "main": "7e5509914d0749ccd01ed83cf11ae30f864591d0",
+    "D": "652b6835b22e9c1b2b79793670d4cea534e0d1fb",
+    "DDirty": false,
+    "E": "95d48acc06b437a2a14a8cd46be430215cc3df5d",
+    "EDirty": false,
+    "EMeasuredSource": "105595d2b6e7045b0300302af96e216506c4aeda",
+    "EMeasuredSourceDirty": false,
+    "EReport": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T05-10-17-187Z/report.json",
+    "ECheckedAt": "2026-11-17T05:20:35.223Z"
+  },
+  "criticalClosures": {
+    "W35CurrentTargetUpgrade": {
+      "status": "CLOSED_WITH_NEW_ORIGINAL_RECEIPT",
+      "oldBlockedPreserved": "reports/wave36/w35-upgrade-raw-blocked.json",
+      "newReceipt": "/Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/reports/wave36/w35-upgrade-retry.json",
+      "actual": "CONFIRMED baselineW32 build88eb/e834 -> targetW35 build599de/edfe, schema18, startedbuild599de/healthok",
+      "preUpgradeBackupSha256": "817e09a83e24a6c35adfe81aee0fcb39256e0183f4b29f9ad664c1c72daa7051",
+      "reportedExit": 0,
+      "scope": "Same-schema managed upgrade from a nonrunning baseline to a healthy personal target; stopped/instance are null. This is not active-Work native handover. Old W33 rollback successes remain separate, and no longer substitute for this target's now-present receipt."
+    },
+    "EQueryUnknown": {
+      "status": "CLOSED_IN_ACTUAL_SHARED_MODULE",
+      "actualSourcePureControls": [
+        { "input": "spawn statusnull/errorENOENT", "signal": "descendant_query_unknown", "release": "descendant_query_unknown", "retained": 1 },
+        { "input": "exit2/empty stdout", "signal": "descendant_query_unknown", "release": "descendant_query_unknown", "retained": 1 },
+        { "input": "exit0/malformed non-PID output", "signal": "descendant_query_unknown", "release": "descendant_query_unknown", "retained": 1 }
+      ],
+      "signalsAndDeletesCaptured": 0,
+      "realEffects": 0
+    },
+    "EReleaseMissingBooleans": {
+      "status": "CLOSED_IN_ACTUAL_SHARED_MODULE",
+      "oldMappedRowWithoutAliveSameIdentity": "REFUSED_unobserved",
+      "legitimateCompleteExitedObservation": "ALLOWED",
+      "realSignalsOrDeletes": 0
+    },
+    "ERequiredOperationCopy": {
+      "status": "CLOSED_IN_COMPLETE_REAL_REPORT_ORACLE",
+      "mutation": "Dedicated E33-OUTER-ZIP-OPERATION copy changed to UNKNOWN with retained material while main case is unchanged",
+      "actual": "REFUSED_operation_copy_unbound_and_outerZipOperation_invalid",
+      "scope": "The specific previously accepted contradictory-copy example is now independently rejected; retain existing valid main-case and caller positives."
+    }
+  },
+  "DCurrentW36HistorySuccessor": {
+    "source": "087a598e5b6f357bd2cc40556cbf693257febc66",
+    "buildId": "14a6b457ea285988",
+    "persistentTar": "/Users/hh/Desktop/joker/pa-artifacts/wave36-target/wave36-target-14a6b45.tar.gz",
+    "originalTar": "/tmp/w36art/wave36-target-14a6b45.tar.gz",
+    "tarSha256": "13798190ae43b28628eaf7131dfb8192bdb786b9bcfe4e1e0b6f9217ab33a8af",
+    "tarBytes": 20625055,
+    "innerEntries": 6889,
+    "innerManifestSha256": "e7a910bce276e5f31c2907d8079942b5471bf68ff5bfdd79730db1ea2ce38ee7",
+    "releaseManifestSha256": "959da9cee3750bd71a75d50bacda3019193a2c8a8d2c837d6a53cdfcab3b7c04",
+    "outerZip": "/Users/hh/Desktop/joker/pa-artifacts/wave36-preview-14a6b45/PersonalAgent-Preview-14a6b45.zip",
+    "zipSha256": "43e06d5bc7606e8283c1c5f58463f402018d4c9c9b223a2c7c021d429ccb8995",
+    "zipBytes": 63565262,
+    "zipEntries": 7457,
+    "outerEntries": 6897,
+    "outerManifestSha256": "a18ae3fac6bdd6f84e9a6d01d275ea44ace7477c6dfe25de8f2595668c78f69e",
+    "environment": { "platform": "darwin", "arch": "arm64", "node": "24.21.0", "abi": "137", "schema": 18 },
+    "independentStatic": {
+      "mainVerifierExactZipSourceBuildHash": "VERIFIED_STATIC_exit0",
+      "fullInventoryCRCLinksCommandsNodeLicense": "PASS",
+      "bothPersistentAndOriginalTarHashSize": "PASS_same_exact_bytes",
+      "diffMain7e55ToBuild087AppsPackagesBootstrap": "EMPTY",
+      "actualDevInstallAndOuterInnerManifestSha": "BOTH_e7a910bce276e5f31c2907d8079942b5471bf68ff5bfdd79730db1ea2ce38ee7",
+      "structuredActualConsoleSourcemap": "Hash-verified App renders CompletionHistoryPanel; actual panel consumes the history method and transport carries /completion-history",
+      "modelGuiAndLauncher": "Inherited from the real W35 successor, with reviewed wrapper339bd/Node24.21/LICENSE; no new wrapper or lifecycle introduced",
+      "packageCodeExecutedByReviewer": false,
+      "releaseApproved": false
+    },
+    "submittedInstalledHistory": {
+      "raw": "/Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/reports/wave36/history-read-200.json",
+      "http": 200,
+      "protocol": "work-completion-history/1",
+      "workId": "e9c9a0de8048124ad16d7a04bd979024",
+      "projectId": "project-wave33",
+      "kind": "verifications",
+      "mode": "live_keyset",
+      "returned": 1,
+      "available": 1,
+      "authorization": "none",
+      "scope": "Genuine installed W36 backend read of one original restored Work verification. Same install manifest and actual frozen App/transport/panel wiring are verified. The App history click was not exercised, other kinds/windows/limits and independent E history verdict remain separate."
+    },
+    "selectedSourceAudit": {
+      "path": "/Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/reports/wave36/source-closure.json",
+      "declaredSource": "087a598e5b6f357bd2cc40556cbf693257febc66",
+      "records": 199,
+      "uniquePaths": 199,
+      "selectedAuditSet": true,
+      "scopeLabelCorrection": "Explicitly marked selected audit, not full runtime inventory; model/helper/history sources were added, closing the previous missing-source scope label issue",
+      "independentHashMatches": 194,
+      "mismatches": ["apps/console/src/App.tsx", "apps/console/src/evidence.css", "apps/console/src/transport.ts", "apps/coordinator/http/app.ts", "apps/coordinator/product/runtime.ts"],
+      "interpretation": "Five selected core records are stale, despite the correct source label and true full frozen inventory. Do not call all199 source records verified or derive trusted running identity from this inaccurate selected audit."
+    },
+    "independentESameW36": "NOT_REACHED"
+  },
+  "EActualCohortsAndTiers": {
+    "counts": { "PASS": 347, "FAIL": 0, "NOT_TESTED": 22 },
+    "actualCurrentW35": {
+      "source": "edfe5e14f2f8fbc7f395a84520c781c7f07ce9e7",
+      "buildId": "599de3e98c02de0b",
+      "tarSha256": "11027a375848c25c2d2ae8e18755f65fa77272db533dcee7bb9ff27ba8ba50db",
+      "zipSha256": "39c0fff0e13d61c59198f8a55f0ed692b887194aaa4e2782b2b3e9cbd623f6c5",
+      "actualCases": ["E36-W35-OUTER", "E36-W35-MODEL-SAVE", "E36-W35-RECOVERY", "E36-W35-UPGRADE"],
+      "progress": "E now really measures the W35 external entry, model-save consumer, nonempty recovery and managed upgrade. Do not inherit the stale claim that E still only measures W33."
+    },
+    "otherCohorts": "Legacy R1 base, prior W33 outer/recovery subset and W32 upgrade baseline remain separately bound",
+    "historyCase": {
+      "id": "E36-COMPLETION-HISTORY-INSTALLED",
+      "status": "NOT_TESTED",
+      "actual": "Frozen W35 returns404 for the newer history endpoint",
+      "interpretation": "Correct temporal scope, not a regression in main/W36. E requires a history-containing successor and must not re-label W35 results as W36."
+    },
+    "originalProjects": "Original project applicability still needs_input and fixture project-atlas execution; E32-ORIGINAL-PROJECT-APPLICABLE remains honestly NOT_TESTED. D alpha/beta sequential controlled runtimes are distinct progress, not the default public two-project chain.",
+    "independentRecordedOracle": {
+      "method": "Actual evaluateRelease/tier/resolveFixtureDigest with complete real report at its original checkedAt and measured clean source; no freshness renewal",
+      "installedAlpha": { "required": 212, "ok": true },
+      "installedFunctional": { "required": 213, "ok": true },
+      "localAlpha": { "required": 212, "ok": true },
+      "fullProduct": { "required": 214, "ok": false, "cause": "Native delivery absent and native control unexecuted" },
+      "scope": "A declared aggregate across multiple cohorts including current W35 subsets, not every required case all on W35 and not W36/native/original-Work active recovery admission."
+    }
+  },
+  "mainUsablePackageAndIdentityInputs": {
+    "immediateStaticInput": "Use the exact W36 source/build/tar/ZIP/install/release digests above and the full validated immutable inventory, not the inaccurate selected source audit or keyword scans",
+    "existingDReadPorts": ["releaseBinding({installRoot,configRoot}) for selected config versus install release digest", "readRelease(configRoot)", "verifyReleaseArtifacts(installRoot,release,{hash:true})", "verifyRuntimeDependencies and verifyConsoleBuild", "inspectTargetInstall(installDir) for regular-file/release/source/build inspection"],
+    "importantPortLimit": "inspectTargetInstall alone skips symlink inventory verification and proves static target bytes, not the currently running entry. Pair with the full vetted inventory/link checker at the publisher/start boundary.",
+    "mainComposition": "Supply an internal startup-owned observation from the real canonical module/entry/runtime/install/config roots and already-verified install facts; derive capability flags from actual registered runtime readers/routes. Source checkout, absent inventory or missing current-entry proof remains origin:null/unknown.",
+    "publicProjection": "Only strict non-secret build/source/schema/provenance/capability data. Do not expose PID/UID/root/argv/IPC endpoint/credentials, accept identity from an HTTP file path, or treat identity as execution permission.",
+    "noNewLifecycleOrWaitingInterface": "The static package input and existing read ports are available now; the running binding is main's own composition responsibility, not a request for G to infer it from manifest text."
+  },
+  "findingsOrdered": [
+    {
+      "id": "D_W36_SELECTED_SOURCE_AUDIT_MIXES_OLDER_CORE_HASHES",
+      "priority": "P2_SOURCE_COHORT_PROVENANCE",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/reports/wave36/source-closure.json",
+      "summary": "The selected audit correctly declares source087 and199 paths but five history-integration core records still carry old bytes/hashes. For example App records144503bytes/2fbe9b83 while source087 actually has144841bytes/1d6853b1; transport records41313 versus43300bytes. All five are independently reproducible with git show087:path.",
+      "affected": ["apps/console/src/App.tsx", "apps/console/src/evidence.css", "apps/console/src/transport.ts", "apps/coordinator/http/app.ts", "apps/coordinator/product/runtime.ts"],
+      "minimalCorrection": "Regenerate every listed record from the exact frozen git087 source, not current D HEAD652 or cached W35 records; preserve the old audit under its own source. Keep the selected-audit label and count from data. This external report correction needs no tar/ZIP rebuild.",
+      "scope": "Selected source attestation/maintenance input. No missing/tampered installed runtime or invalid history endpoint is inferred: the exact W36 archive inventory and actual package consumer remain valid."
+    }
+  ],
+  "remainingProductScope": [
+    "W36 App history navigation/click and independent E history kinds/authority/window/byte/cursor behavior on the exact successor",
+    "Default same-installed-instance two original projects through applicable preview, scoped observations, checks/current candidate/manualaccept and original Work/bytes reopen",
+    "Original active Work/Broker/Runner crash continuation, no-resend and original scheduler2/4resource return",
+    "Current native execution/control, private/target activation, cross-machine/signing/long-run and measured user benefit"
+  ],
+  "limits": {
+    "newLiveStartStop": 0,
+    "realSignalDeleteOrGlobalDiscovery": 0,
+    "realModelVendorNativeTurns": 0,
+    "newTarOrZip": 0,
+    "candidateOrAssertionEdits": 0,
+    "newTaskPackets": 0,
+    "allExecSessionsComplete": true,
+    "preserved": "Twelve user service pairs and all state/profile/archive/ledger/history/runs",
+    "budget": "Original UNKNOWN/BLOCKED allowances remain unchanged, with no reset/top-up/refund/spend; test counts do not confer broad product completion or value."
+  }
+}
