@@ -1,0 +1,43 @@
+{
+  "protocol": "wave36-recipes-insights-admission/1",
+  "date": "2026-11-17",
+  "fixed": {
+    "G": "d09e155d3e8aad74d1238cbafdaec063802221fe",
+    "J": "807c8e00b1e431c0f33cdcdf60a091a01be9c015"
+  },
+  "checks": [
+    {
+      "role": "G",
+      "command": "node --test packages/usage-insights/test/runtime-identity-evidence.case.ts packages/usage-insights/test/runtime-identity.case.ts packages/usage-insights/test/support-port.case.ts",
+      "exitCode": 0,
+      "passed": 25
+    },
+    {
+      "role": "J",
+      "command": "node --test packages/project-recipes/test/observe.case.ts packages/project-recipes/test/module.case.ts tools/project-recipes/test/fail-layer-held.case.ts tools/project-recipes/test/two-project-delivery.case.ts",
+      "exitCode": 0,
+      "passed": 31
+    }
+  ],
+  "progress": {
+    "G": "Old forged-digest/missing-file/comment-route controls now distinguish self-declared/inventory-verified and supplied running input; inventory mode and unknown source are explicit. Actual same-root running identity must still come from the original trusted main/D start record, not external input. This module compares roots; it does not independently prove OS birth or capability execution.",
+    "J": "Permission errors produce bounded unknown/refusal, module declares its actual contract identity/capabilities, two registered projects preserve original controlled delivery/bytes/reopen and same-Work revision. Explicit fail-layer test now records fixture always-check behavior rather than claiming a real verifier FAIL."
+  },
+  "integration": {
+    "GNewSourceImported": false,
+    "JNewSourceImported": false,
+    "mainDefaultSupportExists": true,
+    "mainDefaultRecipeExists": true,
+    "mainCompletionHistoryNewSource": "f32a64ff2d22f3bcbcd48b19cb52c967b63f4530",
+    "realBundleRestoreNotProvenByJStoreReopen": true,
+    "defaultSupportOrigin": null
+  },
+  "limits": {
+    "realVendorModelNative": 0,
+    "candidateEdits": false,
+    "userServicesTouched": 0,
+    "newArchive": 0,
+    "releaseApproved": false,
+    "completionEstimateChanged": false
+  }
+}

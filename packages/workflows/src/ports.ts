@@ -89,6 +89,7 @@ export interface ReadIndexPort {
   sourceMessage(messageId: string, projectIds: readonly string[]): SourceMessageMetadata | undefined
   timeline(input: { workId: string; projectIds: readonly string[]; limit?: number }): { entries: readonly TimelineEntry[]; truncated: boolean } | undefined
   evidencePage(input: { workId: string; projectIds: readonly string[]; limit?: number; cursor?: string }): EvidencePage | undefined
+  completionHistory(query: CompletionHistoryQuery): CompletionHistoryPage
   listArtifacts(input?: { limit?: number; before?: string }): { artifacts: { id: string; digest: string; bytes: number; path: string; createdAt: string }[]; nextCursor?: string; hasMore: boolean }
   /** Keyset continuation over existing completion facts; caller/project cursor is bound and bounded. */
   completionHistory(query: CompletionHistoryQuery): CompletionHistoryPage

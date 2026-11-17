@@ -1,0 +1,94 @@
+{
+  "protocol": "main-product-integration/36",
+  "date": "2026-11-17",
+  "source": "f32a64ff2d22f3bcbcd48b19cb52c967b63f4530",
+  "historyBrowserSource": "b454c0fd234b2e1d4bc26602b42d8aa6772b0632",
+  "otherBrowserSource": "f71cad58431c2837031464a88565d5892999c235",
+  "historyCoreSource": "effe85c231e399fa7379de8d6ba69f1b2b9d8412",
+  "criterionSemanticsSource": "f71cad58431c2837031464a88565d5892999c235",
+  "sourceDeltaAfterHistoryBrowser": [
+    "apps/coordinator/http/app.ts",
+    "tests/integration/completion-history.case.mjs"
+  ],
+  "deltaMeaning": "Only malformed history work-id classification and its focused negative; final backend4 rerun passes. Valid browser path and frontend bytes unchanged.",
+  "otherBrowserAppDelta": [
+    "apps/console/src/CompletionHistoryPanel.tsx",
+    "apps/console/src/evidence.css",
+    "apps/coordinator/http/app.ts"
+  ],
+  "checks": {
+    "historyBackend": 4,
+    "existingEvidenceHistory": 4,
+    "historyTransport": 1,
+    "wrapperPolicy": 1,
+    "staticSelfTest": 10,
+    "contextPreview": 14,
+    "contracts": 241,
+    "generatedReproducible": true,
+    "consoleStrict": 0,
+    "coordinatorStrict": 0,
+    "consoleBuild": 0,
+    "runnerFrozenHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d"
+  },
+  "history": {
+    "actualAProducer": true,
+    "AWorkflowBlob": "5ec4fe61f8a27f85536b600ca6b7864a0aec6fe7",
+    "publicRoute": "GET /v1/works/:id/completion-history",
+    "actualDefaultApp": true,
+    "metadataOnly": true,
+    "kinds": [
+      "contracts",
+      "verifications",
+      "acceptances"
+    ],
+    "acceptanceMeaning": "Human criterion acceptance, not every overall Work acceptance",
+    "oldTimelinePreserved": true,
+    "principalScopeContractKindLimitExpirySigned": true,
+    "streamResponseMaxBytes": 131072,
+    "sourceResponseMaxBytes": 4194304,
+    "sourceHardDeadlineProven": false,
+    "mode": "live_keyset",
+    "blockedIsExplicit": true,
+    "sourceCallerViewsSeparated": true,
+    "publicAttemptsReviews": false
+  },
+  "wrapper": {
+    "reviewedHashes": [
+      "8de31c59d8c9afe90d6464a9b9208d3757a57e76ea49d7af20e473b90360c5dc",
+      "339bdac0912a05da701d04de0670e7b6cd49cc1d86687536fb809f45396d866c"
+    ],
+    "actualMustEqualManifest": true,
+    "arbitraryThirdRefused": true,
+    "W35IndependentStatic": "VERIFIED_STATIC",
+    "archivesChanged": false,
+    "packageCodeExecuted": false
+  },
+  "historyReport": "reports/releases/wave36-integration/history-browser-confirm/browser-report.json",
+  "initialHistoryReport": "reports/releases/wave36-integration/history-browser/browser-report.json",
+  "diagnosticHistoryReport": "reports/releases/wave36-integration/history-browser-recheck/browser-report.json",
+  "firstPassingHistoryReport": "reports/releases/wave36-integration/history-browser-final/browser-report.json",
+  "recipeReport": "reports/releases/wave36-integration/recipes-browser/browser-report.json",
+  "modelReport": "reports/releases/wave36-integration/model-browser/browser-report.json",
+  "notes": [
+    "Initial browser assumption that machine-only overall acceptance creates a completion_acceptances row was false; raw failures retained. Correct criterion semantics/label plus an actual human-criterion original accept produce the real positive.",
+    "Two bounded screenshot rounds: first native category select too small; same workbench tokens and mobile16px applied, second confirms.",
+    "Current source after the successful browser differs only by safeParse malformed-ID400 and its tested negative; no valid history behavior or client bytes changed.",
+    "14 additional history rows are explicit metadata fixture copies; two original controlled Works actually pass check/available.manualaccept/delivered.",
+    "No B control/unsafe tool/slotqueue or C synchronous guard/G new identity was imported. Source package inspection is not installed/runtime/native/benefit admission.",
+    "Existing689.99KB bundle and CSS ramp advisories retained; no unrelated design drift repair."
+  ],
+  "newDependencies": 0,
+  "newMigrations": 0,
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "candidateWorktreesEdited": false,
+  "newTarCreated": false,
+  "newPersistentServiceStarted": false,
+  "userTwelveServicesTouched": false,
+  "fullOriginalWorkRecovery": false,
+  "actualNativeAdmission": false,
+  "currentRuntimeInstalled": false,
+  "valueBenefitAdmission": false,
+  "releaseApproved": false,
+  "completionEstimateChanged": false
+}
