@@ -49,6 +49,32 @@ export interface RuntimeRunningClaim {
   readonly pid: number | null
   readonly startedAt: string | null
   readonly note: string
+  /** Whether a start record was supplied, as opposed to a bare caller string. */
+  readonly provenance: 'main-start-record' | 'caller-string' | null
+  /** Consistency checks against the inspected tree; `null` when a check could not run. */
+  readonly checks: {
+    readonly entryInsideRoot: boolean | null
+    readonly entryIsTheRecordedEntry: boolean | null
+    readonly argvHeadMatchesEntry: boolean | null
+    readonly configInsideRootOrPrivate: boolean | null
+  }
+  readonly reasons: readonly string[]
+}
+
+/**
+ * The start record main/D already hold from the original spawn. G never produces this and never
+ * discovers a process: it consumes the record and checks that it is consistent with the tree it was
+ * given, so a bare caller-supplied path cannot promote the evidence level.
+ */
+export interface RuntimeStartRecord {
+  readonly source: 'main-start-record'
+  readonly entry: string
+  readonly root: string
+  readonly pid: number
+  readonly startedAt: string
+  readonly uid: number
+  readonly argv: readonly string[]
+  readonly config: string
 }
 
 export interface RuntimeIdentity {
@@ -202,6 +228,74 @@ const manifestEntries = (files: unknown): ManifestEntry[] | null => {
   return entries
 }
 
+/** Resolve symlinks in the part of a path that exists, keeping the rest attached. */
+const resolveThroughAncestors = (path: string): string => {
+  let current = resolve(path)
+  const tail: string[] = []
+  for (let depth = 0; depth < 64; depth++) {
+    try {
+      return join(realpathSync(current), ...tail)
+    } catch {
+      const parent = dirname(current)
+      if (parent === current) return resolve(path)
+      tail.unshift(current.slice(parent.length).replace(/^[\\/]+/, ''))
+      current = parent
+    }
+  }
+  return resolve(path)
+}
+
+const runningClaimOf = (root: string, input: RuntimeIdentityOptions['running']): RuntimeRunningClaim | null => {
+  if (input === undefined) return null
+  const record = 'source' in input && input.source === 'main-start-record' ? input as RuntimeStartRecord : null
+  const reasons: string[] = []
+  let claimedRoot: string | null = null
+  try {
+    claimedRoot = realpathSync(resolve(input.root))
+  } catch {
+    claimedRoot = null
+  }
+  const rootMatches = claimedRoot !== null && claimedRoot === root
+  if (claimedRoot === null) reasons.push('the claimed root does not exist')
+  else if (!rootMatches) reasons.push('the claimed root is a different installation')
+  const checks = {
+    entryInsideRoot: null as boolean | null,
+    entryIsTheRecordedEntry: null as boolean | null,
+    argvHeadMatchesEntry: null as boolean | null,
+    configInsideRootOrPrivate: null as boolean | null,
+  }
+  if (record !== null) {
+    const entry = resolve(record.entry)
+    // Compare real paths: on macOS /var is a symlink to /private/var, so a recorded entry can look
+    // outside the root purely because one side was not resolved.
+    const entryReal = resolveThroughAncestors(entry)
+    checks.entryInsideRoot = inside(root, entryReal) && (() => { try { return statSync(entryReal).isFile() } catch { return false } })()
+    if (checks.entryInsideRoot !== true) reasons.push('the recorded entry is not a file inside this installation')
+    // The entry main started must be the launcher this tree ships, not a path that merely exists.
+    const shipped = [join(root, 'bin/pa'), join(root, 'install/bin/pa')].map(path => { try { return realpathSync(path) } catch { return null } })
+      .filter((path): path is string => path !== null)
+    checks.entryIsTheRecordedEntry = shipped.length === 0 ? null : shipped.includes(entryReal)
+    if (checks.entryIsTheRecordedEntry === false) reasons.push('the recorded entry is not the launcher this installation ships')
+    const argvHead = record.argv.length === 0 ? null : resolveThroughAncestors(record.argv[0]!)
+    checks.argvHeadMatchesEntry = argvHead === null ? null : argvHead === entryReal
+    if (checks.argvHeadMatchesEntry === false) reasons.push('the ordered argv does not begin with the recorded entry')
+    const config = resolve(record.config)
+    const configReal = resolveThroughAncestors(config)
+    checks.configInsideRootOrPrivate = inside(root, configReal) || /[\\/]Library[\\/]Application Support[\\/]PersonalAgent[\\/]/.test(configReal)
+    if (checks.configInsideRootOrPrivate === false) reasons.push('the recorded config root is outside the installation and the private root')
+  }
+  return {
+    root: input.root,
+    rootMatches,
+    pid: typeof input.pid === 'number' ? input.pid : record?.pid ?? null,
+    startedAt: typeof input.startedAt === 'string' ? input.startedAt : record?.startedAt ?? null,
+    note: rootMatches ? 'the recorded root is this installation' : 'the recorded root is not this installation',
+    provenance: record === null ? 'caller-string' : 'main-start-record',
+    checks,
+    reasons,
+  }
+}
+
 const inventoryOf = (root: string, base: string, entries: readonly ManifestEntry[] | null, mode: 'hash' | 'size' | 'none'): RuntimeInventory => {
   if (entries === null || mode === 'none')
     return { state: entries === null ? 'none' : 'partial', mode, listed: entries?.length ?? 0, checked: 0, hashed: 0, mismatches: [], skipped: entries?.length ?? 0 }
@@ -263,14 +357,11 @@ export interface RuntimeIdentityOptions {
   /** How thoroughly to check the manifest's own file list: digests, sizes only, or not at all. */
   readonly verify?: 'hash' | 'size' | 'none'
   /**
-   * A process identity supplied by main/D from its own original start record. The module only
-   * compares the recorded root with the inspected one; it never looks for a process.
+   * The original start record from main/D. `running_confirmed` requires a record whose entry, root,
+   * argv and config are consistent with the inspected tree; a bare `{ root }` string is accepted for
+   * comparison only and can never promote the evidence level.
    */
-  readonly running?: {
-    readonly root: string
-    readonly pid?: number
-    readonly startedAt?: string
-  }
+  readonly running?: RuntimeStartRecord | { readonly root: string; readonly pid?: number; readonly startedAt?: string }
 }
 
 /**
@@ -417,28 +508,16 @@ export function inspectRuntimeIdentity(options: RuntimeIdentityOptions): Runtime
   const inventory = inventoryOf(root, manifestPath === null ? root : dirname(manifestPath), entries, options.verify ?? 'hash')
   // A running claim is an input from main/D: this module compares roots and nothing else, because
   // discovering a process would require exactly the global scan this work must not do.
-  let running: RuntimeRunningClaim | null = null
-  if (options.running !== undefined) {
-    let claimedRoot: string | null = null
-    try {
-      claimedRoot = realpathSync(resolve(options.running.root))
-    } catch {
-      claimedRoot = null
-    }
-    running = {
-      root: options.running.root,
-      rootMatches: claimedRoot !== null && claimedRoot === root,
-      pid: typeof options.running.pid === 'number' ? options.running.pid : null,
-      startedAt: typeof options.running.startedAt === 'string' ? options.running.startedAt : null,
-      note: claimedRoot === null ? 'the claimed root does not exist'
-        : claimedRoot === root ? 'the claimed root is this installation'
-          : 'the claimed root is a different installation',
-    }
-    if (!running.rootMatches) unknown.push('the running process was started from a different root')
-  } else unknown.push('no process start identity was supplied')
+  const running = runningClaimOf(root, options.running)
+  if (running !== null && !running.rootMatches) unknown.push('the running process was started from a different root')
+  if (running === null) unknown.push('no process start identity was supplied')
+  else if (running.provenance === 'caller-string') unknown.push('a caller-supplied root is not a start record')
 
+  const runningConfirmed = running !== null && running.provenance === 'main-start-record' && running.rootMatches &&
+    running.checks.entryInsideRoot === true && running.checks.argvHeadMatchesEntry !== false &&
+    running.checks.configInsideRootOrPrivate !== false
   const evidence: RuntimeEvidence = origin === null ? 'self_declared'
-    : inventory.state === 'complete' && running?.rootMatches === true ? 'running_confirmed'
+    : inventory.state === 'complete' && runningConfirmed ? 'running_confirmed'
       : inventory.state === 'complete' ? 'inventory_verified' : 'self_declared'
 
   return {

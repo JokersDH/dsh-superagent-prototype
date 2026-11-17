@@ -37,6 +37,7 @@ function install(options: InstallOptions = {}): { root: string; files: Record<st
       : "app.get('/v1/insights', h)\napp.get('/v1/insights/export', h)\napp.get('/v1/insights/support', h)\n",
     'app/apps/console/dist/assets/index-abc.js': 'const t={downloadUsageObservation:q=>q};fetch("/v1/insights/export")\n',
   }
+  files['bin/pa'] = '#!/bin/sh\nexec node main.js "$@"\n'
   const manifest = {
     format: 'pa-install', formatVersion: 1,
     source: { commit: SOURCE, branch: 'main', dirty: false },
@@ -63,7 +64,7 @@ test('a verified inventory establishes the identity, without claiming it is runn
   const identity = inspectRuntimeIdentity({ installRoot: root })
   assert.equal(identity.inventory.mode, 'hash')
   assert.equal(identity.inventory.state, 'complete')
-  assert.equal(identity.inventory.hashed, 3)
+  assert.equal(identity.inventory.hashed, 4)
   assert.deepEqual(identity.inventory.mismatches, [])
   assert.equal(identity.evidence, 'inventory_verified')
   assert.equal(identity.running, null)
@@ -108,20 +109,60 @@ test('a route mentioned only in a comment is not a capability', () => {
   rmSync(root, { recursive: true, force: true })
 })
 
-test('a running claim confirms only the root it names', () => {
+test('a caller-supplied root can never confirm that this is what is running', () => {
   const { root } = install()
-  const matching = inspectRuntimeIdentity({ installRoot: root, running: { root, pid: 4242, startedAt: '2026-11-16T00:00:00.000Z' } })
-  assert.equal(matching.running?.rootMatches, true)
-  assert.equal(matching.evidence, 'running_confirmed')
-  assert.equal(matching.running?.pid, 4242)
+  const claimed = inspectRuntimeIdentity({ installRoot: root, running: { root, pid: 4242, startedAt: '2026-11-16T00:00:00.000Z' } })
+  assert.equal(claimed.running?.rootMatches, true)
+  assert.equal(claimed.running?.provenance, 'caller-string')
+  assert.equal(claimed.evidence, 'inventory_verified', 'the files are verified; the process is not')
+  assert.ok(claimed.unknown.some(entry => /caller-supplied root is not a start record/.test(entry)))
 
   const other = mkdtempSync(join(tmpdir(), 'usage-runtime-other-'))
   const wrong = inspectRuntimeIdentity({ installRoot: root, running: { root: other, pid: 1 } })
   assert.equal(wrong.running?.rootMatches, false)
-  assert.equal(wrong.evidence, 'inventory_verified', 'a wrong root does not upgrade or destroy the file evidence')
-  assert.ok(wrong.unknown.some(entry => /different root/.test(entry)))
+  assert.equal(wrong.evidence, 'inventory_verified')
   rmSync(root, { recursive: true, force: true })
   rmSync(other, { recursive: true, force: true })
+})
+
+test('the original start record confirms the running installation it names', () => {
+  const { root } = install()
+  const entry = join(root, 'install', 'bin', 'pa')
+  const record = {
+    source: 'main-start-record' as const, entry, root, pid: 4242,
+    startedAt: '2026-11-16T00:00:00.000Z', uid: 501, argv: [entry, 'status'], config: join(root, 'install', 'var', 'config'),
+  }
+  const confirmed = inspectRuntimeIdentity({ installRoot: root, running: record })
+  assert.equal(confirmed.running?.provenance, 'main-start-record')
+  assert.equal(confirmed.running?.checks.entryInsideRoot, true)
+  assert.equal(confirmed.running?.checks.entryIsTheRecordedEntry, true)
+  assert.equal(confirmed.running?.checks.argvHeadMatchesEntry, true)
+  assert.equal(confirmed.running?.checks.configInsideRootOrPrivate, true)
+  assert.equal(confirmed.evidence, 'running_confirmed')
+
+  // A record whose entry is not this installation's launcher is a difference, not a confirmation.
+  const foreignEntry = install()
+  const foreign = inspectRuntimeIdentity({ installRoot: root, running: { ...record, entry: join(foreignEntry.root, 'install', 'bin', 'pa') } })
+  assert.equal(foreign.running?.checks.entryInsideRoot, false)
+  assert.equal(foreign.evidence, 'inventory_verified')
+  assert.ok(foreign.running?.reasons.some(reason => /entry is not a file inside/.test(reason)))
+
+  // An argv that does not begin with the recorded entry is refused rather than trusted.
+  const wrongArgv = inspectRuntimeIdentity({ installRoot: root, running: { ...record, argv: ['/usr/local/bin/node', 'main.js'] } })
+  assert.equal(wrongArgv.running?.checks.argvHeadMatchesEntry, false)
+  assert.equal(wrongArgv.evidence, 'inventory_verified')
+
+  // A config root outside both the installation and the private app support area is a difference.
+  const wrongConfig = inspectRuntimeIdentity({ installRoot: root, running: { ...record, config: '/tmp/somewhere-else' } })
+  assert.equal(wrongConfig.running?.checks.configInsideRootOrPrivate, false)
+  assert.equal(wrongConfig.evidence, 'inventory_verified')
+
+  // A record that names another root never confirms this tree.
+  const mismatch = inspectRuntimeIdentity({ installRoot: root, running: { ...record, root: foreignEntry.root } })
+  assert.equal(mismatch.running?.rootMatches, false)
+  assert.equal(mismatch.evidence, 'inventory_verified')
+  rmSync(root, { recursive: true, force: true })
+  rmSync(foreignEntry.root, { recursive: true, force: true })
 })
 
 test('mode and size checks are weaker and say so', () => {
