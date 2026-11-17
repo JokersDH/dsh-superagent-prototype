@@ -3,12 +3,12 @@
   "tier": "full-product",
   "status": "FAIL",
   "ok": false,
-  "checkedAt": "2026-11-17T01:37:35.570Z",
+  "checkedAt": "2026-11-17T05:30:42.025Z",
   "source": {
-    "commit": "4b4d4089a07e10b01c9deba32f0d51c23e96bdf1",
+    "commit": "105595d2b6e7045b0300302af96e216506c4aeda",
     "dirty": false
   },
-  "expectedSource": "4b4d4089a07e10b01c9deba32f0d51c23e96bdf1",
+  "expectedSource": "105595d2b6e7045b0300302af96e216506c4aeda",
   "requirements": [
     {
       "id": "E1-GATE-CONTROL",
@@ -931,6 +931,46 @@
       "status": "PASS"
     },
     {
+      "id": "E36-W35-OUTER",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E36-W35-OUTER-OPERATION",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E36-W35-MODEL-SAVE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E36-W35-MODEL-SAVE-OPERATION",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E36-W35-RECOVERY",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E36-W35-RECOVERY-OPERATION",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E36-W35-UPGRADE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E36-COMPLETION-HISTORY-INSTALLED",
+      "required": false,
+      "status": "NOT_TESTED"
+    },
+    {
       "id": "E8-ORIGINAL-WORK-RECOVERY",
       "required": false,
       "status": "NOT_TESTED"
@@ -1071,7 +1111,7 @@
   "claimedBy": {
     "status": "PASS",
     "tier": "controlled-product-workflow",
-    "decidedAt": "2026-11-17T01:35:43.572Z",
+    "decidedAt": "2026-11-17T05:20:35.244Z",
     "failureCodes": []
   },
   "notes": [

@@ -2,11 +2,11 @@
   "schema": "product-acceptance-wave35-status/1",
   "agent": "E",
   "branch": "codex/g3-product-acceptance",
-  "base": "5860da13",
+  "base": "7e550991",
   "checkpoint": "PENDING",
-  "head": "4b4d4089a07e10b01c9deba32f0d51c23e96bdf1",
+  "head": "105595d2b6e7045b0300302af96e216506c4aeda",
   "worktreeDirtyAtRun": false,
-  "checkedAt": "2026-11-17T01:35:43.551Z",
+  "checkedAt": "2026-11-17T05:20:35.223Z",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -19,1556 +19,48 @@
   },
   "stages": [
     {
-      "id": "E1",
-      "title": "Whole operation protocol: full-set fresh, late child, 1:1 release",
+      "id": "C1",
+      "title": "Resource query unknown blocks signal and release",
       "command": "node tests/product-acceptance/run.mjs --suites=selftest",
       "notes": [
-        "signal preflights the complete set then the target; late/duplicate/foreign/unknown refuse; product assertions precede the release decision."
+        "pgrep errors/unknown, missing booleans, duplicate/foreign/late rows fail closed; operation copies bind to the product case."
       ],
-      "result": "PASS",
-      "counts": {
-        "PASS": 150
-      },
-      "cases": [
-        {
-          "id": "E1-GATE-CONTROL",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-GATE-REJECT-MISSING-CASE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-GATE-REJECT-UNKNOWN-STATUS",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-GATE-REJECT-UNCERTAIN-ACCEPT",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-GATE-REJECT-STALE-REPORT",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-GATE-REJECT-SOURCE-MISMATCH",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-GATE-REJECT-NO-CANDIDATE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-GATE-REJECT-VACUOUS",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-GATE-REJECT-FAILED-ASSERTION",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-GATE-REJECT-MISSING-EVIDENCE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-GATE-REJECT-DUPLICATE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-GATE-REJECT-BAD-PATCH",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-GATE-REJECT-UNAPPLIED-PATCH",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-GATE-REJECT-MALFORMED-PATCH",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-GATE-REJECT-UNEXECUTED-NATIVE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-GATE-REJECT-INVALID-RESPONSE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-GATE-REJECT-STALE-CASE-BINDING",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-GATE-REJECT-FIXTURE-DRIFT",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-GATE-REJECT-SCHEMA",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-FIXTURE-STRICT",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-FIXTURE-PORTABILITY-STRICT",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-ADMISSION-FAIL-CLOSED",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-PREFLIGHT-NO-FALLBACK",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-WRONG-LAYER",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-DIRTY-SOURCE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-MISSING-SOURCE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-STALE-REPORT",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-CROSS-COMMIT",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-UNBOUND-CASE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-EMPTY-EVIDENCE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-EMPTY-OBJECT-EVIDENCE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-MISSING-CASE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-FAILED-ASSERTION",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-NO-DOWNLOAD-BYTES",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-DOWNLOAD-DIGEST",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-PATCH-NOT-APPLIED",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-PATCH-DIGEST",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-DUPLICATE-ID",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-UNKNOWN-STATUS",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-UNKNOWN-LAYER",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-NATIVE-NOT-EXECUTED",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-NATIVE-NO-VERSION",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-NATIVE-NO-ATTEMPT",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-NATIVE-NO-EVIDENCE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-NATIVE-NO-MODEL-TASKS",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-INSTALL-NOT-STAGED",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-INSTALL-NOT-INDEPENDENT",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-NOT-TESTED",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-REQUIRED-FAIL",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-REQUIRED-UNKNOWN",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-WRONG-REPORT-SOURCE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-WRONG-ARTIFACT-TUPLE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-REQUIRED-PASS-EMPTY-EVIDENCE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-FOREIGN-SUBJECT-SOURCE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-FOREIGN-SUBJECT-SHA-SIZE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-FOREIGN-SUBJECT-BUILD",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-WRONG-MODE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-REQUIRED-WRONG-RUN",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-CURRENT-BLOCKED-AS-PASS",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-CURRENT-FIXTURE-MODE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-OWNERSHIP-COPY-NO-EXIT",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-FAULT-STEP-NAMES",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-RECOVER-BLOCKED",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-RECOVER-EXIT1-SUCCESS",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-FAULT-WRONG-OPERATION",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-NOOP-EXIT1",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-POINTER-MISSING",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-FOREIGN-ABI-PLATFORM",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-HELPER-FOREIGN-PROVENANCE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-HELPER-WITHOUT-FILE-HASH",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-OWNERSHIP-SUBJECT-FOREIGN",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-NO-PREVIOUS-CONTROL",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-INSTALLED-CANDIDATE-NATIVE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-INSTALLED-CANDIDATE-NO-REPLAY",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-SECOND-ROOT-RESEND",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-SOURCE-PREPARE-GRANTED",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-STABILITY-QUEUE-NOT-RETURNED",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-WORKFLOW-V2-BORROWED",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-SECOND-ROOT-PERSONAL-CLAIM",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-PERSONAL-REVIEW-UNBOUND-READ",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-PERSONAL-REVIEW-FIFO-ALLOWED",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-CONSUMER-ENTRY-FOREIGN",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-CONSUMER-ENTRY-SOURCE-ORIGIN",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-REUSE-SILENT-SELECTION",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-SCOPE-DIAGNOSTIC-LEAK",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-SCOPE-WITHHELD-NEGATIVE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-SCOPE-WITHHELD-OVERFLOW",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-SCOPE-DUPLICATE-REASON",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-SCOPE-AUTHORIZATION",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-CAPABILITY-SELF-DOWNGRADE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-SELF-CLAIM",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-ADMISSION-PROBE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-STRUCTURE-TIER-SUPERSET",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-STRUCTURE-NO-ALLOW-GAP",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-ROUTE-NO-ELIGIBLE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-ROUTE-OVERLAP",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-ROUTE-EXPIRED",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-ROUTE-NO-EVIDENCE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-ROUTE-DEFAULT-PATH",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-REVIEW-DISPOSITION",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-REVIEW-SAME-ASSIGNMENT",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-REVIEW-NO-ISOLATION",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-REVIEW-BAD-DIGEST",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-HETERO-SAME-PROTOCOL",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-HETERO-NOT-EXECUTED",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-HETERO-NO-VERSION",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-HETERO-NO-BUDGET",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-HETERO-NO-ISOLATION",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-NATIVE-CONTROL-NOT-EXECUTED",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-NATIVE-CONTROL-NO-STOP",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-NATIVE-CONTROL-NO-RECOVERY",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-PILOT-ZERO-TURNS",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-PILOT-UNKNOWN-USAGE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-PILOT-BLOCKED-PASS",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-PILOT-NO-ORACLE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-MUTATE-HETERO-NO-SUBJECT",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-LIFECYCLE-OWN",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-LIFECYCLE-WRONG-START",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-LIFECYCLE-SIBLING",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-LIFECYCLE-FOREIGN-CHILD",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-LIFECYCLE-MIXED-UNKNOWN",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-LIFECYCLE-START-WINDOW",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-LIFECYCLE-REFUSED-STOP",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-LIFECYCLE-IDEMPOTENT",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-LIFECYCLE-BIRTH-ROOT",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-LIFECYCLE-CHILD-SCOPE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-LIFECYCLE-NO-RECORD-BIRTH",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-LIFECYCLE-NO-RECORD-EXIT",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-LIFECYCLE-NO-RECORD-REUSE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-LIFECYCLE-STOP-NO-RECORD",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-LIFECYCLE-NO-RECORD-UNVERIFIED",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-LIFECYCLE-SET-MISMATCH",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-LIFECYCLE-BIRTH-CONFIG",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-LIFECYCLE-STOPPED-KNOWN-CHILD",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-LIFECYCLE-STOPPED-NO-RECORD-CHILD",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-LIFECYCLE-PARENT-GONE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-LIFECYCLE-BIRTH-NO-SET",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-CALLER-RETAIN-PREVENTS-RELEASE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-CALLER-COMPLETE-RELEASE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-CALLER-INCOMPLETE-SET",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-CALLER-DUPLICATE-AND-FOREIGN",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-CALLER-EXPECTED-START-MISMATCH",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-CALLER-PARENT-DEAD-CHILD-ALIVE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-CALLER-SIGNAL-REFUSES-STALE-IDENTITY",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-CALLER-SIGNAL-REFUSES-STALE-SET",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-CALLER-RELEASE-DUPLICATE-ROWS",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-CALLER-LATE-CHILD",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-CALLER-ASSERT-FAILURE-RETAINS",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-CALLER-NO-FORCE-API",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E1-CALLER-SOURCE-DISCIPLINE",
-          "status": "PASS",
-          "reason": null
-        }
-      ]
+      "result": "SEE_RUN",
+      "counts": {},
+      "cases": []
     },
     {
-      "id": "E2",
-      "title": "Full-report scope, resources and business semantics",
-      "command": "node tests/product-acceptance/run.mjs --suites=selftest",
-      "notes": [
-        "operation contradictions, pending pre-stop question, effect/question/answer rows, registry, artifact ids and sameProject scoped 403 are rejected."
-      ],
-      "result": "PASS_WITH_GAPS",
-      "counts": {
-        "PASS": 34,
-        "NOT_TESTED": 3
-      },
-      "cases": [
-        {
-          "id": "E2-MUTATE-E32-EMPTY-AFTER",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E2-MUTATE-FOREIGN-PID-MISSING-START",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E2-MUTATE-RESOURCE-ALIVE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E2-MUTATE-COHORT-CARDINALITY",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E2-MUTATE-JOURNEY-PHASE-EXPECTED-START",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E2-MUTATE-OPERATION-DELETED-UNKNOWN",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E2-MUTATE-COHORT-PENDING-MISSING",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E2-MUTATE-COHORT-EFFECT-DRIFT",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E2-MUTATE-COHORT-REGISTRY-DRIFT",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E2-AUTH-AND-ORIGIN",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E2-CONFIGURATION",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E2-DAILY-VERTICAL",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E2-ARTIFACT-ROUNDTRIP",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E2-REPLAY-AND-CONFLICT",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E2-SESSION-ISOLATION",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E2-STALE-BUSINESS-REJECTION",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E2-MACHINE-FAIL",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E2-ONE-WRITER",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E2-SCOPE-AND-PROFILE-GUARDS",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E2-CONTEXT-PROPOSALS-NOT-TESTED",
-          "status": "NOT_TESTED",
-          "reason": "The legacy record_decision command returned rejected (unsupported_capability); explicit decisions use /v1/decisions (E3-DECISION-WORKFLOW), but structured proposal confirmation remains absent."
-        },
-        {
-          "id": "E2-WORK-EVIDENCE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E2-EVIDENCE-HISTORY",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E2-REOPEN-PERSISTENCE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E2-ASSISTANT-SDK-MOCK",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E2-CONVERSATION-CATALOG",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E2-VERIFICATION-RECOVERY",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E2-VERIFICATION-FINISHED-STATES",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E2-ATTENTION-SIGNAL",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E2-REVIEW-TIMING",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E2-ROUTE-FIXTURE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E2-ATTENTION-WORKBENCH",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E2-ROUTE-ADVICE",
-          "status": "NOT_TESTED",
-          "reason": "No route-advice producer or HTTP entry exists; the schema fixture and gate validators are prepared, and the default path remains closed."
-        },
-        {
-          "id": "E2-PROJECT-SETTINGS",
-          "status": "NOT_TESTED",
-          "reason": "Project settings GET returned 422 and POST returned 422 (unsupported_capability)."
-        },
-        {
-          "id": "E2-REPLY-DURABLE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E2-REPLY-UNKNOWN-DURABLE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E2-REPLY-MESSAGE-WINDOW",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E2-REPLY-BAD-ARTIFACT",
-          "status": "PASS",
-          "reason": null
-        }
-      ]
-    },
-    {
-      "id": "E3",
-      "title": "Two original projects installed daily journey",
+      "id": "C2",
+      "title": "Same-cohort dual original projects and history",
       "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "composite stale candidate refused; accept readiness verification-based; reopen compares ids and every byte; original-project applicability remains NOT_REACHED."
+        "both registered projects run the full chain; original-project applicability NOT_REACHED; W35 completion-history route absent (404) with successor input."
       ],
-      "result": "PASS_WITH_GAPS",
-      "counts": {
-        "PASS": 32,
-        "NOT_TESTED": 6
-      },
-      "cases": [
-        {
-          "id": "E3-MUTATE-SAME-PROJECT-SCOPED-403",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E3-MUTATE-SAME-PROJECT-NO-DRAFT",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E3-MUTATE-INSIGHTS-WINDOW",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E3-MUTATE-SAME-PROJECT-INSIGHTS-403",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E3-DESKTOP-GEOMETRY",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E3-NOTEBOOK-GEOMETRY",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E3-MOBILE-GEOMETRY",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E3-QUESTION-FORM",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E3-ACCEPT-AND-DOWNLOAD",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E3-OFFLINE-AND-ERROR",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E3-KEYBOARD-AND-SCROLL",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E3-CONVERSATION-UI",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E3-VERIFICATION-RECOVERY-UI",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E3-ASSISTANT-SCHEMA-FIXTURES",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E3-ASSISTANT-DOMAIN-ADMISSION",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E3-ASSISTANT-END-TO-END",
-          "status": "NOT_TESTED",
-          "reason": "Explicit decisions now work over HTTP (E3-DECISION-WORKFLOW); automatic context/proposal confirmation is still absent."
-        },
-        {
-          "id": "E3-REVIEW-FIXTURES",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E3-SEALED-COPY",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E3-REVIEW-ACTIVITY-UI",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E3-REVIEW-PIPELINE",
-          "status": "NOT_TESTED",
-          "reason": "No public entry creates a review Work/Ticket/Assignment or publishes ReviewEvidence; the independent pilot preflight is BLOCKED on pricing."
-        },
-        {
-          "id": "E3-ATTENTION-INBOX",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E3-ATTENTION-DEADLINES",
-          "status": "NOT_TESTED",
-          "reason": "No public entry creates a question with a real decisionDeadline/expiresAt in this checkout; waiting-age and unknown-wait ordering are verified instead."
-        },
-        {
-          "id": "E3-ATTENTION-INBOX-UI",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E3-DECISION-WORKFLOW",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E3-DECISION-SOURCE-STATES",
-          "status": "NOT_TESTED",
-          "reason": "No public entry deletes/changes the source message or expires the project grant; transaction-failure injection is not exposed. These remain NOT_TESTED."
-        },
-        {
-          "id": "E3-PROPOSAL-CONTEXT-BOUNDARY",
-          "status": "NOT_TESTED",
-          "reason": "NOT_TESTED: context preview now exists, but automatic proposal confirmation and grant/revocation invalidation do not. Required inputs: proposal id/revision, source message and digest, current grant/scope/profile/contract, decision to confirm, plus context preview with project/conversation/work binding, window and invalidity. Planned negatives: unconfirmed means no execution; a failed original command leaves no half-confirmed state; an unknown response reuses the same command id; source/actor/grant/scope/profile/version drift is refused; revoke invalidates later context; cross-project isolation and reopen."
-        },
-        {
-          "id": "E3-PROPOSAL-HTTP",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E3-CONTEXT-GRANT-BOUNDARY",
-          "status": "NOT_TESTED",
-          "reason": "NOT_TESTED: E3-CONTEXT-PREVIEW verifies clamped budgets, omissions and basic refusals, but no public entry binds an expired grant or purpose mismatch to the read path. Required: expired grant, purpose mismatch, caller budget above the grant and negative/NaN budget must be refused before any provider read, with the effective window and truncation reported. The C composer probe shows these still fail at the library boundary, so a product pass cannot be claimed."
-        },
-        {
-          "id": "E3-PROPOSAL-UI",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E3-CONTEXT-PREVIEW",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E3-CONTEXT-USE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E3-CONTEXT-SSE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E3-CONTEXT-GUARDS",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E3-CONTEXT-HISTORY",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E3-CONTEXT-SOURCES",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E3-CONTEXT-UI",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E3-PERSONAL-COLD-START",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E3-TRIAL-WORKBENCH-UI",
-          "status": "PASS",
-          "reason": null
-        }
-      ]
+      "result": "SEE_RUN",
+      "counts": {},
+      "cases": []
     },
     {
-      "id": "E4",
-      "title": "Locked outer product with model settings boundary",
+      "id": "C3",
+      "title": "Non-empty W35 recovery and current upgrade",
       "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "W33 outer phases plus instance reuse and invalid-permission policy; successor model-save surface HELD until a D-frozen package exists."
+        "W35 non-empty business restore/read-only read-back and W33→W35 upgrade with E own binary rollback; D's W35 BLOCKED retained."
       ],
-      "result": "PASS_WITH_GAPS",
-      "counts": {
-        "PASS": 21,
-        "NOT_TESTED": 3
-      },
-      "cases": [
-        {
-          "id": "E4-COMPLETED-REPLY",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E4-CANDIDATE-FLOW",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E4-BOUNDED-CYCLES",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E4-PORTABILITY-CHECKLIST",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E4-RECOVERY-READONLY",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E4-DISTRIBUTION-PREREQUISITES",
-          "status": "NOT_TESTED",
-          "reason": "Distribution source paths absent from this checkout: none. A frozen tar.gz is published outside Git and independently accepted by E4-INSTALL-*; source-level installation and migration remain Agent D owned and are not claimed by this case."
-        },
-        {
-          "id": "E4-REAUTHORIZATION",
-          "status": "NOT_TESTED",
-          "reason": "Read-only inspect/prepare are verified (plan authorization=not_granted, commitAvailable=false, no writes, stale/foreign/commit refused). The commit path, expiry/drift/replay/rollback of a real grant, and activation of only new work are not implemented and stay NOT_TESTED."
-        },
-        {
-          "id": "E4-INSTALL-ARTIFACT-IDENTITY",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E4-INSTALL-FIRST-RUN",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E4-INSTALL-CONFIG-ROOT",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E4-INSTALL-REUSE-CONCURRENCY",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E4-INSTALL-HOST-GUARDS",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E4-BACKUP-RESTORE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E4-INSTALL-TAMPER",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E4-INSTALL-ROLLBACK",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E4-UPGRADE-ROLLBACK",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E4-UPGRADE-CROSS-SCHEMA",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E4-MULTI-STATE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E4-UPGRADE-FAULTS",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E4-RECOVERY-PREFLIGHT",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E4-B-PRODUCTION-RECOVERY",
-          "status": "NOT_TESTED",
-          "reason": "NOT_TESTED: current main product path uses ProductExecution with fixture/Codex profiles, but B's new production control candidate is not consumed by main and native execution is outside this wave. Required: actual product begin command -> Work/Ticket/effect/fact_receipts/dispatch_receipts/answers/answer_deliveries/user_questions/runtime rows, real transport/epoch counts, independent process SIGKILL, unknown no resend, and stop/answer through the existing queue. A fixture or receipt-only row is not production recovery."
-        },
-        {
-          "id": "E4-SOURCE-CONFIRM",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E4-SOURCE-CONFIRM-REFUSAL",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E4-PERSONAL-RESTORED-REVIEW",
-          "status": "PASS",
-          "reason": null
-        }
-      ]
+      "result": "SEE_RUN",
+      "counts": {},
+      "cases": []
     },
     {
-      "id": "E5",
-      "title": "Growing non-empty business backup and authorized recovery",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4",
-      "notes": [
-        "all artifact bytes, both Works, pre-stop question, effect rows, registry, auth policy and no-provider read-back."
-      ],
-      "result": "PASS_WITH_GAPS",
-      "counts": {
-        "NOT_TESTED": 2,
-        "PASS": 8
-      },
-      "cases": [
-        {
-          "id": "E5-NATIVE-CONTROL",
-          "status": "NOT_TESTED",
-          "reason": "No executed native stop/question/recovery evidence is available in this checkout."
-        },
-        {
-          "id": "E5-INSTALLED-CANDIDATES",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E5-RECOVERY-INTERRUPTION",
-          "status": "NOT_TESTED",
-          "reason": "NOT_TESTED: main has published RecoveryTargetConfiguration/preparation/material/inventory schemas and a configuration binder, but no commit/activate HTTP or composed target startup. Required inputs: source-committed activation fact, A read-only inventory, D materializer readback, main activation pointer switch, and crash replay semantics. Planned negatives: interruption before source commit, after source commit but before target preparation, during target preparation, and at pointer switch must never dispatch old queues, never grant authority from an old ended/PID/missing writer, and never duplicate authorization on response loss or restart; a backup/re-restore must not inherit executable authority. A schema or read-only prepare is not activation."
-        },
-        {
-          "id": "E5-D-OWNERSHIP-MOCKS",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E5-WORKFLOW-FORMATS",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E5-RESTORED-REVIEW-REFUSALS",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E5-REVIEW-REUSE-CONSISTENCY",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E5-STOP-FUNCTIONAL",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E5-TWO-PROJECT-TEMPLATE-CREATE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E5-COHORT-UPGRADE",
-          "status": "PASS",
-          "reason": null
-        }
-      ]
-    },
-    {
-      "id": "E6",
-      "title": "Non-empty upgrade, post-write and independent rollback",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4",
-      "notes": [
-        "E own W32→W33 managed upgrade with binary-only rollback; D's new raw retry is recorded separately from the preserved BLOCKED history."
-      ],
-      "result": "PASS_WITH_GAPS",
-      "counts": {
-        "NOT_TESTED": 3,
-        "PASS": 5
-      },
-      "cases": [
-        {
-          "id": "E6-REVIEW-PILOT",
-          "status": "NOT_TESTED",
-          "reason": "Preflight BLOCKED: adapter_missing; 0/24 turns used."
-        },
-        {
-          "id": "E6-INSTALLED-CONTEXT",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E6-ARTIFACT-CURRENT-SCOPE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E6-CURRENT-MAIN-INSTALL",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E6-INSTALLED-SOURCE-CONFIRM",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E6-TARGET-CONTENT-DRIFT",
-          "status": "NOT_TESTED",
-          "reason": "NOT_REACHED: the frozen package has no content-binding consumer in main; the producer-side drifted snapshot result was ok. A target-only append cannot be refused by content because no consumer compares restored content with the source subject. This is a recorded product gap for the C/A owners, not an acceptance pass."
-        },
-        {
-          "id": "E6-SOURCE-UI",
-          "status": "NOT_TESTED",
-          "reason": "NOT_REACHED: the scope-review marker exists in this package and its backend ?scopeReview=1 plain/narrow responses are measured, but the independent browser expansion of a restored message scope has not been recorded. Navigation and the trial workbench are separately browser-verified in E3-TRIAL-WORKBENCH-UI."
-        },
-        {
-          "id": "E6-RECIPE-PREVIEW",
-          "status": "PASS",
-          "reason": null
-        }
-      ]
-    },
-    {
-      "id": "E7",
-      "title": "Colleague roots and multi-instance operation",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4",
-      "notes": [
-        "two explicit roots on one install, distinct identities, independent stop, doctor without secret echo; same machine/user only."
-      ],
-      "result": "PASS",
-      "counts": {
-        "PASS": 8
-      },
-      "cases": [
-        {
-          "id": "E7-BACKUP-CONTEXT-REPLY",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E7-OWNERSHIP-COPY",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E7-OWNERSHIP-WRONG-INSTALL",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E7-SECOND-ROOT-READONLY",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E7-SCOPE-DIAGNOSTICS",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E7-READINESS",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E7-JOURNEY-CONTEXT-SOURCE",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E7-MULTI-INSTANCE",
-          "status": "PASS",
-          "reason": null
-        }
-      ]
-    },
-    {
-      "id": "E8",
-      "title": "Original Work recovery consumer",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4",
-      "notes": [
-        "NOT_REACHED with exact owner inputs; callbacks/slots/receipt-only rows are not substitutes."
-      ],
-      "result": "PASS_WITH_GAPS",
-      "counts": {
-        "PASS": 4,
-        "NOT_TESTED": 1
-      },
-      "cases": [
-        {
-          "id": "E8-SCHEMA-MIGRATION",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E8-LEGACY16-MIGRATION",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E8-PACKAGED-STOP-CONSISTENCY",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E8-JOURNEY-STOP-REOPEN",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E8-ORIGINAL-WORK-RECOVERY",
-          "status": "NOT_TESTED",
-          "reason": "NOT_TESTED: no published main/B/I consumer rescues an original faulted Work into the original Broker/queue. Required inputs: published original attachRunnerAttempt consumer in main wired to a real recovered attempt; original Work/Ticket/Assignment/epoch/contract identities for the faulted run; B/I quarantined terminal lease and unknown-send disposition (no resend) with original command receipts; original QuestionBroker answer/check/candidate/manual-accept path for the same Work; original scheduler slot return for the 2/4 resources with full birth/identity facts. Planned negatives: an unknown native send is reconciled before any retry, never resent with a new identity; a foreign epoch/source or a late fact cannot write into the current attempt; a terminal lease cannot be re-used without a fresh original authorization; a new Work/Ticket cannot substitute for the original Work ids. A callback source, channel slot or receipt-only row is not a recovered positive; this remains an explicit gap and does not block installed/data/support work."
-        }
-      ]
-    },
-    {
-      "id": "E9",
-      "title": "Layered tiers and complete handoff",
+      "id": "C4",
+      "title": "Current product tiers, GUI save and maintenance handoff",
       "command": "node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record",
       "notes": [
-        "wave35-status separates legacy R1 and the W33 subset and keeps the pilot/native/value BLOCKED."
+        "W35 real GUI save/private file/no model request/no echo; outer/launcher fix; multi-instance/doctor; R1/W33/W35 separated tiers."
       ],
-      "result": "PASS",
-      "counts": {
-        "PASS": 4
-      },
-      "cases": [
-        {
-          "id": "E9-CONTEXT-CONCURRENCY",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E9-INSTALLED-STABILITY",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E9-COORDINATOR-CHANNEL-CONTRACT",
-          "status": "PASS",
-          "reason": null
-        },
-        {
-          "id": "E9-INSIGHTS-HTTP",
-          "status": "PASS",
-          "reason": null
-        }
-      ]
+      "result": "SEE_RUN",
+      "counts": {},
+      "cases": []
     }
   ],
   "release": {
@@ -1576,12 +68,12 @@
     "tier": "controlled-product-workflow",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-17T01:35:43.572Z",
+    "checkedAt": "2026-11-17T05:20:35.244Z",
     "source": {
-      "commit": "4b4d4089a07e10b01c9deba32f0d51c23e96bdf1",
+      "commit": "105595d2b6e7045b0300302af96e216506c4aeda",
       "dirty": false
     },
-    "expectedSource": "4b4d4089a07e10b01c9deba32f0d51c23e96bdf1",
+    "expectedSource": "105595d2b6e7045b0300302af96e216506c4aeda",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -2366,31 +858,31 @@
       "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability; there is no allow-gap switch."
     ]
   },
-  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z",
+  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T05-10-17-187Z",
   "evidence": {
-    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/report.json",
-    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/release.json",
+    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T05-10-17-187Z/report.json",
+    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T05-10-17-187Z/release.json",
     "screenshots": [
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/desktop-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/notebook-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/mobile-main.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/mobile-navigation.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/mobile-detail.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/desktop-delivered.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/desktop-error.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/desktop-offline.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/desktop-keyboard.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/mobile-conversations.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/desktop-verification-blocked.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/desktop-verification-recovered.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/desktop-review-activity.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/mobile-attention-inbox.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/proposal-preview-desktop.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/proposal-preview-notebook.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/proposal-preview-mobile.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/context-confirm-desktop.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/context-confirm-mobile.png",
-      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/context-history-mobile.png"
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T05-10-17-187Z/screenshots/desktop-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T05-10-17-187Z/screenshots/notebook-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T05-10-17-187Z/screenshots/mobile-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T05-10-17-187Z/screenshots/mobile-navigation.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T05-10-17-187Z/screenshots/mobile-detail.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T05-10-17-187Z/screenshots/desktop-delivered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T05-10-17-187Z/screenshots/desktop-error.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T05-10-17-187Z/screenshots/desktop-offline.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T05-10-17-187Z/screenshots/desktop-keyboard.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T05-10-17-187Z/screenshots/mobile-conversations.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T05-10-17-187Z/screenshots/desktop-verification-blocked.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T05-10-17-187Z/screenshots/desktop-verification-recovered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T05-10-17-187Z/screenshots/desktop-review-activity.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T05-10-17-187Z/screenshots/mobile-attention-inbox.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T05-10-17-187Z/proposal-preview-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T05-10-17-187Z/proposal-preview-notebook.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T05-10-17-187Z/proposal-preview-mobile.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T05-10-17-187Z/screenshots/context-confirm-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T05-10-17-187Z/screenshots/context-confirm-mobile.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T05-10-17-187Z/screenshots/context-history-mobile.png"
     ],
     "matrix": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/release-matrix.json",
     "executionStatus": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/execution-status.json",
@@ -2706,8 +1198,8 @@
       "proof": {
         "proven": true,
         "stopped": [
-          25128,
-          25129
+          85191,
+          85192
         ],
         "unknownLive": []
       }
@@ -2860,38 +1352,38 @@
           "present": true,
           "mode": "personal",
           "startupMode": "normal",
-          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/seed-state",
-          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/app",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/seed-state",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/install/app",
           "resources": [
             {
               "label": "launcher",
-              "pid": 58522,
-              "start": "Tue Nov 17 09:33:39 2026",
+              "pid": 16978,
+              "start": "Tue Nov 17 13:16:08 2026",
               "uid": 501,
               "parentPid": null,
-              "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/app/apps/launcher/bin/pa.mjs start --json --port 63798 --api-port 63799 --discussion-only"
+              "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/install/app/apps/launcher/bin/pa.mjs start --json --port 54563 --api-port 54564 --discussion-only"
             },
             {
               "label": "child",
-              "pid": 58559,
-              "start": "Tue Nov 17 09:33:40 2026",
+              "pid": 17015,
+              "start": "Tue Nov 17 13:16:09 2026",
               "uid": 501,
-              "parentPid": 58522,
-              "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/app/apps/coordinator/product/demo.ts --port 63799 --state /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/seed-state --console-origin htt"
+              "parentPid": 16978,
+              "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/install/app/apps/coordinator/product/demo.ts --port 54564 --state /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/seed-state --console-origin htt"
             }
           ]
         },
         "after": [
           {
-            "pid": 58522,
-            "expectedStart": "Tue Nov 17 09:33:39 2026",
+            "pid": 16978,
+            "expectedStart": "Tue Nov 17 13:16:08 2026",
             "alive": false,
             "start": null,
             "sameIdentity": false
           },
           {
-            "pid": 58559,
-            "expectedStart": "Tue Nov 17 09:33:40 2026",
+            "pid": 17015,
+            "expectedStart": "Tue Nov 17 13:16:09 2026",
             "alive": false,
             "start": null,
             "sameIdentity": false
@@ -2915,38 +1407,38 @@
           "present": true,
           "mode": "personal",
           "startupMode": "recovery_readonly",
-          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/restored",
-          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/app",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/restored",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/install/app",
           "resources": [
             {
               "label": "launcher",
-              "pid": 58854,
-              "start": "Tue Nov 17 09:33:41 2026",
+              "pid": 17311,
+              "start": "Tue Nov 17 13:16:10 2026",
               "uid": 501,
               "parentPid": null,
-              "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/app/apps/launcher/bin/pa.mjs start --json --port 63807 --api-port 63808 --discussion-only"
+              "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/install/app/apps/launcher/bin/pa.mjs start --json --port 54579 --api-port 54580 --discussion-only"
             },
             {
               "label": "child",
-              "pid": 58896,
-              "start": "Tue Nov 17 09:33:42 2026",
+              "pid": 17347,
+              "start": "Tue Nov 17 13:16:11 2026",
               "uid": 501,
-              "parentPid": 58854,
-              "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/app/apps/coordinator/product/demo.ts --port 63808 --state /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/restored --console-origin http:"
+              "parentPid": 17311,
+              "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/install/app/apps/coordinator/product/demo.ts --port 54580 --state /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/restored --console-origin http:"
             }
           ]
         },
         "after": [
           {
-            "pid": 58854,
-            "expectedStart": "Tue Nov 17 09:33:41 2026",
+            "pid": 17311,
+            "expectedStart": "Tue Nov 17 13:16:10 2026",
             "alive": false,
             "start": null,
             "sameIdentity": false
           },
           {
-            "pid": 58896,
-            "expectedStart": "Tue Nov 17 09:33:42 2026",
+            "pid": 17347,
+            "expectedStart": "Tue Nov 17 13:16:11 2026",
             "alive": false,
             "start": null,
             "sameIdentity": false
@@ -2979,7 +1471,7 @@
     "restoredPersonalReview": {
       "status": "PASS",
       "consumerOrigin": "package",
-      "healthDigest": "5a0ad2b542840141fff74154dee8771773df77f9fbb63ffb5f48e3a70b2ead55"
+      "healthDigest": "3516c179165dc6af35e12988cda619d2ffa1ae2056655ce0533c7537ba9845df"
     },
     "restoredReviewRefusals": "PASS",
     "reviewReuse": {
@@ -2999,7 +1491,7 @@
       "status": "PASS",
       "normal": {
         "protocol": "trial-readiness/1",
-        "observedAt": "2026-11-17T01:33:37.342Z",
+        "observedAt": "2026-11-17T05:16:06.286Z",
         "configurationRevision": "a9c826f123324b2d8f1a07902775e6a1c453f4de86b467027490a903c324e84b",
         "mode": "personal",
         "startupMode": "normal",
@@ -3030,8 +1522,8 @@
       },
       "readonly": {
         "protocol": "trial-readiness/1",
-        "observedAt": "2026-11-17T01:33:38.419Z",
-        "configurationRevision": "ad50f6b2d9bcc4324c43e1f5f9c657e48ed7fa8043bc442602816837efc61305",
+        "observedAt": "2026-11-17T05:16:07.366Z",
+        "configurationRevision": "4ef4e0afbea373efd0031b5a2fd9216efc79fa821d557d4ecc22aa1f17b10833",
         "mode": "personal",
         "startupMode": "recovery_readonly",
         "discussion": "unknown",
@@ -3061,7 +1553,7 @@
       },
       "fixture": {
         "protocol": "trial-readiness/1",
-        "observedAt": "2026-11-17T01:33:39.651Z",
+        "observedAt": "2026-11-17T05:16:08.562Z",
         "configurationRevision": "83d2a00c18fe919d4671f2916ce9baec23e44fc5cfd8f51b3ba2d241462e06af",
         "mode": "fixture",
         "startupMode": "normal",
@@ -3107,21 +1599,21 @@
       "screenshots": [
         {
           "path": "tests/product-acceptance/reports/wave27/browser/desktop.png",
-          "sha256": "82d8f257bf196f2536bba9930af380dea468ad5bccc28e9fc426fa01818ba68a",
-          "bytes": 124585,
-          "size": 124585
+          "sha256": "5ff1686fe23f606658e93a1e8df6fd4a83f47a5e01f170c4b9ae4ce0b5fb5b0b",
+          "bytes": 124535,
+          "size": 124535
         },
         {
           "path": "tests/product-acceptance/reports/wave27/browser/mobile.png",
-          "sha256": "92fd6f14c8d7b414871cb4ced2a8bd2bb765d65361614ff3ee00f16d6b0d9494",
-          "bytes": 55970,
-          "size": 55970
+          "sha256": "62985ddedcee011af3906ad578b4c65a660d02d1f30704d95a6e129ba39b9f6c",
+          "bytes": 55943,
+          "size": 55943
         },
         {
           "path": "tests/product-acceptance/reports/wave27/browser/configured-conversation.png",
-          "sha256": "78c0eb1d366de861cc08c882c53d924e090ab5b0c76f40b230e0da0847a88a68",
-          "bytes": 76516,
-          "size": 76516
+          "sha256": "1db9470e1d7c1f06b92ae0fa7c45dc3edabecf82fffa91c16f0385c71ef85151",
+          "bytes": 76517,
+          "size": 76517
         }
       ],
       "bundle": {
@@ -3137,10 +1629,10 @@
           "copied": 22,
           "digests": [
             {
-              "id": "ef4ac502afc7eb974dd44066dc07b93cf1f235eb25bd9e34295939123021cf8e",
+              "id": "9a8244c1c91704c0300928008b028e9cb8c5ad72e105f9acfd49e8fd12164804",
               "present": true,
-              "digest": "ef4ac502afc7eb974dd44066dc07b93cf1f235eb25bd9e34295939123021cf8e",
-              "registryDigest": "ef4ac502afc7eb974dd44066dc07b93cf1f235eb25bd9e34295939123021cf8e",
+              "digest": "9a8244c1c91704c0300928008b028e9cb8c5ad72e105f9acfd49e8fd12164804",
+              "registryDigest": "9a8244c1c91704c0300928008b028e9cb8c5ad72e105f9acfd49e8fd12164804",
               "match": true,
               "bytes": 412
             },
@@ -3153,34 +1645,34 @@
               "bytes": 234
             },
             {
-              "id": "752405bd6468c6f4ed8b7266598217d171f355f6bcf7295cca74eec42b3e964c",
+              "id": "658dca086cbd81a308be7b62719e464751afc7a5c49a743eaeac7621fd7e4151",
               "present": true,
-              "digest": "752405bd6468c6f4ed8b7266598217d171f355f6bcf7295cca74eec42b3e964c",
-              "registryDigest": "752405bd6468c6f4ed8b7266598217d171f355f6bcf7295cca74eec42b3e964c",
+              "digest": "658dca086cbd81a308be7b62719e464751afc7a5c49a743eaeac7621fd7e4151",
+              "registryDigest": "658dca086cbd81a308be7b62719e464751afc7a5c49a743eaeac7621fd7e4151",
               "match": true,
               "bytes": 704
             },
             {
-              "id": "b0fe867ca9a3fc166db01357fc03a64bd047f6913358115b40eb79e95829ee5d",
+              "id": "28122ca5fb530d938e8d5901b796c322d2dbbf17ca0fb08c5f7031be554c9c8d",
               "present": true,
-              "digest": "b0fe867ca9a3fc166db01357fc03a64bd047f6913358115b40eb79e95829ee5d",
-              "registryDigest": "b0fe867ca9a3fc166db01357fc03a64bd047f6913358115b40eb79e95829ee5d",
+              "digest": "28122ca5fb530d938e8d5901b796c322d2dbbf17ca0fb08c5f7031be554c9c8d",
+              "registryDigest": "28122ca5fb530d938e8d5901b796c322d2dbbf17ca0fb08c5f7031be554c9c8d",
               "match": true,
               "bytes": 712
             },
             {
-              "id": "bc32eb83f1f8e5f4b3e4176e6bc8b3e5be07a901efbc1aac2b1f4019dab29cc3",
+              "id": "e387a29e74bccc85cfc449594025ff2addab7fa5aa77fa03dd875ddaecdab05f",
               "present": true,
-              "digest": "bc32eb83f1f8e5f4b3e4176e6bc8b3e5be07a901efbc1aac2b1f4019dab29cc3",
-              "registryDigest": "bc32eb83f1f8e5f4b3e4176e6bc8b3e5be07a901efbc1aac2b1f4019dab29cc3",
+              "digest": "e387a29e74bccc85cfc449594025ff2addab7fa5aa77fa03dd875ddaecdab05f",
+              "registryDigest": "e387a29e74bccc85cfc449594025ff2addab7fa5aa77fa03dd875ddaecdab05f",
               "match": true,
               "bytes": 262
             },
             {
-              "id": "8307a8ca474f88962e6f854f25abdb60278afb1d7753a03f0a70f6836da008ea",
+              "id": "cb8769c40ccafbf640022efc51008dcb69697e24620639c5ce4324a3657718b5",
               "present": true,
-              "digest": "8307a8ca474f88962e6f854f25abdb60278afb1d7753a03f0a70f6836da008ea",
-              "registryDigest": "8307a8ca474f88962e6f854f25abdb60278afb1d7753a03f0a70f6836da008ea",
+              "digest": "cb8769c40ccafbf640022efc51008dcb69697e24620639c5ce4324a3657718b5",
+              "registryDigest": "cb8769c40ccafbf640022efc51008dcb69697e24620639c5ce4324a3657718b5",
               "match": true,
               "bytes": 267
             },
@@ -3193,50 +1685,50 @@
               "bytes": 153
             },
             {
-              "id": "cf8e68fd920dfa0cb6645bae8b9145504fac0c3e9c25716329c7ed982e055fb5",
+              "id": "e7ee233ac59b11eb68e978bbb07a0d654c2a6a3ca939f68f0bf86a000e03a835",
               "present": true,
-              "digest": "cf8e68fd920dfa0cb6645bae8b9145504fac0c3e9c25716329c7ed982e055fb5",
-              "registryDigest": "cf8e68fd920dfa0cb6645bae8b9145504fac0c3e9c25716329c7ed982e055fb5",
+              "digest": "e7ee233ac59b11eb68e978bbb07a0d654c2a6a3ca939f68f0bf86a000e03a835",
+              "registryDigest": "e7ee233ac59b11eb68e978bbb07a0d654c2a6a3ca939f68f0bf86a000e03a835",
               "match": true,
               "bytes": 1330
             },
             {
-              "id": "8c0dc20f8a90e7e34063ad8fb5305f7a65f80997db2f8b82197399ced1133a17",
+              "id": "025254d40976436180de100a03f6732926aafcf491427da38f9d84875e4bcba6",
               "present": true,
-              "digest": "8c0dc20f8a90e7e34063ad8fb5305f7a65f80997db2f8b82197399ced1133a17",
-              "registryDigest": "8c0dc20f8a90e7e34063ad8fb5305f7a65f80997db2f8b82197399ced1133a17",
+              "digest": "025254d40976436180de100a03f6732926aafcf491427da38f9d84875e4bcba6",
+              "registryDigest": "025254d40976436180de100a03f6732926aafcf491427da38f9d84875e4bcba6",
               "match": true,
               "bytes": 570
             },
             {
-              "id": "4e5b188ef5f7f78edfc2a791ccc3c9f5513e549ec83158b9586e5a2bca124555",
+              "id": "95ca37844032f68475ecf12150b829693988033b05a10ae1ba0874407212079e",
               "present": true,
-              "digest": "4e5b188ef5f7f78edfc2a791ccc3c9f5513e549ec83158b9586e5a2bca124555",
-              "registryDigest": "4e5b188ef5f7f78edfc2a791ccc3c9f5513e549ec83158b9586e5a2bca124555",
+              "digest": "95ca37844032f68475ecf12150b829693988033b05a10ae1ba0874407212079e",
+              "registryDigest": "95ca37844032f68475ecf12150b829693988033b05a10ae1ba0874407212079e",
               "match": true,
               "bytes": 790
             },
             {
-              "id": "d19eeee0dc297f8035a7ca887f03f5a84002b54c90652c0d8e7cec319dcb2777",
+              "id": "09ea93611dc36bd6b816bcaef1d0bce74d536cfa6bbb22ca7942c3cd10fef814",
               "present": true,
-              "digest": "d19eeee0dc297f8035a7ca887f03f5a84002b54c90652c0d8e7cec319dcb2777",
-              "registryDigest": "d19eeee0dc297f8035a7ca887f03f5a84002b54c90652c0d8e7cec319dcb2777",
+              "digest": "09ea93611dc36bd6b816bcaef1d0bce74d536cfa6bbb22ca7942c3cd10fef814",
+              "registryDigest": "09ea93611dc36bd6b816bcaef1d0bce74d536cfa6bbb22ca7942c3cd10fef814",
               "match": true,
               "bytes": 174
             },
             {
-              "id": "134e7551e739b17fb58f692fcb1a8bb88ba764dc09404084b23f4c0ab0bd3ce8",
+              "id": "7354d7d1cedab4cb9a5bebb2ecaf6aca5c269616c6471bc27881ea0b44a766ea",
               "present": true,
-              "digest": "134e7551e739b17fb58f692fcb1a8bb88ba764dc09404084b23f4c0ab0bd3ce8",
-              "registryDigest": "134e7551e739b17fb58f692fcb1a8bb88ba764dc09404084b23f4c0ab0bd3ce8",
+              "digest": "7354d7d1cedab4cb9a5bebb2ecaf6aca5c269616c6471bc27881ea0b44a766ea",
+              "registryDigest": "7354d7d1cedab4cb9a5bebb2ecaf6aca5c269616c6471bc27881ea0b44a766ea",
               "match": true,
               "bytes": 187
             },
             {
-              "id": "2500a63888d6b614c41142b9d2817d338f1f11134992e901e8be7dad81b68f42",
+              "id": "243122b13fa3a928aef912aec6377f621638e49c3f3e8f228e1df067fa02affe",
               "present": true,
-              "digest": "2500a63888d6b614c41142b9d2817d338f1f11134992e901e8be7dad81b68f42",
-              "registryDigest": "2500a63888d6b614c41142b9d2817d338f1f11134992e901e8be7dad81b68f42",
+              "digest": "243122b13fa3a928aef912aec6377f621638e49c3f3e8f228e1df067fa02affe",
+              "registryDigest": "243122b13fa3a928aef912aec6377f621638e49c3f3e8f228e1df067fa02affe",
               "match": true,
               "bytes": 253
             },
@@ -3249,28 +1741,28 @@
               "bytes": 142
             },
             {
-              "id": "1c097c07ef83af8da1ae956643e9fa80d7720ba8e7326636bacac9e130ecbcbb",
+              "id": "064a51f3818f2d75e47d47f8c198f65928c4388e297578f16fd8fe7614da3b0e",
               "present": true,
-              "digest": "1c097c07ef83af8da1ae956643e9fa80d7720ba8e7326636bacac9e130ecbcbb",
-              "registryDigest": "1c097c07ef83af8da1ae956643e9fa80d7720ba8e7326636bacac9e130ecbcbb",
+              "digest": "064a51f3818f2d75e47d47f8c198f65928c4388e297578f16fd8fe7614da3b0e",
+              "registryDigest": "064a51f3818f2d75e47d47f8c198f65928c4388e297578f16fd8fe7614da3b0e",
               "match": true,
               "bytes": 874
             },
             {
-              "id": "257b55ffd61e53c84fb1653067a34c9ffb7eafee11fc0aa80bb527c5568f7dc3",
+              "id": "889a8df36cd2a373a814d143810af2345309736ababb783f5aecf3645d1c9e64",
               "present": true,
-              "digest": "257b55ffd61e53c84fb1653067a34c9ffb7eafee11fc0aa80bb527c5568f7dc3",
-              "registryDigest": "257b55ffd61e53c84fb1653067a34c9ffb7eafee11fc0aa80bb527c5568f7dc3",
+              "digest": "889a8df36cd2a373a814d143810af2345309736ababb783f5aecf3645d1c9e64",
+              "registryDigest": "889a8df36cd2a373a814d143810af2345309736ababb783f5aecf3645d1c9e64",
               "match": true,
               "bytes": 234
             },
             {
-              "id": "4140d803f988383ccacfabfaf83cfb3d485bfde4cf495017a5b347fcdbfbfd84",
+              "id": "10cd2c58eb36e5164c5e091f55b35b4be7ff4a1f1ecc2de1cd5f6e162e394c51",
               "present": true,
-              "digest": "4140d803f988383ccacfabfaf83cfb3d485bfde4cf495017a5b347fcdbfbfd84",
-              "registryDigest": "4140d803f988383ccacfabfaf83cfb3d485bfde4cf495017a5b347fcdbfbfd84",
+              "digest": "10cd2c58eb36e5164c5e091f55b35b4be7ff4a1f1ecc2de1cd5f6e162e394c51",
+              "registryDigest": "10cd2c58eb36e5164c5e091f55b35b4be7ff4a1f1ecc2de1cd5f6e162e394c51",
               "match": true,
-              "bytes": 1143
+              "bytes": 376
             },
             {
               "id": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
@@ -3281,6 +1773,14 @@
               "bytes": 24
             },
             {
+              "id": "545f23355d49c06ccfd73aa1e279d372c4e5fcdc4639b4643c353a8a54d2ce4d",
+              "present": true,
+              "digest": "545f23355d49c06ccfd73aa1e279d372c4e5fcdc4639b4643c353a8a54d2ce4d",
+              "registryDigest": "545f23355d49c06ccfd73aa1e279d372c4e5fcdc4639b4643c353a8a54d2ce4d",
+              "match": true,
+              "bytes": 1143
+            },
+            {
               "id": "57f2162bd14e3cc029b4cd1c23a5bbe9768b8e669db1fb878123d106fb580506",
               "present": true,
               "digest": "57f2162bd14e3cc029b4cd1c23a5bbe9768b8e669db1fb878123d106fb580506",
@@ -3289,18 +1789,10 @@
               "bytes": 213
             },
             {
-              "id": "6d189cf0beb05fe420debc9009b051042453b70a3ab388bf9ec82555bc6179da",
+              "id": "750c8747bb25dbd2fde554007ce10ba20ee72b7ccfd1c6e21b418b17aa0e6980",
               "present": true,
-              "digest": "6d189cf0beb05fe420debc9009b051042453b70a3ab388bf9ec82555bc6179da",
-              "registryDigest": "6d189cf0beb05fe420debc9009b051042453b70a3ab388bf9ec82555bc6179da",
-              "match": true,
-              "bytes": 376
-            },
-            {
-              "id": "bd4f14aaf4789832d92b3aa1ac2efa3d10cac93534a17ed8ff4f1425a9dbe932",
-              "present": true,
-              "digest": "bd4f14aaf4789832d92b3aa1ac2efa3d10cac93534a17ed8ff4f1425a9dbe932",
-              "registryDigest": "bd4f14aaf4789832d92b3aa1ac2efa3d10cac93534a17ed8ff4f1425a9dbe932",
+              "digest": "750c8747bb25dbd2fde554007ce10ba20ee72b7ccfd1c6e21b418b17aa0e6980",
+              "registryDigest": "750c8747bb25dbd2fde554007ce10ba20ee72b7ccfd1c6e21b418b17aa0e6980",
               "match": true,
               "bytes": 1615
             },
@@ -3319,10 +1811,10 @@
           "copied": 22,
           "digests": [
             {
-              "id": "ef4ac502afc7eb974dd44066dc07b93cf1f235eb25bd9e34295939123021cf8e",
+              "id": "9a8244c1c91704c0300928008b028e9cb8c5ad72e105f9acfd49e8fd12164804",
               "present": true,
-              "digest": "ef4ac502afc7eb974dd44066dc07b93cf1f235eb25bd9e34295939123021cf8e",
-              "registryDigest": "ef4ac502afc7eb974dd44066dc07b93cf1f235eb25bd9e34295939123021cf8e",
+              "digest": "9a8244c1c91704c0300928008b028e9cb8c5ad72e105f9acfd49e8fd12164804",
+              "registryDigest": "9a8244c1c91704c0300928008b028e9cb8c5ad72e105f9acfd49e8fd12164804",
               "match": true,
               "bytes": 412
             },
@@ -3335,34 +1827,34 @@
               "bytes": 234
             },
             {
-              "id": "752405bd6468c6f4ed8b7266598217d171f355f6bcf7295cca74eec42b3e964c",
+              "id": "658dca086cbd81a308be7b62719e464751afc7a5c49a743eaeac7621fd7e4151",
               "present": true,
-              "digest": "752405bd6468c6f4ed8b7266598217d171f355f6bcf7295cca74eec42b3e964c",
-              "registryDigest": "752405bd6468c6f4ed8b7266598217d171f355f6bcf7295cca74eec42b3e964c",
+              "digest": "658dca086cbd81a308be7b62719e464751afc7a5c49a743eaeac7621fd7e4151",
+              "registryDigest": "658dca086cbd81a308be7b62719e464751afc7a5c49a743eaeac7621fd7e4151",
               "match": true,
               "bytes": 704
             },
             {
-              "id": "b0fe867ca9a3fc166db01357fc03a64bd047f6913358115b40eb79e95829ee5d",
+              "id": "28122ca5fb530d938e8d5901b796c322d2dbbf17ca0fb08c5f7031be554c9c8d",
               "present": true,
-              "digest": "b0fe867ca9a3fc166db01357fc03a64bd047f6913358115b40eb79e95829ee5d",
-              "registryDigest": "b0fe867ca9a3fc166db01357fc03a64bd047f6913358115b40eb79e95829ee5d",
+              "digest": "28122ca5fb530d938e8d5901b796c322d2dbbf17ca0fb08c5f7031be554c9c8d",
+              "registryDigest": "28122ca5fb530d938e8d5901b796c322d2dbbf17ca0fb08c5f7031be554c9c8d",
               "match": true,
               "bytes": 712
             },
             {
-              "id": "bc32eb83f1f8e5f4b3e4176e6bc8b3e5be07a901efbc1aac2b1f4019dab29cc3",
+              "id": "e387a29e74bccc85cfc449594025ff2addab7fa5aa77fa03dd875ddaecdab05f",
               "present": true,
-              "digest": "bc32eb83f1f8e5f4b3e4176e6bc8b3e5be07a901efbc1aac2b1f4019dab29cc3",
-              "registryDigest": "bc32eb83f1f8e5f4b3e4176e6bc8b3e5be07a901efbc1aac2b1f4019dab29cc3",
+              "digest": "e387a29e74bccc85cfc449594025ff2addab7fa5aa77fa03dd875ddaecdab05f",
+              "registryDigest": "e387a29e74bccc85cfc449594025ff2addab7fa5aa77fa03dd875ddaecdab05f",
               "match": true,
               "bytes": 262
             },
             {
-              "id": "8307a8ca474f88962e6f854f25abdb60278afb1d7753a03f0a70f6836da008ea",
+              "id": "cb8769c40ccafbf640022efc51008dcb69697e24620639c5ce4324a3657718b5",
               "present": true,
-              "digest": "8307a8ca474f88962e6f854f25abdb60278afb1d7753a03f0a70f6836da008ea",
-              "registryDigest": "8307a8ca474f88962e6f854f25abdb60278afb1d7753a03f0a70f6836da008ea",
+              "digest": "cb8769c40ccafbf640022efc51008dcb69697e24620639c5ce4324a3657718b5",
+              "registryDigest": "cb8769c40ccafbf640022efc51008dcb69697e24620639c5ce4324a3657718b5",
               "match": true,
               "bytes": 267
             },
@@ -3375,50 +1867,50 @@
               "bytes": 153
             },
             {
-              "id": "cf8e68fd920dfa0cb6645bae8b9145504fac0c3e9c25716329c7ed982e055fb5",
+              "id": "e7ee233ac59b11eb68e978bbb07a0d654c2a6a3ca939f68f0bf86a000e03a835",
               "present": true,
-              "digest": "cf8e68fd920dfa0cb6645bae8b9145504fac0c3e9c25716329c7ed982e055fb5",
-              "registryDigest": "cf8e68fd920dfa0cb6645bae8b9145504fac0c3e9c25716329c7ed982e055fb5",
+              "digest": "e7ee233ac59b11eb68e978bbb07a0d654c2a6a3ca939f68f0bf86a000e03a835",
+              "registryDigest": "e7ee233ac59b11eb68e978bbb07a0d654c2a6a3ca939f68f0bf86a000e03a835",
               "match": true,
               "bytes": 1330
             },
             {
-              "id": "8c0dc20f8a90e7e34063ad8fb5305f7a65f80997db2f8b82197399ced1133a17",
+              "id": "025254d40976436180de100a03f6732926aafcf491427da38f9d84875e4bcba6",
               "present": true,
-              "digest": "8c0dc20f8a90e7e34063ad8fb5305f7a65f80997db2f8b82197399ced1133a17",
-              "registryDigest": "8c0dc20f8a90e7e34063ad8fb5305f7a65f80997db2f8b82197399ced1133a17",
+              "digest": "025254d40976436180de100a03f6732926aafcf491427da38f9d84875e4bcba6",
+              "registryDigest": "025254d40976436180de100a03f6732926aafcf491427da38f9d84875e4bcba6",
               "match": true,
               "bytes": 570
             },
             {
-              "id": "4e5b188ef5f7f78edfc2a791ccc3c9f5513e549ec83158b9586e5a2bca124555",
+              "id": "95ca37844032f68475ecf12150b829693988033b05a10ae1ba0874407212079e",
               "present": true,
-              "digest": "4e5b188ef5f7f78edfc2a791ccc3c9f5513e549ec83158b9586e5a2bca124555",
-              "registryDigest": "4e5b188ef5f7f78edfc2a791ccc3c9f5513e549ec83158b9586e5a2bca124555",
+              "digest": "95ca37844032f68475ecf12150b829693988033b05a10ae1ba0874407212079e",
+              "registryDigest": "95ca37844032f68475ecf12150b829693988033b05a10ae1ba0874407212079e",
               "match": true,
               "bytes": 790
             },
             {
-              "id": "d19eeee0dc297f8035a7ca887f03f5a84002b54c90652c0d8e7cec319dcb2777",
+              "id": "09ea93611dc36bd6b816bcaef1d0bce74d536cfa6bbb22ca7942c3cd10fef814",
               "present": true,
-              "digest": "d19eeee0dc297f8035a7ca887f03f5a84002b54c90652c0d8e7cec319dcb2777",
-              "registryDigest": "d19eeee0dc297f8035a7ca887f03f5a84002b54c90652c0d8e7cec319dcb2777",
+              "digest": "09ea93611dc36bd6b816bcaef1d0bce74d536cfa6bbb22ca7942c3cd10fef814",
+              "registryDigest": "09ea93611dc36bd6b816bcaef1d0bce74d536cfa6bbb22ca7942c3cd10fef814",
               "match": true,
               "bytes": 174
             },
             {
-              "id": "134e7551e739b17fb58f692fcb1a8bb88ba764dc09404084b23f4c0ab0bd3ce8",
+              "id": "7354d7d1cedab4cb9a5bebb2ecaf6aca5c269616c6471bc27881ea0b44a766ea",
               "present": true,
-              "digest": "134e7551e739b17fb58f692fcb1a8bb88ba764dc09404084b23f4c0ab0bd3ce8",
-              "registryDigest": "134e7551e739b17fb58f692fcb1a8bb88ba764dc09404084b23f4c0ab0bd3ce8",
+              "digest": "7354d7d1cedab4cb9a5bebb2ecaf6aca5c269616c6471bc27881ea0b44a766ea",
+              "registryDigest": "7354d7d1cedab4cb9a5bebb2ecaf6aca5c269616c6471bc27881ea0b44a766ea",
               "match": true,
               "bytes": 187
             },
             {
-              "id": "2500a63888d6b614c41142b9d2817d338f1f11134992e901e8be7dad81b68f42",
+              "id": "243122b13fa3a928aef912aec6377f621638e49c3f3e8f228e1df067fa02affe",
               "present": true,
-              "digest": "2500a63888d6b614c41142b9d2817d338f1f11134992e901e8be7dad81b68f42",
-              "registryDigest": "2500a63888d6b614c41142b9d2817d338f1f11134992e901e8be7dad81b68f42",
+              "digest": "243122b13fa3a928aef912aec6377f621638e49c3f3e8f228e1df067fa02affe",
+              "registryDigest": "243122b13fa3a928aef912aec6377f621638e49c3f3e8f228e1df067fa02affe",
               "match": true,
               "bytes": 253
             },
@@ -3431,28 +1923,28 @@
               "bytes": 142
             },
             {
-              "id": "1c097c07ef83af8da1ae956643e9fa80d7720ba8e7326636bacac9e130ecbcbb",
+              "id": "064a51f3818f2d75e47d47f8c198f65928c4388e297578f16fd8fe7614da3b0e",
               "present": true,
-              "digest": "1c097c07ef83af8da1ae956643e9fa80d7720ba8e7326636bacac9e130ecbcbb",
-              "registryDigest": "1c097c07ef83af8da1ae956643e9fa80d7720ba8e7326636bacac9e130ecbcbb",
+              "digest": "064a51f3818f2d75e47d47f8c198f65928c4388e297578f16fd8fe7614da3b0e",
+              "registryDigest": "064a51f3818f2d75e47d47f8c198f65928c4388e297578f16fd8fe7614da3b0e",
               "match": true,
               "bytes": 874
             },
             {
-              "id": "257b55ffd61e53c84fb1653067a34c9ffb7eafee11fc0aa80bb527c5568f7dc3",
+              "id": "889a8df36cd2a373a814d143810af2345309736ababb783f5aecf3645d1c9e64",
               "present": true,
-              "digest": "257b55ffd61e53c84fb1653067a34c9ffb7eafee11fc0aa80bb527c5568f7dc3",
-              "registryDigest": "257b55ffd61e53c84fb1653067a34c9ffb7eafee11fc0aa80bb527c5568f7dc3",
+              "digest": "889a8df36cd2a373a814d143810af2345309736ababb783f5aecf3645d1c9e64",
+              "registryDigest": "889a8df36cd2a373a814d143810af2345309736ababb783f5aecf3645d1c9e64",
               "match": true,
               "bytes": 234
             },
             {
-              "id": "4140d803f988383ccacfabfaf83cfb3d485bfde4cf495017a5b347fcdbfbfd84",
+              "id": "10cd2c58eb36e5164c5e091f55b35b4be7ff4a1f1ecc2de1cd5f6e162e394c51",
               "present": true,
-              "digest": "4140d803f988383ccacfabfaf83cfb3d485bfde4cf495017a5b347fcdbfbfd84",
-              "registryDigest": "4140d803f988383ccacfabfaf83cfb3d485bfde4cf495017a5b347fcdbfbfd84",
+              "digest": "10cd2c58eb36e5164c5e091f55b35b4be7ff4a1f1ecc2de1cd5f6e162e394c51",
+              "registryDigest": "10cd2c58eb36e5164c5e091f55b35b4be7ff4a1f1ecc2de1cd5f6e162e394c51",
               "match": true,
-              "bytes": 1143
+              "bytes": 376
             },
             {
               "id": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
@@ -3463,6 +1955,14 @@
               "bytes": 24
             },
             {
+              "id": "545f23355d49c06ccfd73aa1e279d372c4e5fcdc4639b4643c353a8a54d2ce4d",
+              "present": true,
+              "digest": "545f23355d49c06ccfd73aa1e279d372c4e5fcdc4639b4643c353a8a54d2ce4d",
+              "registryDigest": "545f23355d49c06ccfd73aa1e279d372c4e5fcdc4639b4643c353a8a54d2ce4d",
+              "match": true,
+              "bytes": 1143
+            },
+            {
               "id": "57f2162bd14e3cc029b4cd1c23a5bbe9768b8e669db1fb878123d106fb580506",
               "present": true,
               "digest": "57f2162bd14e3cc029b4cd1c23a5bbe9768b8e669db1fb878123d106fb580506",
@@ -3471,18 +1971,10 @@
               "bytes": 213
             },
             {
-              "id": "6d189cf0beb05fe420debc9009b051042453b70a3ab388bf9ec82555bc6179da",
+              "id": "750c8747bb25dbd2fde554007ce10ba20ee72b7ccfd1c6e21b418b17aa0e6980",
               "present": true,
-              "digest": "6d189cf0beb05fe420debc9009b051042453b70a3ab388bf9ec82555bc6179da",
-              "registryDigest": "6d189cf0beb05fe420debc9009b051042453b70a3ab388bf9ec82555bc6179da",
-              "match": true,
-              "bytes": 376
-            },
-            {
-              "id": "bd4f14aaf4789832d92b3aa1ac2efa3d10cac93534a17ed8ff4f1425a9dbe932",
-              "present": true,
-              "digest": "bd4f14aaf4789832d92b3aa1ac2efa3d10cac93534a17ed8ff4f1425a9dbe932",
-              "registryDigest": "bd4f14aaf4789832d92b3aa1ac2efa3d10cac93534a17ed8ff4f1425a9dbe932",
+              "digest": "750c8747bb25dbd2fde554007ce10ba20ee72b7ccfd1c6e21b418b17aa0e6980",
+              "registryDigest": "750c8747bb25dbd2fde554007ce10ba20ee72b7ccfd1c6e21b418b17aa0e6980",
               "match": true,
               "bytes": 1615
             },
@@ -3502,7 +1994,7 @@
           "status": "blocked",
           "artifacts": [
             {
-              "id": "ef4ac502afc7eb974dd44066dc07b93cf1f235eb25bd9e34295939123021cf8e",
+              "id": "9a8244c1c91704c0300928008b028e9cb8c5ad72e105f9acfd49e8fd12164804",
               "status": "corrupt"
             },
             {
@@ -3510,19 +2002,19 @@
               "status": "ok"
             },
             {
-              "id": "752405bd6468c6f4ed8b7266598217d171f355f6bcf7295cca74eec42b3e964c",
+              "id": "658dca086cbd81a308be7b62719e464751afc7a5c49a743eaeac7621fd7e4151",
               "status": "ok"
             },
             {
-              "id": "b0fe867ca9a3fc166db01357fc03a64bd047f6913358115b40eb79e95829ee5d",
+              "id": "28122ca5fb530d938e8d5901b796c322d2dbbf17ca0fb08c5f7031be554c9c8d",
               "status": "ok"
             },
             {
-              "id": "bc32eb83f1f8e5f4b3e4176e6bc8b3e5be07a901efbc1aac2b1f4019dab29cc3",
+              "id": "e387a29e74bccc85cfc449594025ff2addab7fa5aa77fa03dd875ddaecdab05f",
               "status": "ok"
             },
             {
-              "id": "8307a8ca474f88962e6f854f25abdb60278afb1d7753a03f0a70f6836da008ea",
+              "id": "cb8769c40ccafbf640022efc51008dcb69697e24620639c5ce4324a3657718b5",
               "status": "ok"
             },
             {
@@ -3530,27 +2022,27 @@
               "status": "ok"
             },
             {
-              "id": "cf8e68fd920dfa0cb6645bae8b9145504fac0c3e9c25716329c7ed982e055fb5",
+              "id": "e7ee233ac59b11eb68e978bbb07a0d654c2a6a3ca939f68f0bf86a000e03a835",
               "status": "ok"
             },
             {
-              "id": "8c0dc20f8a90e7e34063ad8fb5305f7a65f80997db2f8b82197399ced1133a17",
+              "id": "025254d40976436180de100a03f6732926aafcf491427da38f9d84875e4bcba6",
               "status": "ok"
             },
             {
-              "id": "4e5b188ef5f7f78edfc2a791ccc3c9f5513e549ec83158b9586e5a2bca124555",
+              "id": "95ca37844032f68475ecf12150b829693988033b05a10ae1ba0874407212079e",
               "status": "ok"
             },
             {
-              "id": "d19eeee0dc297f8035a7ca887f03f5a84002b54c90652c0d8e7cec319dcb2777",
+              "id": "09ea93611dc36bd6b816bcaef1d0bce74d536cfa6bbb22ca7942c3cd10fef814",
               "status": "ok"
             },
             {
-              "id": "134e7551e739b17fb58f692fcb1a8bb88ba764dc09404084b23f4c0ab0bd3ce8",
+              "id": "7354d7d1cedab4cb9a5bebb2ecaf6aca5c269616c6471bc27881ea0b44a766ea",
               "status": "ok"
             },
             {
-              "id": "2500a63888d6b614c41142b9d2817d338f1f11134992e901e8be7dad81b68f42",
+              "id": "243122b13fa3a928aef912aec6377f621638e49c3f3e8f228e1df067fa02affe",
               "status": "ok"
             },
             {
@@ -3558,15 +2050,15 @@
               "status": "ok"
             },
             {
-              "id": "1c097c07ef83af8da1ae956643e9fa80d7720ba8e7326636bacac9e130ecbcbb",
+              "id": "064a51f3818f2d75e47d47f8c198f65928c4388e297578f16fd8fe7614da3b0e",
               "status": "ok"
             },
             {
-              "id": "257b55ffd61e53c84fb1653067a34c9ffb7eafee11fc0aa80bb527c5568f7dc3",
+              "id": "889a8df36cd2a373a814d143810af2345309736ababb783f5aecf3645d1c9e64",
               "status": "ok"
             },
             {
-              "id": "4140d803f988383ccacfabfaf83cfb3d485bfde4cf495017a5b347fcdbfbfd84",
+              "id": "10cd2c58eb36e5164c5e091f55b35b4be7ff4a1f1ecc2de1cd5f6e162e394c51",
               "status": "ok"
             },
             {
@@ -3574,15 +2066,15 @@
               "status": "ok"
             },
             {
+              "id": "545f23355d49c06ccfd73aa1e279d372c4e5fcdc4639b4643c353a8a54d2ce4d",
+              "status": "ok"
+            },
+            {
               "id": "57f2162bd14e3cc029b4cd1c23a5bbe9768b8e669db1fb878123d106fb580506",
               "status": "ok"
             },
             {
-              "id": "6d189cf0beb05fe420debc9009b051042453b70a3ab388bf9ec82555bc6179da",
-              "status": "ok"
-            },
-            {
-              "id": "bd4f14aaf4789832d92b3aa1ac2efa3d10cac93534a17ed8ff4f1425a9dbe932",
+              "id": "750c8747bb25dbd2fde554007ce10ba20ee72b7ccfd1c6e21b418b17aa0e6980",
               "status": "ok"
             },
             {
@@ -3660,7 +2152,7 @@
         "portConflict": {
           "outcome": "EXITED",
           "code": 2,
-          "output": ".0.1:64090\",\"state\":\"/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-home-9ppL3L/Library/Application Support/PersonalAgent/Preview-f880e5bc9c6c1c57/data\"}\n  hint: 用与运行实例相同的参数复用；要切换请先 `pa stop`，再以新参数启动。\n"
+          "output": ".0.1:54832\",\"state\":\"/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-home-pJ2XJn/Library/Application Support/PersonalAgent/Preview-f880e5bc9c6c1c57/data\"}\n  hint: 用与运行实例相同的参数复用；要切换请先 `pa stop`，再以新参数启动。\n"
         }
       }
     },
@@ -3691,7 +2183,7 @@
         "work": {
           "phase": "delivered",
           "artifactIds": [
-            "1060a035bc78af766be0d3f61d8ec853cb86be28b59b120450919543e716f3a7",
+            "39cdf3a4ffe2cdd49156992bc783ad5f9f8ccadd49f868978a99537910382f36",
             "57f2162bd14e3cc029b4cd1c23a5bbe9768b8e669db1fb878123d106fb580506",
             "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
             "6d189cf0beb05fe420debc9009b051042453b70a3ab388bf9ec82555bc6179da"
@@ -3722,31 +2214,31 @@
           "resources": {
             "before": [
               {
-                "pid": 70754,
-                "start": "Tue Nov 17 09:35:11 2026",
+                "pid": 29982,
+                "start": "Tue Nov 17 13:18:39 2026",
                 "uid": 501,
-                "ppid": 20837,
-                "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-recovery-1pVpaK/install/app/apps/launcher/bin/pa.mjs start --json --port 64310 --api-port 64311 --fixture",
-                "argvSha256": "11189052396cd061f7e6f4da5248c41275feaa55e9bbd5292630accef2067337",
+                "ppid": 88930,
+                "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-recovery-W7EJ0A/install/app/apps/launcher/bin/pa.mjs start --json --port 54960 --api-port 54961 --fixture",
+                "argvSha256": "e3b119418f98ab4d99220213a8ed8b2d66291d0b6475f27f95f5be85b84f4ea8",
                 "aliveAtBirth": true,
-                "root": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-recovery-1pVpaK/install",
-                "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-recovery-1pVpaK/config",
-                "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-recovery-1pVpaK/restored",
+                "root": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-recovery-W7EJ0A/install",
+                "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-recovery-W7EJ0A/config",
+                "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-recovery-W7EJ0A/restored",
                 "op": "cohort:fixture-on-restored",
                 "parentPid": null,
                 "role": "product"
               },
               {
-                "pid": 70790,
-                "start": "Tue Nov 17 09:35:11 2026",
+                "pid": 30018,
+                "start": "Tue Nov 17 13:18:40 2026",
                 "uid": 501,
-                "ppid": 70754,
-                "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-recovery-1pVpaK/install/app/apps/coordinator/product/demo.ts --port 64311 --state /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-recovery-1pVpaK/restored --console-origin http://127.0.0.1:64310 --startup-mode recovery_readonly --local-access",
-                "argvSha256": "1295e37ff75efd3866b536fd6ea5729619430297646652c4c23bf9b45d0db672",
+                "ppid": 29982,
+                "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-recovery-W7EJ0A/install/app/apps/coordinator/product/demo.ts --port 54961 --state /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-recovery-W7EJ0A/restored --console-origin http://127.0.0.1:54960 --startup-mode recovery_readonly --local-access",
+                "argvSha256": "b57a3b75752c3f63cefa184319ab5f01a4e8d2431c9f4cb4ab854d827cc3d0f1",
                 "aliveAtBirth": true,
-                "root": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-recovery-1pVpaK/install",
-                "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-recovery-1pVpaK/config",
-                "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-recovery-1pVpaK/restored",
+                "root": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-recovery-W7EJ0A/install",
+                "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-recovery-W7EJ0A/config",
+                "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-recovery-W7EJ0A/restored",
                 "op": "cohort:fixture-on-restored",
                 "parentPid": null,
                 "role": "product"
@@ -3754,10 +2246,10 @@
             ],
             "after": [
               {
-                "pid": 70754,
-                "expectedStart": "Tue Nov 17 09:35:11 2026",
+                "pid": 29982,
+                "expectedStart": "Tue Nov 17 13:18:39 2026",
                 "expectedUid": 501,
-                "expectedArgvSha256": "11189052396cd061f7e6f4da5248c41275feaa55e9bbd5292630accef2067337",
+                "expectedArgvSha256": "e3b119418f98ab4d99220213a8ed8b2d66291d0b6475f27f95f5be85b84f4ea8",
                 "alive": false,
                 "observedStart": null,
                 "observedUid": null,
@@ -3769,10 +2261,10 @@
                 "observation": "independent-ps"
               },
               {
-                "pid": 70790,
-                "expectedStart": "Tue Nov 17 09:35:11 2026",
+                "pid": 30018,
+                "expectedStart": "Tue Nov 17 13:18:40 2026",
                 "expectedUid": 501,
-                "expectedArgvSha256": "1295e37ff75efd3866b536fd6ea5729619430297646652c4c23bf9b45d0db672",
+                "expectedArgvSha256": "b57a3b75752c3f63cefa184319ab5f01a4e8d2431c9f4cb4ab854d827cc3d0f1",
                 "alive": false,
                 "observedStart": null,
                 "observedUid": null,
@@ -3857,6 +2349,14 @@
       "E33-COHORT-RECOVERY-OPERATION",
       "E5-COHORT-UPGRADE",
       "E7-MULTI-INSTANCE",
+      "E36-W35-OUTER",
+      "E36-W35-OUTER-OPERATION",
+      "E36-W35-MODEL-SAVE",
+      "E36-W35-MODEL-SAVE-OPERATION",
+      "E36-W35-RECOVERY",
+      "E36-W35-RECOVERY-OPERATION",
+      "E36-W35-UPGRADE",
+      "E36-COMPLETION-HISTORY-INSTALLED",
       "E8-ORIGINAL-WORK-RECOVERY",
       "E11-TRIAL-IDENTITY-FIELDS",
       "E13-G-SCOPED-SUMMARY",
@@ -3902,45 +2402,25 @@
     "command": "node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record",
     "exitCode": 0,
     "source": {
-      "commit": "4b4d4089a07e10b01c9deba32f0d51c23e96bdf1",
+      "commit": "105595d2b6e7045b0300302af96e216506c4aeda",
       "dirty": false
     }
   },
   "commands": [
     {
-      "id": "E1",
+      "id": "C1",
       "command": "node tests/product-acceptance/run.mjs --suites=selftest"
     },
     {
-      "id": "E2",
-      "command": "node tests/product-acceptance/run.mjs --suites=selftest"
-    },
-    {
-      "id": "E3",
+      "id": "C2",
       "command": "node tests/product-acceptance/run.mjs --suites=e4"
     },
     {
-      "id": "E4",
+      "id": "C3",
       "command": "node tests/product-acceptance/run.mjs --suites=e4"
     },
     {
-      "id": "E5",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4"
-    },
-    {
-      "id": "E6",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4"
-    },
-    {
-      "id": "E7",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4"
-    },
-    {
-      "id": "E8",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4"
-    },
-    {
-      "id": "E9",
+      "id": "C4",
       "command": "node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record"
     }
   ],
@@ -4012,9 +2492,9 @@
       "status": "ok",
       "mode": "personal",
       "startupMode": "recovery_readonly",
-      "digest": "5a0ad2b542840141fff74154dee8771773df77f9fbb63ffb5f48e3a70b2ead55"
+      "digest": "3516c179165dc6af35e12988cda619d2ffa1ae2056655ce0533c7537ba9845df"
     },
-    "healthDigest": "5a0ad2b542840141fff74154dee8771773df77f9fbb63ffb5f48e3a70b2ead55",
+    "healthDigest": "3516c179165dc6af35e12988cda619d2ffa1ae2056655ce0533c7537ba9845df",
     "scopeDiagnostics": "present",
     "packageCapability": {
       "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
@@ -4024,7 +2504,7 @@
     },
     "registry": {
       "present": true,
-      "digest": "f01c34947cc29e52200b3eb059e9928c2c71f2f4479992f5d9fb98198c1105f2"
+      "digest": "44fddfadb1f52763b7a05a5e4a82f26edd52f363d2b431f6b40f025b6f99b876"
     },
     "restore": {
       "verify": "VERIFIED",
@@ -4080,69 +2560,69 @@
       "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
       "digestSupported": true
     },
-    "healthDigest": "555960c8858802b339e2dc14a61a5843387dc01bb7fbd58e74cc4a13e5d96758",
+    "healthDigest": "d170de76af28d78c9169e8951b40b069ccd8d1f3758c3086232b0b2c4bca0ce2",
     "digestAvailable": true,
-    "sameDigest": "555960c8858802b339e2dc14a61a5843387dc01bb7fbd58e74cc4a13e5d96758",
+    "sameDigest": "d170de76af28d78c9169e8951b40b069ccd8d1f3758c3086232b0b2c4bca0ce2",
     "processes": {
-      "live": "Tue Nov 17 09:33:31 2026",
-      "reused": "Tue Nov 17 09:33:31 2026"
+      "live": "Tue Nov 17 13:16:00 2026",
+      "reused": "Tue Nov 17 13:16:00 2026"
     },
-    "firstPid": 55873,
-    "unboundPid": 56881,
-    "pidAfterRefusals": 55873,
-    "pidAfterUnbound": 56881,
+    "firstPid": 14388,
+    "unboundPid": 15385,
+    "pidAfterRefusals": 14388,
+    "pidAfterUnbound": 15385,
     "outcomes": {
       "sameFile": {
         "status": "REUSED",
         "instance": {
           "protocol": "personal-product-instance/1",
-          "pid": 55873,
-          "processStart": "Tue Nov 17 09:33:31 2026",
-          "apiPid": 55909,
-          "consolePid": 55873,
-          "apiURL": "http://127.0.0.1:63712",
-          "consoleURL": "http://127.0.0.1:63711",
-          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/restored",
-          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/app",
+          "pid": 14388,
+          "processStart": "Tue Nov 17 13:16:00 2026",
+          "apiPid": 14424,
+          "consolePid": 14388,
+          "apiURL": "http://127.0.0.1:54501",
+          "consoleURL": "http://127.0.0.1:54500",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/restored",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/install/app",
           "buildId": "8296720d8a25f38c",
           "mode": "personal",
           "access": "local-development",
           "startupMode": "recovery_readonly",
           "launcherArgv": [
             "/Users/hh/.nvm/versions/node/v24.21.0/bin/node",
-            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/app/apps/launcher/bin/pa.mjs",
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/install/app/apps/launcher/bin/pa.mjs",
             "start",
             "--json",
             "--port",
-            "63711",
+            "54500",
             "--api-port",
-            "63712",
+            "54501",
             "--discussion-only",
             "--review-restored-scope",
-            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/reuse-first.json"
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/reuse-first.json"
           ],
-          "launcherCwd": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu",
+          "launcherCwd": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD",
           "apiArgv": [
             "/Users/hh/.nvm/versions/node/v24.21.0/bin/node",
-            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/app/apps/coordinator/product/demo.ts",
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/install/app/apps/coordinator/product/demo.ts",
             "--port",
-            "63712",
+            "54501",
             "--state",
-            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/restored",
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/restored",
             "--console-origin",
-            "http://127.0.0.1:63711",
+            "http://127.0.0.1:54500",
             "--startup-mode",
             "recovery_readonly",
             "--assistant",
             "--discussion-only",
             "--review-restored-scope",
-            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/reuse-first.json",
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/reuse-first.json",
             "--local-access"
           ],
-          "apiProcessStart": "Tue Nov 17 09:33:31 2026",
+          "apiProcessStart": "Tue Nov 17 13:16:00 2026",
           "apiUid": 501,
-          "startedAt": "2026-11-17T01:33:31.997Z",
-          "configRoot": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/config"
+          "startedAt": "2026-11-17T05:16:01.082Z",
+          "configRoot": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/config"
         },
         "recovery": {
           "startupMode": "recovery_readonly",
@@ -4156,22 +2636,22 @@
             "Project bindings not explicitly remapped stay pending and must be rebound to a local path."
           ],
           "pendingRebind": [
-            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/historical-project"
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/historical-project"
           ]
         },
         "stderr": "",
         "birth": {
-          "pid": 55936,
-          "start": "Tue Nov 17 09:33:32 2026",
+          "pid": 14449,
+          "start": "Tue Nov 17 13:16:01 2026",
           "uid": 501,
-          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/bin/pa start --json --port 63711 --api-port 63712 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/reuse-first.json",
-          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install",
-          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/restored",
-          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/config",
-          "consolePort": 63711,
-          "apiPort": 63712,
+          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/install/bin/pa start --json --port 54500 --api-port 54501 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/reuse-first.json",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/restored",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/config",
+          "consolePort": 54500,
+          "apiPort": 54501,
           "argvExact": false,
-          "recordedAt": "2026-11-17T01:33:32.010Z"
+          "recordedAt": "2026-11-17T05:16:01.095Z"
         }
       },
       "differentFile": {
@@ -4179,24 +2659,24 @@
         "code": "restored_review_selection_mismatch",
         "message": "本次显式 review 选择与已运行实例的实际选择不同；保留旧 PID，不复用、不结束",
         "detail": {
-          "requestedReviewIdentity": "e0d4ba6e37b7567fc25731bda7fb2a961b0086445dc2a23f00f2aa258d6d39f6",
-          "liveReviewIdentity": "555960c8858802b339e2dc14a61a5843387dc01bb7fbd58e74cc4a13e5d96758",
-          "pid": 55873
+          "requestedReviewIdentity": "83e11b4c14d025171c5cd6d879c5f99a436ffc8d74d0574670c9bbb1f9d0ff87",
+          "liveReviewIdentity": "d170de76af28d78c9169e8951b40b069ccd8d1f3758c3086232b0b2c4bca0ce2",
+          "pid": 14388
         },
         "hint": "用与运行实例相同的已验证文件复用，或先 `pa stop` 旧实例再以新选择启动；不会重新签发/刷新旧窗口。",
         "stderr": "",
         "birth": {
-          "pid": 56092,
-          "start": "Tue Nov 17 09:33:32 2026",
+          "pid": 14605,
+          "start": "Tue Nov 17 13:16:01 2026",
           "uid": 501,
-          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/bin/pa start --json --port 63711 --api-port 63712 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/reuse-narrow.json",
-          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install",
-          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/restored",
-          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/config",
-          "consolePort": 63711,
-          "apiPort": 63712,
+          "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/install/app/apps/launcher/bin/pa.mjs start --json --port 54500 --api-port 54501 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/reuse-narrow.json",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/restored",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/config",
+          "consolePort": 54500,
+          "apiPort": 54501,
           "argvExact": false,
-          "recordedAt": "2026-11-17T01:33:32.516Z"
+          "recordedAt": "2026-11-17T05:16:01.552Z"
         }
       },
       "missingFile": {
@@ -4205,23 +2685,23 @@
         "message": "本次显式 review 选择与已运行实例的实际选择不同；保留旧 PID，不复用、不结束",
         "detail": {
           "requestedReviewIdentity": null,
-          "liveReviewIdentity": "555960c8858802b339e2dc14a61a5843387dc01bb7fbd58e74cc4a13e5d96758",
-          "pid": 55873
+          "liveReviewIdentity": "d170de76af28d78c9169e8951b40b069ccd8d1f3758c3086232b0b2c4bca0ce2",
+          "pid": 14388
         },
         "hint": "用与运行实例相同的已验证文件复用，或先 `pa stop` 旧实例再以新选择启动；不会重新签发/刷新旧窗口。",
         "stderr": "",
         "birth": {
-          "pid": 56252,
-          "start": "Tue Nov 17 09:33:33 2026",
+          "pid": 14761,
+          "start": "Tue Nov 17 13:16:02 2026",
           "uid": 501,
-          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/bin/pa start --json --port 63711 --api-port 63712 --discussion-only",
-          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install",
-          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/restored",
-          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/config",
-          "consolePort": 63711,
-          "apiPort": 63712,
+          "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/install/app/apps/launcher/bin/pa.mjs start --json --port 54500 --api-port 54501 --discussion-only",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/restored",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/config",
+          "consolePort": 54500,
+          "apiPort": 54501,
           "argvExact": false,
-          "recordedAt": "2026-11-17T01:33:33.018Z"
+          "recordedAt": "2026-11-17T05:16:02.013Z"
         }
       },
       "missingFilePath": {
@@ -4229,22 +2709,22 @@
         "code": "review_scope_missing",
         "message": "显式 review 配置文件不存在",
         "detail": {
-          "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/reuse-gone.json"
+          "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/reuse-gone.json"
         },
         "hint": "用 main 的 review-restored 命令重新生成新的私有文件。",
         "stderr": "",
         "birth": {
-          "pid": 56414,
-          "start": "Tue Nov 17 09:33:33 2026",
+          "pid": 14917,
+          "start": "Tue Nov 17 13:16:02 2026",
           "uid": 501,
-          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/bin/pa start --json --port 63711 --api-port 63712 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/reuse-gone.json",
-          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install",
-          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/restored",
-          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/config",
-          "consolePort": 63711,
-          "apiPort": 63712,
+          "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/install/app/apps/launcher/bin/pa.mjs start --json --port 54500 --api-port 54501 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/reuse-gone.json",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/restored",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/config",
+          "consolePort": 54500,
+          "apiPort": 54501,
           "argvExact": false,
-          "recordedAt": "2026-11-17T01:33:33.516Z"
+          "recordedAt": "2026-11-17T05:16:02.467Z"
         }
       },
       "portChange": {
@@ -4255,35 +2735,35 @@
           "differences": [
             {
               "field": "consoleURL",
-              "expected": "http://127.0.0.1:63733",
-              "actual": "http://127.0.0.1:63711"
+              "expected": "http://127.0.0.1:54515",
+              "actual": "http://127.0.0.1:54500"
             },
             {
               "field": "apiURL",
-              "expected": "http://127.0.0.1:63734",
-              "actual": "http://127.0.0.1:63712"
+              "expected": "http://127.0.0.1:54516",
+              "actual": "http://127.0.0.1:54501"
             }
           ],
           "running": {
-            "pid": 55873,
-            "consoleURL": "http://127.0.0.1:63711",
-            "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/restored"
+            "pid": 14388,
+            "consoleURL": "http://127.0.0.1:54500",
+            "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/restored"
           }
         },
         "hint": "用与运行实例相同的参数复用；要切换请先 `pa stop`，再以新参数启动。",
         "stderr": "",
         "birth": {
-          "pid": 56450,
-          "start": "Tue Nov 17 09:33:33 2026",
+          "pid": 14953,
+          "start": "Tue Nov 17 13:16:02 2026",
           "uid": 501,
-          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/bin/pa start --json --port 63733 --api-port 63734 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/reuse-first.json",
-          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install",
-          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/restored",
-          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/config",
-          "consolePort": 63733,
-          "apiPort": 63734,
+          "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/install/app/apps/launcher/bin/pa.mjs start --json --port 54515 --api-port 54516 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/reuse-first.json",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/restored",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/config",
+          "consolePort": 54515,
+          "apiPort": 54516,
           "argvExact": false,
-          "recordedAt": "2026-11-17T01:33:33.865Z"
+          "recordedAt": "2026-11-17T05:16:02.816Z"
         }
       },
       "unboundThenSelection": {
@@ -4291,24 +2771,24 @@
         "code": "restored_review_selection_mismatch",
         "message": "本次显式 review 选择与已运行实例的实际选择不同；保留旧 PID，不复用、不结束",
         "detail": {
-          "requestedReviewIdentity": "555960c8858802b339e2dc14a61a5843387dc01bb7fbd58e74cc4a13e5d96758",
+          "requestedReviewIdentity": "d170de76af28d78c9169e8951b40b069ccd8d1f3758c3086232b0b2c4bca0ce2",
           "liveReviewIdentity": null,
-          "pid": 56881
+          "pid": 15385
         },
         "hint": "用与运行实例相同的已验证文件复用，或先 `pa stop` 旧实例再以新选择启动；不会重新签发/刷新旧窗口。",
         "stderr": "",
         "birth": {
-          "pid": 56943,
-          "start": "Tue Nov 17 09:33:35 2026",
+          "pid": 15446,
+          "start": "Tue Nov 17 13:16:04 2026",
           "uid": 501,
-          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/bin/pa start --json --port 63739 --api-port 63740 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/reuse-first.json",
-          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install",
-          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/restored",
-          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/config",
-          "consolePort": 63739,
-          "apiPort": 63740,
+          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/install/bin/pa start --json --port 54520 --api-port 54521 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/reuse-first.json",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/restored",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/config",
+          "consolePort": 54520,
+          "apiPort": 54521,
           "argvExact": false,
-          "recordedAt": "2026-11-17T01:33:35.347Z"
+          "recordedAt": "2026-11-17T05:16:04.236Z"
         }
       }
     },
@@ -4413,7 +2893,7 @@
         "status": 200,
         "body": {
           "protocol": "trial-readiness/1",
-          "observedAt": "2026-11-17T01:33:37.342Z",
+          "observedAt": "2026-11-17T05:16:06.286Z",
           "configurationRevision": "a9c826f123324b2d8f1a07902775e6a1c453f4de86b467027490a903c324e84b",
           "mode": "personal",
           "startupMode": "normal",
@@ -4481,8 +2961,8 @@
         "status": 200,
         "body": {
           "protocol": "trial-readiness/1",
-          "observedAt": "2026-11-17T01:33:37.442Z",
-          "configurationRevision": "4f06f905dae4e5e34076b15d573083dd6e85f2a4d7e1852e24687c2a15da6d45",
+          "observedAt": "2026-11-17T05:16:06.386Z",
+          "configurationRevision": "bfb89d327029678ee39198c1cc8343b0e91d661133bb1d6c351c27cf6c053240",
           "mode": "personal",
           "startupMode": "normal",
           "discussion": "configuration_present",
@@ -4520,8 +3000,8 @@
         "status": 200,
         "body": {
           "protocol": "trial-readiness/1",
-          "observedAt": "2026-11-17T01:33:38.419Z",
-          "configurationRevision": "ad50f6b2d9bcc4324c43e1f5f9c657e48ed7fa8043bc442602816837efc61305",
+          "observedAt": "2026-11-17T05:16:07.366Z",
+          "configurationRevision": "4ef4e0afbea373efd0031b5a2fd9216efc79fa821d557d4ecc22aa1f17b10833",
           "mode": "personal",
           "startupMode": "recovery_readonly",
           "discussion": "unknown",
@@ -4551,7 +3031,7 @@
         }
       },
       "configuration": {
-        "revision": "ad50f6b2d9bcc4324c43e1f5f9c657e48ed7fa8043bc442602816837efc61305",
+        "revision": "4ef4e0afbea373efd0031b5a2fd9216efc79fa821d557d4ecc22aa1f17b10833",
         "projects": [
           {
             "discussionOnly": true,
@@ -4600,7 +3080,7 @@
         "status": "ok",
         "mode": "personal",
         "startupMode": "recovery_readonly",
-        "restoredReviewDigest": "6af06117531dc76042251b232e8f74a95b97033928c00191b00a78949c998fbd",
+        "restoredReviewDigest": "b20bc1e5bd5b9ac9b02fbe2e2adea898758140a1e562fc82c918f82d50aa88dc",
         "access": "local-development"
       },
       "code": null,
@@ -4614,7 +3094,7 @@
         "status": 200,
         "body": {
           "protocol": "trial-readiness/1",
-          "observedAt": "2026-11-17T01:33:39.651Z",
+          "observedAt": "2026-11-17T05:16:08.562Z",
           "configurationRevision": "83d2a00c18fe919d4671f2916ce9baec23e44fc5cfd8f51b3ba2d241462e06af",
           "mode": "fixture",
           "startupMode": "normal",
@@ -4783,38 +3263,38 @@
         "present": true,
         "mode": "personal",
         "startupMode": "normal",
-        "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/seed-state",
-        "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/app",
+        "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/seed-state",
+        "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/install/app",
         "resources": [
           {
             "label": "launcher",
-            "pid": 58522,
-            "start": "Tue Nov 17 09:33:39 2026",
+            "pid": 16978,
+            "start": "Tue Nov 17 13:16:08 2026",
             "uid": 501,
             "parentPid": null,
-            "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/app/apps/launcher/bin/pa.mjs start --json --port 63798 --api-port 63799 --discussion-only"
+            "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/install/app/apps/launcher/bin/pa.mjs start --json --port 54563 --api-port 54564 --discussion-only"
           },
           {
             "label": "child",
-            "pid": 58559,
-            "start": "Tue Nov 17 09:33:40 2026",
+            "pid": 17015,
+            "start": "Tue Nov 17 13:16:09 2026",
             "uid": 501,
-            "parentPid": 58522,
-            "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/app/apps/coordinator/product/demo.ts --port 63799 --state /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/seed-state --console-origin htt"
+            "parentPid": 16978,
+            "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/install/app/apps/coordinator/product/demo.ts --port 54564 --state /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/seed-state --console-origin htt"
           }
         ]
       },
       "after": [
         {
-          "pid": 58522,
-          "expectedStart": "Tue Nov 17 09:33:39 2026",
+          "pid": 16978,
+          "expectedStart": "Tue Nov 17 13:16:08 2026",
           "alive": false,
           "start": null,
           "sameIdentity": false
         },
         {
-          "pid": 58559,
-          "expectedStart": "Tue Nov 17 09:33:40 2026",
+          "pid": 17015,
+          "expectedStart": "Tue Nov 17 13:16:09 2026",
           "alive": false,
           "start": null,
           "sameIdentity": false
@@ -4838,38 +3318,38 @@
         "present": true,
         "mode": "personal",
         "startupMode": "recovery_readonly",
-        "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/restored",
-        "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/app",
+        "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/restored",
+        "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/install/app",
         "resources": [
           {
             "label": "launcher",
-            "pid": 58854,
-            "start": "Tue Nov 17 09:33:41 2026",
+            "pid": 17311,
+            "start": "Tue Nov 17 13:16:10 2026",
             "uid": 501,
             "parentPid": null,
-            "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/app/apps/launcher/bin/pa.mjs start --json --port 63807 --api-port 63808 --discussion-only"
+            "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/install/app/apps/launcher/bin/pa.mjs start --json --port 54579 --api-port 54580 --discussion-only"
           },
           {
             "label": "child",
-            "pid": 58896,
-            "start": "Tue Nov 17 09:33:42 2026",
+            "pid": 17347,
+            "start": "Tue Nov 17 13:16:11 2026",
             "uid": 501,
-            "parentPid": 58854,
-            "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/app/apps/coordinator/product/demo.ts --port 63808 --state /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/restored --console-origin http:"
+            "parentPid": 17311,
+            "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/install/app/apps/coordinator/product/demo.ts --port 54580 --state /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-uFJghD/restored --console-origin http:"
           }
         ]
       },
       "after": [
         {
-          "pid": 58854,
-          "expectedStart": "Tue Nov 17 09:33:41 2026",
+          "pid": 17311,
+          "expectedStart": "Tue Nov 17 13:16:10 2026",
           "alive": false,
           "start": null,
           "sameIdentity": false
         },
         {
-          "pid": 58896,
-          "expectedStart": "Tue Nov 17 09:33:42 2026",
+          "pid": 17347,
+          "expectedStart": "Tue Nov 17 13:16:11 2026",
           "alive": false,
           "start": null,
           "sameIdentity": false
@@ -4950,8 +3430,8 @@
       "abi": "137"
     },
     "bundle": {
-      "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-support-r1Mgjl/support-one.pab",
-      "bytes": 13961,
+      "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-support-zrURmZ/support-one.pab",
+      "bytes": 13952,
       "mode": "600"
     },
     "repeated": {
@@ -5074,27 +3554,27 @@
     "screenshots": [
       {
         "path": "tests/product-acceptance/reports/wave27/browser/desktop.png",
-        "sha256": "82d8f257bf196f2536bba9930af380dea468ad5bccc28e9fc426fa01818ba68a",
-        "bytes": 124585,
-        "size": 124585
+        "sha256": "5ff1686fe23f606658e93a1e8df6fd4a83f47a5e01f170c4b9ae4ce0b5fb5b0b",
+        "bytes": 124535,
+        "size": 124535
       },
       {
         "path": "tests/product-acceptance/reports/wave27/browser/mobile.png",
-        "sha256": "92fd6f14c8d7b414871cb4ced2a8bd2bb765d65361614ff3ee00f16d6b0d9494",
-        "bytes": 55970,
-        "size": 55970
+        "sha256": "62985ddedcee011af3906ad578b4c65a660d02d1f30704d95a6e129ba39b9f6c",
+        "bytes": 55943,
+        "size": 55943
       },
       {
         "path": "tests/product-acceptance/reports/wave27/browser/configured-conversation.png",
-        "sha256": "78c0eb1d366de861cc08c882c53d924e090ab5b0c76f40b230e0da0847a88a68",
-        "bytes": 76516,
-        "size": 76516
+        "sha256": "1db9470e1d7c1f06b92ae0fa7c45dc3edabecf82fffa91c16f0385c71ef85151",
+        "bytes": 76517,
+        "size": 76517
       }
     ],
     "problems": [
       "console: Failed to load resource: net::ERR_FAILED",
       "console: Failed to load resource: the server responded with a status of 404 (Not Found)",
-      "console: Failed to load resource: net::ERR_EMPTY_RESPONSE",
+      "console: Failed to load resource: net::ERR_CONNECTION_REFUSED",
       "console: Failed to load resource: net::ERR_CONNECTION_REFUSED"
     ],
     "readinessReads": 9,
@@ -5103,26 +3583,26 @@
     "providerAfter": 0,
     "lifecycle": {
       "stages": [],
-      "root": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-KNrhtT",
+      "root": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-vPV5s9",
       "startA": {
         "status": "RUNNING",
         "code": null,
         "birth": {
-          "pid": 59583,
-          "start": "Tue Nov 17 09:33:48 2026",
+          "pid": 18028,
+          "start": "Tue Nov 17 13:16:17 2026",
           "uid": 501,
-          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-KNrhtT/install/bin/pa start --json --port 63853 --api-port 63854 --discussion-only",
-          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-KNrhtT/install",
-          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-KNrhtT/state",
-          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-KNrhtT/config",
-          "consolePort": 63853,
-          "apiPort": 63854,
+          "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-vPV5s9/install/app/apps/launcher/bin/pa.mjs start --json --port 54600 --api-port 54601 --discussion-only",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-vPV5s9/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-vPV5s9/state",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-vPV5s9/config",
+          "consolePort": 54600,
+          "apiPort": 54601,
           "argvExact": false,
-          "recordedAt": "2026-11-17T01:33:48.399Z"
+          "recordedAt": "2026-11-17T05:16:17.242Z"
         },
         "instance": {
           "mode": "personal",
-          "processStart": "Tue Nov 17 09:33:48 2026"
+          "processStart": "Tue Nov 17 13:16:17 2026"
         }
       },
       "stageAStop": {
@@ -5137,21 +3617,21 @@
         "status": "RUNNING",
         "code": null,
         "birth": {
-          "pid": 59921,
-          "start": "Tue Nov 17 09:33:51 2026",
+          "pid": 18369,
+          "start": "Tue Nov 17 13:16:19 2026",
           "uid": 501,
-          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-KNrhtT/install/bin/pa start --json --port 63872 --api-port 63873 --discussion-only",
-          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-KNrhtT/install",
-          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-KNrhtT/state",
-          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-KNrhtT/config",
-          "consolePort": 63872,
-          "apiPort": 63873,
+          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-vPV5s9/install/bin/pa start --json --port 54624 --api-port 54626 --discussion-only",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-vPV5s9/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-vPV5s9/state",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-vPV5s9/config",
+          "consolePort": 54624,
+          "apiPort": 54626,
           "argvExact": false,
-          "recordedAt": "2026-11-17T01:33:51.025Z"
+          "recordedAt": "2026-11-17T05:16:19.818Z"
         },
         "instance": {
           "mode": "personal",
-          "processStart": "Tue Nov 17 09:33:51 2026"
+          "processStart": "Tue Nov 17 13:16:19 2026"
         }
       },
       "stageBStop": {
@@ -5179,15 +3659,15 @@
     "pageErrors": []
   },
   "counts": {
-    "PASS": 336,
+    "PASS": 347,
     "FAIL": 0,
     "SKIPPED": 0,
-    "NOT_TESTED": 21,
+    "NOT_TESTED": 22,
     "BLOCKED": 0,
     "UNKNOWN": 0
   },
   "testCodeSource": {
-    "commit": "4b4d4089a07e10b01c9deba32f0d51c23e96bdf1",
+    "commit": "105595d2b6e7045b0300302af96e216506c4aeda",
     "dirty": false,
     "branch": "codex/g3-product-acceptance"
   },
@@ -5197,7 +3677,7 @@
     "schema": 18
   },
   "mainSource": {
-    "commit": "5860da13",
+    "commit": "7e550991",
     "schema": 18
   },
   "artifactTuple": {
@@ -5291,7 +3771,7 @@
     }
   ],
   "fixedInputs": {
-    "testSource": "4b4d4089a07e10b01c9deba32f0d51c23e96bdf1",
+    "testSource": "105595d2b6e7045b0300302af96e216506c4aeda",
     "testSourceDirty": false,
     "mainInputs": [
       "23d5a98e original callbacks/support (source only)",
@@ -5369,15 +3849,15 @@
             "reason": null
           },
           "released": [
-            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-home-9ppL3L"
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-home-pJ2XJn"
           ],
           "retained": [],
           "observation": [
             {
-              "pid": 65026,
-              "expectedStart": "Tue Nov 17 09:34:24 2026",
+              "pid": 23443,
+              "expectedStart": "Tue Nov 17 13:16:49 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "682f32cb6e47162a29d2f60549f99271723a4a30676477bc676dd3fff680b172",
+              "expectedArgvSha256": "c3a2c3727e39f03a49236df8d6341f3240a8d33c954615f6ed0a65273dcd34f3",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -5389,10 +3869,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 65094,
-              "expectedStart": "Tue Nov 17 09:34:25 2026",
+              "pid": 24181,
+              "expectedStart": "Tue Nov 17 13:17:52 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "f8323ca78f976c9ef2bf9e7e4ff2cb3d63fb9e0444479e74bac2ceaeb8232d32",
+              "expectedArgvSha256": "fa49661c24609a63a7c5778f76976b8c22ab81a7c2a3ab14d23dd2b190d994be",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -5404,10 +3884,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 65113,
-              "expectedStart": "Tue Nov 17 09:34:26 2026",
+              "pid": 24252,
+              "expectedStart": "Tue Nov 17 13:17:53 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "cc676705945a4f46239b97eb4a03677b8e3a5969e394d79ff57d66851e585e66",
+              "expectedArgvSha256": "617f162bec860668fb6fd4737d16680d1a5d3122533e7fcca9aa8e8e3dc13af6",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -5419,10 +3899,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 65694,
-              "expectedStart": "Tue Nov 17 09:34:29 2026",
+              "pid": 24284,
+              "expectedStart": "Tue Nov 17 13:17:54 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "714e3e03f609a6721ab845a0810f9872d1d79ffb98a865fb49039cf1e1e93d26",
+              "expectedArgvSha256": "8ca725b9c7890f57fb93770b5a2af4c4ee2d361b51fdd35bd572ae30246afa2b",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -5434,10 +3914,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 65747,
-              "expectedStart": "Tue Nov 17 09:34:29 2026",
+              "pid": 24887,
+              "expectedStart": "Tue Nov 17 13:17:57 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "b0e3ea597e57d61cd2ace50b6f7cddc85f0c775ff44112153641da28f82ce848",
+              "expectedArgvSha256": "567b1bdb3675fc389b07b5ec89da9a8ef7d13696d90813126539c26ca3fa3b2f",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -5449,10 +3929,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 65766,
-              "expectedStart": "Tue Nov 17 09:34:30 2026",
+              "pid": 24948,
+              "expectedStart": "Tue Nov 17 13:17:57 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "1deeb81280e99cc9671fe7e62ab5171f0d86f0186a3766c6958846c173fcb6c6",
+              "expectedArgvSha256": "56200149134154b0b0defcd7cd3145ffc6e3ecea93d2fab94a44614e931759d8",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -5464,10 +3944,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 67013,
-              "expectedStart": "Tue Nov 17 09:34:34 2026",
+              "pid": 24964,
+              "expectedStart": "Tue Nov 17 13:17:58 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "3eabab247d8e9f2bc7a4f96de31239afb0df9d97a9a065f25126760f696a1860",
+              "expectedArgvSha256": "5b02c7ff6605524eb88d09e5de567c253ee6efc26927c33222ef1693e5c772f5",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -5479,10 +3959,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 67027,
-              "expectedStart": "Tue Nov 17 09:34:35 2026",
+              "pid": 26213,
+              "expectedStart": "Tue Nov 17 13:18:03 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "167722da9e0b655aec7b0b0da55d93faa5b1320b2a82641a1fefab9b7175ad54",
+              "expectedArgvSha256": "dbc3ddbfd55c64ce84a0d8b8cde9ab3e6f5d6f6ed463b7713c11d80d7518a596",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -5494,10 +3974,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 67630,
-              "expectedStart": "Tue Nov 17 09:34:55 2026",
+              "pid": 26227,
+              "expectedStart": "Tue Nov 17 13:18:03 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "31c0f09a106bbf32a4d5c4152fe179a03661502059adbd51003e3e39d4a59282",
+              "expectedArgvSha256": "4c5a413afcab7c431b7a622fe84d960e0b8affbec9e780501b93989c49fcc0dd",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -5509,10 +3989,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 67703,
-              "expectedStart": "Tue Nov 17 09:34:57 2026",
+              "pid": 26842,
+              "expectedStart": "Tue Nov 17 13:18:24 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "720d76b9441dcbba20924e6e74c530e2eefffa5026c69cac28bd0b5eff2d65cd",
+              "expectedArgvSha256": "2b88d48c687fae36f4e3a4f3a15c62803358cd65a87cf95170616cf98ccfd2e4",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -5524,10 +4004,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 67719,
-              "expectedStart": "Tue Nov 17 09:34:57 2026",
+              "pid": 26912,
+              "expectedStart": "Tue Nov 17 13:18:25 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "6200cf924551b31bd5326ee9b79d15592ade773921964f809c1de860c308e715",
+              "expectedArgvSha256": "c909f58ba349749a37a40e1d3a2f6918195d94e9d1c52762e8eafef9a64c6a0a",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -5539,10 +4019,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 68355,
-              "expectedStart": "Tue Nov 17 09:35:00 2026",
+              "pid": 26931,
+              "expectedStart": "Tue Nov 17 13:18:25 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "10670109776e57f5a0b8bed91ec8c342a6468fba51c8d4efed4db932396c2b09",
+              "expectedArgvSha256": "4ec6a50b9bc1a4a4664f531197e516f8aa822e01d081df4ebd90199f6ee9bb68",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -5554,10 +4034,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 68408,
-              "expectedStart": "Tue Nov 17 09:35:00 2026",
+              "pid": 27564,
+              "expectedStart": "Tue Nov 17 13:18:28 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "f0577204aa05a70b373d90cdce38e3d1f4d732d1b1d347d0afb147603a2ff164",
+              "expectedArgvSha256": "9ef7ce6906d9124d622c9491066547387d6b8713f45447da8989ecb06fafdca6",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -5569,10 +4049,25 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 68427,
-              "expectedStart": "Tue Nov 17 09:35:01 2026",
+              "pid": 27621,
+              "expectedStart": "Tue Nov 17 13:18:28 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "4cf1474d221354dc24f237ec061913907567b50f9b9dd79daf8724b12d5e1959",
+              "expectedArgvSha256": "106a0cb0139761fcef0292e400082296d0aa3fd6d5081843b82aa825582e2a4b",
+              "alive": false,
+              "observedStart": null,
+              "observedUid": null,
+              "observedPpid": null,
+              "observedArgvSha256": null,
+              "sameIdentity": false,
+              "query": "ps",
+              "queryOk": true,
+              "observation": "independent-ps"
+            },
+            {
+              "pid": 27640,
+              "expectedStart": "Tue Nov 17 13:18:29 2026",
+              "expectedUid": 501,
+              "expectedArgvSha256": "4d5ea301399b12f47f00312095a7731656493cb2a629fae62cfa52c698f927a0",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -5592,15 +4087,15 @@
             "reason": null
           },
           "released": [
-            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-recovery-1pVpaK"
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-recovery-W7EJ0A"
           ],
           "retained": [],
           "observation": [
             {
-              "pid": 69371,
-              "expectedStart": "Tue Nov 17 09:35:06 2026",
+              "pid": 28583,
+              "expectedStart": "Tue Nov 17 13:18:35 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "7f2cbf237a8183284ebf9fc440a8e031c1b63db229b0e38b2d7254a3a0b62c0f",
+              "expectedArgvSha256": "aeb68a425e67de3291c928d817936b3cec12ab4ac043fe0e55ae07e5aded16d7",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -5612,10 +4107,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 69407,
-              "expectedStart": "Tue Nov 17 09:35:07 2026",
+              "pid": 28619,
+              "expectedStart": "Tue Nov 17 13:18:35 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "6fd7d62da215622c700b06f69d679654000b523c940ceb61d3918dbd9f3d9c2c",
+              "expectedArgvSha256": "afa9fba954d49abc67e2f62abc87b49f2e6306bdce9331de6b540b6863938fd1",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -5627,10 +4122,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 70247,
-              "expectedStart": "Tue Nov 17 09:35:10 2026",
+              "pid": 29475,
+              "expectedStart": "Tue Nov 17 13:18:38 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "db58c8ab38c75a408a535af60d6d49bf688e7ee88bd676c1f84ce35c95bd0d76",
+              "expectedArgvSha256": "b62b75837ff741dda8d9b3f0b7705cae2eca3614fa5365f954c40dd76c54f800",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -5642,10 +4137,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 70283,
-              "expectedStart": "Tue Nov 17 09:35:10 2026",
+              "pid": 29512,
+              "expectedStart": "Tue Nov 17 13:18:39 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "7d6f72dded3810cb54f8902eec8dd76df0221ab48e9bfbf44885032b2cf56cd9",
+              "expectedArgvSha256": "184bd89ce74248e648f78e8a20d4b1eaa319ba99eb782c2d669e3761e08b56e5",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -5657,10 +4152,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 70754,
-              "expectedStart": "Tue Nov 17 09:35:11 2026",
+              "pid": 29982,
+              "expectedStart": "Tue Nov 17 13:18:39 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "11189052396cd061f7e6f4da5248c41275feaa55e9bbd5292630accef2067337",
+              "expectedArgvSha256": "e3b119418f98ab4d99220213a8ed8b2d66291d0b6475f27f95f5be85b84f4ea8",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -5672,10 +4167,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 70790,
-              "expectedStart": "Tue Nov 17 09:35:11 2026",
+              "pid": 30018,
+              "expectedStart": "Tue Nov 17 13:18:40 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "1295e37ff75efd3866b536fd6ea5729619430297646652c4c23bf9b45d0db672",
+              "expectedArgvSha256": "b57a3b75752c3f63cefa184319ab5f01a4e8d2431c9f4cb4ab854d827cc3d0f1",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -5745,8 +4240,8 @@
               "pause_dispatch",
               "accept_candidate"
             ],
-            "candidateId": "77708cbc2181a3a976fdd5a7b2a367fe/32853348c280eb8685bca9d69f376a88/3",
-            "verificationId": "verification:07e78f2a-7a71-49c8-9f10-3f5d77376d7b",
+            "candidateId": "30070c65e2de6c4fdaa565522bdcd8a8/1217403b11385e1e37311843f7372beb/3",
+            "verificationId": "verification:beb75089-4bdc-4608-9a67-381920733d50",
             "verificationResults": 1,
             "verificationState": "pass"
           },
@@ -5756,8 +4251,8 @@
               "pause_dispatch",
               "accept_candidate"
             ],
-            "candidateId": "b22ede94513bd5c9339ab074833df949/a1d36aba32ae3f47a25ec11c01c6840c/3",
-            "verificationId": "verification:7ce6bc32-0f16-4356-86f9-6a8b33f36547",
+            "candidateId": "bc9c02d5bc54416272ef5f6e67a429f2/f7d4192922377776333424946a29df35/3",
+            "verificationId": "verification:aab3fb31-ff38-41d0-9654-2e852e9dd35d",
             "verificationResults": 1,
             "verificationState": "pass"
           }
@@ -5789,7 +4284,7 @@
       },
       "import": {
         "status": 200,
-        "projectId": "project-4178050852d18ad83af8b487",
+        "projectId": "project-62845cadb41c23f0d0fcf46c",
         "readBack": 2
       },
       "settings": {
@@ -5869,14 +4364,14 @@
       "finalRun": {
         "command": "node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record",
         "source": {
-          "commit": "4b4d4089a07e10b01c9deba32f0d51c23e96bdf1",
+          "commit": "105595d2b6e7045b0300302af96e216506c4aeda",
           "dirty": false
         },
         "counts": {
-          "PASS": 336,
+          "PASS": 347,
           "FAIL": 0,
           "SKIPPED": 0,
-          "NOT_TESTED": 21,
+          "NOT_TESTED": 22,
           "BLOCKED": 0,
           "UNKNOWN": 0
         }
@@ -5963,15 +4458,15 @@
             "reason": null
           },
           "released": [
-            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-home-9ppL3L"
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-home-pJ2XJn"
           ],
           "retained": [],
           "observation": [
             {
-              "pid": 65026,
-              "expectedStart": "Tue Nov 17 09:34:24 2026",
+              "pid": 23443,
+              "expectedStart": "Tue Nov 17 13:16:49 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "682f32cb6e47162a29d2f60549f99271723a4a30676477bc676dd3fff680b172",
+              "expectedArgvSha256": "c3a2c3727e39f03a49236df8d6341f3240a8d33c954615f6ed0a65273dcd34f3",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -5983,10 +4478,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 65094,
-              "expectedStart": "Tue Nov 17 09:34:25 2026",
+              "pid": 24181,
+              "expectedStart": "Tue Nov 17 13:17:52 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "f8323ca78f976c9ef2bf9e7e4ff2cb3d63fb9e0444479e74bac2ceaeb8232d32",
+              "expectedArgvSha256": "fa49661c24609a63a7c5778f76976b8c22ab81a7c2a3ab14d23dd2b190d994be",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -5998,10 +4493,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 65113,
-              "expectedStart": "Tue Nov 17 09:34:26 2026",
+              "pid": 24252,
+              "expectedStart": "Tue Nov 17 13:17:53 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "cc676705945a4f46239b97eb4a03677b8e3a5969e394d79ff57d66851e585e66",
+              "expectedArgvSha256": "617f162bec860668fb6fd4737d16680d1a5d3122533e7fcca9aa8e8e3dc13af6",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -6013,10 +4508,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 65694,
-              "expectedStart": "Tue Nov 17 09:34:29 2026",
+              "pid": 24284,
+              "expectedStart": "Tue Nov 17 13:17:54 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "714e3e03f609a6721ab845a0810f9872d1d79ffb98a865fb49039cf1e1e93d26",
+              "expectedArgvSha256": "8ca725b9c7890f57fb93770b5a2af4c4ee2d361b51fdd35bd572ae30246afa2b",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -6028,10 +4523,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 65747,
-              "expectedStart": "Tue Nov 17 09:34:29 2026",
+              "pid": 24887,
+              "expectedStart": "Tue Nov 17 13:17:57 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "b0e3ea597e57d61cd2ace50b6f7cddc85f0c775ff44112153641da28f82ce848",
+              "expectedArgvSha256": "567b1bdb3675fc389b07b5ec89da9a8ef7d13696d90813126539c26ca3fa3b2f",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -6043,10 +4538,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 65766,
-              "expectedStart": "Tue Nov 17 09:34:30 2026",
+              "pid": 24948,
+              "expectedStart": "Tue Nov 17 13:17:57 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "1deeb81280e99cc9671fe7e62ab5171f0d86f0186a3766c6958846c173fcb6c6",
+              "expectedArgvSha256": "56200149134154b0b0defcd7cd3145ffc6e3ecea93d2fab94a44614e931759d8",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -6058,10 +4553,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 67013,
-              "expectedStart": "Tue Nov 17 09:34:34 2026",
+              "pid": 24964,
+              "expectedStart": "Tue Nov 17 13:17:58 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "3eabab247d8e9f2bc7a4f96de31239afb0df9d97a9a065f25126760f696a1860",
+              "expectedArgvSha256": "5b02c7ff6605524eb88d09e5de567c253ee6efc26927c33222ef1693e5c772f5",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -6073,10 +4568,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 67027,
-              "expectedStart": "Tue Nov 17 09:34:35 2026",
+              "pid": 26213,
+              "expectedStart": "Tue Nov 17 13:18:03 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "167722da9e0b655aec7b0b0da55d93faa5b1320b2a82641a1fefab9b7175ad54",
+              "expectedArgvSha256": "dbc3ddbfd55c64ce84a0d8b8cde9ab3e6f5d6f6ed463b7713c11d80d7518a596",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -6088,10 +4583,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 67630,
-              "expectedStart": "Tue Nov 17 09:34:55 2026",
+              "pid": 26227,
+              "expectedStart": "Tue Nov 17 13:18:03 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "31c0f09a106bbf32a4d5c4152fe179a03661502059adbd51003e3e39d4a59282",
+              "expectedArgvSha256": "4c5a413afcab7c431b7a622fe84d960e0b8affbec9e780501b93989c49fcc0dd",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -6103,10 +4598,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 67703,
-              "expectedStart": "Tue Nov 17 09:34:57 2026",
+              "pid": 26842,
+              "expectedStart": "Tue Nov 17 13:18:24 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "720d76b9441dcbba20924e6e74c530e2eefffa5026c69cac28bd0b5eff2d65cd",
+              "expectedArgvSha256": "2b88d48c687fae36f4e3a4f3a15c62803358cd65a87cf95170616cf98ccfd2e4",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -6118,10 +4613,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 67719,
-              "expectedStart": "Tue Nov 17 09:34:57 2026",
+              "pid": 26912,
+              "expectedStart": "Tue Nov 17 13:18:25 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "6200cf924551b31bd5326ee9b79d15592ade773921964f809c1de860c308e715",
+              "expectedArgvSha256": "c909f58ba349749a37a40e1d3a2f6918195d94e9d1c52762e8eafef9a64c6a0a",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -6133,10 +4628,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 68355,
-              "expectedStart": "Tue Nov 17 09:35:00 2026",
+              "pid": 26931,
+              "expectedStart": "Tue Nov 17 13:18:25 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "10670109776e57f5a0b8bed91ec8c342a6468fba51c8d4efed4db932396c2b09",
+              "expectedArgvSha256": "4ec6a50b9bc1a4a4664f531197e516f8aa822e01d081df4ebd90199f6ee9bb68",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -6148,10 +4643,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 68408,
-              "expectedStart": "Tue Nov 17 09:35:00 2026",
+              "pid": 27564,
+              "expectedStart": "Tue Nov 17 13:18:28 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "f0577204aa05a70b373d90cdce38e3d1f4d732d1b1d347d0afb147603a2ff164",
+              "expectedArgvSha256": "9ef7ce6906d9124d622c9491066547387d6b8713f45447da8989ecb06fafdca6",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -6163,10 +4658,25 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 68427,
-              "expectedStart": "Tue Nov 17 09:35:01 2026",
+              "pid": 27621,
+              "expectedStart": "Tue Nov 17 13:18:28 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "4cf1474d221354dc24f237ec061913907567b50f9b9dd79daf8724b12d5e1959",
+              "expectedArgvSha256": "106a0cb0139761fcef0292e400082296d0aa3fd6d5081843b82aa825582e2a4b",
+              "alive": false,
+              "observedStart": null,
+              "observedUid": null,
+              "observedPpid": null,
+              "observedArgvSha256": null,
+              "sameIdentity": false,
+              "query": "ps",
+              "queryOk": true,
+              "observation": "independent-ps"
+            },
+            {
+              "pid": 27640,
+              "expectedStart": "Tue Nov 17 13:18:29 2026",
+              "expectedUid": 501,
+              "expectedArgvSha256": "4d5ea301399b12f47f00312095a7731656493cb2a629fae62cfa52c698f927a0",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -6186,15 +4696,15 @@
             "reason": null
           },
           "released": [
-            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-recovery-1pVpaK"
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-recovery-W7EJ0A"
           ],
           "retained": [],
           "observation": [
             {
-              "pid": 69371,
-              "expectedStart": "Tue Nov 17 09:35:06 2026",
+              "pid": 28583,
+              "expectedStart": "Tue Nov 17 13:18:35 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "7f2cbf237a8183284ebf9fc440a8e031c1b63db229b0e38b2d7254a3a0b62c0f",
+              "expectedArgvSha256": "aeb68a425e67de3291c928d817936b3cec12ab4ac043fe0e55ae07e5aded16d7",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -6206,10 +4716,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 69407,
-              "expectedStart": "Tue Nov 17 09:35:07 2026",
+              "pid": 28619,
+              "expectedStart": "Tue Nov 17 13:18:35 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "6fd7d62da215622c700b06f69d679654000b523c940ceb61d3918dbd9f3d9c2c",
+              "expectedArgvSha256": "afa9fba954d49abc67e2f62abc87b49f2e6306bdce9331de6b540b6863938fd1",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -6221,10 +4731,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 70247,
-              "expectedStart": "Tue Nov 17 09:35:10 2026",
+              "pid": 29475,
+              "expectedStart": "Tue Nov 17 13:18:38 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "db58c8ab38c75a408a535af60d6d49bf688e7ee88bd676c1f84ce35c95bd0d76",
+              "expectedArgvSha256": "b62b75837ff741dda8d9b3f0b7705cae2eca3614fa5365f954c40dd76c54f800",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -6236,10 +4746,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 70283,
-              "expectedStart": "Tue Nov 17 09:35:10 2026",
+              "pid": 29512,
+              "expectedStart": "Tue Nov 17 13:18:39 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "7d6f72dded3810cb54f8902eec8dd76df0221ab48e9bfbf44885032b2cf56cd9",
+              "expectedArgvSha256": "184bd89ce74248e648f78e8a20d4b1eaa319ba99eb782c2d669e3761e08b56e5",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -6251,10 +4761,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 70754,
-              "expectedStart": "Tue Nov 17 09:35:11 2026",
+              "pid": 29982,
+              "expectedStart": "Tue Nov 17 13:18:39 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "11189052396cd061f7e6f4da5248c41275feaa55e9bbd5292630accef2067337",
+              "expectedArgvSha256": "e3b119418f98ab4d99220213a8ed8b2d66291d0b6475f27f95f5be85b84f4ea8",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -6266,10 +4776,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 70790,
-              "expectedStart": "Tue Nov 17 09:35:11 2026",
+              "pid": 30018,
+              "expectedStart": "Tue Nov 17 13:18:40 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "1295e37ff75efd3866b536fd6ea5729619430297646652c4c23bf9b45d0db672",
+              "expectedArgvSha256": "b57a3b75752c3f63cefa184319ab5f01a4e8d2431c9f4cb4ab854d827cc3d0f1",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -6359,8 +4869,8 @@
               "pause_dispatch",
               "accept_candidate"
             ],
-            "candidateId": "77708cbc2181a3a976fdd5a7b2a367fe/32853348c280eb8685bca9d69f376a88/3",
-            "verificationId": "verification:07e78f2a-7a71-49c8-9f10-3f5d77376d7b",
+            "candidateId": "30070c65e2de6c4fdaa565522bdcd8a8/1217403b11385e1e37311843f7372beb/3",
+            "verificationId": "verification:beb75089-4bdc-4608-9a67-381920733d50",
             "verificationResults": 1,
             "verificationState": "pass"
           },
@@ -6370,8 +4880,8 @@
               "pause_dispatch",
               "accept_candidate"
             ],
-            "candidateId": "b22ede94513bd5c9339ab074833df949/a1d36aba32ae3f47a25ec11c01c6840c/3",
-            "verificationId": "verification:7ce6bc32-0f16-4356-86f9-6a8b33f36547",
+            "candidateId": "bc9c02d5bc54416272ef5f6e67a429f2/f7d4192922377776333424946a29df35/3",
+            "verificationId": "verification:aab3fb31-ff38-41d0-9654-2e852e9dd35d",
             "verificationResults": 1,
             "verificationState": "pass"
           }
@@ -6406,15 +4916,15 @@
             "reason": null
           },
           "released": [
-            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-home-9ppL3L"
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-home-pJ2XJn"
           ],
           "retained": [],
           "observation": [
             {
-              "pid": 65026,
-              "expectedStart": "Tue Nov 17 09:34:24 2026",
+              "pid": 23443,
+              "expectedStart": "Tue Nov 17 13:16:49 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "682f32cb6e47162a29d2f60549f99271723a4a30676477bc676dd3fff680b172",
+              "expectedArgvSha256": "c3a2c3727e39f03a49236df8d6341f3240a8d33c954615f6ed0a65273dcd34f3",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -6426,10 +4936,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 65094,
-              "expectedStart": "Tue Nov 17 09:34:25 2026",
+              "pid": 24181,
+              "expectedStart": "Tue Nov 17 13:17:52 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "f8323ca78f976c9ef2bf9e7e4ff2cb3d63fb9e0444479e74bac2ceaeb8232d32",
+              "expectedArgvSha256": "fa49661c24609a63a7c5778f76976b8c22ab81a7c2a3ab14d23dd2b190d994be",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -6441,10 +4951,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 65113,
-              "expectedStart": "Tue Nov 17 09:34:26 2026",
+              "pid": 24252,
+              "expectedStart": "Tue Nov 17 13:17:53 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "cc676705945a4f46239b97eb4a03677b8e3a5969e394d79ff57d66851e585e66",
+              "expectedArgvSha256": "617f162bec860668fb6fd4737d16680d1a5d3122533e7fcca9aa8e8e3dc13af6",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -6456,10 +4966,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 65694,
-              "expectedStart": "Tue Nov 17 09:34:29 2026",
+              "pid": 24284,
+              "expectedStart": "Tue Nov 17 13:17:54 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "714e3e03f609a6721ab845a0810f9872d1d79ffb98a865fb49039cf1e1e93d26",
+              "expectedArgvSha256": "8ca725b9c7890f57fb93770b5a2af4c4ee2d361b51fdd35bd572ae30246afa2b",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -6471,10 +4981,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 65747,
-              "expectedStart": "Tue Nov 17 09:34:29 2026",
+              "pid": 24887,
+              "expectedStart": "Tue Nov 17 13:17:57 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "b0e3ea597e57d61cd2ace50b6f7cddc85f0c775ff44112153641da28f82ce848",
+              "expectedArgvSha256": "567b1bdb3675fc389b07b5ec89da9a8ef7d13696d90813126539c26ca3fa3b2f",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -6486,10 +4996,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 65766,
-              "expectedStart": "Tue Nov 17 09:34:30 2026",
+              "pid": 24948,
+              "expectedStart": "Tue Nov 17 13:17:57 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "1deeb81280e99cc9671fe7e62ab5171f0d86f0186a3766c6958846c173fcb6c6",
+              "expectedArgvSha256": "56200149134154b0b0defcd7cd3145ffc6e3ecea93d2fab94a44614e931759d8",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -6501,10 +5011,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 67013,
-              "expectedStart": "Tue Nov 17 09:34:34 2026",
+              "pid": 24964,
+              "expectedStart": "Tue Nov 17 13:17:58 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "3eabab247d8e9f2bc7a4f96de31239afb0df9d97a9a065f25126760f696a1860",
+              "expectedArgvSha256": "5b02c7ff6605524eb88d09e5de567c253ee6efc26927c33222ef1693e5c772f5",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -6516,10 +5026,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 67027,
-              "expectedStart": "Tue Nov 17 09:34:35 2026",
+              "pid": 26213,
+              "expectedStart": "Tue Nov 17 13:18:03 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "167722da9e0b655aec7b0b0da55d93faa5b1320b2a82641a1fefab9b7175ad54",
+              "expectedArgvSha256": "dbc3ddbfd55c64ce84a0d8b8cde9ab3e6f5d6f6ed463b7713c11d80d7518a596",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -6531,10 +5041,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 67630,
-              "expectedStart": "Tue Nov 17 09:34:55 2026",
+              "pid": 26227,
+              "expectedStart": "Tue Nov 17 13:18:03 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "31c0f09a106bbf32a4d5c4152fe179a03661502059adbd51003e3e39d4a59282",
+              "expectedArgvSha256": "4c5a413afcab7c431b7a622fe84d960e0b8affbec9e780501b93989c49fcc0dd",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -6546,10 +5056,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 67703,
-              "expectedStart": "Tue Nov 17 09:34:57 2026",
+              "pid": 26842,
+              "expectedStart": "Tue Nov 17 13:18:24 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "720d76b9441dcbba20924e6e74c530e2eefffa5026c69cac28bd0b5eff2d65cd",
+              "expectedArgvSha256": "2b88d48c687fae36f4e3a4f3a15c62803358cd65a87cf95170616cf98ccfd2e4",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -6561,10 +5071,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 67719,
-              "expectedStart": "Tue Nov 17 09:34:57 2026",
+              "pid": 26912,
+              "expectedStart": "Tue Nov 17 13:18:25 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "6200cf924551b31bd5326ee9b79d15592ade773921964f809c1de860c308e715",
+              "expectedArgvSha256": "c909f58ba349749a37a40e1d3a2f6918195d94e9d1c52762e8eafef9a64c6a0a",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -6576,10 +5086,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 68355,
-              "expectedStart": "Tue Nov 17 09:35:00 2026",
+              "pid": 26931,
+              "expectedStart": "Tue Nov 17 13:18:25 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "10670109776e57f5a0b8bed91ec8c342a6468fba51c8d4efed4db932396c2b09",
+              "expectedArgvSha256": "4ec6a50b9bc1a4a4664f531197e516f8aa822e01d081df4ebd90199f6ee9bb68",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -6591,10 +5101,10 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 68408,
-              "expectedStart": "Tue Nov 17 09:35:00 2026",
+              "pid": 27564,
+              "expectedStart": "Tue Nov 17 13:18:28 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "f0577204aa05a70b373d90cdce38e3d1f4d732d1b1d347d0afb147603a2ff164",
+              "expectedArgvSha256": "9ef7ce6906d9124d622c9491066547387d6b8713f45447da8989ecb06fafdca6",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -6606,10 +5116,25 @@
               "observation": "independent-ps"
             },
             {
-              "pid": 68427,
-              "expectedStart": "Tue Nov 17 09:35:01 2026",
+              "pid": 27621,
+              "expectedStart": "Tue Nov 17 13:18:28 2026",
               "expectedUid": 501,
-              "expectedArgvSha256": "4cf1474d221354dc24f237ec061913907567b50f9b9dd79daf8724b12d5e1959",
+              "expectedArgvSha256": "106a0cb0139761fcef0292e400082296d0aa3fd6d5081843b82aa825582e2a4b",
+              "alive": false,
+              "observedStart": null,
+              "observedUid": null,
+              "observedPpid": null,
+              "observedArgvSha256": null,
+              "sameIdentity": false,
+              "query": "ps",
+              "queryOk": true,
+              "observation": "independent-ps"
+            },
+            {
+              "pid": 27640,
+              "expectedStart": "Tue Nov 17 13:18:29 2026",
+              "expectedUid": 501,
+              "expectedArgvSha256": "4d5ea301399b12f47f00312095a7731656493cb2a629fae62cfa52c698f927a0",
               "alive": false,
               "observedStart": null,
               "observedUid": null,
@@ -6627,13 +5152,13 @@
           "outcome": "EXITED",
           "code": 0,
           "pidSetUnchanged": true,
-          "output": "0\n  mode: personal access: local-development startup: normal\n  state: /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-home-9ppL3L/Library/Application Support/PersonalAgent/Preview-f880e5bc9c6c1c57/data\n"
+          "output": "2\n  mode: personal access: local-development startup: normal\n  state: /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-home-pJ2XJn/Library/Application Support/PersonalAgent/Preview-f880e5bc9c6c1c57/data\n"
         },
         "invalidConfig": {
           "outcome": "TIMEOUT",
           "code": null,
           "running": "RUNNING",
-          "output": "h: http://127.0.0.1:64119\n  api: http://127.0.0.1:64120\n  mode: personal access: local-development startup: normal\n  state: /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-home-9ppL3L/Library/Application Support/PersonalAgent/Preview-f880e5bc9c6c1c57/data\n  build: f880e5bc9c6c1c57\n",
+          "output": "h: http://127.0.0.1:54875\n  api: http://127.0.0.1:54876\n  mode: personal access: local-development startup: normal\n  state: /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-home-pJ2XJn/Library/Application Support/PersonalAgent/Preview-f880e5bc9c6c1c57/data\n  build: f880e5bc9c6c1c57\n",
           "mode": 420,
           "permissionEnforcedAtStart": false,
           "secretLeaked": false
@@ -6657,11 +5182,18 @@
         },
         "attempts": [
           {
+            "status": "STOPPED",
+            "exit": {
+              "code": "RUNNING"
+            },
+            "output": "EEXIST: file already exists, mkdir '/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-home-pJ2XJn/Library/Application Support/PersonalAgent/Preview-f880e5bc9c6c1c57'\n"
+          },
+          {
             "status": "RUNNING",
             "exit": {
               "code": "RUNNING"
             },
-            "output": "h: http://127.0.0.1:64069\n  api: http://127.0.0.1:64070\n  mode: personal access: local-development startup: normal\n  state: /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-home-9ppL3L/Library/Application Support/PersonalAgent/Preview-f880e5bc9c6c1c57/data\n  build: f880e5bc9c6c1c57\n"
+            "output": "h: http://127.0.0.1:54751\n  api: http://127.0.0.1:54752\n  mode: personal access: local-development startup: normal\n  state: /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-home-pJ2XJn/Library/Application Support/PersonalAgent/Preview-f880e5bc9c6c1c57/data\n  build: f880e5bc9c6c1c57\n"
           }
         ]
       },
@@ -6778,12 +5310,12 @@
         "instances": {
           "A": {
             "buildId": "f880e5bc9c6c1c57",
-            "pid": 13543,
+            "pid": 70659,
             "stop": true
           },
           "B": {
             "buildId": "f880e5bc9c6c1c57",
-            "pid": 13766,
+            "pid": 70883,
             "stop": true
           }
         }
