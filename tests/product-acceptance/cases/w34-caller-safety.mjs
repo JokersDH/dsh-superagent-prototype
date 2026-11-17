@@ -235,9 +235,11 @@ export async function runCallerSafety() {
     const deadRows = rows.map(item => ({ ...item, alive: false, sameIdentity: false, observedStart: null, observedUid: null, observedArgvSha256: null }))
     const duplicated = [deadRows[0], deadRows[0]]
     const verdict = op.releaseAllowed(duplicated)
-    const clean = op.releaseAllowed()
+    // The mapping defect is evaluated on a dead-by-construction pair; a matching fresh observation
+    // (dead or still exiting) is accepted for the clean pair without depending on kill timing.
+    const clean = op.releaseAllowed(deadRows)
     assert('DUPLICATE_ROWS_REFUSED', verdict.allowed === false && verdict.reason === 'duplicate_observation', JSON.stringify(verdict))
-    assert('CLEAN_PAIR_RELEASES', clean.allowed === true, JSON.stringify({ clean, rows }))
+    assert('CLEAN_PAIR_RELEASES', clean.allowed === true, JSON.stringify({ clean, deadRows }))
     evidence.callerDuplicateRows = { verdict, clean: clean.allowed }
     rmSync(own, { recursive: true, force: true })
   }))
