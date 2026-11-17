@@ -1834,16 +1834,15 @@ export function evaluateRelease({
 
   // Required operation copies are bound to the product case they summarise; one copy cannot pass while
   // the embedded operation or the other copy disagrees.
-  for (const [copyId, productId, key] of [['E33-OUTER-ZIP-OPERATION', 'E33-OUTER-ZIP', 'outerZip'],
-    ['E33-COHORT-RECOVERY-OPERATION', 'E33-COHORT-RECOVERY', 'cohortRecovery'],
-    ['E36-W35-OUTER-OPERATION', 'E36-W35-OUTER', 'outerZip'],
-    ['E36-W35-RECOVERY-OPERATION', 'E36-W35-RECOVERY', 'cohortRecovery'],
-    ['E36-W35-MODEL-SAVE-OPERATION', 'E36-W35-MODEL-SAVE', 'modelSave']]) {
-    const copyKey = copyId.endsWith('OUTER-OPERATION') ? 'outerZipOperation'
-      : copyId.endsWith('RECOVERY-OPERATION') ? 'cohortRecoveryOperation'
-        : 'modelSaveOperation'
+  for (const [copyId, copyKey, productId, productKey] of [
+    ['E33-OUTER-ZIP-OPERATION', 'outerZipOperation', 'E33-OUTER-ZIP', 'outerZip'],
+    ['E33-COHORT-RECOVERY-OPERATION', 'cohortRecoveryOperation', 'E33-COHORT-RECOVERY', 'cohortRecovery'],
+    ['E36-W35-OUTER-OPERATION', 'outerZipOperation', 'E36-W35-OUTER', 'outerZip'],
+    ['E36-W35-RECOVERY-OPERATION', 'cohortRecoveryOperation', 'E36-W35-RECOVERY', 'cohortRecovery'],
+    ['E36-W35-MODEL-SAVE-OPERATION', 'modelSaveOperation', 'E36-W35-MODEL-SAVE', 'modelSave'],
+  ]) {
     const copy = byId.get(copyId)?.evidence?.[copyKey]
-    const product = byId.get(productId)?.evidence?.[key]?.operation
+    const product = byId.get(productId)?.evidence?.[productKey]?.operation
     if (byId.get(copyId)?.status === STATUS.PASS && product !== undefined &&
       JSON.stringify(copy) !== JSON.stringify(product))
       failures.push(fail('operation_copy_unbound', `${copyId} differs from the embedded ${productId} operation`, copyId))
