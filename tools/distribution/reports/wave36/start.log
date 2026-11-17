@@ -1,0 +1,16 @@
+个人预览 14a6b457ea285988
+私有数据：/tmp/w36-home/Library/Application Support/PersonalAgent/Preview-14a6b457ea285988
+模型配置：/tmp/w36-home/Library/Application Support/PersonalAgent/Preview-14a6b457ea285988/config/model.json
+请保留启动窗口；结束时双击 Stop.command。
+[daemon:out] Personal product API: http://127.0.0.1:59101/v1/health
+[daemon:out] Private state/credential references: /private/tmp/w36-home/Library/Application Support/PersonalAgent/Preview-14a6b457ea285988/data
+[daemon:out] Personal discussion mode: execution unavailable (operator_disabled); business queues are retained.
+Workbench: http://127.0.0.1:59100
+  api: http://127.0.0.1:59101
+  mode: personal access: local-development startup: normal
+  state: /private/tmp/w36-home/Library/Application Support/PersonalAgent/Preview-14a6b457ea285988/data
+  build: 14a6b457ea285988
+daemon 已退出（code 0）；日志: /private/tmp/w36-home/Library/Application Support/PersonalAgent/Preview-14a6b457ea285988/logs/daemon-14a6b457ea285988.log
+  Personal product API: http://127.0.0.1:59101/v1/health
+  Private state/credential references: /private/tmp/w36-home/Library/Application Support/PersonalAgent/Preview-14a6b457ea285988/data
+  Personal discussion mode: execution unavailable (operator_disabled); business queues are retained.

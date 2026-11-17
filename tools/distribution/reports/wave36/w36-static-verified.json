@@ -1,0 +1,48 @@
+{
+  "protocol": "personal-agent-preview-verification/1",
+  "status": "VERIFIED_STATIC",
+  "manifestSha256": "a18ae3fac6bdd6f84e9a6d01d275ea44ace7477c6dfe25de8f2595668c78f69e",
+  "source": "087a598e5b6f357bd2cc40556cbf693257febc66",
+  "buildId": "14a6b457ea285988",
+  "predecessor": false,
+  "outer": {
+    "entries": 6897,
+    "regularFiles": 6874,
+    "internalLinks": 23,
+    "bytes": 192809795
+  },
+  "inner": {
+    "entries": 6889,
+    "regularFiles": 6866,
+    "internalLinks": 23,
+    "manifestSha256": "e7a910bce276e5f31c2907d8079942b5471bf68ff5bfdd79730db1ea2ce38ee7",
+    "originalTarSha256": "13798190ae43b28628eaf7131dfb8192bdb786b9bcfe4e1e0b6f9217ab33a8af",
+    "originalTarBytes": 20625055
+  },
+  "runtime": {
+    "version": "24.21.0",
+    "abi": "137",
+    "arch": "arm64",
+    "sha256": "e4b5a3af0e05c75de2eae013904145f40fe7fc2a6e6f17510128bf45cca4e79b",
+    "licenseSha256": "5888dbb9a1d2b18f2c3e6c5f6af1b39de658372b402a0577b002777f14c62ace"
+  },
+  "commandTemplatesExact": true,
+  "reviewedLauncherSha256": "339bdac0912a05da701d04de0670e7b6cd49cc1d86687536fb809f45396d866c",
+  "userDataPathsAndKnownCredentialFormsChecked": true,
+  "limitation": "Static integrity, pinned entry/runtime bytes and manifest consistency only. Original tar identity is recorded, not re-derived from an expanded directory. No package code, runtime version probe, service, model or native task was executed. This is not a signature, release approval or functional startup verdict.",
+  "servicesStarted": 0,
+  "modelNativeTurns": 0,
+  "signals": 0,
+  "releaseApproved": false,
+  "archive": {
+    "sha256": "43e06d5bc7606e8283c1c5f58463f402018d4c9c9b223a2c7c021d429ccb8995",
+    "bytes": 63565262,
+    "root": "PersonalAgent-Preview-14a6b45",
+    "entries": 7457,
+    "expandedBytes": 194453969,
+    "crcChecked": true
+  },
+  "externallyExpectedSource": "087a598e5b6f357bd2cc40556cbf693257febc66",
+  "externallyExpectedBuildId": "14a6b457ea285988",
+  "externallyExpectedArchiveHash": "43e06d5bc7606e8283c1c5f58463f402018d4c9c9b223a2c7c021d429ccb8995"
+}

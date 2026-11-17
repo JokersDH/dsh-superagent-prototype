@@ -1,0 +1,40 @@
+{
+  "status": "OK",
+  "buildId": "14a6b457ea285988",
+  "config": "/tmp/w36buildcfg/release.json",
+  "output": "/tmp/w36dev/install",
+  "tag": null,
+  "staged": {
+    "path": "/tmp/w36dev/install",
+    "installManifest": "/tmp/w36dev/install/install.json"
+  },
+  "source": {
+    "commit": "087a598e5b6f357bd2cc40556cbf693257febc66",
+    "branch": "codex/g3-local-distribution",
+    "dirty": false
+  },
+  "producer": {
+    "node": "24.21.0",
+    "sqlite": "3.53.4",
+    "abi": "137",
+    "platform": "darwin",
+    "arch": "arm64"
+  },
+  "artifacts": {
+    "count": 1043,
+    "bytes": 10208534
+  },
+  "dependencies": {
+    "count": 8,
+    "files": 5803
+  },
+  "console": {
+    "mode": "http",
+    "digest": "a70c075be411e99e67a631f012d986de1e546d2d2d797a9592e324ebbd6c9ce0"
+  },
+  "limitations": [
+    "Same-machine install model: node_modules and the native SQLite binding are not portable evidence for another machine.",
+    "Only darwin/arm64 with Node 24.21.x is a measured candidate; other platforms are NOT_TESTED.",
+    "No credentials, account homes, native sessions or model keys are included in this manifest."
+  ]
+}

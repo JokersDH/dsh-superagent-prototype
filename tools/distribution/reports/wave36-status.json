@@ -1,0 +1,119 @@
+{
+  "protocol": "wave36-status/1",
+  "owner": "agent-d",
+  "branch": "codex/g3-local-distribution",
+  "state": "COMPLETE_CANDIDATE_PENDING_E",
+  "source": "087a598e5b6f357bd2cc40556cbf693257febc66",
+  "closures": {
+    "C1": {
+      "status": "PASS_SCOPE",
+      "title": "installed 双项目与配置日常",
+      "positive": {
+        "modelSave": "1 POST/0command/0model/0600",
+        "projects": [
+          "project-alpha",
+          "project-beta"
+        ],
+        "works": 2,
+        "artifactsPerWork": 4
+      },
+      "negative": [
+        "foreign origin403",
+        "HTTP400",
+        "wide permission503",
+        "wrong project rejected"
+      ],
+      "limitation": "same fixture profile/check; sequential single-project runtimes; not default public two-project",
+      "evidence": [
+        "reports/wave35/ui-save.json",
+        "reports/wave35/two-projects-read.json"
+      ]
+    },
+    "C2": {
+      "status": "PASS",
+      "title": "真实非空数据、恢复与 target 管理",
+      "positive": {
+        "w35Raw": "BLOCKED preserved",
+        "w35Retry": "CONFIRMED exit0",
+        "w35Read": "2 Works/8 refs",
+        "backup": "seq105 artifacts36",
+        "review": "W35 200/422"
+      },
+      "negative": [
+        "unknown live resource raw blocks",
+        "artifact tamper/missing",
+        "nonprivate parent"
+      ],
+      "evidence": [
+        "reports/wave36/w35-upgrade-raw-blocked.json",
+        "reports/wave36/w35-upgrade-retry.json",
+        "reports/wave36/w35-clean-upgrade-read.json",
+        "reports/wave35/backup.json",
+        "reports/wave35/review-read-200.json"
+      ]
+    },
+    "C3": {
+      "status": "PASS_SCOPE",
+      "title": "同事私有搬迁与维护",
+      "positive": [
+        "W35 spaces/Chinese path",
+        "bundled Node",
+        "private model save",
+        "support0600"
+      ],
+      "negative": [
+        "port occupied",
+        "bad config",
+        "outer no state/key"
+      ],
+      "limitation": "same-machine only; second user/cross-machine/signing untested",
+      "evidence": [
+        "reports/wave35/moved-start.log",
+        "reports/wave35/moved-status.json",
+        "reports/wave36/support.json"
+      ]
+    },
+    "C4": {
+      "status": "PASS_SCOPE",
+      "title": "唯一 closure/identity/E 交接",
+      "positive": {
+        "w35Static": "VERIFIED_STATIC 7451/6883",
+        "w36Static": "VERIFIED_STATIC 7457/6889",
+        "closure": 199,
+        "w36Actual": "start/status/stop0"
+      },
+      "negative": [
+        "third wrapper hash refused",
+        "cross-artifact refused"
+      ],
+      "limitation": "W36 selected audit not full inventory; E independent W35/W36 pending",
+      "evidence": [
+        "reports/wave36/w35-static-verified.json",
+        "reports/wave36/w36-static-verified.json",
+        "reports/wave36/source-closure.json"
+      ]
+    }
+  },
+  "oldNine": {
+    "D1": "PASS",
+    "D2": "PASS_SCOPE",
+    "D3": "PASS",
+    "D4": "PASS",
+    "D5": "PASS",
+    "D6": "PASS",
+    "D7": "PASS_SCOPE",
+    "D8": "PASS_SCOPE",
+    "D9": "SOURCE_READY_E"
+  },
+  "remaining": [
+    "E independent W35/W36 verdicts",
+    "default two-project dispatch/applicability",
+    "W36 installed history UI acceptance",
+    "cross-machine/signing/native/value"
+  ],
+  "real": {
+    "vendor": 0,
+    "model": 0,
+    "native": 0
+  }
+}

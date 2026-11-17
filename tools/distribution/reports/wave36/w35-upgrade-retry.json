@@ -1,0 +1,43 @@
+{
+  "protocol": "personal-install-switch/1",
+  "status": "CONFIRMED",
+  "plan": {
+    "protocol": "personal-install-switch/1",
+    "plannedAt": "2026-11-17T03:28:31.107Z",
+    "from": {
+      "installRoot": "/tmp/w33-base/install/app",
+      "bound": true,
+      "buildId": "88eb8c69b0671171",
+      "commit": "e8348a864d7d192589e72b8099475520f841b1e5",
+      "schema": 18
+    },
+    "to": {
+      "installDir": "/tmp/w35dev/install",
+      "buildId": "599de3e98c02de0b",
+      "commit": "edfe5e14f2f8fbc7f395a84520c781c7f07ce9e7",
+      "schema": 18,
+      "digest": "88881bdbae2c1df7acc43a62723531f7ec8d40be038072cd880e2915f98babeb"
+    },
+    "instance": null,
+    "sharedData": true,
+    "dataMigration": false,
+    "binaryDowngrade": false
+  },
+  "backup": {
+    "path": "/private/tmp/w33-upbase/w35pre3.pab",
+    "sha256": "817e09a83e24a6c35adfe81aee0fcb39256e0183f4b29f9ad664c1c72daa7051",
+    "manifestDigest": "15146d9a269fb0da7113511d9161683a53ba53a05995d77a687a44a648b99dd6",
+    "evidenceDigest": "d307a017b9dad83639aa21aeab99ea0df2c68cb0cfd3fe0d5f394d7661e58e88"
+  },
+  "stopped": null,
+  "started": {
+    "pid": 63437,
+    "apiURL": "http://127.0.0.1:65257",
+    "consoleURL": "http://127.0.0.1:65256",
+    "buildId": "599de3e98c02de0b",
+    "mode": "personal",
+    "access": "local-development",
+    "health": "ok"
+  },
+  "journalPath": "/tmp/w33-upcfg/install-switch.json"
+}
