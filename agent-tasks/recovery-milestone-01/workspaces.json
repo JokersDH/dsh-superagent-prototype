@@ -1,0 +1,156 @@
+{
+  "protocol": "recovery-milestone-workspaces/1",
+  "date": "2026-11-17",
+  "mainSource": "42f6daab",
+  "previousDispatch": "agent-tasks/product-wave-36/dispatch.json",
+  "createdWorktrees": 0,
+  "externalPromptsSent": false,
+  "newModelNativeAllowance": 0,
+  "releaseApproved": false,
+  "roles": [
+    {
+      "id": "A",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "branch": "codex/g2-workspaces-verification",
+      "acceptedInput": "269c9c3af3c7049311574c8f1f1b6838a50e5548",
+      "packet": "agent-tasks/recovery-milestone-01/agent-a.zh-CN.md",
+      "ownedPaths": [
+        "packages/storage/",
+        "packages/workflows/"
+      ],
+      "executionMode": "on_demand_concrete_blocker_only"
+    },
+    {
+      "id": "B",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "branch": "codex/g1-runtime",
+      "acceptedInput": "579c40bca3a2fc06f5510f468e0f6ab19f693fd7",
+      "packet": "agent-tasks/recovery-milestone-01/agent-b.zh-CN.md",
+      "ownedPaths": [
+        "packages/execution/",
+        "packages/catalog/",
+        "packages/policy-preparation/",
+        "packages/driver-kit/",
+        "packages/testing/",
+        "packages/drivers/",
+        "apps/runner/",
+        "tests/native-acceptance/"
+      ],
+      "excludedOwnedPaths": [
+        "apps/runner/src/attach-channel/",
+        "apps/runner/test/attach-channel/"
+      ],
+      "executionMode": "active_current_result_only"
+    },
+    {
+      "id": "C",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "branch": "codex/g3-assistant-context",
+      "acceptedInput": "d4ce6f67d06b2af32dfcee84207cf7217163ab61",
+      "packet": "agent-tasks/recovery-milestone-01/agent-c.zh-CN.md",
+      "ownedPaths": [
+        "packages/context/",
+        "packages/proposals/",
+        "packages/knowledge/",
+        "packages/routing/"
+      ],
+      "executionMode": "on_demand_concrete_blocker_only"
+    },
+    {
+      "id": "D",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-d",
+      "branch": "codex/g3-local-distribution",
+      "acceptedInput": "652b6835b22e9c1b2b79793670d4cea534e0d1fb",
+      "packet": "agent-tasks/recovery-milestone-01/agent-d.zh-CN.md",
+      "ownedPaths": [
+        "apps/launcher/",
+        "tools/distribution/",
+        "packages/portability/"
+      ],
+      "executionMode": "active_current_result_only"
+    },
+    {
+      "id": "E",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-e",
+      "branch": "codex/g3-product-acceptance",
+      "acceptedInput": "95d48acc06b437a2a14a8cd46be430215cc3df5d",
+      "packet": "agent-tasks/recovery-milestone-01/agent-e.zh-CN.md",
+      "ownedPaths": [
+        "tests/product-acceptance/"
+      ],
+      "executionMode": "active_current_result_only"
+    },
+    {
+      "id": "F",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-f",
+      "branch": "codex/g4-trial-experience",
+      "acceptedInput": "06e17eb70232a2d14efd49308ff10a6045d77f10",
+      "packet": "agent-tasks/recovery-milestone-01/agent-f.zh-CN.md",
+      "ownedPaths": [
+        "apps/console/src/trial/",
+        "apps/console/test/trial/",
+        "apps/console/e2e/trial/",
+        "docs/user-guide/",
+        "reports/trial-experience/"
+      ],
+      "executionMode": "on_demand_concrete_blocker_only"
+    },
+    {
+      "id": "G",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-g",
+      "branch": "codex/g4-usage-insights",
+      "acceptedInput": "2df7416098dd7ab4a827a55fb4c8755574d3f75c",
+      "packet": "agent-tasks/recovery-milestone-01/agent-g.zh-CN.md",
+      "ownedPaths": [
+        "packages/usage-insights/",
+        "tools/usage-insights/",
+        "reports/usage-insights/"
+      ],
+      "executionMode": "on_demand_concrete_blocker_only"
+    },
+    {
+      "id": "H",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-h",
+      "branch": "codex/g4-trial-operations",
+      "acceptedInput": "74b4166a063d213882f30c54f6860b44bab2e71b",
+      "packet": "agent-tasks/recovery-milestone-01/agent-h.zh-CN.md",
+      "ownedPaths": [
+        "tools/trial-kit/",
+        "tests/operational-soak/",
+        "docs/internal-trial/",
+        "reports/trial-operations/"
+      ],
+      "executionMode": "active_current_result_only"
+    },
+    {
+      "id": "I",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-i",
+      "branch": "codex/g5-coordinator-channel",
+      "acceptedInput": "14ea58c70730ad50032415257e0b77eb5ff2c654",
+      "packet": "agent-tasks/recovery-milestone-01/agent-i.zh-CN.md",
+      "ownedPaths": [
+        "apps/runner/src/attach-channel/",
+        "apps/runner/test/attach-channel/",
+        "docs/runtime-channel/",
+        "reports/runtime-channel/"
+      ],
+      "executionMode": "on_demand_concrete_blocker_only"
+    },
+    {
+      "id": "J",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-j",
+      "branch": "codex/g5-project-recipes",
+      "acceptedInput": "b295eb6e72e55070682fabe4507781f3456fb968",
+      "packet": "agent-tasks/recovery-milestone-01/agent-j.zh-CN.md",
+      "ownedPaths": [
+        "packages/project-recipes/",
+        "tools/project-recipes/",
+        "docs/project-recipes/",
+        "reports/project-recipes/"
+      ],
+      "executionMode": "on_demand_concrete_blocker_only"
+    }
+  ],
+  "activationPolicy": "Only B/H original recovery and D/E fixed installation are active; A/C/F/G/I/J on demand for a concrete blocker from those consumers, otherwise idle",
+  "independentMaintenanceQueues": false
+}

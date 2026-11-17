@@ -48,6 +48,7 @@ import type { IngressBinding } from '../runtime-ingress.ts'
 import { ownedResourceManifestDigest } from '../resource-barrier.ts'
 import { ControlledProductAttempt } from './controlled-attempt.ts'
 import { NativeProductAttempt } from './native-attempt.ts'
+import type { NativeRunnerLinkFactory } from './native-attempt.ts'
 import type { NativeProductConfiguration } from './native-config.ts'
 import { NativeCodexSettingsSchema } from '../../../packages/drivers/codex-native/src/native.ts'
 import type { ProductCompletion } from './completion.ts'
@@ -126,6 +127,7 @@ export class ProductExecution {
   private readonly stateRoot: string
   private readonly principal: { userId: string }
   private readonly native: NativeProductConfiguration | undefined
+  private readonly nativeRunnerLinkFactory: NativeRunnerLinkFactory | undefined
   private readonly environments: ProductEnvironments | undefined
   private readonly projectForContract: ((contract: ContractRevision) => NativeProductConfiguration['projects'][number] | undefined) | undefined
   constructor(
@@ -139,6 +141,7 @@ export class ProductExecution {
     native?: NativeProductConfiguration,
     environments?: ProductEnvironments,
     projectForContract?: (contract: ContractRevision) => NativeProductConfiguration['projects'][number] | undefined,
+    nativeRunnerLinkFactory?: NativeRunnerLinkFactory,
   ) {
     this.store = store
     this.application = application
@@ -147,6 +150,7 @@ export class ProductExecution {
     this.stateRoot = stateRoot
     this.principal = principal
     this.native = native
+    this.nativeRunnerLinkFactory = nativeRunnerLinkFactory
     this.environments = environments
     this.projectForContract = projectForContract
     this.effects = new Effects(store.queue)
@@ -604,6 +608,7 @@ export class ProductExecution {
           this.ingress.bind(producer),
           () => !!this.current(attempt),
           environmentPlan ? { planRef: environmentPlan, capture: () => this.environments!.capture(attempt) } : undefined,
+          this.nativeRunnerLinkFactory,
         )
       : new ControlledProductAttempt(
           spec,
