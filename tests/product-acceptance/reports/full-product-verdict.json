@@ -3,12 +3,12 @@
   "tier": "full-product",
   "status": "FAIL",
   "ok": false,
-  "checkedAt": "2026-11-17T05:30:42.025Z",
+  "checkedAt": "2026-11-17T09:16:16.387Z",
   "source": {
-    "commit": "105595d2b6e7045b0300302af96e216506c4aeda",
+    "commit": "d199cd90888069df2fe6bcc7d30f8ae8ddd90f78",
     "dirty": false
   },
-  "expectedSource": "105595d2b6e7045b0300302af96e216506c4aeda",
+  "expectedSource": "d199cd90888069df2fe6bcc7d30f8ae8ddd90f78",
   "requirements": [
     {
       "id": "E1-GATE-CONTROL",
@@ -971,6 +971,41 @@
       "status": "NOT_TESTED"
     },
     {
+      "id": "E37-W36-OUTER",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E37-W36-OUTER-OPERATION",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E37-W36-MODEL-SAVE",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E37-W36-MODEL-SAVE-OPERATION",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E37-W36-RECOVERY",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E37-W36-RECOVERY-OPERATION",
+      "required": true,
+      "status": "PASS"
+    },
+    {
+      "id": "E37-W36-HISTORY",
+      "required": true,
+      "status": "PASS"
+    },
+    {
       "id": "E8-ORIGINAL-WORK-RECOVERY",
       "required": false,
       "status": "NOT_TESTED"
@@ -1111,7 +1146,7 @@
   "claimedBy": {
     "status": "PASS",
     "tier": "controlled-product-workflow",
-    "decidedAt": "2026-11-17T05:20:35.244Z",
+    "decidedAt": "2026-11-17T09:05:22.577Z",
     "failureCodes": []
   },
   "notes": [

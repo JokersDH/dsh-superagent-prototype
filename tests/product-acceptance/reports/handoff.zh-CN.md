@@ -1,8 +1,19 @@
 # Agent E 第三十六轮交付交接
 
-- 分支 `codex/g3-product-acceptance`，基线 `7e550991`，检查点 `PENDING`，本次证据源 `105595d2b6e7045b0300302af96e216506c4aeda`（干净工作树）。证据文件随源提交之后的提交一起交付；`git log` 的分支头即最终交付提交。
+- 分支 `codex/g3-product-acceptance`，基线 `7e550991`，检查点 `105595d2`，本次证据源 `d199cd90888069df2fe6bcc7d30f8ae8ddd90f78`（干净工作树）。证据文件随源提交之后的提交一起交付；`git log` 的分支头即最终交付提交。
 - 拥有路径：`tests/product-acceptance/`。未修改生产实现、root manifest/lock、公共 schema 或迁移。
 - 模型预算：0 个真实模型任务；唯一模型对端是本机 loopback mock。原生执行：0。
+
+## 恢复里程碑01：固定 W36 独立结论
+
+| 项 | 同包结论 | 依据 |
+| --- | --- | --- |
+| 包身份/入口 | PASS | source 087a598e / build 14a6b457ea285988 / inner 13798190 / outer 43e06d5b；manifest/runtime/Node/ABI 与包内 Start/Stop/status/导入/复用同包。 |
+| 真实 GUI 配置 | PASS | 包内 偏好设置→模型设置 保存：0600 私有文件、显式 HTTP 同意、0 模型请求、key 清空/不回显、重开无 key、重启 config_present；非法端点拒绝且不写。 |
+| 分类历史三 kind + 实际点击 | PASS | 同 Work 的 GET contracts/verifications/acceptances 均 200 "work-completion-history/1"、available≥1；Work 详情展开后通过历史分类 select 依次点击三类，显示“本类来源/已显示”；坏 kind、limit 0/21 拒绝；loopback 无 bearer 200 且错 bearer 401。 |
+| 非空原对象重开 | PASS | 同包两 Work、全部交付 artifact bytes、26 registry、停机前问题与 effect 行保留，restore 新根只读读回一致；answer/business 422、provider 0。 |
+| 已有委托/检查/接受 | PASS | 受控 create_work→回答→verification PASS→accept_candidate→delivered；同 Work 产物重开。 |
+| 原项目/槽/native | 保留未达 | 原项目 applicability 仍 NOT_REACHED（fixture 仅自身项目）；原 2/4 槽与原生故障恢复无 consumer，NOT_TESTED；D selected audit 5 个旧 hash 为 D 修复项，不影响本包字节结论。 |
 
 ## 第三十六轮四闭环（聚合旧九验收点）
 
@@ -55,9 +66,9 @@
 | `node tests/product-acceptance/run.mjs --suites=e2 --tier=e2-controlled-workflow` | E2-* | PASS 36 + NOT_TESTED 3 |
 | `node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui` | E3-* | PASS 32 + NOT_TESTED 6 |
 | `node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha` | E4-* / E5-NATIVE-CONTROL / E6-REVIEW-PILOT | PASS 21 + NOT_TESTED 5 |
-| `node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record` | 全部 369 | PASS 347 + FAIL 0 + SKIPPED 0 + NOT_TESTED 22 + BLOCKED 0 + UNKNOWN 0 |
+| `node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record` | 全部 376 | PASS 354 + FAIL 0 + SKIPPED 0 + NOT_TESTED 22 + BLOCKED 0 + UNKNOWN 0 |
 
-本次聚合：**PASS**（tier `controlled-product-workflow`）。证据目录 `/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T05-10-17-187Z`。
+本次聚合：**PASS**（tier `controlled-product-workflow`）。证据目录 `/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T08-54-30-978Z`。
 
 ## 矩阵摘要
 
@@ -124,7 +135,7 @@
 | --- | --- | --- |
 | 研究价值（独立会话复核是否值得继续） | **BLOCKED — 无价值结论** | 8 例三组一例未发；adapter_missing（无经准入的实际 adapter/整 turn 上界/隔离/材料/main 准入）；0/24 turn。BLOCKED 不是 no-go，也不是正收益。 |
 | 产品准入（普通受控工作流） | 见 `controlled-product-workflow` tier | 真实 HTTP/SQLite/受控执行，不依赖试点。 |
-| 安装准入（个人 Alpha） | **PASS（仅所测 tuple）**：cold personal、fixture 安装版 context、non-empty default-off→建议、候选 GET/prepare/confirm/replay/reject、非空第二根 readonly（候选/context/history/held work/原 body）、同包 source prepare/confirm/audit/进程重开、篡改拒绝、requested-data-root/copied-record stop、legacy16→18 迁移、跨 schema 拒绝 | E3-PERSONAL-COLD-START、E6-INSTALLED-CONTEXT、E7-BACKUP-CONTEXT-REPLY、E4-INSTALL-*、E4-BACKUP-RESTORE、E4-UPGRADE-CROSS-SCHEMA、E8-LEGACY16-MIGRATION、E7-OWNERSHIP-COPY；E33-OUTER-ZIP=PASS、E33-COHORT-RECOVERY=PASS。tuple=8296720d8a25f38c/schema 18，main schema 18；current-main install=PASS (actual personal discussion-only + mock provider HTTP context/history/source/reply)；E4-UPGRADE-ROLLBACK/FAULTS/CROSS、E7 copy/wrong-install、非空 backup 已执行；M1/discussionReadiness=true；D safety mocks=PASS（helper 从 ee tar 提取并核对文件 hash；旧97仅mock失败对照）；candidate installed=PASS；second root=PASS（probeScope=fixture+recovery_readonly）；installed source confirm=PASS；installed stability=PASS；workflow formats=PASS（按包能力：default1+explicit2）；personal review=PASS（consumerOrigin=package，digest=3516c179…，scopeDiagnostics=present）；refusals=PASS；review reuse=PASS（same=REUSED，digestSame=true，different=BLOCKED）。personal旧项目只读重绑定未到，对应项NOT_REACHED，403不自动放宽。 |
+| 安装准入（个人 Alpha） | **PASS（仅所测 tuple）**：cold personal、fixture 安装版 context、non-empty default-off→建议、候选 GET/prepare/confirm/replay/reject、非空第二根 readonly（候选/context/history/held work/原 body）、同包 source prepare/confirm/audit/进程重开、篡改拒绝、requested-data-root/copied-record stop、legacy16→18 迁移、跨 schema 拒绝 | E3-PERSONAL-COLD-START、E6-INSTALLED-CONTEXT、E7-BACKUP-CONTEXT-REPLY、E4-INSTALL-*、E4-BACKUP-RESTORE、E4-UPGRADE-CROSS-SCHEMA、E8-LEGACY16-MIGRATION、E7-OWNERSHIP-COPY；E33-OUTER-ZIP=PASS、E33-COHORT-RECOVERY=PASS。tuple=8296720d8a25f38c/schema 18，main schema 18；current-main install=PASS (actual personal discussion-only + mock provider HTTP context/history/source/reply)；E4-UPGRADE-ROLLBACK/FAULTS/CROSS、E7 copy/wrong-install、非空 backup 已执行；M1/discussionReadiness=true；D safety mocks=PASS（helper 从 ee tar 提取并核对文件 hash；旧97仅mock失败对照）；candidate installed=PASS；second root=PASS（probeScope=fixture+recovery_readonly）；installed source confirm=PASS；installed stability=PASS；workflow formats=PASS（按包能力：default1+explicit2）；personal review=PASS（consumerOrigin=package，digest=585a3095…，scopeDiagnostics=present）；refusals=PASS；review reuse=PASS（same=REUSED，digestSame=true，different=BLOCKED）。personal旧项目只读重绑定未到，对应项NOT_REACHED，403不自动放宽。 |
 
 安装物身份（从本轮真实 tar tuple 读取，位置可用 PA_E_INSTALL_*_DIR 覆盖）：baseline buildId `2d94a7c31ef97b57` / schema 18 / tar `daee1a94…` / source `1fbaf940`；target buildId `8296720d8a25f38c` / schema 18 / tar `04926739…` / source `82ee5b8f`。均为 darwin/arm64、Node 24.21.0、SQLite ABI 137。verdict 只对所测 tuple 成立，旧版本结果未改标签。
 
