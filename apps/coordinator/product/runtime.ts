@@ -33,6 +33,7 @@ import { ProductRecoverySource } from './recovery-source-confirmation.ts'
 import { ProductProposals } from './proposals.ts'
 import { readRecoveryActivationRecord } from './recovery-intents.ts'
 import { ProductEvidenceHistory } from './evidence-history.ts'
+import { ProductCompletionHistory } from './completion-history.ts'
 import { ProductContextPreview } from './context-preview.ts'
 import { ProductAssistantContext } from './assistant-context-use.ts'
 import { ProductRecoveryTargets } from './recovery-target-service.ts'
@@ -199,6 +200,9 @@ export function createProductRuntime(
   })
   const assistantStreams = new AssistantStreams()
   const evidenceHistory = new ProductEvidenceHistory(store, application, () => configuredProjects.map(project => project.id), options.actionSecret, options.now)
+  const completionHistory = new ProductCompletionHistory(store, application, () => ({ principal: options.principal,
+    projects: configuredProjects.map(project => ({ id: project.id, scope: projectSettings?.has(project.id)
+      ? projectSettings.read(project.id).current : project.scope })) }), options.actionSecret, options.now)
   if (options.assistantProvider)
     handleAssistantReplies(execution.effects, store, options.assistantProvider, assistantStreams, {
       nativeExecution: !!options.native,
@@ -227,6 +231,7 @@ export function createProductRuntime(
     },
     contextSources: async (messageId, query) => contextRecords?.sources(messageId, query),
     workEvidenceHistory: (workId, query) => evidenceHistory.read(workId, query),
+    workCompletionHistory: (workId, query) => completionHistory.read(workId, query),
     workEvidence: async workId => {
       const work = (await application.inspect({ workId })).works[0]
       if (!work) throw new ApplicationFault('forbidden', 'Work evidence is outside the configured scope', 'none')

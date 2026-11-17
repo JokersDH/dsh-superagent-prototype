@@ -41,6 +41,8 @@ import {
   WorkEvidenceSchema,
   WorkEvidenceHistorySchema,
   WorkEvidenceHistoryQuerySchema,
+  WorkCompletionHistoryQuerySchema,
+  WorkCompletionHistorySchema,
   ContextPreviewInputSchema,
   ContextPreviewSchema,
   AssistantContextPrepareSchema,
@@ -103,6 +105,8 @@ import type {
   WorkEvidence,
   WorkEvidenceHistory,
   WorkEvidenceHistoryQuery,
+  WorkCompletionHistory,
+  WorkCompletionHistoryQuery,
   ContextPreviewInput,
   ContextPreview,
   AssistantContextPrepare,
@@ -176,6 +180,7 @@ export interface ConsoleTransport {
   proposalCommand?(command: ProposalCommand): Promise<CommandReceipt>
   workEvidence?(workId: string): Promise<WorkEvidence | undefined>
   workEvidenceHistory?(workId: string, query: WorkEvidenceHistoryQuery): Promise<WorkEvidenceHistory | undefined>
+  workCompletionHistory?(workId: string, query: WorkCompletionHistoryQuery, signal?: AbortSignal): Promise<WorkCompletionHistory | undefined>
   contextPreview?(input: ContextPreviewInput): Promise<ContextPreview>
   prepareAssistantContext?(input: AssistantContextPrepare): Promise<AssistantContextPrepared>
   sendAssistantContext?(input: AssistantContextSend): Promise<CommandReceipt>
@@ -226,7 +231,7 @@ export class HttpTransport implements ConsoleTransport {
     this.base = base
   }
 
-  private async request(path: string, init?: RequestInit, optionalResource: boolean | 'json404' = false, receiptCommandId?: string): Promise<unknown> {
+  private async request(path: string, init?: RequestInit, optionalResource: boolean | 'json404' = false, receiptCommandId?: string, maxBytes?: number): Promise<unknown> {
     let response: Response
     try {
       response = await fetch(`${this.base}${path}`, {
@@ -237,7 +242,21 @@ export class HttpTransport implements ConsoleTransport {
     } catch (error) {
       throw new TransportError('storage_unavailable', `无法连接产品服务：${String(error)}`, 'safe')
     }
-    const text = await response.text()
+    let text = ''
+    if (maxBytes !== undefined && response.body) {
+      const reader = response.body.getReader(), decoder = new TextDecoder()
+      let bytes = 0
+      try {
+        while (true) {
+          const chunk = await reader.read()
+          if (chunk.done) break
+          bytes += chunk.value.byteLength
+          if (bytes > maxBytes) { await reader.cancel(); throw new TransportError('schema_mismatch', '读取结果超过本次上限') }
+          text += decoder.decode(chunk.value, { stream: true })
+        }
+        text += decoder.decode()
+      } finally { reader.releaseLock() }
+    } else text = await response.text()
     let body: unknown = undefined
     if (text) {
       try {
@@ -663,6 +682,23 @@ export class HttpTransport implements ConsoleTransport {
       if (body === missingOptionalResource) return undefined
       const page = WorkEvidenceHistorySchema.parse(body)
       if (page.workId !== workId) throw new TransportError('schema_mismatch', '交付历史属于另一项工作')
+      return page
+    } catch (error) {
+      if (error instanceof TransportError && error.code === 'unsupported_capability') return undefined
+      throw error
+    }
+  }
+  async workCompletionHistory(workId: string, input: WorkCompletionHistoryQuery, signal?: AbortSignal): Promise<WorkCompletionHistory | undefined> {
+    const query = WorkCompletionHistoryQuerySchema.parse(input), params = new URLSearchParams()
+    for (const [key, value] of Object.entries(query)) if (value !== undefined) params.set(key, String(value))
+    try {
+      const body = await this.request(`/v1/works/${encodeURIComponent(workId)}/completion-history?${params}`, {
+        signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(10000)]) : AbortSignal.timeout(10000),
+      }, 'json404', undefined, 131072)
+      if (body === missingOptionalResource) return undefined
+      const page = WorkCompletionHistorySchema.parse(body)
+      if (page.workId !== workId || page.kind !== query.kind || page.limit !== query.limit)
+        throw new TransportError('schema_mismatch', '历史不属于当前工作或类别')
       return page
     } catch (error) {
       if (error instanceof TransportError && error.code === 'unsupported_capability') return undefined
