@@ -6,7 +6,7 @@
  */
 import { createHash } from 'node:crypto'
 import type Database from 'better-sqlite3'
-import { ConversationMessageSchema, UserDecisionSchema } from '@personal-agent/contracts'
+import { CompletionProposalSchema, ConversationMessageSchema, IdSchema, UserDecisionSchema, VerificationSchema } from '@personal-agent/contracts'
 import type {
   ContractRef, ContractRevision, ConversationMessage, Json, Scope, TicketLink, UserDecision, WorkRecord,
 } from '@personal-agent/contracts'
@@ -615,6 +615,61 @@ export interface WorkflowStateFacts {
   observedAt: string
 }
 
+export interface CompletionReviewFact {
+  commandId: string; payloadDigest: string; seq: number; recordedAt: string
+  proposal: Record<string, unknown>; verification: Record<string, unknown>
+  artifactIds: readonly string[]; attemptId: string
+  /** The original attempt's historical binding state; historical validity is not current eligibility. */
+  bindingState: string
+  /** Whether the ticket's current pointer still names this review's attempt. Data link only. */
+  currentLink: 'current_attempt' | 'historical_attempt'
+}
+export interface CompletionVerificationFact {
+  id: string; ticketId: string; assignmentId: string; candidateGeneration: number
+  artifactDigest: string; criteriaDigest: string; environmentRef: string; verifierIdentityRef: string
+  results: unknown; createdAt: string
+}
+export interface CompletionAcceptanceFact {
+  id: string; ticketId: string; assignmentId: string; candidateGeneration: number
+  artifactDigest: string; criterionIds: readonly string[]; actorRef: string; acceptedAt: string
+}
+export interface UnclassifiedReviewFact { commandId: string; reason: string }
+export interface CompletionFacts {
+  /** Exact canonical ProductCompletion review receipts; never inferred from a loose ticket id alone. */
+  reviews: readonly CompletionReviewFact[]
+  /** Receipts that looked like reviews but failed strict canonical/Work/contract/binding validation. */
+  unclassifiedReviews: readonly UnclassifiedReviewFact[]
+  verifications: readonly CompletionVerificationFact[]
+  acceptances: readonly CompletionAcceptanceFact[]
+  /** Per-ticket read bound; `truncated` means more historical rows exist than returned. */
+  coverage: { reviews: 'complete' | 'truncated'; verifications: 'complete' | 'truncated'; acceptances: 'complete' | 'truncated' }
+  /** Source-side availability per ticket; returned arrays may be smaller when coverage is truncated. */
+  available: { reviewCandidates: number; verifications: number; acceptances: number }
+  limits: { perTicket: 50 }
+}
+/** Exact public orchestrator-core `key('product-review', canonicalDigest(candidate))` algorithm. */
+export function productReviewCommandId(candidate: { ticketId: string; assignmentId: string; contract: { workId: string; revision: number; digest: string }; candidateGeneration: number }): string {
+  const canonical = digest({ ticketId: candidate.ticketId, assignmentId: candidate.assignmentId, contract: candidate.contract,
+    candidateGeneration: candidate.candidateGeneration })
+  return createHash('sha256').update(JSON.stringify(['product-review', canonical])).digest('hex').slice(0, 32)
+}
+export type CompletionHistoryKind = 'reviews' | 'verifications' | 'acceptances' | 'contracts' | 'attempts'
+export interface CompletionHistoryQuery {
+  workId: string; projectIds: readonly string[]; kind: CompletionHistoryKind; limit?: number; cursor?: string
+}
+export interface CompletionHistoryPage {
+  protocol: 'completion-history/1'
+  status: 'ok' | 'blocked'
+  reason: 'entry_too_large' | 'page_budget' | null
+  workId: string; projectId: string; kind: CompletionHistoryKind
+  limit: number; returned: number; available: number; hasMore: boolean; nextCursor: string | null
+  coverage: 'complete' | 'truncated'
+  entries: readonly unknown[]
+  unclassifiedReviews: readonly UnclassifiedReviewFact[]
+  omittedUnclassifiedReviews: number
+  limits: { maxLimit: 200; maxBytes: number }
+}
+
 export interface WorkIndexEntry {
   work: WorkRecord
   authority: ContractRef | undefined
@@ -627,6 +682,8 @@ export interface WorkIndexEntry {
   verificationIds: readonly string[]
   acceptanceIds: readonly string[]
   deliverables: readonly { verificationId: string; artifactDigest: string; criteriaDigest: string; accepted: boolean }[]
+  /** Existing ProductCompletion/verification/acceptance facts; data only, never current/accept authority. */
+  completion: CompletionFacts
   project: { id: string; settings: ProjectCurrent | undefined; state: 'current' | 'missing' | 'archived' }
   provenance: readonly string[]
 }
@@ -708,6 +765,186 @@ export class WorkflowIndex {
     }
   }
 
+  private completionVerification(row: Row): CompletionVerificationFact {
+    return { id: text(row.id), ticketId: text(row.ticket_id), assignmentId: text(row.assignment_id),
+      candidateGeneration: Number(row.candidate_generation), artifactDigest: text(row.artifact_digest),
+      criteriaDigest: text(row.criteria_digest), environmentRef: text(row.environment_ref),
+      verifierIdentityRef: text(row.verifier_identity_ref), results: json<unknown>(row.results), createdAt: text(row.created_at) }
+  }
+  private completionAcceptance(row: Row): CompletionAcceptanceFact {
+    return { id: text(row.id), ticketId: text(row.ticket_id), assignmentId: text(row.assignment_id),
+      candidateGeneration: Number(row.candidate_generation), artifactDigest: text(row.artifact_digest),
+      criterionIds: json<string[]>(row.criterion_ids), actorRef: text(row.actor_ref), acceptedAt: text(row.accepted_at) }
+  }
+  private completionReviewFor(workId: string, ticketId: string, currentAttemptId: string | null, verification: Row):
+    { review?: CompletionReviewFact; unclassified?: UnclassifiedReviewFact } {
+    let contract: { workId: string; revision: number; digest: string }
+    try { contract = json(verification.contract) } catch { return { unclassified: { commandId: '', reason: 'verification_contract_invalid' } } }
+    const candidate = { ticketId, assignmentId: text(verification.assignment_id), contract, candidateGeneration: Number(verification.candidate_generation) }
+    const commandId = productReviewCommandId(candidate)
+    const receipt = this.db.prepare(`SELECT command_id, payload_digest, seq, recorded_at, result FROM command_receipts WHERE command_id = ?`).get(commandId) as Row | undefined
+    if (!receipt) return {}
+    const unclassified = (reason: string) => ({ unclassified: { commandId, reason } })
+    let parsed: Record<string, unknown>
+    try { parsed = json<Record<string, unknown>>(receipt.result) } catch { return unclassified('result_not_json') }
+    if (Object.keys(parsed).sort().join(',') !== 'artifactIds,attemptId,proposal,verification') return unclassified('review_shape')
+    const proposal = CompletionProposalSchema.safeParse(parsed.proposal)
+    const verified = VerificationSchema.safeParse(parsed.verification)
+    if (!proposal.success) return unclassified('proposal_shape')
+    if (!verified.success) return unclassified('verification_shape')
+    const attemptId = IdSchema.safeParse(parsed.attemptId)
+    const artifactIds = Array.isArray(parsed.artifactIds) ? parsed.artifactIds : null
+    if (!attemptId.success || !artifactIds || artifactIds.length === 0 || artifactIds.length > 512 ||
+      artifactIds.some(value => !IdSchema.safeParse(value).success) || new Set(artifactIds).size !== artifactIds.length)
+      return unclassified('artifact_or_attempt_shape')
+    const bindingRow = this.db.prepare('SELECT value FROM runtime_bindings WHERE attempt_id = ?').get(attemptId.data) as Row | undefined
+    if (!bindingRow) return unclassified('historical_binding_missing')
+    const binding = json<Record<string, unknown>>(bindingRow.value)
+    if (proposal.data.ticketId !== ticketId || proposal.data.contract.workId !== workId ||
+      proposal.data.ticketId !== text(binding.ticketId) || proposal.data.assignmentId !== text(binding.assignmentId) ||
+      attemptId.data !== text(binding.attemptId) || digest(proposal.data.contract) !== digest(binding.contract))
+      return unclassified('foreign_work_or_binding')
+    if (proposal.data.verificationId !== verified.data.id || proposal.data.artifactDigest !== verified.data.artifactDigest ||
+      proposal.data.ticketId !== verified.data.ticketId || proposal.data.assignmentId !== verified.data.assignmentId ||
+      proposal.data.candidateGeneration !== verified.data.candidateGeneration ||
+      digest(proposal.data.contract) !== digest(verified.data.contract)) return unclassified('proposal_verification_mismatch')
+    if (commandId !== productReviewCommandId(proposal.data)) return unclassified('noncanonical_review_key')
+    return { review: { commandId, payloadDigest: text(receipt.payload_digest), seq: Number(receipt.seq), recordedAt: text(receipt.recorded_at),
+      proposal: proposal.data as unknown as Record<string, unknown>, verification: verified.data as unknown as Record<string, unknown>,
+      artifactIds: [...artifactIds] as string[], attemptId: attemptId.data, bindingState: text(binding.state),
+      currentLink: currentAttemptId === attemptId.data ? 'current_attempt' : 'historical_attempt' } }
+  }
+  private historyCursor(query: CompletionHistoryQuery, projectId: string, key: string): string {
+    return Buffer.from(JSON.stringify({ v: 1, workId: query.workId, projectId, kind: query.kind, key }), 'utf8').toString('base64url')
+  }
+  private parseHistoryCursor(query: CompletionHistoryQuery, projectId: string, cursor: string | undefined): string | null {
+    if (!cursor) return null
+    let value: any
+    try { value = JSON.parse(Buffer.from(cursor, 'base64url').toString('utf8')) } catch { throw new WorkflowConflict('invalid completion history cursor') }
+    if (value?.v !== 1 || value.workId !== query.workId || value.projectId !== projectId || value.kind !== query.kind ||
+      typeof value.key !== 'string' || !value.key) throw new WorkflowConflict('completion history cursor does not belong to this subject')
+    return value.key
+  }
+
+  /** Stable keyset continuation over existing facts; no history ledger or second candidate state. */
+  completionHistory(query: CompletionHistoryQuery): CompletionHistoryPage {
+    const workId = id(query.workId, 'work id')
+    if (query.projectIds.length !== 1) throw new WorkflowConflict('completion history requires exactly one project')
+    const projectId = id(query.projectIds[0], 'project id')
+    const row = this.db.prepare('SELECT value FROM works WHERE id = ?').get(workId) as Row | undefined
+    if (!row) throw new WorkflowConflict('unknown work')
+    const work = json<WorkRecord>(row.value)
+    if (work.projectId !== projectId) throw new WorkflowConflict('work does not belong to the requested project')
+    if (!['reviews', 'verifications', 'acceptances', 'contracts', 'attempts'].includes(query.kind)) throw new WorkflowConflict('unknown completion history kind')
+    const limit = query.limit === undefined ? 50 : Math.trunc(query.limit)
+    if (!Number.isInteger(limit) || limit < 0 || limit > 200) throw new WorkflowConflict('completion history limit must be 0..200')
+    const cursorKey = this.parseHistoryCursor(query, projectId, query.cursor)
+    const linkRows = this.db.prepare('SELECT value FROM ticket_links WHERE work_id = ? ORDER BY revision DESC, ticket_id').all(workId) as Row[]
+    const links = linkRows.map(item => json<TicketLink>(item.value))
+    const ticketIds = links.map(link => link.ticketId)
+    const ph = ticketIds.map(() => '?').join(', ')
+    const maxBytes = 4 * 1024 * 1024
+    let available = 0
+    const entries: unknown[] = [], keys: string[] = [], unclassifiedReviews: UnclassifiedReviewFact[] = []
+    let hasMore = false
+    const count = (sql: string, args: unknown[]) => Number((this.db.prepare(sql).get(...args) as Row).count)
+    if (limit === 0) {
+      available = query.kind === 'contracts' ? count('SELECT COUNT(*) AS count FROM contract_revisions WHERE work_id = ?', [workId])
+        : query.kind === 'attempts' ? count(`SELECT COUNT(*) AS count FROM runtime_bindings WHERE ticket_id IN (${ph || "''"})`, ticketIds)
+          : query.kind === 'acceptances' ? count(`SELECT COUNT(*) AS count FROM completion_acceptances WHERE ticket_id IN (${ph || "''"})`, ticketIds)
+            : count(`SELECT COUNT(*) AS count FROM completion_verifications WHERE ticket_id IN (${ph || "''"})`, ticketIds)
+      return { protocol: 'completion-history/1', status: 'ok', reason: null, workId, projectId, kind: query.kind, limit,
+        returned: 0, available, hasMore: available > 0, nextCursor: null, coverage: available > 0 ? 'truncated' : 'complete',
+        entries, unclassifiedReviews, omittedUnclassifiedReviews: 0, limits: { maxLimit: 200, maxBytes } }
+    }
+    if (query.kind === 'contracts') {
+      const [rev, dig] = cursorKey ? cursorKey.split('\u0000') : []
+      const rows = this.db.prepare(`SELECT revision, digest FROM contract_revisions WHERE work_id = ?
+        ${cursorKey ? 'AND (revision < ? OR (revision = ? AND digest < ?))' : ''} ORDER BY revision DESC, digest DESC LIMIT ?`)
+        .all(workId, ...(cursorKey ? [Number(rev), Number(rev), dig] : []), limit + 1) as Row[]
+      available = count('SELECT COUNT(*) AS count FROM contract_revisions WHERE work_id = ?', [workId])
+      for (const item of rows.slice(0, limit)) { entries.push({ revision: Number(item.revision), digest: text(item.digest) }); keys.push(`${text(item.revision)}\u0000${text(item.digest)}`) }
+      hasMore = rows.length > limit
+    } else if (query.kind === 'attempts') {
+      available = ticketIds.length ? count(`SELECT COUNT(*) AS count FROM runtime_bindings WHERE ticket_id IN (${ph})`, ticketIds) : 0
+      if (ticketIds.length) {
+        const [epoch, attempt] = cursorKey ? cursorKey.split('\u0000') : []
+        const rows = this.db.prepare(`SELECT value FROM runtime_bindings WHERE ticket_id IN (${ph})
+          ${cursorKey ? "AND (json_extract(value, '$.fenceEpoch') < ? OR (json_extract(value, '$.fenceEpoch') = ? AND attempt_id < ?))" : ''}
+          ORDER BY json_extract(value, '$.fenceEpoch') DESC, attempt_id DESC LIMIT ?`).all(...ticketIds, ...(cursorKey ? [Number(epoch), Number(epoch), attempt] : []), limit + 1) as Row[]
+        for (const item of rows.slice(0, limit)) { const value = json<Record<string, unknown>>(item.value); entries.push({ attempt: value }); keys.push(`${text(value.fenceEpoch)}\u0000${text(value.attemptId)}`) }
+        hasMore = rows.length > limit
+      }
+    } else if (query.kind === 'acceptances') {
+      available = ticketIds.length ? count(`SELECT COUNT(*) AS count FROM completion_acceptances WHERE ticket_id IN (${ph})`, ticketIds) : 0
+      if (ticketIds.length) {
+        const [at, aid] = cursorKey ? cursorKey.split('\u0000') : []
+        const rows = this.db.prepare(`SELECT id, ticket_id, assignment_id, candidate_generation, artifact_digest, criterion_ids, actor_ref, accepted_at
+          FROM completion_acceptances WHERE ticket_id IN (${ph}) ${cursorKey ? 'AND (accepted_at < ? OR (accepted_at = ? AND id < ?))' : ''}
+          ORDER BY accepted_at DESC, id DESC LIMIT ?`).all(...ticketIds, ...(cursorKey ? [at, at, aid] : []), limit + 1) as Row[]
+        for (const item of rows.slice(0, limit)) { entries.push({ acceptance: this.completionAcceptance(item) }); keys.push(`${text(item.accepted_at)}\u0000${text(item.id)}`) }
+        hasMore = rows.length > limit
+      }
+    } else {
+      available = ticketIds.length ? count(`SELECT COUNT(*) AS count FROM completion_verifications WHERE ticket_id IN (${ph})`, ticketIds) : 0
+      if (ticketIds.length) {
+        const [created, vid] = cursorKey ? cursorKey.split('\u0000') : []
+        const rows = this.db.prepare(`SELECT id, ticket_id, assignment_id, candidate_generation, artifact_digest, criteria_digest,
+          environment_ref, verifier_identity_ref, results, contract, created_at FROM completion_verifications WHERE ticket_id IN (${ph})
+          ${cursorKey ? 'AND (created_at < ? OR (created_at = ? AND id < ?))' : ''} ORDER BY created_at DESC, id DESC LIMIT ?`)
+          .all(...ticketIds, ...(cursorKey ? [created, created, vid] : []), limit + 1) as Row[]
+        const currentAttempts = new Map<string, string | null>()
+        for (const ticketId of ticketIds) { const current = this.db.prepare('SELECT attempt_id FROM runtime_current WHERE ticket_id = ?').get(ticketId) as Row | undefined; currentAttempts.set(ticketId, current ? text(current.attempt_id) : null) }
+        for (const item of rows.slice(0, limit)) {
+          const fact = this.completionVerification(item)
+          let entry: unknown = { verification: fact }
+          if (query.kind === 'reviews') {
+            const classified = this.completionReviewFor(workId, fact.ticketId, currentAttempts.get(fact.ticketId) ?? null, item)
+            if (classified.review) entry = { verification: fact, review: classified.review }
+            else if (classified.unclassified) { entry = { verification: fact, unclassified: classified.unclassified }; unclassifiedReviews.push(classified.unclassified) }
+          }
+          entries.push(entry); keys.push(`${text(item.created_at)}\u0000${text(item.id)}`)
+        }
+        hasMore = rows.length > limit
+      }
+    }
+
+    // Exact final-envelope budget: hasMore/nextCursor/coverage/reason and unclassified facts are all
+    // included before accepting a page. A page that cannot fit its first entry is explicitly blocked.
+    let selected = entries.slice()
+    let selectedUnclassified = unclassifiedReviews.slice()
+    let omittedUnclassifiedReviews = 0
+    const makePage = (status: 'ok' | 'blocked', reason: 'entry_too_large' | 'page_budget' | null,
+      pageEntries: unknown[], pageUnclassified: UnclassifiedReviewFact[]): CompletionHistoryPage => {
+      const pageHasMore = hasMore || pageEntries.length < entries.length
+      const pageKey = pageEntries.length ? keys[pageEntries.length - 1] : null
+      return { protocol: 'completion-history/1', status, reason, workId, projectId, kind: query.kind, limit,
+        returned: pageEntries.length, available, hasMore: pageHasMore,
+        nextCursor: pageHasMore && pageKey ? this.historyCursor(query, projectId, pageKey) : null,
+        coverage: pageHasMore ? 'truncated' : 'complete', entries: pageEntries, unclassifiedReviews: pageUnclassified,
+        omittedUnclassifiedReviews, limits: { maxLimit: 200, maxBytes } }
+    }
+    let page = makePage('ok', entries.length > selected.length ? 'page_budget' : null, selected, selectedUnclassified)
+    while (Buffer.byteLength(JSON.stringify(page)) > maxBytes) {
+      if (selected.length > 0) {
+        selected = selected.slice(0, -1)
+        page = makePage('ok', 'page_budget', selected, selectedUnclassified)
+        continue
+      }
+      if (selectedUnclassified.length > 0) {
+        selectedUnclassified = selectedUnclassified.slice(0, -1); omittedUnclassifiedReviews += 1
+        page = makePage('ok', 'page_budget', selected, selectedUnclassified)
+        continue
+      }
+      if (entries.length > 0) {
+        return makePage('blocked', 'entry_too_large', [], [])
+      }
+      return makePage('blocked', 'entry_too_large', [], [])
+    }
+    if (entries.length > 0 && selected.length === 0) return makePage('blocked', 'entry_too_large', [], [])
+    return page
+  }
+
   work(workId: string, projectIds: readonly string[]): WorkIndexEntry | undefined {
     const value = id(workId, 'work id')
     const row = this.db.prepare('SELECT value FROM works WHERE id = ?').get(value) as Row | undefined
@@ -731,11 +968,24 @@ export class WorkflowIndex {
     const verificationIds: string[] = []
     const acceptanceIds: string[] = []
     const deliverables: { verificationId: string; artifactDigest: string; criteriaDigest: string; accepted: boolean }[] = []
+    const reviews: CompletionReviewFact[] = []
+    const unclassifiedReviews: UnclassifiedReviewFact[] = []
+    let verificationsTruncated = false, acceptancesTruncated = false
+    let reviewCandidateCount = 0, verificationCount = 0, acceptanceCount = 0
+    const completionVerifications: CompletionVerificationFact[] = []
+    const completionAcceptances: CompletionAcceptanceFact[] = []
     for (const ticketId of ticketIds) {
-      const verifications = this.db.prepare(`SELECT id, artifact_digest, criteria_digest FROM completion_verifications
-        WHERE ticket_id = ? ORDER BY created_at DESC LIMIT 50`).all(ticketId) as Row[]
-      const acceptances = this.db.prepare(`SELECT id, artifact_digest FROM completion_acceptances
-        WHERE ticket_id = ? ORDER BY accepted_at DESC LIMIT 50`).all(ticketId) as Row[]
+      const verifications = this.db.prepare(`SELECT id, ticket_id, assignment_id, candidate_generation, artifact_digest,
+        criteria_digest, environment_ref, verifier_identity_ref, results, contract, created_at FROM completion_verifications
+        WHERE ticket_id = ? ORDER BY created_at DESC LIMIT 51`).all(ticketId) as Row[]
+      const acceptances = this.db.prepare(`SELECT id, ticket_id, assignment_id, candidate_generation, artifact_digest,
+        criterion_ids, actor_ref, accepted_at FROM completion_acceptances
+        WHERE ticket_id = ? ORDER BY accepted_at DESC LIMIT 51`).all(ticketId) as Row[]
+      const verificationTotal = Number((this.db.prepare('SELECT COUNT(*) AS count FROM completion_verifications WHERE ticket_id = ?').get(ticketId) as Row).count)
+      const acceptanceTotal = Number((this.db.prepare('SELECT COUNT(*) AS count FROM completion_acceptances WHERE ticket_id = ?').get(ticketId) as Row).count)
+      reviewCandidateCount += verificationTotal; verificationCount += verificationTotal; acceptanceCount += acceptanceTotal
+      if (verifications.length > 50) { verificationsTruncated = true; verifications.length = 50 }
+      if (acceptances.length > 50) { acceptancesTruncated = true; acceptances.length = 50 }
       verificationIds.push(...verifications.map(item => text(item.id)))
       acceptanceIds.push(...acceptances.map(item => text(item.id)))
       for (const verification of verifications) {
@@ -744,6 +994,65 @@ export class WorkflowIndex {
           artifactDigest: text(verification.artifact_digest),
           criteriaDigest: text(verification.criteria_digest),
           accepted: acceptances.some(item => text(item.artifact_digest) === text(verification.artifact_digest)),
+        })
+        completionVerifications.push({
+          id: text(verification.id), ticketId: text(verification.ticket_id), assignmentId: text(verification.assignment_id),
+          candidateGeneration: Number(verification.candidate_generation), artifactDigest: text(verification.artifact_digest),
+          criteriaDigest: text(verification.criteria_digest), environmentRef: text(verification.environment_ref),
+          verifierIdentityRef: text(verification.verifier_identity_ref), results: json<unknown>(verification.results), createdAt: text(verification.created_at),
+        })
+      }
+      for (const acceptance of acceptances) completionAcceptances.push({
+        id: text(acceptance.id), ticketId: text(acceptance.ticket_id), assignmentId: text(acceptance.assignment_id),
+        candidateGeneration: Number(acceptance.candidate_generation), artifactDigest: text(acceptance.artifact_digest),
+        criterionIds: json<string[]>(acceptance.criterion_ids), actorRef: text(acceptance.actor_ref), acceptedAt: text(acceptance.accepted_at),
+      })
+      const currentRow = this.db.prepare('SELECT attempt_id FROM runtime_current WHERE ticket_id = ?').get(ticketId) as Row | undefined
+      const currentAttemptId = currentRow ? text(currentRow.attempt_id) : null
+      for (const verification of verifications) {
+        let contract: { workId: string; revision: number; digest: string }
+        try { contract = json(verification.contract) } catch { unclassifiedReviews.push({ commandId: '', reason: 'verification_contract_invalid' }); continue }
+        const candidate = { ticketId: text(verification.ticket_id), assignmentId: text(verification.assignment_id),
+          contract, candidateGeneration: Number(verification.candidate_generation) }
+        const commandId = productReviewCommandId(candidate)
+        const receipt = this.db.prepare(`SELECT command_id, payload_digest, seq, recorded_at, result FROM command_receipts
+          WHERE command_id = ?`).get(commandId) as Row | undefined
+        if (!receipt) continue
+        const unclassified = (reason: string): void => { unclassifiedReviews.push({ commandId, reason }) }
+        let parsed: Record<string, unknown>
+        try { parsed = json<Record<string, unknown>>(receipt.result) } catch { unclassified('result_not_json'); continue }
+        const keys = Object.keys(parsed).sort().join(',')
+        if (keys !== 'artifactIds,attemptId,proposal,verification') { unclassified('review_shape'); continue }
+        const proposal = CompletionProposalSchema.safeParse(parsed.proposal)
+        const verified = VerificationSchema.safeParse(parsed.verification)
+        if (!proposal.success) { unclassified('proposal_shape'); continue }
+        if (!verified.success) { unclassified('verification_shape'); continue }
+        const attemptId = IdSchema.safeParse(parsed.attemptId)
+        const artifactIds = Array.isArray(parsed.artifactIds) ? parsed.artifactIds : null
+        if (!attemptId.success || !artifactIds || artifactIds.length === 0 || artifactIds.length > 512 ||
+          artifactIds.some(value => !IdSchema.safeParse(value).success) || new Set(artifactIds).size !== artifactIds.length) {
+          unclassified('artifact_or_attempt_shape'); continue
+        }
+        const bindingRow = this.db.prepare('SELECT value FROM runtime_bindings WHERE attempt_id = ?').get(attemptId.data) as Row | undefined
+        const binding = bindingRow ? json<Record<string, unknown>>(bindingRow.value) : undefined
+        if (!binding) { unclassified('historical_binding_missing'); continue }
+        if (proposal.data.ticketId !== ticketId || proposal.data.contract.workId !== workId ||
+          proposal.data.ticketId !== text(binding.ticketId) || proposal.data.assignmentId !== text(binding.assignmentId) ||
+          attemptId.data !== text(binding.attemptId) || digest(proposal.data.contract) !== digest(binding.contract)) {
+          unclassified('foreign_work_or_binding'); continue
+        }
+        if (proposal.data.verificationId !== verified.data.id || proposal.data.artifactDigest !== verified.data.artifactDigest ||
+          proposal.data.ticketId !== verified.data.ticketId || proposal.data.assignmentId !== verified.data.assignmentId ||
+          proposal.data.candidateGeneration !== verified.data.candidateGeneration ||
+          digest(proposal.data.contract) !== digest(verified.data.contract)) {
+          unclassified('proposal_verification_mismatch'); continue
+        }
+        if (commandId !== productReviewCommandId(proposal.data)) { unclassified('noncanonical_review_key'); continue }
+        reviews.push({
+          commandId, payloadDigest: text(receipt.payload_digest), seq: Number(receipt.seq),
+          recordedAt: text(receipt.recorded_at), proposal: proposal.data as unknown as Record<string, unknown>,
+          verification: verified.data as unknown as Record<string, unknown>, artifactIds: [...artifactIds] as string[], attemptId: attemptId.data,
+          bindingState: text(binding.state), currentLink: currentAttemptId === attemptId.data ? 'current_attempt' : 'historical_attempt',
         })
       }
     }
@@ -759,6 +1068,10 @@ export class WorkflowIndex {
       verificationIds,
       acceptanceIds,
       deliverables,
+      completion: { reviews, unclassifiedReviews, verifications: completionVerifications, acceptances: completionAcceptances,
+        coverage: { reviews: verificationsTruncated ? 'truncated' : 'complete', verifications: verificationsTruncated ? 'truncated' : 'complete',
+          acceptances: acceptancesTruncated ? 'truncated' : 'complete' }, available: { reviewCandidates: reviewCandidateCount,
+          verifications: verificationCount, acceptances: acceptanceCount }, limits: { perTicket: 50 } },
       project: { id: work.projectId, settings: project.current, state: project.state },
       provenance: [
         ...(project.current ? [project.current.settings.sourceRef] : []),
@@ -914,6 +1227,7 @@ export class WorkflowRecords {
   readonly acceptance: AcceptanceOutcomeProjection
   readonly recoveryIntents: RecoveryIntents
   readonly recoveryActivations: RecoveryActivations
+  /** Wave-11 bounded logical source snapshot; never a writer or startup grant. */
   readonly recoverySource: RecoverySourceStore
   readonly index: WorkflowIndex
   constructor(db: Database.Database, uow: UnitOfWork, artifacts: ArtifactStore) {
