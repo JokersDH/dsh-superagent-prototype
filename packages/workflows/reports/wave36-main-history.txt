@@ -1,0 +1,12 @@
+✔ actual authorized HTTP continues 65 original metadata records and reads the original contract without writes (95.6315ms)
+✔ history authenticates, rejects injected/repeated parameters and reads under recovery readonly (36.185542ms)
+✔ cursor binds exact principal, current scope, work, kind, limit and expiry (45.992ms)
+✔ oversized first entry is explicitly blocked, while corrupt or non-progress producer frames are refused (118.666042ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 301.480958

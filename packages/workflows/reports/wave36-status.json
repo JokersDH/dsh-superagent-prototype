@@ -1,0 +1,83 @@
+{
+  "role": "A",
+  "package": ["packages/storage", "packages/workflows"],
+  "branch": "codex/g2-workspaces-verification",
+  "fixedBaseline": "eac2c9d8",
+  "mergedMain": "7e550991",
+  "mergeCommit": "2e4c1110",
+  "testedSourceCommit": "2e4c1110",
+  "dirty": false,
+  "productSchema": 18,
+  "newMigrationThisWave": null,
+  "modelOrNativeTurns": 0,
+  "status": "SOURCE_READY",
+  "wholeProductComplete": false,
+  "layers": {
+    "source": "candidate branch; strict/build/main product strict pass",
+    "controlled": "A source tests and main controlled completion-history/recipe tests",
+    "installed": null,
+    "native": "NOT_TESTED/NOT_REACHED",
+    "recovered": "source-level restore/readback only; no live same-Work recovery",
+    "value": "not claimed"
+  },
+  "identities": {
+    "r1": {"source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2", "build": "8296720d8a25f38c", "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543", "installed": false},
+    "r2": {"source": "303b2c6a", "tarSha256": null, "installed": false},
+    "dW33": {"inner": "ee45c92c7c5a8f2caa0449572b14bf97175b0392f1fd92c6f89d7a19464604e8", "outer": "46e01c8c7b79818d19e019f6d2208ad54c5c9538674218f85455434eff8207f9", "installed": false}
+  },
+  "commands": [
+    {"command": "node --test ... wave32-persistent-two-project.case.ts wave33-continuation.case.ts", "cwd": "packages/workflows", "exit": 0, "result": "14 pass / 0 fail", "evidence": "wave36-node.txt"},
+    {"command": "npx tsx --test packages/workflows/test/*.case.ts", "exit": 0, "result": "125 pass / 0 fail", "evidence": "wave36-workflow-tests.txt"},
+    {"command": "npx tsx --test packages/storage/test/*.case.ts", "exit": 0, "result": "88 pass / 0 fail", "evidence": "wave36-storage-tests.txt"},
+    {"command": "npx tsc --noEmit -p packages/storage", "exit": 0, "result": "strict ok", "evidence": "wave36-strict-storage.txt"},
+    {"command": "npx tsc --noEmit -p packages/workflows", "exit": 0, "result": "strict ok", "evidence": "wave36-strict-workflows.txt"},
+    {"command": "npx tsc -p packages/storage/tsconfig.build.json", "exit": 0, "result": "build ok", "evidence": "wave36-build-storage.txt"},
+    {"command": "npx tsc -p packages/workflows/tsconfig.build.json", "exit": 0, "result": "build ok", "evidence": "wave36-build-workflows.txt"},
+    {"command": "npx tsc --noEmit -p apps/coordinator/tsconfig.product.json", "exit": 0, "result": "main product strict ok", "evidence": "wave36-product-strict.txt"},
+    {"command": "node tests/integration/completion-history.case.mjs", "exit": 0, "result": "4 pass / 0 fail; actual main strict metadata/HMAC cursor/oversized blocked", "evidence": "wave36-main-history.txt"},
+    {"command": "node tests/integration/project-recipes.case.mjs", "exit": 0, "result": "5 pass / 0 fail", "evidence": "wave36-project-recipes.txt"},
+    {"command": "node tests/integration/usage-observation.case.mjs", "exit": 0, "result": "8 pass / 0 fail", "evidence": "wave36-main-completion.txt"}
+  ],
+  "closures": [
+    {"id": "A-CLOSURE-1", "status": "PASS", "name": "official history to trusted original artifacts",
+      "oldPoints": ["W35-A1", "W35-A2", "W35-A3"],
+      "implementation": ["packages/storage/src/workflows.ts", "packages/workflows/src/ports.ts", "packages/storage/src/index.ts"],
+      "consumer": "main ProductCompletionHistory / CompletionHistoryPanel strict metadata and A WorkIndex/artifact bytes reader",
+      "positive": "final envelope 4MiB exact (187 entries/4,193,837 bytes), 120-row 50+50+20, main 65 metadata pages/HMAC cursor 4/4, original artifact bytes/new PID",
+      "negative": "oversized first blocked no cursor, budget trim/page_budget, bad cursor/subject/kind, corrupt/non-progress producer refused; no event/queue/acceptance/model increment",
+      "evidence": ["wave36-continuation.txt", "wave36-main-history.txt", "wave36-two-project.txt"]},
+    {"id": "A-CLOSURE-2", "status": "PASS_SOURCE", "name": "authorized non-empty v1/v2 recovery reading",
+      "oldPoints": ["W35-A4", "W35-A5"],
+      "implementation": ["packages/workflows/src/restore.ts", "packages/workflows/test/wave25-dual-snapshot-personal.case.ts"],
+      "consumer": "C wave27 target proof and restored readers; main authorized HTTP not restarted",
+      "positive": "non-empty v1/v2 original Work/Q&A/native_applied/source restore; C proof ok; artifact/content readback",
+      "negative": "wrong root/source/format, target drift, emptied inventory and artifact replacement reject; no credential/grant transfer",
+      "evidence": ["wave36-dual.txt"]},
+    {"id": "A-CLOSURE-3", "status": "PARTIAL", "name": "multi-project daily query and same-object fault readback",
+      "oldPoints": ["W35-A6", "W35-A7"],
+      "implementation": ["existing project/conversation/Work/search/evidence/artifact ports", "packages/storage/src/workflows.ts"],
+      "consumer": "main current WorkIndex/query; F/C multi-page UI not fully wired",
+      "positive": "two-project Work/query/reopen, 120+ history, held queue and new-PID readback",
+      "negative": "source/caller truncation, blocked page, bad format/old subject and unknown retained; no new query/stat ledger",
+      "evidence": ["wave36-two-project.txt", "wave36-continuation.txt"]},
+    {"id": "A-CLOSURE-4", "status": "PARTIAL", "name": "formal modules to same-version default product and handoff",
+      "oldPoints": ["W35-A8", "W35-A9"],
+      "implementation": ["packages/storage/src/index.ts", "packages/workflows/src/index.ts", "packages/workflows/src/ports.ts"],
+      "consumer": "main product/history/recipe/completion consumers; F/C daily UI and install remain separate",
+      "positive": "exports/strict/build/main product strict and actual main history 4/4; old nine acceptance points retained",
+      "negative": "installed same-instance restart, F multi-page UI, native/live recovery and E final verdict NOT_REACHED; no package/source remix",
+      "evidence": ["wave36-main-history.txt", "wave36-product-strict.txt"]}
+  ],
+  "oldNine": {"W35-A1": "in closure1", "W35-A2": "in closure1", "W35-A3": "in closure1", "W35-A4": "in closure2", "W35-A5": "in closure2", "W35-A6": "in closure3", "W35-A7": "in closure3", "W35-A8": "in closure4", "W35-A9": "in closure4"},
+  "remaining": [
+    "main/F multi-project multi-page query UI and remaining daily integration",
+    "D/E installed same-instance restart and independent E verdict",
+    "B/I live native recovery and same-Work takeover",
+    "support/model configuration are separate main-owned source paths; CAC excluded"
+  ],
+  "preserved": [
+    "twelve services 5180-5191 / 8796-8807 and all state/profile/tar/ledger/dirty/runs",
+    "R1/R2/W33 identities and old nine acceptance matrix",
+    "old capped WorkIndex/Completion APIs as compatibility regression"
+  ]
+}
