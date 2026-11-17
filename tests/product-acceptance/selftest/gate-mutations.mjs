@@ -749,6 +749,19 @@ const evidenceFor = (key) => {
         isolation: { distinctPid: true, distinctConsole: true, distinctApi: true, distinctConfig: true, distinctState: true, distinctModel: true, sameInstall: true, bAfterAStop: { health: true, readiness: 200, bPidAlive: true } },
         doctor: { A: { exit: 1, secretLeaked: false }, B: { exit: 1, secretLeaked: false } },
         operation: { verdict: { allowed: true, reason: null }, released: ['/tmp/two'], retained: [], signals: [] } }
+    case 'w36History': {
+      const pair = resourcePair(40, 'w36:history')
+      return { subject: { ...ZIP_TUPLE },
+        zip: { sumsMatch: true, resultMatch: true, installManifestDigest: DIGEST, installManifestSha256: DIGEST,
+          runtimeDigest: DIGEST, runtime: { sha256: DIGEST, licenseSha256: DIGEST } },
+        work: { workId: 'work-1', phase: 'delivered', accepted: 'recorded', artifacts: 2, check: { state: 'pass' } },
+        api: Object.fromEntries(['contracts', 'verifications', 'acceptances'].map(kind => [kind,
+          { status: 200, protocol: 'work-completion-history/1', workId: 'work-1', projectId: 'project-atlas', available: 1 }])),
+        negatives: { badKind: { status: 400 }, limitZero: { status: 400 }, limitOver: { status: 400 } },
+        ui: { expanded: true, categories: Object.fromEntries(['checks', 'acceptances', 'contracts'].map(key => [key,
+          { present: true, clicked: true, sourceLine: { source: 1, shown: 1 } }])) },
+        resources: { ...pair, stop: { clean: true, after: pair.after } } }
+    }
     case 'historySurface':
       return { zip: { sha256: DIGEST, bytes: 1, buildId: 'zip-build', source: '9'.repeat(40), installManifestDigest: DIGEST, installManifestSha256: DIGEST },
         probe: { installed: 'present', authenticated: { status: 200, hasHistoryBody: true }, unauthorized: { status: 401 } },
@@ -801,6 +814,7 @@ const evidenceFor = (key) => {
       return { subject: tuple, zip: { sumsMatch: true, resultMatch: true, digestsMatch: true },
         operation: { verdict: { allowed: true, reason: null }, released: ['/tmp/private/root'], retained: [], signals: [] },
         seed: { workId: 'work-1', phase: 'delivered', accepted: 'recorded', artifactIds: 1,
+          check: { state: 'pass', results: 1 }, available: ['accept_candidate'],
           artifacts: [{ id: 'a1', sha256: DIGEST, bytes: 1 }], messages: 1, messageShape: shape,
           pending: { beforeStop: { phase: 'needs_user', openQuestionIds: ['q1'] } } },
         backup: { status: 'CREATED', verify: 'VERIFIED', sha256: DIGEST, counts: { entries: 2, artifacts: 1 }, database: { eventSeq: 1 } },
@@ -826,7 +840,7 @@ const buildCase = (entry, overrides = {}) => {
   const evidence = Object.fromEntries((entry.evidence ?? []).map((key) => [key, evidenceFor(key)]))
   const nested = ['subject', 'frozenScope', 'currentInstall', 'upgradeFaults', 'ownershipCopy', 'installedContext',
     'backupContextReply', 'ownershipMocks', 'installedCandidates', 'secondRoot', 'installedSourceConfirm', 'installedStability',
-    'outerZip', 'cohortRecovery', 'outerZipOperation', 'cohortRecoveryOperation', 'multiInstance', 'modelSave', 'modelSaveOperation', 'cohortUpgradeW35']
+    'outerZip', 'cohortRecovery', 'outerZipOperation', 'cohortRecoveryOperation', 'multiInstance', 'modelSave', 'modelSaveOperation', 'cohortUpgradeW35', 'w36History']
     .some((key) => evidence[key] !== undefined)
   if ((entry.layers ?? []).includes(LAYERS.INSTALLED) && entry.id !== 'E4-INSTALL-ARTIFACT-IDENTITY' && !nested)
     evidence.subject = { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' }

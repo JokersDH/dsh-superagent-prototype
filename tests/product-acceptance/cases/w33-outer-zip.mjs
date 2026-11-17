@@ -5,7 +5,7 @@ import { dirname, join } from 'node:path'
 import { runCase, LAYERS } from '../lib/status.mjs'
 import { candidateModel } from '../../../tests/integration/fixtures/assistant-candidate-model.mjs'
 import { captureSet, createOperation, resourceBirth, rollout } from '../lib/caller-safety.mjs'
-import { extractOuterZip, launcherEnv, OUTER_ZIP_DIR, OUTER_ZIP_NAME, parseJson, privateHome, verifyOuterZip, W35_ZIP_DIR, W35_ZIP_NAME } from '../lib/outer-zip.mjs'
+import { extractOuterZip, launcherEnv, OUTER_ZIP_DIR, OUTER_ZIP_NAME, parseJson, privateHome, verifyOuterZip, W35_ZIP_DIR, W35_ZIP_NAME, W36_ZIP_DIR, W36_ZIP_NAME } from '../lib/outer-zip.mjs'
 import { freePort, liveIdentity } from '../lib/packaged-instance.mjs'
 
 /**
@@ -64,8 +64,8 @@ const recordPids = path => {
 
 export async function runOuterZip({ cohort = { id: 'w33', dir: OUTER_ZIP_DIR, name: OUTER_ZIP_NAME } } = {}) {
   const cases = []
-  const caseId = cohort.id === 'w35' ? 'E36-W35-OUTER' : 'E33-OUTER-ZIP'
-  const operationId = cohort.id === 'w35' ? 'E36-W35-OUTER-OPERATION' : 'E33-OUTER-ZIP-OPERATION'
+  const caseId = cohort.id === 'w36' ? 'E37-W36-OUTER' : cohort.id === 'w35' ? 'E36-W35-OUTER' : 'E33-OUTER-ZIP'
+  const operationId = cohort.id === 'w36' ? 'E37-W36-OUTER-OPERATION' : cohort.id === 'w35' ? 'E36-W35-OUTER-OPERATION' : 'E33-OUTER-ZIP-OPERATION'
   const zipPath = join(cohort.dir, cohort.name)
   const evidence = { zip: { path: zipPath, sha256: null, bytes: null, source: null, buildId: null, innerTarSha256: null,
     innerTarBytes: null, installManifestSha256: null, runtime: null, entries: null, secretScan: null },
@@ -429,4 +429,9 @@ export async function runOuterZip({ cohort = { id: 'w33', dir: OUTER_ZIP_DIR, na
 /** The current W35 cohort (D stable freeze 599de3e9 / outer 39c0fff0) on the same product entry. */
 export async function runW35OuterZip() {
   return runOuterZip({ cohort: { id: 'w35', dir: W35_ZIP_DIR, name: W35_ZIP_NAME } })
+}
+
+/** The fixed W36 cohort (source 087a598e / build 14a6b457 / outer 43e06d5b). */
+export async function runW36OuterZip() {
+  return runOuterZip({ cohort: { id: 'w36', dir: W36_ZIP_DIR, name: W36_ZIP_NAME } })
 }

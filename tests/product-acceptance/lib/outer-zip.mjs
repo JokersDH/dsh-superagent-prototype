@@ -56,6 +56,8 @@ export const launcherEnv = (home, extra = {}) => ({
 })
 
 /** Extracts into `<home>/dist` and binds the inner install/runtime/license to the recorded result. */
+export const W36_ZIP_DIR = process.env.PA_E_RM01_W36_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave36-preview-14a6b45'
+export const W36_ZIP_NAME = 'PersonalAgent-Preview-14a6b45.zip'
 export const W35_ZIP_DIR = process.env.PA_E_W36_W35_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave35-preview-599de3e'
 export const W35_ZIP_NAME = 'PersonalAgent-Preview-599de3e.zip'
 

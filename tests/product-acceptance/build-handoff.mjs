@@ -562,11 +562,29 @@ const w36caller = ['E1-CALLER-RETAIN-PREVENTS-RELEASE', 'E1-CALLER-COMPLETE-RELE
   'E1-CALLER-LATE-CHILD', 'E1-CALLER-DESCENDANT-QUERY-UNKNOWN', 'E1-CALLER-RELEASE-MISSING-BOOLEAN',
   'E1-CALLER-ASSERT-FAILURE-RETAINS', 'E1-CALLER-NO-FORCE-API', 'E1-CALLER-SOURCE-DISCIPLINE']
 
+const w37outer = byId.get('E37-W36-OUTER')?.evidence?.outerZip ?? null
+const w37model = byId.get('E37-W36-MODEL-SAVE')?.evidence?.modelSave ?? null
+const w37rec = byId.get('E37-W36-RECOVERY')?.evidence?.cohortRecovery ?? null
+const w37his = byId.get('E37-W36-HISTORY')?.evidence?.w36History ?? null
+const w37ops = ['E37-W36-OUTER-OPERATION', 'E37-W36-MODEL-SAVE-OPERATION', 'E37-W36-RECOVERY-OPERATION']
+  .map(id => ({ id, status: byId.get(id)?.status ?? 'MISSING' }))
+
 const handoff = `# Agent E 第三十六轮交付交接
 
 - 分支 \`${stages.branch}\`，基线 \`${stages.base}\`，检查点 \`${stages.checkpoint}\`，本次证据源 \`${report.source.commit}\`${report.source.dirty ? '（运行时尚有未提交文件，最终提交包含它们）' : '（干净工作树）'}。证据文件随源提交之后的提交一起交付；\`git log\` 的分支头即最终交付提交。
 - 拥有路径：\`tests/product-acceptance/\`。未修改生产实现、root manifest/lock、公共 schema 或迁移。
 - 模型预算：0 个真实模型任务；唯一模型对端是本机 loopback mock。原生执行：0。
+
+## 恢复里程碑01：固定 W36 独立结论
+
+| 项 | 同包结论 | 依据 |
+| --- | --- | --- |
+| 包身份/入口 | ${byId.get('E37-W36-OUTER')?.status ?? 'MISSING'} | source ${String(w37outer?.zip?.source ?? '').slice(0, 8)} / build ${w37outer?.zip?.buildId ?? '?'} / inner ${String(w37outer?.zip?.innerTarSha256 ?? '').slice(0, 8)} / outer ${String(w37outer?.zip?.sha256 ?? '').slice(0, 8)}；manifest/runtime/Node/ABI 与包内 Start/Stop/status/导入/复用同包。 |
+| 真实 GUI 配置 | ${byId.get('E37-W36-MODEL-SAVE')?.status ?? 'MISSING'} | 包内 偏好设置→模型设置 保存：0600 私有文件、显式 HTTP 同意、0 模型请求、key 清空/不回显、重开无 key、重启 config_present；非法端点拒绝且不写。 |
+| 分类历史三 kind + 实际点击 | ${byId.get('E37-W36-HISTORY')?.status ?? 'MISSING'} | 同 Work 的 GET contracts/verifications/acceptances 均 200 "work-completion-history/1"、available≥1；Work 详情展开后通过历史分类 select 依次点击三类，显示“本类来源/已显示”；坏 kind、limit 0/21 拒绝；loopback 无 bearer 200 且错 bearer 401。 |
+| 非空原对象重开 | ${byId.get('E37-W36-RECOVERY')?.status ?? 'MISSING'} | 同包两 Work、全部交付 artifact bytes、26 registry、停机前问题与 effect 行保留，restore 新根只读读回一致；answer/business 422、provider 0。 |
+| 已有委托/检查/接受 | ${w37rec?.seed?.check?.state === 'pass' ? 'PASS' : (byId.get('E37-W36-RECOVERY')?.status ?? 'MISSING')} | 受控 create_work→回答→verification PASS→accept_candidate→delivered；同 Work 产物重开。 |
+| 原项目/槽/native | 保留未达 | 原项目 applicability 仍 NOT_REACHED（fixture 仅自身项目）；原 2/4 槽与原生故障恢复无 consumer，NOT_TESTED；D selected audit 5 个旧 hash 为 D 修复项，不影响本包字节结论。 |
 
 ## 第三十六轮四闭环（聚合旧九验收点）
 
@@ -1702,6 +1720,36 @@ const wave36Status = {
       zipSha256: w36outer?.zip?.sha256 ?? null, zipBytes: w36outer?.zip?.bytes ?? null,
       cases: ['E36-W35-OUTER', 'E36-W35-MODEL-SAVE', 'E36-W35-RECOVERY', 'E36-W35-UPGRADE', 'E36-COMPLETION-HISTORY-INSTALLED'] },
   ],
+  recoveryMilestone01: {
+    cohort: { source: w37outer?.zip?.source ?? null, buildId: w37outer?.zip?.buildId ?? null,
+      innerTarSha256: w37outer?.zip?.innerTarSha256 ?? null, innerTarBytes: w37outer?.zip?.innerTarBytes ?? null,
+      outerZipSha256: w37outer?.zip?.sha256 ?? null, outerZipBytes: w37outer?.zip?.bytes ?? null,
+      subject: w37his?.subject ?? w37rec?.subject ?? null },
+    verdicts: {
+      entries: { status: byId.get('E37-W36-OUTER')?.status ?? 'MISSING', zip: w37outer?.zip ?? null, launcherFix: w37outer?.launcherFix ?? null,
+        repeatedOpen: w37outer?.negatives?.repeatedOpen ?? null, settings: w37outer?.settings ?? null, phases: w37outer?.phases ? Object.keys(w37outer.phases) : null },
+      config: { status: byId.get('E37-W36-MODEL-SAVE')?.status ?? 'MISSING', save: w37model?.save ?? null,
+        invalid: w37model?.negatives?.invalidEndpoint ?? null, reopen: w37model?.negatives?.reopen ?? null,
+        restart: w37model?.restart ? { status: w37model.restart.status, readiness: w37model.restart.readiness,
+          provider: w37model.restart.providerRequests } : null },
+      history: { status: byId.get('E37-W36-HISTORY')?.status ?? 'MISSING', work: w37his?.work ?? null, api: w37his?.api ?? null,
+        negatives: w37his?.negatives ?? null, ui: w37his?.ui ? { expanded: w37his.ui.expanded, select: w37his.ui.select,
+          categories: Object.fromEntries(Object.entries(w37his.ui.categories ?? {}).map(([k, v]) => [k, { via: v.via, clicked: v.clicked, sourceLine: v.sourceLine }])) } : null },
+      reopen: { status: byId.get('E37-W36-RECOVERY')?.status ?? 'MISSING', seed: w37rec?.seed ? { check: w37rec.seed.check,
+        accepted: w37rec.seed.accepted, artifacts: w37rec.seed.artifacts?.length ?? null } : null,
+        readonly: w37rec?.readonly ? { artifactsEqual: w37rec.readonly.artifactsEqual, registry: w37rec.directRead?.registry?.length ?? null,
+          pending: w37rec.readonly.pending?.questionsRecorded ?? null, business: w37rec.readonly.business ?? null,
+          provider: w37rec.readonly.providerRequests ?? null } : null },
+      operationCopies: w37ops,
+    },
+    gaps: {
+      originalProject: 'NOT_REACHED: the controlled fixture exposes only its own project; the two registered roots are not dispatchable and personal has no executor',
+      slotsNative: 'NOT_TESTED: no original 2/4 slot or native fault-recovery consumer is published into this package',
+      dAudit: 'D selected audit reports five old hashes; this is a D source-report defect and does not change the measured W36 bytes',
+      value: 'user confirmed the review-value pilot and its research are not advanced in this milestone',
+    },
+    finalRun: { command: 'node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record', source: report.source },
+  },
   finalRun: { command: 'node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record', exitCode: 0, source: report.source },
 }
 writeFileSync(join(reports, 'wave36-status.json'), JSON.stringify(wave36Status, null, 2) + '\n')

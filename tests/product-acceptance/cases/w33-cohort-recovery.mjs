@@ -8,7 +8,7 @@ import { candidateModel } from '../../../tests/integration/fixtures/assistant-ca
 import { captureSet, createOperation, resourceBirth, rollout } from '../lib/caller-safety.mjs'
 import { DEFAULT_FROZEN_DIRS, frozenArtifactSubject, loadFrozenArtifact } from '../lib/frozen-package.mjs'
 import { extractFrozen, freePort, launcher, liveIdentity, privateRoot, readRecord, sha256, startOwned, stopOwned } from '../lib/packaged-instance.mjs'
-import { extractOuterZip, privateHome, verifyOuterZip, W35_ZIP_DIR, W35_ZIP_NAME } from '../lib/outer-zip.mjs'
+import { extractOuterZip, privateHome, verifyOuterZip, W35_ZIP_DIR, W35_ZIP_NAME, W36_ZIP_DIR, W36_ZIP_NAME } from '../lib/outer-zip.mjs'
 
 /**
  * Wave-34 same-cohort non-empty business recovery.
@@ -75,9 +75,10 @@ async function directStoreRead(install, statePath, own) {
 
 export async function runCohortRecovery({ cohort = { id: 'w33' } } = {}) {
   const cases = []
-  const caseId = cohort.id === 'w35' ? 'E36-W35-RECOVERY' : 'E33-COHORT-RECOVERY'
-  const operationCaseId = cohort.id === 'w35' ? 'E36-W35-RECOVERY-OPERATION' : 'E33-COHORT-RECOVERY-OPERATION'
-  const target = cohort.id === 'w35' ? null : loadFrozenArtifact('w33', DEFAULT_FROZEN_DIRS.w33)
+  const caseId = cohort.id === 'w36' ? 'E37-W36-RECOVERY' : cohort.id === 'w35' ? 'E36-W35-RECOVERY' : 'E33-COHORT-RECOVERY'
+  const operationCaseId = cohort.id === 'w36' ? 'E37-W36-RECOVERY-OPERATION' : cohort.id === 'w35' ? 'E36-W35-RECOVERY-OPERATION' : 'E33-COHORT-RECOVERY-OPERATION'
+  const target = cohort.id === 'w36' ? loadFrozenArtifact('w36', cohort.targetDir ?? '/Users/hh/Desktop/joker/pa-artifacts/wave36-target')
+    : cohort.id === 'w35' ? null : loadFrozenArtifact('w33', DEFAULT_FROZEN_DIRS.w33)
   const evidence = { subject: target ? frozenArtifactSubject(target) : null, artifact: target ? { role: target.role, name: target.name,
     tarSha256: target.tarSha256, tarBytes: target.tarBytes, installManifestSha256: target.installManifestSha256,
     buildId: target.buildId, source: target.sourceCommit, schema: target.productSchema, abi: target.abi,
@@ -110,8 +111,8 @@ export async function runCohortRecovery({ cohort = { id: 'w33' } } = {}) {
 
   try {
     mark(cohort.id === 'w35' ? 'extract locked W35 outer install' : 'extract locked W33 tar')
-    const outerCohort = cohort.id === 'w35'
-      ? { dir: W35_ZIP_DIR, name: W35_ZIP_NAME } : { dir: undefined, name: undefined }
+    const outerCohort = cohort.id === 'w36' ? { dir: W36_ZIP_DIR, name: W36_ZIP_NAME }
+      : cohort.id === 'w35' ? { dir: W35_ZIP_DIR, name: W35_ZIP_NAME } : { dir: undefined, name: undefined }
     const outer = outerCohort.dir ? verifyOuterZip(outerCohort.dir, outerCohort.name) : verifyOuterZip()
     evidence.zip = { sha256: outer.sha256, bytes: outer.bytes, sumsMatch: outer.sumsMatch, resultMatch: outer.resultMatch,
       buildId: outer.result?.inner?.buildId ?? null, source: outer.result?.inner?.source ?? null,
@@ -182,6 +183,12 @@ export async function runCohortRecovery({ cohort = { id: 'w33' } } = {}) {
       }
       await new Promise(resolvePromise => setTimeout(resolvePromise, 130))
     }
+    const verification = view?.actions?.currentVerificationId
+      ? await seedClient.verification(view.actions.currentVerificationId).catch(() => null) : null
+    const verificationResults = Array.isArray(verification?.results) ? verification.results : null
+    const check = { verificationId: view?.actions?.currentVerificationId ?? null, results: verificationResults?.length ?? null,
+      state: verificationResults && verificationResults.length > 0 && verificationResults.every(item => item.outcome === 'PASS') ? 'pass' : null }
+    const availableBeforeAccept = view?.actions?.available ?? []
     const accepted = view?.actions?.available?.includes('accept_candidate')
       ? await seedClient.dispatch({ commandId: 'w34-rec-accept', conversationId: 'conv-w34-rec', kind: 'accept_candidate', candidate: view.actions.currentCandidate })
       : null
@@ -213,7 +220,8 @@ export async function runCohortRecovery({ cohort = { id: 'w33' } } = {}) {
     const pendingSnapshot = await seedClient.snapshot({ workId: pendingWorkId })
     const pendingQuestion = (pendingSnapshot.questions ?? [])[0] ?? null
     evidence.seed = { workId, phase: view?.phase ?? null, receipt: created.receipt?.status ?? null,
-      accepted: accepted?.receipt?.status ?? null, artifactIds: artifactIds.length, artifacts,
+      accepted: accepted?.receipt?.status ?? null, check, available: availableBeforeAccept,
+      artifactIds: artifactIds.length, artifacts,
       messages: page?.messages?.length ?? 0, messageShape, providerRequests: mock.requests.length }
     evidence.pending = { workId: pendingWorkId, receipt: pendingCreated.receipt?.status ?? null,
       phase: pendingView?.phase ?? null, beforeStop: { phase: pendingView?.phase ?? null,
@@ -372,6 +380,8 @@ export async function runCohortRecovery({ cohort = { id: 'w33' } } = {}) {
       JSON.stringify({ installed: evidence.installedSchema, subject: evidence.subject?.schema }))
     assert('RECOVERY_SEED_DELIVERED', evidence.seed?.phase === 'delivered' && evidence.seed?.accepted === 'recorded' &&
       (evidence.seed?.artifactIds ?? 0) >= 1, JSON.stringify({ phase: evidence.seed?.phase, accepted: evidence.seed?.accepted, artifacts: evidence.seed?.artifactIds }))
+    assert('RECOVERY_SEED_CHECK_ACCEPT', evidence.seed?.check?.state === 'pass' && evidence.seed?.check?.results >= 1 &&
+      (evidence.seed?.available ?? []).includes('accept_candidate'), JSON.stringify({ check: evidence.seed?.check, available: evidence.seed?.available }))
     assert('RECOVERY_ALL_ARTIFACT_BYTES', evidence.seed?.artifacts?.length === evidence.seed?.artifactIds &&
       evidence.seed.artifacts.every(item => /^[a-f0-9]{64}$/u.test(item.sha256) && item.bytes > 0), JSON.stringify({ count: evidence.seed?.artifacts?.length, ids: evidence.seed?.artifactIds }))
     assert('RECOVERY_PENDING_SEEDED', evidence.pending?.question !== null && (evidence.pending?.openQuestionIds?.length ?? 0) >= 1,
@@ -460,4 +470,9 @@ export async function runCohortRecovery({ cohort = { id: 'w33' } } = {}) {
 /** The current W35 cohort: non-empty business recovery on the frozen outer ZIP's inner install. */
 export async function runW35CohortRecovery() {
   return runCohortRecovery({ cohort: { id: 'w35' } })
+}
+
+/** The fixed W36 cohort: non-empty business recovery on its own frozen tar/outer identity. */
+export async function runW36CohortRecovery() {
+  return runCohortRecovery({ cohort: { id: 'w36' } })
 }

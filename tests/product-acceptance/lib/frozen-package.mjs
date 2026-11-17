@@ -8,7 +8,7 @@
  */
 import { spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { existsSync, readFileSync, statSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 
 export const DEFAULT_FROZEN_DIRS = Object.freeze({
@@ -30,11 +30,18 @@ export function loadFrozenArtifact(role, dirName) {
   const envJson = process.env[`PA_E_${role.toUpperCase()}_ARTIFACT_JSON`]
   if (envJson !== undefined) return { role, ...JSON.parse(envJson) }
   const dir = resolve(dirName)
-  const manifest = JSON.parse(readFileSync(join(dir, 'install-artifact.json'), 'utf8'))
+  const manifestPath = join(dir, 'install-artifact.json')
+  const manifest = existsSync(manifestPath)
+    ? JSON.parse(readFileSync(manifestPath, 'utf8'))
+    : JSON.parse(readFileSync(join(dir, readdirSync(dir).find(name => name.endsWith('.json') && !name.startsWith('package-result') && !name.startsWith('SHA') && name !== 'install-artifact.json')), 'utf8'))
+  // A producer manifest may record a build-time /tmp tar path that no longer exists; the frozen
+  // tarball lives next to the manifest under its published name.
+  const publishedTar = join(dir, `${manifest.name}.tar.gz`)
+  const tarPath = manifest.tarPath && existsSync(manifest.tarPath) ? manifest.tarPath : publishedTar
   return {
     role,
     name: manifest.name,
-    tarPath: manifest.tarPath ?? join(dir, `${manifest.name}.tar.gz`),
+    tarPath,
     tarSha256: manifest.digests.tarSha256,
     tarBytes: manifest.digests.tarBytes,
     installManifestSha256: manifest.digests.installManifestSha256,

@@ -146,7 +146,7 @@ await collect('e3', async () => {
   }
 })
 await collect('e4', async () => {
-  const [stability, wave04, release, install, recoveryPreflight, replyDurability, sourceConfirm, installedRecovery, personalReview, trialUi, inputs, surfaces, journey, zipLifecycle, outerZip, cohortRecovery, cohortUpgrade, multiInstance, originalRecovery, modelSave, upgradeW35, historySurface] = await Promise.all([
+  const [stability, wave04, release, install, recoveryPreflight, replyDurability, sourceConfirm, installedRecovery, personalReview, trialUi, inputs, surfaces, journey, zipLifecycle, outerZip, cohortRecovery, cohortUpgrade, multiInstance, originalRecovery, modelSave, upgradeW35, historySurface, w36History] = await Promise.all([
     import('./cases/e4-stability.mjs'),
     import('./cases/e4-wave04.mjs'),
     import('./cases/e5-release.mjs'),
@@ -169,6 +169,7 @@ await collect('e4', async () => {
     import('./cases/w36-model-save.mjs'),
     import('./cases/w36-w35-upgrade.mjs'),
     import('./cases/w36-history-surface.mjs'),
+    import('./cases/w37-w36-history.mjs'),
   ])
   const first = await stability.runE4({
     root,
@@ -199,8 +200,12 @@ await collect('e4', async () => {
   const twentyThird = await cohortRecovery.runW35CohortRecovery({ root, runDirectory: run.directory })
   const twentyFourth = await upgradeW35.runW35Upgrade({ root, runDirectory: run.directory })
   const twentyFifth = await historySurface.runHistorySurface({ root, runDirectory: run.directory })
+  const twentySixth = await outerZip.runW36OuterZip({ root, runDirectory: run.directory })
+  const twentySeventh = await modelSave.runW36ModelSave({ root, runDirectory: run.directory })
+  const twentyEighth = await cohortRecovery.runW36CohortRecovery({ root, runDirectory: run.directory })
+  const twentyNinth = await w36History.runW36History({ root, runDirectory: run.directory })
   return {
-    cases: [...first.cases, ...second.cases, ...third.cases, ...fourth.cases, ...fifth.cases, ...sixth.cases, ...seventh.cases, ...eighth.cases, ...ninth.cases, ...eleventh.cases, ...twelfth.cases, ...thirteenth.cases, ...fourteenth.cases, ...fifteenth.cases, ...sixteenth.cases, ...seventeenth.cases, ...eighteenth.cases, ...nineteenth.cases, ...twentieth.cases, ...twentyFirst.cases, ...twentySecond.cases, ...twentyThird.cases, ...twentyFourth.cases, ...twentyFifth.cases],
+    cases: [...first.cases, ...second.cases, ...third.cases, ...fourth.cases, ...fifth.cases, ...sixth.cases, ...seventh.cases, ...eighth.cases, ...ninth.cases, ...eleventh.cases, ...twelfth.cases, ...thirteenth.cases, ...fourteenth.cases, ...fifteenth.cases, ...sixteenth.cases, ...seventeenth.cases, ...eighteenth.cases, ...nineteenth.cases, ...twentieth.cases, ...twentyFirst.cases, ...twentySecond.cases, ...twentyThird.cases, ...twentyFourth.cases, ...twentyFifth.cases, ...twentySixth.cases, ...twentySeventh.cases, ...twentyEighth.cases, ...twentyNinth.cases],
     artifacts: {
       screenshots: [
         ...(first.artifacts?.screenshots ?? []),

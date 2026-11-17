@@ -215,6 +215,13 @@ export const INSTALL_CASES = [
   case_('E36-W35-RECOVERY-OPERATION', { layers: [LAYERS.INSTALLED], evidence: ['cohortRecoveryOperation'] }),
   case_('E36-W35-UPGRADE', { layers: [LAYERS.INSTALLED], evidence: ['cohortUpgradeW35'] }),
   { id: 'E36-COMPLETION-HISTORY-INSTALLED', required: false, layers: [LAYERS.INSTALLED], evidence: ['historySurface'] },
+  case_('E37-W36-OUTER', { layers: [LAYERS.INSTALLED], evidence: ['outerZip'] }),
+  case_('E37-W36-OUTER-OPERATION', { layers: [LAYERS.INSTALLED], evidence: ['outerZipOperation'] }),
+  case_('E37-W36-MODEL-SAVE', { layers: [LAYERS.INSTALLED], evidence: ['modelSave'] }),
+  case_('E37-W36-MODEL-SAVE-OPERATION', { layers: [LAYERS.INSTALLED], evidence: ['modelSaveOperation'] }),
+  case_('E37-W36-RECOVERY', { layers: [LAYERS.INSTALLED], evidence: ['cohortRecovery'] }),
+  case_('E37-W36-RECOVERY-OPERATION', { layers: [LAYERS.INSTALLED], evidence: ['cohortRecoveryOperation'] }),
+  case_('E37-W36-HISTORY', { layers: [LAYERS.INSTALLED], evidence: ['w36History'] }),
   { id: 'E8-ORIGINAL-WORK-RECOVERY', required: false, layers: [LAYERS.INSTALLED], evidence: ['originalWorkRecovery'] },
   // Tracked gaps: installed F identity fields and a wired G summary need successor frozen bytes.
   { id: 'E11-TRIAL-IDENTITY-FIELDS', required: false, layers: [LAYERS.INSTALLED], evidence: ['trialIdentity'] },

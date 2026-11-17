@@ -7,7 +7,7 @@ import { runCase, LAYERS } from '../lib/status.mjs'
 import { openBrowser } from '../lib/browser.mjs'
 import { candidateModel } from '../../../tests/integration/fixtures/assistant-candidate-model.mjs'
 import { captureSet, createOperation, resourceBirth, rollout } from '../lib/caller-safety.mjs'
-import { extractOuterZip, launcherEnv, parseJson, privateHome, verifyOuterZip, W35_ZIP_DIR, W35_ZIP_NAME } from '../lib/outer-zip.mjs'
+import { extractOuterZip, launcherEnv, parseJson, privateHome, verifyOuterZip, W35_ZIP_DIR, W35_ZIP_NAME, W36_ZIP_DIR, W36_ZIP_NAME } from '../lib/outer-zip.mjs'
 import { freePort, liveIdentity, sha256 } from '../lib/packaged-instance.mjs'
 
 /**
@@ -41,8 +41,10 @@ const recordPids = path => {
 }
 const fileSha = path => createHash('sha256').update(readFileSync(path)).digest('hex')
 
-export async function runW35ModelSave() {
+export async function runW35ModelSave({ cohort = { id: 'w35', dir: W35_ZIP_DIR, name: W35_ZIP_NAME } } = {}) {
   const cases = []
+  const caseId = cohort.id === 'w36' ? 'E37-W36-MODEL-SAVE' : 'E36-W35-MODEL-SAVE'
+  const operationId = cohort.id === 'w36' ? 'E37-W36-MODEL-SAVE-OPERATION' : 'E36-W35-MODEL-SAVE-OPERATION'
   const evidence = { subject: null, zip: null, form: null, save: null, negatives: {}, restart: null, resources: {}, operation: null }
   const home = privateHome('pa-e-w36-model-')
   const operation = createOperation({ id: 'w36-model-save' })
@@ -51,7 +53,7 @@ export async function runW35ModelSave() {
   const modelPath = join(modelDir, 'private.json')
   let root = null, run = null, mock = null, child = null, failure = null
   try {
-    const zip = verifyOuterZip(W35_ZIP_DIR, W35_ZIP_NAME)
+    const zip = verifyOuterZip(cohort.dir, cohort.name)
     const extracted = extractOuterZip(zip, home)
     root = extracted.root
     run = runner(root, home)
@@ -184,7 +186,7 @@ export async function runW35ModelSave() {
 
   await mock?.close?.().catch(() => {})
   // Product assertions run in the product case; the release decision follows them.
-  const productCase = await runCase({ id: 'E36-W35-MODEL-SAVE',
+  const productCase = await runCase({ id: caseId,
     title: 'The W35 packaged console saves a private model configuration without sending a model request',
     layer: LAYERS.INSTALLED, evidence: { modelSave: evidence }, limitations: [
       'The configured endpoint is a loopback mock; no vendor model or native run is claimed.',
@@ -221,7 +223,7 @@ export async function runW35ModelSave() {
     const kept = operation.retainAll(failure ?? verdict.reason ?? 'unknown')
     evidence.operation = { verdict, released: [], retained: kept.retained, reason: kept.reason, observation, signals: operation.signals, failures: operation.failures }
   }
-  const operationCase = await runCase({ id: 'E36-W35-MODEL-SAVE-OPERATION',
+  const operationCase = await runCase({ id: operationId,
     title: 'The W35 model-save operation releases its private HOME only on a complete exited observation',
     layer: LAYERS.INSTALLED, evidence: { modelSaveOperation: evidence.operation, subject: evidence.subject }, limitations: ['Operation outcome only.'] },
     async ({ assert }) => {
@@ -231,6 +233,11 @@ export async function runW35ModelSave() {
       else assert('OPERATION_RETAINED', op.released.length === 0 && (op.retained?.length ?? 0) >= 1, JSON.stringify(op?.retained))
     })
   return { cases: [productCase, operationCase], artifacts: {} }
+}
+
+/** The fixed W36 cohort's real web model-configuration consumer. */
+export async function runW36ModelSave() {
+  return runW35ModelSave({ cohort: { id: 'w36', dir: W36_ZIP_DIR, name: W36_ZIP_NAME } })
 }
 
 /** Birth facts captured immediately after spawn, before any status wait. */
