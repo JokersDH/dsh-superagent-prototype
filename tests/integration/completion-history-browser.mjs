@@ -83,7 +83,13 @@ try {
   await check('ORIGINAL-CONTRACT-AND-ACCEPTANCE-CATEGORIES-PRESERVE-THEIR-OWN-IDENTITIES', async () => {
     await choose('contracts'); await history.getByText('合同版本 1', { exact: true }).waitFor()
     assert.equal(await history.locator('ol > li').count(), 1)
-    await choose('acceptances'); await history.getByText('第 1 代接受记录', { exact: true }).waitFor()
+    const received = page.waitForResponse(response => new URL(response.url()).pathname.endsWith('/completion-history') && new URL(response.url()).searchParams.get('kind') === 'acceptances')
+    await choose('acceptances')
+    const response = await received, value = await response.json()
+    assert.equal(response.status(), 200, JSON.stringify(value))
+    const accepted = store.db.prepare('SELECT candidate_generation FROM completion_acceptances WHERE ticket_id=? LIMIT 1').get(original.ticket_id)
+    assert.equal(value.entries[0]?.generation, accepted.candidate_generation)
+    await history.getByText(`第 ${accepted.candidate_generation} 代接受记录`, { exact: true }).waitFor()
     assert.equal(await history.locator('ol > li').count(), 1)
   })
   await check('WRONG-WORK-RESPONSE-IS-REFUSED-WITHOUT-OLD-ROWS-OR-RAW-ERROR', async () => {
