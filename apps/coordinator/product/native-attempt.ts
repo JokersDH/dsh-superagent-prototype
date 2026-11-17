@@ -12,7 +12,9 @@ import type { AttemptSpec, RunnerCommand } from '@personal-agent/contracts'
 import type { ProductStore } from '@personal-agent/storage'
 import type { FactSink, RunningAttempt } from '../../../packages/execution/src/contracts.ts'
 import { RunnerLink } from '../../runner/src/runner-link-client.ts'
-import type { SpawnedRunner } from '../../runner/src/runner-link-client.ts'
+import type { RunnerLinkOptions, SpawnedRunner } from '../../runner/src/runner-link-client.ts'
+import { attachRunningAttempt } from '../../../packages/execution/src/attached-attempt.ts'
+import type { AttachedAttempt } from '../../../packages/execution/src/attached-attempt.ts'
 import { RunnerPayloadStore } from '../../runner/src/payload-store.ts'
 import { endpointDirectory } from '../../runner/src/recovery-endpoint.ts'
 import { connectRunnerRecovery, verifiedRunnerInspection } from '../runner-link.ts'
@@ -22,6 +24,9 @@ import { confirmOwnedQuiescence } from '../resource-barrier.ts'
 import type { IngressBinding, RuntimeProducer } from '../runtime-ingress.ts'
 import { storedAttemptPayloads } from '../stored-ingress.ts'
 import { key } from '@personal-agent/orchestrator-core'
+
+/** Trusted Node composition only; no profile, environment flag or public request can select it. */
+export type NativeRunnerLinkFactory = (options: RunnerLinkOptions) => Pick<RunnerLink, 'spawnAttempt'>
 
 /** Owns one independent Runner; recovery can inspect/cancel it but cannot replay native business. */
 export class NativeProductAttempt {
@@ -38,6 +43,10 @@ export class NativeProductAttempt {
   private child: SpawnedRunner | undefined
   private endpoint: RunnerEndpoint | undefined
   private disposed = false
+  private readonly createLink: NativeRunnerLinkFactory
+  private callbackOwner: AttachedAttempt | undefined
+  private callbackTask: Promise<void> | undefined
+  private callbacksStopped = false
   private readonly environment: { planRef: string; capture(): void } | undefined
   constructor(
     spec: AttemptSpec,
@@ -48,6 +57,7 @@ export class NativeProductAttempt {
     sink: FactSink,
     current: () => boolean,
     environment?: { planRef: string; capture(): void },
+    createLink: NativeRunnerLinkFactory = options => new RunnerLink(options),
   ) {
     this.spec = spec
     this.store = store
@@ -57,6 +67,7 @@ export class NativeProductAttempt {
     this.sink = sink
     this.current = current
     this.environment = environment
+    this.createLink = createLink
   }
   private connection() {
     if (!this.endpoint) {
@@ -147,7 +158,7 @@ export class NativeProductAttempt {
     })
     void ready.catch(() => undefined)
     const recordFact = (incoming: unknown) => this.recordFact(incoming, local, prepared)
-    const link = new RunnerLink({
+    const link = this.createLink({
       executable: process.execPath,
       entry: fileURLToPath(new URL('../../runner/src/runner-service-entry.ts', import.meta.url)),
       args: ['codex-native'],
@@ -170,7 +181,7 @@ export class NativeProductAttempt {
     if (!this.current()) throw new Error('Work changed during native preparation')
     const endpoint = this.endpoint
     if (!endpoint) throw new Error('Native Runner registration is unavailable')
-    return {
+    const running: RunningAttempt = {
       attemptId: this.spec.attemptId,
       attachPort: structuredClone({ registration: endpoint, producer: this.producer }),
       attachCallbacks: {
@@ -179,12 +190,38 @@ export class NativeProductAttempt {
         nativeWrite: intent => this.nativeWriteDecision(intent.command),
       },
       feed: (command) => this.feed(command),
-      waitExit: async () => (await this.child!.waitExit()).exit,
+      waitExit: async () => {
+        const value = await this.child!.waitExit()
+        await this.stopCallbacks()
+        return value.exit
+      },
       stop: async () => {
         await this.quiesce()
         return { quiescence: 'confirmed', evidenceRefs: ['native-owned-resource-barrier'] }
       },
     }
+    const owner = attachRunningAttempt(running, key('native-callback-owner', running.attemptId))
+    // Bind before begin. Immutable pending preparation facts may replay with their original IDs.
+    await owner.pollOnce()
+    this.callbackOwner = owner
+    if (!this.current()) { await this.stopCallbacks(); throw new Error('Work changed during callback attachment') }
+    this.callbackTask = (async () => {
+      while (!this.callbacksStopped) {
+        try {
+          if (!await owner.pollOnce()) await new Promise(resolve => setTimeout(resolve, 10))
+        } catch {
+          // A lost lease is not permission to bind again or replay a business command.
+          this.callbacksStopped = true
+          owner.stop()
+        }
+      }
+    })()
+    return running
+  }
+  private async stopCallbacks() {
+    this.callbacksStopped = true
+    this.callbackOwner?.stop()
+    await this.callbackTask
   }
   allowAnswer(id: string, beforeWrite: () => void) {
     this.answerWrites.set(id, beforeWrite)
@@ -206,12 +243,15 @@ export class NativeProductAttempt {
     })
     if (command.kind !== 'cancel') throw new Error('Native close requires cancellation')
     const proof = await this.connection().cancel(command)
-    return confirmOwnedQuiescence(this.store, proof).result
+    const receipt = confirmOwnedQuiescence(this.store, proof).result
+    await this.stopCallbacks()
+    return receipt
   }
   async dispose() {
     if (this.disposed) return
     if (this.store.bindings.binding(this.spec.attemptId)?.state !== 'ended') await this.quiesce()
     this.disposed = true
+    await this.stopCallbacks()
     await this.child?.close()
     rmSync(this.recoveryRoot, { recursive: true, force: true })
   }

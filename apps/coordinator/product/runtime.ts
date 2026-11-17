@@ -21,6 +21,7 @@ import type { PrivateModelProvider } from './model-provider.ts'
 import { ModelProviderError } from './model-provider.ts'
 import { AssistantStreams } from './assistant-streams.ts'
 import type { NativeProductConfiguration } from './native-config.ts'
+import type { NativeRunnerLinkFactory } from './native-attempt.ts'
 import type { NativeProjectRegistry } from './project-registry.ts'
 import { ProductEnvironments } from './environments.ts'
 import { ProductProjectSettings } from './project-settings.ts'
@@ -53,6 +54,8 @@ export function createProductRuntime(
     scratchProject: string
     assistantProvider?: PrivateModelProvider
     native?: NativeProductConfiguration
+    /** Trusted in-process test/host port; never read from configuration or HTTP. */
+    nativeRunnerLinkFactory?: NativeRunnerLinkFactory
     executionUnavailable?: ExecutionUnavailableReason
     projectRegistry?: NativeProjectRegistry
     workspaceRoot?: string
@@ -165,6 +168,7 @@ export function createProductRuntime(
     environments,
     projectSettings ? contract => projectSettings.has(contract.scope.projectId) ? projectSettings.forContract(contract)
       : nativeProjects.find(project => project.id === contract.scope.projectId) : undefined,
+    options.nativeRunnerLinkFactory,
   )
   const { store } = options
   const replyResults = options.assistantReplyResults ??

@@ -1,5 +1,9 @@
 # 个人 Agent 助理：方案 B 产品实现蓝图
 
+2026-11-17现行工程入口：[原Work恢复里程碑01](../agent-tasks/recovery-milestone-01/README.zh-CN.md)，替代下面旧轮次的扩线派工。main/B/H主动闭合原恢复，D/E主动验已有固定W36；A/C/F/G/I/J只按具体阻断参与，否则待命，不扩独立维护队列。[0095已交正常组合](../docs/rfcs/WP-16/0095-main-original-running-callback-composition.md)与[最新验收](../reports/releases/wave37-admission/README.zh-CN.md)分清受控正常链/故障恢复/物理/安装。
+
+用户确认本阶段不推进复核价值试点、依赖它的第二协议复核与路由收益研究，价值未测；CAC仍后置。旧设计/协议/ledger按历史保留，不构成本阶段工作或新增预算。产品进度以[STATUS](../docs/product/STATUS.zh-CN.md)为准。以下旧日期的“当前”均按其历史时间阅读。
+
 版本：`B-1.0-draft` · 2026-11-07 · 状态：可用于拆分实施，须先通过 G0。本文档集是本产品的当前设计基线；不是已实现产品的说明书。
 
 2026-11-17当前实施：[Wave36完整子系统长任务](../agent-tasks/product-wave-36/README.zh-CN.md)，四条更大端到端交付线/owner延续旧九项；[0092实际历史消费者](../docs/rfcs/WP-16/0092-main-completion-history-consumer.md)和[本轮验收](../reports/releases/wave36-admission/README.zh-CN.md)区分默认source/准确安装/恢复/收益，以下早期阶段作历史设计读。

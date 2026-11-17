@@ -1,0 +1,49 @@
+{
+  "protocol": "recovery-milestone-status/1",
+  "date": "2026-11-17",
+  "source": "42f6daabd2c55c15486b7ffc310626f7763141c3",
+  "normalOriginalComposition": "CONTROLLED_PASS",
+  "sameOriginalWorkCrashRecovery": "NOT_REACHED",
+  "originalSchedulerTwoFourResources": "NOT_REACHED",
+  "realNativePhysicalQuiescence": "NOT_TESTED",
+  "independentFixedW36Installed": "NOT_REACHED",
+  "latestHistoricalEstimate": {
+    "stableLocal": "76/100",
+    "schemeBWithoutCAC": "55.7/95=58.6%",
+    "reassessedThisTurn": false
+  },
+  "phaseResearch": {
+    "userConfirmed": true,
+    "reviewValuePilot": "NOT_PURSUED_THIS_PHASE_VALUE_UNMEASURED",
+    "dependentSecondProtocolReview": "NOT_PURSUED_THIS_PHASE",
+    "routingBenefitResearch": "NOT_PURSUED_THIS_PHASE",
+    "historicalProtocolFixturesLedgerReportsChanged": false,
+    "newAllowance": 0
+  },
+  "nextResponsibility": "main/B/H actively close original business recovery; D/E actively verify existing fixed W36; A/C/F/G/I/J on demand for a concrete blocker, otherwise idle",
+  "forwardPrompts": "agent-tasks/recovery-milestone-01/forward-prompts.zh-CN.md",
+  "externalPromptsSent": false,
+  "staticVerification": {
+    "spec": "PASS 17 design packages /83 NOT_TESTED requirements /558 local links; runtime0",
+    "milestone": "PASS 10 fixed heads/original branches/unchanged ownership /48 links /JSON /verbatim instruction archive",
+    "AGENTSLines": 72,
+    "candidateDirtyInventoryUnchanged": true,
+    "doesNotGrantRuntimeReleaseOrValueAdmission": true
+  },
+  "preservation": {
+    "userServicesOperated": 0,
+    "realVendorModelNativeTurns": 0,
+    "realSignals": 0,
+    "globalProcessDiscovery": 0,
+    "newArchives": 0,
+    "newWorktrees": 0
+  },
+  "externalReview": "Preserved unstaged; its root-log removals were external changes, not performed or restored by this task",
+  "firstKnownGap": {
+    "entry": "apps/coordinator/product/execution.ts:295",
+    "behavior": "start changes unfinished native bindings to stopping; reconcileRegisteredRunner only inspects/cancels and businessResumed:false; new coordinator has no original runtime in attempts map",
+    "nextResult": "same unfinished original Work reopens and continues original question/answer without new begin"
+  },
+  "independentMaintenanceQueues": false,
+  "unusedCandidateDefects": "Remain recorded and disabled, not automatic prerequisites for the original recovery path"
+}
