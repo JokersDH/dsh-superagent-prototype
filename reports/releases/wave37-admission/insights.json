@@ -1,0 +1,59 @@
+{
+  "protocol": "wave37-insights-admission/1",
+  "date": "2026-11-17",
+  "fixedInput": {
+    "agent": "G",
+    "worktree": "/Users/hh/Desktop/joker/superagent-agent-g",
+    "branch": "codex/g4-usage-insights",
+    "commit": "2df7416098dd7ab4a827a55fb4c8755574d3f75c",
+    "dirty": false
+  },
+  "verdict": "DO_NOT_ADMIT_AS_TRUSTED_CURRENT_RUNTIME_IDENTITY",
+  "scope": "Independent source review and three pure read-only inspectRuntimeIdentity controls against an existing unstarted extracted W35 tree. No process discovery, liveness probe, service action, signal, model/native call, archive generation or source/assertion edit.",
+  "findings": [
+    {
+      "priority": "P1",
+      "id": "G_START_RECORD_IGNORED_LAUNCHER_CHECK",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-g/packages/usage-insights/src/runtime-identity.ts",
+      "line": 516,
+      "problem": "runningConfirmed omits entryIsTheRecordedEntry and accepts unknown argvHeadMatchesEntry. A wrong launcher is diagnosed but still promoted to running_confirmed.",
+      "reproduction": {
+        "tree": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-wave36-outer-5fRR3w/PersonalAgent-Preview-599de3e",
+        "method": "Node imports actual G source; only filesystem reads, no process observation. Synthetic records use pid999999999, startedAt not-a-timestamp and uid-1.",
+        "controls": [
+          { "input": "no running record", "actual": "inventory_verified, running:null, inventory:complete" },
+          { "input": "entry=install/app/package.json; argv=[entry]", "actual": "running_confirmed, entryInsideRoot:true, entryIsTheRecordedEntry:false, reason:not the launcher this installation ships" },
+          { "input": "entry=install/bin/pa; argv=[]", "actual": "running_confirmed, entryIsTheRecordedEntry:true, argvHeadMatchesEntry:null" }
+        ],
+        "exit": 0
+      },
+      "required": "Validate the record shape and require every necessary consistency check to be true; wrong or unavailable launcher/argv evidence must remain inventory_verified at most. Cover these exact controls while preserving missing-record degradation."
+    },
+    {
+      "priority": "P2",
+      "id": "G_CALLER_JSON_IS_NOT_TRUSTED_MAIN_START_FACT",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-g/tools/usage-insights/cli.mjs",
+      "line": 409,
+      "problem": "The delivered CLI accepts arbitrary JSON as main provenance after checking only source==='main-start-record'. The pure module makes the same tag-based distinction. This establishes caller-record consistency, not origin from the original main/D spawn or a current runtime binding; nonsensical pid/start/uid are accepted in the independent controls.",
+      "evidence": "CLI lines409-423 read the file and pass it directly; runtime-identity.ts line250 trusts the tag. G documentation correctly disclaims liveness, but wave36-status calls this trusted/current identity and verified identity available for main.",
+      "required": "Keep caller JSON explicitly caller-declared and do not promote it to trusted/current provenance. Main may supply its original trusted startup observation through an internal boundary and compare exact canonical entry/root/config and verified inventory. Do not add global process discovery; absent trusted facts must remain unknown/null."
+    }
+  ],
+  "actualConsumersAndScopes": {
+    "candidate": "G CLI verify --dto --install --start-record consumes the source module and prints its evidence. No independent CLI invocation was run by this reviewer.",
+    "main": "No inspectRuntimeIdentity/main-start-record/running_confirmed consumer exists in main apps/packages; default support origin:null remains. The candidate findings demonstrate no current public product permission bypass.",
+    "GSubmittedTree": "G reports an extracted R2 tree, build4dcd28f758bbb265, 6841 hashed regular files and a supplied start record. It reports no installation, startup or current process observation. This is distinct from reviewer W35 filesystem controls and D W36 delivery.",
+    "otherClaims": "G reports package192/tool59 tests and controlled support-download probe success; not independently rerun here. Static text capability detection is not proof of registered runtime consumers.",
+    "H_EConsumption": "NOT_REACHED for a trusted current record; native and value claims remain NOT_TESTED."
+  },
+  "preservedBoundaries": {
+    "authorization": "none in all three actual controls",
+    "defaultUnknown": "PASS: no record remains running:null and inventory_verified",
+    "readOnly": true,
+    "productSourceEdits": 0,
+    "candidateEdits": 0,
+    "modelNativeTurns": 0,
+    "serviceActionsSignalsProcessDiscovery": 0,
+    "preserved": "All twelve user service pairs, original worktrees, archives, profiles, state, ledgers, reports and runs."
+  }
+}

@@ -1,0 +1,20 @@
+# I：唯一通信层的恢复支持与安全收尾
+
+目录 `/Users/hh/Desktop/joker/superagent-agent-i`，分支 `codex/g5-coordinator-channel`；本轮已验输入 `14ea58c70730ad50032415257e0b77eb5ff2c654`。
+先读[共同里程碑](README.zh-CN.md)、AGENTS/START-HERE/product-spec/README和[验收](../../reports/releases/wave37-admission/README.zh-CN.md)。保留dirty后fetch/merge origin/main，固定实际consumer source。原owned/excluded路径仍以[原表](../product-wave-36/dispatch.json)为准。
+
+你负责原 sole attach-channel 的恢复通信支持，持续协助 main/B/H，不再实现第二套宿主/生命周期。主线42f6daab已从实际 Native.launch 返回对象激活回调，I host不是这条默认路径。
+
+先修 I37-HOST-SHUTDOWN-DELETES-BORROWED-PARENT-STATE：构造时借用stateRoot、零launch再shutdown不得删父目录或sentinel；只删除自己确切创建且确认收尾的run目录。分别测借用父目录、自己建临时root、重复shutdown与UNKNOWN保留；不以便利factory绕主边界。
+
+维护detach/rebind、原factId durable ACK、payload body/预算/新intent相关ID/fresh guard和terminal拒绝。已pending写意图断连仍indeterminate，不迁移批准、不自动重放命令。类型客户端inspect/cancel不得伪装main VerifiedRunnerInspection物理proof。
+
+给B/main/H提供与现有模块ABI一致的最小source/故障consumer。Native的SpawnedRunner/eagerPrepare/同stateRoot已有main adapter，不再增加不兼容RunnerHost替换方案或复制B auth/dispatch逻辑。
+
+独立队列为原通信背压、迟到/错误回调和有界timer/waiter退出；保持v1协议，不新增schema/ledger/调度槽。
+
+完成出口：借用状态树完整保留，原通信反例通过且实际consumer使用相同实现；模块close不等物理quiescence。
+
+早交可运行source及必要source闭包后，连续支持本里程碑集成、修复、复验和上述独立队列，不逐fix等待、不把SOURCE_READY当整包完成。状态写原owned报告目录的 `recovery-milestone-01-status.json`，列commit/base/实际命令exit/原IDs/层次/剩余项。只显式owned路径提交到原origin分支；外部依赖只阻对应项，不改他人候选。
+
+自动vendor/model/native和真实信号均0；Bcap4UNKNOWN不可花，原E试点本阶段不推进，材料/ledger不变。十二用户实例及state/profile/tar/历史保留；不新Driver/CAC/desktop/自动接受/第二生命周期，不global discovery、借凭据或绕stop拒绝清理。无工时/当天deadline/新token预算；无需用重复测试填执行时间。

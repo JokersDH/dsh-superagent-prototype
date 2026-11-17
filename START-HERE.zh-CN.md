@@ -1,5 +1,13 @@
 # 从这里开始：仓库、代码位置和并行开发
 
+**当前唯一工程入口：[原 Work 恢复里程碑01](agent-tasks/recovery-milestone-01/README.zh-CN.md)。** main端到端负责同原Work故障接管到检查/人工接受/原2&4槽归还；十位沿原目录分支持续支持，不再扩大功能线。分别转发[A–J十段话术](agent-tasks/recovery-milestone-01/forward-prompts.zh-CN.md)，完整任务和原路径都已写好，不必逐fix重新派工。
+
+本轮[固定提交验收](reports/releases/wave37-admission/README.zh-CN.md)已完成。main42f6daab已实接原Native.launch回调并通过受控正常Work问答→检查→人工接受→产物重开，撤销授权零效果；30测试/strict过，仍未证明崩溃恢复/真实物理/原槽。见[0095](docs/rfcs/WP-16/0095-main-original-running-callback-composition.md)。E确已W35安装/配置/非空恢复/upgrade子集，D已有W36含历史固定包，下一步E只验同W36，不追移动main。
+
+用户确认本阶段不推进复核价值试点、依赖它的第二协议复核和路由收益研究；价值未测，原材料/ledger/预算保留。自动真实vendor/model/native/信号0，十二用户实例及状态不操作。完整B/CAC后置，进度最近评估76/100与58.6%未因任务数或研究退出自动调整。
+
+现行规则已收敛到[AGENTS.md](AGENTS.md)，499行旧轮次记录原文保留在[历史归档](docs/history/agents-waves.md)。以下为按时间保留的旧检查点和派工，**不覆盖上面的当前入口**。
+
 **当前推进：[Wave36完整子系统长任务](agent-tasks/product-wave-36/README.zh-CN.md)。** 上轮十位已[独立验收](reports/releases/wave36-admission/README.zh-CN.md)，每位1whole-subsystem goal/4条更大端到端产品交付线，映射延续旧九项，不继续凑十二微阶段。main已实际交A strict分类历史→原WorkDetail，8真实App/4backend/4旧evidence/1transport/241契约/strict/build过，原9模板/6模型保持，两个受控Work人工接受；人工标准验收与整体交付分开。W35新GUI/launcher包真实存在，双已审hash校验现已静态通过，E同W35安装仍未达；B自然结束quiesce/Csync治理/EqueryUNKNOWN新阻断分层保留。分别转发[十段整包话术](agent-tasks/product-wave-36/forward-prompts.zh-CN.md)，[原目录](agent-tasks/product-wave-36/workspaces.json)/[0092](docs/rfcs/WP-16/0092-main-completion-history-consumer.md)/[0093](docs/rfcs/WP-16/0093-wave-36-reviewed-architecture.md)/[0094](docs/rfcs/WP-16/0094-wave-36-whole-subsystem-closures.md)。完整B/CAC后置，12实例/dirty/state/预算保持；以下旧轮次按历史范围阅读。
 
 **当前推进：[Wave35三连续工程包](agent-tasks/product-wave-35/README.zh-CN.md)。** 上轮十位已[独立验收](reports/releases/wave35-admission/README.zh-CN.md)，每位从六扩大到九个完整生产成果，一个goal连续三包/联调/独立队列，早交source后持续，不逐fix等派工。main4cde已接网页模型配置→原私有Provider，修F StrictMode/身份迟到/secret边界，6实际App/15后端/1传输/241契约/strict/build过；原16观察/9模板、两受控人工接受保持。8cd另修真实启动目录竞争3pure，未换W33；E已真正W33outer/非空恢复/升级子集，旧已修不重派、新边界分层。分别转发[十段大任务话术](agent-tasks/product-wave-35/forward-prompts.zh-CN.md)，[原目录](agent-tasks/product-wave-35/workspaces.json)/[0089](docs/rfcs/WP-16/0089-main-model-configuration-consumer.md)/[0090](docs/rfcs/WP-16/0090-wave-35-reviewed-architecture.md)/[0091](docs/rfcs/WP-16/0091-wave-35-continuous-subsystem-program.md)。完整B/CAC后置，12实例/state/dirty/预算保持，以下为历史。
