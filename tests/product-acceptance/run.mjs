@@ -165,10 +165,10 @@ await collect('e4', async () => {
     import('./cases/w33-cohort-recovery.mjs'),
     import('./cases/w34-cohort-upgrade.mjs'),
     import('./cases/w35-multi-instance.mjs'),
+    import('./cases/w35-original-work-recovery.mjs'),
     import('./cases/w36-model-save.mjs'),
     import('./cases/w36-w35-upgrade.mjs'),
     import('./cases/w36-history-surface.mjs'),
-    import('./cases/w35-original-work-recovery.mjs'),
   ])
   const first = await stability.runE4({
     root,
