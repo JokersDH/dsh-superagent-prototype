@@ -98,46 +98,53 @@ function issueSpawn(store, spawnFn, executable, args, intent = {}) {
   for (const [name, value] of [['root', intent.root], ['config', intent.config], ['operation', intent.operation]]) {
     if (value !== undefined && value !== null && !argv.includes(value)) return { ok: false, unknown: `spawn_${name}_not_in_argv`, child }
   }
-  const provenance = deepFreeze(structuredClone({
-    pid: child.pid,
+  const registered = registerIntent(child.pid, {
     executable, argv,
     ...(intent.root === undefined ? {} : { root: intent.root }),
     ...(intent.config === undefined ? {} : { config: intent.config }),
     ...(intent.operation === undefined ? {} : { operation: intent.operation }),
-  }))
-  store.set(child, provenance)
-  const registered = registerIntent(child.pid, {
-    executable, argv,
-    ...(provenance.root === undefined ? {} : { root: provenance.root }),
-    ...(provenance.config === undefined ? {} : { config: provenance.config }),
-    ...(provenance.operation === undefined ? {} : { operation: provenance.operation }),
     ...(intent.expectedChildren === undefined ? {} : { expectedChildren: intent.expectedChildren }),
   })
+  if (!registered.ok) return { ...registered, child }
+  // Immutable birth record: every later re-adoption must match these exact identity fields, not take a
+  // fresh ps snapshot as a new birth.
+  const birth = deepFreeze(structuredClone({
+    pid: registered.record.pid, uid: registered.record.uid, ppid: registered.record.ppid,
+    start: registered.record.start, argvTokens: registered.record.argvTokens,
+    executable: registered.record.executable, record: registered.record,
+  }))
+  store.set(child, birth)
   return { ...registered, child, argv }
 }
 
 function adoptWithProvenance(store, childOrPid, intent = {}) {
   if (!childOrPid || typeof childOrPid !== 'object') return { ok: false, unknown: 'numeric_pid_not_accepted' }
-  const provenance = store.get(childOrPid)
+  const birth = store.get(childOrPid)
   // No provenance means this factory never spawned this object: a plain object, a copied ChildProcess,
   // Object.create(ChildProcess.prototype), new ChildProcess() and a foreign process all fail here.
-  if (!provenance) return { ok: false, unknown: 'foreign_spawn' }
+  if (!birth) return { ok: false, unknown: 'foreign_spawn' }
   // The public child.pid is not authority: mutating it must not retarget the immutable birth.
-  if (childOrPid.pid !== provenance.pid) return { ok: false, unknown: 'pid_mutated' }
-  if (Array.isArray(intent.argv) && !sameTokens(intent.argv, provenance.argv)) return { ok: false, unknown: 'intent_differs_from_spawn' }
-  if (typeof intent.executable === 'string' && intent.executable !== provenance.executable) return { ok: false, unknown: 'intent_differs_from_spawn' }
+  if (childOrPid.pid !== birth.pid) return { ok: false, unknown: 'pid_mutated' }
+  const live = snapshot(birth.pid)
+  if (live.state === 'unknown') return { ok: false, unknown: live.reason ?? 'unreadable', live }
+  if (live.state === 'gone') return { ok: false, unknown: 'already_gone', live }
+  // Re-adoption never renews the birth: the fresh identity must equal the stored birth exactly.
+  const birthMismatch = live.uid !== birth.uid || live.start !== birth.start || live.ppid !== birth.ppid ||
+    !sameTokens(tokens(live.argv ?? ''), birth.argvTokens)
+  if (birthMismatch) return { ok: false, unknown: 'birth_mismatch', live }
+  if (Array.isArray(intent.argv) && !sameTokens(intent.argv, birth.argvTokens)) return { ok: false, unknown: 'intent_differs_from_spawn' }
+  if (typeof intent.executable === 'string' && intent.executable !== birth.executable) return { ok: false, unknown: 'intent_differs_from_spawn' }
   for (const [name, value] of [['root', intent.root], ['config', intent.config], ['operation', intent.operation]]) {
-    if (value !== undefined && value !== null && !provenance.argv.includes(value)) return { ok: false, unknown: `spawn_${name}_not_in_argv` }
+    if (value !== undefined && value !== null && !birth.argvTokens.includes(value)) return { ok: false, unknown: `spawn_${name}_not_in_argv` }
   }
-  const registered = registerIntent(childOrPid.pid, {
-    executable: provenance.executable,
-    argv: provenance.argv,
-    ...(provenance.root === undefined ? {} : { root: provenance.root }),
-    ...(provenance.config === undefined ? {} : { config: provenance.config }),
-    ...(provenance.operation === undefined ? {} : { operation: provenance.operation }),
-    ...(intent.expectedChildren === undefined ? {} : { expectedChildren: intent.expectedChildren }),
+  const registered = registerIntent(birth.pid, {
+    executable: birth.executable, argv: birth.argvTokens.slice(),
+    ...(birth.record.root === null ? {} : { root: birth.record.root }),
+    ...(birth.record.config === null ? {} : { config: birth.record.config }),
+    ...(birth.record.operation === null ? {} : { operation: birth.record.operation }),
+    ...(intent.expectedChildren === undefined ? { expectedChildren: birth.record.expectedChildren } : { expectedChildren: intent.expectedChildren }),
   })
-  return { ...registered, child: childOrPid, argv: provenance.argv }
+  return registered.ok ? { ...registered, child: childOrPid } : registered
 }
 
 /**

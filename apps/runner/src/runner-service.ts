@@ -456,6 +456,15 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
               resources: () => processHost.inventory(),
               state: () => physicallyStopped ? 'terminated' : businessClosed ? 'unknown' : 'serving',
               cancel: async (command, auth) => {
+                // A natural terminal already ran the physical stop; a no-lease original cancel must still
+                // be able to collect that barrier instead of being refused by the closed flag. It never
+                // revives business admission or serves a callback.
+                if (closed) {
+                  if (auth?.leaseId) throw Object.assign(new Error('stale_lease'), { code: 'stale_connection', reason: 'stale_lease' })
+                  if (auth?.producer && channelProducer && !sameCoordinatorChannelProducer(auth.producer as never, channelProducer))
+                    throw Object.assign(new Error('foreign_producer'), { code: 'identity_mismatch', reason: 'foreign_producer' })
+                  return
+                }
                 // Identity/lease is certified BEFORE the physical stop mutates anything; a foreign cancel
                 // is refused here without running stopPhysical. A legitimate stop after admission closed
                 // is still allowed, but a terminal service is not revived.

@@ -131,6 +131,22 @@ try {
     } else log.fail(`pid mutation/reuse controls failed: ${JSON.stringify({ readopted, viaHandle, afterReuse, reused, foreignAdopt, kills: world.kills })}`)
   }
 
+  log.begin('B31-SIGNAL-READOPT-BIRTH-NOT-RENEWED', 're-adoption must match the stored birth, never renew it from a fresh ps', 'pure_mock')
+  {
+    const world = mockWorld()
+    const factory = createSpawnFactory((executable, args) => { const child = { pid: world.nextPid++, spawnfile: executable, spawnargs: [executable, ...args] }; world.add(child.pid, [executable, ...args], { ppid: 1, start: 'Sat Nov 15 10:00:00 2026' }); return child })
+    const spawned = factory.spawn(process.execPath, ['--root=/tmp/w36-root'], { root: '--root=/tmp/w36-root', expectedChildren: [] })
+    const same = factory.adopt(spawned.child, { expectedChildren: [] })
+    // The PID is reused by a live process with the SAME argv but a different start/parent: a fresh ps
+    // snapshot must not become a new birth for this child.
+    world.add(spawned.child.pid, [process.execPath, '--root=/tmp/w36-root'], { ppid: 2, start: 'Mon Nov 17 09:00:00 2026' })
+    const reused = factory.adopt(spawned.child, { expectedChildren: [] })
+    const sentAfterReuse = signalOwned(spawned.handle, 'SIGKILL')
+    log.evidence({ same: same.ok, reused, sentAfterReuse, kills: world.kills.length })
+    if (same.ok && !reused.ok && reused.unknown === 'birth_mismatch' && sentAfterReuse.refused && world.kills.length === 0) log.pass('the same live birth re-adopted, but a live PID reuse with identical argv was refused (birth_mismatch) and the handle produced zero signals')
+    else log.fail(`re-adoption renewed the birth: ${JSON.stringify({ same, reused, sentAfterReuse, kills: world.kills })}`)
+  }
+
   log.begin('B31-SIGNAL-IDENTITY-UID-START', 'uid/start changes end ownership', 'pure_mock')
   {
     const world = mockWorld()

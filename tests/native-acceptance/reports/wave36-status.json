@@ -1,0 +1,90 @@
+{
+  "agent": "B",
+  "branch": "codex/g1-runtime",
+  "wave": 36,
+  "source": {
+    "B_merge_head": "d6820c68",
+    "main_merged": "d6820c68 (main history/support line; origin/main ancestor of HEAD at checkpoint)",
+    "changed_paths": [
+      "tests/native-acceptance/signal-guard.mjs",
+      "tests/native-acceptance/b28-signal.mjs",
+      "tests/native-acceptance/b36-natural-cancel.mjs",
+      "apps/runner/src/runner-service.ts"
+    ],
+    "tar": "NONE - source only; no installed tar/ZIP and no user-instance restart"
+  },
+  "dirtyPreserved": [
+    "reports/releases/wave11-admission/runtime.json",
+    "reports/releases/wave12-admission/runtime.json",
+    "tests/native-acceptance/b16-real-begin.mjs (untracked)"
+  ],
+  "lines": {
+    "L1_trusted_runtime_and_control": {
+      "status": "COMPLETE for B-owned runtime/control; candidate (main has not admitted raw feed/cancel to default business path)",
+      "implementation": "Factory provenance stores an immutable birth record (pid/uid/ppid/start/ordered argv/root/config/operation). Re-adoption now compares the fresh identity to that stored birth and never renews it: a live PID reuse with identical argv is refused birth_mismatch, a mutated public pid is pid_mutated, the issued handle refuses a reused pid; native-noise negatives keep 0 signal. Control uses I currentness: never-bound/old leases, foreign producer, terminal/stopped feed are refused before effect; a NATURAL terminal no longer blocks the original no-lease physical cancel, which returns the terminated/closed barrier, while terminal feed and stale claimed leases stay refused.",
+      "evidence": [
+        "b28-signal 13 PASS/0 FAIL/1 NOT_TESTED (14 cases incl. re-adopt birth and pid mutation/reuse)",
+        "b36-natural-cancel 2 PASS/0 FAIL/1 NOT_TESTED (natural terminal cancel barrier + feed/stale-lease refusal)",
+        "b31 4/0/1, b32 5/0/1",
+        "runner 156/156, recovery-endpoint 10/10"
+      ]
+    },
+    "L2_original_callback_activation_broker_delivery": {
+      "status": "NOT_REACHED (helper/consumer ready; original launch-returned RunningAttempt and original QuestionBroker delivery not executed)",
+      "detail": "attachRunningAttempt consumes main's attachPort+attachCallbacks from the same handle with attemptId/producer match and fail-closed awaited guard; main attached-port 4/4 and native-attach-callbacks 11/11 pass. Actual NativeProductAttempt.launch -> original Application Work question/answer delivery is main-owned and not run; no seeded substitute is labeled recovered.",
+      "old_points": [
+        "B2 PARTIAL",
+        "B4 NOT_REACHED"
+      ]
+    },
+    "L3_same_work_fault_ack_succession_and_original_slots": {
+      "status": "NOT_CLOSED (transport-level handover only; original 2/4 queue authority not reached)",
+      "detail": "b31 proves same spawned Runner/attempt takeover with original fact ids, old lease refused and stdio 0; b32 proves terminal late-receipt/stopped-feed refusal; b33 accounting on real ProductStore bindings 7/7 is explicitly a component, not a second queue. before-write / receiver-after-ACK / receipt windows, original frozen check/currentCandidate/accept and original core queue 2/4 remain main-dependent.",
+      "old_points": [
+        "B5 PARTIAL",
+        "B6 NOT_REACHED",
+        "B7 COMPONENT ONLY"
+      ]
+    },
+    "L4_nonempty_restart_and_maintenance_handoff": {
+      "status": "PARTIAL (source/diagnostics/RFC and same-run rebind; no non-empty original restart)",
+      "detail": "B8 same-run rebind and binding-state restore exist, but reopening a non-empty original Work/question/candidate/artifacts from the Store is main-owned. B9 diagnostics are actionable and non-retrying for missing executor/version/auth/foreign/terminal/old lease/late callback/closed admission/timeout/unknown; RFC 0003 gives the main activation contract. No installed/native/value admission.",
+      "old_points": [
+        "B8 PARTIAL",
+        "B9 PARTIAL"
+      ]
+    }
+  },
+  "old_nine": {
+    "B1": "COMPLETE (tool scope)",
+    "B2": "PARTIAL",
+    "B3": "IMPLEMENTED/candidate",
+    "B4": "NOT_REACHED",
+    "B5": "PARTIAL (transport)",
+    "B6": "NOT_REACHED",
+    "B7": "COMPONENT ONLY / NOT_REACHED as authority",
+    "B8": "PARTIAL",
+    "B9": "PARTIAL"
+  },
+  "verification": {
+    "root_tsc": "exit 0",
+    "attached_tsc": "exit 0",
+    "runner_tests": "156 pass / 0 fail",
+    "main_attached_port": "4/4",
+    "main_native_attach_callbacks": "11/11",
+    "b28_signal": "13/0/1",
+    "b36_natural": "2/0/1",
+    "b31": "4/0/1",
+    "b32": "5/0/1",
+    "b27_sigkill": "7/0/1",
+    "b27_chain": "4/0/1",
+    "b33_slots": "7/7"
+  },
+  "scope": {
+    "modelTurns": 0,
+    "nativeTurns": 0,
+    "cap4UnknownUnspendable": true,
+    "noNew": "no second coordinator/queue/ledger/candidate table/Work/migration/shared schema/HTTP/App/transport edit; no new Driver/CAC/desktop/auto-accept/writer racing/DAG/second lifecycle; no unsafe live SIGKILL/procguard/global discovery; no real CLI fallback",
+    "installed": "not installed; source/controlled only, not a complete product delivery"
+  }
+}
