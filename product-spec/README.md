@@ -2,6 +2,8 @@
 
 版本：`B-1.0-draft` · 2026-11-07 · 状态：可用于拆分实施，须先通过 G0。本文档集是本产品的当前设计基线；不是已实现产品的说明书。
 
+2026-11-17当前实施：[Wave36完整子系统长任务](../agent-tasks/product-wave-36/README.zh-CN.md)，四条更大端到端交付线/owner延续旧九项；[0092实际历史消费者](../docs/rfcs/WP-16/0092-main-completion-history-consumer.md)和[本轮验收](../reports/releases/wave36-admission/README.zh-CN.md)区分默认source/准确安装/恢复/收益，以下早期阶段作历史设计读。
+
 2026-11-16当前实施：[Wave35三连续工程包](../agent-tasks/product-wave-35/README.zh-CN.md)，每位九完整成果；[独立验收](../reports/releases/wave35-admission/README.zh-CN.md)和[实际配置消费者](../docs/rfcs/WP-16/0089-main-model-configuration-consumer.md)区分当前源码/准确安装/恢复/收益。下文旧阶段为历史设计，不替当前实测。
 
 当前工程入口：[Wave35三连续工程包](../agent-tasks/product-wave-35/README.zh-CN.md)，十原owner每人九完整成果，主线模型配置消费者见[0089](../docs/rfcs/WP-16/0089-main-model-configuration-consumer.md)；[最新验收](../reports/releases/wave35-admission/README.zh-CN.md)区分旧闭合与新边界，不按任务数量计完成。

@@ -1,0 +1,166 @@
+{
+  "protocol": "wave36-delivery-admission/1",
+  "date": "2026-11-17",
+  "scope": "Read-only independent D/E acceptance: exact successor archives, immutable manifests and structured sourcemap, recorded installed consumers and complete-report oracle, actual-source pure signal/release controls. No service start/stop, live signal/discovery, model/native turn, archive generation or candidate/assertion edit.",
+  "fixedInputs": {
+    "mainAtStart": "5860da139d72ec62b69f0683d6378cd81ed9d4fb",
+    "D": "397332d55799784cf676dba41e6c570f66d91db0",
+    "DDirty": false,
+    "E": "2644d23feb6fda39bb22012f48064c3bce90e10c",
+    "EDirty": false,
+    "EMeasuredSource": "4b4d4089a07e10b01c9deba32f0d51c23e96bdf1",
+    "EMeasuredSourceDirty": false,
+    "EActualReport": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/report.json",
+    "ECheckedAt": "2026-11-17T01:35:43.551Z"
+  },
+  "DCurrentSuccessor": {
+    "name": "W35 model configuration and launcher-fix successor",
+    "source": "edfe5e14f2f8fbc7f395a84520c781c7f07ce9e7",
+    "buildId": "599de3e98c02de0b",
+    "tarActualPath": "/tmp/w35art/wave35-target-599de3e.tar.gz",
+    "tarSha256": "11027a375848c25c2d2ae8e18755f65fa77272db533dcee7bb9ff27ba8ba50db",
+    "tarBytes": 20598155,
+    "tarEntries": 7440,
+    "innerEntries": 6883,
+    "innerManifestSha256": "d8677d1e313b232ab30026b67e478cdd8f49e72436f01cd1ad454b30641effac",
+    "outerZip": "/Users/hh/Desktop/joker/pa-artifacts/wave35-preview-599de3e/PersonalAgent-Preview-599de3e.zip",
+    "zipSha256": "39c0fff0e13d61c59198f8a55f0ed692b887194aaa4e2782b2b3e9cbd623f6c5",
+    "zipBytes": 63536701,
+    "zipEntries": 7451,
+    "outerEntries": 6891,
+    "outerManifestSha256": "8a8021397318788dedb007cd8ff96da00b4f1af78e369a0bf2aecca7f3e2cb22",
+    "runtime": { "node": "24.21.0", "abi": "137", "platform": "darwin", "arch": "arm64", "schema": 18 },
+    "independentStatic": {
+      "tarBytesShaAndManifest": "PASS",
+      "boundedStandardZipListingUnpackAndCRC": "PASS",
+      "outerAndInnerFilesLinks": "13774 inventory checks,0 mismatches;23 internal links per inventory",
+      "verifiedRoot": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-wave36-outer-5fRR3w/PersonalAgent-Preview-599de3e",
+      "wrapperSha256": "339bdac0912a05da701d04de0670e7b6cd49cc1d86687536fb809f45396d866c",
+      "wrapperMatchesCurrentMainBytes": true,
+      "nodeSha256": "e4b5a3af0e05c75de2eae013904145f40fe7fc2a6e6f17510128bf45cca4e79b",
+      "fullNodeLicenseSha256": "5888dbb9a1d2b18f2c3e6c5f6af1b39de658372b402a0577b002777f14c62ace",
+      "gitDiffMain5860ToBuildAppsPackagesBootstrap": "EMPTY",
+      "sourceClosureRecordedHashes": "192 records/192 unique paths all match git edfe5e14; completeness limitation below",
+      "structuredConsoleSourcemap": "Actual App/transport include configureAssistant and /v1/assistant/connection; actual model-connection.ts and ModelConnectionForm.tsx include model/key fields and explicit HTTP consent",
+      "packageCodeExecutedByReviewer": false
+    },
+    "MainVerifierBlocker": {
+      "initial": "Known current339b wrapper rejected by the old single8de31 allowlist; actual bytes matched main exactly and only differed by the already-reviewed EEXIST revalidation fix",
+      "minimalRecommendation": "Two explicit independently reviewed hashes, actual wrapper equals declared wrapper hash, no learning hashes from untrusted metadata; preserve exact commands, runtime/LICENSE, inventory and identity guards",
+      "mainImplementedDuringAudit": true,
+      "updatedActualMainVerifier": "VERIFIED_STATIC_exit0 for this exact W35 ZIP/source/build/hash, matchedLauncher339b; no archive changed",
+      "status": "CLOSED_IN_MAIN_SOURCE_AND_NEW_W35_STATIC_CONSUMER",
+      "notImplied": "This does not certify E's installed lifecycle, native capability or release approval."
+    }
+  },
+  "DRecordedFunctionalScope": {
+    "installedGui": "D submits real installed App model save1, businesscommands0, errors0, secretVisiblefalse, private0600; raw foreign-origin403/HTTP-consent400/wide-permission503 remain separate negatives. Independent audit confirms the actual frozen GUI/API bytes, not a live browser rerun.",
+    "launcherFix": "The new wrapper exactly matches main's EEXIST-only catch followed by independent type/owner/mode checks; W33 old wrapper and old retry evidence are preserved.",
+    "twoProjects": {
+      "projects": ["project-alpha", "project-beta"],
+      "works": ["f9edce3a73b65ffa571caaea2fec5352", "dc8f3692c726f6e801b1b744042113c2"],
+      "recordedArtifactsPerWork": 4,
+      "scope": "Two sequential single-project controlled runtimes over one state, distinct roots/IDs, same profile-fixture-question and FIXTURE_CHECK. Installed Application/Store reads expose delivered data. This is genuine new controlled scope, not the default multi-project personal preview/apply/scoped HTTP/native end-to-end or independent production profiles."
+    },
+    "nonemptyRestore": "W35 backup/restore/reader consumes the prior real W33 two-Work/36artifact/eventSeq105 data; preserve compatibility continuity, distinguish W35-born alpha/beta data from imported W33 data.",
+    "authorizedRead": "W35 raw review-read-200 is a historical ordinary unanchored assistant-candidates/1 metadata projection with statusunavailable/authorizationnone; businesswrite422 remains. This is not permission for every Work-anchored source or execution.",
+    "upgradeRaw": {
+      "file": "/Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/reports/wave35/upgrade.json",
+      "actual": "BLOCKED_unknown_live_resource_pointer_unchanged",
+      "statusClaim": "D6 says W35 CONFIRMED/PASS",
+      "interpretation": "No successful W35 upgrade retry receipt is included in the submitted material inspected. Old successful W33 rollback remains closed; it cannot certify this different target. Reading data with W35/W32 readers does not prove a managed pointer transition."
+    },
+    "secretsModelsNative": "Developer GUI and local configuration evidence does not prove real model connection; all automatic vendor/model/native remains0."
+  },
+  "EActualCohortAndTier": {
+    "counts": { "PASS": 336, "FAIL": 0, "NOT_TESTED": 21 },
+    "actualOuterRecovery": "W33 source048f/buildf880/taree45/outer46e, not W35 sourceedfe/build599d/outer39c",
+    "legacy": "R1 remains the frozen base for installed identity/readiness/two-project fixture/tar lifecycle; W32 remains the upgrade baseline",
+    "independentRecordedOracle": {
+      "method": "Actual evaluateRelease/tier/resolveFixtureDigest with complete real report, its measured clean source and original checkedAt; no freshness renewal",
+      "installedAlpha": { "required": 204, "ok": true },
+      "installedFunctional": { "required": 205, "ok": true },
+      "localAlpha": "Same controlled-plus-staged-install scope as installed-alpha; native excluded",
+      "fullProduct": { "required": 206, "ok": false, "cause": "Native delivery absent and native control unexecuted" }
+    },
+    "originalProjectApplicability": "E32-ORIGINAL-PROJECT-APPLICABLE is still NOT_TESTED: registered original project previews needs_input; execution remains fixture project-atlas. Current tiers are not original-project/full-native or all-W35 admission.",
+    "nonemptyAndReadonly": "Real W33 delivered Work/all4 artifact bytes plus question Work, archive/direct frozen reader/held historical facts/business refusal and no-provider observations remain valid. Do not relabel the same report as W35 evidence.",
+    "sameW35IndependentVerdict": "NOT_REACHED"
+  },
+  "oldGapIndependentRechecks": {
+    "actualSharedModulePure": [
+      { "case": "complete descriptors with a stale foreign child before parent signal", "result": "set_not_fresh;0 fake signals", "oldP1": "CLOSED" },
+      { "case": "duplicate exited parent post rows omitting a live child", "result": "duplicate_observation;no release", "oldP2": "CLOSED" }
+    ],
+    "fullRecordedReportMutations": [
+      { "case": "sameProject with schema-valid complete draft but per-project7/30 insights403", "result": "REFUSE_journey_scope_unproven" },
+      { "case": "old E32 tar lifecycle empty after", "result": "REFUSE_zip_invalid" },
+      { "case": "actual outer foreign PID42/missing start", "result": "REFUSE_outerZip_invalid" },
+      { "case": "readonly pending evidence missing", "result": "REFUSE_cohortRecovery_invalid" },
+      { "case": "actual outer embedded operation UNKNOWN plus retained material", "result": "REFUSE_outerZip_invalid" }
+    ],
+    "interpretation": "These exact old signal/release/scope/pending/main-operation counterexamples are truly closed and should not be reassigned as absent work. Residual query/type/duplicate-snapshot issues below are different boundaries.",
+    "realProcessesSignalsDeletes": 0
+  },
+  "findingsOrdered": [
+    {
+      "id": "E_DESCENDANT_QUERY_UNKNOWN_BECOMES_EMPTY_AND_AUTHORIZES_EFFECTS",
+      "priority": "P1_TEST_TOOL_UNCERTAIN_RESOURCE_AUTHORITY",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/lib/caller-safety.mjs",
+      "line": 129,
+      "summary": "lateDescendants ignores spawnSync.error/status/signal and catches exceptions as no children. A permission/error/timeout/missing probe can therefore become a proven empty descendant set, allowing signal or release while related-resource coverage is unknown.",
+      "actualSourcePureReproduction": "Known parent identity fresh, exact Node spawn-failure shape{statusnull,errorENOENT,stdoutundefined} becomes no descendants -> signal returnsSIGTERM and fake kill capturesTERM; all known parent rows exited with the same failed query -> release captures rm('/synthetic/install'). A status2/error/empty-output control also passed unsafely.0 real effects.",
+      "narrowCorrection": "Distinguish observed PID list, legitimate exit1/no matches and query UNKNOWN. Query error/timeout/malformed response retains all materials and refuses every signal/release; do not globally discover or adopt the missing child.",
+      "scope": "E shared acceptance-tool policy, not the product public stop route or proof of an actual user process being signalled. Old whole-set stale and duplicate-row fixes remain closed."
+    },
+    {
+      "id": "E_RELEASE_STILL_ACCEPTS_UNSPECIFIED_LIVENESS",
+      "priority": "P2_TEST_TOOL_PROOF_COMPLETENESS",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/lib/caller-safety.mjs",
+      "line": 167,
+      "summary": "Duplicate and foreign PID mapping now reject, but releaseAllowed still only rejects alive===true and the false/true contradiction. A mapped row with expectedStart/queryOk but missing alive/sameIdentity passes releaseAllowed.",
+      "pureReproduction": "One complete birth, successful no-children probe, supplied row{pid101,expectedStart:start101,queryOktrue} -> allowedtrue; no real deletion performed.",
+      "narrowCorrection": "Validate explicit liveness and identity/query/UID/argv observation fields in the release decision itself, using the same complete proof semantics as resourceRowsIssues. Missing facts remain UNKNOWN."
+    },
+    {
+      "id": "D_NEW_W35_UPGRADE_CLAIM_NOT_SUPPORTED_BY_RAW_RECEIPT",
+      "priority": "P2_CURRENT_TARGET_DELIVERY_EVIDENCE",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/reports/wave35/upgrade.json",
+      "summary": "The current W35 raw result is BLOCKED unknown_live_resource, whereas wave35-status D6 calls it W35 CONFIRMED/PASS. A source/data read or old W33 successful operation cannot supply this target's missing successful receipt.",
+      "narrowCorrection": "Preserve the blocked attempt, provide a separate successful original W35 operation receipt/exit/pointer/bytes result or accurately retain this target as HELD. Never force-kill the wrapper or loosen identity guards to get success.",
+      "scope": "Current W35 managed upgrade claim only; old D raw rollback correction, immutable W35 bytes and independent data-read progress remain valid."
+    },
+    {
+      "id": "D_W35_SOURCE_CHECKLIST_IS_NOT_COMPLETE_FOR_NEW_GUI",
+      "priority": "P2_SOURCE_HANDOFF_SCOPE",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-d/tools/distribution/reports/wave35/ordinary-source-closure.json",
+      "summary": "All192 listed paths match sourceedfe, but the checklist omits actual model-connection.ts and ModelConnectionForm.tsx sources that occur in this frozen console sourcemap. It is a selected source audit set, not a complete new-GUI source closure.",
+      "narrowCorrection": "Derive and record the actual relevant source dependency set including the new model component/helper/contracts, or label the checklist's narrower scope. Recount from that authority rather than preserving192 as a target; an external report correction does not require refreezing unchanged runtime.",
+      "scope": "Build/maintenance provenance; no missing runtime file or invalid installed GUI is inferred because the full inner/outer inventories and compiled bundle are sound."
+    },
+    {
+      "id": "E_REQUIRED_OPERATION_COPY_IS_NOT_VALIDATED_WITH_ITS_SOURCE_CASE",
+      "priority": "P2_REPORT_CONSISTENCY",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/lib/release.mjs",
+      "line": 545,
+      "summary": "The main embedded operation now rejects UNKNOWN/deletion contradictions, closing the old counterexample. But changing only E33-OUTER-ZIP-OPERATION.outerZipOperation to UNKNOWN while retaining its released entry leaves the complete functional205 oracle passing, because the redundant required copy is not checked or bound back to the main snapshot.",
+      "narrowCorrection": "Use one canonical operation result or require the dedicated case snapshot to equal the authoritative main case and pass the same semantic validator. Keep the valid main operation positive; this is not a regression of its newly added guard."
+    }
+  ],
+  "nextWholeSubsystemDirection": {
+    "D": "Current immutable installed product daily two-original-project/configuration use; real nonempty persistence/restore and current-target managed receipt; colleague-owned Mac ARM operation and secure configuration; one accurate source/runtime identity and stable E handoff. Keep already proven closures and select necessary new runtime only after owner source is published.",
+    "E": "All resource-query UNKNOWN strictly gates whole-operation signal/release; same-cohort original-project/window/context/accept/reopen semantics; nonempty portability/current upgrade/recovery authorization and held facts; current scoped independent tiers and repeated maintainable daily use.",
+    "cohortPolicy": "W33 remains E's measured fixed subset. W35 is now a statically verified necessary successor with real D installed GUI evidence, pending E same-subject functional adoption. Main's forthcoming completion-history source is another explicit runtime input, not permission to patch frozen archives or chase HEAD.",
+    "noNewStageInflation": true
+  },
+  "limits": {
+    "liveStartStop": 0,
+    "realSignalDeleteOrGlobalDiscovery": 0,
+    "realModelVendorNativeTurns": 0,
+    "newTarOrZip": 0,
+    "candidateOrAssertionEdits": 0,
+    "allExecSessionsComplete": true,
+    "preserved": "All twelve services, state/profile/tar/ZIP/ledger/history/runs and original budgets",
+    "budget": "B UNKNOWN cap unspendable; E original pilot BLOCKED with no reset/top-up/refund/research spend. No completion/value estimate follows from additional PASS counts."
+  }
+}
