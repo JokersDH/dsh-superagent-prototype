@@ -44,7 +44,8 @@ try {
   for (const id of ['one', 'two']) {
     const receipt = await product.application.dispatch({ kind: 'create_work', commandId: `create-${id}`, conversationId: 'conv-main', projectId: id,
       goal: `History ${id}`, profileId: 'profile-fixture-pass', scope: scope(id),
-      criteria: [{ id: 'machine', kind: 'machine', required: true, description: 'Fixed output', checkDefinitionRef: FIXTURE_CHECK }] }, { ...principal, source: 'local_cli' })
+      criteria: [{ id: 'machine', kind: 'machine', required: true, description: 'Fixed output', checkDefinitionRef: FIXTURE_CHECK },
+        ...(id === 'one' ? [{ id: 'human', kind: 'human', required: true, description: 'Review fixed output' }] : [])] }, { ...principal, source: 'local_cli' })
     assert.equal(receipt.status, 'recorded')
     const ready = await until(async () => {
       const value = (await product.application.inspect({ workId: receipt.workId })).works[0]
@@ -89,7 +90,7 @@ try {
     assert.equal(response.status(), 200, JSON.stringify(value))
     const accepted = store.db.prepare('SELECT candidate_generation FROM completion_acceptances WHERE ticket_id=? LIMIT 1').get(original.ticket_id)
     assert.equal(value.entries[0]?.generation, accepted.candidate_generation)
-    await history.getByText(`第 ${accepted.candidate_generation} 代接受记录`, { exact: true }).waitFor()
+    await history.getByText(`第 ${accepted.candidate_generation} 代标准验收`, { exact: true }).waitFor()
     assert.equal(await history.locator('ol > li').count(), 1)
   })
   await check('WRONG-WORK-RESPONSE-IS-REFUSED-WITHOUT-OLD-ROWS-OR-RAW-ERROR', async () => {

@@ -3,7 +3,7 @@ import { ChevronDown, History, RefreshCw } from 'lucide-react'
 import type { WorkCompletionHistory, WorkCompletionHistoryQuery, WorkView } from '@personal-agent/contracts'
 import type { ConsoleTransport } from './transport.ts'
 
-const kinds = { verifications: '检查记录', acceptances: '接受记录', contracts: '合同版本' } as const
+const kinds = { verifications: '检查记录', acceptances: '标准验收', contracts: '合同版本' } as const
 export function CompletionHistoryPanel({ work, transport, identity }: { work: WorkView; transport: ConsoleTransport; identity: string }) {
   const [open, setOpen] = useState(false), [kind, setKind] = useState<WorkCompletionHistoryQuery['kind']>('verifications')
   const [loaded, setLoaded] = useState<{ key: string; page?: WorkCompletionHistory }>(), [error, setError] = useState<string>()

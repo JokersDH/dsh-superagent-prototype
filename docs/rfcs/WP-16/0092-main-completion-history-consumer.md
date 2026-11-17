@@ -6,7 +6,7 @@
 
 原ProductStore/A completionHistory→原Application.inspect当前授权→严格metadata投影→认证GET `/v1/works/:id/completion-history`→typedtransport→原WorkDetail内独立工作历史。原WorkEvidencePanel/timeline、当前检查/产物/人工接受入口保持原协议，不把F的旧WorkEvidenceHistory组件改名为A新协议。
 
-首个默认消费者支持合同版本、检查记录、接受记录三kind；attempts/reviews仍不公开，后续按字段语义演进。每页1–20，默认10，浏览器最多显示200；内部A页最终4MiB预算，公共响应128KiB，transport按流计字节。原同步读取/解析不是可抢占硬deadline；不以最终响应界限声称全读取成本已证明。
+首个默认消费者支持合同版本、检查记录、人工标准验收三kind；该acceptances是人工criterion验收，不是所有交付接受事件，机器标准为主的已接受Work也可能没有该类row。整体接受仍见原时间线/ExecutionOutcome。attempts/reviews仍不公开。每页1–20，默认10，浏览器最多显示200；内部A页最终4MiB预算，公共响应128KiB，transport按流计字节。原同步读取/解析不是可抢占硬deadline；不以最终响应界限声称全读取成本已证明。
 
 ## 历史与当前分开
 
