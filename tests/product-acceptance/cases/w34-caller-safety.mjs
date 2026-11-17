@@ -226,7 +226,11 @@ export async function runCallerSafety() {
     cleanup.track(resourceBirth(child.pid, { root: own }))
     cleanup.signal(parent.pid, 'SIGTERM'); cleanup.signal(child.pid, 'SIGTERM')
     await waitGone(parent.pid); await waitGone(child.pid)
-    const rows = op.observe()
+    let rows = op.observe()
+    for (let index = 0; index < 40 && rows.some(item => item.alive === true); index += 1) {
+      await new Promise(resolvePromise => setTimeout(resolvePromise, 50))
+      rows = op.observe()
+    }
     const duplicated = [rows[0], rows[0]]
     const verdict = op.releaseAllowed(duplicated)
     assert('DUPLICATE_ROWS_REFUSED', verdict.allowed === false && verdict.reason === 'duplicate_observation', JSON.stringify(verdict))

@@ -3,12 +3,12 @@
   "tier": "full-product",
   "status": "FAIL",
   "ok": false,
-  "checkedAt": "2026-11-16T13:30:44.119Z",
+  "checkedAt": "2026-11-16T19:49:46.704Z",
   "source": {
-    "commit": "7e269fff38e4a80b64a347261ab1095efe1c557a",
+    "commit": "c99475c617fc3abb8ea5c82e00a4aaa2160e14e0",
     "dirty": false
   },
-  "expectedSource": "7e269fff38e4a80b64a347261ab1095efe1c557a",
+  "expectedSource": "c99475c617fc3abb8ea5c82e00a4aaa2160e14e0",
   "requirements": [
     {
       "id": "E1-GATE-CONTROL",
@@ -488,527 +488,547 @@
     {
       "id": "E2-CONFIGURATION",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E2-DAILY-VERTICAL",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E2-ARTIFACT-ROUNDTRIP",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E2-WORK-EVIDENCE",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E2-EVIDENCE-HISTORY",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E2-REOPEN-PERSISTENCE",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E2-REPLAY-AND-CONFLICT",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E2-SESSION-ISOLATION",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E2-STALE-BUSINESS-REJECTION",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E2-MACHINE-FAIL",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E2-ONE-WRITER",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E2-SCOPE-AND-PROFILE-GUARDS",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E2-AUTH-AND-ORIGIN",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E2-ASSISTANT-SDK-MOCK",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E2-CONVERSATION-CATALOG",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E2-ATTENTION-SIGNAL",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E2-REVIEW-TIMING",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E2-ROUTE-FIXTURE",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E3-REVIEW-FIXTURES",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E3-SEALED-COPY",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E3-REVIEW-ACTIVITY-UI",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E3-ATTENTION-INBOX",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E3-ATTENTION-INBOX-UI",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E3-DECISION-WORKFLOW",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E3-PROPOSAL-HTTP",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E3-PROPOSAL-UI",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E3-CONTEXT-PREVIEW",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E3-CONTEXT-USE",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E3-CONTEXT-SSE",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E3-CONTEXT-GUARDS",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E4-CANDIDATE-FLOW",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E3-CONTEXT-HISTORY",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E3-CONTEXT-SOURCES",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E3-CONTEXT-UI",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E4-SOURCE-CONFIRM",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E4-SOURCE-CONFIRM-REFUSAL",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E4-COMPLETED-REPLY",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E2-REPLY-DURABLE",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E2-REPLY-UNKNOWN-DURABLE",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E2-REPLY-MESSAGE-WINDOW",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E2-REPLY-BAD-ARTIFACT",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E8-SCHEMA-MIGRATION",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E8-LEGACY16-MIGRATION",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E9-CONTEXT-CONCURRENCY",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E3-DESKTOP-GEOMETRY",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E3-NOTEBOOK-GEOMETRY",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E3-MOBILE-GEOMETRY",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E3-QUESTION-FORM",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E3-ACCEPT-AND-DOWNLOAD",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E3-ASSISTANT-SCHEMA-FIXTURES",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E3-CONVERSATION-UI",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E3-VERIFICATION-RECOVERY-UI",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E3-OFFLINE-AND-ERROR",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E3-KEYBOARD-AND-SCROLL",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E4-BOUNDED-CYCLES",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E4-PORTABILITY-CHECKLIST",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E4-RECOVERY-PREFLIGHT",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E4-RECOVERY-READONLY",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E2-VERIFICATION-RECOVERY",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E2-VERIFICATION-FINISHED-STATES",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E6-ARTIFACT-CURRENT-SCOPE",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E4-INSTALL-ARTIFACT-IDENTITY",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E7-BACKUP-CONTEXT-REPLY",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E5-INSTALLED-CANDIDATES",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E7-SECOND-ROOT-READONLY",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E6-INSTALLED-SOURCE-CONFIRM",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E9-INSTALLED-STABILITY",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E5-WORKFLOW-FORMATS",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E4-PERSONAL-RESTORED-REVIEW",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E5-RESTORED-REVIEW-REFUSALS",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E5-REVIEW-REUSE-CONSISTENCY",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E7-SCOPE-DIAGNOSTICS",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E7-READINESS",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E8-PACKAGED-STOP-CONSISTENCY",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E6-TARGET-CONTENT-DRIFT",
       "required": false,
-      "status": "NOT_TESTED"
+      "status": "MISSING"
     },
     {
       "id": "E9-COORDINATOR-CHANNEL-CONTRACT",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E17-SUPPORT-MATERIAL",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E9-INSIGHTS-HTTP",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E6-RECIPE-PREVIEW",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E5-TWO-PROJECT-TEMPLATE-CREATE",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E7-JOURNEY-CONTEXT-SOURCE",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E8-JOURNEY-STOP-REOPEN",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E32-ZIP-LIFECYCLE",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E33-OUTER-ZIP",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E33-COHORT-RECOVERY",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
+    },
+    {
+      "id": "E33-OUTER-ZIP-OPERATION",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E33-COHORT-RECOVERY-OPERATION",
+      "required": true,
+      "status": "MISSING"
     },
     {
       "id": "E5-COHORT-UPGRADE",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
+    },
+    {
+      "id": "E7-MULTI-INSTANCE",
+      "required": true,
+      "status": "MISSING"
+    },
+    {
+      "id": "E8-ORIGINAL-WORK-RECOVERY",
+      "required": false,
+      "status": "MISSING"
     },
     {
       "id": "E11-TRIAL-IDENTITY-FIELDS",
       "required": false,
-      "status": "NOT_TESTED"
+      "status": "MISSING"
     },
     {
       "id": "E13-G-SCOPED-SUMMARY",
       "required": false,
-      "status": "NOT_TESTED"
+      "status": "MISSING"
     },
     {
       "id": "E3-TRIAL-WORKBENCH-UI",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E6-INSTALLED-CONTEXT",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E3-PERSONAL-COLD-START",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E4-INSTALL-FIRST-RUN",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E4-INSTALL-CONFIG-ROOT",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E4-INSTALL-REUSE-CONCURRENCY",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E4-INSTALL-HOST-GUARDS",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E4-BACKUP-RESTORE",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E4-INSTALL-TAMPER",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E4-INSTALL-ROLLBACK",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E4-UPGRADE-FAULTS",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E7-OWNERSHIP-COPY",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E5-D-OWNERSHIP-MOCKS",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E6-CURRENT-MAIN-INSTALL",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E4-UPGRADE-ROLLBACK",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E4-UPGRADE-CROSS-SCHEMA",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E4-MULTI-STATE",
       "required": true,
-      "status": "PASS"
+      "status": "MISSING"
     },
     {
       "id": "E5-NATIVE-DELIVERY",
@@ -1018,40 +1038,550 @@
     {
       "id": "E5-NATIVE-CONTROL",
       "required": true,
-      "status": "NOT_TESTED"
+      "status": "MISSING"
     }
   ],
   "failures": [
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-CONFIGURATION is absent",
+      "caseId": "E2-CONFIGURATION"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-DAILY-VERTICAL is absent",
+      "caseId": "E2-DAILY-VERTICAL"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-ARTIFACT-ROUNDTRIP is absent",
+      "caseId": "E2-ARTIFACT-ROUNDTRIP"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-WORK-EVIDENCE is absent",
+      "caseId": "E2-WORK-EVIDENCE"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-EVIDENCE-HISTORY is absent",
+      "caseId": "E2-EVIDENCE-HISTORY"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-REOPEN-PERSISTENCE is absent",
+      "caseId": "E2-REOPEN-PERSISTENCE"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-REPLAY-AND-CONFLICT is absent",
+      "caseId": "E2-REPLAY-AND-CONFLICT"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-SESSION-ISOLATION is absent",
+      "caseId": "E2-SESSION-ISOLATION"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-STALE-BUSINESS-REJECTION is absent",
+      "caseId": "E2-STALE-BUSINESS-REJECTION"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-MACHINE-FAIL is absent",
+      "caseId": "E2-MACHINE-FAIL"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-ONE-WRITER is absent",
+      "caseId": "E2-ONE-WRITER"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-SCOPE-AND-PROFILE-GUARDS is absent",
+      "caseId": "E2-SCOPE-AND-PROFILE-GUARDS"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-AUTH-AND-ORIGIN is absent",
+      "caseId": "E2-AUTH-AND-ORIGIN"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-ASSISTANT-SDK-MOCK is absent",
+      "caseId": "E2-ASSISTANT-SDK-MOCK"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-CONVERSATION-CATALOG is absent",
+      "caseId": "E2-CONVERSATION-CATALOG"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-ATTENTION-SIGNAL is absent",
+      "caseId": "E2-ATTENTION-SIGNAL"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-REVIEW-TIMING is absent",
+      "caseId": "E2-REVIEW-TIMING"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-ROUTE-FIXTURE is absent",
+      "caseId": "E2-ROUTE-FIXTURE"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-REVIEW-FIXTURES is absent",
+      "caseId": "E3-REVIEW-FIXTURES"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-SEALED-COPY is absent",
+      "caseId": "E3-SEALED-COPY"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-REVIEW-ACTIVITY-UI is absent",
+      "caseId": "E3-REVIEW-ACTIVITY-UI"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-ATTENTION-INBOX is absent",
+      "caseId": "E3-ATTENTION-INBOX"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-ATTENTION-INBOX-UI is absent",
+      "caseId": "E3-ATTENTION-INBOX-UI"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-DECISION-WORKFLOW is absent",
+      "caseId": "E3-DECISION-WORKFLOW"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-PROPOSAL-HTTP is absent",
+      "caseId": "E3-PROPOSAL-HTTP"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-PROPOSAL-UI is absent",
+      "caseId": "E3-PROPOSAL-UI"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-CONTEXT-PREVIEW is absent",
+      "caseId": "E3-CONTEXT-PREVIEW"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-CONTEXT-USE is absent",
+      "caseId": "E3-CONTEXT-USE"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-CONTEXT-SSE is absent",
+      "caseId": "E3-CONTEXT-SSE"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-CONTEXT-GUARDS is absent",
+      "caseId": "E3-CONTEXT-GUARDS"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E4-CANDIDATE-FLOW is absent",
+      "caseId": "E4-CANDIDATE-FLOW"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-CONTEXT-HISTORY is absent",
+      "caseId": "E3-CONTEXT-HISTORY"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-CONTEXT-SOURCES is absent",
+      "caseId": "E3-CONTEXT-SOURCES"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-CONTEXT-UI is absent",
+      "caseId": "E3-CONTEXT-UI"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E4-SOURCE-CONFIRM is absent",
+      "caseId": "E4-SOURCE-CONFIRM"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E4-SOURCE-CONFIRM-REFUSAL is absent",
+      "caseId": "E4-SOURCE-CONFIRM-REFUSAL"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E4-COMPLETED-REPLY is absent",
+      "caseId": "E4-COMPLETED-REPLY"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-REPLY-DURABLE is absent",
+      "caseId": "E2-REPLY-DURABLE"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-REPLY-UNKNOWN-DURABLE is absent",
+      "caseId": "E2-REPLY-UNKNOWN-DURABLE"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-REPLY-MESSAGE-WINDOW is absent",
+      "caseId": "E2-REPLY-MESSAGE-WINDOW"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-REPLY-BAD-ARTIFACT is absent",
+      "caseId": "E2-REPLY-BAD-ARTIFACT"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E8-SCHEMA-MIGRATION is absent",
+      "caseId": "E8-SCHEMA-MIGRATION"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E8-LEGACY16-MIGRATION is absent",
+      "caseId": "E8-LEGACY16-MIGRATION"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E9-CONTEXT-CONCURRENCY is absent",
+      "caseId": "E9-CONTEXT-CONCURRENCY"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-DESKTOP-GEOMETRY is absent",
+      "caseId": "E3-DESKTOP-GEOMETRY"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-NOTEBOOK-GEOMETRY is absent",
+      "caseId": "E3-NOTEBOOK-GEOMETRY"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-MOBILE-GEOMETRY is absent",
+      "caseId": "E3-MOBILE-GEOMETRY"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-QUESTION-FORM is absent",
+      "caseId": "E3-QUESTION-FORM"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-ACCEPT-AND-DOWNLOAD is absent",
+      "caseId": "E3-ACCEPT-AND-DOWNLOAD"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-ASSISTANT-SCHEMA-FIXTURES is absent",
+      "caseId": "E3-ASSISTANT-SCHEMA-FIXTURES"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-CONVERSATION-UI is absent",
+      "caseId": "E3-CONVERSATION-UI"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-VERIFICATION-RECOVERY-UI is absent",
+      "caseId": "E3-VERIFICATION-RECOVERY-UI"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-OFFLINE-AND-ERROR is absent",
+      "caseId": "E3-OFFLINE-AND-ERROR"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-KEYBOARD-AND-SCROLL is absent",
+      "caseId": "E3-KEYBOARD-AND-SCROLL"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E4-BOUNDED-CYCLES is absent",
+      "caseId": "E4-BOUNDED-CYCLES"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E4-PORTABILITY-CHECKLIST is absent",
+      "caseId": "E4-PORTABILITY-CHECKLIST"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E4-RECOVERY-PREFLIGHT is absent",
+      "caseId": "E4-RECOVERY-PREFLIGHT"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E4-RECOVERY-READONLY is absent",
+      "caseId": "E4-RECOVERY-READONLY"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-VERIFICATION-RECOVERY is absent",
+      "caseId": "E2-VERIFICATION-RECOVERY"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E2-VERIFICATION-FINISHED-STATES is absent",
+      "caseId": "E2-VERIFICATION-FINISHED-STATES"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E6-ARTIFACT-CURRENT-SCOPE is absent",
+      "caseId": "E6-ARTIFACT-CURRENT-SCOPE"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E4-INSTALL-ARTIFACT-IDENTITY is absent",
+      "caseId": "E4-INSTALL-ARTIFACT-IDENTITY"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E7-BACKUP-CONTEXT-REPLY is absent",
+      "caseId": "E7-BACKUP-CONTEXT-REPLY"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E5-INSTALLED-CANDIDATES is absent",
+      "caseId": "E5-INSTALLED-CANDIDATES"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E7-SECOND-ROOT-READONLY is absent",
+      "caseId": "E7-SECOND-ROOT-READONLY"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E6-INSTALLED-SOURCE-CONFIRM is absent",
+      "caseId": "E6-INSTALLED-SOURCE-CONFIRM"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E9-INSTALLED-STABILITY is absent",
+      "caseId": "E9-INSTALLED-STABILITY"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E5-WORKFLOW-FORMATS is absent",
+      "caseId": "E5-WORKFLOW-FORMATS"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E4-PERSONAL-RESTORED-REVIEW is absent",
+      "caseId": "E4-PERSONAL-RESTORED-REVIEW"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E5-RESTORED-REVIEW-REFUSALS is absent",
+      "caseId": "E5-RESTORED-REVIEW-REFUSALS"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E5-REVIEW-REUSE-CONSISTENCY is absent",
+      "caseId": "E5-REVIEW-REUSE-CONSISTENCY"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E7-SCOPE-DIAGNOSTICS is absent",
+      "caseId": "E7-SCOPE-DIAGNOSTICS"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E7-READINESS is absent",
+      "caseId": "E7-READINESS"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E8-PACKAGED-STOP-CONSISTENCY is absent",
+      "caseId": "E8-PACKAGED-STOP-CONSISTENCY"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E9-COORDINATOR-CHANNEL-CONTRACT is absent",
+      "caseId": "E9-COORDINATOR-CHANNEL-CONTRACT"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E17-SUPPORT-MATERIAL is absent",
+      "caseId": "E17-SUPPORT-MATERIAL"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E9-INSIGHTS-HTTP is absent",
+      "caseId": "E9-INSIGHTS-HTTP"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E6-RECIPE-PREVIEW is absent",
+      "caseId": "E6-RECIPE-PREVIEW"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E5-TWO-PROJECT-TEMPLATE-CREATE is absent",
+      "caseId": "E5-TWO-PROJECT-TEMPLATE-CREATE"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E7-JOURNEY-CONTEXT-SOURCE is absent",
+      "caseId": "E7-JOURNEY-CONTEXT-SOURCE"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E8-JOURNEY-STOP-REOPEN is absent",
+      "caseId": "E8-JOURNEY-STOP-REOPEN"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E32-ZIP-LIFECYCLE is absent",
+      "caseId": "E32-ZIP-LIFECYCLE"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E33-OUTER-ZIP is absent",
+      "caseId": "E33-OUTER-ZIP"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E33-COHORT-RECOVERY is absent",
+      "caseId": "E33-COHORT-RECOVERY"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E33-OUTER-ZIP-OPERATION is absent",
+      "caseId": "E33-OUTER-ZIP-OPERATION"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E33-COHORT-RECOVERY-OPERATION is absent",
+      "caseId": "E33-COHORT-RECOVERY-OPERATION"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E5-COHORT-UPGRADE is absent",
+      "caseId": "E5-COHORT-UPGRADE"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E7-MULTI-INSTANCE is absent",
+      "caseId": "E7-MULTI-INSTANCE"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-TRIAL-WORKBENCH-UI is absent",
+      "caseId": "E3-TRIAL-WORKBENCH-UI"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E6-INSTALLED-CONTEXT is absent",
+      "caseId": "E6-INSTALLED-CONTEXT"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E3-PERSONAL-COLD-START is absent",
+      "caseId": "E3-PERSONAL-COLD-START"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E4-INSTALL-FIRST-RUN is absent",
+      "caseId": "E4-INSTALL-FIRST-RUN"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E4-INSTALL-CONFIG-ROOT is absent",
+      "caseId": "E4-INSTALL-CONFIG-ROOT"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E4-INSTALL-REUSE-CONCURRENCY is absent",
+      "caseId": "E4-INSTALL-REUSE-CONCURRENCY"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E4-INSTALL-HOST-GUARDS is absent",
+      "caseId": "E4-INSTALL-HOST-GUARDS"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E4-BACKUP-RESTORE is absent",
+      "caseId": "E4-BACKUP-RESTORE"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E4-INSTALL-TAMPER is absent",
+      "caseId": "E4-INSTALL-TAMPER"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E4-INSTALL-ROLLBACK is absent",
+      "caseId": "E4-INSTALL-ROLLBACK"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E4-UPGRADE-FAULTS is absent",
+      "caseId": "E4-UPGRADE-FAULTS"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E7-OWNERSHIP-COPY is absent",
+      "caseId": "E7-OWNERSHIP-COPY"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E5-D-OWNERSHIP-MOCKS is absent",
+      "caseId": "E5-D-OWNERSHIP-MOCKS"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E6-CURRENT-MAIN-INSTALL is absent",
+      "caseId": "E6-CURRENT-MAIN-INSTALL"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E4-UPGRADE-ROLLBACK is absent",
+      "caseId": "E4-UPGRADE-ROLLBACK"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E4-UPGRADE-CROSS-SCHEMA is absent",
+      "caseId": "E4-UPGRADE-CROSS-SCHEMA"
+    },
+    {
+      "code": "missing_required_case",
+      "detail": "Required case E4-MULTI-STATE is absent",
+      "caseId": "E4-MULTI-STATE"
+    },
     {
       "code": "missing_required_case",
       "detail": "Required case E5-NATIVE-DELIVERY is absent",
       "caseId": "E5-NATIVE-DELIVERY"
     },
     {
-      "code": "case_not_pass",
-      "detail": "Required case E5-NATIVE-CONTROL is NOT_TESTED",
-      "caseId": "E5-NATIVE-CONTROL"
-    },
-    {
-      "code": "layer_not_allowed",
-      "detail": "Layer not-tested is not admitted by full-product",
-      "caseId": "E5-NATIVE-CONTROL"
-    },
-    {
-      "code": "layer_not_allowed",
-      "detail": "Case E5-NATIVE-CONTROL ran as not-tested, expected actual-native",
-      "caseId": "E5-NATIVE-CONTROL"
-    },
-    {
-      "code": "required_evidence_missing",
-      "detail": "Case E5-NATIVE-CONTROL has no substantive evidence.native",
+      "code": "missing_required_case",
+      "detail": "Required case E5-NATIVE-CONTROL is absent",
       "caseId": "E5-NATIVE-CONTROL"
     }
   ],
   "claimedBy": {
     "status": "PASS",
-    "tier": "controlled-product-workflow",
-    "decidedAt": "2026-11-16T13:23:36.609Z",
+    "tier": "harness-only",
+    "decidedAt": "2026-11-16T19:09:15.805Z",
     "failureCodes": []
   },
   "notes": [

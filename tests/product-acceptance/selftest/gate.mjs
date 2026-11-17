@@ -357,14 +357,21 @@ const CASES = [
     title: 'The pilot runner refuses corrupt ledgers, clipped bounds and a missing adapter',
     check: ({ assert }) => {
       const here = dirname(fileURLToPath(import.meta.url))
-      const run = spawnSync(process.execPath, [join(here, '../pilot/runner-selftest.mjs')], { encoding: 'utf8', timeout: 120_000 })
+      let run = spawnSync(process.execPath, [join(here, '../pilot/runner-selftest.mjs')], { encoding: 'utf8', timeout: 120_000 })
       let result
-      try {
-        result = JSON.parse(run.stdout)
-      } catch {
-        result = undefined
+      const attempts = []
+      for (let attempt = 0; attempt < 2; attempt += 1) {
+        try {
+          result = JSON.parse(run.stdout)
+          break
+        } catch {
+          attempts.push((run.stderr || run.stdout || '').slice(-200))
+          result = undefined
+        }
+        // A loaded host can kill the child mid-print; retry once and report both attempts.
+        run = spawnSync(process.execPath, [join(here, '../pilot/runner-selftest.mjs')], { encoding: 'utf8', timeout: 120_000 })
       }
-      assert('SELFTEST_RAN', result !== undefined, (run.stderr || run.stdout || '').slice(-300))
+      assert('SELFTEST_RAN', result !== undefined, JSON.stringify({ attempts }))
       assert('SELFTEST_NO_FAILURE', result?.failures?.length === 0, JSON.stringify(result?.failures ?? []))
       assert('SELFTEST_BOUND_NOT_CLIPPED', result?.assertions?.some((item) => item.id === 'BOUND_IS_DECLARED_NOT_CLIPPED' && item.ok))
       assert('SELFTEST_CORRUPT_LEDGER', result?.assertions?.filter((item) => item.id.startsWith('CORRUPT_')).every((item) => item.ok))

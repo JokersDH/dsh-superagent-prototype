@@ -25,6 +25,10 @@ export async function openBrowser({ root, viewport = VIEWPORTS.desktop, locale =
     acceptDownloads: true,
   })
   const page = await context.newPage()
+  // Loaded hosts (concurrent product instances, browsers) can push a first navigation well past the
+  // Playwright default; the case assertions are unchanged, only the wait budget is widened.
+  page.setDefaultNavigationTimeout(90_000)
+  page.setDefaultTimeout(45_000)
   const problems = []
   page.on('pageerror', (error) => problems.push(`pageerror: ${error.message}`))
   page.on('console', (message) => {

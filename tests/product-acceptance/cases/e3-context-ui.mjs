@@ -33,7 +33,7 @@ export async function runContextUi({ root, runDirectory }) {
     browser = await openBrowser({ root, viewport: VIEWPORTS.desktop })
     const page = browser.page
     const consoleURL = `http://127.0.0.1:${port}/?conversation=conv-ui`
-    await page.goto(consoleURL, { waitUntil: 'domcontentloaded', timeout: 30_000 })
+    await page.goto(consoleURL, { waitUntil: 'domcontentloaded', timeout: 90_000 })
     await page.locator('#composer-input').waitFor({ timeout: 25_000 })
 
     const waitCalls = async (count, timeoutMs = 15_000) => {

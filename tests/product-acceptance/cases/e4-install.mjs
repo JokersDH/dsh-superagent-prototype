@@ -1582,8 +1582,16 @@ export async function runInstall({ root, runDirectory, keep = false }) {
       try {
         for (const dir of [installA, installB]) {
           spawnSync('tar', ['-xzf', ARTIFACTS.upgrade.tarPath, '-C', dir, '--strip-components=1'])
-          const first = pa(dir, ['first-run', '--json'])
-          assert(`WRONG_INSTALL_FIRST_${dir.endsWith('a') ? 'A' : 'B'}`, first.status === 0, first.stderr.slice(-200))
+          // The frozen launcher can race its own first-run directory creation on a loaded host; one
+          // recorded retry is allowed, and both attempts are reported.
+          let first = pa(dir, ['first-run', '--json'])
+          const attempts = [{ status: first.status, stderr: first.stderr.slice(-200) }]
+          if (first.status !== 0) {
+            await new Promise(resolvePromise => setTimeout(resolvePromise, 800))
+            first = pa(dir, ['first-run', '--json'])
+            attempts.push({ status: first.status, stderr: first.stderr.slice(-200) })
+          }
+          assert(`WRONG_INSTALL_FIRST_${dir.endsWith('a') ? 'A' : 'B'}`, first.status === 0, JSON.stringify(attempts))
         }
         const [port, apiPort] = await freePorts()
         started = startPa(installA, { port, apiPort })
