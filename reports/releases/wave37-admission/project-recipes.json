@@ -1,0 +1,102 @@
+{
+  "protocol": "wave37-project-recipes-admission/1",
+  "date": "2026-11-17",
+  "status": "SOURCE_SELF_CHECK_AND_CONTROLLED_CONSUMER_EVIDENCE_RETAINED_DEFAULT_AND_INSTALLED_SCOPES_SEPARATE",
+  "fixedSource": {
+    "owner": "J",
+    "head": "b295eb6e72e55070682fabe4507781f3456fb968",
+    "runtimeSourceInSubmittedEvidence": "56fdb46ac31fb29b7e597097caf95fedc223a5dc",
+    "priorSource": "807c8e00b1e431c0f33cdcdf60a091a01be9c015",
+    "mergedMain": "7e5509914d0749ccd01ed83cf11ae30f864591d0",
+    "root": "/Users/hh/Desktop/joker/superagent-agent-j",
+    "branch": "codex/g5-project-recipes",
+    "dirtyBeforeAndAfter": []
+  },
+  "scope": "Read-only source and submitted-evidence inspection, focused pure tests and noEmit strict checks only. No product runtime, browser, installation, model/native turn, fault or signal was run by this audit.",
+  "executed": [
+    {
+      "command": "node --test packages/project-recipes/test/currency.case.ts packages/project-recipes/test/module.case.ts",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-j",
+      "exitCode": 0,
+      "passed": 13,
+      "failed": 0,
+      "scope": "Pure configuration/facts/currentness and module description/capability controls, including fresh positive and changed revision, malformed/versioned config, changed/future/expired facts, expiry, clock and incomplete observation."
+    },
+    {
+      "command": "pnpm exec tsc -p packages/project-recipes/tsconfig.json --noEmit",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-j",
+      "exitCode": 0
+    },
+    {
+      "command": "pnpm exec tsc -p tools/project-recipes/tsconfig.json --noEmit",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-j",
+      "exitCode": 0
+    },
+    {
+      "command": "Inline Node: import source CLI main, invoke --self-check with captured stdout/stderr, assert exit0 and all5 checks",
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-j",
+      "exitCode": 0,
+      "result": {
+        "protocol": "project-recipes-self-check/1",
+        "ok": true,
+        "checks": ["protocol", "catalog-digest", "capabilities", "contracts", "kinds"]
+      },
+      "scope": "Actual candidate CLI source entry, pure in-process description validation. The CLI loads packages/project-recipes/src/index.ts; this is not an immutable installed-package consumer proof."
+    }
+  ],
+  "actualIncrement": {
+    "production": "Compared with the prior fixed J807c8e00, packages/project-recipes/src has no new diff. New executable functionality is the source CLI --self-check. Existing draftCurrency/rebind/module capabilities remain valid candidate production source but are not new this wave.",
+    "newConsumers": "New config-evolution test and extensions to two-project-delivery/restore-continuity directly consume the original main ProductProjectRecipes, Application and ProductCompletionHistory. These are real controlled source compositions, not a parallel recipe runtime or a replacement completion reader.",
+    "finalCommit": "b295eb6e publishes reports/status after runtime-source56fdb46a. No source-revision mismatch is inferred merely because the final commit is documentation."
+  },
+  "configEvolution": {
+    "actualSource": "tools/project-recipes/test/config-evolution.case.ts creates a controlled original Work and explicitly accepts it, closes the runtime, then creates another runtime over the same Store with a changed project displayName. The public configuration revision changes; the old delivered Work keeps its original contract revision/digest and project identity; the old draft yields configuration_changed; a new preview carries the new revision; the old contract history is read through the main reader.",
+    "consumerBoundary": "The new test calls product.read.projectRecipePreview and application.dispatch directly. It does not itself exercise authenticated HTTP or NewWorkForm for configuration evolution. Those default surfaces already exist in inherited main and have separate submitted browser evidence.",
+    "remaining": "A displayName-driven projection revision change is not an implemented versioned project-settings write/authorization path. The J report honestly keeps that write path held on admitted native configuration."
+  },
+  "completionHistory": {
+    "actualSource": "The updated two-project test reads the revised original Work through product.read.workCompletionHistory: two contract revisions are paged with the same signed cursor limit, tampering is refused, and verification rows are asserted nonempty and correctly typed. Reopen reads the same original Work/project history. Restore-continuity now also reads original contract history after the same Store is reopened.",
+    "acceptanceEvidenceLimit": "The acceptance-history branch asserts status=ok and that every returned row has the expected kind, but does not assert a nonempty acceptance list. Preserve the controlled manual-accept operations separately; do not derive a demonstrated nonempty human-criterion history solely from this vacuous-all check.",
+    "scopeLimit": "The direct reader calls are genuine source consumers. Store reopen is not an A/D archive restore, an installed package restart, active original-Work recovery or resource-slot return."
+  },
+  "defaultConsumer": {
+    "unchangedMainFiles": [
+      "apps/coordinator/product/project-recipes.ts",
+      "apps/coordinator/product/completion-history.ts",
+      "apps/coordinator/product/runtime.ts",
+      "apps/console/src/App.tsx"
+    ],
+    "comparison": "All four files have no diff between fixed Jb295eb6e and merged main7e550991. The existing authenticated preview, original form revalidation, scoped history reader and default CompletionHistoryPanel are inherited main capabilities, not a new J default integration.",
+    "candidateOnly": "Structured draftCurrency reasons, rebindRegisteredProject and describeProjectRecipes are available in J source. Source search shows no direct default App/runtime consumer for those optional functions; main does call the existing previewInputs/assertDraftCurrent path. Do not claim the structured reason UI or rebinding workflow has been newly wired.",
+    "browserEvidence": "Submitted browser report names clean source56fdb46a,9 passing cases and2 controlled accepted Works. It covers actual existing recipe/workbench/form flows, not installed/native/recovered admission. No browser or runtime case was rerun by this audit."
+  },
+  "newBlockingFindings": [],
+  "heldOutcomes": [
+    "Actual project machine FAIL -> repair -> same-Work registered recheck; the fixture success verifier does not prove it.",
+    "A/D exact two-format bundle restore with nonempty original bytes and the real current-authorization/readonly boundary.",
+    "Versioned project-settings write authorization and default structured currency/rebind consumers.",
+    "D/H/E exact immutable package consumer and installed compatibility. CLI source self-check is not that evidence."
+  ],
+  "layers": {
+    "source": "Focused pure13 and2 strict commands plus actual source CLI self-check pass.",
+    "controlled": "Submitted config evolution, direct completion-history and browser source evidence inspected and scoped; not rerun here.",
+    "default": "Inherited main preview/form/history consumers retained, optional J currency/rebind/description integration still distinct.",
+    "installed": "NOT_MEASURED; no archive/package/install/upgrade was created or used by this audit.",
+    "native": "Real vendor/model/native turns0.",
+    "recovered": "Original running Work/QuestionBroker and slots not measured; same Store reopen is data continuity only.",
+    "value": "No productivity or innovation benefit measured; tests/reports do not increase completion percentage."
+  },
+  "preservation": {
+    "candidateEdits": false,
+    "mainProductionOrTaskEdits": false,
+    "productRuntimeOrBrowserRuns": 0,
+    "realVendorModelOrNativeCalls": 0,
+    "manualOrFaultSignals": 0,
+    "globalProcessOrSocketDiscovery": false,
+    "userServicesTouched": 0,
+    "budgetsLedgersStateProfilesTarsHistoryPreserved": true,
+    "allExecSessionsCompleted": true,
+    "onlyOutputFile": "reports/releases/wave37-admission/project-recipes.json",
+    "releaseApproved": false
+  }
+}

@@ -31,6 +31,15 @@ const open = async (options: { resources?: RunnerResourceState[]; onCancel?: () 
   return { endpoint, spec, token }
 }
 
+const commandOf = (spec: ReturnType<typeof makeAttemptSpec>) => ({
+  ticketId: spec.ticketId, assignmentId: spec.assignmentId, attemptId: spec.attemptId, fenceEpoch: spec.fenceEpoch, contract: spec.contract,
+})
+
+const producerOf = (spec: ReturnType<typeof makeAttemptSpec>) => ({
+  attempt: { ticketId: spec.ticketId, assignmentId: spec.assignmentId, attemptId: spec.attemptId, fenceEpoch: spec.fenceEpoch, contract: spec.contract },
+  runnerIdentityRef: `runner-${spec.attemptId}`, source: 'attempt-runner',
+})
+
 const call = (socketPath: string, method: string, path: string, token?: string, body?: unknown): Promise<{ status: number; json: unknown }> =>
   new Promise((resolve, reject) => {
     const bytes = body === undefined ? undefined : Buffer.from(JSON.stringify(body))
@@ -111,9 +120,9 @@ test('inspection carries the full attempt identity and complete inventory', asyn
 
 test('cancel closes admission before stopping and the result is reported', async () => {
   let cancelled = false
-  const { endpoint, token } = await open({ onCancel: async () => { cancelled = true } })
+  const { endpoint, spec, token } = await open({ onCancel: async () => { cancelled = true } })
   try {
-    const response = await call(endpoint.socketPath, 'POST', '/v1/cancel', token, makeCommand('cancel'))
+    const response = await call(endpoint.socketPath, 'POST', '/v1/cancel', token, { producer: producerOf(spec), command: makeCommand('cancel', commandOf(spec)) })
     assert.equal(response.status, 200)
     assert.equal(cancelled, true)
     const inspection = response.json as { admission: string }
@@ -126,12 +135,30 @@ test('cancel closes admission before stopping and the result is reported', async
   }
 })
 
-test('only a cancel command is accepted on the cancel route', async () => {
-  const { endpoint, token } = await open()
+test('a cancel without a stated producer is refused before the physical stop', async () => {
+  let cancelled = false
+  const { endpoint, spec, token } = await open({ onCancel: async () => { cancelled = true } })
   try {
-    const begin = await call(endpoint.socketPath, 'POST', '/v1/cancel', token, makeCommand('begin', { inputRef: 'i', preparedPolicyRef: 'prepared-1' }))
+    const bare = await call(endpoint.socketPath, 'POST', '/v1/cancel', token, makeCommand('cancel', commandOf(spec)))
+    assert.equal(bare.status, 409)
+    assert.equal((bare.json as { reason?: string }).reason, 'missing_producer')
+    assert.equal(cancelled, false)
+    const foreignProducer = { ...producerOf(spec), runnerIdentityRef: 'runner-foreign' }
+    const foreign = await call(endpoint.socketPath, 'POST', '/v1/cancel', token, { producer: foreignProducer, command: makeCommand('cancel', commandOf(spec)) })
+    assert.equal(foreign.status, 409)
+    assert.equal((foreign.json as { error?: string }).error, 'identity_mismatch')
+    assert.equal(cancelled, false)
+  } finally {
+    await endpoint.close()
+  }
+})
+
+test('only a cancel command is accepted on the cancel route', async () => {
+  const { endpoint, spec, token } = await open()
+  try {
+    const begin = await call(endpoint.socketPath, 'POST', '/v1/cancel', token, { producer: producerOf(spec), command: makeCommand('begin', { ...commandOf(spec), inputRef: 'i', preparedPolicyRef: 'prepared-1' }) })
     assert.equal(begin.status, 403)
-    const malformed = await call(endpoint.socketPath, 'POST', '/v1/cancel', token, { kind: 'nonsense' })
+    const malformed = await call(endpoint.socketPath, 'POST', '/v1/cancel', token, { producer: producerOf(spec), command: { kind: 'nonsense' } })
     assert.equal(malformed.status, 503)
   } finally {
     await endpoint.close()

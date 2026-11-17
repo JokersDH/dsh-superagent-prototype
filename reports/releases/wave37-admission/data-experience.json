@@ -1,0 +1,227 @@
+{
+  "protocol": "wave37-data-experience-admission/1",
+  "date": "2026-11-17",
+  "status": "C_OLD_SYNC_GOVERNANCE_AND_DIGEST_CONTROLS_CLOSED_A_MAIN_HISTORY_RETAINED_F_NEW_DTO_OPTIONAL",
+  "initialMain": "7e5509914d0749ccd01ed83cf11ae30f864591d0",
+  "scope": "Independent, read-only acceptance of fixed wave36 A/C/F submissions. Only this report is written; no candidate, production, assertion, lock, task book, package or user-service mutation by this audit.",
+  "fixedSources": {
+    "A": {
+      "head": "269c9c3af3c7049311574c8f1f1b6838a50e5548",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "branch": "codex/g2-workspaces-verification"
+    },
+    "C": {
+      "head": "d4ce6f67d06b2af32dfcee84207cf7217163ab61",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "branch": "codex/g3-assistant-context"
+    },
+    "F": {
+      "head": "06e17eb70232a2d14efd49308ff10a6045d77f10",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-f",
+      "branch": "codex/g4-trial-experience"
+    }
+  },
+  "dirtyBeforeAndAfter": {
+    "A": [],
+    "C": ["pnpm-lock.yaml"],
+    "FUntrackedPreserved": [
+      "reports/releases/wave12-context/history-browser/scope-desktop.png",
+      "reports/releases/wave12-context/history-browser/scope-mobile.png",
+      "reports/releases/wave29-integration/browser/workbench-desktop.png",
+      "reports/releases/wave29-integration/browser/workbench-mobile.png",
+      "reports/releases/wave31-integration/browser/support-desktop.png",
+      "reports/releases/wave31-integration/browser/support-mobile.png",
+      "reports/releases/wave36-integration/history-browser/desktop.png",
+      "reports/releases/wave36-integration/history-browser/mobile.png"
+    ],
+    "mainExistingUntrackedPreserved": ["new-start.err", "new-start.json", "old-onnew.err", "old-onnew.json", "old-start2.json"]
+  },
+  "executed": [
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "command": "node --test --test-concurrency=1 packages/workflows/test/wave33-continuation.case.ts packages/workflows/test/wave32-persistent-two-project.case.ts",
+      "exitCode": 0,
+      "passed": 2,
+      "failed": 0,
+      "durationMs": 2997.935125,
+      "observations": {
+        "keysetPages": [50, 50, 20],
+        "uniqueRows": 120,
+        "largePageReturned": 187,
+        "largePageBytes": 4193837,
+        "largePageMaxBytes": 4194304,
+        "largePageHasMore": true,
+        "twoOriginalProjectsAndHeldQueue": true
+      },
+      "scope": "Existing production reader continuation and controlled original Work/contract/candidate/artifact/receipt reopen. Retained behavior, not a newly delivered A algorithm or active native recovery."
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "command": "node --test --test-concurrency=1 packages/knowledge/test/decision-context-snapshot.case.ts packages/knowledge/test/main-personal-decision-work-confirmation.case.ts packages/context/test/history-coverage.case.ts",
+      "exitCode": 0,
+      "passed": 5,
+      "failed": 0,
+      "durationMs": 26144.14325,
+      "scope": "Current selected lookup, source/scope/snapshot controls, repaired sync guard and original Application prepareCommand/commitPrepared source transaction composition. The fixture provider is a local fixed-response model; no vendor/native turn.",
+      "timing": "Existing bounded Promise.race timers kept Node alive after subtests completed. The finite process exited naturally; no forced termination."
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-f/apps/console",
+      "command": "node --test test/trial/*.case.ts",
+      "exitCode": 0,
+      "passed": 50,
+      "failed": 0,
+      "durationMs": 286.037333,
+      "scope": "Actual WorkCompletionHistory admission/continuation helpers and retained current-decision/review/context/readiness/recipe/model-configuration pure rules. This does not prove default mounting or browser/installed behavior."
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "command": "pnpm exec tsc -p packages/workflows/tsconfig.json --noEmit",
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "command": "pnpm exec tsc -p packages/knowledge/tsconfig.json --noEmit",
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "command": "pnpm exec tsc -p packages/context/tsconfig.json --noEmit",
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-f",
+      "command": "pnpm exec tsc -p apps/console/tsconfig.json --noEmit",
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "command": "Inline Node importing source: actual InMemoryAssistantState, AssistantDecisionStore, DecisionGovernance, prepare/bind, async current and sync binding guard; fresh control, forged digest, normal supersession and async comparison",
+      "exitCode": 0,
+      "passed": 4,
+      "failed": 0,
+      "result": {
+        "fresh": { "current": true },
+        "forgedDigest": { "current": false, "code": "invalid_binding" },
+        "superseded": { "current": false, "code": "inactive" },
+        "asyncCurrentAfterSupersession": { "current": false, "code": "inactive" },
+        "originalPredecessor": { "version": 1, "revokedAt": null, "status": "superseded" }
+      },
+      "scope": "Independent pure public-governance controls, not a private SQL mutation, raw-record cast, all-inactive fixture or copied submitted assertion. No disk database, network, model, native or process signal."
+    }
+  ],
+  "previousFindingsClosed": [
+    {
+      "id": "C36-SYNC-BINDING-GUARD-ACCEPTS-SUPERSEDED-DECISION",
+      "status": "CLOSED_AT_FIXED_C_SOURCE",
+      "file": "packages/knowledge/src/decision-preparation.ts",
+      "implementation": "The synchronous guard now requires the actual governed DecisionRecord.status to be active. A legitimate replacement recorded through normal DecisionGovernance leaves the predecessor at version1 without revokedAt yet correctly yields inactive in both sync and async checks.",
+      "actualReader": "The controlled transaction consumer now constructs AssistantDecisionStore(store.workflows.assistant) and calls getSync; it no longer casts a raw PersistedDecision to the richer governed DecisionRecord."
+    },
+    {
+      "id": "C36-CANONICAL-BINDING-DIGEST-NOT-VERIFIED",
+      "status": "CLOSED_FOR_RECOMPUTED_BINDING_IDENTITY_AND_TESTED_SHAPES",
+      "implementation": "The guard validates protocol/authorization/identity/time/count, selected-reference fields and uniqueness, then recomputes the digest of the canonical represented decision refs. Replacing an otherwise fresh binding digest with64 zeroes returns invalid_binding before current-record evaluation.",
+      "retainedScope": "This is a data/currentness check. Trusted source provenance and original actor/project/Scope/confirmation authority remain host responsibilities."
+    },
+    {
+      "id": "F36-OLD-EVENT-TIMELINE-PASSED-AS-NEW-COMPLETION-HISTORY",
+      "status": "CLOSED_FOR_OPTIONAL_NEW_PRESENTATIONAL_SOURCE",
+      "implementation": "The new trial helper and WorkCompletionHistoryPanel really consume the strict public WorkCompletionHistory DTO, with work/project/kind/current-contract and continuation/blocked checks. They no longer present the old WorkEvidenceHistory event DTO as the new completion-fact protocol.",
+      "retainedScope": "Default App still mounts the canonical main CompletionHistoryPanel. The optional F panel is not newly mounted by this submission, and no default replacement is required merely to count integration."
+    }
+  ],
+  "newBlockingFindings": [],
+  "actualProgressAndEvidenceLayers": {
+    "A": {
+      "newSubmission": "Final269c9c3a contains16 reports/doc files only. Its merge brings current main history/App behavior into the branch; storage/workflows.ts is byte-identical to main. Credit evidence/synchronization and retained regressions, not another new history algorithm.",
+      "actualDefaultConsumer": "At initial main7e550991, strict three-kind public completion-history metadata, signed continuation and the original WorkEvidencePanel with distinct CompletionHistoryPanel already exist. Preserve the old event timeline and current/historical distinction. Existing main App validation belongs to its earlier main checkpoint, not to new A production work.",
+      "mergeCaution": "A ports.ts retains a duplicate identical ReadIndexPort.completionHistory signature plus older unmerged recoverySource/export helpers. This type-only merge artifact is not a new runtime capability or release blocker; do not wholesale copy the cumulative file when no reader change is needed.",
+      "remaining": "The original broader nonempty restore/data/body/default-consumer/installation and query-cost outcomes retain their individual evidence scopes. Existing live-keyset output bounds do not by themselves prove frozen multi-page snapshots, pre-read memory limits or hard synchronous deadlines."
+    },
+    "C": {
+      "newSubmission": "Canonical binding/currentness fixes are real source changes. Both prior independent counterexamples now pass correct refusals with a legitimate fresh positive, and the actual source transaction test uses the proper governed synchronous projection.",
+      "actualConsumer": "The controlled consumer awaits original application.prepareCommand outside the transaction, then invokes the sync guard and original application.commitPrepared within store.uow.atomic. It preserves original receipt replay and ordinary unbound work creation.",
+      "remaining": "The selected canonical refs/digest are still not durably attached by the default main create form/handler to the original Work/contract/context. Passing this source composition does not complete that user-visible workflow or prove installed/native recovery.",
+      "admission": "Admit the repaired source guard for deliberate main integration. Main remains owner of public schema/UI/auth/original confirmation and durable binding placement. No second create API, coordinator or ledger is needed."
+    },
+    "F": {
+      "newSubmission": "Concrete optional completion-history presentational code now uses the right DTO. It distinguishes blocked from complete-empty, rejects foreign or inconsistent continuation, and labels human criterion acceptance separately from overall delivery acceptance.",
+      "actualDefaultConsumer": "App.tsx imports and mounts the main CompletionHistoryPanel; the new trial WorkCompletionHistoryPanel is exported from trial/index.ts but is not mounted by the default App. Preserve the working main consumer and adopt optional presentational pieces only for a deliberate UX improvement.",
+      "remaining": "Submitted inherited App/browser evidence and untracked screenshots were preserved and inspected as claimed history, not newly rerun in this audit. WebKit, actual200% zoom, screen reader and exact installed UX remain unmeasured here."
+    },
+    "source": "Fixed source revisions inspected;57 focused tests and4 independent pure controls pass, with4 noEmit strict commands. Counts are validation evidence, not product completion credit.",
+    "controlled": "Original controlled two-project data/reopen and local fixed-response source transaction evidence only. No real vendor/model/native turn is inferred.",
+    "installed": "NOT_MEASURED. No archive, freeze, installation, upgrade, packaged consumer or existing instance operation by this audit.",
+    "native": "Real vendor/model/native turns0; no native compatibility or real2/4 slot-resource return conclusion.",
+    "recovery": "Existing data/receipt/artifact reopen remains distinct from original running Work/QuestionBroker reconnection or coordinator fault takeover.",
+    "value": "No measured productivity, independent-review benefit or automatic-learning result. No completion-score increase is justified by these tests or report updates."
+  },
+  "safeMainDecisionBindingComposition": {
+    "reuse": [
+      "Original DecisionGovernance/AssistantDecisionStore and prepareDecisionSelection/bindDecisionSelection provide the current selected data.",
+      "Original application.prepareCommand runs before the UnitOfWork; the repaired synchronous binding check belongs within the same original UoW as commitPrepared.",
+      "Persist the canonical selected refs/digest in the original Work/contract/context path under main-owned schema rules, with A owning any necessary storage migration.",
+      "Use the original trusted source reader with project/conversation/user-role/provenance checks. A matching text digest alone is not trusted source authorization.",
+      "No selection must continue the existing ordinary delegation flow. Decision references do not widen tools, paths, network, native approvals or acceptance authority."
+    ],
+    "receiptReplayCaution": "Original commitPrepared checks an existing matching command receipt before fresh guards and returns the original Work. Preserve that order for already-committed replay; a later decision revoke/supersede must not create another Work, rewrite historical refs, or make original receipt replay depend on fresh currentness.",
+    "primitiveLimit": "ApplicationService does not currently expose an arbitrary new custom create-guard callback. The demonstrated composition is original prepareCommand plus same-UoW sync assertion plus commitPrepared, not an already-installed default hook.",
+    "priority": "Useful independent integration, not a prerequisite for main original-running callbacks/QuestionBroker work. Do not distract or block that runtime work with an optional F swap or wholesale A merge."
+  },
+  "sourceReferences": [
+    {
+      "owner": "main_and_A_identical",
+      "path": "packages/storage/src/workflows.ts",
+      "bytes": 75621,
+      "sha256": "8d55a971802ed68141230a982f4119f1073a7eb4b35bea6c9b82e7dfbdf2879e"
+    },
+    {
+      "owner": "A",
+      "path": "packages/workflows/src/ports.ts",
+      "bytes": 8842,
+      "sha256": "d799c725862a67ee729f154f322466c4a56577aa04b12af3061bb7e8f76f9a63"
+    },
+    {
+      "owner": "C",
+      "path": "packages/knowledge/src/decision-preparation.ts",
+      "bytes": 13762,
+      "sha256": "c88a3023a434ee5af120bae3ef79a38fe2eadac92957c55d332360dfd7524bcd"
+    },
+    {
+      "owner": "C",
+      "path": "packages/knowledge/test/main-personal-decision-work-confirmation.case.ts",
+      "bytes": 17484,
+      "sha256": "e434445e8bd682e98bc3fcdb4848ace2137cd65d7c7ac53562925edeecd7268a"
+    },
+    {
+      "owner": "F",
+      "path": "apps/console/src/trial/work-review.ts",
+      "bytes": 11572,
+      "sha256": "b6488b36a594101c3c45a29d7520191025ad1466486f419e001649ae03e55207"
+    },
+    {
+      "owner": "F",
+      "path": "apps/console/src/trial/WorkReviewPanels.tsx",
+      "bytes": 14424,
+      "sha256": "27317cabb8b51d83ca9e2cba478ff339f76e467a8f1258616f0931dc24e030be"
+    }
+  ],
+  "preservation": {
+    "realVendorModelCalls": 0,
+    "realNativeTurns": 0,
+    "manualOrFaultSignals": 0,
+    "globalProcessOrSocketDiscovery": false,
+    "userServicesTouched": 0,
+    "persistentServicesStarted": 0,
+    "newArchiveOrPackage": false,
+    "candidateSourcesAssertionsOrLocksEdited": false,
+    "mainProductionEditedByThisAudit": false,
+    "taskBooksCreated": false,
+    "allExecSessionsCompleted": true,
+    "budgetsLedgersStateProfilesTarsHistoryPreserved": true,
+    "onlyOutputFile": "reports/releases/wave37-admission/data-experience.json",
+    "completionPercentageChangedByThisAudit": false,
+    "releaseApproved": false
+  }
+}

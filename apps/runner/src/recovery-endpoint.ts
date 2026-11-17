@@ -3,7 +3,7 @@ import { existsSync, mkdirSync, rmdirSync, unlinkSync } from 'node:fs'
 import { IdSchema } from '@personal-agent/contracts'
 import type { AttemptSpec, RunnerCommand } from '../../../packages/contracts/src/types.ts'
 import { createRunnerCredential, serveRunnerRecovery } from '../../../packages/execution/src/recovery-transport.ts'
-import type { RunnerInspection, RunnerState } from '../../../packages/execution/src/recovery-transport.ts'
+import type { RunnerControlAuth, RunnerInspection, RunnerState } from '../../../packages/execution/src/recovery-transport.ts'
 
 export type { RunnerInspection }
 export type RunnerResourceState = RunnerState['resources'][number]
@@ -14,7 +14,7 @@ export type RecoveryEndpointOptions = {
   source: string
   resources: () => RunnerResourceState[]
   state: () => 'serving' | 'terminated' | 'unknown'
-  cancel: (command: Extract<RunnerCommand, { kind: 'cancel' }>) => Promise<void>
+  cancel: (command: Extract<RunnerCommand, { kind: 'cancel' }>, auth?: RunnerControlAuth) => Promise<void>
   /** Durable business facts this Runner already recorded, for attach replay. */
   facts?: (since: number, maxBytes: number) => Promise<{ frames: unknown[]; next: number; done: boolean }>
   payload?: (ref: string, offset: number, length: number) => Promise<{ total: number; digest: string; base64: string }>
@@ -22,7 +22,7 @@ export type RecoveryEndpointOptions = {
   channelNext?: (producer: unknown, leaseId: string, expectedGeneration: number) => Promise<{ generation: number; request: unknown } | null>
   channelReply?: (producer: unknown, reply: unknown, leaseId: string) => Promise<{ accepted: boolean; generation: number }>
   /** Business command intake for an attached client; applied to the same attempt and child. */
-  command?: (command: RunnerCommand) => Promise<void>
+  command?: (command: RunnerCommand, auth?: RunnerControlAuth) => Promise<void>
   now?: () => string
 }
 export const CREDENTIAL_FILE = 'runner.credential'
@@ -65,9 +65,11 @@ export async function serveRecoveryEndpoint(options: RecoveryEndpointOptions): P
   }
   const server = await serveRunnerRecovery({ socketPath, credentialPath }, producer, {
     inspect: async () => state(),
-    cancel: async (command) => {
+    cancel: async (command, auth) => {
+      // A refused cancel (foreign producer / old lease) must not mutate admission: close it only after
+      // the original cancel actually succeeded.
+      await options.cancel(command, auth)
       admission = 'closed'
-      await options.cancel(command)
       return state()
     },
     ...(options.facts ? { facts: options.facts } : {}),
@@ -75,7 +77,7 @@ export async function serveRecoveryEndpoint(options: RecoveryEndpointOptions): P
     ...(options.channelState ? { channelState: options.channelState } : {}),
     ...(options.channelNext ? { channelNext: options.channelNext } : {}),
     ...(options.channelReply ? { channelReply: options.channelReply } : {}),
-    ...(options.command ? { command: async (command) => { await options.command!(command); return state() } } : {}),
+    ...(options.command ? { command: async (command, auth) => { await options.command!(command, auth); return state() } } : {}),
   })
   return {
     socketPath,

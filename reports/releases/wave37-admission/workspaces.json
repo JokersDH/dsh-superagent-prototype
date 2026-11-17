@@ -1,0 +1,102 @@
+{
+  "date": "2026-11-17",
+  "mainAtReview": "7e5509914d0749ccd01ed83cf11ae30f864591d0",
+  "mainNormalComposition": "42f6daab",
+  "roles": [
+    {
+      "id": "A",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "branch": "codex/g2-workspaces-verification",
+      "head": "269c9c3af3c7049311574c8f1f1b6838a50e5548",
+      "dirtyBeforeAndAfter": "",
+      "previous": "eac2c9d812d9ddf2c630a2fcd00e4fde1ac876b2",
+      "evidencePath": "packages/workflows/reports/wave36-status.json"
+    },
+    {
+      "id": "B",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "branch": "codex/g1-runtime",
+      "head": "579c40bca3a2fc06f5510f468e0f6ab19f693fd7",
+      "dirtyBeforeAndAfter": "M reports/releases/wave11-admission/runtime.json\n M reports/releases/wave12-admission/runtime.json\n?? tests/native-acceptance/b16-real-begin.mjs",
+      "previous": "88e472e67555c3f64716ce6dc457edc1c188f37a",
+      "evidencePath": "tests/native-acceptance/reports/wave36-status.json"
+    },
+    {
+      "id": "C",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "branch": "codex/g3-assistant-context",
+      "head": "d4ce6f67d06b2af32dfcee84207cf7217163ab61",
+      "dirtyBeforeAndAfter": "M pnpm-lock.yaml",
+      "previous": "01177e1db6ac40ef053f12cbbc634a6a73752976",
+      "evidencePath": "packages/context/reports/wave36-status.json"
+    },
+    {
+      "id": "D",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-d",
+      "branch": "codex/g3-local-distribution",
+      "head": "652b6835b22e9c1b2b79793670d4cea534e0d1fb",
+      "dirtyBeforeAndAfter": "",
+      "previous": "397332d55799784cf676dba41e6c570f66d91db0",
+      "evidencePath": "tools/distribution/reports/wave36-status.json"
+    },
+    {
+      "id": "E",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-e",
+      "branch": "codex/g3-product-acceptance",
+      "head": "95d48acc06b437a2a14a8cd46be430215cc3df5d",
+      "dirtyBeforeAndAfter": "",
+      "previous": "2644d23feb6fda39bb22012f48064c3bce90e10c",
+      "evidencePath": "tests/product-acceptance/reports/wave36-status.json"
+    },
+    {
+      "id": "F",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-f",
+      "branch": "codex/g4-trial-experience",
+      "head": "06e17eb70232a2d14efd49308ff10a6045d77f10",
+      "dirtyBeforeAndAfter": "?? reports/releases/wave12-context/history-browser/scope-desktop.png\n?? reports/releases/wave12-context/history-browser/scope-mobile.png\n?? reports/releases/wave29-integration/browser/workbench-desktop.png\n?? reports/releases/wave29-integration/browser/workbench-mobile.png\n?? reports/releases/wave31-integration/browser/support-desktop.png\n?? reports/releases/wave31-integration/browser/support-mobile.png\n?? reports/releases/wave36-integration/history-browser/desktop.png\n?? reports/releases/wave36-integration/history-browser/mobile.png",
+      "previous": "d515a9d4ed726c3e20ab847e3d6770bf81610066",
+      "evidencePath": "reports/trial-experience/wave36-status.json"
+    },
+    {
+      "id": "G",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-g",
+      "branch": "codex/g4-usage-insights",
+      "head": "2df7416098dd7ab4a827a55fb4c8755574d3f75c",
+      "dirtyBeforeAndAfter": "",
+      "previous": "d09e155d3e8aad74d1238cbafdaec063802221fe",
+      "evidencePath": "reports/usage-insights/wave36-status.json"
+    },
+    {
+      "id": "H",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-h",
+      "branch": "codex/g4-trial-operations",
+      "head": "74b4166a063d213882f30c54f6860b44bab2e71b",
+      "dirtyBeforeAndAfter": "",
+      "previous": "e14c9597d1df3f084b21048de5e9338f24de54c8",
+      "evidencePath": "reports/trial-operations/wave36-status.json"
+    },
+    {
+      "id": "I",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-i",
+      "branch": "codex/g5-coordinator-channel",
+      "head": "14ea58c70730ad50032415257e0b77eb5ff2c654",
+      "dirtyBeforeAndAfter": "",
+      "previous": "b21698fa5c4418b9670f3b97907971d8e03c1a0e",
+      "evidencePath": "reports/runtime-channel/wave36-status.json"
+    },
+    {
+      "id": "J",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-j",
+      "branch": "codex/g5-project-recipes",
+      "head": "b295eb6e72e55070682fabe4507781f3456fb968",
+      "dirtyBeforeAndAfter": "",
+      "previous": "807c8e00b1e431c0f33cdcdf60a091a01be9c015",
+      "evidencePath": "reports/project-recipes/wave36-status.json"
+    }
+  ],
+  "candidateWorkingTreeEdits": 0,
+  "newUserThreads": 0,
+  "newWorktrees": 0,
+  "newModelNativeAllowance": 0,
+  "releaseApproved": false
+}

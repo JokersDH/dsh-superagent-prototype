@@ -44,7 +44,12 @@ const RunnerInspectionSchema = z
  * Mirror of main's `connectRunnerRecovery` wire behaviour: authenticate with the bearer credential,
  * GET the inspection, and validate it with the same frozen schema.
  */
-function connect(socketPath: string, credentialPath: string) {
+const producerOf = (spec: ReturnType<typeof makeAttemptSpec>) => ({
+  attempt: { ticketId: spec.ticketId, assignmentId: spec.assignmentId, attemptId: spec.attemptId, fenceEpoch: spec.fenceEpoch, contract: spec.contract },
+  runnerIdentityRef: `runner-${spec.attemptId}`, source: 'attempt-runner',
+})
+
+function connect(socketPath: string, credentialPath: string, producer?: ReturnType<typeof producerOf>) {
   const token = readFileSync(credentialPath, 'utf8').trim()
   const call = (method: 'GET' | 'POST', path: string, body?: unknown) =>
     new Promise<{ status: number; json: unknown }>((resolve, reject) => {
@@ -82,7 +87,8 @@ function connect(socketPath: string, credentialPath: string) {
       return parsed.data
     },
     async cancel(command: unknown) {
-      const response = await call('POST', '/v1/cancel', command)
+      if (!producer) throw new Error('cancel requires the registered producer')
+      const response = await call('POST', '/v1/cancel', { producer, command })
       if (response.status !== 200) throw Object.assign(new Error('refused'), { code: 'unknown_outcome' })
       const parsed = RunnerInspectionSchema.safeParse(response.json)
       if (!parsed.success) throw Object.assign(new Error('invalid response'), { code: 'invalid_response' })
@@ -105,7 +111,7 @@ test('main client inspects a real Runner endpoint and gets a verified proof', as
     cancel: async () => undefined,
   })
   try {
-    const client = connect(endpoint.socketPath, endpoint.credentialPath)
+    const client = connect(endpoint.socketPath, endpoint.credentialPath, producerOf(spec))
     const verified = await client.inspect()
     assert.equal(verified.attempt.attemptId, spec.attemptId)
     assert.equal(verified.admission, 'open')
@@ -132,7 +138,7 @@ test('main client cancels a real Runner endpoint and admission closes', async ()
     },
   })
   try {
-    const client = connect(endpoint.socketPath, endpoint.credentialPath)
+    const client = connect(endpoint.socketPath, endpoint.credentialPath, producerOf(spec))
     const verified = await client.cancel(makeCommand('cancel'))
     assert.equal(cancelled, true)
     assert.equal(verified.admission, 'closed')
