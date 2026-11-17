@@ -1,0 +1,22 @@
+{
+  "status": "PASS_WHOLE_SUBSYSTEM_DISPATCH_STATIC_ONLY",
+  "externalAgents": 10,
+  "ownersIncludingMain": 11,
+  "productClosuresPerOwner": 4,
+  "retainedPriorAcceptancePointsPerOwner": 9,
+  "noMicrophaseExpansion": true,
+  "acyclic": true,
+  "checkpoints": 41,
+  "ownershipDisjoint": true,
+  "originalBranchesAndDirtyChecked": 11,
+  "localLinks": 95,
+  "runtimeSource": "f32a64ff2d22f3bcbcd48b19cb52c967b63f4530",
+  "defaultCompletionHistory": true,
+  "originalWorkRecoveryStillRequired": true,
+  "W35StaticNotInstalled": true,
+  "cacExcluded": true,
+  "budgetUnchanged": true,
+  "runtimeTestsStarted": 0,
+  "nativeTurnStarts": 0,
+  "releaseApproved": false
+}

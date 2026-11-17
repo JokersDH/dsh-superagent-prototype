@@ -1,0 +1,267 @@
+{
+  "date": "2026-11-17",
+  "main": "5860da139d72ec62b69f0683d6378cd81ed9d4fb",
+  "roles": [
+    {
+      "id": "A",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-a",
+      "branch": "codex/g2-workspaces-verification",
+      "head": "eac2c9d812d9ddf2c630a2fcd00e4fde1ac876b2",
+      "dirty": "",
+      "log": "eac2c9d8 docs(workflows): record wave35 nine-outcome source evidence\n62088bd0 fix(storage): enforce exact final completion-history page envelope\n555f65f7 Merge remote-tracking branch 'origin/main' into codex/g2-workspaces-verification",
+      "previous": "49082c5bd9502494f0372fa399ed800567f00460",
+      "evidencePath": "packages/workflows/reports/wave35-status.json",
+      "state": {
+        "status": "SOURCE_READY",
+        "remaining": [
+          "main/C signed HTTP cursor and principal/Scope real Work history consumer",
+          "main/F multi-page history/source UI and daily query integration",
+          "D/E installed same-instance restart with E independent verdict",
+          "B/I live native recovery and same-Work takeover",
+          "CAC deferred"
+        ]
+      }
+    },
+    {
+      "id": "B",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "branch": "codex/g1-runtime",
+      "head": "88e472e67555c3f64716ce6dc457edc1c188f37a",
+      "dirty": "M reports/releases/wave11-admission/runtime.json\n M reports/releases/wave12-admission/runtime.json\n?? tests/native-acceptance/b16-real-begin.mjs",
+      "log": "88e472e6 feat(wave35): immutable birth pid, attempt-bound attach, I-current lease fence\n98acea19 Merge remote-tracking branch 'origin/main' into codex/g1-runtime\n5860da13 docs: admit wave34 and dispatch larger continuous subsystem goals",
+      "previous": "843cf35f4f366e74d13a372bdb08ced085f031cc",
+      "evidencePath": "tests/native-acceptance/reports/wave35-status.json",
+      "state": {
+        "status": null,
+        "remaining": null
+      }
+    },
+    {
+      "id": "C",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "branch": "codex/g3-assistant-context",
+      "head": "01177e1db6ac40ef053f12cbbc634a6a73752976",
+      "dirty": "M pnpm-lock.yaml",
+      "log": "01177e1d test(context): keep wave35 session CLI evidence\n2c3fe8e5 docs(context): publish wave35 nine-outcome status, guide and evidence\n19bd0b2a feat(knowledge): bind a decision selection and guard it inside the create transaction",
+      "previous": "0929145f4062dffa1f7c0df1c0564cecca730175",
+      "evidencePath": "packages/context/reports/wave35-status.json",
+      "state": {
+        "status": {
+          "source": "verified",
+          "controlled": "verified in tests",
+          "mainIntegration": "NOT_MERGED",
+          "installed": "NOT_TESTED",
+          "native": "0",
+          "recovery": "readonly only",
+          "value": "NOT_MEASURED"
+        },
+        "remaining": [
+          "main to persist decision-selection binding refs into Work/contract and call sync guard inside the default create transaction",
+          "main/F to consume DTOs in App/UI; A continuation if adopted",
+          "installed/native/active-recovery/value and CAC unverified; E independent acceptance"
+        ]
+      }
+    },
+    {
+      "id": "D",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-d",
+      "branch": "codex/g3-local-distribution",
+      "head": "397332d55799784cf676dba41e6c570f66d91db0",
+      "dirty": "",
+      "log": "397332d5 Wave-35: installed UI model save, exact W35 review read/422, W35 closure\naf40f41e Wave-35 D2: two distinct project works and installed artifact read\na5002d7c Wave-35: model save successor, movable W35, backup/upgrade data continuity and E handoff",
+      "previous": "86301c9fb89eab327ac2acfa985077f07dac8ebd",
+      "evidencePath": "tools/distribution/reports/wave35-status.json",
+      "state": {
+        "status": "COMPLETE_CANDIDATE_PENDING_E",
+        "remaining": [
+          "main verifier W35 wrapper allowlist",
+          "E independent W33 and W35 verdicts",
+          "cross-machine/signing/native/value"
+        ]
+      }
+    },
+    {
+      "id": "E",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-e",
+      "branch": "codex/g3-product-acceptance",
+      "head": "2644d23feb6fda39bb22012f48064c3bce90e10c",
+      "dirty": "",
+      "log": "2644d23f docs(product-acceptance): record the wave-35 nine outcomes and tier verdicts\n4b4d4089 test(product-acceptance): make the duplicate post-row control pure\nb6621cb7 test(product-acceptance): keep a missing answers table as unknown instead of drift",
+      "previous": "4f9373a4e66354f9c6b2557cf0084e69e9a4a6af",
+      "evidencePath": "tests/product-acceptance/reports/wave35-status.json",
+      "state": {
+        "status": {
+          "source": "source-checkout results stay source-level and never back an installed claim",
+          "fixture": "fixture+recovery_readonly second root is its own layer, not personal",
+          "ordinaryInstalled": "PASS",
+          "installedCandidates": "PASS",
+          "stopDetector": "PASS",
+          "stopFunctional": "PASS",
+          "recoveredPersonal": "PASS",
+          "sourceUi": "NOT_TESTED",
+          "readiness": "PASS",
+          "trialWorkbenchUi": "PASS",
+          "functionalStop": "PASS",
+          "insights": "PASS",
+          "journey": "PASS",
+          "journeyContext": "PASS",
+          "journeyReopen": "PASS",
+          "zipLifecycle": "PASS",
+          "originalProjectApplicable": "NOT_TESTED",
+          "recipePreview": "PASS",
+          "lifecycleControls": [
+            "E1-LIFECYCLE-NO-RECORD-UNVERIFIED:PASS",
+            "E1-LIFECYCLE-SET-MISMATCH:PASS",
+            "E1-LIFECYCLE-BIRTH-CONFIG:PASS",
+            "E1-LIFECYCLE-NO-RECORD-BIRTH:PASS",
+            "E1-LIFECYCLE-NO-RECORD-EXIT:PASS",
+            "E1-LIFECYCLE-NO-RECORD-REUSE:PASS",
+            "E1-LIFECYCLE-STOP-NO-RECORD:PASS",
+            "E1-LIFECYCLE-BIRTH-ROOT:PASS",
+            "E1-LIFECYCLE-CHILD-SCOPE:PASS",
+            "E1-LIFECYCLE-OWN:PASS",
+            "E1-LIFECYCLE-WRONG-START:PASS",
+            "E1-LIFECYCLE-SIBLING:PASS",
+            "E1-LIFECYCLE-FOREIGN-CHILD:PASS",
+            "E1-LIFECYCLE-MIXED-UNKNOWN:PASS",
+            "E1-LIFECYCLE-START-WINDOW:PASS",
+            "E1-LIFECYCLE-REFUSED-STOP:PASS",
+            "E1-LIFECYCLE-IDEMPOTENT:PASS"
+          ],
+          "native": "NOT_TESTED: 0 vendor/native sends; B recovery/private permission/target remain separate",
+          "value": "BLOCKED: review pilot unchanged",
+          "outerZip": "PASS",
+          "cohortRecovery": "PASS",
+          "callerSafety": "PASS",
+          "cohortUpgrade": "PASS"
+        },
+        "remaining": []
+      }
+    },
+    {
+      "id": "F",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-f",
+      "branch": "codex/g4-trial-experience",
+      "head": "d515a9d4ed726c3e20ab847e3d6770bf81610066",
+      "dirty": "?? reports/releases/wave12-context/history-browser/scope-desktop.png\n?? reports/releases/wave12-context/history-browser/scope-mobile.png\n?? reports/releases/wave29-integration/browser/workbench-desktop.png\n?? reports/releases/wave29-integration/browser/workbench-mobile.png\n?? reports/releases/wave31-integration/browser/support-desktop.png\n?? reports/releases/wave31-integration/browser/support-mobile.png",
+      "log": "d515a9d4 feat(trial): extend integrated model lifecycle and work review experience\nf8edaf5c Merge remote-tracking branch 'origin/main' into codex/g4-trial-experience\n5860da13 docs: admit wave34 and dispatch larger continuous subsystem goals",
+      "previous": "d03a78720fb818dff26e696b33246c39a066a509",
+      "evidencePath": "reports/trial-experience/wave35-status.json",
+      "state": {
+        "status": "THREE_PACKAGES_SOURCE_AND_ACTUAL_MAIN_DELIVERED_FOR_MOST_OUTCOMES; WHOLE_GOAL_NOT_COMPLETE: F4 is HELD on A's public completion-history DTO (F WorkHistoryPanel is a candidate), and WebKit/200%/screen-reader remain untested. F-owned WorkHistory/DecisionReference/ReviewEvidence panels are not mounted by main App; main's existing actual viewers were independently exercised.",
+        "remaining": [
+          "A public completion-history DTO and main wiring for F4's WorkHistoryPanel (or keep main evidence history; do not relabel ContextHistory)",
+          "main decision on mounting F decision/review panels; existing DecisionWorkspace/WorkEvidencePanel already provide actual behavior",
+          "WebKit actual page test, real 200% zoom, screen reader/forced-colors across all screens; only forced-colors on the review harness was exercised",
+          "D/E independent installed/whole-product verdict for the fixed successor; F does not self-admit",
+          "F9 default product closure requires all nine outcomes; currently not claimed"
+        ]
+      }
+    },
+    {
+      "id": "G",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-g",
+      "branch": "codex/g4-usage-insights",
+      "head": "d09e155d3e8aad74d1238cbafdaec063802221fe",
+      "dirty": "",
+      "log": "d09e155d docs(usage-insights): publish the wave35 evidence levels, contract and nine-outcome status\nbe2d873e feat(usage-insights-cli): report identity evidence and accept a compared running root\ndf358853 feat(usage-insights): separate self-declared, inventory-verified and running-confirmed identity",
+      "previous": "35fc58957c2768b204a8ce67567d3d5a4ff888ed",
+      "evidencePath": "reports/usage-insights/wave35-status.json",
+      "state": {
+        "status": {
+          "source": "G sources in this branch; main has byte-identical analyze/export/display-export/crosscheck/support.ts, the rest are candidate-only",
+          "controlled": "probe over the real product runtime with the fixed fixture driver (0 vendor/model/native turns)",
+          "installed": "NOT_REACHED: no E verdict; the materialised install tree is inspected, not installed or started",
+          "native": "NOT_TESTED (0 turns)",
+          "recovery": "NOT_APPLICABLE to G",
+          "value": "NOT_TESTED: no operator baseline, no benefit figure"
+        },
+        "remaining": [
+          {
+            "item": "main wiring inspectRuntimeIdentity into the support DTO",
+            "state": "SOURCE_READY"
+          },
+          {
+            "item": "a live process start record for running_confirmed",
+            "dependency": "main/D original start identity",
+            "state": "NOT_REACHED (input contract documented)"
+          },
+          {
+            "item": "H/E independent consumption of one support report",
+            "state": "NOT_REACHED"
+          },
+          {
+            "item": "D freeze + E verdict for a successor tar",
+            "state": "NOT_REACHED"
+          },
+          {
+            "item": "operator long-term baseline and value; native execution",
+            "state": "NOT_TESTED"
+          }
+        ]
+      }
+    },
+    {
+      "id": "H",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-h",
+      "branch": "codex/g4-trial-operations",
+      "head": "e14c9597d1df3f084b21048de5e9338f24de54c8",
+      "dirty": "",
+      "log": "e14c9597 docs(trial-ops): pin wave35 status to checkpoint\n8c036672 feat(trial-ops): publish wave35 exact consumer, model errors and W33 persistence evidence\n98bdb4a4 Merge remote-tracking branch 'origin/main' into codex/g4-trial-operations",
+      "previous": "6dc9d26e61a25e14662ef5a38d27d5ead85d49c1",
+      "evidencePath": "reports/trial-operations/wave35-status.json",
+      "state": {
+        "status": null,
+        "remaining": [
+          "human cohort/feedback/value",
+          "B original Application/QuestionBroker same-Run callback and ACK-loss window",
+          "recovered same-Work accept and original scheduler 2/4 slot release",
+          "main attachPort actual ProductExecution consumer beyond main tests",
+          "review-restored and upgrade continuity",
+          "E independent W33 f880 verdict, native/installed release",
+          "main8cd model GUI not in W33 package; D successor not frozen",
+          "H/B/I candidate source not merged into main"
+        ]
+      }
+    },
+    {
+      "id": "I",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-i",
+      "branch": "codex/g5-coordinator-channel",
+      "head": "b21698fa5c4418b9670f3b97907971d8e03c1a0e",
+      "dirty": "",
+      "log": "b21698fa test(runner): widen harness exit/socket waits for loaded parallel runs\nb96c9e38 feat(runner): add launch-handle guard, lease ownership and nine wave35 consumers\ncb535ea5 Merge remote-tracking branch 'origin/main' into codex/g5-coordinator-channel",
+      "previous": "9337348926277315fe43a0127549184d166e1d98",
+      "evidencePath": "reports/runtime-channel/wave35-status.json",
+      "state": {
+        "status": "SOURCE_READY_NINE_OUTCOMES_PASS_LAUNCH_RETURNED_HANDLE_APPLICATION_BROKER_RECOVERY_AND_PRODUCT_SLOTS_NOT_REACHED",
+        "remaining": null
+      }
+    },
+    {
+      "id": "J",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-j",
+      "branch": "codex/g5-project-recipes",
+      "head": "807c8e00b1e431c0f33cdcdf60a091a01be9c015",
+      "dirty": "",
+      "log": "807c8e00 docs(project-recipes): publish wave35 nine-outcome status with held layers\n5b1ef235 feat(project-recipes): bound permission failures, pin contract identity, extend delivery\nc1cfd08d Merge remote-tracking branch 'origin/main' into codex/g5-project-recipes",
+      "previous": "db8647ea059c103fd17b8640c927182b663603fd",
+      "evidencePath": "reports/project-recipes/wave35-status.json",
+      "state": {
+        "status": {
+          "source": "PASS (102 library / 46 tools / strict / build / example / wave-35 verifier)",
+          "controlled": "PASS (two roots delivery + same-Work revision + fail-recovery + restored-store continuity; main 5 integration + 9 browser)",
+          "installed": "NOT_REACHED (no tar/ZIP built or installed)",
+          "native": "NOT_APPLICABLE (real vendor/model/native 0)",
+          "recovered": "NOT_REACHED (B/I same-Work recovery and slots are outside this block)",
+          "value": "NOT_CLAIMED"
+        },
+        "remaining": [
+          "main re-import of rebind.ts/module.ts/preview.ts/match.ts/observe.ts",
+          "D successor freeze after the integrated runtime is determined, then E installed verdict on one exact tar",
+          "A/D bundle cohort and native verification for the two HELD layers"
+        ]
+      }
+    }
+  ]
+}

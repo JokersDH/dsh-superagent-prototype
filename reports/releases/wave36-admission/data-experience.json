@@ -1,0 +1,202 @@
+{
+  "protocol": "wave36-data-experience-admission/1",
+  "date": "2026-11-17",
+  "status": "A_EXACT_ENVELOPE_AND_C_SELECTED_LOOKUP_CLOSED_NEW_C_SYNC_CURRENT_BINDING_P2",
+  "initialMain": "5860da139d72ec62b69f0683d6378cd81ed9d4fb",
+  "scope": "Read-only A/C/F wave35 acceptance with early guidance for a real main Work completion-history consumer. Unique audit output only; no task books, candidate edits, main production edits, packages or user-service operations.",
+  "fixedSources": {
+    "A": "eac2c9d812d9ddf2c630a2fcd00e4fde1ac876b2",
+    "C": "01177e1db6ac40ef053f12cbbc634a6a73752976",
+    "F": "d515a9d4ed726c3e20ab847e3d6770bf81610066"
+  },
+  "dirtyBeforeAndAfter": {
+    "A": [],
+    "C": ["pnpm-lock.yaml"],
+    "FUntrackedPreserved": [
+      "reports/releases/wave12-context/history-browser/scope-desktop.png",
+      "reports/releases/wave12-context/history-browser/scope-mobile.png",
+      "reports/releases/wave29-integration/browser/workbench-desktop.png",
+      "reports/releases/wave29-integration/browser/workbench-mobile.png",
+      "reports/releases/wave31-integration/browser/support-desktop.png",
+      "reports/releases/wave31-integration/browser/support-mobile.png"
+    ],
+    "mainExistingUntrackedPreserved": ["new-start.err", "new-start.json", "old-onnew.err", "old-onnew.json", "old-start2.json"]
+  },
+  "executed": [
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-a/packages/workflows",
+      "command": "node --test test/acceptance.case.ts test/wave33-continuation.case.ts test/wave32-persistent-two-project.case.ts",
+      "exitCode": 0,
+      "passed": 9,
+      "failed": 0,
+      "durationMs": 5275,
+      "scope": "Original canonical/per-attempt history/current separation; actual production120-row keyset50+50+20;205 large rows trimmed to187/4193837 bytes with resumable cursor; two genuinely registered controlled projects/Work/check/explicit accept; original artifact bytes and separate-PID readback after Store reopen."
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-c",
+      "command": "node --test --test-concurrency=1 packages/knowledge/test/decision-context-snapshot.case.ts packages/knowledge/test/main-personal-decision-work-confirmation.case.ts packages/context/test/history-coverage.case.ts",
+      "exitCode": 0,
+      "passed": 5,
+      "failed": 0,
+      "durationMs": 26933,
+      "scope": "Selected40-decision lookup, canonical scope/provenance/deep-freeze, source/expiry/revoke controls and new source example of synchronous guard plus original commitPrepared inside one Store UnitOfWork. Fixed local provider only; no real vendor/native.",
+      "timing": "The existing Promise.race timers keep Node alive after subtests finish; the finite session exited0 without forced termination."
+    },
+    {
+      "cwd": "/Users/hh/Desktop/joker/superagent-agent-f/apps/console",
+      "command": "node --test test/trial/*.case.ts",
+      "exitCode": 0,
+      "passed": 49,
+      "failed": 0,
+      "scope": "New Work review/history/decision rules plus inherited actual-main model configuration validation and retained context/readiness/recipe/window controls."
+    },
+    { "cwd": "/Users/hh/Desktop/joker/superagent-agent-a", "command": "./node_modules/.bin/tsc --noEmit -p packages/storage/tsconfig.json", "exitCode": 0 },
+    { "cwd": "/Users/hh/Desktop/joker/superagent-agent-a", "command": "./node_modules/.bin/tsc --noEmit -p packages/workflows/tsconfig.json", "exitCode": 0 },
+    { "cwd": "/Users/hh/Desktop/joker/superagent-agent-c", "command": "./node_modules/.bin/tsc --noEmit -p packages/context/tsconfig.json", "exitCode": 0 },
+    { "cwd": "/Users/hh/Desktop/joker/superagent-agent-c", "command": "./node_modules/.bin/tsc --noEmit -p packages/knowledge/tsconfig.json", "exitCode": 0 },
+    { "cwd": "/Users/hh/Desktop/joker/superagent-agent-f", "command": "./node_modules/.bin/tsc --noEmit -p apps/console/tsconfig.json", "exitCode": 0 },
+    {
+      "command": "Inline Node: actual A ProductStore and completionHistory, exact final response boundary using one registered attempt",
+      "exitCode": 0,
+      "status": "PASS_OLD_FINAL_ENVELOPE_ONE_BYTE_CONTROL",
+      "result": {
+        "exact": { "status": "ok", "bytes": 4194304, "maxBytes": 4194304 },
+        "plusOne": { "status": "blocked", "reason": "entry_too_large", "returned": 0, "bytes": 335 }
+      },
+      "scope": "Self-owned temporary DB and actual source reader; no network/model/process service. The previously demonstrated1-byte residue is closed rather than merely hidden by a smaller positive."
+    },
+    {
+      "command": "Inline Node: actual C governance/prepare/bind/current-sync functions, public supersession and forged binding digest",
+      "exitCode": 1,
+      "status": "FAIL_SYNC_SUPERSEDED_AND_BINDING_DIGEST_CONTROL",
+      "result": {
+        "fresh": true,
+        "oldStatus": "superseded",
+        "oldVersion": 1,
+        "asyncCurrent": false,
+        "syncCurrent": true,
+        "forgedDigestCurrent": true
+      },
+      "scope": "Pure governed explicit decisions using the declared DecisionRecord reader, not a private SQL mutation or an inactive-only fixture. No real model/network/native, signal or user state."
+    }
+  ],
+  "previousFindingsClosed": [
+    {
+      "id": "A35-FINAL-ENCODED-ENVELOPE-NOT-FULLY-COUNTED",
+      "status": "CLOSED_FOR_EXACT_FINAL_ENVELOPE",
+      "file": "packages/storage/src/workflows.ts",
+      "implementation": "makePage assembles the actual final response including status/reason/cursor/coverage and omittedUnclassifiedReviews, then trims against its encoded JSON length. Exact4MiB returns ok; one more byte explicitly blocks. Large normal pages retain continuation.",
+      "scopeLimit": "Final response bounds are proven for the exact control and suite, not a hard preemptive synchronous deadline or installed/scaled-runtime admission."
+    },
+    {
+      "id": "C35-SELECTED-CURRENT-DECISION-HIDDEN-BY-CALLER-CAP",
+      "status": "CLOSED",
+      "implementation": "Explicit selected IDs are now bounded and resolved through trusted getEffective per ID before any project-window truncation. coverage.mode=selected/scan=selected_ids distinguishes this from window/complete. The new40-decision test and suite pass.",
+      "retained": "Unknown/duplicate/foreign selection, selected count over max and normal incomplete/expiry/source controls remain explicit."
+    },
+    {
+      "id": "F35-STRICTMODE-MOUNT-FLAG-NEVER-RESTORED_AND_LATE_IDENTITY_FEEDBACK",
+      "status": "MAIN_FIX_INHERITED_BY_NEW_CANDIDATE",
+      "evidence": "Candidate ModelConnectionForm/helper are byte-identical to current main: form657111b00cda29e5bfe856dd18b0f7aa24e1f603f42f4b64b9cfbb87cd2f918f and helperd2b70739edd0fb809dab71b5140b1ca449529ac998f3dd2fc38ada1fcd7f983f. Prior independent real-React/main tests retain their exact source scope;49 current pure tests and console strict pass.",
+      "scopeLimit": "No new model connection, vendor request or installed capability is inferred from save/configuration."
+    }
+  ],
+  "newFindings": [
+    {
+      "id": "C36-SYNC-BINDING-GUARD-ACCEPTS-SUPERSEDED-DECISION",
+      "priority": "P2_GOVERNANCE_GUARD_BEFORE_DEFAULT_MAIN_ADMISSION",
+      "file": "/Users/hh/Desktop/joker/superagent-agent-c/packages/knowledge/src/decision-preparation.ts",
+      "line": 185,
+      "relatedLines": [177, 189, 208],
+      "problem": "The new synchronous guard checks version/revokedAt/expiry/content/source but ignores DecisionRecord.status. Normal governance supersession leaves the old decision at version1 without revokedAt, so its record becomes superseded while this guard still returns current=true. The existing async governance/assert correctly returns false.",
+      "independentEvidence": "Fresh binding passes first. Record a legitimate replacement through DecisionGovernance.record({supersedes:old}); AssistantDecisionStore.getSync(old).status is superseded. Same current scope/source gives asyncCurrent=false but syncCurrent=true.",
+      "relatedCanonicalBindingGap": "The guard only checks that snapshotDigest is a string; changing it to64 zeroes while keeping current decision fields still returns current=true. A canonical binding should validate/recompute the represented digest before its identity is persisted or trusted.",
+      "actualConsumerCaution": "The submitted test reader casts raw store.workflows.assistant.get(id) to never, though the interface promises DecisionRecord with derived status. The host should supply the real current governed record, e.g. the original AssistantDecisionStore synchronous projection, and preserve complete effectiveness semantics rather than hiding missing status behind a cast.",
+      "requiredBehavior": "Refuse every non-effective/superseded record and verify canonical binding shape/digest; preserve current principal/Scope/source checks and fail if a required effectiveness scan cannot complete. Add a fresh positive, normal supersession, revoke and forged-digest controls inside the original create transaction.",
+      "scopeLimit": "Unmerged C data-only binding guard. No current default main HTTP authorization or native write bypass is claimed. It should remain held as a complete create-time assertion until repaired; the independent readonly A history path need not wait."
+    }
+  ],
+  "actualProgressAndEvidenceLayers": {
+    "A": {
+      "progress": "Exact final-envelope correction and omitted-unclassified count are actual production changes. Normal keyset continuation beyond50, original historical/current distinction and artifact byte readback remain real source behavior.",
+      "remaining": "Public principal/Scope/signed cursor/default UI consumption is absent at initial main5860; source status correctly keeps this partial. The reader still materializes and parses selected source rows before trimming; do not market final output bytes as proof of a hard pre-read memory/deadline limit.",
+      "artifactScope": "Original controlled two-project Work/contract/receipt/verification/artifact bytes read after Store reopen and in another Node PID. This is not packaged coordinator restart, active same-Work native recovery or real2/4 scheduler resource return."
+    },
+    "C": {
+      "progress": "Selected lookup now represents the right bounded current set. New bindDecisionSelection plus synchronous current-reader interface supports an original transaction composition, materially beyond the prior assert-call-then-raw-create example.",
+      "actualConsumer": "The new test prepares the original Application command, enters store.uow.atomic, invokes the sync binding guard, then calls original commitPrepared. It exercises a legitimate source-level transaction consumer and a revoked refusal case.",
+      "remaining": "The binding reference is still not durably attached to Work/contract and the default main create handler does not invoke it. The new supersession/canonical-digest defect also means the source guard is not ready to certify complete current selection semantics.",
+      "notDiscarded": "The passing controlled transaction and fixed snapshot/selection behavior retain their scope; one new missing effectiveness case does not mean the whole C module is only a mock."
+    },
+    "F": {
+      "progress": "The actual main model-save surface and inherited lifecycle fixes are acknowledged. New WorkHistory/DecisionReference/ReviewEvidence panels are concrete reusable presentational source with49 pure tests, but are not mounted by default main.",
+      "importantDtoBoundary": "F WorkHistoryPanel consumes existing WorkEvidenceHistory event timeline, not A completion-history/1. Its entries are at/kind/sourceRef and it requires contract/window/sourcesCapped; A rows are physical completion facts with kind/status/reason/available/omitted counts. A bare cast or protocol relabel is incorrect.",
+      "historyChoice": "Keep the existing actual ContextHistory and WorkEvidence timeline. Add a distinct completion-fact view/strict adapter if needed; do not count a pre-existing context/timeline viewer as the new A continuation consumer.",
+      "limits": "F's submitted actual-App/browser/multiwork evidence is read but not rerun here. WebKit/real200%/screen reader/installed/long-runtime tiers remain unmeasured, as its report admits."
+    },
+    "source": "Production modules and typed consumers checked at fixed candidate HEADs; initial main5860 still lacks A completion-history and C default binding integration.",
+    "controlled": "63 focused tests plus exact source probes are scoped controlled evidence. The one existing C provider fixture is local fixed-response, not a vendor model.",
+    "installed": "NOT_MEASURED; no archive, freeze, install, upgrade or user-instance action by this audit.",
+    "native": "Real model/vendor/native0, no Native.launch compatibility conclusion.",
+    "recovery": "Original data/artifact readback and source readonly recovery history remain distinct from active execution fault takeover.",
+    "value": "No productivity/review-benefit or automatic-learning claim, and no completion-score increase based on tests/components."
+  },
+  "minimalSafeMainHistoryIntegration": {
+    "recommendation": "Proceed with an actual original Work completion-history read path, independently of the held C sync assertion. Use original WorkEvidencePanel plus a distinct strict completion view, keeping the existing event timeline/context history intact.",
+    "AReferenceFiles": [
+      { "path": "packages/storage/src/workflows.ts", "bytes": 75621, "sha256": "8d55a971802ed68141230a982f4119f1073a7eb4b35bea6c9b82e7dfbdf2879e" },
+      { "path": "packages/storage/src/index.ts", "bytes": 10322, "sha256": "56ef659c386b2094bca1f9b04ea5106c241e3d3a6098faac71dcd76e3cda53e9" },
+      { "path": "packages/workflows/src/ports.ts", "bytes": 8768, "sha256": "da2418e22bb1e78d0b0146826be7578e2647d78dd5b9851fd5d5fa07c8719513" }
+    ],
+    "exactImportBoundary": "Strict minimum reader implementation is the cumulative readonly completion types/classifier/work data/new completionHistory in storage/workflows.ts with existing contract-schema imports. If bare public ports are needed, take only completion exports from storage/index and history type/method imports/exports from workflows/ports. Do not wholesale copy the unrelated content-proof export (main has no such file) or old recoverySource hunk.",
+    "sourcePort": "store.workflows.index.completionHistory({workId,projectIds:[exactProject],kind:reviews|verifications|acceptances|contracts|attempts,limit?:0..200,cursor?}) -> completion-history/1 with status ok|blocked, reason null|entry_too_large|page_budget, entries/returned/available/hasMore/nextCursor/coverage/unclassifiedReviews/omittedUnclassifiedReviews/limits.",
+    "mainHostRequirements": [
+      "Use the original authenticated principal/current project/Scope and original Work read/body rules before calling. Project IDs alone are not authorization.",
+      "Strict query/response DTOs, finite bounded limits and signed external cursor tied to current identity/Scope/config/Work/filter kind. Internal base64 is only a data position, never a grant.",
+      "Validate final public response bytes/progress. Blocked is explicit and need not have a cursor; ordinary more-pages require one. Keep internal count-only limit0 separate from a UI load-more request.",
+      "available is physical scanned fact/candidate count, not authentic review count. Preserve live-keyset semantics and omitted/unknown states.",
+      "Do not silently stamp current contract onto historical verification rows: the source fact projection does not carry its original contract field; use the original link/record or omit a claim that is not known. Keep original historical/current qualification separate."
+    ],
+    "suggestedStrictPublicFields": {
+      "header": "Independent protocol such as work-completion-history/1, workId, observedAt, kind, live-keyset marker, status/reason, returned/available, hasMore, externally signed nextCursor, coverage, omittedUnclassifiedReviews.",
+      "verification": "Original id/time/generation/artifactDigest and bounded criterion-outcome summary; not raw full evidence text, command result or private host path.",
+      "acceptance": "Original id/time/generation/artifact/count and approved metadata only.",
+      "contract": "Original revision/digest for this Work; history must not become current permission.",
+      "attempt": "Only id/epoch/state/known historical contract metadata; never raw binding/resources/argv/endpoints or credentials.",
+      "review": "Classified/unclassified/no-receipt state, original references and bounded reason/currentLink as data. No boolean that implies accept/native permission."
+    },
+    "FOptionalExistingTimelineClosure": [
+      { "path": "apps/console/src/trial/work-review.ts", "bytes": 9962, "sha256": "12be773b0bb94e2a0450f32e34af87f5ff3d92d0ed9a8404f4090d06c353ed82" },
+      { "path": "apps/console/src/trial/WorkReviewPanels.tsx", "bytes": 13698, "sha256": "cbf45845a57ed4892a3ef5c56375e260c4b309fc115a5cb179d65927b768425c" }
+    ],
+    "FClosureWarning": "Only if deliberately adopting the old event-timeline presentation: direct named WorkHistoryPanel import + work-review rules + matching review CSS, preserving current Work/contract callbacks. It is not a drop-in completion DTO widget. Do not replace unrelated model/history/support barrels or duplicate the original viewers."
+  },
+  "CBindingIntegrationReference": {
+    "files": [
+      { "path": "packages/knowledge/src/decision-snapshot.ts", "bytes": 13028, "sha256": "4131a51e7b2b742c304a49e985f9e616306a1e48c8acfb2d067c583ebb5b05f6" },
+      { "path": "packages/knowledge/src/decision-preparation.ts", "bytes": 11791, "sha256": "f949c63e64dc14bfa4a9cfaf765492af1a0f15fd0b12350aaaf7ee08d4df495a" },
+      { "path": "packages/knowledge/src/governance.ts", "bytes": 13447, "sha256": "af2b09e3073ffc655f036cc6e13a677df9fe8cdddc7254d2c97028853b4130e5" },
+      { "path": "packages/knowledge/src/index.ts", "bytes": 1920, "sha256": "ab12e0c3dac7cdba6f335b2c1f10064baf668710511a572593e364ec18125a9d" }
+    ],
+    "ports": "bindDecisionSelection -> decision-selection-binding/1 {projectId,boundAt,authorization:none,snapshotDigest,decisions}; assertDecisionSelectionBindingCurrentSync(binding,{getDecision,sourceTextDigest},{projectId?,projectScope?,now?}) -> current/code/decisions.",
+    "safeBoundary": "Repair full effectiveness/canonical binding checks before default create-time admission. Persist the actual selected refs into original Work/contract context and invoke the synchronous guard in the same original UnitOfWork as commitPrepared; do not add a second lifecycle or treat data-only current as a permission token."
+  },
+  "preservation": {
+    "realVendorModelCalls": 0,
+    "realNativeTurns": 0,
+    "manualOrFaultSignals": 0,
+    "globalProcessOrSocketDiscovery": false,
+    "userServicesTouched": 0,
+    "persistentServicesStarted": 0,
+    "newArchiveOrPackage": false,
+    "candidateSourcesAssertionsOrLocksEdited": false,
+    "mainProductionEditedByThisAudit": false,
+    "taskBooksCreated": false,
+    "FUntrackedScreenshotsPreserved": true,
+    "allExecSessionsCompleted": true,
+    "budgetsLedgersStateProfilesTarsHistoryPreserved": true,
+    "onlyOutputFile": "reports/releases/wave36-admission/data-experience.json",
+    "completionPercentageChangedByThisAudit": false,
+    "releaseApproved": false
+  }
+}
