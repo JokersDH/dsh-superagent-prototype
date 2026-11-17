@@ -5,8 +5,8 @@
   "branch": "codex/g4-trial-operations",
   "base": "e14c9597d1df3f084b21048de5e9338f24de54c8",
   "mergedMain": "296254d8",
-  "currentH": "PENDING_COMMIT",
-  "updatedAt": "2026-11-17T03:47:35.230Z",
+  "currentH": "78b62ce3",
+  "updatedAt": "2026-11-17T03:49:40.245Z",
   "goal": {
     "wholeSubsystem": true,
     "closures": 4,
@@ -402,5 +402,6 @@
     "reports/trial-operations/wave36/successor/report.json": "f9727f2cbf118c9520e3413e89c7e647e094a420015cd962552a1c35ce8d7f0f",
     "reports/trial-operations/wave36/windows/windows.json": "172bcba0e40bd833205771609ff7d8675aa4aa905fde5fe28794d81bbc0ad5f5",
     "reports/trial-operations/wave36/cohort/cohort.json": "773a5731b45ef82ad20c34cdba73bfea5eac707d27d73b92dfe76f75bd64866c"
-  }
+  },
+  "evidenceCommit": "78b62ce3"
 }
