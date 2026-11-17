@@ -77,7 +77,9 @@ verify only
   --dto <file>                Verify a served usage-observation/1 document instead of a bundle
   --package <absolute tar>    Also inspect a release archive and name the build and any missing capability
   --install <absolute dir>    Also inspect the installation (manifest + installed files) for identity
-  --running-root <abs dir>    A process start root supplied by main/D; compared, never discovered
+  --running-root <abs dir>    A bare root string: compared only, never upgrades the evidence level
+  --start-record <abs json>   main/D original start record (entry/root/pid/uid/argv/config); the only
+                              input that can confirm the running installation
   --out <absolute path>       Write the support report to a new 0600 file instead of stdout
   --format json|markdown      Report format for verify (default json)
 
@@ -145,7 +147,7 @@ const SPECS = {
   verify: {
     input: flag(), 'max-input-bytes': flag(), 'max-records': flag(), 'max-works': flag(), 'max-pages': flag(),
     'expect-digest': flag(), dto: flag(), format: flag(), package: flag(), out: flag(), 'max-archive-bytes': flag(),
-    install: flag(), 'running-root': flag(),
+    install: flag(), 'running-root': flag(), 'start-record': flag(),
   },
   package: {
     tar: flag(), 'expect-sha256': flag(), 'expect-build': flag(), expect: flag(), 'max-archive-bytes': flag(),
@@ -402,11 +404,23 @@ async function commandVerify(options, io) {
       const runningRoot = options['running-root'] === undefined ? undefined
         : requiredString(options['running-root'], 'running-root')
       if (runningRoot !== undefined && !isAbsolute(runningRoot)) throw new UsageError('--running-root must be an absolute path')
+      if (runningRoot !== undefined && options['start-record'] !== undefined)
+        throw new UsageError('--running-root and --start-record are mutually exclusive')
+      let startRecord
+      if (options['start-record'] !== undefined) {
+        const recordPath = requiredString(options['start-record'], 'start-record')
+        if (!isAbsolute(recordPath)) throw new UsageError('--start-record must be an absolute path')
+        const record = readBundle(recordPath, DEFAULT_MAX_INPUT_BYTES).value
+        if (record === null || typeof record !== 'object' || record.source !== 'main-start-record')
+          throw new UsageError('--start-record must carry source: "main-start-record"')
+        startRecord = record
+      }
       let identity
       try {
         identity = insights.inspectRuntimeIdentity({
           installRoot,
           ...(runningRoot === undefined ? {} : { running: { root: runningRoot } }),
+          ...(startRecord === undefined ? {} : { running: startRecord }),
         })
       } catch (error) {
         if (error?.name === 'RuntimeIdentityFault') throw new UsageInsightsError('source_unavailable', error.message)
