@@ -4,9 +4,9 @@
   "branch": "codex/g3-product-acceptance",
   "base": "5860da13",
   "checkpoint": "PENDING",
-  "head": "c99475c617fc3abb8ea5c82e00a4aaa2160e14e0",
+  "head": "4b4d4089a07e10b01c9deba32f0d51c23e96bdf1",
   "worktreeDirtyAtRun": false,
-  "checkedAt": "2026-11-16T19:09:15.790Z",
+  "checkedAt": "2026-11-17T01:35:43.551Z",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -789,9 +789,10 @@
       "notes": [
         "operation contradictions, pending pre-stop question, effect/question/answer rows, registry, artifact ids and sameProject scoped 403 are rejected."
       ],
-      "result": "PASS",
+      "result": "PASS_WITH_GAPS",
       "counts": {
-        "PASS": 9
+        "PASS": 34,
+        "NOT_TESTED": 3
       },
       "cases": [
         {
@@ -838,6 +839,146 @@
           "id": "E2-MUTATE-COHORT-REGISTRY-DRIFT",
           "status": "PASS",
           "reason": null
+        },
+        {
+          "id": "E2-AUTH-AND-ORIGIN",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-CONFIGURATION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-DAILY-VERTICAL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-ARTIFACT-ROUNDTRIP",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-REPLAY-AND-CONFLICT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-SESSION-ISOLATION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-STALE-BUSINESS-REJECTION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-MACHINE-FAIL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-ONE-WRITER",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-SCOPE-AND-PROFILE-GUARDS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-CONTEXT-PROPOSALS-NOT-TESTED",
+          "status": "NOT_TESTED",
+          "reason": "The legacy record_decision command returned rejected (unsupported_capability); explicit decisions use /v1/decisions (E3-DECISION-WORKFLOW), but structured proposal confirmation remains absent."
+        },
+        {
+          "id": "E2-WORK-EVIDENCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-EVIDENCE-HISTORY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-REOPEN-PERSISTENCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-ASSISTANT-SDK-MOCK",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-CONVERSATION-CATALOG",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-VERIFICATION-RECOVERY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-VERIFICATION-FINISHED-STATES",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-ATTENTION-SIGNAL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-REVIEW-TIMING",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-ROUTE-FIXTURE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-ATTENTION-WORKBENCH",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-ROUTE-ADVICE",
+          "status": "NOT_TESTED",
+          "reason": "No route-advice producer or HTTP entry exists; the schema fixture and gate validators are prepared, and the default path remains closed."
+        },
+        {
+          "id": "E2-PROJECT-SETTINGS",
+          "status": "NOT_TESTED",
+          "reason": "Project settings GET returned 422 and POST returned 422 (unsupported_capability)."
+        },
+        {
+          "id": "E2-REPLY-DURABLE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-REPLY-UNKNOWN-DURABLE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-REPLY-MESSAGE-WINDOW",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-REPLY-BAD-ARTIFACT",
+          "status": "PASS",
+          "reason": null
         }
       ]
     },
@@ -848,9 +989,10 @@
       "notes": [
         "composite stale candidate refused; accept readiness verification-based; reopen compares ids and every byte; original-project applicability remains NOT_REACHED."
       ],
-      "result": "PASS",
+      "result": "PASS_WITH_GAPS",
       "counts": {
-        "PASS": 4
+        "PASS": 32,
+        "NOT_TESTED": 6
       },
       "cases": [
         {
@@ -872,6 +1014,176 @@
           "id": "E3-MUTATE-SAME-PROJECT-INSIGHTS-403",
           "status": "PASS",
           "reason": null
+        },
+        {
+          "id": "E3-DESKTOP-GEOMETRY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-NOTEBOOK-GEOMETRY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-MOBILE-GEOMETRY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-QUESTION-FORM",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-ACCEPT-AND-DOWNLOAD",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-OFFLINE-AND-ERROR",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-KEYBOARD-AND-SCROLL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-CONVERSATION-UI",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-VERIFICATION-RECOVERY-UI",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-ASSISTANT-SCHEMA-FIXTURES",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-ASSISTANT-DOMAIN-ADMISSION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-ASSISTANT-END-TO-END",
+          "status": "NOT_TESTED",
+          "reason": "Explicit decisions now work over HTTP (E3-DECISION-WORKFLOW); automatic context/proposal confirmation is still absent."
+        },
+        {
+          "id": "E3-REVIEW-FIXTURES",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-SEALED-COPY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-REVIEW-ACTIVITY-UI",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-REVIEW-PIPELINE",
+          "status": "NOT_TESTED",
+          "reason": "No public entry creates a review Work/Ticket/Assignment or publishes ReviewEvidence; the independent pilot preflight is BLOCKED on pricing."
+        },
+        {
+          "id": "E3-ATTENTION-INBOX",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-ATTENTION-DEADLINES",
+          "status": "NOT_TESTED",
+          "reason": "No public entry creates a question with a real decisionDeadline/expiresAt in this checkout; waiting-age and unknown-wait ordering are verified instead."
+        },
+        {
+          "id": "E3-ATTENTION-INBOX-UI",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-DECISION-WORKFLOW",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-DECISION-SOURCE-STATES",
+          "status": "NOT_TESTED",
+          "reason": "No public entry deletes/changes the source message or expires the project grant; transaction-failure injection is not exposed. These remain NOT_TESTED."
+        },
+        {
+          "id": "E3-PROPOSAL-CONTEXT-BOUNDARY",
+          "status": "NOT_TESTED",
+          "reason": "NOT_TESTED: context preview now exists, but automatic proposal confirmation and grant/revocation invalidation do not. Required inputs: proposal id/revision, source message and digest, current grant/scope/profile/contract, decision to confirm, plus context preview with project/conversation/work binding, window and invalidity. Planned negatives: unconfirmed means no execution; a failed original command leaves no half-confirmed state; an unknown response reuses the same command id; source/actor/grant/scope/profile/version drift is refused; revoke invalidates later context; cross-project isolation and reopen."
+        },
+        {
+          "id": "E3-PROPOSAL-HTTP",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-CONTEXT-GRANT-BOUNDARY",
+          "status": "NOT_TESTED",
+          "reason": "NOT_TESTED: E3-CONTEXT-PREVIEW verifies clamped budgets, omissions and basic refusals, but no public entry binds an expired grant or purpose mismatch to the read path. Required: expired grant, purpose mismatch, caller budget above the grant and negative/NaN budget must be refused before any provider read, with the effective window and truncation reported. The C composer probe shows these still fail at the library boundary, so a product pass cannot be claimed."
+        },
+        {
+          "id": "E3-PROPOSAL-UI",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-CONTEXT-PREVIEW",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-CONTEXT-USE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-CONTEXT-SSE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-CONTEXT-GUARDS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-CONTEXT-HISTORY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-CONTEXT-SOURCES",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-CONTEXT-UI",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-PERSONAL-COLD-START",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-TRIAL-WORKBENCH-UI",
+          "status": "PASS",
+          "reason": null
         }
       ]
     },
@@ -882,9 +1194,133 @@
       "notes": [
         "W33 outer phases plus instance reuse and invalid-permission policy; successor model-save surface HELD until a D-frozen package exists."
       ],
-      "result": "SEE_RUN",
-      "counts": {},
-      "cases": []
+      "result": "PASS_WITH_GAPS",
+      "counts": {
+        "PASS": 21,
+        "NOT_TESTED": 3
+      },
+      "cases": [
+        {
+          "id": "E4-COMPLETED-REPLY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-CANDIDATE-FLOW",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-BOUNDED-CYCLES",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-PORTABILITY-CHECKLIST",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-RECOVERY-READONLY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-DISTRIBUTION-PREREQUISITES",
+          "status": "NOT_TESTED",
+          "reason": "Distribution source paths absent from this checkout: none. A frozen tar.gz is published outside Git and independently accepted by E4-INSTALL-*; source-level installation and migration remain Agent D owned and are not claimed by this case."
+        },
+        {
+          "id": "E4-REAUTHORIZATION",
+          "status": "NOT_TESTED",
+          "reason": "Read-only inspect/prepare are verified (plan authorization=not_granted, commitAvailable=false, no writes, stale/foreign/commit refused). The commit path, expiry/drift/replay/rollback of a real grant, and activation of only new work are not implemented and stay NOT_TESTED."
+        },
+        {
+          "id": "E4-INSTALL-ARTIFACT-IDENTITY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-INSTALL-FIRST-RUN",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-INSTALL-CONFIG-ROOT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-INSTALL-REUSE-CONCURRENCY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-INSTALL-HOST-GUARDS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-BACKUP-RESTORE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-INSTALL-TAMPER",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-INSTALL-ROLLBACK",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-UPGRADE-ROLLBACK",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-UPGRADE-CROSS-SCHEMA",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-MULTI-STATE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-UPGRADE-FAULTS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-RECOVERY-PREFLIGHT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-B-PRODUCTION-RECOVERY",
+          "status": "NOT_TESTED",
+          "reason": "NOT_TESTED: current main product path uses ProductExecution with fixture/Codex profiles, but B's new production control candidate is not consumed by main and native execution is outside this wave. Required: actual product begin command -> Work/Ticket/effect/fact_receipts/dispatch_receipts/answers/answer_deliveries/user_questions/runtime rows, real transport/epoch counts, independent process SIGKILL, unknown no resend, and stop/answer through the existing queue. A fixture or receipt-only row is not production recovery."
+        },
+        {
+          "id": "E4-SOURCE-CONFIRM",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-SOURCE-CONFIRM-REFUSAL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-PERSONAL-RESTORED-REVIEW",
+          "status": "PASS",
+          "reason": null
+        }
+      ]
     },
     {
       "id": "E5",
@@ -893,9 +1329,63 @@
       "notes": [
         "all artifact bytes, both Works, pre-stop question, effect rows, registry, auth policy and no-provider read-back."
       ],
-      "result": "SEE_RUN",
-      "counts": {},
-      "cases": []
+      "result": "PASS_WITH_GAPS",
+      "counts": {
+        "NOT_TESTED": 2,
+        "PASS": 8
+      },
+      "cases": [
+        {
+          "id": "E5-NATIVE-CONTROL",
+          "status": "NOT_TESTED",
+          "reason": "No executed native stop/question/recovery evidence is available in this checkout."
+        },
+        {
+          "id": "E5-INSTALLED-CANDIDATES",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E5-RECOVERY-INTERRUPTION",
+          "status": "NOT_TESTED",
+          "reason": "NOT_TESTED: main has published RecoveryTargetConfiguration/preparation/material/inventory schemas and a configuration binder, but no commit/activate HTTP or composed target startup. Required inputs: source-committed activation fact, A read-only inventory, D materializer readback, main activation pointer switch, and crash replay semantics. Planned negatives: interruption before source commit, after source commit but before target preparation, during target preparation, and at pointer switch must never dispatch old queues, never grant authority from an old ended/PID/missing writer, and never duplicate authorization on response loss or restart; a backup/re-restore must not inherit executable authority. A schema or read-only prepare is not activation."
+        },
+        {
+          "id": "E5-D-OWNERSHIP-MOCKS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E5-WORKFLOW-FORMATS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E5-RESTORED-REVIEW-REFUSALS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E5-REVIEW-REUSE-CONSISTENCY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E5-STOP-FUNCTIONAL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E5-TWO-PROJECT-TEMPLATE-CREATE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E5-COHORT-UPGRADE",
+          "status": "PASS",
+          "reason": null
+        }
+      ]
     },
     {
       "id": "E6",
@@ -904,9 +1394,53 @@
       "notes": [
         "E own W32→W33 managed upgrade with binary-only rollback; D's new raw retry is recorded separately from the preserved BLOCKED history."
       ],
-      "result": "SEE_RUN",
-      "counts": {},
-      "cases": []
+      "result": "PASS_WITH_GAPS",
+      "counts": {
+        "NOT_TESTED": 3,
+        "PASS": 5
+      },
+      "cases": [
+        {
+          "id": "E6-REVIEW-PILOT",
+          "status": "NOT_TESTED",
+          "reason": "Preflight BLOCKED: adapter_missing; 0/24 turns used."
+        },
+        {
+          "id": "E6-INSTALLED-CONTEXT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E6-ARTIFACT-CURRENT-SCOPE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E6-CURRENT-MAIN-INSTALL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E6-INSTALLED-SOURCE-CONFIRM",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E6-TARGET-CONTENT-DRIFT",
+          "status": "NOT_TESTED",
+          "reason": "NOT_REACHED: the frozen package has no content-binding consumer in main; the producer-side drifted snapshot result was ok. A target-only append cannot be refused by content because no consumer compares restored content with the source subject. This is a recorded product gap for the C/A owners, not an acceptance pass."
+        },
+        {
+          "id": "E6-SOURCE-UI",
+          "status": "NOT_TESTED",
+          "reason": "NOT_REACHED: the scope-review marker exists in this package and its backend ?scopeReview=1 plain/narrow responses are measured, but the independent browser expansion of a restored message scope has not been recorded. Navigation and the trial workbench are separately browser-verified in E3-TRIAL-WORKBENCH-UI."
+        },
+        {
+          "id": "E6-RECIPE-PREVIEW",
+          "status": "PASS",
+          "reason": null
+        }
+      ]
     },
     {
       "id": "E7",
@@ -915,9 +1449,52 @@
       "notes": [
         "two explicit roots on one install, distinct identities, independent stop, doctor without secret echo; same machine/user only."
       ],
-      "result": "SEE_RUN",
-      "counts": {},
-      "cases": []
+      "result": "PASS",
+      "counts": {
+        "PASS": 8
+      },
+      "cases": [
+        {
+          "id": "E7-BACKUP-CONTEXT-REPLY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E7-OWNERSHIP-COPY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E7-OWNERSHIP-WRONG-INSTALL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E7-SECOND-ROOT-READONLY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E7-SCOPE-DIAGNOSTICS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E7-READINESS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E7-JOURNEY-CONTEXT-SOURCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E7-MULTI-INSTANCE",
+          "status": "PASS",
+          "reason": null
+        }
+      ]
     },
     {
       "id": "E8",
@@ -926,9 +1503,38 @@
       "notes": [
         "NOT_REACHED with exact owner inputs; callbacks/slots/receipt-only rows are not substitutes."
       ],
-      "result": "SEE_RUN",
-      "counts": {},
-      "cases": []
+      "result": "PASS_WITH_GAPS",
+      "counts": {
+        "PASS": 4,
+        "NOT_TESTED": 1
+      },
+      "cases": [
+        {
+          "id": "E8-SCHEMA-MIGRATION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E8-LEGACY16-MIGRATION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E8-PACKAGED-STOP-CONSISTENCY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E8-JOURNEY-STOP-REOPEN",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E8-ORIGINAL-WORK-RECOVERY",
+          "status": "NOT_TESTED",
+          "reason": "NOT_TESTED: no published main/B/I consumer rescues an original faulted Work into the original Broker/queue. Required inputs: published original attachRunnerAttempt consumer in main wired to a real recovered attempt; original Work/Ticket/Assignment/epoch/contract identities for the faulted run; B/I quarantined terminal lease and unknown-send disposition (no resend) with original command receipts; original QuestionBroker answer/check/candidate/manual-accept path for the same Work; original scheduler slot return for the 2/4 resources with full birth/identity facts. Planned negatives: an unknown native send is reconciled before any retry, never resent with a new identity; a foreign epoch/source or a late fact cannot write into the current attempt; a terminal lease cannot be re-used without a fresh original authorization; a new Work/Ticket cannot substitute for the original Work ids. A callback source, channel slot or receipt-only row is not a recovered positive; this remains an explicit gap and does not block installed/data/support work."
+        }
+      ]
     },
     {
       "id": "E9",
@@ -937,22 +1543,45 @@
       "notes": [
         "wave35-status separates legacy R1 and the W33 subset and keeps the pilot/native/value BLOCKED."
       ],
-      "result": "SEE_RUN",
-      "counts": {},
-      "cases": []
+      "result": "PASS",
+      "counts": {
+        "PASS": 4
+      },
+      "cases": [
+        {
+          "id": "E9-CONTEXT-CONCURRENCY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E9-INSTALLED-STABILITY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E9-COORDINATOR-CHANNEL-CONTRACT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E9-INSIGHTS-HTTP",
+          "status": "PASS",
+          "reason": null
+        }
+      ]
     }
   ],
   "release": {
     "schema": "product-acceptance-release/1",
-    "tier": "harness-only",
+    "tier": "controlled-product-workflow",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-16T19:09:15.805Z",
+    "checkedAt": "2026-11-17T01:35:43.572Z",
     "source": {
-      "commit": "c99475c617fc3abb8ea5c82e00a4aaa2160e14e0",
+      "commit": "4b4d4089a07e10b01c9deba32f0d51c23e96bdf1",
       "dirty": false
     },
-    "expectedSource": "c99475c617fc3abb8ea5c82e00a4aaa2160e14e0",
+    "expectedSource": "4b4d4089a07e10b01c9deba32f0d51c23e96bdf1",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -1428,6 +2057,306 @@
         "id": "E1-LIFECYCLE-IDEMPOTENT",
         "required": true,
         "status": "PASS"
+      },
+      {
+        "id": "E2-CONFIGURATION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-DAILY-VERTICAL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-ARTIFACT-ROUNDTRIP",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-WORK-EVIDENCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-EVIDENCE-HISTORY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REOPEN-PERSISTENCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REPLAY-AND-CONFLICT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-SESSION-ISOLATION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-STALE-BUSINESS-REJECTION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-MACHINE-FAIL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-ONE-WRITER",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-SCOPE-AND-PROFILE-GUARDS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-AUTH-AND-ORIGIN",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-ASSISTANT-SDK-MOCK",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-CONVERSATION-CATALOG",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-ATTENTION-SIGNAL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REVIEW-TIMING",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-ROUTE-FIXTURE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-REVIEW-FIXTURES",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-SEALED-COPY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-REVIEW-ACTIVITY-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-ATTENTION-INBOX",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-ATTENTION-INBOX-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-DECISION-WORKFLOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-PROPOSAL-HTTP",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-PROPOSAL-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONTEXT-PREVIEW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONTEXT-USE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONTEXT-SSE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONTEXT-GUARDS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-CANDIDATE-FLOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONTEXT-HISTORY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONTEXT-SOURCES",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONTEXT-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-SOURCE-CONFIRM",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-SOURCE-CONFIRM-REFUSAL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-COMPLETED-REPLY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REPLY-DURABLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REPLY-UNKNOWN-DURABLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REPLY-MESSAGE-WINDOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REPLY-BAD-ARTIFACT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E8-SCHEMA-MIGRATION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E8-LEGACY16-MIGRATION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E9-CONTEXT-CONCURRENCY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-DESKTOP-GEOMETRY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-NOTEBOOK-GEOMETRY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-MOBILE-GEOMETRY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-QUESTION-FORM",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-ACCEPT-AND-DOWNLOAD",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-ASSISTANT-SCHEMA-FIXTURES",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONVERSATION-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-VERIFICATION-RECOVERY-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-OFFLINE-AND-ERROR",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-KEYBOARD-AND-SCROLL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-BOUNDED-CYCLES",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-PORTABILITY-CHECKLIST",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-RECOVERY-PREFLIGHT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-RECOVERY-READONLY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-VERIFICATION-RECOVERY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-VERIFICATION-FINISHED-STATES",
+        "required": true,
+        "status": "PASS"
       }
     ],
     "failures": [],
@@ -1437,11 +2366,32 @@
       "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability; there is no allow-gap switch."
     ]
   },
-  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T19-08-57-315Z",
+  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z",
   "evidence": {
-    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T19-08-57-315Z/report.json",
-    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T19-08-57-315Z/release.json",
-    "screenshots": [],
+    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/report.json",
+    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/release.json",
+    "screenshots": [
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/desktop-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/notebook-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/mobile-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/mobile-navigation.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/mobile-detail.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/desktop-delivered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/desktop-error.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/desktop-offline.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/desktop-keyboard.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/mobile-conversations.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/desktop-verification-blocked.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/desktop-verification-recovered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/desktop-review-activity.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/mobile-attention-inbox.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/proposal-preview-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/proposal-preview-notebook.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/proposal-preview-mobile.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/context-confirm-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/context-confirm-mobile.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/context-history-mobile.png"
+    ],
     "matrix": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/release-matrix.json",
     "executionStatus": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/execution-status.json",
     "wave09Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave09-status.json",
@@ -1694,7 +2644,18 @@
       ]
     }
   ],
-  "externalBlockers": [],
+  "externalBlockers": [
+    {
+      "owner": "B",
+      "code": "production_control_not_consumed",
+      "detail": "NOT_TESTED: current main product path uses ProductExecution with fixture/Codex profiles, but B's new production control candidate is not consumed by main and native execution is outside this wave. Required: actual product begin command -> Work/Ticket/effect/fact_receipts/dispatch_receipts/answers/answer_deliveries/user_questions/runtime rows, real transport/epoch counts, independent process SIGKILL, unknown no resend, and stop/answer through the existing queue. A fixture or receipt-only row is not production recovery."
+    },
+    {
+      "owner": "main",
+      "code": "recovery_activation_missing",
+      "detail": "NOT_TESTED: main has published RecoveryTargetConfiguration/preparation/material/inventory schemas and a configuration binder, but no commit/activate HTTP or composed target startup. Required inputs: source-committed activation fact, A read-only inventory, D materializer readback, main activation pointer switch, and crash replay semantics. Planned negatives: interruption before source commit, after source commit but before target preparation, during target preparation, and at pointer switch must never dispatch old queues, never grant authority from an old ended/PID/missing writer, and never duplicate authorization on response loss or restart; a backup/re-restore must not inherit executable authority. A schema or read-only prepare is not activation."
+    }
+  ],
   "next": [
     "D: bind the single install instance record to its exact data root and make a stop aimed at another state refuse without signalling that state's launcher/API; then E can measure launcher-dead/API-alive and PID/start reuse windows.",
     "C/main: publish automatic proposal/context confirmation, the context-use send path (explicit selection, revalidation, same-transaction binding/receipt, no auto-resend, source audit) and recovery activation; E then converts E5-CONTEXT-USE and E5-RECOVERY-INTERRUPTION from NOT_TESTED.",

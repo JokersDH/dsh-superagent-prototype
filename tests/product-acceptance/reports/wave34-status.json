@@ -4,9 +4,9 @@
   "branch": "codex/g3-product-acceptance",
   "base": "5860da13",
   "checkpoint": "PENDING",
-  "head": "c99475c617fc3abb8ea5c82e00a4aaa2160e14e0",
+  "head": "4b4d4089a07e10b01c9deba32f0d51c23e96bdf1",
   "worktreeDirtyAtRun": false,
-  "checkedAt": "2026-11-16T19:09:15.790Z",
+  "checkedAt": "2026-11-17T01:35:43.551Z",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -789,9 +789,10 @@
       "notes": [
         "operation contradictions, pending pre-stop question, effect/question/answer rows, registry, artifact ids and sameProject scoped 403 are rejected."
       ],
-      "result": "PASS",
+      "result": "PASS_WITH_GAPS",
       "counts": {
-        "PASS": 9
+        "PASS": 34,
+        "NOT_TESTED": 3
       },
       "cases": [
         {
@@ -838,6 +839,146 @@
           "id": "E2-MUTATE-COHORT-REGISTRY-DRIFT",
           "status": "PASS",
           "reason": null
+        },
+        {
+          "id": "E2-AUTH-AND-ORIGIN",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-CONFIGURATION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-DAILY-VERTICAL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-ARTIFACT-ROUNDTRIP",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-REPLAY-AND-CONFLICT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-SESSION-ISOLATION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-STALE-BUSINESS-REJECTION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-MACHINE-FAIL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-ONE-WRITER",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-SCOPE-AND-PROFILE-GUARDS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-CONTEXT-PROPOSALS-NOT-TESTED",
+          "status": "NOT_TESTED",
+          "reason": "The legacy record_decision command returned rejected (unsupported_capability); explicit decisions use /v1/decisions (E3-DECISION-WORKFLOW), but structured proposal confirmation remains absent."
+        },
+        {
+          "id": "E2-WORK-EVIDENCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-EVIDENCE-HISTORY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-REOPEN-PERSISTENCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-ASSISTANT-SDK-MOCK",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-CONVERSATION-CATALOG",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-VERIFICATION-RECOVERY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-VERIFICATION-FINISHED-STATES",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-ATTENTION-SIGNAL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-REVIEW-TIMING",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-ROUTE-FIXTURE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-ATTENTION-WORKBENCH",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-ROUTE-ADVICE",
+          "status": "NOT_TESTED",
+          "reason": "No route-advice producer or HTTP entry exists; the schema fixture and gate validators are prepared, and the default path remains closed."
+        },
+        {
+          "id": "E2-PROJECT-SETTINGS",
+          "status": "NOT_TESTED",
+          "reason": "Project settings GET returned 422 and POST returned 422 (unsupported_capability)."
+        },
+        {
+          "id": "E2-REPLY-DURABLE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-REPLY-UNKNOWN-DURABLE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-REPLY-MESSAGE-WINDOW",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E2-REPLY-BAD-ARTIFACT",
+          "status": "PASS",
+          "reason": null
         }
       ]
     },
@@ -848,9 +989,10 @@
       "notes": [
         "composite stale candidate refused; accept readiness verification-based; reopen compares ids and every byte; original-project applicability remains NOT_REACHED."
       ],
-      "result": "PASS",
+      "result": "PASS_WITH_GAPS",
       "counts": {
-        "PASS": 4
+        "PASS": 32,
+        "NOT_TESTED": 6
       },
       "cases": [
         {
@@ -872,6 +1014,176 @@
           "id": "E3-MUTATE-SAME-PROJECT-INSIGHTS-403",
           "status": "PASS",
           "reason": null
+        },
+        {
+          "id": "E3-DESKTOP-GEOMETRY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-NOTEBOOK-GEOMETRY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-MOBILE-GEOMETRY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-QUESTION-FORM",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-ACCEPT-AND-DOWNLOAD",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-OFFLINE-AND-ERROR",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-KEYBOARD-AND-SCROLL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-CONVERSATION-UI",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-VERIFICATION-RECOVERY-UI",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-ASSISTANT-SCHEMA-FIXTURES",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-ASSISTANT-DOMAIN-ADMISSION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-ASSISTANT-END-TO-END",
+          "status": "NOT_TESTED",
+          "reason": "Explicit decisions now work over HTTP (E3-DECISION-WORKFLOW); automatic context/proposal confirmation is still absent."
+        },
+        {
+          "id": "E3-REVIEW-FIXTURES",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-SEALED-COPY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-REVIEW-ACTIVITY-UI",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-REVIEW-PIPELINE",
+          "status": "NOT_TESTED",
+          "reason": "No public entry creates a review Work/Ticket/Assignment or publishes ReviewEvidence; the independent pilot preflight is BLOCKED on pricing."
+        },
+        {
+          "id": "E3-ATTENTION-INBOX",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-ATTENTION-DEADLINES",
+          "status": "NOT_TESTED",
+          "reason": "No public entry creates a question with a real decisionDeadline/expiresAt in this checkout; waiting-age and unknown-wait ordering are verified instead."
+        },
+        {
+          "id": "E3-ATTENTION-INBOX-UI",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-DECISION-WORKFLOW",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-DECISION-SOURCE-STATES",
+          "status": "NOT_TESTED",
+          "reason": "No public entry deletes/changes the source message or expires the project grant; transaction-failure injection is not exposed. These remain NOT_TESTED."
+        },
+        {
+          "id": "E3-PROPOSAL-CONTEXT-BOUNDARY",
+          "status": "NOT_TESTED",
+          "reason": "NOT_TESTED: context preview now exists, but automatic proposal confirmation and grant/revocation invalidation do not. Required inputs: proposal id/revision, source message and digest, current grant/scope/profile/contract, decision to confirm, plus context preview with project/conversation/work binding, window and invalidity. Planned negatives: unconfirmed means no execution; a failed original command leaves no half-confirmed state; an unknown response reuses the same command id; source/actor/grant/scope/profile/version drift is refused; revoke invalidates later context; cross-project isolation and reopen."
+        },
+        {
+          "id": "E3-PROPOSAL-HTTP",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-CONTEXT-GRANT-BOUNDARY",
+          "status": "NOT_TESTED",
+          "reason": "NOT_TESTED: E3-CONTEXT-PREVIEW verifies clamped budgets, omissions and basic refusals, but no public entry binds an expired grant or purpose mismatch to the read path. Required: expired grant, purpose mismatch, caller budget above the grant and negative/NaN budget must be refused before any provider read, with the effective window and truncation reported. The C composer probe shows these still fail at the library boundary, so a product pass cannot be claimed."
+        },
+        {
+          "id": "E3-PROPOSAL-UI",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-CONTEXT-PREVIEW",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-CONTEXT-USE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-CONTEXT-SSE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-CONTEXT-GUARDS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-CONTEXT-HISTORY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-CONTEXT-SOURCES",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-CONTEXT-UI",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-PERSONAL-COLD-START",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E3-TRIAL-WORKBENCH-UI",
+          "status": "PASS",
+          "reason": null
         }
       ]
     },
@@ -882,9 +1194,133 @@
       "notes": [
         "W33 outer phases plus instance reuse and invalid-permission policy; successor model-save surface HELD until a D-frozen package exists."
       ],
-      "result": "SEE_RUN",
-      "counts": {},
-      "cases": []
+      "result": "PASS_WITH_GAPS",
+      "counts": {
+        "PASS": 21,
+        "NOT_TESTED": 3
+      },
+      "cases": [
+        {
+          "id": "E4-COMPLETED-REPLY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-CANDIDATE-FLOW",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-BOUNDED-CYCLES",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-PORTABILITY-CHECKLIST",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-RECOVERY-READONLY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-DISTRIBUTION-PREREQUISITES",
+          "status": "NOT_TESTED",
+          "reason": "Distribution source paths absent from this checkout: none. A frozen tar.gz is published outside Git and independently accepted by E4-INSTALL-*; source-level installation and migration remain Agent D owned and are not claimed by this case."
+        },
+        {
+          "id": "E4-REAUTHORIZATION",
+          "status": "NOT_TESTED",
+          "reason": "Read-only inspect/prepare are verified (plan authorization=not_granted, commitAvailable=false, no writes, stale/foreign/commit refused). The commit path, expiry/drift/replay/rollback of a real grant, and activation of only new work are not implemented and stay NOT_TESTED."
+        },
+        {
+          "id": "E4-INSTALL-ARTIFACT-IDENTITY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-INSTALL-FIRST-RUN",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-INSTALL-CONFIG-ROOT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-INSTALL-REUSE-CONCURRENCY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-INSTALL-HOST-GUARDS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-BACKUP-RESTORE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-INSTALL-TAMPER",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-INSTALL-ROLLBACK",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-UPGRADE-ROLLBACK",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-UPGRADE-CROSS-SCHEMA",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-MULTI-STATE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-UPGRADE-FAULTS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-RECOVERY-PREFLIGHT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-B-PRODUCTION-RECOVERY",
+          "status": "NOT_TESTED",
+          "reason": "NOT_TESTED: current main product path uses ProductExecution with fixture/Codex profiles, but B's new production control candidate is not consumed by main and native execution is outside this wave. Required: actual product begin command -> Work/Ticket/effect/fact_receipts/dispatch_receipts/answers/answer_deliveries/user_questions/runtime rows, real transport/epoch counts, independent process SIGKILL, unknown no resend, and stop/answer through the existing queue. A fixture or receipt-only row is not production recovery."
+        },
+        {
+          "id": "E4-SOURCE-CONFIRM",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-SOURCE-CONFIRM-REFUSAL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E4-PERSONAL-RESTORED-REVIEW",
+          "status": "PASS",
+          "reason": null
+        }
+      ]
     },
     {
       "id": "E5",
@@ -893,9 +1329,63 @@
       "notes": [
         "all artifact bytes, both Works, pre-stop question, effect rows, registry, auth policy and no-provider read-back."
       ],
-      "result": "SEE_RUN",
-      "counts": {},
-      "cases": []
+      "result": "PASS_WITH_GAPS",
+      "counts": {
+        "NOT_TESTED": 2,
+        "PASS": 8
+      },
+      "cases": [
+        {
+          "id": "E5-NATIVE-CONTROL",
+          "status": "NOT_TESTED",
+          "reason": "No executed native stop/question/recovery evidence is available in this checkout."
+        },
+        {
+          "id": "E5-INSTALLED-CANDIDATES",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E5-RECOVERY-INTERRUPTION",
+          "status": "NOT_TESTED",
+          "reason": "NOT_TESTED: main has published RecoveryTargetConfiguration/preparation/material/inventory schemas and a configuration binder, but no commit/activate HTTP or composed target startup. Required inputs: source-committed activation fact, A read-only inventory, D materializer readback, main activation pointer switch, and crash replay semantics. Planned negatives: interruption before source commit, after source commit but before target preparation, during target preparation, and at pointer switch must never dispatch old queues, never grant authority from an old ended/PID/missing writer, and never duplicate authorization on response loss or restart; a backup/re-restore must not inherit executable authority. A schema or read-only prepare is not activation."
+        },
+        {
+          "id": "E5-D-OWNERSHIP-MOCKS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E5-WORKFLOW-FORMATS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E5-RESTORED-REVIEW-REFUSALS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E5-REVIEW-REUSE-CONSISTENCY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E5-STOP-FUNCTIONAL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E5-TWO-PROJECT-TEMPLATE-CREATE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E5-COHORT-UPGRADE",
+          "status": "PASS",
+          "reason": null
+        }
+      ]
     },
     {
       "id": "E6",
@@ -904,9 +1394,53 @@
       "notes": [
         "E own W32→W33 managed upgrade with binary-only rollback; D's new raw retry is recorded separately from the preserved BLOCKED history."
       ],
-      "result": "SEE_RUN",
-      "counts": {},
-      "cases": []
+      "result": "PASS_WITH_GAPS",
+      "counts": {
+        "NOT_TESTED": 3,
+        "PASS": 5
+      },
+      "cases": [
+        {
+          "id": "E6-REVIEW-PILOT",
+          "status": "NOT_TESTED",
+          "reason": "Preflight BLOCKED: adapter_missing; 0/24 turns used."
+        },
+        {
+          "id": "E6-INSTALLED-CONTEXT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E6-ARTIFACT-CURRENT-SCOPE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E6-CURRENT-MAIN-INSTALL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E6-INSTALLED-SOURCE-CONFIRM",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E6-TARGET-CONTENT-DRIFT",
+          "status": "NOT_TESTED",
+          "reason": "NOT_REACHED: the frozen package has no content-binding consumer in main; the producer-side drifted snapshot result was ok. A target-only append cannot be refused by content because no consumer compares restored content with the source subject. This is a recorded product gap for the C/A owners, not an acceptance pass."
+        },
+        {
+          "id": "E6-SOURCE-UI",
+          "status": "NOT_TESTED",
+          "reason": "NOT_REACHED: the scope-review marker exists in this package and its backend ?scopeReview=1 plain/narrow responses are measured, but the independent browser expansion of a restored message scope has not been recorded. Navigation and the trial workbench are separately browser-verified in E3-TRIAL-WORKBENCH-UI."
+        },
+        {
+          "id": "E6-RECIPE-PREVIEW",
+          "status": "PASS",
+          "reason": null
+        }
+      ]
     },
     {
       "id": "E7",
@@ -915,9 +1449,52 @@
       "notes": [
         "two explicit roots on one install, distinct identities, independent stop, doctor without secret echo; same machine/user only."
       ],
-      "result": "SEE_RUN",
-      "counts": {},
-      "cases": []
+      "result": "PASS",
+      "counts": {
+        "PASS": 8
+      },
+      "cases": [
+        {
+          "id": "E7-BACKUP-CONTEXT-REPLY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E7-OWNERSHIP-COPY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E7-OWNERSHIP-WRONG-INSTALL",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E7-SECOND-ROOT-READONLY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E7-SCOPE-DIAGNOSTICS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E7-READINESS",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E7-JOURNEY-CONTEXT-SOURCE",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E7-MULTI-INSTANCE",
+          "status": "PASS",
+          "reason": null
+        }
+      ]
     },
     {
       "id": "E8",
@@ -926,9 +1503,38 @@
       "notes": [
         "NOT_REACHED with exact owner inputs; callbacks/slots/receipt-only rows are not substitutes."
       ],
-      "result": "SEE_RUN",
-      "counts": {},
-      "cases": []
+      "result": "PASS_WITH_GAPS",
+      "counts": {
+        "PASS": 4,
+        "NOT_TESTED": 1
+      },
+      "cases": [
+        {
+          "id": "E8-SCHEMA-MIGRATION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E8-LEGACY16-MIGRATION",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E8-PACKAGED-STOP-CONSISTENCY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E8-JOURNEY-STOP-REOPEN",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E8-ORIGINAL-WORK-RECOVERY",
+          "status": "NOT_TESTED",
+          "reason": "NOT_TESTED: no published main/B/I consumer rescues an original faulted Work into the original Broker/queue. Required inputs: published original attachRunnerAttempt consumer in main wired to a real recovered attempt; original Work/Ticket/Assignment/epoch/contract identities for the faulted run; B/I quarantined terminal lease and unknown-send disposition (no resend) with original command receipts; original QuestionBroker answer/check/candidate/manual-accept path for the same Work; original scheduler slot return for the 2/4 resources with full birth/identity facts. Planned negatives: an unknown native send is reconciled before any retry, never resent with a new identity; a foreign epoch/source or a late fact cannot write into the current attempt; a terminal lease cannot be re-used without a fresh original authorization; a new Work/Ticket cannot substitute for the original Work ids. A callback source, channel slot or receipt-only row is not a recovered positive; this remains an explicit gap and does not block installed/data/support work."
+        }
+      ]
     },
     {
       "id": "E9",
@@ -937,22 +1543,45 @@
       "notes": [
         "wave35-status separates legacy R1 and the W33 subset and keeps the pilot/native/value BLOCKED."
       ],
-      "result": "SEE_RUN",
-      "counts": {},
-      "cases": []
+      "result": "PASS",
+      "counts": {
+        "PASS": 4
+      },
+      "cases": [
+        {
+          "id": "E9-CONTEXT-CONCURRENCY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E9-INSTALLED-STABILITY",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E9-COORDINATOR-CHANNEL-CONTRACT",
+          "status": "PASS",
+          "reason": null
+        },
+        {
+          "id": "E9-INSIGHTS-HTTP",
+          "status": "PASS",
+          "reason": null
+        }
+      ]
     }
   ],
   "release": {
     "schema": "product-acceptance-release/1",
-    "tier": "harness-only",
+    "tier": "controlled-product-workflow",
     "status": "PASS",
     "ok": true,
-    "checkedAt": "2026-11-16T19:09:15.805Z",
+    "checkedAt": "2026-11-17T01:35:43.572Z",
     "source": {
-      "commit": "c99475c617fc3abb8ea5c82e00a4aaa2160e14e0",
+      "commit": "4b4d4089a07e10b01c9deba32f0d51c23e96bdf1",
       "dirty": false
     },
-    "expectedSource": "c99475c617fc3abb8ea5c82e00a4aaa2160e14e0",
+    "expectedSource": "4b4d4089a07e10b01c9deba32f0d51c23e96bdf1",
     "requirements": [
       {
         "id": "E1-GATE-CONTROL",
@@ -1428,6 +2057,306 @@
         "id": "E1-LIFECYCLE-IDEMPOTENT",
         "required": true,
         "status": "PASS"
+      },
+      {
+        "id": "E2-CONFIGURATION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-DAILY-VERTICAL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-ARTIFACT-ROUNDTRIP",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-WORK-EVIDENCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-EVIDENCE-HISTORY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REOPEN-PERSISTENCE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REPLAY-AND-CONFLICT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-SESSION-ISOLATION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-STALE-BUSINESS-REJECTION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-MACHINE-FAIL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-ONE-WRITER",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-SCOPE-AND-PROFILE-GUARDS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-AUTH-AND-ORIGIN",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-ASSISTANT-SDK-MOCK",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-CONVERSATION-CATALOG",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-ATTENTION-SIGNAL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REVIEW-TIMING",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-ROUTE-FIXTURE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-REVIEW-FIXTURES",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-SEALED-COPY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-REVIEW-ACTIVITY-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-ATTENTION-INBOX",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-ATTENTION-INBOX-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-DECISION-WORKFLOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-PROPOSAL-HTTP",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-PROPOSAL-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONTEXT-PREVIEW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONTEXT-USE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONTEXT-SSE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONTEXT-GUARDS",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-CANDIDATE-FLOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONTEXT-HISTORY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONTEXT-SOURCES",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONTEXT-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-SOURCE-CONFIRM",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-SOURCE-CONFIRM-REFUSAL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-COMPLETED-REPLY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REPLY-DURABLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REPLY-UNKNOWN-DURABLE",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REPLY-MESSAGE-WINDOW",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-REPLY-BAD-ARTIFACT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E8-SCHEMA-MIGRATION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E8-LEGACY16-MIGRATION",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E9-CONTEXT-CONCURRENCY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-DESKTOP-GEOMETRY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-NOTEBOOK-GEOMETRY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-MOBILE-GEOMETRY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-QUESTION-FORM",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-ACCEPT-AND-DOWNLOAD",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-ASSISTANT-SCHEMA-FIXTURES",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-CONVERSATION-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-VERIFICATION-RECOVERY-UI",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-OFFLINE-AND-ERROR",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E3-KEYBOARD-AND-SCROLL",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-BOUNDED-CYCLES",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-PORTABILITY-CHECKLIST",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-RECOVERY-PREFLIGHT",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E4-RECOVERY-READONLY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-VERIFICATION-RECOVERY",
+        "required": true,
+        "status": "PASS"
+      },
+      {
+        "id": "E2-VERIFICATION-FINISHED-STATES",
+        "required": true,
+        "status": "PASS"
       }
     ],
     "failures": [],
@@ -1437,11 +2366,32 @@
       "A NOT_TESTED or BLOCKED gap is honest only when the release claim excludes that capability; there is no allow-gap switch."
     ]
   },
-  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T19-08-57-315Z",
+  "runDirectory": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z",
   "evidence": {
-    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T19-08-57-315Z/report.json",
-    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T19-08-57-315Z/release.json",
-    "screenshots": [],
+    "report": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/report.json",
+    "release": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/release.json",
+    "screenshots": [
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/desktop-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/notebook-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/mobile-main.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/mobile-navigation.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/mobile-detail.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/desktop-delivered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/desktop-error.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/desktop-offline.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/desktop-keyboard.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/mobile-conversations.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/desktop-verification-blocked.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/desktop-verification-recovered.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/desktop-review-activity.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/mobile-attention-inbox.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/proposal-preview-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/proposal-preview-notebook.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/proposal-preview-mobile.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/context-confirm-desktop.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/context-confirm-mobile.png",
+      "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z/screenshots/context-history-mobile.png"
+    ],
     "matrix": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/release-matrix.json",
     "executionStatus": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/execution-status.json",
     "wave09Status": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/wave09-status.json",
@@ -1694,7 +2644,18 @@
       ]
     }
   ],
-  "externalBlockers": [],
+  "externalBlockers": [
+    {
+      "owner": "B",
+      "code": "production_control_not_consumed",
+      "detail": "NOT_TESTED: current main product path uses ProductExecution with fixture/Codex profiles, but B's new production control candidate is not consumed by main and native execution is outside this wave. Required: actual product begin command -> Work/Ticket/effect/fact_receipts/dispatch_receipts/answers/answer_deliveries/user_questions/runtime rows, real transport/epoch counts, independent process SIGKILL, unknown no resend, and stop/answer through the existing queue. A fixture or receipt-only row is not production recovery."
+    },
+    {
+      "owner": "main",
+      "code": "recovery_activation_missing",
+      "detail": "NOT_TESTED: main has published RecoveryTargetConfiguration/preparation/material/inventory schemas and a configuration binder, but no commit/activate HTTP or composed target startup. Required inputs: source-committed activation fact, A read-only inventory, D materializer readback, main activation pointer switch, and crash replay semantics. Planned negatives: interruption before source commit, after source commit but before target preparation, during target preparation, and at pointer switch must never dispatch old queues, never grant authority from an old ended/PID/missing writer, and never duplicate authorization on response loss or restart; a backup/re-restore must not inherit executable authority. A schema or read-only prepare is not activation."
+    }
+  ],
   "next": [
     "D: bind the single install instance record to its exact data root and make a stop aimed at another state refuse without signalling that state's launcher/API; then E can measure launcher-dead/API-alive and PID/start reuse windows.",
     "C/main: publish automatic proposal/context confirmation, the context-use send path (explicit selection, revalidation, same-transaction binding/receipt, no auto-resend, source audit) and recovery activation; E then converts E5-CONTEXT-USE and E5-RECOVERY-INTERRUPTION from NOT_TESTED.",
@@ -1705,10 +2666,62 @@
   "taskPackage": "agent-tasks/product-wave-34/README.zh-CN.md",
   "supersedes": "wave33-status.json",
   "subject": {
-    "target": null,
-    "baseline": null,
-    "control": null,
-    "outerZip": null
+    "target": {
+      "role": "target",
+      "name": "wave30-target-8296720",
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave30-target/wave30-target-8296720.tar.gz",
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "tarBytes": 20481470,
+      "installManifestSha256": "b6d907d626094ce6f73b91f8bd0869e1383c545dd6dfc2b30ad180b9c74dfa43",
+      "releaseManifestSha256": "308980db8b07a8a0d28d51aa31a02d0b6ea6b79a632564b467fc6c9a56688187",
+      "closureDigest": "3fa4b84a05421d67ba870caf5da6249deb45272d47fd0a2425f630e9a01b53c1",
+      "files": 6849,
+      "buildId": "8296720d8a25f38c",
+      "sourceCommit": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "sourceDirty": false,
+      "productSchema": 18,
+      "platform": "darwin",
+      "arch": "arm64",
+      "node": "24.21.0",
+      "abi": "137"
+    },
+    "baseline": {
+      "buildId": "2d94a7c31ef97b57",
+      "schema": 18,
+      "tarSha256": "daee1a94b43156cec659f7df2a3b08e1ecb89b645fde1ea81c35a81d75b47d7a",
+      "source": "1fbaf940d426fa34ff6289304e073b9159586ed9"
+    },
+    "control": {
+      "source": "97cace735c6cdbdd7ecdade05132371da1a5273c",
+      "buildId": "8a5a0a85631f22ca",
+      "tarSha256": "6b6517c441e56405ac9929ffbd7b3e3c8149b217c5ea736a2d9a447b4b4546c3",
+      "upgradeSha256": "fa4b4ed348fccbe00b22af348c8b5513a19662f3fc99ce3bc063a28b8e96742a",
+      "pass": 2,
+      "fail": 3,
+      "failures": [
+        "same_uid_child_not_owned",
+        "child_not_signalled",
+        "unknown_child_blocks_proof"
+      ],
+      "proof": {
+        "proven": true,
+        "stopped": [
+          25128,
+          25129
+        ],
+        "unknownLive": []
+      }
+    },
+    "outerZip": {
+      "source": "048f0184606202b0b39e7426b7747f3fe57541c1",
+      "buildId": "f880e5bc9c6c1c57",
+      "schema": 18,
+      "tarSha256": "ee45c92c7c5a8f2caa0449572b14bf97175b0392f1fd92c6f89d7a19464604e8",
+      "tarBytes": 20547728,
+      "platform": "darwin",
+      "arch": "arm64",
+      "abi": "137"
+    }
   },
   "gateControls": {
     "recorded0edePositive": "PASS",
@@ -1774,22 +2787,22 @@
   "layers": {
     "source": "source-checkout results stay source-level and never back an installed claim",
     "fixture": "fixture+recovery_readonly second root is its own layer, not personal",
-    "ordinaryInstalled": "MISSING",
-    "installedCandidates": "MISSING",
-    "stopDetector": "MISSING",
-    "stopFunctional": "MISSING",
-    "recoveredPersonal": "MISSING",
-    "sourceUi": "MISSING",
-    "readiness": "MISSING",
-    "trialWorkbenchUi": "MISSING",
-    "functionalStop": "MISSING",
-    "insights": "MISSING",
-    "journey": "MISSING",
-    "journeyContext": "MISSING",
-    "journeyReopen": "MISSING",
-    "zipLifecycle": "MISSING",
-    "originalProjectApplicable": "MISSING",
-    "recipePreview": "MISSING",
+    "ordinaryInstalled": "PASS",
+    "installedCandidates": "PASS",
+    "stopDetector": "PASS",
+    "stopFunctional": "PASS",
+    "recoveredPersonal": "PASS",
+    "sourceUi": "NOT_TESTED",
+    "readiness": "PASS",
+    "trialWorkbenchUi": "PASS",
+    "functionalStop": "PASS",
+    "insights": "PASS",
+    "journey": "PASS",
+    "journeyContext": "PASS",
+    "journeyReopen": "PASS",
+    "zipLifecycle": "PASS",
+    "originalProjectApplicable": "NOT_TESTED",
+    "recipePreview": "PASS",
     "lifecycleControls": [
       "E1-LIFECYCLE-NO-RECORD-UNVERIFIED:PASS",
       "E1-LIFECYCLE-SET-MISMATCH:PASS",
@@ -1811,95 +2824,978 @@
     ],
     "native": "NOT_TESTED: 0 vendor/native sends; B recovery/private permission/target remain separate",
     "value": "BLOCKED: review pilot unchanged",
-    "outerZip": "MISSING",
-    "cohortRecovery": "MISSING",
+    "outerZip": "PASS",
+    "cohortRecovery": "PASS",
     "callerSafety": "PASS",
-    "cohortUpgrade": "MISSING"
+    "cohortUpgrade": "PASS"
   },
   "functional": {
-    "alphaVerdict": "FAIL",
-    "verdict": "FAIL",
-    "detector": "MISSING",
-    "functionalCase": "MISSING",
-    "evidence": null,
+    "alphaVerdict": "PASS",
+    "verdict": "PASS",
+    "detector": "PASS",
+    "functionalCase": "PASS",
+    "evidence": {
+      "subject": {
+        "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+        "buildId": "8296720d8a25f38c",
+        "schema": 18,
+        "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+        "tarBytes": 20481470,
+        "platform": "darwin",
+        "arch": "arm64",
+        "abi": "137"
+      },
+      "normal": {
+        "status": "RUNNING",
+        "mode": "personal",
+        "startupMode": "normal",
+        "health": {
+          "mode": "personal",
+          "startupMode": "normal"
+        },
+        "packageStatus": "STOPPED",
+        "packageCode": null,
+        "exit": 0,
+        "before": {
+          "present": true,
+          "mode": "personal",
+          "startupMode": "normal",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/seed-state",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/app",
+          "resources": [
+            {
+              "label": "launcher",
+              "pid": 58522,
+              "start": "Tue Nov 17 09:33:39 2026",
+              "uid": 501,
+              "parentPid": null,
+              "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/app/apps/launcher/bin/pa.mjs start --json --port 63798 --api-port 63799 --discussion-only"
+            },
+            {
+              "label": "child",
+              "pid": 58559,
+              "start": "Tue Nov 17 09:33:40 2026",
+              "uid": 501,
+              "parentPid": 58522,
+              "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/app/apps/coordinator/product/demo.ts --port 63799 --state /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/seed-state --console-origin htt"
+            }
+          ]
+        },
+        "after": [
+          {
+            "pid": 58522,
+            "expectedStart": "Tue Nov 17 09:33:39 2026",
+            "alive": false,
+            "start": null,
+            "sameIdentity": false
+          },
+          {
+            "pid": 58559,
+            "expectedStart": "Tue Nov 17 09:33:40 2026",
+            "alive": false,
+            "start": null,
+            "sameIdentity": false
+          }
+        ],
+        "recordPresent": false,
+        "recordMode": null
+      },
+      "restored": {
+        "status": "RUNNING",
+        "mode": "personal",
+        "startupMode": "recovery_readonly",
+        "health": {
+          "mode": "personal",
+          "startupMode": "recovery_readonly"
+        },
+        "packageStatus": "STOPPED",
+        "packageCode": null,
+        "exit": 0,
+        "before": {
+          "present": true,
+          "mode": "personal",
+          "startupMode": "recovery_readonly",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/restored",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/app",
+          "resources": [
+            {
+              "label": "launcher",
+              "pid": 58854,
+              "start": "Tue Nov 17 09:33:41 2026",
+              "uid": 501,
+              "parentPid": null,
+              "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/app/apps/launcher/bin/pa.mjs start --json --port 63807 --api-port 63808 --discussion-only"
+            },
+            {
+              "label": "child",
+              "pid": 58896,
+              "start": "Tue Nov 17 09:33:42 2026",
+              "uid": 501,
+              "parentPid": 58854,
+              "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/app/apps/coordinator/product/demo.ts --port 63808 --state /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/restored --console-origin http:"
+            }
+          ]
+        },
+        "after": [
+          {
+            "pid": 58854,
+            "expectedStart": "Tue Nov 17 09:33:41 2026",
+            "alive": false,
+            "start": null,
+            "sameIdentity": false
+          },
+          {
+            "pid": 58896,
+            "expectedStart": "Tue Nov 17 09:33:42 2026",
+            "alive": false,
+            "start": null,
+            "sameIdentity": false
+          }
+        ],
+        "recordPresent": false,
+        "recordMode": null
+      },
+      "resourcePolicy": "fixed pre-stop pid/start set, independently re-observed after stop",
+      "detectorCase": "E8-PACKAGED-STOP-CONSISTENCY records the refusal; this case is the product functional requirement",
+      "proofFallbackUsed": false
+    },
     "note": "A detector PASS that records a packaged-stop refusal is not the package stopping itself; installed-alpha keeps the ordinary scope and does not certify stop functional."
   },
   "scopes": {
     "workflowFormats": {
-      "status": "MISSING",
-      "capability": null,
-      "packageCapabilities": null
+      "status": "PASS",
+      "capability": "default1+explicit2",
+      "packageCapabilities": {
+        "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+        "buildId": "8296720d8a25f38c",
+        "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+        "digestSupported": true
+      }
     },
     "secondRootFixtureReadonly": {
-      "status": "MISSING",
+      "status": "PASS",
       "probeScope": "fixture+recovery_readonly"
     },
     "restoredPersonalReview": {
-      "status": "MISSING",
-      "consumerOrigin": null,
-      "healthDigest": null
+      "status": "PASS",
+      "consumerOrigin": "package",
+      "healthDigest": "5a0ad2b542840141fff74154dee8771773df77f9fbb63ffb5f48e3a70b2ead55"
     },
-    "restoredReviewRefusals": "MISSING",
+    "restoredReviewRefusals": "PASS",
     "reviewReuse": {
-      "status": "MISSING",
-      "sameFile": null,
-      "differentFile": null,
+      "status": "PASS",
+      "sameFile": "REUSED",
+      "differentFile": "BLOCKED",
       "digestSame": true
     },
     "scopeDiagnostics": {
-      "status": "MISSING",
-      "plainHttp": null,
-      "narrowHttp": null,
-      "optInProtocol": null
+      "status": "PASS",
+      "plainHttp": 200,
+      "narrowHttp": 200,
+      "optInProtocol": "context-scope-review/1"
     },
-    "sourceUi": "MISSING",
+    "sourceUi": "NOT_TESTED",
     "readiness": {
-      "status": "MISSING",
-      "normal": null,
-      "readonly": null,
-      "fixture": null
+      "status": "PASS",
+      "normal": {
+        "protocol": "trial-readiness/1",
+        "observedAt": "2026-11-17T01:33:37.342Z",
+        "configurationRevision": "a9c826f123324b2d8f1a07902775e6a1c453f4de86b467027490a903c324e84b",
+        "mode": "personal",
+        "startupMode": "normal",
+        "discussion": "configuration_present",
+        "execution": {
+          "state": "unavailable",
+          "reason": "operator_disabled"
+        },
+        "development": "blocked",
+        "projects": {
+          "development": 0,
+          "discussion": 1,
+          "dispatchable": 0
+        },
+        "profiles": {
+          "native": 1,
+          "controlled": 0,
+          "admittedNative": 0,
+          "admittedControlled": 0
+        },
+        "capabilities": {
+          "contextHistory": true,
+          "contextSources": true,
+          "decisions": true,
+          "proposals": true
+        },
+        "authorization": "none"
+      },
+      "readonly": {
+        "protocol": "trial-readiness/1",
+        "observedAt": "2026-11-17T01:33:38.419Z",
+        "configurationRevision": "ad50f6b2d9bcc4324c43e1f5f9c657e48ed7fa8043bc442602816837efc61305",
+        "mode": "personal",
+        "startupMode": "recovery_readonly",
+        "discussion": "unknown",
+        "execution": {
+          "state": "unavailable",
+          "reason": "recovery_readonly"
+        },
+        "development": "readonly",
+        "projects": {
+          "development": 1,
+          "discussion": 2,
+          "dispatchable": 0
+        },
+        "profiles": {
+          "native": 0,
+          "controlled": 4,
+          "admittedNative": 0,
+          "admittedControlled": 0
+        },
+        "capabilities": {
+          "contextHistory": true,
+          "contextSources": true,
+          "decisions": false,
+          "proposals": false
+        },
+        "authorization": "none"
+      },
+      "fixture": {
+        "protocol": "trial-readiness/1",
+        "observedAt": "2026-11-17T01:33:39.651Z",
+        "configurationRevision": "83d2a00c18fe919d4671f2916ce9baec23e44fc5cfd8f51b3ba2d241462e06af",
+        "mode": "fixture",
+        "startupMode": "normal",
+        "discussion": "configuration_present",
+        "execution": {
+          "state": "available",
+          "kind": "controlled_fixture"
+        },
+        "development": "fixture_only",
+        "projects": {
+          "development": 1,
+          "discussion": 0,
+          "dispatchable": 1
+        },
+        "profiles": {
+          "native": 0,
+          "controlled": 4,
+          "admittedNative": 0,
+          "admittedControlled": 4
+        },
+        "capabilities": {
+          "contextHistory": true,
+          "contextSources": true,
+          "decisions": true,
+          "proposals": true
+        },
+        "authorization": "none"
+      }
     },
     "trialWorkbenchUi": {
-      "status": "MISSING",
-      "actions": null,
-      "screenshots": null,
-      "bundle": null
+      "status": "PASS",
+      "actions": {
+        "model": "opened-settings",
+        "import": "opened-import-form",
+        "executor": "opened-executor",
+        "phaseOneRendered": [
+          "configure_model",
+          "import_project",
+          "inspect_executor"
+        ],
+        "conversation": "opened-conversation-draft-kept"
+      },
+      "screenshots": [
+        {
+          "path": "tests/product-acceptance/reports/wave27/browser/desktop.png",
+          "sha256": "82d8f257bf196f2536bba9930af380dea468ad5bccc28e9fc426fa01818ba68a",
+          "bytes": 124585,
+          "size": 124585
+        },
+        {
+          "path": "tests/product-acceptance/reports/wave27/browser/mobile.png",
+          "sha256": "92fd6f14c8d7b414871cb4ced2a8bd2bb765d65361614ff3ee00f16d6b0d9494",
+          "bytes": 55970,
+          "size": 55970
+        },
+        {
+          "path": "tests/product-acceptance/reports/wave27/browser/configured-conversation.png",
+          "sha256": "78c0eb1d366de861cc08c882c53d924e090ab5b0c76f40b230e0da0847a88a68",
+          "bytes": 76516,
+          "size": 76516
+        }
+      ],
+      "bundle": {
+        "entry": "install/app/apps/console/dist/assets/index-DTOhkXHZ.js",
+        "sha256": "5a70bf9fd07b0e2f3c15b9ba556f4d6abb1e05de767e8b0070b0623976265972",
+        "bytes": 658695
+      }
     },
     "twoSnapshotSameChain": {
-      "formats": "MISSING",
-      "artifactClosure": null,
-      "derived": null,
-      "targetDrift": null
+      "formats": "PASS",
+      "artifactClosure": {
+        "v1": {
+          "copied": 22,
+          "digests": [
+            {
+              "id": "ef4ac502afc7eb974dd44066dc07b93cf1f235eb25bd9e34295939123021cf8e",
+              "present": true,
+              "digest": "ef4ac502afc7eb974dd44066dc07b93cf1f235eb25bd9e34295939123021cf8e",
+              "registryDigest": "ef4ac502afc7eb974dd44066dc07b93cf1f235eb25bd9e34295939123021cf8e",
+              "match": true,
+              "bytes": 412
+            },
+            {
+              "id": "c500e19059fc98746211c452900da4c9c942d8c2119692b1388b6656fea2c031",
+              "present": true,
+              "digest": "c500e19059fc98746211c452900da4c9c942d8c2119692b1388b6656fea2c031",
+              "registryDigest": "c500e19059fc98746211c452900da4c9c942d8c2119692b1388b6656fea2c031",
+              "match": true,
+              "bytes": 234
+            },
+            {
+              "id": "752405bd6468c6f4ed8b7266598217d171f355f6bcf7295cca74eec42b3e964c",
+              "present": true,
+              "digest": "752405bd6468c6f4ed8b7266598217d171f355f6bcf7295cca74eec42b3e964c",
+              "registryDigest": "752405bd6468c6f4ed8b7266598217d171f355f6bcf7295cca74eec42b3e964c",
+              "match": true,
+              "bytes": 704
+            },
+            {
+              "id": "b0fe867ca9a3fc166db01357fc03a64bd047f6913358115b40eb79e95829ee5d",
+              "present": true,
+              "digest": "b0fe867ca9a3fc166db01357fc03a64bd047f6913358115b40eb79e95829ee5d",
+              "registryDigest": "b0fe867ca9a3fc166db01357fc03a64bd047f6913358115b40eb79e95829ee5d",
+              "match": true,
+              "bytes": 712
+            },
+            {
+              "id": "bc32eb83f1f8e5f4b3e4176e6bc8b3e5be07a901efbc1aac2b1f4019dab29cc3",
+              "present": true,
+              "digest": "bc32eb83f1f8e5f4b3e4176e6bc8b3e5be07a901efbc1aac2b1f4019dab29cc3",
+              "registryDigest": "bc32eb83f1f8e5f4b3e4176e6bc8b3e5be07a901efbc1aac2b1f4019dab29cc3",
+              "match": true,
+              "bytes": 262
+            },
+            {
+              "id": "8307a8ca474f88962e6f854f25abdb60278afb1d7753a03f0a70f6836da008ea",
+              "present": true,
+              "digest": "8307a8ca474f88962e6f854f25abdb60278afb1d7753a03f0a70f6836da008ea",
+              "registryDigest": "8307a8ca474f88962e6f854f25abdb60278afb1d7753a03f0a70f6836da008ea",
+              "match": true,
+              "bytes": 267
+            },
+            {
+              "id": "8eefb66fc881f500f31c2cd9d5d0c92fb81c374fb1afda1a436c0654f1f976e0",
+              "present": true,
+              "digest": "8eefb66fc881f500f31c2cd9d5d0c92fb81c374fb1afda1a436c0654f1f976e0",
+              "registryDigest": "8eefb66fc881f500f31c2cd9d5d0c92fb81c374fb1afda1a436c0654f1f976e0",
+              "match": true,
+              "bytes": 153
+            },
+            {
+              "id": "cf8e68fd920dfa0cb6645bae8b9145504fac0c3e9c25716329c7ed982e055fb5",
+              "present": true,
+              "digest": "cf8e68fd920dfa0cb6645bae8b9145504fac0c3e9c25716329c7ed982e055fb5",
+              "registryDigest": "cf8e68fd920dfa0cb6645bae8b9145504fac0c3e9c25716329c7ed982e055fb5",
+              "match": true,
+              "bytes": 1330
+            },
+            {
+              "id": "8c0dc20f8a90e7e34063ad8fb5305f7a65f80997db2f8b82197399ced1133a17",
+              "present": true,
+              "digest": "8c0dc20f8a90e7e34063ad8fb5305f7a65f80997db2f8b82197399ced1133a17",
+              "registryDigest": "8c0dc20f8a90e7e34063ad8fb5305f7a65f80997db2f8b82197399ced1133a17",
+              "match": true,
+              "bytes": 570
+            },
+            {
+              "id": "4e5b188ef5f7f78edfc2a791ccc3c9f5513e549ec83158b9586e5a2bca124555",
+              "present": true,
+              "digest": "4e5b188ef5f7f78edfc2a791ccc3c9f5513e549ec83158b9586e5a2bca124555",
+              "registryDigest": "4e5b188ef5f7f78edfc2a791ccc3c9f5513e549ec83158b9586e5a2bca124555",
+              "match": true,
+              "bytes": 790
+            },
+            {
+              "id": "d19eeee0dc297f8035a7ca887f03f5a84002b54c90652c0d8e7cec319dcb2777",
+              "present": true,
+              "digest": "d19eeee0dc297f8035a7ca887f03f5a84002b54c90652c0d8e7cec319dcb2777",
+              "registryDigest": "d19eeee0dc297f8035a7ca887f03f5a84002b54c90652c0d8e7cec319dcb2777",
+              "match": true,
+              "bytes": 174
+            },
+            {
+              "id": "134e7551e739b17fb58f692fcb1a8bb88ba764dc09404084b23f4c0ab0bd3ce8",
+              "present": true,
+              "digest": "134e7551e739b17fb58f692fcb1a8bb88ba764dc09404084b23f4c0ab0bd3ce8",
+              "registryDigest": "134e7551e739b17fb58f692fcb1a8bb88ba764dc09404084b23f4c0ab0bd3ce8",
+              "match": true,
+              "bytes": 187
+            },
+            {
+              "id": "2500a63888d6b614c41142b9d2817d338f1f11134992e901e8be7dad81b68f42",
+              "present": true,
+              "digest": "2500a63888d6b614c41142b9d2817d338f1f11134992e901e8be7dad81b68f42",
+              "registryDigest": "2500a63888d6b614c41142b9d2817d338f1f11134992e901e8be7dad81b68f42",
+              "match": true,
+              "bytes": 253
+            },
+            {
+              "id": "f4c8092236fe351296f4a1c9d0f9d4df747990eac545d9f7af47ee195c4d7756",
+              "present": true,
+              "digest": "f4c8092236fe351296f4a1c9d0f9d4df747990eac545d9f7af47ee195c4d7756",
+              "registryDigest": "f4c8092236fe351296f4a1c9d0f9d4df747990eac545d9f7af47ee195c4d7756",
+              "match": true,
+              "bytes": 142
+            },
+            {
+              "id": "1c097c07ef83af8da1ae956643e9fa80d7720ba8e7326636bacac9e130ecbcbb",
+              "present": true,
+              "digest": "1c097c07ef83af8da1ae956643e9fa80d7720ba8e7326636bacac9e130ecbcbb",
+              "registryDigest": "1c097c07ef83af8da1ae956643e9fa80d7720ba8e7326636bacac9e130ecbcbb",
+              "match": true,
+              "bytes": 874
+            },
+            {
+              "id": "257b55ffd61e53c84fb1653067a34c9ffb7eafee11fc0aa80bb527c5568f7dc3",
+              "present": true,
+              "digest": "257b55ffd61e53c84fb1653067a34c9ffb7eafee11fc0aa80bb527c5568f7dc3",
+              "registryDigest": "257b55ffd61e53c84fb1653067a34c9ffb7eafee11fc0aa80bb527c5568f7dc3",
+              "match": true,
+              "bytes": 234
+            },
+            {
+              "id": "4140d803f988383ccacfabfaf83cfb3d485bfde4cf495017a5b347fcdbfbfd84",
+              "present": true,
+              "digest": "4140d803f988383ccacfabfaf83cfb3d485bfde4cf495017a5b347fcdbfbfd84",
+              "registryDigest": "4140d803f988383ccacfabfaf83cfb3d485bfde4cf495017a5b347fcdbfbfd84",
+              "match": true,
+              "bytes": 1143
+            },
+            {
+              "id": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+              "present": true,
+              "digest": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+              "registryDigest": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+              "match": true,
+              "bytes": 24
+            },
+            {
+              "id": "57f2162bd14e3cc029b4cd1c23a5bbe9768b8e669db1fb878123d106fb580506",
+              "present": true,
+              "digest": "57f2162bd14e3cc029b4cd1c23a5bbe9768b8e669db1fb878123d106fb580506",
+              "registryDigest": "57f2162bd14e3cc029b4cd1c23a5bbe9768b8e669db1fb878123d106fb580506",
+              "match": true,
+              "bytes": 213
+            },
+            {
+              "id": "6d189cf0beb05fe420debc9009b051042453b70a3ab388bf9ec82555bc6179da",
+              "present": true,
+              "digest": "6d189cf0beb05fe420debc9009b051042453b70a3ab388bf9ec82555bc6179da",
+              "registryDigest": "6d189cf0beb05fe420debc9009b051042453b70a3ab388bf9ec82555bc6179da",
+              "match": true,
+              "bytes": 376
+            },
+            {
+              "id": "bd4f14aaf4789832d92b3aa1ac2efa3d10cac93534a17ed8ff4f1425a9dbe932",
+              "present": true,
+              "digest": "bd4f14aaf4789832d92b3aa1ac2efa3d10cac93534a17ed8ff4f1425a9dbe932",
+              "registryDigest": "bd4f14aaf4789832d92b3aa1ac2efa3d10cac93534a17ed8ff4f1425a9dbe932",
+              "match": true,
+              "bytes": 1615
+            },
+            {
+              "id": "1b1d9c28e230cbd6fd87f1ee8a421d70768a53df069d5f42bb1b8b742522dcd8",
+              "present": true,
+              "digest": "1b1d9c28e230cbd6fd87f1ee8a421d70768a53df069d5f42bb1b8b742522dcd8",
+              "registryDigest": "1b1d9c28e230cbd6fd87f1ee8a421d70768a53df069d5f42bb1b8b742522dcd8",
+              "match": true,
+              "bytes": 505
+            }
+          ],
+          "allMatch": true
+        },
+        "v2": {
+          "copied": 22,
+          "digests": [
+            {
+              "id": "ef4ac502afc7eb974dd44066dc07b93cf1f235eb25bd9e34295939123021cf8e",
+              "present": true,
+              "digest": "ef4ac502afc7eb974dd44066dc07b93cf1f235eb25bd9e34295939123021cf8e",
+              "registryDigest": "ef4ac502afc7eb974dd44066dc07b93cf1f235eb25bd9e34295939123021cf8e",
+              "match": true,
+              "bytes": 412
+            },
+            {
+              "id": "c500e19059fc98746211c452900da4c9c942d8c2119692b1388b6656fea2c031",
+              "present": true,
+              "digest": "c500e19059fc98746211c452900da4c9c942d8c2119692b1388b6656fea2c031",
+              "registryDigest": "c500e19059fc98746211c452900da4c9c942d8c2119692b1388b6656fea2c031",
+              "match": true,
+              "bytes": 234
+            },
+            {
+              "id": "752405bd6468c6f4ed8b7266598217d171f355f6bcf7295cca74eec42b3e964c",
+              "present": true,
+              "digest": "752405bd6468c6f4ed8b7266598217d171f355f6bcf7295cca74eec42b3e964c",
+              "registryDigest": "752405bd6468c6f4ed8b7266598217d171f355f6bcf7295cca74eec42b3e964c",
+              "match": true,
+              "bytes": 704
+            },
+            {
+              "id": "b0fe867ca9a3fc166db01357fc03a64bd047f6913358115b40eb79e95829ee5d",
+              "present": true,
+              "digest": "b0fe867ca9a3fc166db01357fc03a64bd047f6913358115b40eb79e95829ee5d",
+              "registryDigest": "b0fe867ca9a3fc166db01357fc03a64bd047f6913358115b40eb79e95829ee5d",
+              "match": true,
+              "bytes": 712
+            },
+            {
+              "id": "bc32eb83f1f8e5f4b3e4176e6bc8b3e5be07a901efbc1aac2b1f4019dab29cc3",
+              "present": true,
+              "digest": "bc32eb83f1f8e5f4b3e4176e6bc8b3e5be07a901efbc1aac2b1f4019dab29cc3",
+              "registryDigest": "bc32eb83f1f8e5f4b3e4176e6bc8b3e5be07a901efbc1aac2b1f4019dab29cc3",
+              "match": true,
+              "bytes": 262
+            },
+            {
+              "id": "8307a8ca474f88962e6f854f25abdb60278afb1d7753a03f0a70f6836da008ea",
+              "present": true,
+              "digest": "8307a8ca474f88962e6f854f25abdb60278afb1d7753a03f0a70f6836da008ea",
+              "registryDigest": "8307a8ca474f88962e6f854f25abdb60278afb1d7753a03f0a70f6836da008ea",
+              "match": true,
+              "bytes": 267
+            },
+            {
+              "id": "8eefb66fc881f500f31c2cd9d5d0c92fb81c374fb1afda1a436c0654f1f976e0",
+              "present": true,
+              "digest": "8eefb66fc881f500f31c2cd9d5d0c92fb81c374fb1afda1a436c0654f1f976e0",
+              "registryDigest": "8eefb66fc881f500f31c2cd9d5d0c92fb81c374fb1afda1a436c0654f1f976e0",
+              "match": true,
+              "bytes": 153
+            },
+            {
+              "id": "cf8e68fd920dfa0cb6645bae8b9145504fac0c3e9c25716329c7ed982e055fb5",
+              "present": true,
+              "digest": "cf8e68fd920dfa0cb6645bae8b9145504fac0c3e9c25716329c7ed982e055fb5",
+              "registryDigest": "cf8e68fd920dfa0cb6645bae8b9145504fac0c3e9c25716329c7ed982e055fb5",
+              "match": true,
+              "bytes": 1330
+            },
+            {
+              "id": "8c0dc20f8a90e7e34063ad8fb5305f7a65f80997db2f8b82197399ced1133a17",
+              "present": true,
+              "digest": "8c0dc20f8a90e7e34063ad8fb5305f7a65f80997db2f8b82197399ced1133a17",
+              "registryDigest": "8c0dc20f8a90e7e34063ad8fb5305f7a65f80997db2f8b82197399ced1133a17",
+              "match": true,
+              "bytes": 570
+            },
+            {
+              "id": "4e5b188ef5f7f78edfc2a791ccc3c9f5513e549ec83158b9586e5a2bca124555",
+              "present": true,
+              "digest": "4e5b188ef5f7f78edfc2a791ccc3c9f5513e549ec83158b9586e5a2bca124555",
+              "registryDigest": "4e5b188ef5f7f78edfc2a791ccc3c9f5513e549ec83158b9586e5a2bca124555",
+              "match": true,
+              "bytes": 790
+            },
+            {
+              "id": "d19eeee0dc297f8035a7ca887f03f5a84002b54c90652c0d8e7cec319dcb2777",
+              "present": true,
+              "digest": "d19eeee0dc297f8035a7ca887f03f5a84002b54c90652c0d8e7cec319dcb2777",
+              "registryDigest": "d19eeee0dc297f8035a7ca887f03f5a84002b54c90652c0d8e7cec319dcb2777",
+              "match": true,
+              "bytes": 174
+            },
+            {
+              "id": "134e7551e739b17fb58f692fcb1a8bb88ba764dc09404084b23f4c0ab0bd3ce8",
+              "present": true,
+              "digest": "134e7551e739b17fb58f692fcb1a8bb88ba764dc09404084b23f4c0ab0bd3ce8",
+              "registryDigest": "134e7551e739b17fb58f692fcb1a8bb88ba764dc09404084b23f4c0ab0bd3ce8",
+              "match": true,
+              "bytes": 187
+            },
+            {
+              "id": "2500a63888d6b614c41142b9d2817d338f1f11134992e901e8be7dad81b68f42",
+              "present": true,
+              "digest": "2500a63888d6b614c41142b9d2817d338f1f11134992e901e8be7dad81b68f42",
+              "registryDigest": "2500a63888d6b614c41142b9d2817d338f1f11134992e901e8be7dad81b68f42",
+              "match": true,
+              "bytes": 253
+            },
+            {
+              "id": "f4c8092236fe351296f4a1c9d0f9d4df747990eac545d9f7af47ee195c4d7756",
+              "present": true,
+              "digest": "f4c8092236fe351296f4a1c9d0f9d4df747990eac545d9f7af47ee195c4d7756",
+              "registryDigest": "f4c8092236fe351296f4a1c9d0f9d4df747990eac545d9f7af47ee195c4d7756",
+              "match": true,
+              "bytes": 142
+            },
+            {
+              "id": "1c097c07ef83af8da1ae956643e9fa80d7720ba8e7326636bacac9e130ecbcbb",
+              "present": true,
+              "digest": "1c097c07ef83af8da1ae956643e9fa80d7720ba8e7326636bacac9e130ecbcbb",
+              "registryDigest": "1c097c07ef83af8da1ae956643e9fa80d7720ba8e7326636bacac9e130ecbcbb",
+              "match": true,
+              "bytes": 874
+            },
+            {
+              "id": "257b55ffd61e53c84fb1653067a34c9ffb7eafee11fc0aa80bb527c5568f7dc3",
+              "present": true,
+              "digest": "257b55ffd61e53c84fb1653067a34c9ffb7eafee11fc0aa80bb527c5568f7dc3",
+              "registryDigest": "257b55ffd61e53c84fb1653067a34c9ffb7eafee11fc0aa80bb527c5568f7dc3",
+              "match": true,
+              "bytes": 234
+            },
+            {
+              "id": "4140d803f988383ccacfabfaf83cfb3d485bfde4cf495017a5b347fcdbfbfd84",
+              "present": true,
+              "digest": "4140d803f988383ccacfabfaf83cfb3d485bfde4cf495017a5b347fcdbfbfd84",
+              "registryDigest": "4140d803f988383ccacfabfaf83cfb3d485bfde4cf495017a5b347fcdbfbfd84",
+              "match": true,
+              "bytes": 1143
+            },
+            {
+              "id": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+              "present": true,
+              "digest": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+              "registryDigest": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+              "match": true,
+              "bytes": 24
+            },
+            {
+              "id": "57f2162bd14e3cc029b4cd1c23a5bbe9768b8e669db1fb878123d106fb580506",
+              "present": true,
+              "digest": "57f2162bd14e3cc029b4cd1c23a5bbe9768b8e669db1fb878123d106fb580506",
+              "registryDigest": "57f2162bd14e3cc029b4cd1c23a5bbe9768b8e669db1fb878123d106fb580506",
+              "match": true,
+              "bytes": 213
+            },
+            {
+              "id": "6d189cf0beb05fe420debc9009b051042453b70a3ab388bf9ec82555bc6179da",
+              "present": true,
+              "digest": "6d189cf0beb05fe420debc9009b051042453b70a3ab388bf9ec82555bc6179da",
+              "registryDigest": "6d189cf0beb05fe420debc9009b051042453b70a3ab388bf9ec82555bc6179da",
+              "match": true,
+              "bytes": 376
+            },
+            {
+              "id": "bd4f14aaf4789832d92b3aa1ac2efa3d10cac93534a17ed8ff4f1425a9dbe932",
+              "present": true,
+              "digest": "bd4f14aaf4789832d92b3aa1ac2efa3d10cac93534a17ed8ff4f1425a9dbe932",
+              "registryDigest": "bd4f14aaf4789832d92b3aa1ac2efa3d10cac93534a17ed8ff4f1425a9dbe932",
+              "match": true,
+              "bytes": 1615
+            },
+            {
+              "id": "1b1d9c28e230cbd6fd87f1ee8a421d70768a53df069d5f42bb1b8b742522dcd8",
+              "present": true,
+              "digest": "1b1d9c28e230cbd6fd87f1ee8a421d70768a53df069d5f42bb1b8b742522dcd8",
+              "registryDigest": "1b1d9c28e230cbd6fd87f1ee8a421d70768a53df069d5f42bb1b8b742522dcd8",
+              "match": true,
+              "bytes": 505
+            }
+          ],
+          "allMatch": true
+        },
+        "corruptDetected": true,
+        "corruptDetail": {
+          "status": "blocked",
+          "artifacts": [
+            {
+              "id": "ef4ac502afc7eb974dd44066dc07b93cf1f235eb25bd9e34295939123021cf8e",
+              "status": "corrupt"
+            },
+            {
+              "id": "c500e19059fc98746211c452900da4c9c942d8c2119692b1388b6656fea2c031",
+              "status": "ok"
+            },
+            {
+              "id": "752405bd6468c6f4ed8b7266598217d171f355f6bcf7295cca74eec42b3e964c",
+              "status": "ok"
+            },
+            {
+              "id": "b0fe867ca9a3fc166db01357fc03a64bd047f6913358115b40eb79e95829ee5d",
+              "status": "ok"
+            },
+            {
+              "id": "bc32eb83f1f8e5f4b3e4176e6bc8b3e5be07a901efbc1aac2b1f4019dab29cc3",
+              "status": "ok"
+            },
+            {
+              "id": "8307a8ca474f88962e6f854f25abdb60278afb1d7753a03f0a70f6836da008ea",
+              "status": "ok"
+            },
+            {
+              "id": "8eefb66fc881f500f31c2cd9d5d0c92fb81c374fb1afda1a436c0654f1f976e0",
+              "status": "ok"
+            },
+            {
+              "id": "cf8e68fd920dfa0cb6645bae8b9145504fac0c3e9c25716329c7ed982e055fb5",
+              "status": "ok"
+            },
+            {
+              "id": "8c0dc20f8a90e7e34063ad8fb5305f7a65f80997db2f8b82197399ced1133a17",
+              "status": "ok"
+            },
+            {
+              "id": "4e5b188ef5f7f78edfc2a791ccc3c9f5513e549ec83158b9586e5a2bca124555",
+              "status": "ok"
+            },
+            {
+              "id": "d19eeee0dc297f8035a7ca887f03f5a84002b54c90652c0d8e7cec319dcb2777",
+              "status": "ok"
+            },
+            {
+              "id": "134e7551e739b17fb58f692fcb1a8bb88ba764dc09404084b23f4c0ab0bd3ce8",
+              "status": "ok"
+            },
+            {
+              "id": "2500a63888d6b614c41142b9d2817d338f1f11134992e901e8be7dad81b68f42",
+              "status": "ok"
+            },
+            {
+              "id": "f4c8092236fe351296f4a1c9d0f9d4df747990eac545d9f7af47ee195c4d7756",
+              "status": "ok"
+            },
+            {
+              "id": "1c097c07ef83af8da1ae956643e9fa80d7720ba8e7326636bacac9e130ecbcbb",
+              "status": "ok"
+            },
+            {
+              "id": "257b55ffd61e53c84fb1653067a34c9ffb7eafee11fc0aa80bb527c5568f7dc3",
+              "status": "ok"
+            },
+            {
+              "id": "4140d803f988383ccacfabfaf83cfb3d485bfde4cf495017a5b347fcdbfbfd84",
+              "status": "ok"
+            },
+            {
+              "id": "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+              "status": "ok"
+            },
+            {
+              "id": "57f2162bd14e3cc029b4cd1c23a5bbe9768b8e669db1fb878123d106fb580506",
+              "status": "ok"
+            },
+            {
+              "id": "6d189cf0beb05fe420debc9009b051042453b70a3ab388bf9ec82555bc6179da",
+              "status": "ok"
+            },
+            {
+              "id": "bd4f14aaf4789832d92b3aa1ac2efa3d10cac93534a17ed8ff4f1425a9dbe932",
+              "status": "ok"
+            },
+            {
+              "id": "1b1d9c28e230cbd6fd87f1ee8a421d70768a53df069d5f42bb1b8b742522dcd8",
+              "status": "ok"
+            }
+          ]
+        },
+        "missingDetected": true
+      },
+      "derived": {
+        "table": "conversation_search_probe_unknown",
+        "status": "blocked",
+        "complete": false,
+        "unknownTables": [
+          "conversation_search_probe_unknown"
+        ],
+        "refused": true
+      },
+      "targetDrift": {
+        "subject": {
+          "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+          "buildId": "8296720d8a25f38c",
+          "schema": 18,
+          "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+          "tarBytes": 20481470,
+          "platform": "darwin",
+          "arch": "arm64",
+          "abi": "137"
+        },
+        "appended": true,
+        "verify": {
+          "status": "ok",
+          "error": null,
+          "verified": "ok"
+        },
+        "consumerContentBinding": "NOT_AVAILABLE_IN_MAIN",
+        "reason": "the packaged producer accepted a snapshot of the drifted target: its verify covers database integrity, schema and artifact digests, not source-content equality"
+      }
     },
     "channel": {
-      "status": "MISSING",
-      "consumer": null
+      "status": "PASS",
+      "consumer": "NOT_INTEGRATED"
     },
-    "supportMaterial": "MISSING",
-    "trialIdentity": "MISSING",
-    "gSummary": "MISSING",
-    "installedSourceConfirm": "MISSING",
-    "installedStability": "MISSING",
-    "missingArtifactTerminal": null,
+    "supportMaterial": "PASS",
+    "trialIdentity": "NOT_TESTED",
+    "gSummary": "NOT_TESTED",
+    "installedSourceConfirm": "PASS",
+    "installedStability": "PASS",
+    "missingArtifactTerminal": "fail_closed_unclean_exit1",
     "privatePermissionTarget": "NOT_REACHED: private startup permission and target activation remain main scope",
     "bBusinessRecovery": "NOT_TESTED: B control source is not admitted as business resume",
     "outerZip": {
-      "status": "MISSING",
-      "zip": null,
-      "phases": null
+      "status": "PASS",
+      "zip": {
+        "sha256": "46e01c8c7b79818d19e019f6d2208ad54c5c9538674218f85455434eff8207f9",
+        "bytes": 63481603,
+        "sumsMatch": true,
+        "resultMatch": true,
+        "innerTarSha256": "ee45c92c7c5a8f2caa0449572b14bf97175b0392f1fd92c6f89d7a19464604e8",
+        "buildId": "f880e5bc9c6c1c57",
+        "source": "048f0184606202b0b39e7426b7747f3fe57541c1",
+        "installManifestDigest": "f8d40ee86e10bb0319cb1959744760f986609f81eaa6e8db67f2cdca9de44693",
+        "runtimeDigest": "e4b5a3af0e05c75de2eae013904145f40fe7fc2a6e6f17510128bf45cca4e79b",
+        "licenseDigest": "5888dbb9a1d2b18f2c3e6c5f6af1b39de658372b402a0577b002777f14c62ace"
+      },
+      "phases": {
+        "unconfigured": "RUNNING",
+        "configured": "RUNNING",
+        "reopen": "RUNNING",
+        "statusStopped": {
+          "status": 2,
+          "result": "STOPPED"
+        },
+        "portConflict": {
+          "outcome": "EXITED",
+          "code": 2,
+          "output": ".0.1:64090\",\"state\":\"/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-home-9ppL3L/Library/Application Support/PersonalAgent/Preview-f880e5bc9c6c1c57/data\"}\n  hint: 用与运行实例相同的参数复用；要切换请先 `pa stop`，再以新参数启动。\n"
+        }
+      }
     },
     "cohortRecovery": {
-      "status": "MISSING",
-      "seed": null,
-      "backup": null,
-      "restore": null,
-      "readonly": null,
-      "negatives": null,
+      "status": "PASS",
+      "seed": {
+        "phase": "delivered",
+        "artifacts": 4,
+        "messages": 2
+      },
+      "backup": {
+        "status": "CREATED",
+        "verify": "VERIFIED",
+        "counts": {
+          "entries": 27,
+          "artifacts": 26,
+          "excluded": 10
+        },
+        "eventSeq": 73
+      },
+      "restore": {
+        "markerPresent": true,
+        "startupMode": "recovery_readonly",
+        "authorization": "BLOCKED"
+      },
+      "readonly": {
+        "startupMode": "recovery_readonly",
+        "work": {
+          "phase": "delivered",
+          "artifactIds": [
+            "1060a035bc78af766be0d3f61d8ec853cb86be28b59b120450919543e716f3a7",
+            "57f2162bd14e3cc029b4cd1c23a5bbe9768b8e669db1fb878123d106fb580506",
+            "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+            "6d189cf0beb05fe420debc9009b051042453b70a3ab388bf9ec82555bc6179da"
+          ],
+          "artifactsEqual": true
+        },
+        "business": {
+          "status": 422,
+          "code": "unsupported_capability"
+        },
+        "providerRequests": {
+          "afterSeed": 0,
+          "afterReads": 0
+        }
+      },
+      "negatives": {
+        "tamperedBundle": {
+          "status": 2,
+          "result": "BLOCKED",
+          "code": "archive_invalid"
+        },
+        "fixtureOnRestored": {
+          "status": "RUNNING",
+          "code": null,
+          "startupMode": "recovery_readonly",
+          "stderr": "",
+          "business": 422,
+          "resources": {
+            "before": [
+              {
+                "pid": 70754,
+                "start": "Tue Nov 17 09:35:11 2026",
+                "uid": 501,
+                "ppid": 20837,
+                "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-recovery-1pVpaK/install/app/apps/launcher/bin/pa.mjs start --json --port 64310 --api-port 64311 --fixture",
+                "argvSha256": "11189052396cd061f7e6f4da5248c41275feaa55e9bbd5292630accef2067337",
+                "aliveAtBirth": true,
+                "root": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-recovery-1pVpaK/install",
+                "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-recovery-1pVpaK/config",
+                "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-recovery-1pVpaK/restored",
+                "op": "cohort:fixture-on-restored",
+                "parentPid": null,
+                "role": "product"
+              },
+              {
+                "pid": 70790,
+                "start": "Tue Nov 17 09:35:11 2026",
+                "uid": 501,
+                "ppid": 70754,
+                "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-recovery-1pVpaK/install/app/apps/coordinator/product/demo.ts --port 64311 --state /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-recovery-1pVpaK/restored --console-origin http://127.0.0.1:64310 --startup-mode recovery_readonly --local-access",
+                "argvSha256": "1295e37ff75efd3866b536fd6ea5729619430297646652c4c23bf9b45d0db672",
+                "aliveAtBirth": true,
+                "root": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-recovery-1pVpaK/install",
+                "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-recovery-1pVpaK/config",
+                "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-recovery-1pVpaK/restored",
+                "op": "cohort:fixture-on-restored",
+                "parentPid": null,
+                "role": "product"
+              }
+            ],
+            "after": [
+              {
+                "pid": 70754,
+                "expectedStart": "Tue Nov 17 09:35:11 2026",
+                "expectedUid": 501,
+                "expectedArgvSha256": "11189052396cd061f7e6f4da5248c41275feaa55e9bbd5292630accef2067337",
+                "alive": false,
+                "observedStart": null,
+                "observedUid": null,
+                "observedPpid": null,
+                "observedArgvSha256": null,
+                "sameIdentity": false,
+                "query": "ps",
+                "queryOk": true,
+                "observation": "independent-ps"
+              },
+              {
+                "pid": 70790,
+                "expectedStart": "Tue Nov 17 09:35:11 2026",
+                "expectedUid": 501,
+                "expectedArgvSha256": "1295e37ff75efd3866b536fd6ea5729619430297646652c4c23bf9b45d0db672",
+                "alive": false,
+                "observedStart": null,
+                "observedUid": null,
+                "observedPpid": null,
+                "observedArgvSha256": null,
+                "sameIdentity": false,
+                "query": "ps",
+                "queryOk": true,
+                "observation": "independent-ps"
+              }
+            ]
+          },
+          "stop": {
+            "clean": true,
+            "reason": null
+          }
+        }
+      },
       "upgradeReopen": "E4-UPGRADE-ROLLBACK on the frozen baseline/target pair keeps a post-upgrade write and rolls the binary back; it is not a second lifecycle"
     },
     "originalProjectApplicable": {
-      "status": "MISSING",
-      "reason": null
+      "status": "NOT_TESTED",
+      "reason": "NOT_REACHED: original-project previews reported needs_input/needs_input (a fresh project has no facts/catalog, so no applicable draft), and the controlled-fixture configuration exposes only [\"project-atlas\"] while the registered projects are not dispatchable there. The executed Works are therefore bound to the fixture project, not the original project. This is a recorded product gap, not an acceptance pass."
     },
     "w32ZipBackup": "E32-ZIP-LIFECYCLE records a CREATED/VERIFIED backup with 20 artifacts but never restores it; the non-empty restore and readonly read-back are claimed only by E33-COHORT-RECOVERY"
   },
@@ -1983,30 +3879,30 @@
       "E4-MULTI-STATE"
     ],
     "current": {
-      "ownershipMocks": "MISSING",
-      "installedCandidates": "MISSING",
-      "stopDetector": "MISSING",
-      "stopFunctional": "MISSING",
-      "secondRoot": "MISSING",
-      "installedSourceConfirm": "MISSING",
-      "installedStability": "MISSING",
-      "workflowFormats": "MISSING",
-      "personalReview": "MISSING",
-      "reviewRefusals": "MISSING",
-      "reviewReuse": "MISSING",
-      "scopeDiagnostics": "MISSING",
-      "readiness": "MISSING",
-      "trialWorkbenchUi": "MISSING",
-      "currentMainInstall": "MISSING",
-      "upgradeFaults": "MISSING",
-      "upgradeRollback": "MISSING"
+      "ownershipMocks": "PASS",
+      "installedCandidates": "PASS",
+      "stopDetector": "PASS",
+      "stopFunctional": "PASS",
+      "secondRoot": "PASS",
+      "installedSourceConfirm": "PASS",
+      "installedStability": "PASS",
+      "workflowFormats": "PASS",
+      "personalReview": "PASS",
+      "reviewRefusals": "PASS",
+      "reviewReuse": "PASS",
+      "scopeDiagnostics": "PASS",
+      "readiness": "PASS",
+      "trialWorkbenchUi": "PASS",
+      "currentMainInstall": "PASS",
+      "upgradeFaults": "PASS",
+      "upgradeRollback": "PASS"
     }
   },
   "finalRun": {
     "command": "node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record",
     "exitCode": 0,
     "source": {
-      "commit": "c99475c617fc3abb8ea5c82e00a4aaa2160e14e0",
+      "commit": "4b4d4089a07e10b01c9deba32f0d51c23e96bdf1",
       "dirty": false
     }
   },
@@ -2048,12 +3944,944 @@
       "command": "node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record"
     }
   ],
-  "personalReview": null,
-  "reviewReuse": null,
-  "scopeDiagnostics": null,
-  "readiness": null,
-  "packagedStop": null,
-  "stopFunctional": null,
+  "personalReview": {
+    "subject": {
+      "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "buildId": "8296720d8a25f38c",
+      "schema": 18,
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "tarBytes": 20481470,
+      "platform": "darwin",
+      "arch": "arm64",
+      "abi": "137"
+    },
+    "mode": "personal",
+    "state": "recovery_readonly",
+    "consumerEntry": {
+      "origin": "package",
+      "package": {
+        "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+        "buildId": "8296720d8a25f38c",
+        "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+        "tarBytes": 20481470
+      },
+      "files": [
+        {
+          "path": "apps/launcher/lib/start.mjs",
+          "sha256": "de21a1cf0117ecee9794442e679da90abea1a6d2971fb6dea28abcb226233e09",
+          "bytes": 23370
+        },
+        {
+          "path": "apps/launcher/lib/daemon.mjs",
+          "sha256": "2597175e8a27c69c986f4dc728ba40b6b86bf8d4958983bda7055fc7e29a6d56",
+          "bytes": 7716
+        },
+        {
+          "path": "apps/coordinator/product/restored-review.ts",
+          "sha256": "e6b77f1cdbdd9d9bd67f78e2e1c5f2bd3228f87ef7aa8d14314246135d6034c5",
+          "bytes": 7325
+        },
+        {
+          "path": "apps/coordinator/product/demo.ts",
+          "sha256": "ea78e3e915854071f7ee4344de0f0dc9d94795c11b205aebf55e86c4a5cf89e1",
+          "bytes": 6819
+        }
+      ]
+    },
+    "before": {
+      "status": "RUNNING",
+      "candidates": 403,
+      "history": 403
+    },
+    "after": {
+      "candidates": 200,
+      "history": 200,
+      "sources": 200,
+      "originalBody": true
+    },
+    "reviewFile": {
+      "mode": "600",
+      "access": "historical_data_read_only",
+      "startupAvailable": false,
+      "projects": 1
+    },
+    "business": 422,
+    "queueHeld": true,
+    "providerRequests": 2,
+    "health": {
+      "status": "ok",
+      "mode": "personal",
+      "startupMode": "recovery_readonly",
+      "digest": "5a0ad2b542840141fff74154dee8771773df77f9fbb63ffb5f48e3a70b2ead55"
+    },
+    "healthDigest": "5a0ad2b542840141fff74154dee8771773df77f9fbb63ffb5f48e3a70b2ead55",
+    "scopeDiagnostics": "present",
+    "packageCapability": {
+      "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "buildId": "8296720d8a25f38c",
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "digestSupported": true
+    },
+    "registry": {
+      "present": true,
+      "digest": "f01c34947cc29e52200b3eb059e9928c2c71f2f4479992f5d9fb98198c1105f2"
+    },
+    "restore": {
+      "verify": "VERIFIED",
+      "restore": "RESTORED"
+    }
+  },
+  "reviewReuse": {
+    "subject": {
+      "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "buildId": "8296720d8a25f38c",
+      "schema": 18,
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "tarBytes": 20481470,
+      "platform": "darwin",
+      "arch": "arm64",
+      "abi": "137"
+    },
+    "mode": "personal",
+    "consumerEntry": {
+      "origin": "package",
+      "package": {
+        "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+        "buildId": "8296720d8a25f38c",
+        "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+        "tarBytes": 20481470
+      },
+      "files": [
+        {
+          "path": "apps/launcher/lib/start.mjs",
+          "sha256": "de21a1cf0117ecee9794442e679da90abea1a6d2971fb6dea28abcb226233e09",
+          "bytes": 23370
+        },
+        {
+          "path": "apps/launcher/lib/daemon.mjs",
+          "sha256": "2597175e8a27c69c986f4dc728ba40b6b86bf8d4958983bda7055fc7e29a6d56",
+          "bytes": 7716
+        },
+        {
+          "path": "apps/coordinator/product/restored-review.ts",
+          "sha256": "e6b77f1cdbdd9d9bd67f78e2e1c5f2bd3228f87ef7aa8d14314246135d6034c5",
+          "bytes": 7325
+        },
+        {
+          "path": "apps/coordinator/product/demo.ts",
+          "sha256": "ea78e3e915854071f7ee4344de0f0dc9d94795c11b205aebf55e86c4a5cf89e1",
+          "bytes": 6819
+        }
+      ]
+    },
+    "packageCapability": {
+      "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "buildId": "8296720d8a25f38c",
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "digestSupported": true
+    },
+    "healthDigest": "555960c8858802b339e2dc14a61a5843387dc01bb7fbd58e74cc4a13e5d96758",
+    "digestAvailable": true,
+    "sameDigest": "555960c8858802b339e2dc14a61a5843387dc01bb7fbd58e74cc4a13e5d96758",
+    "processes": {
+      "live": "Tue Nov 17 09:33:31 2026",
+      "reused": "Tue Nov 17 09:33:31 2026"
+    },
+    "firstPid": 55873,
+    "unboundPid": 56881,
+    "pidAfterRefusals": 55873,
+    "pidAfterUnbound": 56881,
+    "outcomes": {
+      "sameFile": {
+        "status": "REUSED",
+        "instance": {
+          "protocol": "personal-product-instance/1",
+          "pid": 55873,
+          "processStart": "Tue Nov 17 09:33:31 2026",
+          "apiPid": 55909,
+          "consolePid": 55873,
+          "apiURL": "http://127.0.0.1:63712",
+          "consoleURL": "http://127.0.0.1:63711",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/restored",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/app",
+          "buildId": "8296720d8a25f38c",
+          "mode": "personal",
+          "access": "local-development",
+          "startupMode": "recovery_readonly",
+          "launcherArgv": [
+            "/Users/hh/.nvm/versions/node/v24.21.0/bin/node",
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/app/apps/launcher/bin/pa.mjs",
+            "start",
+            "--json",
+            "--port",
+            "63711",
+            "--api-port",
+            "63712",
+            "--discussion-only",
+            "--review-restored-scope",
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/reuse-first.json"
+          ],
+          "launcherCwd": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu",
+          "apiArgv": [
+            "/Users/hh/.nvm/versions/node/v24.21.0/bin/node",
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/app/apps/coordinator/product/demo.ts",
+            "--port",
+            "63712",
+            "--state",
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/restored",
+            "--console-origin",
+            "http://127.0.0.1:63711",
+            "--startup-mode",
+            "recovery_readonly",
+            "--assistant",
+            "--discussion-only",
+            "--review-restored-scope",
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/reuse-first.json",
+            "--local-access"
+          ],
+          "apiProcessStart": "Tue Nov 17 09:33:31 2026",
+          "apiUid": 501,
+          "startedAt": "2026-11-17T01:33:31.997Z",
+          "configRoot": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/config"
+        },
+        "recovery": {
+          "startupMode": "recovery_readonly",
+          "markerPresent": true,
+          "markerValid": true,
+          "warning": "恢复态只读：仅历史/诊断；重新绑定与重新验证由 main 的恢复授权完成前不会开启业务。",
+          "requiresRevalidation": [
+            "Native execution environment and policy evidence were not migrated; re-probe before dispatching.",
+            "Native authentication lives in the account home and is not part of the bundle; re-authenticate locally.",
+            "The old writer pid/nonce and runtime records are historical and never become authority on restore.",
+            "Project bindings not explicitly remapped stay pending and must be rebound to a local path."
+          ],
+          "pendingRebind": [
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/historical-project"
+          ]
+        },
+        "stderr": "",
+        "birth": {
+          "pid": 55936,
+          "start": "Tue Nov 17 09:33:32 2026",
+          "uid": 501,
+          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/bin/pa start --json --port 63711 --api-port 63712 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/reuse-first.json",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/restored",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/config",
+          "consolePort": 63711,
+          "apiPort": 63712,
+          "argvExact": false,
+          "recordedAt": "2026-11-17T01:33:32.010Z"
+        }
+      },
+      "differentFile": {
+        "status": "BLOCKED",
+        "code": "restored_review_selection_mismatch",
+        "message": "本次显式 review 选择与已运行实例的实际选择不同；保留旧 PID，不复用、不结束",
+        "detail": {
+          "requestedReviewIdentity": "e0d4ba6e37b7567fc25731bda7fb2a961b0086445dc2a23f00f2aa258d6d39f6",
+          "liveReviewIdentity": "555960c8858802b339e2dc14a61a5843387dc01bb7fbd58e74cc4a13e5d96758",
+          "pid": 55873
+        },
+        "hint": "用与运行实例相同的已验证文件复用，或先 `pa stop` 旧实例再以新选择启动；不会重新签发/刷新旧窗口。",
+        "stderr": "",
+        "birth": {
+          "pid": 56092,
+          "start": "Tue Nov 17 09:33:32 2026",
+          "uid": 501,
+          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/bin/pa start --json --port 63711 --api-port 63712 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/reuse-narrow.json",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/restored",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/config",
+          "consolePort": 63711,
+          "apiPort": 63712,
+          "argvExact": false,
+          "recordedAt": "2026-11-17T01:33:32.516Z"
+        }
+      },
+      "missingFile": {
+        "status": "BLOCKED",
+        "code": "restored_review_selection_mismatch",
+        "message": "本次显式 review 选择与已运行实例的实际选择不同；保留旧 PID，不复用、不结束",
+        "detail": {
+          "requestedReviewIdentity": null,
+          "liveReviewIdentity": "555960c8858802b339e2dc14a61a5843387dc01bb7fbd58e74cc4a13e5d96758",
+          "pid": 55873
+        },
+        "hint": "用与运行实例相同的已验证文件复用，或先 `pa stop` 旧实例再以新选择启动；不会重新签发/刷新旧窗口。",
+        "stderr": "",
+        "birth": {
+          "pid": 56252,
+          "start": "Tue Nov 17 09:33:33 2026",
+          "uid": 501,
+          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/bin/pa start --json --port 63711 --api-port 63712 --discussion-only",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/restored",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/config",
+          "consolePort": 63711,
+          "apiPort": 63712,
+          "argvExact": false,
+          "recordedAt": "2026-11-17T01:33:33.018Z"
+        }
+      },
+      "missingFilePath": {
+        "status": "BLOCKED",
+        "code": "review_scope_missing",
+        "message": "显式 review 配置文件不存在",
+        "detail": {
+          "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/reuse-gone.json"
+        },
+        "hint": "用 main 的 review-restored 命令重新生成新的私有文件。",
+        "stderr": "",
+        "birth": {
+          "pid": 56414,
+          "start": "Tue Nov 17 09:33:33 2026",
+          "uid": 501,
+          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/bin/pa start --json --port 63711 --api-port 63712 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/reuse-gone.json",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/restored",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/config",
+          "consolePort": 63711,
+          "apiPort": 63712,
+          "argvExact": false,
+          "recordedAt": "2026-11-17T01:33:33.516Z"
+        }
+      },
+      "portChange": {
+        "status": "BLOCKED",
+        "code": "instance_conflict",
+        "message": "已运行实例与本次请求的身份不一致；不静默复用不同 state/mode/access/build/端口",
+        "detail": {
+          "differences": [
+            {
+              "field": "consoleURL",
+              "expected": "http://127.0.0.1:63733",
+              "actual": "http://127.0.0.1:63711"
+            },
+            {
+              "field": "apiURL",
+              "expected": "http://127.0.0.1:63734",
+              "actual": "http://127.0.0.1:63712"
+            }
+          ],
+          "running": {
+            "pid": 55873,
+            "consoleURL": "http://127.0.0.1:63711",
+            "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/restored"
+          }
+        },
+        "hint": "用与运行实例相同的参数复用；要切换请先 `pa stop`，再以新参数启动。",
+        "stderr": "",
+        "birth": {
+          "pid": 56450,
+          "start": "Tue Nov 17 09:33:33 2026",
+          "uid": 501,
+          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/bin/pa start --json --port 63733 --api-port 63734 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/reuse-first.json",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/restored",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/config",
+          "consolePort": 63733,
+          "apiPort": 63734,
+          "argvExact": false,
+          "recordedAt": "2026-11-17T01:33:33.865Z"
+        }
+      },
+      "unboundThenSelection": {
+        "status": "BLOCKED",
+        "code": "restored_review_selection_mismatch",
+        "message": "本次显式 review 选择与已运行实例的实际选择不同；保留旧 PID，不复用、不结束",
+        "detail": {
+          "requestedReviewIdentity": "555960c8858802b339e2dc14a61a5843387dc01bb7fbd58e74cc4a13e5d96758",
+          "liveReviewIdentity": null,
+          "pid": 56881
+        },
+        "hint": "用与运行实例相同的已验证文件复用，或先 `pa stop` 旧实例再以新选择启动；不会重新签发/刷新旧窗口。",
+        "stderr": "",
+        "birth": {
+          "pid": 56943,
+          "start": "Tue Nov 17 09:33:35 2026",
+          "uid": 501,
+          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/bin/pa start --json --port 63739 --api-port 63740 --discussion-only --review-restored-scope /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/reuse-first.json",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/restored",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/config",
+          "consolePort": 63739,
+          "apiPort": 63740,
+          "argvExact": false,
+          "recordedAt": "2026-11-17T01:33:35.347Z"
+        }
+      }
+    },
+    "scope": "selection digest present"
+  },
+  "scopeDiagnostics": {
+    "subject": {
+      "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "buildId": "8296720d8a25f38c",
+      "schema": 18,
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "tarBytes": 20481470,
+      "platform": "darwin",
+      "arch": "arm64",
+      "abi": "137"
+    },
+    "mode": "personal",
+    "consumerEntry": {
+      "origin": "package",
+      "package": {
+        "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+        "buildId": "8296720d8a25f38c",
+        "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+        "tarBytes": 20481470
+      },
+      "files": [
+        {
+          "path": "apps/launcher/lib/start.mjs",
+          "sha256": "de21a1cf0117ecee9794442e679da90abea1a6d2971fb6dea28abcb226233e09",
+          "bytes": 23370
+        },
+        {
+          "path": "apps/launcher/lib/daemon.mjs",
+          "sha256": "2597175e8a27c69c986f4dc728ba40b6b86bf8d4958983bda7055fc7e29a6d56",
+          "bytes": 7716
+        },
+        {
+          "path": "apps/coordinator/product/restored-review.ts",
+          "sha256": "e6b77f1cdbdd9d9bd67f78e2e1c5f2bd3228f87ef7aa8d14314246135d6034c5",
+          "bytes": 7325
+        },
+        {
+          "path": "apps/coordinator/product/demo.ts",
+          "sha256": "ea78e3e915854071f7ee4344de0f0dc9d94795c11b205aebf55e86c4a5cf89e1",
+          "bytes": 6819
+        }
+      ]
+    },
+    "plain": {
+      "plain": 200,
+      "plainHasDiagnostic": false,
+      "state": "scope_changed",
+      "bindingSourceCount": 3,
+      "optIn": 200,
+      "diagnostic": {
+        "protocol": "context-scope-review/1",
+        "reasons": [
+          "selection_replaced"
+        ],
+        "partial": true,
+        "withheldSourceCount": 3,
+        "authorization": "none"
+      },
+      "duplicate": 400,
+      "unknown": 400
+    },
+    "narrow": {
+      "start": "RUNNING",
+      "plain": 200,
+      "bodyServed": false,
+      "state": "scope_changed",
+      "bindingSourceCount": 3,
+      "optIn": 200,
+      "diagnostic": {
+        "protocol": "context-scope-review/1",
+        "reasons": [
+          "selection_replaced"
+        ],
+        "partial": true,
+        "withheldSourceCount": 3,
+        "authorization": "none"
+      }
+    }
+  },
+  "readiness": {
+    "subject": {
+      "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "buildId": "8296720d8a25f38c",
+      "schema": 18,
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "tarBytes": 20481470,
+      "platform": "darwin",
+      "arch": "arm64",
+      "abi": "137"
+    },
+    "mode": "personal",
+    "normal": {
+      "status": "RUNNING",
+      "mode": "personal",
+      "startupMode": "normal",
+      "readiness": {
+        "status": 200,
+        "body": {
+          "protocol": "trial-readiness/1",
+          "observedAt": "2026-11-17T01:33:37.342Z",
+          "configurationRevision": "a9c826f123324b2d8f1a07902775e6a1c453f4de86b467027490a903c324e84b",
+          "mode": "personal",
+          "startupMode": "normal",
+          "discussion": "configuration_present",
+          "execution": {
+            "state": "unavailable",
+            "reason": "operator_disabled"
+          },
+          "development": "blocked",
+          "projects": {
+            "development": 0,
+            "discussion": 1,
+            "dispatchable": 0
+          },
+          "profiles": {
+            "native": 1,
+            "controlled": 0,
+            "admittedNative": 0,
+            "admittedControlled": 0
+          },
+          "capabilities": {
+            "contextHistory": true,
+            "contextSources": true,
+            "decisions": true,
+            "proposals": true
+          },
+          "authorization": "none"
+        }
+      },
+      "configuration": {
+        "revision": "a9c826f123324b2d8f1a07902775e6a1c453f4de86b467027490a903c324e84b",
+        "projects": [
+          {
+            "discussionOnly": true,
+            "dispatchAllowed": false
+          }
+        ],
+        "profiles": [
+          {
+            "kind": "native",
+            "dispatchAllowed": false
+          }
+        ],
+        "contextHistoryAvailable": true,
+        "contextSourcesAvailable": true,
+        "decisionsAvailable": true,
+        "proposalsAvailable": true
+      },
+      "negatives": {
+        "invalidBearer": 401,
+        "noBearer": 200,
+        "badQuery": 400,
+        "badQueryCode": "invalid_request",
+        "missingRoute": 404
+      },
+      "health": {
+        "status": "ok",
+        "mode": "personal",
+        "access": "local-development"
+      },
+      "code": null,
+      "issues": [],
+      "registration": 200,
+      "after": {
+        "status": 200,
+        "body": {
+          "protocol": "trial-readiness/1",
+          "observedAt": "2026-11-17T01:33:37.442Z",
+          "configurationRevision": "4f06f905dae4e5e34076b15d573083dd6e85f2a4d7e1852e24687c2a15da6d45",
+          "mode": "personal",
+          "startupMode": "normal",
+          "discussion": "configuration_present",
+          "execution": {
+            "state": "unavailable",
+            "reason": "operator_disabled"
+          },
+          "development": "blocked",
+          "projects": {
+            "development": 1,
+            "discussion": 1,
+            "dispatchable": 0
+          },
+          "profiles": {
+            "native": 1,
+            "controlled": 0,
+            "admittedNative": 0,
+            "admittedControlled": 0
+          },
+          "capabilities": {
+            "contextHistory": true,
+            "contextSources": true,
+            "decisions": true,
+            "proposals": true
+          },
+          "authorization": "none"
+        }
+      }
+    },
+    "readonly": {
+      "status": "RUNNING",
+      "mode": "personal",
+      "startupMode": "recovery_readonly",
+      "readiness": {
+        "status": 200,
+        "body": {
+          "protocol": "trial-readiness/1",
+          "observedAt": "2026-11-17T01:33:38.419Z",
+          "configurationRevision": "ad50f6b2d9bcc4324c43e1f5f9c657e48ed7fa8043bc442602816837efc61305",
+          "mode": "personal",
+          "startupMode": "recovery_readonly",
+          "discussion": "unknown",
+          "execution": {
+            "state": "unavailable",
+            "reason": "recovery_readonly"
+          },
+          "development": "readonly",
+          "projects": {
+            "development": 1,
+            "discussion": 2,
+            "dispatchable": 0
+          },
+          "profiles": {
+            "native": 0,
+            "controlled": 4,
+            "admittedNative": 0,
+            "admittedControlled": 0
+          },
+          "capabilities": {
+            "contextHistory": true,
+            "contextSources": true,
+            "decisions": false,
+            "proposals": false
+          },
+          "authorization": "none"
+        }
+      },
+      "configuration": {
+        "revision": "ad50f6b2d9bcc4324c43e1f5f9c657e48ed7fa8043bc442602816837efc61305",
+        "projects": [
+          {
+            "discussionOnly": true,
+            "dispatchAllowed": false
+          },
+          {
+            "discussionOnly": true,
+            "dispatchAllowed": false
+          },
+          {
+            "discussionOnly": false,
+            "dispatchAllowed": false
+          }
+        ],
+        "profiles": [
+          {
+            "kind": "controlled_fixture",
+            "dispatchAllowed": false
+          },
+          {
+            "kind": "controlled_fixture",
+            "dispatchAllowed": false
+          },
+          {
+            "kind": "controlled_fixture",
+            "dispatchAllowed": false
+          },
+          {
+            "kind": "controlled_fixture",
+            "dispatchAllowed": false
+          }
+        ],
+        "contextHistoryAvailable": true,
+        "contextSourcesAvailable": true,
+        "decisionsAvailable": false,
+        "proposalsAvailable": false
+      },
+      "negatives": {
+        "invalidBearer": 401,
+        "noBearer": 200,
+        "badQuery": 400,
+        "badQueryCode": "invalid_request",
+        "missingRoute": 404
+      },
+      "health": {
+        "status": "ok",
+        "mode": "personal",
+        "startupMode": "recovery_readonly",
+        "restoredReviewDigest": "6af06117531dc76042251b232e8f74a95b97033928c00191b00a78949c998fbd",
+        "access": "local-development"
+      },
+      "code": null,
+      "issues": []
+    },
+    "fixture": {
+      "status": "RUNNING",
+      "mode": "fixture",
+      "startupMode": "normal",
+      "readiness": {
+        "status": 200,
+        "body": {
+          "protocol": "trial-readiness/1",
+          "observedAt": "2026-11-17T01:33:39.651Z",
+          "configurationRevision": "83d2a00c18fe919d4671f2916ce9baec23e44fc5cfd8f51b3ba2d241462e06af",
+          "mode": "fixture",
+          "startupMode": "normal",
+          "discussion": "configuration_present",
+          "execution": {
+            "state": "available",
+            "kind": "controlled_fixture"
+          },
+          "development": "fixture_only",
+          "projects": {
+            "development": 1,
+            "discussion": 0,
+            "dispatchable": 1
+          },
+          "profiles": {
+            "native": 0,
+            "controlled": 4,
+            "admittedNative": 0,
+            "admittedControlled": 4
+          },
+          "capabilities": {
+            "contextHistory": true,
+            "contextSources": true,
+            "decisions": true,
+            "proposals": true
+          },
+          "authorization": "none"
+        }
+      },
+      "configuration": {
+        "revision": "83d2a00c18fe919d4671f2916ce9baec23e44fc5cfd8f51b3ba2d241462e06af",
+        "projects": [
+          {
+            "discussionOnly": false,
+            "dispatchAllowed": true
+          }
+        ],
+        "profiles": [
+          {
+            "kind": "controlled_fixture",
+            "dispatchAllowed": true
+          },
+          {
+            "kind": "controlled_fixture",
+            "dispatchAllowed": true
+          },
+          {
+            "kind": "controlled_fixture",
+            "dispatchAllowed": true
+          },
+          {
+            "kind": "controlled_fixture",
+            "dispatchAllowed": true
+          }
+        ],
+        "contextHistoryAvailable": true,
+        "contextSourcesAvailable": true,
+        "decisionsAvailable": true,
+        "proposalsAvailable": true
+      },
+      "negatives": {
+        "invalidBearer": 401,
+        "noBearer": 200,
+        "badQuery": 400,
+        "badQueryCode": "invalid_request",
+        "missingRoute": 404
+      },
+      "health": {
+        "status": "ok",
+        "mode": "fixture",
+        "access": "local-development"
+      },
+      "code": null,
+      "issues": []
+    },
+    "mockRequests": 2,
+    "providerBefore": 2,
+    "consumer": {
+      "origin": "package",
+      "package": {
+        "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+        "buildId": "8296720d8a25f38c",
+        "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+        "tarBytes": 20481470
+      },
+      "files": [
+        {
+          "path": "apps/launcher/lib/start.mjs",
+          "sha256": "de21a1cf0117ecee9794442e679da90abea1a6d2971fb6dea28abcb226233e09",
+          "bytes": 23370
+        },
+        {
+          "path": "apps/launcher/lib/daemon.mjs",
+          "sha256": "2597175e8a27c69c986f4dc728ba40b6b86bf8d4958983bda7055fc7e29a6d56",
+          "bytes": 7716
+        },
+        {
+          "path": "apps/coordinator/product/restored-review.ts",
+          "sha256": "e6b77f1cdbdd9d9bd67f78e2e1c5f2bd3228f87ef7aa8d14314246135d6034c5",
+          "bytes": 7325
+        },
+        {
+          "path": "apps/coordinator/product/demo.ts",
+          "sha256": "ea78e3e915854071f7ee4344de0f0dc9d94795c11b205aebf55e86c4a5cf89e1",
+          "bytes": 6819
+        }
+      ]
+    },
+    "packageCapability": {
+      "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "buildId": "8296720d8a25f38c",
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "digestSupported": true
+    }
+  },
+  "packagedStop": {
+    "subject": {
+      "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "buildId": "8296720d8a25f38c",
+      "schema": 18,
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "tarBytes": 20481470,
+      "platform": "darwin",
+      "arch": "arm64",
+      "abi": "137"
+    },
+    "status": "RUNNING",
+    "healthMode": "personal",
+    "healthStartupMode": "recovery_readonly",
+    "recordMode": "personal",
+    "stopStatus": "STOPPED",
+    "stopCode": null,
+    "finding": null,
+    "cleaned": {
+      "clean": true,
+      "package": "STOPPED",
+      "refusal": null,
+      "recordRemoved": null,
+      "signals": [],
+      "reason": null
+    }
+  },
+  "stopFunctional": {
+    "subject": {
+      "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "buildId": "8296720d8a25f38c",
+      "schema": 18,
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "tarBytes": 20481470,
+      "platform": "darwin",
+      "arch": "arm64",
+      "abi": "137"
+    },
+    "normal": {
+      "status": "RUNNING",
+      "mode": "personal",
+      "startupMode": "normal",
+      "health": {
+        "mode": "personal",
+        "startupMode": "normal"
+      },
+      "packageStatus": "STOPPED",
+      "packageCode": null,
+      "exit": 0,
+      "before": {
+        "present": true,
+        "mode": "personal",
+        "startupMode": "normal",
+        "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/seed-state",
+        "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/app",
+        "resources": [
+          {
+            "label": "launcher",
+            "pid": 58522,
+            "start": "Tue Nov 17 09:33:39 2026",
+            "uid": 501,
+            "parentPid": null,
+            "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/app/apps/launcher/bin/pa.mjs start --json --port 63798 --api-port 63799 --discussion-only"
+          },
+          {
+            "label": "child",
+            "pid": 58559,
+            "start": "Tue Nov 17 09:33:40 2026",
+            "uid": 501,
+            "parentPid": 58522,
+            "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/app/apps/coordinator/product/demo.ts --port 63799 --state /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/seed-state --console-origin htt"
+          }
+        ]
+      },
+      "after": [
+        {
+          "pid": 58522,
+          "expectedStart": "Tue Nov 17 09:33:39 2026",
+          "alive": false,
+          "start": null,
+          "sameIdentity": false
+        },
+        {
+          "pid": 58559,
+          "expectedStart": "Tue Nov 17 09:33:40 2026",
+          "alive": false,
+          "start": null,
+          "sameIdentity": false
+        }
+      ],
+      "recordPresent": false,
+      "recordMode": null
+    },
+    "restored": {
+      "status": "RUNNING",
+      "mode": "personal",
+      "startupMode": "recovery_readonly",
+      "health": {
+        "mode": "personal",
+        "startupMode": "recovery_readonly"
+      },
+      "packageStatus": "STOPPED",
+      "packageCode": null,
+      "exit": 0,
+      "before": {
+        "present": true,
+        "mode": "personal",
+        "startupMode": "recovery_readonly",
+        "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/restored",
+        "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/app",
+        "resources": [
+          {
+            "label": "launcher",
+            "pid": 58854,
+            "start": "Tue Nov 17 09:33:41 2026",
+            "uid": 501,
+            "parentPid": null,
+            "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/app/apps/launcher/bin/pa.mjs start --json --port 63807 --api-port 63808 --discussion-only"
+          },
+          {
+            "label": "child",
+            "pid": 58896,
+            "start": "Tue Nov 17 09:33:42 2026",
+            "uid": 501,
+            "parentPid": 58854,
+            "argv": "/Users/hh/.nvm/versions/node/v24.21.0/bin/node /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/install/app/apps/coordinator/product/demo.ts --port 63808 --state /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-w21-review-5N7MNu/restored --console-origin http:"
+          }
+        ]
+      },
+      "after": [
+        {
+          "pid": 58854,
+          "expectedStart": "Tue Nov 17 09:33:41 2026",
+          "alive": false,
+          "start": null,
+          "sameIdentity": false
+        },
+        {
+          "pid": 58896,
+          "expectedStart": "Tue Nov 17 09:33:42 2026",
+          "alive": false,
+          "start": null,
+          "sameIdentity": false
+        }
+      ],
+      "recordPresent": false,
+      "recordMode": null
+    },
+    "resourcePolicy": "fixed pre-stop pid/start set, independently re-observed after stop",
+    "detectorCase": "E8-PACKAGED-STOP-CONSISTENCY records the refusal; this case is the product functional requirement",
+    "proofFallbackUsed": false
+  },
   "lifecycle": [
     {
       "id": "E1-LIFECYCLE-BIRTH-ROOT",
@@ -2096,43 +4924,330 @@
       "status": "PASS"
     }
   ],
-  "channel": null,
-  "supportMaterial": null,
-  "trialUi": null,
+  "channel": {
+    "module": "packages/contracts/src/coordinator-channel.ts",
+    "validFact": true,
+    "mismatchedFact": false,
+    "validPayload": true,
+    "mismatchedPayload": false,
+    "answerWrite": true,
+    "otherWrite": false,
+    "goodReceipt": true,
+    "badReceipt": false,
+    "producerMismatch": false,
+    "consumer": "NOT_INTEGRATED",
+    "limits": false
+  },
+  "supportMaterial": {
+    "subject": {
+      "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "buildId": "8296720d8a25f38c",
+      "schema": 18,
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "tarBytes": 20481470,
+      "platform": "darwin",
+      "arch": "arm64",
+      "abi": "137"
+    },
+    "bundle": {
+      "path": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-support-r1Mgjl/support-one.pab",
+      "bytes": 13961,
+      "mode": "600"
+    },
+    "repeated": {
+      "status": 2,
+      "result": "BLOCKED"
+    },
+    "credentialLike": false,
+    "installManifestMode": "600",
+    "releaseManifestMode": "600"
+  },
+  "trialUi": {
+    "subject": {
+      "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "buildId": "8296720d8a25f38c",
+      "schema": 18,
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "tarBytes": 20481470,
+      "platform": "darwin",
+      "arch": "arm64",
+      "abi": "137"
+    },
+    "mode": "personal",
+    "selector": {
+      "navigations": [
+        "主对话视图",
+        "试用准备"
+      ],
+      "trialRegion": "试用准备",
+      "draft": ".composer textarea"
+    },
+    "bundle": {
+      "entry": "install/app/apps/console/dist/assets/index-DTOhkXHZ.js",
+      "sha256": "5a70bf9fd07b0e2f3c15b9ba556f4d6abb1e05de767e8b0070b0623976265972",
+      "bytes": 658695
+    },
+    "actions": {
+      "model": "opened-settings",
+      "import": "opened-import-form",
+      "executor": "opened-executor",
+      "phaseOneRendered": [
+        "configure_model",
+        "import_project",
+        "inspect_executor"
+      ],
+      "conversation": "opened-conversation-draft-kept"
+    },
+    "negatives": {
+      "abort": {
+        "preservesPrior": true
+      },
+      "badSchema": {
+        "alertShown": true,
+        "leaksGranted": false,
+        "keepsPersonal": true
+      },
+      "legacy": {
+        "absentInterfaceStated": true
+      }
+    },
+    "layout": {
+      "desktop": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "boxes": [
+          {
+            "name": "主对话视图",
+            "present": true,
+            "x": 8,
+            "y": 67,
+            "width": 40,
+            "height": 40
+          },
+          {
+            "name": "试用准备",
+            "present": true,
+            "x": 8,
+            "y": 267,
+            "width": 40,
+            "height": 40
+          }
+        ],
+        "overlaps": [],
+        "overflow": {
+          "scrollWidth": 1440,
+          "innerWidth": 1440
+        }
+      },
+      "mobile": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "boxes": [
+          {
+            "name": "主对话视图",
+            "present": true,
+            "x": 31.390625,
+            "y": 797,
+            "width": 44,
+            "height": 38
+          },
+          {
+            "name": "试用准备",
+            "present": true,
+            "x": 314.59375,
+            "y": 797,
+            "width": 44,
+            "height": 38
+          }
+        ],
+        "overlaps": [],
+        "overflow": {
+          "scrollWidth": 390,
+          "innerWidth": 390
+        }
+      }
+    },
+    "screenshots": [
+      {
+        "path": "tests/product-acceptance/reports/wave27/browser/desktop.png",
+        "sha256": "82d8f257bf196f2536bba9930af380dea468ad5bccc28e9fc426fa01818ba68a",
+        "bytes": 124585,
+        "size": 124585
+      },
+      {
+        "path": "tests/product-acceptance/reports/wave27/browser/mobile.png",
+        "sha256": "92fd6f14c8d7b414871cb4ced2a8bd2bb765d65361614ff3ee00f16d6b0d9494",
+        "bytes": 55970,
+        "size": 55970
+      },
+      {
+        "path": "tests/product-acceptance/reports/wave27/browser/configured-conversation.png",
+        "sha256": "78c0eb1d366de861cc08c882c53d924e090ab5b0c76f40b230e0da0847a88a68",
+        "bytes": 76516,
+        "size": 76516
+      }
+    ],
+    "problems": [
+      "console: Failed to load resource: net::ERR_FAILED",
+      "console: Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "console: Failed to load resource: net::ERR_EMPTY_RESPONSE",
+      "console: Failed to load resource: net::ERR_CONNECTION_REFUSED"
+    ],
+    "readinessReads": 9,
+    "writes": 0,
+    "providerBefore": 0,
+    "providerAfter": 0,
+    "lifecycle": {
+      "stages": [],
+      "root": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-KNrhtT",
+      "startA": {
+        "status": "RUNNING",
+        "code": null,
+        "birth": {
+          "pid": 59583,
+          "start": "Tue Nov 17 09:33:48 2026",
+          "uid": 501,
+          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-KNrhtT/install/bin/pa start --json --port 63853 --api-port 63854 --discussion-only",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-KNrhtT/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-KNrhtT/state",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-KNrhtT/config",
+          "consolePort": 63853,
+          "apiPort": 63854,
+          "argvExact": false,
+          "recordedAt": "2026-11-17T01:33:48.399Z"
+        },
+        "instance": {
+          "mode": "personal",
+          "processStart": "Tue Nov 17 09:33:48 2026"
+        }
+      },
+      "stageAStop": {
+        "clean": true,
+        "reason": null,
+        "package": "STOPPED",
+        "refusal": null,
+        "recordRemoved": null,
+        "signals": []
+      },
+      "startB": {
+        "status": "RUNNING",
+        "code": null,
+        "birth": {
+          "pid": 59921,
+          "start": "Tue Nov 17 09:33:51 2026",
+          "uid": 501,
+          "argv": "/bin/sh /private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-KNrhtT/install/bin/pa start --json --port 63872 --api-port 63873 --discussion-only",
+          "install": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-KNrhtT/install",
+          "state": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-KNrhtT/state",
+          "config": "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w27-ui-KNrhtT/config",
+          "consolePort": 63872,
+          "apiPort": 63873,
+          "argvExact": false,
+          "recordedAt": "2026-11-17T01:33:51.025Z"
+        },
+        "instance": {
+          "mode": "personal",
+          "processStart": "Tue Nov 17 09:33:51 2026"
+        }
+      },
+      "stageBStop": {
+        "clean": true,
+        "reason": null,
+        "package": "STOPPED",
+        "refusal": null,
+        "recordRemoved": null,
+        "signals": []
+      },
+      "released": {
+        "removed": true
+      },
+      "unknown": null
+    },
+    "configuredMode": {
+      "actions": {
+        "configureVisible": 0,
+        "openConversationVisible": 1,
+        "draft": "尚未发送的原始草稿"
+      },
+      "status": "RUNNING",
+      "mode": "personal"
+    },
+    "pageErrors": []
+  },
   "counts": {
-    "PASS": 227,
+    "PASS": 336,
     "FAIL": 0,
     "SKIPPED": 0,
-    "NOT_TESTED": 0,
+    "NOT_TESTED": 21,
     "BLOCKED": 0,
     "UNKNOWN": 0
   },
   "testCodeSource": {
-    "commit": "c99475c617fc3abb8ea5c82e00a4aaa2160e14e0",
+    "commit": "4b4d4089a07e10b01c9deba32f0d51c23e96bdf1",
     "dirty": false,
     "branch": "codex/g3-product-acceptance"
   },
   "productSource": {
-    "commit": null,
-    "buildId": null,
-    "schema": null
+    "commit": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+    "buildId": "8296720d8a25f38c",
+    "schema": 18
   },
   "mainSource": {
     "commit": "5860da13",
-    "schema": null
+    "schema": 18
   },
   "artifactTuple": {
-    "baseline": null,
-    "target": null
+    "baseline": {
+      "role": "baseline",
+      "name": "wave29-target-1fbaf94",
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave29-target/wave29-target-1fbaf94.tar.gz",
+      "tarSha256": "daee1a94b43156cec659f7df2a3b08e1ecb89b645fde1ea81c35a81d75b47d7a",
+      "tarBytes": 20458656,
+      "installManifestSha256": "057731760a6be5eead713c0fc13c2102eb2dac39ecc33a7bc50dba80fb8aa585",
+      "releaseManifestSha256": "a6fef63e2a31bbbd2e96cf7433085fd8508de74a6e722e58d287bf43a5d3b918",
+      "closureDigest": "c2920614d1e0d45b86f0cebf4ff2891306d7be87c88d96877061c576f84e6ed4",
+      "files": 6849,
+      "buildId": "2d94a7c31ef97b57",
+      "sourceCommit": "1fbaf940d426fa34ff6289304e073b9159586ed9",
+      "sourceDirty": false,
+      "productSchema": 18,
+      "platform": "darwin",
+      "arch": "arm64",
+      "node": "24.21.0",
+      "abi": "137"
+    },
+    "target": {
+      "role": "target",
+      "name": "wave30-target-8296720",
+      "tarPath": "/Users/hh/Desktop/joker/pa-artifacts/wave30-target/wave30-target-8296720.tar.gz",
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "tarBytes": 20481470,
+      "installManifestSha256": "b6d907d626094ce6f73b91f8bd0869e1383c545dd6dfc2b30ad180b9c74dfa43",
+      "releaseManifestSha256": "308980db8b07a8a0d28d51aa31a02d0b6ea6b79a632564b467fc6c9a56688187",
+      "closureDigest": "3fa4b84a05421d67ba870caf5da6249deb45272d47fd0a2425f630e9a01b53c1",
+      "files": 6849,
+      "buildId": "8296720d8a25f38c",
+      "sourceCommit": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "sourceDirty": false,
+      "productSchema": 18,
+      "platform": "darwin",
+      "arch": "arm64",
+      "node": "24.21.0",
+      "abi": "137"
+    }
   },
   "cohorts": [
     {
       "id": "frozen-install-target",
-      "buildId": null,
-      "source": null,
-      "schema": null,
-      "tarSha256": null,
-      "tarBytes": null,
+      "buildId": "8296720d8a25f38c",
+      "source": "82ee5b8f1bc3e4b76233268fe61e4ebfd2f514b2",
+      "schema": 18,
+      "tarSha256": "04926739f491c34e9a093b2fc3edff2f85243e4a232af46c7a2430cf13687543",
+      "tarBytes": 20481470,
       "cases": [
         "E4-INSTALL-ARTIFACT-IDENTITY",
         "E7-READINESS",
@@ -2143,14 +5258,22 @@
     },
     {
       "id": "locked-w33-cohort",
-      "buildId": null,
-      "source": null,
-      "schema": null,
-      "tarSha256": null,
-      "tarBytes": null,
-      "zipSha256": null,
-      "zipBytes": null,
-      "runtime": null,
+      "buildId": "f880e5bc9c6c1c57",
+      "source": "048f0184606202b0b39e7426b7747f3fe57541c1",
+      "schema": 18,
+      "tarSha256": "ee45c92c7c5a8f2caa0449572b14bf97175b0392f1fd92c6f89d7a19464604e8",
+      "tarBytes": 20547728,
+      "zipSha256": "46e01c8c7b79818d19e019f6d2208ad54c5c9538674218f85455434eff8207f9",
+      "zipBytes": 63481603,
+      "runtime": {
+        "version": "24.21.0",
+        "abi": "137",
+        "sha256": "e4b5a3af0e05c75de2eae013904145f40fe7fc2a6e6f17510128bf45cca4e79b",
+        "licenseSha256": "5888dbb9a1d2b18f2c3e6c5f6af1b39de658372b402a0577b002777f14c62ace",
+        "bytes": 122129232,
+        "platform": "darwin",
+        "arch": "arm64"
+      },
       "cases": [
         "E33-OUTER-ZIP",
         "E33-COHORT-RECOVERY"
@@ -2158,27 +5281,35 @@
     },
     {
       "id": "w32-upgrade-baseline",
-      "buildId": null,
-      "source": null,
-      "schema": null,
-      "tarSha256": null,
+      "buildId": "88eb8c69b0671171",
+      "source": "e8348a864d7d192589e72b8099475520f841b1e5",
+      "schema": 18,
+      "tarSha256": "65c386d108d385c1e8463de33b801a1865925d5dd752a7b82a0c57974b8453ac",
       "cases": [
         "E5-COHORT-UPGRADE"
       ]
     }
   ],
   "fixedInputs": {
-    "testSource": "c99475c617fc3abb8ea5c82e00a4aaa2160e14e0",
+    "testSource": "4b4d4089a07e10b01c9deba32f0d51c23e96bdf1",
     "testSourceDirty": false,
     "mainRuntime": "23d5a98e6e75a3b0fb08168431260a9935cf5674 (main callbacks/support, consumed as source only)",
     "lockedCohort": {
-      "inner": null,
-      "source": null,
-      "tarSha256": null,
-      "zipSha256": null,
-      "zipBytes": null
+      "inner": "f880e5bc9c6c1c57",
+      "source": "048f0184606202b0b39e7426b7747f3fe57541c1",
+      "tarSha256": "ee45c92c7c5a8f2caa0449572b14bf97175b0392f1fd92c6f89d7a19464604e8",
+      "zipSha256": "46e01c8c7b79818d19e019f6d2208ad54c5c9538674218f85455434eff8207f9",
+      "zipBytes": 63481603
     },
-    "upgradeBaseline": null
+    "upgradeBaseline": {
+      "role": "w32",
+      "name": "wave32-target-88eb8c6",
+      "buildId": "88eb8c69b0671171",
+      "source": "e8348a864d7d192589e72b8099475520f841b1e5",
+      "schema": 18,
+      "tarSha256": "65c386d108d385c1e8463de33b801a1865925d5dd752a7b82a0c57974b8453ac",
+      "tarBytes": 20543106
+    }
   },
   "sixOutcomes": [
     {
@@ -2228,8 +5359,332 @@
         }
       ],
       "operation": {
-        "outer": null,
-        "cohort": null
+        "outer": {
+          "verdict": {
+            "allowed": true,
+            "reason": null
+          },
+          "released": [
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-home-9ppL3L"
+          ],
+          "retained": [],
+          "observation": [
+            {
+              "pid": 65026,
+              "expectedStart": "Tue Nov 17 09:34:24 2026",
+              "expectedUid": 501,
+              "expectedArgvSha256": "682f32cb6e47162a29d2f60549f99271723a4a30676477bc676dd3fff680b172",
+              "alive": false,
+              "observedStart": null,
+              "observedUid": null,
+              "observedPpid": null,
+              "observedArgvSha256": null,
+              "sameIdentity": false,
+              "query": "ps",
+              "queryOk": true,
+              "observation": "independent-ps"
+            },
+            {
+              "pid": 65094,
+              "expectedStart": "Tue Nov 17 09:34:25 2026",
+              "expectedUid": 501,
+              "expectedArgvSha256": "f8323ca78f976c9ef2bf9e7e4ff2cb3d63fb9e0444479e74bac2ceaeb8232d32",
+              "alive": false,
+              "observedStart": null,
+              "observedUid": null,
+              "observedPpid": null,
+              "observedArgvSha256": null,
+              "sameIdentity": false,
+              "query": "ps",
+              "queryOk": true,
+              "observation": "independent-ps"
+            },
+            {
+              "pid": 65113,
+              "expectedStart": "Tue Nov 17 09:34:26 2026",
+              "expectedUid": 501,
+              "expectedArgvSha256": "cc676705945a4f46239b97eb4a03677b8e3a5969e394d79ff57d66851e585e66",
+              "alive": false,
+              "observedStart": null,
+              "observedUid": null,
+              "observedPpid": null,
+              "observedArgvSha256": null,
+              "sameIdentity": false,
+              "query": "ps",
+              "queryOk": true,
+              "observation": "independent-ps"
+            },
+            {
+              "pid": 65694,
+              "expectedStart": "Tue Nov 17 09:34:29 2026",
+              "expectedUid": 501,
+              "expectedArgvSha256": "714e3e03f609a6721ab845a0810f9872d1d79ffb98a865fb49039cf1e1e93d26",
+              "alive": false,
+              "observedStart": null,
+              "observedUid": null,
+              "observedPpid": null,
+              "observedArgvSha256": null,
+              "sameIdentity": false,
+              "query": "ps",
+              "queryOk": true,
+              "observation": "independent-ps"
+            },
+            {
+              "pid": 65747,
+              "expectedStart": "Tue Nov 17 09:34:29 2026",
+              "expectedUid": 501,
+              "expectedArgvSha256": "b0e3ea597e57d61cd2ace50b6f7cddc85f0c775ff44112153641da28f82ce848",
+              "alive": false,
+              "observedStart": null,
+              "observedUid": null,
+              "observedPpid": null,
+              "observedArgvSha256": null,
+              "sameIdentity": false,
+              "query": "ps",
+              "queryOk": true,
+              "observation": "independent-ps"
+            },
+            {
+              "pid": 65766,
+              "expectedStart": "Tue Nov 17 09:34:30 2026",
+              "expectedUid": 501,
+              "expectedArgvSha256": "1deeb81280e99cc9671fe7e62ab5171f0d86f0186a3766c6958846c173fcb6c6",
+              "alive": false,
+              "observedStart": null,
+              "observedUid": null,
+              "observedPpid": null,
+              "observedArgvSha256": null,
+              "sameIdentity": false,
+              "query": "ps",
+              "queryOk": true,
+              "observation": "independent-ps"
+            },
+            {
+              "pid": 67013,
+              "expectedStart": "Tue Nov 17 09:34:34 2026",
+              "expectedUid": 501,
+              "expectedArgvSha256": "3eabab247d8e9f2bc7a4f96de31239afb0df9d97a9a065f25126760f696a1860",
+              "alive": false,
+              "observedStart": null,
+              "observedUid": null,
+              "observedPpid": null,
+              "observedArgvSha256": null,
+              "sameIdentity": false,
+              "query": "ps",
+              "queryOk": true,
+              "observation": "independent-ps"
+            },
+            {
+              "pid": 67027,
+              "expectedStart": "Tue Nov 17 09:34:35 2026",
+              "expectedUid": 501,
+              "expectedArgvSha256": "167722da9e0b655aec7b0b0da55d93faa5b1320b2a82641a1fefab9b7175ad54",
+              "alive": false,
+              "observedStart": null,
+              "observedUid": null,
+              "observedPpid": null,
+              "observedArgvSha256": null,
+              "sameIdentity": false,
+              "query": "ps",
+              "queryOk": true,
+              "observation": "independent-ps"
+            },
+            {
+              "pid": 67630,
+              "expectedStart": "Tue Nov 17 09:34:55 2026",
+              "expectedUid": 501,
+              "expectedArgvSha256": "31c0f09a106bbf32a4d5c4152fe179a03661502059adbd51003e3e39d4a59282",
+              "alive": false,
+              "observedStart": null,
+              "observedUid": null,
+              "observedPpid": null,
+              "observedArgvSha256": null,
+              "sameIdentity": false,
+              "query": "ps",
+              "queryOk": true,
+              "observation": "independent-ps"
+            },
+            {
+              "pid": 67703,
+              "expectedStart": "Tue Nov 17 09:34:57 2026",
+              "expectedUid": 501,
+              "expectedArgvSha256": "720d76b9441dcbba20924e6e74c530e2eefffa5026c69cac28bd0b5eff2d65cd",
+              "alive": false,
+              "observedStart": null,
+              "observedUid": null,
+              "observedPpid": null,
+              "observedArgvSha256": null,
+              "sameIdentity": false,
+              "query": "ps",
+              "queryOk": true,
+              "observation": "independent-ps"
+            },
+            {
+              "pid": 67719,
+              "expectedStart": "Tue Nov 17 09:34:57 2026",
+              "expectedUid": 501,
+              "expectedArgvSha256": "6200cf924551b31bd5326ee9b79d15592ade773921964f809c1de860c308e715",
+              "alive": false,
+              "observedStart": null,
+              "observedUid": null,
+              "observedPpid": null,
+              "observedArgvSha256": null,
+              "sameIdentity": false,
+              "query": "ps",
+              "queryOk": true,
+              "observation": "independent-ps"
+            },
+            {
+              "pid": 68355,
+              "expectedStart": "Tue Nov 17 09:35:00 2026",
+              "expectedUid": 501,
+              "expectedArgvSha256": "10670109776e57f5a0b8bed91ec8c342a6468fba51c8d4efed4db932396c2b09",
+              "alive": false,
+              "observedStart": null,
+              "observedUid": null,
+              "observedPpid": null,
+              "observedArgvSha256": null,
+              "sameIdentity": false,
+              "query": "ps",
+              "queryOk": true,
+              "observation": "independent-ps"
+            },
+            {
+              "pid": 68408,
+              "expectedStart": "Tue Nov 17 09:35:00 2026",
+              "expectedUid": 501,
+              "expectedArgvSha256": "f0577204aa05a70b373d90cdce38e3d1f4d732d1b1d347d0afb147603a2ff164",
+              "alive": false,
+              "observedStart": null,
+              "observedUid": null,
+              "observedPpid": null,
+              "observedArgvSha256": null,
+              "sameIdentity": false,
+              "query": "ps",
+              "queryOk": true,
+              "observation": "independent-ps"
+            },
+            {
+              "pid": 68427,
+              "expectedStart": "Tue Nov 17 09:35:01 2026",
+              "expectedUid": 501,
+              "expectedArgvSha256": "4cf1474d221354dc24f237ec061913907567b50f9b9dd79daf8724b12d5e1959",
+              "alive": false,
+              "observedStart": null,
+              "observedUid": null,
+              "observedPpid": null,
+              "observedArgvSha256": null,
+              "sameIdentity": false,
+              "query": "ps",
+              "queryOk": true,
+              "observation": "independent-ps"
+            }
+          ],
+          "signals": []
+        },
+        "cohort": {
+          "verdict": {
+            "allowed": true,
+            "reason": null
+          },
+          "released": [
+            "/private/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/pa-e-w34-recovery-1pVpaK"
+          ],
+          "retained": [],
+          "observation": [
+            {
+              "pid": 69371,
+              "expectedStart": "Tue Nov 17 09:35:06 2026",
+              "expectedUid": 501,
+              "expectedArgvSha256": "7f2cbf237a8183284ebf9fc440a8e031c1b63db229b0e38b2d7254a3a0b62c0f",
+              "alive": false,
+              "observedStart": null,
+              "observedUid": null,
+              "observedPpid": null,
+              "observedArgvSha256": null,
+              "sameIdentity": false,
+              "query": "ps",
+              "queryOk": true,
+              "observation": "independent-ps"
+            },
+            {
+              "pid": 69407,
+              "expectedStart": "Tue Nov 17 09:35:07 2026",
+              "expectedUid": 501,
+              "expectedArgvSha256": "6fd7d62da215622c700b06f69d679654000b523c940ceb61d3918dbd9f3d9c2c",
+              "alive": false,
+              "observedStart": null,
+              "observedUid": null,
+              "observedPpid": null,
+              "observedArgvSha256": null,
+              "sameIdentity": false,
+              "query": "ps",
+              "queryOk": true,
+              "observation": "independent-ps"
+            },
+            {
+              "pid": 70247,
+              "expectedStart": "Tue Nov 17 09:35:10 2026",
+              "expectedUid": 501,
+              "expectedArgvSha256": "db58c8ab38c75a408a535af60d6d49bf688e7ee88bd676c1f84ce35c95bd0d76",
+              "alive": false,
+              "observedStart": null,
+              "observedUid": null,
+              "observedPpid": null,
+              "observedArgvSha256": null,
+              "sameIdentity": false,
+              "query": "ps",
+              "queryOk": true,
+              "observation": "independent-ps"
+            },
+            {
+              "pid": 70283,
+              "expectedStart": "Tue Nov 17 09:35:10 2026",
+              "expectedUid": 501,
+              "expectedArgvSha256": "7d6f72dded3810cb54f8902eec8dd76df0221ab48e9bfbf44885032b2cf56cd9",
+              "alive": false,
+              "observedStart": null,
+              "observedUid": null,
+              "observedPpid": null,
+              "observedArgvSha256": null,
+              "sameIdentity": false,
+              "query": "ps",
+              "queryOk": true,
+              "observation": "independent-ps"
+            },
+            {
+              "pid": 70754,
+              "expectedStart": "Tue Nov 17 09:35:11 2026",
+              "expectedUid": 501,
+              "expectedArgvSha256": "11189052396cd061f7e6f4da5248c41275feaa55e9bbd5292630accef2067337",
+              "alive": false,
+              "observedStart": null,
+              "observedUid": null,
+              "observedPpid": null,
+              "observedArgvSha256": null,
+              "sameIdentity": false,
+              "query": "ps",
+              "queryOk": true,
+              "observation": "independent-ps"
+            },
+            {
+              "pid": 70790,
+              "expectedStart": "Tue Nov 17 09:35:11 2026",
+              "expectedUid": 501,
+              "expectedArgvSha256": "1295e37ff75efd3866b536fd6ea5729619430297646652c4c23bf9b45d0db672",
+              "alive": false,
+              "observedStart": null,
+              "observedUid": null,
+              "observedPpid": null,
+              "observedArgvSha256": null,
+              "sameIdentity": false,
+              "query": "ps",
+              "queryOk": true,
+              "observation": "independent-ps"
+            }
+          ],
+          "signals": []
+        }
       },
       "notes": "w33 outer/cohort callers consume one shared operation protocol: complete birth set, fresh per-signal identity, sticky UNKNOWN, release only on a complete exited observation; a failed assertion or refused stop keeps the whole private HOME/install/state."
     },
@@ -2276,44 +5731,131 @@
     {
       "id": "E3",
       "title": "两个原项目的真实 scoped 旅程与重开",
-      "status": "MISSING",
+      "status": "PASS",
       "journey": {
-        "sameProject": null,
-        "acceptReadiness": null,
-        "staleScope": null
+        "sameProject": false,
+        "acceptReadiness": [
+          {
+            "available": [
+              "stop_work",
+              "pause_dispatch",
+              "accept_candidate"
+            ],
+            "candidateId": "77708cbc2181a3a976fdd5a7b2a367fe/32853348c280eb8685bca9d69f376a88/3",
+            "verificationId": "verification:07e78f2a-7a71-49c8-9f10-3f5d77376d7b",
+            "verificationResults": 1,
+            "verificationState": "pass"
+          },
+          {
+            "available": [
+              "stop_work",
+              "pause_dispatch",
+              "accept_candidate"
+            ],
+            "candidateId": "b22ede94513bd5c9339ab074833df949/a1d36aba32ae3f47a25ec11c01c6840c/3",
+            "verificationId": "verification:7ce6bc32-0f16-4356-86f9-6a8b33f36547",
+            "verificationResults": 1,
+            "verificationState": "pass"
+          }
+        ],
+        "staleScope": "COMPOSITE: stale candidate derived by replacing the contract digest on the current candidate reference"
       },
-      "originalProjectApplicable": "MISSING",
+      "originalProjectApplicable": "NOT_TESTED",
       "notes": "both registered projects run preview/create/candidate/verification accept; reopen reads the same Work id, phase, artifact ids and every artifact byte; sameProject stays false because the fixture exposes only its own project, and a sameProject claim over a scoped 403 is rejected by the final report oracle."
     },
     {
       "id": "E4",
       "title": "actual outer ZIP 的当前产品安装与再启",
-      "status": "MISSING",
-      "zip": null,
-      "phases": null,
-      "import": null,
-      "settings": null,
+      "status": "PASS",
+      "zip": {
+        "sha256": "46e01c8c7b79818d19e019f6d2208ad54c5c9538674218f85455434eff8207f9",
+        "bytes": 63481603,
+        "buildId": "f880e5bc9c6c1c57",
+        "source": "048f0184606202b0b39e7426b7747f3fe57541c1",
+        "innerTarSha256": "ee45c92c7c5a8f2caa0449572b14bf97175b0392f1fd92c6f89d7a19464604e8",
+        "installManifestDigest": "f8d40ee86e10bb0319cb1959744760f986609f81eaa6e8db67f2cdca9de44693",
+        "runtimeDigest": "e4b5a3af0e05c75de2eae013904145f40fe7fc2a6e6f17510128bf45cca4e79b",
+        "licenseDigest": "5888dbb9a1d2b18f2c3e6c5f6af1b39de658372b402a0577b002777f14c62ace"
+      },
+      "phases": {
+        "unconfigured": "RUNNING",
+        "configured": "RUNNING",
+        "import": "RUNNING",
+        "reopen": "RUNNING"
+      },
+      "import": {
+        "status": 200,
+        "projectId": "project-4178050852d18ad83af8b487",
+        "readBack": 2
+      },
+      "settings": {
+        "entry": "Settings.command",
+        "template": {
+          "mode0600": true,
+          "exclusive": true,
+          "keys": [
+            "baseURL",
+            "apiKey",
+            "model",
+            "allowedModels",
+            "allowInsecureHttp",
+            "maxOutputTokens"
+          ]
+        },
+        "gui": "HELD",
+        "reason": "Settings.command opens TextEdit through the absolute /usr/bin/open; E does not launch a GUI editor unattended."
+      },
       "notes": "the locked outer ZIP is verified by its own sidecars and driven with its bundled Node: unconfigured/configured/import/reopen phases, port-conflict refusal, status STOPPED, and the Settings template contract (GUI HELD, never launched unattended)."
     },
     {
       "id": "E5",
       "title": "同 cohort 非空恢复、升级与回退字节证明",
-      "status": "INCOMPLETE",
+      "status": "PASS",
       "recovery": {
-        "seedArtifacts": null,
-        "artifactBytesEqual": null,
-        "works": null,
-        "questions": null,
-        "pendingRecorded": null,
-        "queueHeld": null,
-        "directStore": null,
-        "registry": null,
-        "unauthorized": null,
-        "wrongToken": null,
-        "business": null,
-        "provider": null
+        "seedArtifacts": 4,
+        "artifactBytesEqual": true,
+        "works": 2,
+        "questions": 2,
+        "pendingRecorded": 2,
+        "queueHeld": true,
+        "directStore": true,
+        "registry": 26,
+        "unauthorized": {
+          "status": 200
+        },
+        "wrongToken": {
+          "status": 401
+        },
+        "business": {
+          "status": 422,
+          "code": "unsupported_capability"
+        },
+        "provider": {
+          "afterSeed": 0,
+          "afterReads": 0
+        }
       },
-      "upgrade": null,
+      "upgrade": {
+        "from": "88eb8c69b0671171",
+        "to": "f880e5bc9c6c1c57",
+        "rollback": {
+          "raw": {
+            "status": "BINARY_ROLLED_BACK",
+            "from": "f880e5bc9c6c1c57",
+            "to": "88eb8c69b0671171",
+            "dataRolledBack": false
+          },
+          "build": "88eb8c69b0671171",
+          "postDataKept": true,
+          "schema": 18,
+          "postKept": true
+        },
+        "postKept": true,
+        "dSubmitted": {
+          "raw": "BLOCKED_unknown_live_resource",
+          "admission": "Preserve CONFIRMED upgrade and data continuity; full original rollback command success is NOT_ADMITTED until the successful operation-bound raw result is provided"
+        }
+      },
       "notes": "the same locked cohort backs up a delivered Work with all referenced artifact bytes and a recorded question, restores into a new root, reads identical bytes/history and direct Store registry rows, refuses answer/business writes with no provider call, and a managed W32→W33 upgrade keeps post-upgrade data with a binary-only rollback. D’s submitted rollback summary contradicts its raw BLOCKED result and is NOT_ADMITTED."
     },
     {
@@ -2323,14 +5865,14 @@
       "finalRun": {
         "command": "node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record",
         "source": {
-          "commit": "c99475c617fc3abb8ea5c82e00a4aaa2160e14e0",
+          "commit": "4b4d4089a07e10b01c9deba32f0d51c23e96bdf1",
           "dirty": false
         },
         "counts": {
-          "PASS": 227,
+          "PASS": 336,
           "FAIL": 0,
           "SKIPPED": 0,
-          "NOT_TESTED": 0,
+          "NOT_TESTED": 21,
           "BLOCKED": 0,
           "UNKNOWN": 0
         }
@@ -2340,12 +5882,15 @@
   ],
   "tiers": {
     "controlled": "PASS",
-    "installedAlpha": "FAIL",
-    "installedFunctional": "FAIL",
-    "localAlpha": "FAIL",
+    "installedAlpha": "PASS",
+    "installedFunctional": "PASS",
+    "localAlpha": "PASS",
     "fullProduct": "FAIL",
     "fullProductFailures": [
-      "missing_required_case"
+      "missing_required_case",
+      "case_not_pass",
+      "layer_not_allowed",
+      "required_evidence_missing"
     ]
   }
 }

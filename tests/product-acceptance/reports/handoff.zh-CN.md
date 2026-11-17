@@ -1,6 +1,6 @@
 # Agent E 第三十五轮交付交接
 
-- 分支 `codex/g3-product-acceptance`，基线 `5860da13`，检查点 `PENDING`，本次证据源 `c99475c617fc3abb8ea5c82e00a4aaa2160e14e0`（干净工作树）。证据文件随源提交之后的提交一起交付；`git log` 的分支头即最终交付提交。
+- 分支 `codex/g3-product-acceptance`，基线 `5860da13`，检查点 `PENDING`，本次证据源 `4b4d4089a07e10b01c9deba32f0d51c23e96bdf1`（干净工作树）。证据文件随源提交之后的提交一起交付；`git log` 的分支头即最终交付提交。
 - 拥有路径：`tests/product-acceptance/`。未修改生产实现、root manifest/lock、公共 schema 或迁移。
 - 模型预算：0 个真实模型任务；唯一模型对端是本机 loopback mock。原生执行：0。
 
@@ -8,34 +8,34 @@
 
 | 成果 | 结论 | 依据 |
 | --- | --- | --- |
-| E1 operation 协议 | PASS | 全 set fresh 后目标 fresh、重复/外来/迟到 child/UNKNOWN 拒绝、1:1 退出映射、assert 先于 release；outer/cohort operation=undefined/undefined。 |
+| E1 operation 协议 | PASS | 全 set fresh 后目标 fresh、重复/外来/迟到 child/UNKNOWN 拒绝、1:1 退出映射、assert 先于 release；outer/cohort operation=true/true。 |
 | E2 完整 report 语义 | PASS | operation 矛盾、pending 停机前问题、effect/question/answer 行、direct registry、artifact ids、sameProject scoped403 全 report 拒绝。 |
-| E3 原项目日常 | MISSING；原项目 NOT_REACHED | 两项目 preview/create/candidate/verification accept，composite stale candidate 被拒，重开全字节相等；原项目 applicability 仍 NOT_REACHED。 |
-| E4 outer+模型设置 | MISSING；successor HELD | W33 46e 未配置/已配置/导入/复用/再启/停止；0644 config 在 start 被接受（记录 gap），无 secret 回显；模型保存 successor 需 D 以 4cde5883/8cd709ca 稳定组合冻结，source-only 不重贴 f880。 |
-| E5 非空恢复 | MISSING | 全部 bytes/两 Work/pending 前问题/effect 行/registry/错 bearer/422/provider0；停机后 phase 如实记录。 |
-| E6 升级回退 | MISSING | E 自测 W32→W33 CONFIRMED + 仅二进制回退；D 新 raw retry exit0 与原 BLOCKED 分开记录。 |
-| E7 多实例 | MISSING | 同装两独立 config/state/model 根同时运行、身份/端口/根隔离、停 A 后 B 可服务、doctor DEGRADED 且不泄 key。 |
+| E3 原项目日常 | PASS；原项目 NOT_REACHED | 两项目 preview/create/candidate/verification accept，composite stale candidate 被拒，重开全字节相等；原项目 applicability 仍 NOT_REACHED。 |
+| E4 outer+模型设置 | PASS；successor HELD | W33 46e 未配置/已配置/导入/复用/再启/停止；0644 config 在 start 被接受（记录 gap），无 secret 回显；模型保存 successor 需 D 以 4cde5883/8cd709ca 稳定组合冻结，source-only 不重贴 f880。 |
+| E5 非空恢复 | PASS | 全部 bytes/两 Work/pending 前问题/effect 行/registry/错 bearer/422/provider0；停机后 phase 如实记录。 |
+| E6 升级回退 | PASS | E 自测 W32→W33 CONFIRMED + 仅二进制回退；D 新 raw retry exit0 与原 BLOCKED 分开记录。 |
+| E7 多实例 | PASS | 同装两独立 config/state/model 根同时运行、身份/端口/根隔离、停 A 后 B 可服务、doctor DEGRADED 且不泄 key。 |
 | E8 原 Work 恢复 | NOT_REACHED | 缺 main/B/I 实际恢复 consumer；精确 owner 输入已记录，不以 callbacks/slot 替证。 |
-| E9 分层交接 | controlled=PASS；alpha=FAIL；functional=FAIL | legacy R1 与 W33 subset 分列；full-product 仍因 native 拒绝。 |
+| E9 分层交接 | controlled=PASS；alpha=PASS；functional=PASS | legacy R1 与 W33 subset 分列；full-product 仍因 native 拒绝。 |
 
 ## 第三十四轮六成果（两个连续工程包）
 
 | 成果 | 结论 | 依据 |
 | --- | --- | --- |
-| E1 caller finally 完整资源 | PASS | 共享 operation 协议（完整 birth/每次 fresh/粘性 UNKNOWN/仅完整退出后 release）；outer=undefined，cohort=undefined；10 个纯控制含 retain 拒 release、parent 死 child 活、伪造 start、assert 失败保留、无 force API、caller 源码零直接删除。 |
+| E1 caller finally 完整资源 | PASS | 共享 operation 协议（完整 birth/每次 fresh/粘性 UNKNOWN/仅完整退出后 release）；outer=true，cohort=true；10 个纯控制含 retain 拒 release、parent 死 child 活、伪造 start、assert 失败保留、无 force API、caller 源码零直接删除。 |
 | E2 完整资源映射 oracle | PASS | resourceRowsIssues 绑定 pid/start/uid/argv/root/config/op 与 1:1 同序 post 观察，应用于 outer/cohort/E32/journey；全 report 变异覆盖空 after、foreign pid、alive 行、cardinality、错 start。 |
-| E3 两个原项目 scoped 旅程 | MISSING；原项目执行 NOT_REACHED | 两项目 preview/create/candidate/verification accept；重开同 Work/phase/artifact IDs 与全部 bytes；sameProject 仅在 scoped 可读且 draft 完整时成立，scoped403 由最终 oracle 拒绝；接受面无 candidate 身份，stale-candidate 反例记 NOT_REACHED。 |
-| E4 锁定 outer ZIP | MISSING | W33 outer 46e（…，? bytes）自身校验+包内 Node：未配置/已配置/导入/重开、端口冲突拒绝、status STOPPED、Settings 模板契约（GUI HELD 未启动）。 |
-| E5 非空恢复/升级 | MISSING + MISSING | 全部 artifact bytes（?）与 history、? Work/问题行、effect 行不变、冻结 Store registry ?、错 bearer 401、业务/回答 422、provider 0；W32→W33 CONFIRMED 升级与仅二进制回退（post 数据保留）。D 提交的 rollback raw BLOCKED 与 summary 冲突，NOT_ADMITTED。 |
-| E6 整体 tier/交接 | controlled=PASS；installed-alpha=FAIL；installed-functional=FAIL | 分层结论；full-product 仅因原生缺失 FAIL（missing_required_case）；原生/试点仍 0/BLOCKED。 |
+| E3 两个原项目 scoped 旅程 | PASS；原项目执行 NOT_REACHED | 两项目 preview/create/candidate/verification accept；重开同 Work/phase/artifact IDs 与全部 bytes；sameProject 仅在 scoped 可读且 draft 完整时成立，scoped403 由最终 oracle 拒绝；接受面无 candidate 身份，stale-candidate 反例记 NOT_REACHED。 |
+| E4 锁定 outer ZIP | PASS | W33 outer 46e（46e01c8c…，63481603 bytes）自身校验+包内 Node：未配置/已配置/导入/重开、端口冲突拒绝、status STOPPED、Settings 模板契约（GUI HELD 未启动）。 |
+| E5 非空恢复/升级 | PASS + PASS | 全部 artifact bytes（4）与 history、2 Work/问题行、effect 行不变、冻结 Store registry 26、错 bearer 401、业务/回答 422、provider 0；W32→W33 CONFIRMED 升级与仅二进制回退（post 数据保留）。D 提交的 rollback raw BLOCKED 与 summary 冲突，NOT_ADMITTED。 |
+| E6 整体 tier/交接 | controlled=PASS；installed-alpha=PASS；installed-functional=PASS | 分层结论；full-product 仅因原生缺失 FAIL（missing_required_case, case_not_pass, layer_not_allowed, required_evidence_missing）；原生/试点仍 0/BLOCKED。 |
 
 ## 第三十三轮三项成果
 
 | 成果 | 结论 | 依据 |
 | --- | --- | --- |
 | 1. 两个原项目的真实完整旅程 | 模板正例 PASS；原项目同项目执行链 **NOT_REACHED**（不冒充 PASS） | E5-TWO-PROJECT-TEMPLATE-CREATE 记录两个原项目、预览、创建、候选、手动接受和执行身份连续性；最终 validator 拒绝 needs_input 却声称 applicable、跨项目 executionProjectId、scoped 403，以及重开缺 found/phase/artifacts。E32-ORIGINAL-PROJECT-APPLICABLE 仍是 NOT_REACHED：受控 fixture 中原登记项目不可派发，personal 无 executor。 |
-| 2. 唯一准确安装 cohort 与 actual outer ZIP | **PASS（两个命名 cohort）** | E33-OUTER-ZIP：ZIP 自身 SHA256SUMS 与 package-result（zip …）、内层 install/runtime/license digest、bundled Node 版本/ABI、私有 HOME 下 Start/Stop/status、未配置与已配置、端口冲突拒绝、重开、停止后 status=2 STOPPED；cohort=zip-inner buildId ?。 |
-| 3. 非空业务恢复、升级重开与完整停止 | **PASS（所测 cohort）**，其余保留 gap | E33-COHORT-RECOVERY：交付 Work + artifacts → backup CREATED/VERIFIED（eventSeq ?）→ 新 root restore → recovery_readonly 读回相同 artifact 字节/历史、业务写 422、provider 0、篡改 bundle 拒绝、固定集停止；E4-UPGRADE-ROLLBACK 在 baseline/target 对保留升级后写入并回滚二进制。W32 的 ZIP backup 记录了 20 个 artifact 但未恢复读回；非空恢复结论只由 E33-COHORT-RECOVERY 承担。 |
+| 2. 唯一准确安装 cohort 与 actual outer ZIP | **PASS（两个命名 cohort）** | E33-OUTER-ZIP：ZIP 自身 SHA256SUMS 与 package-result（zip 46e01c8c…）、内层 install/runtime/license digest、bundled Node 版本/ABI、私有 HOME 下 Start/Stop/status、未配置与已配置、端口冲突拒绝、重开、停止后 status=2 STOPPED；cohort=zip-inner buildId f880e5bc9c6c1c57。 |
+| 3. 非空业务恢复、升级重开与完整停止 | **PASS（所测 cohort）**，其余保留 gap | E33-COHORT-RECOVERY：交付 Work + artifacts → backup CREATED/VERIFIED（eventSeq 73）→ 新 root restore → recovery_readonly 读回相同 artifact 字节/历史、业务写 422、provider 0、篡改 bundle 拒绝、固定集停止；E4-UPGRADE-ROLLBACK 在 baseline/target 对保留升级后写入并回滚二进制。W32 的 ZIP backup 记录了 20 个 artifact 但未恢复读回；非空恢复结论只由 E33-COHORT-RECOVERY 承担。 |
 
 ## 实际命令与结果
 
@@ -43,65 +43,65 @@
 | --- | --- | --- |
 | `node tests/product-acceptance/pilot/harness.mjs --preflight` | 冻结输入/价格/ledger | BLOCKED（adapter_missing）；runner selftest 66/17 |
 | `node tests/product-acceptance/run.mjs --suites=selftest --tier=harness-only` | E1-* | PASS 150 |
-| `node tests/product-acceptance/run.mjs --suites=e2 --tier=e2-controlled-workflow` | E2-* | PASS 9 |
-| `node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui` | E3-* | PASS 4 |
-| `node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha` | E4-* / E5-NATIVE-CONTROL / E6-REVIEW-PILOT | 无病例 |
-| `node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record` | 全部 227 | PASS 227 + FAIL 0 + SKIPPED 0 + NOT_TESTED 0 + BLOCKED 0 + UNKNOWN 0 |
+| `node tests/product-acceptance/run.mjs --suites=e2 --tier=e2-controlled-workflow` | E2-* | PASS 34 + NOT_TESTED 3 |
+| `node tests/product-acceptance/run.mjs --suites=e3 --tier=e3-browser-ui` | E3-* | PASS 32 + NOT_TESTED 6 |
+| `node tests/product-acceptance/run.mjs --suites=e4 --tier=installed-alpha` | E4-* / E5-NATIVE-CONTROL / E6-REVIEW-PILOT | PASS 21 + NOT_TESTED 5 |
+| `node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record` | 全部 357 | PASS 336 + FAIL 0 + SKIPPED 0 + NOT_TESTED 21 + BLOCKED 0 + UNKNOWN 0 |
 
-本次聚合：**PASS**（tier `harness-only`）。证据目录 `/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-16T19-08-57-315Z`。
+本次聚合：**PASS**（tier `controlled-product-workflow`）。证据目录 `/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T01-27-16-378Z`。
 
 ## 矩阵摘要
 
 | 能力 | 受控 fixture | SDK mock | 只读 | 安装（同一字节） | 实际原生 |
 | --- | --- | --- | --- | --- | --- |
-| 主对话：普通消息持久化与重开 | MISSING | MISSING | NOT_TESTED | NOT_TESTED | NOT_TESTED |
-| 明确委托到受控执行、验证与完成 | MISSING | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
-| 问题中心：打开、回答、投递与决策收件箱 | MISSING | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
-| 机器检查、完整 patch、artifact 字节与人工接受 | MISSING | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
-| 验证阻断→明确重新检查→同一候选验证→接受→重开 | MISSING | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
-| 接受结果投影与工作证据读取 | MISSING | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
-| 必需机器检查失败不可被人工接受 | MISSING | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
-| 同 commandId 幂等重放与冲突拒绝 | MISSING | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
-| 旧合同/旧候选/旧回答按业务规则拒绝 | MISSING | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
-| 会话隔离与工作隔离 | MISSING | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
-| 停止后继续使用新 ticket，不重用旧执行 | MISSING | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
-| 重启后交付、消息与 artifact 保留 | MISSING | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
-| 越权 scope、未知项目、未准入 profile、认证与 Origin | MISSING | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
-| 桌面 1440×900 主对话中心布局 | MISSING | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
-| 笔记本 1280×800 布局 | MISSING | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
-| 窄屏 390×844 抽屉、键盘与关闭 | MISSING | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
-| 加载/错误/离线与重连状态 | MISSING | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
-| 完整 patch 预览与 artifact 下载字节校验 | MISSING | NOT_TESTED | MISSING | NOT_TESTED | NOT_TESTED |
-| 有界混合周期稳定性（受控） | MISSING | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
-| 迁移清单验收规则（缺产物/坏 digest/无回滚拒绝） | MISSING | NOT_TESTED | MISSING | NOT_TESTED | NOT_TESTED |
-| 新目录/新账户安装与 first-run | NOT_TESTED | NOT_TESTED | NOT_TESTED | MISSING | NOT_TESTED |
-| 完整备份、恢复与路径映射 | NOT_TESTED | NOT_TESTED | NOT_TESTED | MISSING | NOT_TESTED |
-| 升级与回滚 | NOT_TESTED | NOT_TESTED | NOT_TESTED | MISSING | NOT_TESTED |
-| 会话目录、搜索、CAS 重命名、归档与恢复 | MISSING | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
-| 待办注意信号：未结束工作、归档可见、交付后清除 | MISSING | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
-| 跨项目注意力收件箱：排序/筛选/分页/逐项打开 | MISSING | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
-| 验收等待与 UI 活动代理（unknown 不填 0） | MISSING | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
-| 推荐建议只在显式实验入口；默认路径关闭 | NOT_TESTED | NOT_TESTED | MISSING | NOT_TESTED | NOT_TESTED |
-| 冻结候选 + 独立复核 + sealed copy + 人工审阅 | NOT_TESTED | NOT_TESTED | MISSING | NOT_TESTED | NOT_TESTED |
+| 主对话：普通消息持久化与重开 | PASS | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED |
+| 明确委托到受控执行、验证与完成 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
+| 问题中心：打开、回答、投递与决策收件箱 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
+| 机器检查、完整 patch、artifact 字节与人工接受 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
+| 验证阻断→明确重新检查→同一候选验证→接受→重开 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
+| 接受结果投影与工作证据读取 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
+| 必需机器检查失败不可被人工接受 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
+| 同 commandId 幂等重放与冲突拒绝 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
+| 旧合同/旧候选/旧回答按业务规则拒绝 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
+| 会话隔离与工作隔离 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
+| 停止后继续使用新 ticket，不重用旧执行 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
+| 重启后交付、消息与 artifact 保留 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
+| 越权 scope、未知项目、未准入 profile、认证与 Origin | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
+| 桌面 1440×900 主对话中心布局 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
+| 笔记本 1280×800 布局 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
+| 窄屏 390×844 抽屉、键盘与关闭 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
+| 加载/错误/离线与重连状态 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
+| 完整 patch 预览与 artifact 下载字节校验 | PASS | NOT_TESTED | PASS | NOT_TESTED | NOT_TESTED |
+| 有界混合周期稳定性（受控） | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
+| 迁移清单验收规则（缺产物/坏 digest/无回滚拒绝） | PASS | NOT_TESTED | PASS | NOT_TESTED | NOT_TESTED |
+| 新目录/新账户安装与 first-run | NOT_TESTED | NOT_TESTED | NOT_TESTED | PASS | NOT_TESTED |
+| 完整备份、恢复与路径映射 | NOT_TESTED | NOT_TESTED | NOT_TESTED | PASS | NOT_TESTED |
+| 升级与回滚 | NOT_TESTED | NOT_TESTED | NOT_TESTED | PASS | NOT_TESTED |
+| 会话目录、搜索、CAS 重命名、归档与恢复 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
+| 待办注意信号：未结束工作、归档可见、交付后清除 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
+| 跨项目注意力收件箱：排序/筛选/分页/逐项打开 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
+| 验收等待与 UI 活动代理（unknown 不填 0） | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
+| 推荐建议只在显式实验入口；默认路径关闭 | NOT_TESTED | NOT_TESTED | PASS | NOT_TESTED | NOT_TESTED |
+| 冻结候选 + 独立复核 + sealed copy + 人工审阅 | NOT_TESTED | NOT_TESTED | PASS | NOT_TESTED | NOT_TESTED |
 | 真实不同协议复核（版本/身份/预算/隔离/主题） | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
 | 项目设置版本化与归档 | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
-| 上下文、提案与明确决定治理 | MISSING | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
-| 显式选源消息、同事务绑定、审计、SSE 与丢响应重放 | MISSING | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
-| 完成回复先落盘、失败重开补齐且不重复请求 | MISSING | NOT_TESTED | NOT_TESTED | MISSING | NOT_TESTED |
-| 真实 D 数据库迁移到当前 A schema 且数据保留 | MISSING | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
+| 上下文、提案与明确决定治理 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
+| 显式选源消息、同事务绑定、审计、SSE 与丢响应重放 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
+| 完成回复先落盘、失败重开补齐且不重复请求 | PASS | NOT_TESTED | NOT_TESTED | PASS | NOT_TESTED |
+| 真实 D 数据库迁移到当前 A schema 且数据保留 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
 | B 真实生产 begin/answer/stop 与独立进程恢复 | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
-| 恢复后首次启动只读、零业务发送 | MISSING | NOT_TESTED | NOT_TESTED | MISSING | NOT_TESTED |
-| 明确决定、授权上下文、结构化提案与事务消费 | MISSING | NOT_TESTED | MISSING | NOT_TESTED | NOT_TESTED |
-| 可迁移发行、安装、备份恢复、升级回滚 | NOT_TESTED | NOT_TESTED | MISSING | MISSING | NOT_TESTED |
-| D 托管 upgrade/rollback-install 与显式 baseline/target 字节 | NOT_TESTED | NOT_TESTED | NOT_TESTED | MISSING | NOT_TESTED |
-| 模式保持、未知活 PID 阻断与不误杀 | NOT_TESTED | NOT_TESTED | NOT_TESTED | MISSING | NOT_TESTED |
-| 结构化提案 prepare/confirm/reject（真实 HTTP/SQLite） | MISSING | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
-| 提案网页预览/确认/拒绝与响应丢失重放 | MISSING | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
-| 上下文来源/窗口/授权预览 | MISSING | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
-| 恢复只读 inspect/prepare 与重放/重启边界 | MISSING | NOT_TESTED | NOT_TESTED | MISSING | NOT_TESTED |
-| 工作证据与分页历史 | MISSING | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
-| 显式恢复 personal 项目的只读审阅入口与拒绝面 | NOT_TESTED | NOT_TESTED | NOT_TESTED | MISSING | NOT_TESTED |
-| D 归属/safety helper 与安装 subject 同一冻结包（旧包失败对照） | NOT_TESTED | NOT_TESTED | NOT_TESTED | MISSING | NOT_TESTED |
+| 恢复后首次启动只读、零业务发送 | PASS | NOT_TESTED | NOT_TESTED | PASS | NOT_TESTED |
+| 明确决定、授权上下文、结构化提案与事务消费 | PASS | NOT_TESTED | PASS | NOT_TESTED | NOT_TESTED |
+| 可迁移发行、安装、备份恢复、升级回滚 | NOT_TESTED | NOT_TESTED | PASS | PASS | NOT_TESTED |
+| D 托管 upgrade/rollback-install 与显式 baseline/target 字节 | NOT_TESTED | NOT_TESTED | NOT_TESTED | PASS | NOT_TESTED |
+| 模式保持、未知活 PID 阻断与不误杀 | NOT_TESTED | NOT_TESTED | NOT_TESTED | PASS | NOT_TESTED |
+| 结构化提案 prepare/confirm/reject（真实 HTTP/SQLite） | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
+| 提案网页预览/确认/拒绝与响应丢失重放 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
+| 上下文来源/窗口/授权预览 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
+| 恢复只读 inspect/prepare 与重放/重启边界 | PASS | NOT_TESTED | NOT_TESTED | PASS | NOT_TESTED |
+| 工作证据与分页历史 | PASS | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
+| 显式恢复 personal 项目的只读审阅入口与拒绝面 | NOT_TESTED | NOT_TESTED | NOT_TESTED | PASS | NOT_TESTED |
+| D 归属/safety helper 与安装 subject 同一冻结包（旧包失败对照） | NOT_TESTED | NOT_TESTED | NOT_TESTED | PASS | NOT_TESTED |
 | 恢复授权 commit、目标准备与激活切换 | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
 | 真实原生停止/问题/恢复控制 | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
 | 独立会话复核价值试点（8例三组） | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED | NOT_TESTED |
@@ -115,9 +115,9 @@
 | --- | --- | --- |
 | 研究价值（独立会话复核是否值得继续） | **BLOCKED — 无价值结论** | 8 例三组一例未发；adapter_missing（无经准入的实际 adapter/整 turn 上界/隔离/材料/main 准入）；0/24 turn。BLOCKED 不是 no-go，也不是正收益。 |
 | 产品准入（普通受控工作流） | 见 `controlled-product-workflow` tier | 真实 HTTP/SQLite/受控执行，不依赖试点。 |
-| 安装准入（个人 Alpha） | **FAIL（仅所测 tuple）**：cold personal、fixture 安装版 context、non-empty default-off→建议、候选 GET/prepare/confirm/replay/reject、非空第二根 readonly（候选/context/history/held work/原 body）、同包 source prepare/confirm/audit/进程重开、篡改拒绝、requested-data-root/copied-record stop、legacy16→18 迁移、跨 schema 拒绝 | E3-PERSONAL-COLD-START、E6-INSTALLED-CONTEXT、E7-BACKUP-CONTEXT-REPLY、E4-INSTALL-*、E4-BACKUP-RESTORE、E4-UPGRADE-CROSS-SCHEMA、E8-LEGACY16-MIGRATION、E7-OWNERSHIP-COPY；E33-OUTER-ZIP=MISSING、E33-COHORT-RECOVERY=MISSING。tuple=?/schema ?，main schema ?；current-main install=PASS (actual personal discussion-only + mock provider HTTP context/history/source/reply)；E4-UPGRADE-ROLLBACK/FAULTS/CROSS、E7 copy/wrong-install、非空 backup 已执行；M1/discussionReadiness=?；D safety mocks=MISSING（helper 从 ee tar 提取并核对文件 hash；旧97仅mock失败对照）；candidate installed=MISSING；second root=MISSING（probeScope=fixture+recovery_readonly）；installed source confirm=MISSING；installed stability=MISSING；workflow formats=MISSING（按包能力：?）；personal review=MISSING（consumerOrigin=?，digest=…，scopeDiagnostics=?）；refusals=MISSING；review reuse=MISSING（same=?，digestSame=true，different=?）。personal旧项目只读重绑定未到，对应项NOT_REACHED，403不自动放宽。 |
+| 安装准入（个人 Alpha） | **PASS（仅所测 tuple）**：cold personal、fixture 安装版 context、non-empty default-off→建议、候选 GET/prepare/confirm/replay/reject、非空第二根 readonly（候选/context/history/held work/原 body）、同包 source prepare/confirm/audit/进程重开、篡改拒绝、requested-data-root/copied-record stop、legacy16→18 迁移、跨 schema 拒绝 | E3-PERSONAL-COLD-START、E6-INSTALLED-CONTEXT、E7-BACKUP-CONTEXT-REPLY、E4-INSTALL-*、E4-BACKUP-RESTORE、E4-UPGRADE-CROSS-SCHEMA、E8-LEGACY16-MIGRATION、E7-OWNERSHIP-COPY；E33-OUTER-ZIP=PASS、E33-COHORT-RECOVERY=PASS。tuple=8296720d8a25f38c/schema 18，main schema 18；current-main install=PASS (actual personal discussion-only + mock provider HTTP context/history/source/reply)；E4-UPGRADE-ROLLBACK/FAULTS/CROSS、E7 copy/wrong-install、非空 backup 已执行；M1/discussionReadiness=true；D safety mocks=PASS（helper 从 ee tar 提取并核对文件 hash；旧97仅mock失败对照）；candidate installed=PASS；second root=PASS（probeScope=fixture+recovery_readonly）；installed source confirm=PASS；installed stability=PASS；workflow formats=PASS（按包能力：default1+explicit2）；personal review=PASS（consumerOrigin=package，digest=5a0ad2b5…，scopeDiagnostics=present）；refusals=PASS；review reuse=PASS（same=REUSED，digestSame=true，different=BLOCKED）。personal旧项目只读重绑定未到，对应项NOT_REACHED，403不自动放宽。 |
 
-安装物身份（从本轮真实 tar tuple 读取，位置可用 PA_E_INSTALL_*_DIR 覆盖）：baseline buildId `unknown` / schema ? / tar `…` / source ``；target buildId `unknown` / schema ? / tar `…` / source ``。均为 darwin/arm64、Node 24.21.0、SQLite ABI 137。verdict 只对所测 tuple 成立，旧版本结果未改标签。
+安装物身份（从本轮真实 tar tuple 读取，位置可用 PA_E_INSTALL_*_DIR 覆盖）：baseline buildId `2d94a7c31ef97b57` / schema 18 / tar `daee1a94…` / source `1fbaf940`；target buildId `8296720d8a25f38c` / schema 18 / tar `04926739…` / source `82ee5b8f`。均为 darwin/arm64、Node 24.21.0、SQLite ABI 137。verdict 只对所测 tuple 成立，旧版本结果未改标签。
 
 ## 独立复核价值试点
 
@@ -134,17 +134,17 @@
 
 | tier | 结果 |
 | --- | --- |
-| `module` | FAIL（missing_required_case） |
-| `controlled-product` | FAIL（missing_required_case） |
-| `actual-native-control` | FAIL（missing_required_case） |
-| `installed-alpha` | FAIL（missing_required_case） |
-| `installed-functional` | FAIL（missing_required_case） |
-| `advisory-routing` | FAIL（missing_required_case） |
-| `controlled-review` | FAIL（missing_required_case） |
-| `actual-heterogeneous-review` | FAIL（missing_required_case） |
-| `review-value` | FAIL（missing_required_case） |
-| `local-alpha` | FAIL（missing_required_case） |
-| `full-product` | FAIL（missing_required_case） |
+| `module` | PASS |
+| `controlled-product` | PASS |
+| `actual-native-control` | FAIL（case_not_pass, layer_not_allowed） |
+| `installed-alpha` | PASS |
+| `installed-functional` | PASS |
+| `advisory-routing` | FAIL（case_not_pass, layer_not_allowed） |
+| `controlled-review` | FAIL（case_not_pass, layer_not_allowed, missing_required_case） |
+| `actual-heterogeneous-review` | FAIL（case_not_pass, layer_not_allowed, missing_required_case） |
+| `review-value` | FAIL（case_not_pass, layer_not_allowed） |
+| `local-alpha` | PASS |
+| `full-product` | FAIL（missing_required_case, case_not_pass, layer_not_allowed, required_evidence_missing） |
 
 ## 明确未测
 

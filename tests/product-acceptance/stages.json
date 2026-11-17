@@ -4,7 +4,7 @@
   "taskPackage": "agent-tasks/product-wave-35/README.zh-CN.md",
   "branch": "codex/g3-product-acceptance",
   "base": "5860da13",
-  "checkpoint": "PENDING",
+  "checkpoint": "4b4d4089",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
