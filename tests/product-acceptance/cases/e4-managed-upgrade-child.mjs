@@ -7,6 +7,7 @@
  * Inputs come from PA_E_MANAGED_PAIR (baseline/target tar tuples). It prints one JSON line.
  */
 import { spawn, spawnSync } from 'node:child_process'
+import { createHash } from 'node:crypto'
 import { existsSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs'
 import { mkdtempSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -86,8 +87,23 @@ const hasMessage = (needle) => {
 
 try {
   mkdirSync(target, { recursive: true }); mkdirSync(baseline, { recursive: true })
-  spawnSync('tar', ['-xzf', pair.target.tarPath, '-C', target, '--strip-components=1'])
-  spawnSync('tar', ['-xzf', pair.baseline.tarPath, '-C', baseline, '--strip-components=1'])
+  // A frozen package may be published as a tar or only as an outer ZIP whose inner install directory
+  // is immutable; either way the extracted install manifest must match the recorded identity.
+  const materialize = (spec, dir) => {
+    if (spec.tarPath) spawnSync('tar', ['-xzf', spec.tarPath, '-C', dir, '--strip-components=1'])
+    else if (spec.installPath) spawnSync('cp', ['-R', `${spec.installPath}/.`, dir])
+    else return { ok: false, reason: 'no_tar_or_install_path' }
+    const manifest = join(dir, 'install.json')
+    if (!existsSync(manifest)) return { ok: false, reason: 'install_manifest_missing' }
+    const digest = createHash('sha256').update(readFileSync(manifest)).digest('hex')
+    if (spec.installManifestSha256 && digest !== spec.installManifestSha256) return { ok: false, reason: 'install_manifest_mismatch', digest }
+    return { ok: true, digest }
+  }
+  const targetMaterial = materialize(pair.target, target)
+  const baselineMaterial = materialize(pair.baseline, baseline)
+  result.materialize = { target: targetMaterial, baseline: baselineMaterial }
+  step('materialize', targetMaterial.ok && baselineMaterial.ok ? 'PASS' : 'FAIL', JSON.stringify(result.materialize))
+  if (!targetMaterial.ok || !baselineMaterial.ok) throw new Error('materialize failed')
   for (const dir of Object.values(roots)) mkdirSync(dir, { recursive: true, mode: 0o700 })
 
   const bootstrap = spawnSync(process.execPath, [join(target, 'app/apps/launcher/bin/pa.mjs'), 'first-run', '--json', '--install', join(baseline, 'app'), ...rootArgs], { cwd: w, env, encoding: 'utf8', timeout: 60_000 })

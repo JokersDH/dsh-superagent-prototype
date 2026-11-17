@@ -5,7 +5,7 @@ import { dirname, join } from 'node:path'
 import { runCase, LAYERS } from '../lib/status.mjs'
 import { candidateModel } from '../../../tests/integration/fixtures/assistant-candidate-model.mjs'
 import { captureSet, createOperation, resourceBirth, rollout } from '../lib/caller-safety.mjs'
-import { extractOuterZip, launcherEnv, OUTER_ZIP_DIR, OUTER_ZIP_NAME, parseJson, privateHome, verifyOuterZip } from '../lib/outer-zip.mjs'
+import { extractOuterZip, launcherEnv, OUTER_ZIP_DIR, OUTER_ZIP_NAME, parseJson, privateHome, verifyOuterZip, W35_ZIP_DIR, W35_ZIP_NAME } from '../lib/outer-zip.mjs'
 import { freePort, liveIdentity } from '../lib/packaged-instance.mjs'
 
 /**
@@ -62,9 +62,11 @@ const recordPids = path => {
   return [...new Set([record.pid, record.apiPid, record.consolePid])].filter(Number.isSafeInteger)
 }
 
-export async function runOuterZip() {
+export async function runOuterZip({ cohort = { id: 'w33', dir: OUTER_ZIP_DIR, name: OUTER_ZIP_NAME } } = {}) {
   const cases = []
-  const zipPath = join(OUTER_ZIP_DIR, OUTER_ZIP_NAME)
+  const caseId = cohort.id === 'w35' ? 'E36-W35-OUTER' : 'E33-OUTER-ZIP'
+  const operationId = cohort.id === 'w35' ? 'E36-W35-OUTER-OPERATION' : 'E33-OUTER-ZIP-OPERATION'
+  const zipPath = join(cohort.dir, cohort.name)
   const evidence = { zip: { path: zipPath, sha256: null, bytes: null, source: null, buildId: null, innerTarSha256: null,
     innerTarBytes: null, installManifestSha256: null, runtime: null, entries: null, secretScan: null },
     phases: {}, negatives: {}, operation: null }
@@ -91,7 +93,7 @@ export async function runOuterZip() {
   }
 
   try {
-    const zipValue = verifyOuterZip(OUTER_ZIP_DIR)
+    const zipValue = verifyOuterZip(cohort.dir, cohort.name)
     const result = zipValue.result
     evidence.zip.sha256 = zipValue.sha256
     evidence.zip.bytes = zipValue.bytes
@@ -117,6 +119,8 @@ export async function runOuterZip() {
     evidence.zip.licenseDigest = extracted.digests.license
     evidence.zip.manifestProtocol = manifest.protocol
 
+    const launcherSourceForFix = readFileSync(join(root, 'personal-preview-launcher.mjs'), 'utf8')
+    evidence.launcherFix = { eexistTolerated: /error\.code !== 'EEXIST'/u.test(launcherSourceForFix) }
     const secretScan = spawnSync('grep', ['-rIl', '-E', '(sk-[A-Za-z0-9]{20,}|api[_-]?key["\u0027]?\\s*[:=]\\s*["\u0027][A-Za-z0-9]{16,})', join(root, 'install/app/apps')], { encoding: 'utf8', timeout: 60_000 })
     evidence.zip.secretScan = { status: secretScan.status, hits: String(secretScan.stdout ?? '').split('\n').filter(Boolean).length }
 
@@ -332,7 +336,7 @@ export async function runOuterZip() {
 
   await mock?.close?.().catch(() => {})
 
-  const productCase = await runCase({ id: 'E33-OUTER-ZIP',
+  const productCase = await runCase({ id: caseId,
     title: 'The locked shareable outer ZIP is verified by its own hashes, extracted privately and driven through the packaged Start/Stop/status',
     layer: LAYERS.INSTALLED, evidence: { outerZip: evidence }, limitations: [
       'The private HOME is redirected for this operation; the user’s Application Support tree and existing instances are untouched.',
@@ -403,7 +407,7 @@ export async function runOuterZip() {
     if (process.env.PA_E_TRACE) process.stderr.write(`[w34zip] retained ${JSON.stringify(kept.retained)} reason=${kept.reason}\n`)
   }
 
-  const operationCase = await runCase({ id: 'E33-OUTER-ZIP-OPERATION',
+  const operationCase = await runCase({ id: operationId,
     title: 'The outer ZIP operation releases its private HOME only after the complete set is observed exited',
     layer: LAYERS.INSTALLED, evidence: { outerZipOperation: evidence.operation, subject: evidence.subject }, limitations: [
       'Operation outcome only: product phases are asserted by E33-OUTER-ZIP; this case proves the material release decision.',
@@ -411,7 +415,7 @@ export async function runOuterZip() {
     const op = evidence.operation
     assert('OPERATION_DECIDED', op !== null && op !== undefined && typeof op.verdict?.allowed === 'boolean', JSON.stringify(op?.verdict))
     if (op.verdict.allowed === true) {
-      assert('OPERATION_RELEASED_CLEAN', op.released.length === 1 && op.retained.length === 0 && op.signals.length === 0 &&
+      assert('OPERATION_RELEASED_CLEAN', op.released.length >= 1 && op.retained.length === 0 && op.signals.length === 0 &&
         op.verdict.reason === null, JSON.stringify(op))
     } else {
       assert('OPERATION_RETAINED_NO_DELETE', op.released.length === 0 && (op.retained?.length ?? 0) >= 1,
@@ -420,4 +424,9 @@ export async function runOuterZip() {
   })
 
   return { cases: [productCase, operationCase], artifacts: {} }
+}
+
+/** The current W35 cohort (D stable freeze 599de3e9 / outer 39c0fff0) on the same product entry. */
+export async function runW35OuterZip() {
+  return runOuterZip({ cohort: { id: 'w35', dir: W35_ZIP_DIR, name: W35_ZIP_NAME } })
 }

@@ -25,8 +25,8 @@ export function parseJson(text) {
 }
 
 /** Reads the ZIP and its two sidecars; nothing here trusts a filename alone. */
-export function verifyOuterZip(dir = OUTER_ZIP_DIR) {
-  const zipPath = join(dir, OUTER_ZIP_NAME)
+export function verifyOuterZip(dir = OUTER_ZIP_DIR, zipName = OUTER_ZIP_NAME) {
+  const zipPath = join(dir, zipName)
   if (!existsSync(zipPath)) throw new Error(`outer ZIP is absent: ${zipPath}`)
   const zipBytes = readFileSync(zipPath)
   const digest = sha256(zipBytes)
@@ -56,6 +56,9 @@ export const launcherEnv = (home, extra = {}) => ({
 })
 
 /** Extracts into `<home>/dist` and binds the inner install/runtime/license to the recorded result. */
+export const W35_ZIP_DIR = process.env.PA_E_W36_W35_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/wave35-preview-599de3e'
+export const W35_ZIP_NAME = 'PersonalAgent-Preview-599de3e.zip'
+
 export function extractOuterZip(zip, home) {
   const extractRoot = join(home, 'dist')
   mkdirSync(extractRoot, { recursive: true })

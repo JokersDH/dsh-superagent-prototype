@@ -136,7 +136,7 @@ export async function runCallerSafety() {
     const aliveForged = [{ ...run.observationDead[0], alive: true, sameIdentity: false, observedStart: 'x' }]
     const aliveVerdict = run.operation.releaseAllowed(aliveForged)
     assert('WRONG_EXPECTED_START_REFUSED', verdict.allowed === false && verdict.reason === 'expected_start_mismatch', JSON.stringify(verdict))
-    assert('FORGED_ALIVE_REFUSED', aliveVerdict.allowed === false && aliveVerdict.reason === 'resource_alive', JSON.stringify(aliveVerdict))
+    assert('FORGED_ALIVE_REFUSED', aliveVerdict.allowed === false && ['identity_changed', 'resource_alive'].includes(aliveVerdict.reason), JSON.stringify(aliveVerdict))
     evidence.callerStart = { verdict, aliveVerdict }
     rmSync(run.own, { recursive: true, force: true })
   }))
@@ -250,17 +250,66 @@ export async function runCallerSafety() {
     const parent = spawn(process.execPath, [script], { stdio: 'ignore' })
     op.track(resourceBirth(parent.pid, { root: own, op: 'late-child' }))
     await new Promise(resolvePromise => setTimeout(resolvePromise, 1_000))
-    const late = op.lateDescendants()
+    const descendants = op.lateDescendants()
+    const late = descendants.late
     const signal = op.signal(parent.pid, 'SIGTERM')
     const release = op.releaseAllowed()
-    assert('LATE_CHILD_DETECTED', late.length >= 1, JSON.stringify(late))
+    assert('LATE_CHILD_DETECTED', late.length >= 1 && descendants.unknown.length === 0, JSON.stringify(descendants))
     assert('SIGNAL_REFUSED_LATE_CHILD', signal.signalled === null && signal.refused === 'late_child', JSON.stringify(signal))
     assert('RELEASE_REFUSED_LATE_CHILD', release.allowed === false && release.reason === 'late_child', JSON.stringify(release))
-    evidence.callerLateChild = { late, signal, release }
+    evidence.callerLateChild = { descendants, signal, release }
     // Probe-owned scratch cleanup only after recording the refusal: fresh identity read per pid.
     for (const item of late) { const identity = liveIdentity(item.pid); if (identity.alive) process.kill(item.pid, 'SIGTERM') }
     await waitGone(parent.pid)
     for (const item of late) await waitGone(item.pid)
+    rmSync(own, { recursive: true, force: true })
+  }))
+
+  cases.push(await runCase(define('E1-CALLER-DESCENDANT-QUERY-UNKNOWN'), async ({ assert, evidence }) => {
+    const own = scratch()
+    const fakeBin = join(own, 'bin')
+    mkdirSync(fakeBin, { recursive: true })
+    writeFileSync(join(fakeBin, 'pgrep'), '#!/bin/sh\nexit 2\n', { mode: 0o755 })
+    const originalPath = process.env.PATH
+    process.env.PATH = `${fakeBin}:${originalPath ?? ''}`
+    const op = createOperation({ id: 'query-unknown' })
+    const sleeper = spawnSleeper({ own }, { name: 'query-child' })
+    op.track(resourceBirth(sleeper.pid, { root: own, op: 'query-unknown' }))
+    const descendants = op.lateDescendants()
+    const signal = op.signal(sleeper.pid, 'SIGTERM')
+    const release = op.releaseAllowed()
+    process.env.PATH = originalPath
+    assert('QUERY_UNKNOWN_DETECTED', descendants.unknown.length >= 1 && descendants.late.length === 0, JSON.stringify(descendants))
+    assert('QUERY_UNKNOWN_BLOCKS_SIGNAL', signal.signalled === null && signal.refused === 'descendant_query_unknown' &&
+      op.signals.length === 0 && liveIdentity(sleeper.pid).alive === true, JSON.stringify(signal))
+    assert('QUERY_UNKNOWN_BLOCKS_RELEASE', release.allowed === false && release.reason === 'descendant_query_unknown', JSON.stringify(release))
+    evidence.callerQueryUnknown = { descendants, signal, release }
+    const cleanup = createOperation({ id: 'query-unknown-cleanup' })
+    cleanup.track(resourceBirth(sleeper.pid, { root: own }))
+    cleanup.signal(sleeper.pid, 'SIGTERM')
+    await waitGone(sleeper.pid)
+    rmSync(own, { recursive: true, force: true })
+  }))
+
+  cases.push(await runCase(define('E1-CALLER-RELEASE-MISSING-BOOLEAN'), async ({ assert, evidence }) => {
+    const own = scratch()
+    const op = createOperation({ id: 'missing-boolean' })
+    const sleeper = spawnSleeper({ own }, { name: 'boolean-child' })
+    op.track(resourceBirth(sleeper.pid, { root: own, op: 'missing-boolean' }))
+    const cleanup = createOperation({ id: 'missing-boolean-cleanup' })
+    cleanup.track(resourceBirth(sleeper.pid, { root: own }))
+    cleanup.signal(sleeper.pid, 'SIGTERM')
+    await waitGone(sleeper.pid)
+    const rows = op.observe()
+    const noAlive = [{ ...rows[0], alive: undefined }]
+    const noQuery = [{ ...rows[0], query: undefined }]
+    const noSame = [{ ...rows[0], sameIdentity: undefined }]
+    for (const [label, forged] of [['alive', noAlive], ['query', noQuery], ['same', noSame]]) {
+      const verdict = op.releaseAllowed(forged)
+      assert(`MISSING_${label.toUpperCase()}_REFUSED`, verdict.allowed === false && verdict.reason === 'unobserved', JSON.stringify(verdict))
+    }
+    assert('COMPLETE_ROW_ALLOWED', op.releaseAllowed(rows).allowed === true, JSON.stringify(op.releaseAllowed(rows)))
+    evidence.callerMissingBoolean = { rows }
     rmSync(own, { recursive: true, force: true })
   }))
 

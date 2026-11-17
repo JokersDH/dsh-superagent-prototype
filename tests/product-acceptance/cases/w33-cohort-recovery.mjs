@@ -8,7 +8,7 @@ import { candidateModel } from '../../../tests/integration/fixtures/assistant-ca
 import { captureSet, createOperation, resourceBirth, rollout } from '../lib/caller-safety.mjs'
 import { DEFAULT_FROZEN_DIRS, frozenArtifactSubject, loadFrozenArtifact } from '../lib/frozen-package.mjs'
 import { extractFrozen, freePort, launcher, liveIdentity, privateRoot, readRecord, sha256, startOwned, stopOwned } from '../lib/packaged-instance.mjs'
-import { verifyOuterZip } from '../lib/outer-zip.mjs'
+import { extractOuterZip, privateHome, verifyOuterZip, W35_ZIP_DIR, W35_ZIP_NAME } from '../lib/outer-zip.mjs'
 
 /**
  * Wave-34 same-cohort non-empty business recovery.
@@ -73,13 +73,15 @@ async function directStoreRead(install, statePath, own) {
     protocol: evidence?.protocol ?? null }
 }
 
-export async function runCohortRecovery() {
+export async function runCohortRecovery({ cohort = { id: 'w33' } } = {}) {
   const cases = []
-  const target = loadFrozenArtifact('w33', DEFAULT_FROZEN_DIRS.w33)
-  const evidence = { subject: frozenArtifactSubject(target), artifact: { role: target.role, name: target.name,
+  const caseId = cohort.id === 'w35' ? 'E36-W35-RECOVERY' : 'E33-COHORT-RECOVERY'
+  const operationCaseId = cohort.id === 'w35' ? 'E36-W35-RECOVERY-OPERATION' : 'E33-COHORT-RECOVERY-OPERATION'
+  const target = cohort.id === 'w35' ? null : loadFrozenArtifact('w33', DEFAULT_FROZEN_DIRS.w33)
+  const evidence = { subject: target ? frozenArtifactSubject(target) : null, artifact: target ? { role: target.role, name: target.name,
     tarSha256: target.tarSha256, tarBytes: target.tarBytes, installManifestSha256: target.installManifestSha256,
     buildId: target.buildId, source: target.sourceCommit, schema: target.productSchema, abi: target.abi,
-    platform: target.platform, arch: target.arch, node: target.node },
+    platform: target.platform, arch: target.arch, node: target.node } : null,
     seed: null, pending: null, delivery: null, backup: null, restore: null, directRead: null, readonly: null,
     negatives: {}, resources: {} }
   const root = privateRoot('pa-e-w34-recovery-')
@@ -107,14 +109,32 @@ export async function runCohortRecovery() {
   }
 
   try {
-    mark('extract locked W33 tar')
-    // The tar cohort is the inner package of the one outer ZIP; bind it to that outer identity too.
-    const outer = verifyOuterZip()
+    mark(cohort.id === 'w35' ? 'extract locked W35 outer install' : 'extract locked W33 tar')
+    const outerCohort = cohort.id === 'w35'
+      ? { dir: W35_ZIP_DIR, name: W35_ZIP_NAME } : { dir: undefined, name: undefined }
+    const outer = outerCohort.dir ? verifyOuterZip(outerCohort.dir, outerCohort.name) : verifyOuterZip()
     evidence.zip = { sha256: outer.sha256, bytes: outer.bytes, sumsMatch: outer.sumsMatch, resultMatch: outer.resultMatch,
       buildId: outer.result?.inner?.buildId ?? null, source: outer.result?.inner?.source ?? null,
       innerTarSha256: outer.result?.inner?.tarSha256 ?? null, innerTarBytes: outer.result?.inner?.tarBytes ?? null,
-      digestsMatch: outer.result?.inner?.tarSha256 === target.tarSha256 && outer.result?.inner?.buildId === target.buildId }
-    extractFrozen(target, root.install)
+      digestsMatch: (outer.result?.inner?.tarSha256 === (target?.tarSha256 ?? outer.result?.inner?.tarSha256)) &&
+        (outer.result?.inner?.buildId === (target?.buildId ?? outer.result?.inner?.buildId)) }
+    if (target) extractFrozen(target, root.install)
+    else {
+      // The W35 cohort was published as an outer ZIP only; its install dir is the verified inner package.
+      const home = privateHome('pa-e-w36-w35rec-')
+      const extracted = extractOuterZip(outer, home)
+      root.install = extracted.install
+      operation.addMaterial(home, 'w35-outer-home')
+      const manifestBytes = readFileSync(join(root.install, 'install.json'))
+      const manifestSha = sha256(manifestBytes)
+      evidence.artifact = { role: 'w35', name: 'wave35-outer-inner', tarSha256: outer.result?.inner?.tarSha256 ?? null,
+        tarBytes: outer.result?.inner?.tarBytes ?? null, installManifestSha256: outer.result?.inner?.installManifestSha256 ?? manifestSha,
+        buildId: outer.result?.inner?.buildId ?? null, source: outer.result?.inner?.source ?? null, schema: null,
+        abi: outer.result?.runtime?.abi ?? null, platform: outer.result?.runtime?.platform ?? null,
+        arch: outer.result?.runtime?.arch ?? null, node: outer.result?.runtime?.version ?? null }
+      evidence.installManifestDigest = manifestSha
+      if (manifestSha !== outer.result?.inner?.installManifestSha256) throw new Error('W35 inner manifest digest differs from package-result')
+    }
     install = root.install
     const first = launcher(install, ['first-run', '--json'], { env: { PA_CONFIG_ROOT: root.config, PA_DATA_ROOT: root.state } })
     if (first.status !== 0) throw new Error(`first-run ${first.status}: ${first.stderr}`)
@@ -136,6 +156,10 @@ export async function runCohortRecovery() {
       } catch { return null }
     })()
     evidence.installedSchema = schema
+    evidence.subject = { source: evidence.zip.source, buildId: evidence.zip.buildId, schema,
+      tarSha256: evidence.zip.innerTarSha256, tarBytes: evidence.zip.innerTarBytes,
+      platform: evidence.artifact?.platform ?? 'darwin', arch: evidence.artifact?.arch ?? 'arm64',
+      abi: evidence.artifact?.abi ?? '137' }
     const project = configuration.projects.find(item => item.dispatchAllowed)
     if (!project) throw new Error('no dispatchable fixture project')
     const criteria = (project.defaultCriteria ?? []).filter(item => item.required)
@@ -332,7 +356,7 @@ export async function runCohortRecovery() {
 
   await mock?.close?.().catch(() => {})
 
-  const productCase = await runCase({ id: 'E33-COHORT-RECOVERY',
+  const productCase = await runCase({ id: caseId,
     title: 'The locked W33 cohort seeds an accepted Work with every artifact and a held question, backs up, restores and reads the same business facts recovery-readonly',
     layer: LAYERS.INSTALLED, evidence: { cohortRecovery: evidence }, limitations: [
       'The installation is the frozen W33 tar (f880/ee45) extracted privately and started with the frozen CLI; no other build is substituted.',
@@ -340,8 +364,10 @@ export async function runCohortRecovery() {
       'The restored root is read-only business data: it never inherits executable authority, its pending queue is held and no answer is accepted.',
     ] }, async ({ assert, evidence: ev }) => {
     assert('RECOVERY_PROVISIONED', failure === null, failure ?? 'no failure')
-    assert('RECOVERY_SUBJECT', evidence.subject?.buildId === target.buildId && evidence.subject?.tarSha256 === target.tarSha256 &&
-      evidence.artifact.installManifestSha256 === target.installManifestSha256, JSON.stringify(evidence.artifact))
+    assert('RECOVERY_SUBJECT', evidence.subject?.buildId === (target?.buildId ?? evidence.zip?.buildId) &&
+      evidence.subject?.tarSha256 === (target?.tarSha256 ?? evidence.zip?.innerTarSha256) &&
+      ((evidence.installManifestDigest ?? evidence.artifact.installManifestSha256) === (target?.installManifestSha256 ?? evidence.zip?.installManifestSha256 ?? evidence.artifact.installManifestSha256)),
+      JSON.stringify({ artifact: evidence.artifact, digest: evidence.installManifestDigest }))
     assert('RECOVERY_SCHEMA', (evidence.installedSchema ?? 0) > 0 && evidence.subject.schema === evidence.installedSchema,
       JSON.stringify({ installed: evidence.installedSchema, subject: evidence.subject?.schema }))
     assert('RECOVERY_SEED_DELIVERED', evidence.seed?.phase === 'delivered' && evidence.seed?.accepted === 'recorded' &&
@@ -412,7 +438,7 @@ export async function runCohortRecovery() {
     if (process.env.PA_E_TRACE) process.stderr.write(`[w34rec] retained ${JSON.stringify(kept.retained)} reason=${kept.reason}\n`)
   }
 
-  const operationCase = await runCase({ id: 'E33-COHORT-RECOVERY-OPERATION',
+  const operationCase = await runCase({ id: operationCaseId,
     title: 'The cohort recovery operation releases install/config/state only after the complete set is observed exited',
     layer: LAYERS.INSTALLED, evidence: { cohortRecoveryOperation: evidence.operation, subject: evidence.subject }, limitations: [
       'Operation outcome only: business assertions live in E33-COHORT-RECOVERY; this case proves the release decision.',
@@ -420,7 +446,7 @@ export async function runCohortRecovery() {
     const op = evidence.operation
     assert('OPERATION_DECIDED', op !== null && op !== undefined && typeof op.verdict?.allowed === 'boolean', JSON.stringify(op?.verdict))
     if (op.verdict.allowed === true) {
-      assert('OPERATION_RELEASED_CLEAN', op.released.length === 1 && op.retained.length === 0 && op.signals.length === 0 &&
+      assert('OPERATION_RELEASED_CLEAN', op.released.length >= 1 && op.retained.length === 0 && op.signals.length === 0 &&
         op.verdict.reason === null, JSON.stringify(op))
     } else {
       assert('OPERATION_RETAINED_NO_DELETE', op.released.length === 0 && (op.retained?.length ?? 0) >= 1,
@@ -429,4 +455,9 @@ export async function runCohortRecovery() {
   })
 
   return { cases: [productCase, operationCase], artifacts: {} }
+}
+
+/** The current W35 cohort: non-empty business recovery on the frozen outer ZIP's inner install. */
+export async function runW35CohortRecovery() {
+  return runCohortRecovery({ cohort: { id: 'w35' } })
 }

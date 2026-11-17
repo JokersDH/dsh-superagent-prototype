@@ -736,7 +736,7 @@ const evidenceFor = (key) => {
             resources: resourcePair(106, 'outer:import') } },
         settings: { entry: 'Settings.command', gui: 'HELD',
           template: { mode0600: true, exclusive: true, keys: ['baseURL', 'apiKey', 'model', 'allowedModels', 'allowInsecureHttp', 'maxOutputTokens'] } },
-        operation: { verdict: { allowed: true, reason: null }, released: ['/tmp/private/home'], retained: [], signals: [] },
+        operation: { verdict: { allowed: true, reason: null }, released: ['/tmp/private/root'], retained: [], signals: [] },
         negatives: { portConflict: { outcome: 'EXITED', code: 1 }, statusStopped: { status: 2, result: 'STOPPED' } } }
     }
     case 'originalWorkRecovery':
@@ -749,6 +749,36 @@ const evidenceFor = (key) => {
         isolation: { distinctPid: true, distinctConsole: true, distinctApi: true, distinctConfig: true, distinctState: true, distinctModel: true, sameInstall: true, bAfterAStop: { health: true, readiness: 200, bPidAlive: true } },
         doctor: { A: { exit: 1, secretLeaked: false }, B: { exit: 1, secretLeaked: false } },
         operation: { verdict: { allowed: true, reason: null }, released: ['/tmp/two'], retained: [], signals: [] } }
+    case 'historySurface':
+      return { zip: { sha256: DIGEST, bytes: 1, buildId: 'zip-build', source: '9'.repeat(40), installManifestDigest: DIGEST, installManifestSha256: DIGEST },
+        probe: { installed: 'present', authenticated: { status: 200, hasHistoryBody: true }, unauthorized: { status: 401 } },
+        resources: { stop: { clean: true } } }
+    case 'modelSave':
+      return { subject: { ...ZIP_TUPLE },
+        zip: { sha256: DIGEST, bytes: 1, sumsMatch: true, resultMatch: true, installManifestSha256: DIGEST,
+          installManifestDigest: DIGEST, runtimeDigest: DIGEST, licenseDigest: DIGEST,
+          runtime: { version: '24.21.0', abi: '137', platform: 'darwin', arch: 'arm64', sha256: DIGEST, licenseSha256: DIGEST },
+          manifestProtocol: 'personal-agent-preview/1' },
+        form: { endpoint: 'url', model: 'text', key: 'password' },
+        negatives: { invalidEndpoint: { rejected: true, fileAbsent: true },
+          reopen: { keyValue: '', bodyLeaksKey: false } },
+        save: { mode: 0o600, keyMatches: true, allowInsecureHttp: true, baseURL: 'http://127.0.0.1:1/v1',
+          providerRequests: 0, keyEchoed: false, passwordCleared: true, sha256: DIGEST, bytes: 1 },
+        restart: { status: 'RUNNING', readiness: { status: 200, discussion: 'configuration_present' },
+          providerRequests: 0, stop: { result: 'STOPPED' }, resources: resourcePair(31, 'model:restart') },
+        resources: { instance: { before: resourcePair(30, 'model:instance').before, stop: { after: resourcePair(30, 'model:instance').after, result: 'STOPPED' } } },
+        operation: { ...CLEAN_OPERATION } }
+    case 'modelSaveOperation':
+      return { subject: { ...ZIP_TUPLE }, operation: { ...CLEAN_OPERATION } }
+    case 'cohortUpgradeW35':
+      return { subject: { ...ZIP_TUPLE },
+        pair: { baseline: { buildId: 'f880-prev', schema: 18, tarSha256: '8'.repeat(64) },
+          target: { buildId: 'zip-build', schema: 18, tarSha256: '9'.repeat(64) } },
+        steps: ['materialize', 'bootstrap', 'baseline_start', 'upgrade', 'upgraded_health', 'post_upgrade_write', 'tampered_target', 'rollback_install', 'rollback_start']
+          .map((id, index) => ({ id, status: index === 7 || index === 8 ? 'PASS' : 'PASS' })),
+        upgrade: { status: 'CONFIRMED', from: 'f880-prev', to: 'zip-build' },
+        probe: { postKept: true, tampered: { code: 'target_tampered' }, rollbackKeptPost: true },
+        rollback: { raw: { status: 'BINARY_ROLLED_BACK', dataRolledBack: false }, build: 'f880-prev', held: false, reason: null } }
     case 'outerZipOperation':
       return { subject: ZIP_TUPLE, operation: { ...CLEAN_OPERATION } }
     case 'cohortRecoveryOperation':
@@ -796,7 +826,7 @@ const buildCase = (entry, overrides = {}) => {
   const evidence = Object.fromEntries((entry.evidence ?? []).map((key) => [key, evidenceFor(key)]))
   const nested = ['subject', 'frozenScope', 'currentInstall', 'upgradeFaults', 'ownershipCopy', 'installedContext',
     'backupContextReply', 'ownershipMocks', 'installedCandidates', 'secondRoot', 'installedSourceConfirm', 'installedStability',
-    'outerZip', 'cohortRecovery', 'outerZipOperation', 'cohortRecoveryOperation', 'multiInstance']
+    'outerZip', 'cohortRecovery', 'outerZipOperation', 'cohortRecoveryOperation', 'multiInstance', 'modelSave', 'modelSaveOperation', 'cohortUpgradeW35']
     .some((key) => evidence[key] !== undefined)
   if ((entry.layers ?? []).includes(LAYERS.INSTALLED) && entry.id !== 'E4-INSTALL-ARTIFACT-IDENTITY' && !nested)
     evidence.subject = { source: COMMIT, buildId: 'b', schema: 18, tarSha256: DIGEST, tarBytes: 1, abi: '137', platform: 'darwin', arch: 'arm64' }
@@ -2584,6 +2614,29 @@ const ROUTING_CASES = [
         journey.projects[0].insights.seven = 403
         return report
       }, 'journey_scope_unproven'),
+  },
+  {
+    id: 'E2-MUTATE-OP-COPY-DELETED-UNKNOWN',
+    title: 'A standalone operation copy that deleted materials under UNKNOWN is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'OPCOPY_DELETE', (report) => {
+        const copy = findCase(report, 'E33-OUTER-ZIP-OPERATION').evidence.outerZipOperation
+        copy.verdict = { allowed: false, reason: 'resource_alive' }
+        copy.released = ['/tmp/private/root']
+        copy.retained = [{ path: '/tmp/private/root' }]
+        return report
+      }, 'outerZipOperation_invalid'),
+  },
+  {
+    id: 'E2-MUTATE-OP-COPY-UNBOUND',
+    title: 'A standalone operation copy that disagrees with the product case is rejected',
+    check: ({ assert }) =>
+      rejectWith(assert, 'OPCOPY_UNBOUND', (report) => {
+        const copy = findCase(report, 'E33-OUTER-ZIP-OPERATION').evidence.outerZipOperation
+        copy.released = ['/tmp/private/root', '/tmp/private/extra']
+        copy.retained = []
+        return report
+      }, 'operation_copy_unbound'),
   },
   {
     id: 'E1-MUTATE-HETERO-NO-SUBJECT',

@@ -1,10 +1,10 @@
 {
   "schema": "product-acceptance-stages/1",
   "agent": "E",
-  "taskPackage": "agent-tasks/product-wave-35/README.zh-CN.md",
+  "taskPackage": "agent-tasks/product-wave-36/README.zh-CN.md",
   "branch": "codex/g3-product-acceptance",
-  "base": "5860da13",
-  "checkpoint": "4b4d4089",
+  "base": "7e550991",
+  "checkpoint": "PENDING",
   "budget": {
     "modelTasks": 0,
     "nativeRuns": 0,
@@ -17,75 +17,35 @@
   },
   "stages": [
     {
-      "id": "E1",
-      "title": "Whole operation protocol: full-set fresh, late child, 1:1 release",
+      "id": "C1",
+      "title": "Resource query unknown blocks signal and release",
       "command": "node tests/product-acceptance/run.mjs --suites=selftest",
       "notes": [
-        "signal preflights the complete set then the target; late/duplicate/foreign/unknown refuse; product assertions precede the release decision."
+        "pgrep errors/unknown, missing booleans, duplicate/foreign/late rows fail closed; operation copies bind to the product case."
       ]
     },
     {
-      "id": "E2",
-      "title": "Full-report scope, resources and business semantics",
-      "command": "node tests/product-acceptance/run.mjs --suites=selftest",
-      "notes": [
-        "operation contradictions, pending pre-stop question, effect/question/answer rows, registry, artifact ids and sameProject scoped 403 are rejected."
-      ]
-    },
-    {
-      "id": "E3",
-      "title": "Two original projects installed daily journey",
+      "id": "C2",
+      "title": "Same-cohort dual original projects and history",
       "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "composite stale candidate refused; accept readiness verification-based; reopen compares ids and every byte; original-project applicability remains NOT_REACHED."
+        "both registered projects run the full chain; original-project applicability NOT_REACHED; W35 completion-history route absent (404) with successor input."
       ]
     },
     {
-      "id": "E4",
-      "title": "Locked outer product with model settings boundary",
+      "id": "C3",
+      "title": "Non-empty W35 recovery and current upgrade",
       "command": "node tests/product-acceptance/run.mjs --suites=e4",
       "notes": [
-        "W33 outer phases plus instance reuse and invalid-permission policy; successor model-save surface HELD until a D-frozen package exists."
+        "W35 non-empty business restore/read-only read-back and W33→W35 upgrade with E own binary rollback; D's W35 BLOCKED retained."
       ]
     },
     {
-      "id": "E5",
-      "title": "Growing non-empty business backup and authorized recovery",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4",
-      "notes": [
-        "all artifact bytes, both Works, pre-stop question, effect rows, registry, auth policy and no-provider read-back."
-      ]
-    },
-    {
-      "id": "E6",
-      "title": "Non-empty upgrade, post-write and independent rollback",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4",
-      "notes": [
-        "E own W32→W33 managed upgrade with binary-only rollback; D's new raw retry is recorded separately from the preserved BLOCKED history."
-      ]
-    },
-    {
-      "id": "E7",
-      "title": "Colleague roots and multi-instance operation",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4",
-      "notes": [
-        "two explicit roots on one install, distinct identities, independent stop, doctor without secret echo; same machine/user only."
-      ]
-    },
-    {
-      "id": "E8",
-      "title": "Original Work recovery consumer",
-      "command": "node tests/product-acceptance/run.mjs --suites=e4",
-      "notes": [
-        "NOT_REACHED with exact owner inputs; callbacks/slots/receipt-only rows are not substitutes."
-      ]
-    },
-    {
-      "id": "E9",
-      "title": "Layered tiers and complete handoff",
+      "id": "C4",
+      "title": "Current product tiers, GUI save and maintenance handoff",
       "command": "node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record",
       "notes": [
-        "wave35-status separates legacy R1 and the W33 subset and keeps the pilot/native/value BLOCKED."
+        "W35 real GUI save/private file/no model request/no echo; outer/launcher fix; multi-instance/doctor; R1/W33/W35 separated tiers."
       ]
     }
   ]

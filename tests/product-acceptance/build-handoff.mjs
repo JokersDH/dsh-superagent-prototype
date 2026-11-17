@@ -548,11 +548,34 @@ const w35mutations = ['E2-MUTATE-E32-EMPTY-AFTER', 'E2-MUTATE-FOREIGN-PID-MISSIN
   'E2-MUTATE-COHORT-PENDING-MISSING', 'E2-MUTATE-COHORT-EFFECT-DRIFT', 'E2-MUTATE-COHORT-REGISTRY-DRIFT',
   'E3-MUTATE-SAME-PROJECT-INSIGHTS-403']
 
-const handoff = `# Agent E 第三十五轮交付交接
+const w36outer = byId.get('E36-W35-OUTER')?.evidence?.outerZip ?? null
+const w36outerOp = byId.get('E36-W35-OUTER-OPERATION')?.evidence?.outerZipOperation ?? null
+const w36rec = byId.get('E36-W35-RECOVERY')?.evidence?.cohortRecovery ?? null
+const w36recOp = byId.get('E36-W35-RECOVERY-OPERATION')?.evidence?.cohortRecoveryOperation ?? null
+const w36model = byId.get('E36-W35-MODEL-SAVE')?.evidence?.modelSave ?? null
+const w36modelOp = byId.get('E36-W35-MODEL-SAVE-OPERATION')?.evidence?.modelSaveOperation ?? null
+const w36up = byId.get('E36-W35-UPGRADE')?.evidence?.cohortUpgradeW35 ?? null
+const w36history = byId.get('E36-COMPLETION-HISTORY-INSTALLED')?.evidence?.historySurface ?? null
+const w36caller = ['E1-CALLER-RETAIN-PREVENTS-RELEASE', 'E1-CALLER-COMPLETE-RELEASE', 'E1-CALLER-INCOMPLETE-SET',
+  'E1-CALLER-DUPLICATE-AND-FOREIGN', 'E1-CALLER-EXPECTED-START-MISMATCH', 'E1-CALLER-PARENT-DEAD-CHILD-ALIVE',
+  'E1-CALLER-SIGNAL-REFUSES-STALE-IDENTITY', 'E1-CALLER-SIGNAL-REFUSES-STALE-SET', 'E1-CALLER-RELEASE-DUPLICATE-ROWS',
+  'E1-CALLER-LATE-CHILD', 'E1-CALLER-DESCENDANT-QUERY-UNKNOWN', 'E1-CALLER-RELEASE-MISSING-BOOLEAN',
+  'E1-CALLER-ASSERT-FAILURE-RETAINS', 'E1-CALLER-NO-FORCE-API', 'E1-CALLER-SOURCE-DISCIPLINE']
+
+const handoff = `# Agent E 第三十六轮交付交接
 
 - 分支 \`${stages.branch}\`，基线 \`${stages.base}\`，检查点 \`${stages.checkpoint}\`，本次证据源 \`${report.source.commit}\`${report.source.dirty ? '（运行时尚有未提交文件，最终提交包含它们）' : '（干净工作树）'}。证据文件随源提交之后的提交一起交付；\`git log\` 的分支头即最终交付提交。
 - 拥有路径：\`tests/product-acceptance/\`。未修改生产实现、root manifest/lock、公共 schema 或迁移。
 - 模型预算：0 个真实模型任务；唯一模型对端是本机 loopback mock。原生执行：0。
+
+## 第三十六轮四闭环（聚合旧九验收点）
+
+| 闭环 | 结论 | 依据 |
+| --- | --- | --- |
+| 一、资源 query 未知阻断 signal/release | ${w36caller.every(id => byId.get(id)?.status === 'PASS') ? 'PASS' : 'INCOMPLETE'} | pgrep 非 0/1、error/timeout/坏输出即 unknown → 零 signal/release；缺 alive/query/sameIdentity 布尔拒绝；重复/外来/迟到 child 拒绝；产品断言先于释放；required operation 副本与产品内嵌 operation 逐字段绑定。 |
+| 二、同 cohort 双原项目与历史 | journey=${byId.get('E5-TWO-PROJECT-TEMPLATE-CREATE')?.status ?? '?'}；原项目 NOT_REACHED；history=${byId.get('E36-COMPLETION-HISTORY-INSTALLED')?.status ?? '?'} | 两项目 preview/create/candidate/verification accept、composite stale 拒绝、重开全字节；sameProject 需每项目 7/30 scoped 200 且绑原 project/窗口，403 不替代；W35 包内 completion-history 实测 404 → NOT_INSTALLED，successor 输入已列。 |
+| 三、非空 portability 与当前 W35 管理 | recovery=${byId.get('E36-W35-RECOVERY')?.status ?? '?'}；upgrade=${byId.get('E36-W35-UPGRADE')?.status ?? '?'} | W35 outer inner install 上两 Work、全部 4 交付 bytes、26 registry、held 问题与 effect 行保留，只读读回；W33→W35 CONFIRMED、post 数据保留、仅二进制回退成功（E 自测 raw），D 自报 W35 raw BLOCKED 保留为输入；旧 W33 retry/BLOCKED 历史未改。 |
+| 四、当前产品 tiers 与维护交接 | model=${byId.get('E36-W35-MODEL-SAVE')?.status ?? '?'}；alpha=${tierVerdicts['installed-alpha']?.status ?? '?'}；functional=${tierVerdicts['installed-functional']?.status ?? '?'} | W35 真实 GUI 保存：0600 私有文件、显式 HTTP 同意、0 模型请求、key 清空且不回显、重开无 key、重启 config_present；outer 39c0…/59? inner 11027a…/launcher EEXIST 修复；多实例/doctor/端口/根隔离沿用；R1/W33/W35 分列，full 仍因 native 拒绝。 |
 
 ## 第三十五轮九成果（三个连续工程包）
 
@@ -1623,6 +1646,65 @@ const wave35Status = {
   finalRun: { command: 'node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record', exitCode: 0, source: report.source },
 }
 writeFileSync(join(reports, 'wave35-status.json'), JSON.stringify(wave35Status, null, 2) + '\n')
+
+const wave36Status = {
+  ...wave35Status,
+  schema: 'product-acceptance-wave36-status/1',
+  taskPackage: 'agent-tasks/product-wave-36/README.zh-CN.md',
+  supersedes: 'wave35-status.json',
+  fixedInputs: {
+    testSource: report.source.commit, testSourceDirty: report.source.dirty,
+    dW35: { source: 'edfe5e14f2f8fbc7f395a84520c781c7f07ce9e7', buildId: '599de3e98c02de0b',
+      innerTarSha256: '11027a375848c25c2d2ae8e18755f65fa77272db533dcee7bb9ff27ba8ba50db', innerTarBytes: 20598155,
+      outerZipSha256: '39c0fff0e13d61c59198f8a55f0ed692b887194aaa4e2782b2b3e9cbd623f6c5', outerZipBytes: 63536701,
+      installManifestSha256: 'd8677d1e313b232ab30026b67e478cdd8f49e72436f01cd1ad454b30641effac' },
+    mainInputs: ['5860da13 main baseline', 'completion-history source (0092) not in frozen W35 bytes', 'model settings POST/private save in W35 bytes', 'launcher EEXIST fix in W35 bytes'],
+    w33: wave35Status.fixedInputs.lockedCohort, baseline: wave35Status.fixedInputs.upgradeBaseline,
+  },
+  fourClosures: [
+    { id: 'C1', title: '所有资源 query 未知均阻断 signal/release', status: w36caller.every(id => byId.get(id)?.status === 'PASS') ? 'PASS' : 'INCOMPLETE',
+      cases: w36caller.map(id => ({ id, status: byId.get(id)?.status ?? 'MISSING' })),
+      operationCopies: ['E33-OUTER-ZIP-OPERATION', 'E33-COHORT-RECOVERY-OPERATION', 'E36-W35-OUTER-OPERATION',
+        'E36-W35-RECOVERY-OPERATION', 'E36-W35-MODEL-SAVE-OPERATION'].map(id => ({ id, status: byId.get(id)?.status ?? 'MISSING' })),
+      notes: 'descendant query errors/unknown, missing booleans, duplicate/foreign/late rows and operation copies are all fail-closed; the new W35 callers use the same protocol.' },
+    { id: 'C2', title: '同 cohort 双原项目、窗口、上下文、接受与重开', status: byId.get('E5-TWO-PROJECT-TEMPLATE-CREATE')?.status ?? 'MISSING',
+      journey: byId.get('E5-TWO-PROJECT-TEMPLATE-CREATE')?.evidence?.journey ?? null,
+      originalProjectApplicable: byId.get('E32-ORIGINAL-PROJECT-APPLICABLE')?.status ?? 'MISSING',
+      history: w36history?.probe ?? null,
+      notes: 'both registered projects run the full chain with verification accept, composite stale refusal and byte-equal reopen; original-project applicability stays NOT_REACHED (fixture exposes only its own project); the classified completion-history route is absent (404) from frozen W35 bytes, so a successor is required.' },
+    { id: 'C3', title: '非空 portability、当前 W35 upgrade 与恢复授权/held', status: [byId.get('E36-W35-RECOVERY')?.status, byId.get('E36-W35-UPGRADE')?.status].every(v => v === 'PASS') ? 'PASS' : 'INCOMPLETE',
+      recovery: { subject: w36rec?.subject ?? null, artifacts: w36rec?.seed?.artifacts?.length ?? null,
+        registry: w36rec?.directRead?.registry?.length ?? null, pending: w36rec?.readonly?.pending?.questionsRecorded ?? null,
+        effectsHeld: w36rec?.readonly?.pending?.held ?? null, provider: w36rec?.readonly?.providerRequests ?? null,
+        operation: w36recOp?.verdict ?? null },
+      upgrade: { upgrade: w36up?.upgrade ?? null, rollback: w36up?.rollback ?? null, dSubmitted: w35up?.dRetry ?? null },
+      notes: 'W35 non-empty business is restored into a new root with every artifact byte, held question/effect rows and direct registry; E own W33→W35 managed upgrade and binary rollback succeed while D’s W35 raw BLOCKED remains a separate retained input. The W33 retry/BLOCKED history is unchanged.' },
+    { id: 'C4', title: '当前产品独立 tiers、重复日常与维护交接', status: release.status,
+      model: { subject: w36model?.subject ?? null, save: w36model?.save ?? null, invalid: w36model?.negatives?.invalidEndpoint ?? null,
+        reopen: w36model?.negatives?.reopen ?? null, restart: w36model?.restart ? { status: w36model.restart.status,
+          readiness: w36model.restart.readiness, provider: w36model.restart.providerRequests } : null, operation: w36modelOp?.verdict ?? null },
+      product: { outer: w36outer ? { sha256: w36outer.zip?.sha256, buildId: w36outer.zip?.buildId, launcherFix: w36outer.launcherFix,
+        repeatedOpen: w36outer.negatives?.repeatedOpen, settings: w36outer.settings } : null,
+        multi: byId.get('E7-MULTI-INSTANCE')?.status ?? 'MISSING' },
+      tiers: { controlled: release.status, installedAlpha: tierVerdicts['installed-alpha']?.status ?? 'MISSING',
+        installedFunctional: tierVerdicts['installed-functional']?.status ?? 'MISSING', localAlpha: tierVerdicts['local-alpha']?.status ?? 'MISSING',
+        fullProduct: tierVerdicts['full-product']?.status ?? 'MISSING',
+        fullProductFailures: [...new Set((tierVerdicts['full-product']?.failures ?? []).map(item => item.code))] },
+      legacy: 'legacy R1 cases remain in the aggregate; W33 and W35 subsets are named by their own case ids and are not averaged into the whole product.',
+      notes: 'the W35 GUI save is a real packaged consumer with private 0600 file, explicit HTTP consent, zero model requests and no key echo; outer/recovery/upgrade/model cases carry the W35 subject; native/value/recovery remain separate and full-product stays refused.' },
+  ],
+  cohorts: [
+    wave35Status.cohorts[0],
+    wave35Status.cohorts[1],
+    { id: 'locked-w35-cohort', buildId: w36model?.subject?.buildId ?? w36outer?.zip?.buildId ?? null,
+      source: w36model?.subject?.source ?? w36outer?.zip?.source ?? null, schema: w36model?.subject?.schema ?? null,
+      tarSha256: w36model?.subject?.tarSha256 ?? null, tarBytes: w36model?.subject?.tarBytes ?? null,
+      zipSha256: w36outer?.zip?.sha256 ?? null, zipBytes: w36outer?.zip?.bytes ?? null,
+      cases: ['E36-W35-OUTER', 'E36-W35-MODEL-SAVE', 'E36-W35-RECOVERY', 'E36-W35-UPGRADE', 'E36-COMPLETION-HISTORY-INSTALLED'] },
+  ],
+  finalRun: { command: 'node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record', exitCode: 0, source: report.source },
+}
+writeFileSync(join(reports, 'wave36-status.json'), JSON.stringify(wave36Status, null, 2) + '\n')
 
 // Historical wave06-32 status files are frozen inputs; wave33 supersedes them.
 

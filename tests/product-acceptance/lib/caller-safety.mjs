@@ -129,16 +129,27 @@ export function createOperation({ id }) {
     lateDescendants() {
       const known = new Set(operation.births.map(item => item.pid))
       const late = []
+      const unknown = []
       for (const pid of known) {
-        try {
-          const out = spawnSync('pgrep', ['-P', String(pid)], { encoding: 'utf8', timeout: 5_000 })
-          for (const line of String(out.stdout ?? '').split('\n').map(item => item.trim()).filter(Boolean)) {
-            const child = Number(line)
-            if (Number.isSafeInteger(child) && !known.has(child)) late.push({ parent: pid, pid: child })
-          }
-        } catch { /* no children */ }
+        let out
+        try { out = spawnSync('pgrep', ['-P', String(pid)], { encoding: 'utf8', timeout: 5_000 }) } catch (error) {
+          unknown.push({ parent: pid, reason: `spawn:${error?.code ?? 'unknown'}` }); continue
+        }
+        if (out.error) { unknown.push({ parent: pid, reason: `error:${out.error.code ?? 'unknown'}` }); continue }
+        if (out.signal) { unknown.push({ parent: pid, reason: `signal:${out.signal}` }); continue }
+        // Only exit 0 with a parseable pid list or exit 1 with no output prove "children known".
+        if (out.status !== 0 && out.status !== 1) { unknown.push({ parent: pid, reason: `exit:${String(out.status)}` }); continue }
+        const lines = String(out.stdout ?? '').split('\n').map(item => item.trim()).filter(Boolean)
+        if (out.status === 1 && lines.length > 0) { unknown.push({ parent: pid, reason: 'exit1_with_output' }); continue }
+        let bad = null
+        for (const line of lines) {
+          const child = Number(line)
+          if (!Number.isSafeInteger(child) || child <= 0) { bad = line; break }
+          if (!known.has(child)) late.push({ parent: pid, pid: child })
+        }
+        if (bad !== null) unknown.push({ parent: pid, reason: `bad_output:${bad.slice(0, 20)}` })
       }
-      return late
+      return { late, unknown, query: 'pgrep-P' }
     },
     /** A signal needs the whole set preflighted and this pid's identity re-read immediately before. */
     signal(pid, signal = 'SIGTERM') {
@@ -148,8 +159,9 @@ export function createOperation({ id }) {
       if (!operation.isComplete()) return { pid, signalled: null, refused: 'incomplete_set' }
       const all = operation.preflightAll()
       if (all.ok !== true) return { pid, signalled: null, refused: 'set_not_fresh', issues: all.issues }
-      const late = operation.lateDescendants()
-      if (late.length > 0) return { pid, signalled: null, refused: 'late_child', late }
+      const descendants = operation.lateDescendants()
+      if (descendants.unknown.length > 0) return { pid, signalled: null, refused: 'descendant_query_unknown', descendants }
+      if (descendants.late.length > 0) return { pid, signalled: null, refused: 'late_child', late: descendants.late }
       const fresh = observeBirth(entry)
       if (!fresh.sameIdentity) return { pid, signalled: null, refused: fresh.alive ? 'identity_changed' : 'not_alive', fresh }
       try {
@@ -166,8 +178,9 @@ export function createOperation({ id }) {
      */
     releaseAllowed(observation = operation.observe()) {
       if (retained !== null) return { allowed: false, reason: 'operation_unknown' }
-      const late = operation.lateDescendants()
-      if (late.length > 0) return { allowed: false, reason: 'late_child', late }
+      const descendants = operation.lateDescendants()
+      if (descendants.unknown.length > 0) return { allowed: false, reason: 'descendant_query_unknown', descendants }
+      if (descendants.late.length > 0) return { allowed: false, reason: 'late_child', late: descendants.late }
       if (!operation.isComplete()) return { allowed: false, reason: 'incomplete_set' }
       if (observation.length !== births.size) return { allowed: false, reason: 'observation_missing' }
       const observedPids = observation.map(row => row?.pid)
@@ -176,10 +189,20 @@ export function createOperation({ id }) {
       for (const row of observation) {
         const entry = births.get(row.pid)
         if (!entry) return { allowed: false, reason: 'foreign_observation' }
-        if (row.expectedStart !== entry.start) return { allowed: false, reason: 'expected_start_mismatch' }
+        // A row must carry the complete observation contract; a missing boolean or query field is
+        // unknown, never quiescence.
+        if (!row || row.query !== 'ps' || typeof row.queryOk !== 'boolean' || typeof row.alive !== 'boolean' ||
+          typeof row.sameIdentity !== 'boolean') return { allowed: false, reason: 'unobserved', row }
+        if (row.expectedStart !== entry.start || row.expectedUid !== entry.uid || row.expectedArgvSha256 !== entry.argvSha256)
+          return { allowed: false, reason: 'expected_start_mismatch', row }
         if (row.queryOk !== true) return { allowed: false, reason: 'query_failed' }
-        if (row.alive === true) return { allowed: false, reason: 'resource_alive' }
-        if (row.alive === false && row.sameIdentity === true) return { allowed: false, reason: 'contradictory_observation' }
+        if (row.alive === true) {
+          if (row.sameIdentity !== true) return { allowed: false, reason: 'identity_changed', row }
+          return { allowed: false, reason: 'resource_alive' }
+        }
+        if (row.sameIdentity !== false) return { allowed: false, reason: 'contradictory_observation', row }
+        if (row.observedStart !== null || row.observedUid !== null || row.observedArgvSha256 !== null)
+          return { allowed: false, reason: 'exited_fields', row }
       }
       return { allowed: true, reason: null }
     },

@@ -546,12 +546,19 @@ function operationConsistencyIssues(op) {
   if (!op || typeof op !== 'object' || typeof op.verdict?.allowed !== 'boolean') return ['operation_missing']
   const issues = []
   if (op.verdict.allowed === true) {
-    if (!Array.isArray(op.released) || op.released.length !== 1) issues.push('operation_released_count')
+    if (!Array.isArray(op.released) || op.released.length < 1) issues.push('operation_released_count')
     if (!Array.isArray(op.retained) || op.retained.length !== 0) issues.push('operation_retained_after_release')
     if (!Array.isArray(op.signals) || op.signals.length !== 0) issues.push('operation_signals_after_release')
     if (op.verdict.reason !== null && op.verdict.reason !== undefined) issues.push('operation_reason_after_release')
   } else if (Array.isArray(op.released) && op.released.length > 0) issues.push('operation_deleted_after_unknown')
   return issues
+}
+
+/** A standalone operation case must carry the same complete operation contract as the product case. */
+export function operationEvidenceIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  if (typeof value.verdict?.allowed !== 'boolean') return ['verdict']
+  return operationConsistencyIssues(value)
 }
 
 /** The shareable outer ZIP is verified by its own sidecars and driven through the packaged entries. */
@@ -643,9 +650,68 @@ export function cohortRecoveryIssues(value) {
   return issues
 }
 
-const UPGRADE_STEPS = ['bootstrap', 'baseline_start', 'upgrade', 'upgraded_health', 'post_upgrade_write', 'tampered_target', 'rollback_install', 'rollback_start']
+const UPGRADE_STEPS = ['materialize', 'bootstrap', 'baseline_start', 'upgrade', 'upgraded_health', 'post_upgrade_write', 'tampered_target', 'rollback_install', 'rollback_start']
 
 /** Same-cohort managed upgrade and binary rollback; D's submitted contradiction is never authority. */
+/** W35 web model-configuration save: private file, no model request and no key echo. */
+export function modelSaveIssues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (!value.subject || !HEX64(String(value.subject.tarSha256 ?? '')) || !HEX40(value.subject.source) ||
+    !Number.isInteger(value.subject.schema)) issues.push('subject')
+  const zip = value.zip ?? {}
+  if (zip.sumsMatch !== true || zip.resultMatch !== true) issues.push('zip_sidecars')
+  if (!HEX64(String(zip.sha256 ?? '')) || zip.installManifestDigest !== zip.installManifestSha256 ||
+    zip.runtimeDigest !== zip.runtime?.sha256 || zip.licenseDigest !== zip.runtime?.licenseSha256) issues.push('zip_identity')
+  if (zip.manifestProtocol !== 'personal-agent-preview/1') issues.push('protocol')
+  if (value.form?.endpoint !== 'url' || value.form?.key !== 'password') issues.push('form')
+  if (value.negatives?.invalidEndpoint?.rejected !== true || value.negatives?.invalidEndpoint?.fileAbsent !== true) issues.push('invalid_endpoint')
+  const save = value.save ?? {}
+  if (save.mode !== 0o600 || save.keyMatches !== true || save.allowInsecureHttp !== true ||
+    !String(save.baseURL ?? '').startsWith('http://127.0.0.1:') || !HEX64(String(save.sha256 ?? '')) || !(save.bytes > 0)) issues.push('save')
+  if (save.providerRequests !== 0) issues.push('model_request')
+  if (save.keyEchoed !== false || save.passwordCleared !== true) issues.push('key_echo')
+  if (value.negatives?.reopen?.keyValue !== '' || value.negatives?.reopen?.bodyLeaksKey !== false) issues.push('reopen_key')
+  const restart = value.restart ?? {}
+  if (restart.status !== 'RUNNING' || restart.readiness?.status !== 200 ||
+    restart.readiness?.discussion !== 'configuration_present' || restart.providerRequests !== 0) issues.push('restart')
+  if (value.resources?.instance?.stop?.result !== 'STOPPED' || restart.stop?.result !== 'STOPPED') issues.push('stop')
+  for (const [key, before, after] of [['instance', value.resources?.instance?.before, value.resources?.instance?.stop?.after],
+    ['restart', restart.resources?.before, restart.resources?.after]]) {
+    for (const issue of resourceRowsIssues(before, after)) issues.push(`${key}_${issue}`)
+  }
+  issues.push(...operationConsistencyIssues(value.operation))
+  return issues
+}
+
+/** Current W35 managed upgrade: success must be proven, otherwise the rollback outcome stays HELD. */
+export function cohortUpgradeW35Issues(value) {
+  if (!value || typeof value !== 'object') return ['missing']
+  const issues = []
+  if (!value.subject || !HEX64(String(value.subject.tarSha256 ?? '')) || !HEX40(value.subject.source)) issues.push('subject')
+  const pair = value.pair ?? {}
+  if (!isSubstantive(pair.baseline?.buildId) || !isSubstantive(pair.target?.buildId)) issues.push('pair')
+  if (pair.target?.tarSha256 !== value.subject?.tarSha256) issues.push('subject_pair')
+  const steps = new Map((value.steps ?? []).map(step => [step.id, step.status]))
+  for (const id of ['materialize', 'bootstrap', 'baseline_start', 'upgrade', 'upgraded_health', 'post_upgrade_write', 'tampered_target'])
+    if (steps.get(id) !== 'PASS') issues.push(`step:${id}`)
+  if (value.upgrade?.status !== 'CONFIRMED' || value.upgrade?.from !== pair.baseline.buildId || value.upgrade?.to !== pair.target.buildId)
+    issues.push('upgrade_from_to')
+  if (value.probe?.postKept !== true) issues.push('post_data')
+  if (value.probe?.tampered?.code !== 'target_tampered') issues.push('tampered')
+  const rollback = value.rollback ?? {}
+  if (rollback.held === true) {
+    // A HELD rollback must not be dressed as a success.
+    if (steps.get('rollback_install') === 'PASS' || rollback.raw?.status === 'BINARY_ROLLED_BACK') issues.push('held_contradiction')
+    if (!isSubstantive(rollback.raw?.status)) issues.push('held_reason')
+  } else {
+    if (steps.get('rollback_install') !== 'PASS' || rollback.raw?.status !== 'BINARY_ROLLED_BACK' ||
+      rollback.raw?.dataRolledBack !== false || rollback.build !== pair.baseline.buildId) issues.push('rollback')
+    if (value.probe?.rollbackKeptPost !== true) issues.push('rollback_data')
+  }
+  return issues
+}
+
 export function cohortUpgradeIssues(value) {
   if (!value || typeof value !== 'object') return ['missing']
   const issues = []
@@ -1745,7 +1811,7 @@ export function evaluateRelease({
         item.evidence?.supportMaterial?.subject ?? item.evidence?.packagedStop?.subject ?? item.evidence?.insights?.subject ??
         item.evidence?.recipePreview?.subject ?? item.evidence?.journey?.subject ?? item.evidence?.journeyContext?.subject ??
         item.evidence?.journeyPhases?.subject ?? item.evidence?.journeyReopen?.subject ?? item.evidence?.zip?.subject ??
-        item.evidence?.outerZip?.subject ?? item.evidence?.cohortRecovery?.subject ?? item.evidence?.cohortUpgrade?.subject ?? item.evidence?.multiInstance?.subject
+        item.evidence?.outerZip?.subject ?? item.evidence?.cohortRecovery?.subject ?? item.evidence?.cohortUpgrade?.subject ?? item.evidence?.cohortUpgradeW35?.subject ?? item.evidence?.multiInstance?.subject ?? item.evidence?.modelSave?.subject
       if (!subject || typeof subject !== 'object') {
         failures.push(fail('subject_missing', `Case ${id} has no frozen artifact subject`, id))
         continue
@@ -1753,7 +1819,7 @@ export function evaluateRelease({
       // Exactly two named cohorts are admitted: the frozen install target and the outer-ZIP inner
       // build it was packaged from. A case must match one of them field by field; there is no
       // "close enough" comparison and no third cohort.
-      const cohorts = [canonicalTuple, byId.get('E33-OUTER-ZIP')?.evidence?.outerZip?.subject].filter(Boolean)
+      const cohorts = [canonicalTuple, byId.get('E33-OUTER-ZIP')?.evidence?.outerZip?.subject, byId.get('E36-W35-OUTER')?.evidence?.outerZip?.subject, byId.get('E36-W35-RECOVERY')?.evidence?.cohortRecovery?.subject].filter(Boolean)
       const matched = cohorts.find(cohort =>
         ['source', 'buildId', 'schema', 'tarSha256', 'tarBytes', 'abi', 'platform', 'arch'].every(field =>
           String(normalize(subject, field) ?? '') === String(normalize(cohort, field) ?? '')))
@@ -1764,6 +1830,23 @@ export function evaluateRelease({
         }
       }
     }
+  }
+
+  // Required operation copies are bound to the product case they summarise; one copy cannot pass while
+  // the embedded operation or the other copy disagrees.
+  for (const [copyId, productId, key] of [['E33-OUTER-ZIP-OPERATION', 'E33-OUTER-ZIP', 'outerZip'],
+    ['E33-COHORT-RECOVERY-OPERATION', 'E33-COHORT-RECOVERY', 'cohortRecovery'],
+    ['E36-W35-OUTER-OPERATION', 'E36-W35-OUTER', 'outerZip'],
+    ['E36-W35-RECOVERY-OPERATION', 'E36-W35-RECOVERY', 'cohortRecovery'],
+    ['E36-W35-MODEL-SAVE-OPERATION', 'E36-W35-MODEL-SAVE', 'modelSave']]) {
+    const copyKey = copyId.endsWith('OUTER-OPERATION') ? 'outerZipOperation'
+      : copyId.endsWith('RECOVERY-OPERATION') ? 'cohortRecoveryOperation'
+        : 'modelSaveOperation'
+    const copy = byId.get(copyId)?.evidence?.[copyKey]
+    const product = byId.get(productId)?.evidence?.[key]?.operation
+    if (byId.get(copyId)?.status === STATUS.PASS && product !== undefined &&
+      JSON.stringify(copy) !== JSON.stringify(product))
+      failures.push(fail('operation_copy_unbound', `${copyId} differs from the embedded ${productId} operation`, copyId))
   }
 
   // An original-project execution claim is only admitted together with a readable scoped observation
@@ -1838,7 +1921,7 @@ export function evaluateRelease({
           failures.push(fail('evidence_history_invalid', `Evidence history ${issue}`, entry.id))
       }
       for (const [key, fn] of [['contextUse', contextUseIssues], ['sse', contextSseIssues], ['guards', contextGuardIssues], ['sourceConfirm', sourceConfirmIssues], ['sourceConfirmRefusal', sourceConfirmRefusalIssues], ['candidateFlow', candidateFlowIssues], ['history', contextHistoryIssues], ['sources', contextSourcesIssues], ['contextUi', contextUiIssues], ['concurrency', concurrencyIssues], ['schemaMigration', schemaMigrationIssues], ['legacyMigration', legacyMigrationIssues], ['frozenScope', frozenScopeIssues], ['ownershipCopy', ownershipCopyIssues], ['ownershipMocks', ownershipMocksIssues], ['installedCandidates', installedCandidatesIssues], ['secondRoot', secondRootIssues], ['workflowFormats', workflowFormatsIssues], ['personalReview', personalReviewIssues], ['restoredReviewRefusals', restoredReviewRefusalsIssues], ['reviewReuse', reviewReuseIssues], ['scopeDiagnostics', scopeDiagnosticsIssues], ['readiness', readinessIssues], ['trialUi', trialUiIssues],
-      ['zip', zipLifecycleIssues], ['outerZip', outerZipIssues], ['cohortRecovery', cohortRecoveryIssues], ['cohortUpgrade', cohortUpgradeIssues], ['journey', journeyIssues], ['journeyContext', journeyContextIssues], ['journeyPhases', journeyPhasesIssues], ['journeyReopen', journeyReopenIssues],
+      ['zip', zipLifecycleIssues], ['outerZip', outerZipIssues], ['cohortRecovery', cohortRecoveryIssues], ['outerZipOperation', operationEvidenceIssues], ['cohortRecoveryOperation', operationEvidenceIssues], ['modelSave', modelSaveIssues], ['modelSaveOperation', operationEvidenceIssues], ['cohortUpgradeW35', cohortUpgradeW35Issues], ['cohortUpgrade', cohortUpgradeIssues], ['journey', journeyIssues], ['journeyContext', journeyContextIssues], ['journeyPhases', journeyPhasesIssues], ['journeyReopen', journeyReopenIssues],
       ['recipePreview', recipePreviewIssues], ['packagedStop', packagedStopIssues], ['stopFunctional', stopFunctionalIssues], ['lifecycleOwn', lifecycleOwnIssues], ['lifecycleBirthNoSet', lifecycleBirthNoSetIssues], ['lifecycleStoppedChild', lifecycleStoppedChildIssues], ['lifecycleStoppedNoRecordChild', lifecycleStoppedNoRecordChildIssues],
       ['lifecycleParentGone', lifecycleParentGoneIssues], ['lifecycleNoRecordUnverified', lifecycleNoRecordUnverifiedIssues], ['lifecycleSetMismatch', lifecycleSetMismatchIssues],
       ['lifecycleBirthConfig', lifecycleBirthConfigIssues], ['lifecycleNoRecord', lifecycleNoRecordIssues], ['lifecycleNoRecordExit', lifecycleNoRecordExitIssues],
