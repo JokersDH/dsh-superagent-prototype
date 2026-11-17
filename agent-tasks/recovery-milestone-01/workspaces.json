@@ -17,7 +17,8 @@
       "ownedPaths": [
         "packages/storage/",
         "packages/workflows/"
-      ]
+      ],
+      "executionMode": "on_demand_concrete_blocker_only"
     },
     {
       "id": "B",
@@ -38,7 +39,8 @@
       "excludedOwnedPaths": [
         "apps/runner/src/attach-channel/",
         "apps/runner/test/attach-channel/"
-      ]
+      ],
+      "executionMode": "active_current_result_only"
     },
     {
       "id": "C",
@@ -51,7 +53,8 @@
         "packages/proposals/",
         "packages/knowledge/",
         "packages/routing/"
-      ]
+      ],
+      "executionMode": "on_demand_concrete_blocker_only"
     },
     {
       "id": "D",
@@ -63,7 +66,8 @@
         "apps/launcher/",
         "tools/distribution/",
         "packages/portability/"
-      ]
+      ],
+      "executionMode": "active_current_result_only"
     },
     {
       "id": "E",
@@ -73,7 +77,8 @@
       "packet": "agent-tasks/recovery-milestone-01/agent-e.zh-CN.md",
       "ownedPaths": [
         "tests/product-acceptance/"
-      ]
+      ],
+      "executionMode": "active_current_result_only"
     },
     {
       "id": "F",
@@ -87,7 +92,8 @@
         "apps/console/e2e/trial/",
         "docs/user-guide/",
         "reports/trial-experience/"
-      ]
+      ],
+      "executionMode": "on_demand_concrete_blocker_only"
     },
     {
       "id": "G",
@@ -99,7 +105,8 @@
         "packages/usage-insights/",
         "tools/usage-insights/",
         "reports/usage-insights/"
-      ]
+      ],
+      "executionMode": "on_demand_concrete_blocker_only"
     },
     {
       "id": "H",
@@ -112,7 +119,8 @@
         "tests/operational-soak/",
         "docs/internal-trial/",
         "reports/trial-operations/"
-      ]
+      ],
+      "executionMode": "active_current_result_only"
     },
     {
       "id": "I",
@@ -125,7 +133,8 @@
         "apps/runner/test/attach-channel/",
         "docs/runtime-channel/",
         "reports/runtime-channel/"
-      ]
+      ],
+      "executionMode": "on_demand_concrete_blocker_only"
     },
     {
       "id": "J",
@@ -138,7 +147,10 @@
         "tools/project-recipes/",
         "docs/project-recipes/",
         "reports/project-recipes/"
-      ]
+      ],
+      "executionMode": "on_demand_concrete_blocker_only"
     }
-  ]
+  ],
+  "activationPolicy": "Only B/H original recovery and D/E fixed installation are active; A/C/F/G/I/J on demand for a concrete blocker from those consumers, otherwise idle",
+  "independentMaintenanceQueues": false
 }

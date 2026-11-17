@@ -1,93 +1,26 @@
-# A–J 可分别转发的话术
+# 当前投入方式更正
 
-每个代码块单独发给对应Agent。任务已写入主仓；原目录/分支不变，先fetch并merge origin/main再读文件。一次负责到里程碑集成与复验结束，无需每个小fix重派。此文件是转发材料，尚未代你发送。
+旧十份整包不再同时启动。主动开发只有 main/B/H 的原恢复主线和 D/E 的已有固定 W36 验收；A/C/F/G/I/J 按实际阻断参与，没有触发项就待命。原root/branch/owned路径不变，详见 [README](README.zh-CN.md) 和 [目录](workspaces.json)。
 
-## Agent A
-
-```text
-继续在 /Users/hh/Desktop/joker/superagent-agent-a、codex/g2-workspaces-verification 工作。先保留dirty，fetch/merge origin/main。
-本轮负责“原 Work 数据连续性”。请完整读取本仓 agent-tasks/recovery-milestone-01/README.zh-CN.md 和 agent-tasks/recovery-milestone-01/agent-a.zh-CN.md，按里面的完整责任执行。
-目标是支持同一原Work故障后恢复到交付；不要增加新功能线。早交可运行source后，持续联调/修复/复验及包内独立队列，不在SOURCE_READY或单个修复后等我派工。
-保留原owned边界、十二用户实例和全部状态/历史/预算。自动真实模型/native/信号0；本阶段不推进复核价值、第二协议复核和路由收益研究。只推原origin分支，最终给准确commit、实际consumer、正负证据和未达层。
-```
-
-## Agent B
+下面一段可以转给所有Agent，无需重新生成十套长任务。此文件仅为转发材料，未代发：
 
 ```text
-继续在 /Users/hh/Desktop/joker/superagent-agent-b、codex/g1-runtime 工作。先保留dirty，fetch/merge origin/main。
-本轮负责“原执行路径与不可变资源归属”。请完整读取本仓 agent-tasks/recovery-milestone-01/README.zh-CN.md 和 agent-tasks/recovery-milestone-01/agent-b.zh-CN.md，按里面的完整责任执行。
-目标是支持同一原Work故障后恢复到交付；不要增加新功能线。早交可运行source后，持续联调/修复/复验及包内独立队列，不在SOURCE_READY或单个修复后等我派工。
-保留原owned边界、十二用户实例和全部状态/历史/预算。自动真实模型/native/信号0；本阶段不推进复核价值、第二协议复核和路由收益研究。只推原origin分支，最终给准确commit、实际consumer、正负证据和未达层。
+本轮调整：增加Agent的目标是加快已有结果，停止新增功能线和独立维护队列。旧任务尚未提交的改动请保留，不需要为了用满资源继续找事做。
+main端到端负责同一个未完成Work故障后接管原问题/回答，继续检查、当前候选、人工接受和原2/4槽归还；B提供该实际consumer需要的Runner/控制修复，H独立验证同一个故障消费者。
+D/E完成现有固定W36的准确安装结论，不追移动main，不因报告更正重包。
+A/C/F/G/I/J按需待命：只有上述原消费者复现具体阻断且涉及你owned模块时才处理；没有阻断不自动执行包里的备用职责。未采用的host/identity/helper缺陷继续禁用并登记，不自动插入主线前置。
+已激活事项负责到同一个结果集成/复验完成，不逐fix等重派；没有剩余阻断可以交回待命，不扩新接口/框架/维护任务，也不生成大套新报告。
+请fetch/merge最新origin/main后，读 agent-tasks/recovery-milestone-01/README.zh-CN.md 及自己原任务文件顶部的新投入模式。
+预算、状态保护与所有权保持：真实模型/native/信号0；研究本阶段不推进；只推原origin分支，不操作十二用户实例或清状态。
 ```
 
-## Agent C
+当前主动分工：
 
-```text
-继续在 /Users/hh/Desktop/joker/superagent-agent-c、codex/g3-assistant-context 工作。先保留dirty，fetch/merge origin/main。
-本轮负责“恢复期间的来源与决定一致性”。请完整读取本仓 agent-tasks/recovery-milestone-01/README.zh-CN.md 和 agent-tasks/recovery-milestone-01/agent-c.zh-CN.md，按里面的完整责任执行。
-目标是支持同一原Work故障后恢复到交付；不要增加新功能线。早交可运行source后，持续联调/修复/复验及包内独立队列，不在SOURCE_READY或单个修复后等我派工。
-保留原owned边界、十二用户实例和全部状态/历史/预算。自动真实模型/native/信号0；本阶段不推进复核价值、第二协议复核和路由收益研究。只推原origin分支，最终给准确commit、实际consumer、正负证据和未达层。
-```
+| Agent | 本次负责的结果 | 入口 |
+| --- | --- | --- |
+| B | main原恢复consumer所需的Runner控制修复，未用工具不抢先扩修 | [B](agent-b.zh-CN.md) |
+| H | 同一未完成Work故障前后原ID/问答/交付的独立消费者 | [H](agent-h.zh-CN.md) |
+| D | 固定W36来源更正、同包交接并解决E实际阻断 | [D](agent-d.zh-CN.md) |
+| E | 固定W36的独立安装结论 | [E](agent-e.zh-CN.md) |
 
-## Agent D
-
-```text
-继续在 /Users/hh/Desktop/joker/superagent-agent-d、codex/g3-local-distribution 工作。先保留dirty，fetch/merge origin/main。
-本轮负责“固定 W36 安装交付与准确来源”。请完整读取本仓 agent-tasks/recovery-milestone-01/README.zh-CN.md 和 agent-tasks/recovery-milestone-01/agent-d.zh-CN.md，按里面的完整责任执行。
-目标是支持同一原Work故障后恢复到交付；不要增加新功能线。早交可运行source后，持续联调/修复/复验及包内独立队列，不在SOURCE_READY或单个修复后等我派工。
-保留原owned边界、十二用户实例和全部状态/历史/预算。自动真实模型/native/信号0；本阶段不推进复核价值、第二协议复核和路由收益研究。只推原origin分支，最终给准确commit、实际consumer、正负证据和未达层。
-```
-
-## Agent E
-
-```text
-继续在 /Users/hh/Desktop/joker/superagent-agent-e、codex/g3-product-acceptance 工作。先保留dirty，fetch/merge origin/main。
-本轮负责“固定 W36 的独立安装结论”。请完整读取本仓 agent-tasks/recovery-milestone-01/README.zh-CN.md 和 agent-tasks/recovery-milestone-01/agent-e.zh-CN.md，按里面的完整责任执行。
-目标是支持同一原Work故障后恢复到交付；不要增加新功能线。早交可运行source后，持续联调/修复/复验及包内独立队列，不在SOURCE_READY或单个修复后等我派工。
-保留原owned边界、十二用户实例和全部状态/历史/预算。自动真实模型/native/信号0；本阶段不推进复核价值、第二协议复核和路由收益研究。只推原origin分支，最终给准确commit、实际consumer、正负证据和未达层。
-```
-
-## Agent F
-
-```text
-继续在 /Users/hh/Desktop/joker/superagent-agent-f、codex/g4-trial-experience 工作。先保留dirty，fetch/merge origin/main。
-本轮负责“现有工作台的恢复可用性维护”。请完整读取本仓 agent-tasks/recovery-milestone-01/README.zh-CN.md 和 agent-tasks/recovery-milestone-01/agent-f.zh-CN.md，按里面的完整责任执行。
-目标是支持同一原Work故障后恢复到交付；不要增加新功能线。早交可运行source后，持续联调/修复/复验及包内独立队列，不在SOURCE_READY或单个修复后等我派工。
-保留原owned边界、十二用户实例和全部状态/历史/预算。自动真实模型/native/信号0；本阶段不推进复核价值、第二协议复核和路由收益研究。只推原origin分支，最终给准确commit、实际consumer、正负证据和未达层。
-```
-
-## Agent G
-
-```text
-继续在 /Users/hh/Desktop/joker/superagent-agent-g、codex/g4-usage-insights 工作。先保留dirty，fetch/merge origin/main。
-本轮负责“可信身份诊断的收口”。请完整读取本仓 agent-tasks/recovery-milestone-01/README.zh-CN.md 和 agent-tasks/recovery-milestone-01/agent-g.zh-CN.md，按里面的完整责任执行。
-目标是支持同一原Work故障后恢复到交付；不要增加新功能线。早交可运行source后，持续联调/修复/复验及包内独立队列，不在SOURCE_READY或单个修复后等我派工。
-保留原owned边界、十二用户实例和全部状态/历史/预算。自动真实模型/native/信号0；本阶段不推进复核价值、第二协议复核和路由收益研究。只推原origin分支，最终给准确commit、实际consumer、正负证据和未达层。
-```
-
-## Agent H
-
-```text
-继续在 /Users/hh/Desktop/joker/superagent-agent-h、codex/g4-trial-operations 工作。先保留dirty，fetch/merge origin/main。
-本轮负责“原恢复链路的独立故障消费者”。请完整读取本仓 agent-tasks/recovery-milestone-01/README.zh-CN.md 和 agent-tasks/recovery-milestone-01/agent-h.zh-CN.md，按里面的完整责任执行。
-目标是支持同一原Work故障后恢复到交付；不要增加新功能线。早交可运行source后，持续联调/修复/复验及包内独立队列，不在SOURCE_READY或单个修复后等我派工。
-保留原owned边界、十二用户实例和全部状态/历史/预算。自动真实模型/native/信号0；本阶段不推进复核价值、第二协议复核和路由收益研究。只推原origin分支，最终给准确commit、实际consumer、正负证据和未达层。
-```
-
-## Agent I
-
-```text
-继续在 /Users/hh/Desktop/joker/superagent-agent-i、codex/g5-coordinator-channel 工作。先保留dirty，fetch/merge origin/main。
-本轮负责“唯一通信层的恢复支持与安全收尾”。请完整读取本仓 agent-tasks/recovery-milestone-01/README.zh-CN.md 和 agent-tasks/recovery-milestone-01/agent-i.zh-CN.md，按里面的完整责任执行。
-目标是支持同一原Work故障后恢复到交付；不要增加新功能线。早交可运行source后，持续联调/修复/复验及包内独立队列，不在SOURCE_READY或单个修复后等我派工。
-保留原owned边界、十二用户实例和全部状态/历史/预算。自动真实模型/native/信号0；本阶段不推进复核价值、第二协议复核和路由收益研究。只推原origin分支，最终给准确commit、实际consumer、正负证据和未达层。
-```
-
-## Agent J
-
-```text
-继续在 /Users/hh/Desktop/joker/superagent-agent-j、codex/g5-project-recipes 工作。先保留dirty，fetch/merge origin/main。
-本轮负责“原项目与检查的里程碑支持”。请完整读取本仓 agent-tasks/recovery-milestone-01/README.zh-CN.md 和 agent-tasks/recovery-milestone-01/agent-j.zh-CN.md，按里面的完整责任执行。
-目标是支持同一原Work故障后恢复到交付；不要增加新功能线。早交可运行source后，持续联调/修复/复验及包内独立队列，不在SOURCE_READY或单个修复后等我派工。
-保留原owned边界、十二用户实例和全部状态/历史/预算。自动真实模型/native/信号0；本阶段不推进复核价值、第二协议复核和路由收益研究。只推原origin分支，最终给准确commit、实际consumer、正负证据和未达层。
-```
+按需职责保留，未触发不执行：[A](agent-a.zh-CN.md)、[C](agent-c.zh-CN.md)、[F](agent-f.zh-CN.md)、[G](agent-g.zh-CN.md)、[I](agent-i.zh-CN.md)、[J](agent-j.zh-CN.md)。main先提供实际故障复现和需要的最小依赖，不把整个恢复目标分摊成十份并行新工程。

@@ -1,5 +1,7 @@
 # G：可信身份诊断的收口
 
+**投入模式：按需支持，当前不自动开工。** 下文是触发后的职责边界，不是待办清单。只有main/B/H的原恢复或D/E固定包实际出现本模块阻断时才执行；否则保留现状并待命，不修未用候选、不做独立维护队列。
+
 目录 `/Users/hh/Desktop/joker/superagent-agent-g`，分支 `codex/g4-usage-insights`；本轮已验输入 `2df7416098dd7ab4a827a55fb4c8755574d3f75c`。
 先读[共同里程碑](README.zh-CN.md)、AGENTS/START-HERE/product-spec/README和[验收](../../reports/releases/wave37-admission/README.zh-CN.md)。保留dirty后fetch/merge origin/main，固定实际consumer source。原owned/excluded路径仍以[原表](../product-wave-36/dispatch.json)为准。
 
@@ -11,10 +13,9 @@
 
 提供主线现有support DTO可消费的最小纯验证/脱敏报告，以及上述反例；actual main尚未接候选identity模块，不把候选问题称默认公共绕过。H/E读取同一固定subject，数值不反解析格式化文本，未知费用/活动代理口径保留。
 
-独立队列是既有导出/支持在恢复前后的身份/截断/错误维护；不扩collector、ledger、价格或路由收益研究。
 
 完成出口：错误entry/空argv/自标来源不能获得可信当前身份，合法原内部输入与缺失输入有对照；不凭静态证据声称liveness。
 
-早交可运行source及必要source闭包后，连续支持本里程碑集成、修复、复验和上述独立队列，不逐fix等待、不把SOURCE_READY当整包完成。状态写原owned报告目录的 `recovery-milestone-01-status.json`，列commit/base/实际命令exit/原IDs/层次/剩余项。只显式owned路径提交到原origin分支；外部依赖只阻对应项，不改他人候选。
+被激活的具体事项交可运行source后，继续解决同一个consumer的集成和复验；无剩余实际阻断即可交回待命，不新建任务或独立队列。仅在现有状态文件补commit/命令exit/原IDs/剩余缺口，不额外生成大套报告。只显式owned路径提交到原origin分支，保留其他人的候选。
 
 自动vendor/model/native和真实信号均0；Bcap4UNKNOWN不可花，原E试点本阶段不推进，材料/ledger不变。十二用户实例及state/profile/tar/历史保留；不新Driver/CAC/desktop/自动接受/第二生命周期，不global discovery、借凭据或绕stop拒绝清理。无工时/当天deadline/新token预算；无需用重复测试填执行时间。

@@ -7,7 +7,11 @@
   "originalSchedulerTwoFourResources": "NOT_REACHED",
   "realNativePhysicalQuiescence": "NOT_TESTED",
   "independentFixedW36Installed": "NOT_REACHED",
-  "latestHistoricalEstimate": { "stableLocal": "76/100", "schemeBWithoutCAC": "55.7/95=58.6%", "reassessedThisTurn": false },
+  "latestHistoricalEstimate": {
+    "stableLocal": "76/100",
+    "schemeBWithoutCAC": "55.7/95=58.6%",
+    "reassessedThisTurn": false
+  },
   "phaseResearch": {
     "userConfirmed": true,
     "reviewValuePilot": "NOT_PURSUED_THIS_PHASE_VALUE_UNMEASURED",
@@ -16,7 +20,7 @@
     "historicalProtocolFixturesLedgerReportsChanged": false,
     "newAllowance": 0
   },
-  "nextResponsibility": "main end-to-end original Work recovery; B/I/H support; A/C data and authority; D/E fixed existing W36; F/G/J existing maintenance and milestone evidence",
+  "nextResponsibility": "main/B/H actively close original business recovery; D/E actively verify existing fixed W36; A/C/F/G/I/J on demand for a concrete blocker, otherwise idle",
   "forwardPrompts": "agent-tasks/recovery-milestone-01/forward-prompts.zh-CN.md",
   "externalPromptsSent": false,
   "staticVerification": {
@@ -26,6 +30,20 @@
     "candidateDirtyInventoryUnchanged": true,
     "doesNotGrantRuntimeReleaseOrValueAdmission": true
   },
-  "preservation": { "userServicesOperated": 0, "realVendorModelNativeTurns": 0, "realSignals": 0, "globalProcessDiscovery": 0, "newArchives": 0, "newWorktrees": 0 },
-  "externalReview": "Preserved unstaged; its root-log removals were external changes, not performed or restored by this task"
+  "preservation": {
+    "userServicesOperated": 0,
+    "realVendorModelNativeTurns": 0,
+    "realSignals": 0,
+    "globalProcessDiscovery": 0,
+    "newArchives": 0,
+    "newWorktrees": 0
+  },
+  "externalReview": "Preserved unstaged; its root-log removals were external changes, not performed or restored by this task",
+  "firstKnownGap": {
+    "entry": "apps/coordinator/product/execution.ts:295",
+    "behavior": "start changes unfinished native bindings to stopping; reconcileRegisteredRunner only inspects/cancels and businessResumed:false; new coordinator has no original runtime in attempts map",
+    "nextResult": "same unfinished original Work reopens and continues original question/answer without new begin"
+  },
+  "independentMaintenanceQueues": false,
+  "unusedCandidateDefects": "Remain recorded and disabled, not automatic prerequisites for the original recovery path"
 }

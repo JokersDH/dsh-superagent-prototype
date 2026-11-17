@@ -7,9 +7,9 @@
 - Read START-HERE.zh-CN.md, product-spec/README.md and your assigned packet before implementation.
 - Current work is agent-tasks/recovery-milestone-01/README.zh-CN.md. It replaces wave36 NEW expansion dispatch, while retaining all prior outcomes and evidence.
 - The one milestone is the SAME original Work through coordinator failure, original Store/Application/QuestionBroker continuation, original check/currentCandidate/manual acceptance/delivery and original 2/4 slot/resource return.
-- Main owns the end-to-end result. B/I/H support that original chain; A/C maintain original data/authority; D/E close the fixed installation cohort; F/G/J maintain existing capabilities and supply milestone evidence.
+- Main owns the end-to-end result. Main/B/H actively close original recovery; D/E actively close the fixed existing installation cohort. A/C/F/G/I/J are on demand only when those actual consumers expose a concrete blocking issue; otherwise stay idle.
 - Do not start another feature-expansion wave before that exit. Larger tasks mean continuous integration, repair and acceptance responsibility, not more numbered deliverables.
-- Publish runnable source early, then continue the whole milestone and independent maintenance queue. SOURCE_READY is not whole-product completion; no per-fix waiting, repeated soak to fill time, same-day deadline, duration promise or token allowance.
+- Publish runnable source early, then finish the SAME result through integration and acceptance. No independent maintenance queues or busywork to use all agents; unused candidate defects stay disabled and do not automatically block the active path. SOURCE_READY is not whole-product completion. No same-day deadline, duration promise or token allowance.
 - Full Scheme B engineering remains the goal. CAC, desktop, new Driver, automatic acceptance, writer racing and dynamic DAG work are outside this milestone.
 - Historical instructions and exact wave evidence are archived in docs/history/agents-waves.md. Read a historical section only when tracing its subject; current explicit scope takes precedence.
 

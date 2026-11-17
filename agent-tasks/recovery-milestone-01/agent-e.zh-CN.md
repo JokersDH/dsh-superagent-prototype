@@ -1,5 +1,7 @@
 # E：固定 W36 的独立安装结论
 
+**投入模式：主动，仅完成共同README里的当前路径。** 没有当前consumer的剩余阻断即可交回待命，不扩独立维护队列。
+
 目录 `/Users/hh/Desktop/joker/superagent-agent-e`，分支 `codex/g3-product-acceptance`；本轮已验输入 `95d48acc06b437a2a14a8cd46be430215cc3df5d`。
 先读[共同里程碑](README.zh-CN.md)、AGENTS/START-HERE/product-spec/README和[验收](../../reports/releases/wave37-admission/README.zh-CN.md)。保留dirty后fetch/merge origin/main，固定实际consumer source。原owned/excluded路径仍以[原表](../product-wave-36/dispatch.json)为准。
 
@@ -15,6 +17,6 @@
 
 完成出口：交一个准确 W36 独立 verdict，逐项区分同包/旧包/source/controlled/native/recovered；失败有原始材料和owner，不用aggregate数替整包。
 
-早交可运行source及必要source闭包后，连续支持本里程碑集成、修复、复验和上述独立队列，不逐fix等待、不把SOURCE_READY当整包完成。状态写原owned报告目录的 `recovery-milestone-01-status.json`，列commit/base/实际命令exit/原IDs/层次/剩余项。只显式owned路径提交到原origin分支；外部依赖只阻对应项，不改他人候选。
+被激活的具体事项交可运行source后，继续解决同一个consumer的集成和复验；无剩余实际阻断即可交回待命，不新建任务或独立队列。仅在现有状态文件补commit/命令exit/原IDs/剩余缺口，不额外生成大套报告。只显式owned路径提交到原origin分支，保留其他人的候选。
 
 自动vendor/model/native和真实信号均0；Bcap4UNKNOWN不可花，原E试点本阶段不推进，材料/ledger不变。十二用户实例及state/profile/tar/历史保留；不新Driver/CAC/desktop/自动接受/第二生命周期，不global discovery、借凭据或绕stop拒绝清理。无工时/当天deadline/新token预算；无需用重复测试填执行时间。

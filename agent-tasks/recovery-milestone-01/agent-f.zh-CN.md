@@ -1,5 +1,7 @@
 # F：现有工作台的恢复可用性维护
 
+**投入模式：按需支持，当前不自动开工。** 下文是触发后的职责边界，不是待办清单。只有main/B/H的原恢复或D/E固定包实际出现本模块阻断时才执行；否则保留现状并待命，不修未用候选、不做独立维护队列。
+
 目录 `/Users/hh/Desktop/joker/superagent-agent-f`，分支 `codex/g4-trial-experience`；本轮已验输入 `06e17eb70232a2d14efd49308ff10a6045d77f10`。
 先读[共同里程碑](README.zh-CN.md)、AGENTS/START-HERE/product-spec/README和[验收](../../reports/releases/wave37-admission/README.zh-CN.md)。保留dirty后fetch/merge origin/main，固定实际consumer source。原owned/excluded路径仍以[原表](../product-wave-36/dispatch.json)为准。
 
@@ -9,10 +11,9 @@
 
 在自己 trial owned 子树修真实体验缺陷，向 main 提供最小可导入 slice/必要正负与原默认 App 复现；App/transport/globalCSS/HTTP由 main修改。与 H/E 对齐实际冻结版入口，不用 standalone panel 截图代替默认产品。
 
-独立队列为当前问题/历史/错误状态的键盘、手机及迟到身份响应维护；保留原截图和缺 WebKit/屏幕阅读器范围，不以重复截图扩大证据。不做新仪表盘、配置页或功能设计。
 
 完成出口：现有日常/问题/交付路径无误导状态，恢复相关缺陷修复有真实consumer；默认与可选、source与安装严格分列。
 
-早交可运行source及必要source闭包后，连续支持本里程碑集成、修复、复验和上述独立队列，不逐fix等待、不把SOURCE_READY当整包完成。状态写原owned报告目录的 `recovery-milestone-01-status.json`，列commit/base/实际命令exit/原IDs/层次/剩余项。只显式owned路径提交到原origin分支；外部依赖只阻对应项，不改他人候选。
+被激活的具体事项交可运行source后，继续解决同一个consumer的集成和复验；无剩余实际阻断即可交回待命，不新建任务或独立队列。仅在现有状态文件补commit/命令exit/原IDs/剩余缺口，不额外生成大套报告。只显式owned路径提交到原origin分支，保留其他人的候选。
 
 自动vendor/model/native和真实信号均0；Bcap4UNKNOWN不可花，原E试点本阶段不推进，材料/ledger不变。十二用户实例及state/profile/tar/历史保留；不新Driver/CAC/desktop/自动接受/第二生命周期，不global discovery、借凭据或绕stop拒绝清理。无工时/当天deadline/新token预算；无需用重复测试填执行时间。

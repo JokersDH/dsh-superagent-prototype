@@ -1,6 +1,6 @@
 # 个人 Agent 助理：方案 B 产品实现蓝图
 
-2026-11-17现行工程入口：[原Work恢复里程碑01](../agent-tasks/recovery-milestone-01/README.zh-CN.md)，替代下面旧轮次的扩线派工。main端到端负责，十位支持同一原生命周期；[0095已交正常组合](../docs/rfcs/WP-16/0095-main-original-running-callback-composition.md)与[最新验收](../reports/releases/wave37-admission/README.zh-CN.md)分清受控正常链/故障恢复/物理/安装。D/E锁已有W36。
+2026-11-17现行工程入口：[原Work恢复里程碑01](../agent-tasks/recovery-milestone-01/README.zh-CN.md)，替代下面旧轮次的扩线派工。main/B/H主动闭合原恢复，D/E主动验已有固定W36；A/C/F/G/I/J只按具体阻断参与，否则待命，不扩独立维护队列。[0095已交正常组合](../docs/rfcs/WP-16/0095-main-original-running-callback-composition.md)与[最新验收](../reports/releases/wave37-admission/README.zh-CN.md)分清受控正常链/故障恢复/物理/安装。
 
 用户确认本阶段不推进复核价值试点、依赖它的第二协议复核与路由收益研究，价值未测；CAC仍后置。旧设计/协议/ledger按历史保留，不构成本阶段工作或新增预算。产品进度以[STATUS](../docs/product/STATUS.zh-CN.md)为准。以下旧日期的“当前”均按其历史时间阅读。
 

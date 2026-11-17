@@ -2,7 +2,9 @@
 
 日期：2026-11-17。本次核对十位A–J的固定最新提交、主线代码、必要正反例和准确安装字节；不是按“Agent说完成”统计。读者入口：[如何使用](../ASSISTANT-GUIDE.zh-CN.md)、[架构](ARCHITECTURE.zh-CN.md)、[创新](INNOVATION.zh-CN.md)。
 
-最新续交：wave36十位已按[本轮验收](../../reports/releases/wave37-admission/README.zh-CN.md)固定提交复核。main `42f6daab` 已激活原Native.launch回调，受控原Work问答→检查→人工接受→产物重开及撤销授权反例通过；尚非崩溃恢复/真实物理/原2&4槽证明。下一步收敛到[原Work恢复里程碑01](../../agent-tasks/recovery-milestone-01/README.zh-CN.md)，main端到端负责，十位持续支持集成，不再扩功能线。
+最新续交：wave36十位已按[本轮验收](../../reports/releases/wave37-admission/README.zh-CN.md)固定提交复核。main `42f6daab` 已激活原Native.launch回调，受控原Work问答→检查→人工接受→产物重开及撤销授权反例通过；尚非崩溃恢复/真实物理/原2&4槽证明。下一步收敛到[原Work恢复里程碑01](../../agent-tasks/recovery-milestone-01/README.zh-CN.md)：main/B/H恢复主线、D/E固定包主动工作，A/C/F/G/I/J按具体阻断参与，否则待命，不以用满Agent为目标。
+
+首要缺口已经在代码定位：重启时活动native绑定进入stopping，原reconcile只核对/取消旧Runner且businessResumed:false，新进程未重建原业务连接。下一次进展以同一未完成Work重开后能继续原问答为准，不以更多正常链/未用候选修复或文档替代。
 
 **用户已确认：本阶段不推进复核价值试点、依赖它的第二协议复核和路由收益研究，价值未测。** 原协议、ledger、fixture、报告保留，不重置/退款/补样/研究计价；自动模型/native仍0。此范围决定不自动改变既有分母和历史最近评估。
 

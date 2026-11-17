@@ -1,6 +1,6 @@
 # 从这里开始：仓库、代码位置和并行开发
 
-**当前唯一工程入口：[原 Work 恢复里程碑01](agent-tasks/recovery-milestone-01/README.zh-CN.md)。** main端到端负责同原Work故障接管到检查/人工接受/原2&4槽归还；十位沿原目录分支持续支持，不再扩大功能线。分别转发[A–J十段话术](agent-tasks/recovery-milestone-01/forward-prompts.zh-CN.md)，完整任务和原路径都已写好，不必逐fix重新派工。
+**当前唯一工程入口：[原 Work 恢复里程碑01](agent-tasks/recovery-milestone-01/README.zh-CN.md)。** main/B/H主动闭合同原Work故障接管到交付，D/E主动完成固定W36验收；A/C/F/G/I/J只在这两条实际路径出现具体阻断时按需参与，否则待命。不再要求用满十位，不扩独立维护队列。已有[转发说明](agent-tasks/recovery-milestone-01/forward-prompts.zh-CN.md)已更正投入方式，旧整包不再同时开工。
 
 本轮[固定提交验收](reports/releases/wave37-admission/README.zh-CN.md)已完成。main42f6daab已实接原Native.launch回调并通过受控正常Work问答→检查→人工接受→产物重开，撤销授权零效果；30测试/strict过，仍未证明崩溃恢复/真实物理/原槽。见[0095](docs/rfcs/WP-16/0095-main-original-running-callback-composition.md)。E确已W35安装/配置/非空恢复/upgrade子集，D已有W36含历史固定包，下一步E只验同W36，不追移动main。
 
