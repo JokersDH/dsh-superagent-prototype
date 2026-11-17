@@ -6,7 +6,7 @@
 import type {
   AcceptanceProjectionInput, AcceptanceProjectionResult, AssistantState, Conversation, ConversationPage, ConversationSearchPage, DecisionRecord, LegacyDecisionRecord,
   ProductStore, ProjectCurrent, ProjectSettings, ProjectVersion, EvidencePage, RecoveryIntentInput, RecoveryIntentPage, RecoveryIntentRecord,
-  SourceMessageMetadata, TimelineEntry, WorkflowStateFacts, WorkIndexEntry,
+  SourceMessageMetadata, TimelineEntry, WorkflowStateFacts, WorkIndexEntry, CompletionHistoryPage, CompletionHistoryQuery,
 } from '@personal-agent/storage'
 import { WorkflowConflict as StorageWorkflowConflict } from '@personal-agent/storage'
 import type {
@@ -89,6 +89,7 @@ export interface ReadIndexPort {
   sourceMessage(messageId: string, projectIds: readonly string[]): SourceMessageMetadata | undefined
   timeline(input: { workId: string; projectIds: readonly string[]; limit?: number }): { entries: readonly TimelineEntry[]; truncated: boolean } | undefined
   evidencePage(input: { workId: string; projectIds: readonly string[]; limit?: number; cursor?: string }): EvidencePage | undefined
+  completionHistory(query: CompletionHistoryQuery): CompletionHistoryPage
   listArtifacts(input?: { limit?: number; before?: string }): { artifacts: { id: string; digest: string; bytes: number; path: string; createdAt: string }[]; nextCursor?: string; hasMore: boolean }
 }
 
