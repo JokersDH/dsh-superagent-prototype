@@ -693,7 +693,9 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
     }
     const query = WorkCompletionHistoryQuerySchema.safeParse(input)
     if (!query.success) throw new ApplicationFault('invalid_request', 'Invalid history query', 'none')
-    const id = IdSchema.parse(c.req.param('id'))
+    const parsedId = IdSchema.safeParse(c.req.param('id'))
+    if (!parsedId.success) throw new ApplicationFault('invalid_request', 'Invalid work identity', 'none')
+    const id = parsedId.data
     const page = WorkCompletionHistorySchema.parse(await options.read.workCompletionHistory(id, query.data))
     if (page.workId !== id || page.kind !== query.data.kind || page.limit !== query.data.limit)
       throw new ApplicationFault('storage_unavailable', 'History response identity mismatch', 'none')

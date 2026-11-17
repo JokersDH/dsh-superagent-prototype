@@ -65,6 +65,7 @@ test('history authenticates, rejects injected/repeated parameters and reads unde
   assert.equal((await h.get(h.first.work.id, undefined, h.app(), { authorization: `Bearer ${token}`, origin: 'https://foreign.invalid' })).status, 403)
   for (const query of ['kind=contracts&kind=verifications', 'kind=attempts', 'kind=contracts&limit=0', 'kind=contracts&limit=21', 'kind=contracts&path=/private'])
     assert.equal((await h.get(h.first.work.id, query)).status, 400)
+  assert.equal((await h.get('invalid%20identity', 'kind=contracts')).status, 400)
   assert.equal((await h.get(h.first.work.id, undefined, h.app(h.product.read, 'recovery_readonly'))).status, 200)
 })
 
