@@ -1,0 +1,48 @@
+{
+  "status": "PASS_ACTUAL_COMPLETION_HISTORY_APP",
+  "cases": [
+    {
+      "id": "ORIGINAL-WORK-DETAIL-READS-REAL-COMPLETION-PAGES-ONLY-ON-DEMAND",
+      "status": "PASS"
+    },
+    {
+      "id": "ORIGINAL-CONTRACT-AND-ACCEPTANCE-CATEGORIES-PRESERVE-THEIR-OWN-IDENTITIES",
+      "status": "PASS"
+    },
+    {
+      "id": "WRONG-WORK-RESPONSE-IS-REFUSED-WITHOUT-OLD-ROWS-OR-RAW-ERROR",
+      "status": "PASS"
+    },
+    {
+      "id": "LATE-OTHER-CATEGORY-CANNOT-REPLACE-CURRENT-HISTORY",
+      "status": "PASS"
+    },
+    {
+      "id": "OVERSIZED-FIRST-RECORD-IS-EXPLICITLY-BLOCKED-WITHOUT-FALSE-CONTINUATION",
+      "status": "PASS"
+    },
+    {
+      "id": "LEGACY-ABSENCE-KEEPS-THE-ORIGINAL-DELIVERY-VIEW",
+      "status": "PASS"
+    },
+    {
+      "id": "SWITCHING-ORIGINAL-WORKS-DOES-NOT-REUSE-THE-PREVIOUS-WORK-PAGE",
+      "status": "PASS"
+    },
+    {
+      "id": "DESKTOP-MOBILE-HISTORY-IS-READABLE-WITHOUT-BUSINESS-WRITES",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "historyReads": 11,
+  "businessPosts": 0,
+  "eventDelta": 0,
+  "acceptedWorks": 2,
+  "additionalMetadataFixtures": 14,
+  "realModelTurns": 0,
+  "nativeTurnStarts": 0,
+  "sourceCommit": "b454c0fd234b2e1d4bc26602b42d8aa6772b0632",
+  "sourceWorktreeClean": true,
+  "scope": "Actual App/HTTP/A production keyset/original controlled Work/check/manualaccept; additional historical rows are explicit metadata fixtures, no installed/native/recovery/value admission"
+}

@@ -1,10 +1,12 @@
 # 产品进度、完成度与当前可用范围
 
-日期：2026-11-16。本次核对十位A–J的固定最新提交、主线代码、必要正反例和准确安装字节；不是按“Agent说完成”统计。读者入口：[如何使用](../ASSISTANT-GUIDE.zh-CN.md)、[架构](ARCHITECTURE.zh-CN.md)、[创新](INNOVATION.zh-CN.md)。
+日期：2026-11-17。本次核对十位A–J的固定最新提交、主线代码、必要正反例和准确安装字节；不是按“Agent说完成”统计。读者入口：[如何使用](../ASSISTANT-GUIDE.zh-CN.md)、[架构](ARCHITECTURE.zh-CN.md)、[创新](INNOVATION.zh-CN.md)。
 
-最新续交：wave34十路已按[本轮验收](../../reports/releases/wave35-admission/README.zh-CN.md)独立复核。main4cde5883把网页配置接到原私有Provider，修F StrictMode/迟到identity；6实际App/15backend/1transport/241contracts、原16观察/9模板通过，两受控Work人工接受。8cd709ca另修启动目录竞争3pure。A/C/B/E原报告问题多已闭，剩余精确预算/选定窗口、首次lease/不可变birth、operation/oracle分层处理；D真实rollback回执、E准确W33非空/outer/upgrade是真进展。原Work恢复仍未达，分数保留；沿[Wave35三连续包](../../agent-tasks/product-wave-35/README.zh-CN.md)每位九完整成果继续，非按任务数加分。
+最新续交：wave35十路已按[Wave36验收](../../reports/releases/wave36-admission/README.zh-CN.md)独立复核。main已交真实分类历史、W35 wrapper静态兼容，8历史/9模板/6配置App过；旧A/C/B/E问题关闭与新guard/收尾/queryUNKNOWN缺口分开。下一步按[完整子系统长任务](../../agent-tasks/product-wave-36/README.zh-CN.md)四条更大交付线延续旧九点，默认consumer/同版本维护是结束条件，不按任务数量升计分。
 
 ## 现在到哪一步
+
+本轮重点：A精确页预算/C显式选择等旧问题关闭。main已接合同/检查/人工标准验收分类历史到原WorkDetail，原接受gate保留。W35 GUI/launcher包全量静态与双已审hash真过，E尚无同W35安装结论。B post-exit quiesce、Csync superseded/digest、EqueryUNKNOWN/证明缺失和W35当前upgrade回执仍需收口。
 
 用户已澄清当前优先级：加速完成方案B整体工程（CAC暂不包含），随后在完整工程中构建可本机使用、可分享同事的安装交付。工程目标不缩成一个临时预览包；功能、原任务恢复、数据与上下文、工作台、运行时和发行并行建设，main持续集成。M系列Mac是先支持的平台，不是让全员先停下功能去突击ZIP；研究收益与实际native能力仍按证据独立验收，不能由源码推断。
 
@@ -48,11 +50,12 @@
 
 | 层 | 准确身份 | 已证范围 | 未证范围 |
 | --- | --- | --- | --- |
-| main运行代码 | 模型配置4cde5883 / launcher8cd709ca | 原回调/诊断；网页私有配置6场景、原16观察/9模板，两个受控Work接受；目录竞争3pure | 保存不验证模型；A新history/C创建时确认/Jrebind仍候选；原恢复/native未新增准入 |
+| main运行代码 | 分类历史f71/b454 / 最终API f32 | A精确源/授权cursor/三kind分类历史默认App8；原模板9/配置6、两个受控Work接受，旧timeline保持 | 人工标准验收不是所有交付接受；C创建绑定/Jrebind仍候选，原恢复/native未新增准入 |
 | R1 | source82ee5b8f / build8296720d8a25f38c / tarSHA04926739… | E最新290PASS/0FAIL/20NT，recorded普通197/功能198过；合法启停保留，同fixture Work真重开found=true新增 | 两原project完整旅程仍未达，oracle仍会接不足材料；新ZIPcase实际只用R1tar；无新观察download，非全原生/全产品 |
 | R2 | source c0a1f897 / build4dcd28f758bbb265 / tarSHA405ecd02… | 6864清单项/209closure，实际包含main303严格导出；D开发受控证据 | E尚无同R2独立结果；不含本轮新A/C/F/G/J候选 |
 | W32候选 | sourcee8348a86 / build88eb8c69b0671171 / innerSHA65c386d1… / outerSHA0a46cd36… | 全量静态；E新actual ZIP包内Node/启动/非空原Work备份/readonly HTTP读取是真实进展 | E306/20NT、普通199/功能200是R1+W32 aggregate，不是W32全套或W33；未含fc38 |
-| W33当前工程包 | source048f0184 / buildf880e5bc9c6c1c57 / innerSHAee45c92c… / outerSHA46e01c8c… | 原静态不变；D两Work/8产物bytes与真实rollback retry；E实际同W33 outer/非空recovery/upgrade子集 | E325/20NT、普通200/功能201仍mixed legacy范围，full202native拒；未含23d/4cde新功能 |
+| 已测子集W33 | source048f0184 / buildf880e5bc9c6c1c57 / innerSHAee45c92c… / outerSHA46e01c8c… | 原静态不变；D两Work/8产物bytes与真实rollback retry；E同W33 outer/非空recovery/upgrade子集 | E336/21NT、普通204/功能205仍mixed legacy范围，full206native拒；未含23d/4cde新功能 |
+| W35必要后继 | sourceedfe5e14 / build599de3e98c02de0b / innerSHA11027a37… / outerSHA39c0fff0… | 6883inner/6891outer全量静态、已审wrapper339b真过；包含原模型GUI，D安装自验 | E仍R1+W33的336/21NT、204普通205功能/full206拒；W35原upgrade BLOCKED不能写成功；不含新分类历史 |
 | 十位候选 | 固定HEAD见[清单](../../reports/releases/wave34-admission/workspaces.json) | 每位各自source/受控结果 | 新six成果是计划，不等真实产品闭合 |
 | 用户旧5180–5191实例 | 每个实例独立state与启动代码 | 保留原历史 | 不自动升级/迁移，不据仓库HEAD推它们的能力 |
 
@@ -105,4 +108,4 @@ E现已真实消费W33固定包，D成功rollback retry原回执/exit0也已存�
 - [使用指南](../ASSISTANT-GUIDE.zh-CN.md)：源码/安装、配置、第一次交付、故障与备份。
 - [架构说明](ARCHITECTURE.zh-CN.md)：进程、七个模块组、请求/数据/执行/恢复、代码位置。
 - [创新状态](INNOVATION.zh-CN.md)：原I1/I2/I3、独立复核、路由/注意力，怎样证明价值。
-- [最新验收总表](../../reports/releases/wave35-admission/README.zh-CN.md)：命令、反例、准确source/tar及限制；原计分来由保留在wave32报告。
+- [最新验收总表](../../reports/releases/wave36-admission/README.zh-CN.md)：命令、反例、准确source/tar及限制；原计分来由保留在wave32报告。
