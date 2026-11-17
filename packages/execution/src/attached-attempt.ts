@@ -32,6 +32,20 @@ export type AttachedAttemptCallbacks = {
   nativeWrite?(intent: AttachedNativeIntent): Promise<{ allowed: boolean; reason?: string }>
 }
 
+/**
+ * The original host handle main actually publishes: the registered port plus its shared original
+ * callbacks. Attaching through this helper guarantees both come from the SAME original attempt, so a
+ * caller cannot pair a port with a different store/guard.
+ */
+export type AttachableRunningAttempt = {
+  readonly attemptId: string
+  readonly attachPort?: {
+    readonly registration: { socketPath: string; credentialPath: string; socketIdentity: { dev: number; ino: number } }
+    readonly producer: unknown
+  }
+  readonly attachCallbacks?: AttachedAttemptCallbacks
+}
+
 export type AttachedAttempt = {
   leaseId: string
   generation: number
@@ -43,6 +57,14 @@ export type AttachedAttempt = {
   stop(): void
   /** Read-only original inspection for the caller (state/resources), never a permission. */
   inspect(): Promise<unknown>
+  /**
+   * Feed one original business command to the SAME registered attempt through its feed transport. This is
+   * admission of an authenticated command, not proof that the native side acted, and it never launches a
+   * new attempt. The command keeps its original id.
+   */
+  feed(command: AttachedCommand): Promise<unknown>
+  /** Cancel through the original cancel transport; the caller supplies the original cancel command id. */
+  cancel(command: Extract<AttachedCommand, { kind: 'cancel' }>): Promise<unknown>
 }
 
 export type AttachAttemptInput = {
@@ -52,6 +74,39 @@ export type AttachAttemptInput = {
   leaseId: string
   callbacks: AttachedAttemptCallbacks
   timeoutMs?: number
+}
+
+/**
+ * Normalize the caller's fresh native guard: only an explicit `{allowed:true}` return authorizes. A void
+ * return, a denial, or a thrown guard all become `allowed:false`; the guard is always awaited.
+ */
+export async function resolveNativeDecision(guard: AttachedAttemptCallbacks['nativeWrite'], intent: AttachedNativeIntent): Promise<{ allowed: boolean; reason?: string }> {
+  if (!guard) return { allowed: false, reason: 'no_native_guard' }
+  try {
+    const decision = await guard(intent)
+    return decision && decision.allowed === true ? { allowed: true } : { allowed: false, reason: decision?.reason ?? 'denied' }
+  } catch (error) {
+    return { allowed: false, reason: `guard_threw:${String((error as { message?: string })?.message ?? error).slice(0, 120)}` }
+  }
+}
+
+/**
+ * Attach to the ORIGINAL RunningAttempt main exposes. The registration, producer and callbacks are all
+ * read from that one handle; missing pieces are refused rather than substituted with local defaults.
+ */
+export function attachRunningAttempt(handle: AttachableRunningAttempt, leaseId: string, options: { timeoutMs?: number } = {}): AttachedAttempt {
+  if (!handle?.attachPort) throw new Error('The original Runner has no registered attachPort yet')
+  if (!handle.attachCallbacks) throw new Error('The original Runner exposes no shared attachCallbacks')
+  if (!handle.attemptId) throw new Error('The original Runner handle has no attempt identity')
+  const producerAttempt = (handle.attachPort.producer as { attempt?: { attemptId?: unknown } } | undefined)?.attempt
+  if (producerAttempt?.attemptId !== handle.attemptId) throw new Error('The attachPort producer does not belong to this original attempt')
+  return attachRunnerAttempt({
+    endpoint: handle.attachPort.registration,
+    producer: handle.attachPort.producer as AttachAttemptInput['producer'],
+    leaseId,
+    callbacks: handle.attachCallbacks,
+    ...(options.timeoutMs === undefined ? {} : { timeoutMs: options.timeoutMs }),
+  })
 }
 
 export function attachRunnerAttempt(input: AttachAttemptInput): AttachedAttempt {
@@ -96,7 +151,8 @@ export function attachRunnerAttempt(input: AttachAttemptInput): AttachedAttempt 
     }
     if (request.type === 'native-write-intent') {
       const command = RunnerCommandSchema.parse((request as { command?: unknown }).command)
-      const decision = input.callbacks.nativeWrite ? await input.callbacks.nativeWrite({ id: (request as { id: string }).id, command }) : { allowed: false as const, reason: 'no_native_guard' }
+      // The caller's guard is awaited; void/throw/deny never authorize a native write.
+      const decision = await resolveNativeDecision(input.callbacks.nativeWrite, { id: (request as { id: string }).id, command })
       await client.channelReply!(input.leaseId, { v: 1, type: 'write-admission', id: (request as { id: string }).id, allowed: decision.allowed })
       served.nativeWrites += 1
       return
@@ -132,5 +188,13 @@ export function attachRunnerAttempt(input: AttachAttemptInput): AttachedAttempt 
     },
     stop() { stopped = true },
     inspect: () => client.inspect(),
+    feed: async command => {
+      if (!client.command) throw new Error('Runner does not expose the original command feed')
+      return client.command(command, input.leaseId)
+    },
+    cancel: async command => {
+      if (!client.cancel) throw new Error('Runner does not expose the original cancel transport')
+      return client.cancel(command, input.leaseId)
+    },
   }
 }

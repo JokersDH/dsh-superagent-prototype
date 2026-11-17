@@ -26,11 +26,13 @@ export const RunnerInspectionSchema = z.strictObject({
 export type RunnerInspection = z.infer<typeof RunnerInspectionSchema>
 export type RunnerState = Pick<RunnerInspection, 'state' | 'admission' | 'coverage' | 'resources' | 'evidence'>
 export type RunnerEndpoint = { socketPath: string; credentialPath: string; socketIdentity: { dev: number; ino: number } }
+/** The authenticated caller for a control action: current registration producer plus its attach lease. */
+export type RunnerControlAuth = { producer: RuntimeProducer; leaseId: string | null }
 export interface RecoveryRunnerPort {
   /** Inventory must include every owned writer; terminated/closed is irreversible for this endpoint. */
   inspect(): Promise<RunnerState>
   /** Must close business admission before attempting to stop owned resources. */
-  cancel(command: Extract<ReturnType<typeof RunnerCommandSchema.parse>, { kind: 'cancel' }>): Promise<RunnerState>
+  cancel(command: Extract<ReturnType<typeof RunnerCommandSchema.parse>, { kind: 'cancel' }>, auth?: RunnerControlAuth): Promise<RunnerState>
   /**
    * Business facts already recorded by this Runner, from `since` onward. Replay is what lets a second
    * client recover the original work without a second ledger: the frames come from the Runner's own
@@ -57,7 +59,7 @@ export interface RecoveryRunnerPort {
    * Business command intake for an attached client. The Runner applies it to the SAME attempt and
    * child; this is admission of an authenticated command, not a second execution lifecycle.
    */
-  command?(command: ReturnType<typeof RunnerCommandSchema.parse>): Promise<RunnerState>
+  command?(command: ReturnType<typeof RunnerCommandSchema.parse>, auth?: RunnerControlAuth): Promise<RunnerState>
 }
 export class RunnerLinkError extends Error {
   /**
@@ -309,10 +311,12 @@ export async function serveRunnerRecovery(endpoint: Pick<RunnerEndpoint, 'socket
       try { claimedProducer = identity(claimed as RuntimeProducer) } catch { reply(res, 409, { error: 'identity_mismatch' }); return }
       if (!matches(claimedProducer, trusted)) { reply(res, 409, { error: 'identity_mismatch' }); return }
       if (!matchesCommandIdentity(claimedProducer.attempt, command as unknown as Record<string, unknown>)) { reply(res, 409, { error: 'identity_mismatch' }); return }
+      const leaseHeader = typeof req.headers['x-pa-lease'] === 'string' ? req.headers['x-pa-lease'].trim() : ''
+      if (leaseHeader && !/^[A-Za-z0-9._:-]{1,128}$/.test(leaseHeader)) { reply(res, 400, { error: 'invalid_lease' }); return }
       const content = JSON.stringify(command), existing = commands.get(command.id)
       if (existing && existing.body !== content) { reply(res, 409, { error: 'command_conflict' }); return }
       if (!existing && commands.size >= 256) { reply(res, 503, { error: 'control_capacity' }); return }
-      const result = existing?.result ?? Promise.resolve().then(() => backend.command!(command)).then(inspect)
+      const result = existing?.result ?? Promise.resolve().then(() => backend.command!(command, { producer: claimedProducer, leaseId: leaseHeader || null })).then(inspect)
       if (!existing) { commands.set(command.id, { body: content, result }); void result.catch(() => undefined) }
       try {
         reply(res, 200, await result)
@@ -329,15 +333,31 @@ export async function serveRunnerRecovery(endpoint: Pick<RunnerEndpoint, 'socket
       return
     }
     if (req.method !== 'POST' || req.url !== '/v1/cancel') { reply(res, 404, { error: 'unsupported_recovery_action' }); return }
-    const command = RunnerCommandSchema.parse(await body(req))
+    const raw = await body(req) as { producer?: unknown; command?: unknown; leaseId?: unknown }
+    const commandBody = raw && typeof raw === 'object' && 'command' in raw ? raw.command : raw
+    const command = RunnerCommandSchema.parse(commandBody)
     if (command.kind !== 'cancel') { reply(res, 403, { error: 'business_action_forbidden' }); return }
-    if (!matches({ ...trusted, attempt: command }, trusted)) { reply(res, 409, { error: 'identity_mismatch' }); return }
+    // A cancel mutates the original service, so the caller's producer must be stated and compared BEFORE
+    // the backend is touched. A bare command has no caller identity and is refused instead of being
+    // applied and then failing an identity check.
+    const claimed = (raw as { producer?: unknown })?.producer
+    if (!claimed || typeof claimed !== 'object') { reply(res, 409, { error: 'identity_mismatch', reason: 'missing_producer' }); return }
+    let cancelProducer: RuntimeProducer
+    try { cancelProducer = identity(claimed as RuntimeProducer) } catch { reply(res, 409, { error: 'identity_mismatch' }); return }
+    if (!matches(cancelProducer, trusted) || !matchesCommandIdentity(cancelProducer.attempt, command as unknown as Record<string, unknown>)) { reply(res, 409, { error: 'identity_mismatch' }); return }
+    const leaseHeader = typeof req.headers['x-pa-lease'] === 'string' ? req.headers['x-pa-lease'].trim()
+      : typeof (raw as { leaseId?: unknown })?.leaseId === 'string' ? ((raw as { leaseId: string }).leaseId).trim() : ''
+    if (leaseHeader && !/^[A-Za-z0-9._:-]{1,128}$/.test(leaseHeader)) { reply(res, 400, { error: 'invalid_lease' }); return }
     const content = JSON.stringify(command), existing = cancels.get(command.id)
     if (existing && existing.body !== content) { reply(res, 409, { error: 'command_conflict' }); return }
     if (!existing && cancels.size >= 128) { reply(res, 503, { error: 'control_capacity' }); return }
-    const result = existing?.result ?? Promise.resolve().then(() => backend.cancel(command)).then(inspect)
+    const result = existing?.result ?? Promise.resolve().then(() => backend.cancel(command, { producer: cancelProducer, leaseId: leaseHeader || null })).then(inspect)
     if (!existing) { cancels.set(command.id, { body: content, result }); void result.catch(() => undefined) }
-    reply(res, 200, await result)
+    try { reply(res, 200, await result) } catch (error) {
+      const refusal = error as { code?: unknown; reason?: unknown; message?: unknown }
+      reply(res, 409, { error: typeof refusal.code === 'string' ? refusal.code : 'unknown_outcome',
+        ...(typeof refusal.reason === 'string' ? { reason: refusal.reason } : {}), message: String(refusal.message ?? '').slice(0, 200) })
+    }
   })().catch(() => { if (!res.headersSent) reply(res, 503, { error: 'unknown_outcome' }); else res.destroy() }) })
   server.requestTimeout = 5000; server.headersTimeout = 5000; server.maxHeadersCount = 16
   server.setTimeout(5000, socket => socket.destroy())
@@ -406,8 +426,8 @@ export function connectRunnerRecovery(input: RunnerEndpoint, context: RuntimePro
     })
     return { value, startedAt }
   }
-  async function call(method: 'GET' | 'POST', path: string, data?: unknown): Promise<VerifiedRunnerInspection> {
-    const { value, startedAt } = await invoke(method, path, data) as { value: unknown; startedAt: number }
+  async function call(method: 'GET' | 'POST', path: string, data?: unknown, extraHeaders?: Record<string, string>): Promise<VerifiedRunnerInspection> {
+    const { value, startedAt } = await invoke(method, path, data, extraHeaders) as { value: unknown; startedAt: number }
     const parsed = RunnerInspectionSchema.safeParse(value)
     if (!parsed.success) throw new RunnerLinkError('invalid_response', 'Runner inspection did not match the recovery protocol')
     if (!matches(parsed.data, trusted)) throw new RunnerLinkError('identity_mismatch', 'Runner inspection belongs to another registered attempt')
@@ -416,7 +436,7 @@ export function connectRunnerRecovery(input: RunnerEndpoint, context: RuntimePro
     return proof
   }
   return Object.freeze({ inspect: () => call('GET', '/v1/inspection'),
-    cancel: (command: Extract<ReturnType<typeof RunnerCommandSchema.parse>, { kind: 'cancel' }>) => call('POST', '/v1/cancel', command),
+    cancel: (command: Extract<ReturnType<typeof RunnerCommandSchema.parse>, { kind: 'cancel' }>, leaseId?: string) => call('POST', '/v1/cancel', { producer: trusted, command }, leaseId ? { 'x-pa-lease': leaseId } : undefined),
     facts: async (since = 0, maxBytes = 49_152) => {
       if (!Number.isSafeInteger(since) || since < 0) throw new RunnerLinkError('invalid_response', 'Fact replay cursor must be a nonnegative integer')
       if (!Number.isSafeInteger(maxBytes) || maxBytes < 1024) throw new RunnerLinkError('invalid_response', 'Fact page budget must be at least 1024 bytes')
@@ -432,7 +452,7 @@ export function connectRunnerRecovery(input: RunnerEndpoint, context: RuntimePro
       if (!matches(pageProducer, trusted)) throw new RunnerLinkError('identity_mismatch', 'Fact replay page belongs to another registered attempt')
       return { producer: pageProducer, frames: replay.frames as unknown[], next: replay.next as number, done: replay.done as boolean }
     },
-    command: (command: ReturnType<typeof RunnerCommandSchema.parse>) => call('POST', '/v1/commands', { producer: trusted, command }),
+    command: (command: ReturnType<typeof RunnerCommandSchema.parse>, leaseId?: string) => call('POST', '/v1/commands', { producer: trusted, command }, leaseId ? { 'x-pa-lease': leaseId } : undefined),
     channelState: async () => {
       const { value } = await invoke('GET', '/v1/channel/state', undefined, { 'x-pa-producer': Buffer.from(JSON.stringify(trusted), 'utf8').toString('base64') }) as { value: unknown }
       const state = value as { generation?: unknown }
