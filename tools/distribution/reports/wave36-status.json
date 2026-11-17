@@ -90,7 +90,21 @@
           "mode": "live_keyset"
         },
         "w36TarPersistent": "pa-artifacts/wave36-target/wave36-target-14a6b45.tar.gz",
-        "w36TarSha": "13798190ae43b28628eaf7131dfb8192bdb786b9bcfe4e1e0b6f9217ab33a8af"
+        "w36TarSha": "13798190ae43b28628eaf7131dfb8192bdb786b9bcfe4e1e0b6f9217ab33a8af",
+        "appClickHistory": {
+          "opened": true,
+          "historyVisible": true,
+          "errors": 0,
+          "workId": "e9c9a0de8048124ad16d7a04bd979024",
+          "kind": "检查记录",
+          "returned": 1
+        },
+        "eEntry": {
+          "build": "14a6b457ea285988",
+          "inner": "13798190ae43b28628eaf7131dfb8192bdb786b9bcfe4e1e0b6f9217ab33a8af",
+          "outer": "43e06d5bc7606e8283c1c5f58463f402018d4c9c9b223a2c7c021d429ccb8995",
+          "appClickEvidence": "reports/wave36/app-history-click.json"
+        }
       },
       "negative": [
         "third wrapper hash refused",
@@ -118,14 +132,88 @@
     "D9": "SOURCE_READY_E"
   },
   "remaining": [
-    "default two-project dispatch/applicability (main/native held)",
-    "E independent W35/W36 verdicts",
-    "W36 installed App history click",
+    "E independent W35/W36 verdict",
     "cross-machine/signing/native/value"
   ],
   "real": {
     "vendor": 0,
     "model": 0,
     "native": 0
+  },
+  "sourceAudit": {
+    "frozenCommit": "087a598e5b6f357bd2cc40556cbf693257febc66",
+    "corrected": 5,
+    "allRecords": 199,
+    "allMatchFrozen": true,
+    "corrections": [
+      {
+        "path": "apps/console/src/App.tsx",
+        "group": "mainIntegration",
+        "old": {
+          "bytes": 144503,
+          "sha256": "2fbe9b83556c34946b858a0c0f9c00fb72581507a8a96abe1660d74187ef0d37"
+        },
+        "new": {
+          "bytes": 144841,
+          "sha256": "1d6853b15abac1d2d069a8a863986e16796b5e8e924e4d7043030aa988fb0e5c"
+        },
+        "frozenCommit": "087a598e5b6f357bd2cc40556cbf693257febc66"
+      },
+      {
+        "path": "apps/console/src/evidence.css",
+        "group": "mainUi",
+        "old": {
+          "bytes": 2350,
+          "sha256": "3352d8b3207b0d76c9f2e732355c801868cccac213a9a3bea2088f602eb6066a"
+        },
+        "new": {
+          "bytes": 2756,
+          "sha256": "4711d555f0ab5607b3a76ea7c6e9f9edd0e00099a99a8f39be545ccd5205604f"
+        },
+        "frozenCommit": "087a598e5b6f357bd2cc40556cbf693257febc66"
+      },
+      {
+        "path": "apps/console/src/transport.ts",
+        "group": "mainUi",
+        "old": {
+          "bytes": 41313,
+          "sha256": "940f5a002cf5a8c883f3875ec7d0cd568d1fc5300c2ca14564b6af239332b89d"
+        },
+        "new": {
+          "bytes": 43300,
+          "sha256": "67a0fdd73381ff8c1d442bb5f89dcdbf74fa4d5ebd9618d67c7a27ab7e1b6ed8"
+        },
+        "frozenCommit": "087a598e5b6f357bd2cc40556cbf693257febc66"
+      },
+      {
+        "path": "apps/coordinator/http/app.ts",
+        "group": "mainUi",
+        "old": {
+          "bytes": 56426,
+          "sha256": "01ada718b2b736f747206bf231132ae518c6aa86234255fdb22a53e088157919"
+        },
+        "new": {
+          "bytes": 58058,
+          "sha256": "9fb983f770a64494b5f01646e6a55cd39bfa470bb00550fb5e4677035a6ddb29"
+        },
+        "frozenCommit": "087a598e5b6f357bd2cc40556cbf693257febc66"
+      },
+      {
+        "path": "apps/coordinator/product/runtime.ts",
+        "group": "mainUi",
+        "old": {
+          "bytes": 32523,
+          "sha256": "259be69706ce324eef53a0569f47cc9ff1d2c173e6e56b2e0ca202bd98390d33"
+        },
+        "new": {
+          "bytes": 33006,
+          "sha256": "1e890955f249d54560ec78976b7cc6e37c8858383fc3a035f9e8120afcf31629"
+        },
+        "frozenCommit": "087a598e5b6f357bd2cc40556cbf693257febc66"
+      }
+    ],
+    "preserved": "reports/wave36/source-closure-pre-correction.json",
+    "selectedAuditSet": true,
+    "notFullInventory": true
   }
 }
