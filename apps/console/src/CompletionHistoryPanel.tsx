@@ -39,7 +39,7 @@ export function CompletionHistoryPanel({ work, transport, identity }: { work: Wo
   }, [key, open, revision, transport])
   if (!transport.workCompletionHistory) return null
   const page = loaded?.key === key ? loaded.page : undefined, visible = loaded?.key === key ? rows : []
-  return <section className="work-evidence" aria-label="工作历史">
+  return <section className="work-evidence completion-history" aria-label="工作历史">
     <header><h4><History size={15} />工作历史</h4><button type="button" className="icon-button" title={open ? '收起工作历史' : '展开工作历史'}
       aria-label={open ? '收起工作历史' : '展开工作历史'} aria-expanded={open} onClick={() => setOpen(!open)}><ChevronDown size={16} /></button></header>
     {open && <>
