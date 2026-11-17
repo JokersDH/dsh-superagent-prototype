@@ -1,0 +1,32 @@
+{
+  "status": "OK_WITH_NOT_REACHED",
+  "failed": [],
+  "checks": {
+    "backupCreated": true,
+    "verifyOk": true,
+    "restoreOk": true,
+    "sameWork": true,
+    "sameQuestionAnswer": true,
+    "nativeApplied": true,
+    "commandRecorded": true,
+    "secondRestoreRefused": true,
+    "missingBundleRefused": true,
+    "emptyStateRefused": true
+  },
+  "statuses": {
+    "backup": "CREATED",
+    "verify": "VERIFIED",
+    "restore": "RESTORED",
+    "secondRestore": "BLOCKED",
+    "emptyBackup": "BLOCKED"
+  },
+  "readback": {
+    "work": "94012e1a1c7265c033f285a944656a04",
+    "question": "30253ea76a07bf7960f996f86a27d904",
+    "questionVersion": 2,
+    "answer": "30253ea76a07bf7960f996f86a27d904",
+    "delivery": "native_applied",
+    "command": "recorded"
+  },
+  "reviewStartup": "NOT_REACHED: restore does not start a daemon; explicit review-restored selection/health/PID REUSED path was not exercised."
+}

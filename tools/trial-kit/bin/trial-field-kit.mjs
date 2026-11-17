@@ -28,7 +28,7 @@ async function main() {
   let values
   try {
     values = parseOptions(process.argv.slice(2), {
-      tar: 'string', artifact: 'string', out: 'string', 'readiness-fixture': 'boolean',
+      tar: 'string', artifact: 'string', install: 'string', out: 'string', 'readiness-fixture': 'boolean',
       'expect-sha256': 'string', 'expect-build': 'string', 'expect-schema': 'number', 'expect-source': 'string',
       'source-consumer': 'boolean', 'i-commit': 'string', 'b-commit': 'string',
       'i-root': 'string', 'b-root': 'string', 'main-root': 'string', 'timeout-ms': 'number',
@@ -39,7 +39,7 @@ async function main() {
     return EXIT.REFUSED
   }
   if (values.help === true) { process.stdout.write(`${USAGE}\n`); return EXIT.OK }
-  if (!values.tar || !values.artifact || !values.out) { process.stderr.write(`trial-field-kit: REFUSED usage: --tar/--artifact/--out are required\n${USAGE}`); return EXIT.REFUSED }
+  if ((!values.tar || !values.artifact) && !values.install || !values.out) { process.stderr.write(`trial-field-kit: REFUSED usage: --tar/--artifact or --install, and --out are required\n${USAGE}`); return EXIT.REFUSED }
   let out
   try { out = createOutputRoot(values.out) } catch (error) {
     process.stderr.write(`trial-field-kit: REFUSED ${error?.code ?? 'output'}: ${values.out}\n`)
@@ -47,7 +47,7 @@ async function main() {
   }
   try {
     const result = runFieldKit({
-      tar: values.tar, artifact: values.artifact, out,
+      tar: values.tar, artifact: values.artifact, install: values.install, out,
       readinessFixture: values['readiness-fixture'] === true,
       timeoutMs: values['timeout-ms'] ?? 600000,
       expectations: { sha256: values['expect-sha256'], build: values['expect-build'], schema: values['expect-schema'], source: values['expect-source'] },

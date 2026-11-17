@@ -1,0 +1,406 @@
+{
+  "protocol": "trial-operations-status/1",
+  "wave": "product-wave-36",
+  "owner": "H",
+  "branch": "codex/g4-trial-operations",
+  "base": "e14c9597d1df3f084b21048de5e9338f24de54c8",
+  "mergedMain": "296254d8",
+  "currentH": "PENDING_COMMIT",
+  "updatedAt": "2026-11-17T03:47:35.230Z",
+  "goal": {
+    "wholeSubsystem": true,
+    "closures": 4,
+    "legacyOutcomes": 9,
+    "tokenBudget": null,
+    "deadline": null,
+    "sourceReady": true,
+    "complete": false
+  },
+  "ownedPaths": [
+    "tools/trial-kit/",
+    "tests/operational-soak/",
+    "docs/internal-trial/",
+    "reports/trial-operations/"
+  ],
+  "dirty": {
+    "H": "wave36 source/evidence pending this commit; history preserved",
+    "B": [
+      "reports/releases/wave11-admission/runtime.json",
+      "reports/releases/wave12-admission/runtime.json",
+      "tests/native-acceptance/b16-real-begin.mjs (untracked)"
+    ],
+    "note": "B dirty not consumed; B88 is subject"
+  },
+  "sources": {
+    "H": {
+      "base": "e14c9597",
+      "merge": "296254d8"
+    },
+    "B": {
+      "commit": "88e472e67555c3f64716ce6dc457edc1c188f37a",
+      "branch": "codex/g1-runtime"
+    },
+    "I": {
+      "commit": "b21698fa5c4418b9670f3b97907971d8e03c1a0e",
+      "branch": "codex/g5-coordinator-channel"
+    },
+    "main": {
+      "commit": "5860da13",
+      "historySource": "0092",
+      "merge": "296254d8",
+      "note": "completion/history default consumer is main-owned; H support only"
+    },
+    "package": {
+      "name": "PersonalAgent-Preview-599de3e",
+      "innerSource": "edfe5e14f2f8fbc7f395a84520c781c7f07ce9e7",
+      "innerBuild": "599de3e98c02de0b",
+      "innerTarSha256": "11027a375848c25c2d2ae8e18755f65fa77272db533dcee7bb9ff27ba8ba50db",
+      "outerZipSha256": "39c0fff0e13d61c59198f8a55f0ed692b887194aaa4e2782b2b3e9cbd623f6c5",
+      "installSubject": "~/Desktop/joker/pa-artifacts/wave35-preview-599de3e/PersonalAgent-Preview-599de3e/install",
+      "installManifestSha256": "d8677d1e313b232ab30026b67e478cdd8f49e72436f01cd1ad454b30641effac",
+      "note": "actual W35 install folder; inner tar not preserved/consumed; outer not installed"
+    }
+  },
+  "integratedInMain": {
+    "H": false,
+    "B": false,
+    "I": false,
+    "mainHistory": true,
+    "statement": "main history/consumer source is main-owned; H/B/I candidate evidence not merged."
+  },
+  "closures": {
+    "C1_currentExactAndAccept": {
+      "status": "COMPLETE_SOURCE_AND_INSTALLED",
+      "current": {
+        "checks": {
+          "source": {
+            "sourcesOk": true,
+            "sourcesUnchanged": true,
+            "materializedUnchanged": true,
+            "iChecks": true,
+            "bChecks": true,
+            "bSinkGuardClosed": true,
+            "zeroModel": true,
+            "zeroSignals": true
+          },
+          "i": {
+            "fact": true,
+            "ackFailed": true,
+            "payload": true,
+            "writeAllow": true,
+            "writeDeny": true,
+            "freshIntentFixed": true,
+            "queueNamespace": true,
+            "timeoutPrune": true,
+            "generation": true,
+            "oldLease": true,
+            "capacity": true,
+            "close": true
+          },
+          "b": {
+            "factThreeFrames": true,
+            "duplicateReceipt": true,
+            "payloadRead": true,
+            "externalAllow": true,
+            "externalDeny": true,
+            "sinkMissingGuardRefused": true,
+            "sinkDenyRefused": true,
+            "sinkAllowFresh": true
+          }
+        }
+      },
+      "accept": {
+        "tests": 4,
+        "installed": {
+          "buildId": "599de3e98c02de0b",
+          "workId": "ca73397f13d97d6e419d8a4ca76cb205",
+          "candidateSeen": true,
+          "gateObserved": true,
+          "acceptRecorded": true,
+          "delivered": true,
+          "reopened": "delivered"
+        }
+      },
+      "model": {
+        "checks": {
+          "initiallyNotConfigured": true,
+          "invalidHttpRefused": true,
+          "invalidKeyRefused": true,
+          "validConfigured": true,
+          "privateFile0600": true,
+          "privateDir0700": true,
+          "apiKeyNotExposed": true,
+          "sameBaseAccumulatesModels": true,
+          "differentBaseResetsModels": true,
+          "symlinkRefused": true,
+          "visibleDirectoryRefused": true,
+          "noModelRequest": true
+        },
+        "networkFetches": 0,
+        "errors": {
+          "invalidHttp": "ZodError",
+          "invalidKey": "ZodError",
+          "symlink": "configuration_invalid",
+          "visibleDirectory": "configuration_invalid"
+        }
+      },
+      "mainHistory": {
+        "hConsumed": false,
+        "observed": "direct main-owned completion-history.case.mjs run returned 4 failures (HTTP 422 where 200 expected, cursor missing)",
+        "owner": "main",
+        "disposition": "not used as H evidence; no source change by H"
+      }
+    },
+    "C2_sameWorkFaultSlots": {
+      "status": "PARTIAL_ORIGINAL_RUN_NOT_REACHED",
+      "join": {
+        "status": "OK_WITH_NOT_REACHED",
+        "original": {
+          "workId": "94012e1a1c7265c033f285a944656a04",
+          "questionId": "ed1afc2b16a9d654705a0c1fb96fffd0",
+          "answerId": "0c4da78469ec2ca5857439d4cfb1837a",
+          "commandId": "recovery-command-2",
+          "attemptId": "attempt-b125de54-59b4-4515-88e4-f6162ae503ad",
+          "contract": {
+            "workId": "94012e1a1c7265c033f285a944656a04",
+            "revision": 1,
+            "digest": "4d7f353c47e01fa098cc3254630cc65c19ba132f9c64362da6e5e5c98e67b78a"
+          }
+        },
+        "bCallbackJoin": "NOT_REACHED: current B serveRunner fixture facts are not ingested as this original question/answer; no B same-run callback join was executed."
+      },
+      "successor": {
+        "status": "OK_WITH_NOT_REACHED"
+      },
+      "windows": {
+        "count": 8,
+        "checks": {
+          "beginNotAccepted": true,
+          "answerNotAccepted": true,
+          "receiverUnknown": true,
+          "factDurable": true,
+          "conflictRefused": true,
+          "answerWrittenNotTerminal": true,
+          "lateDuplicateNoResend": true,
+          "terminalNative": true,
+          "missingDeliveryUnknown": true,
+          "zeroResend": true
+        },
+        "ledgerFull": true
+      },
+      "externalResources": {
+        "pid": 76592,
+        "apiPid": 76615,
+        "stop": "STOPPED",
+        "stillAlive": true
+      },
+      "blocker": "B post-exit physical quiesce compatibility and reused-PID readoption remain owner P1; actual original Work/Broker recovery and scheduler 2/4 not reached",
+      "notReached": [
+        "B original Application/QuestionBroker same-Run recovery",
+        "ACK-loss original window",
+        "original scheduler 2/4 fifth-item/release"
+      ]
+    },
+    "C3_nonemptyField": {
+      "status": "COMPLETE_INSTALLED_REOPEN_FIELD_REVIEW_UPGRADE_NOT_REACHED",
+      "lifecycle": {
+        "status": "OK",
+        "buildId": "599de3e98c02de0b",
+        "pid": 76592,
+        "apiPid": 76615,
+        "workId": "ca73397f13d97d6e419d8a4ca76cb205",
+        "phase": "delivered",
+        "reopened": "delivered",
+        "checks": {
+          "firstRunOk": true,
+          "startRunning": true,
+          "sameOwnInstance": true,
+          "readinessModeFixture": true,
+          "readinessAuthorizationNone": true,
+          "healthOk": true,
+          "consoleServed": true,
+          "sseConnected": true,
+          "snapshotVisible": true,
+          "configurationVisible": true,
+          "installedWorkCreated": true,
+          "installedCandidateSeen": true,
+          "staleCandidateRejected": true,
+          "installedAcceptGateObserved": true,
+          "installedAcceptRecorded": true,
+          "installedDelivered": true,
+          "reusedSamePid": true,
+          "reviewOnFixtureRefused": true,
+          "stoppedOwnInstance": true,
+          "stoppedStatus": true,
+          "stoppedNotServing": true,
+          "reopenedSameWork": true,
+          "noHSignal": true
+        }
+      },
+      "restore": {
+        "status": "OK_WITH_NOT_REACHED",
+        "ids": {
+          "work": "94012e1a1c7265c033f285a944656a04",
+          "question": "30253ea76a07bf7960f996f86a27d904",
+          "questionVersion": 2,
+          "answer": "30253ea76a07bf7960f996f86a27d904",
+          "delivery": "native_applied",
+          "command": "recorded"
+        },
+        "statuses": {
+          "backup": "CREATED",
+          "verify": "VERIFIED",
+          "restore": "RESTORED",
+          "secondRestore": "BLOCKED",
+          "emptyBackup": "BLOCKED"
+        }
+      },
+      "field": {
+        "result": "DEGRADED",
+        "counts": {
+          "pass": 42,
+          "warn": 0,
+          "unknown": 5,
+          "fail": 0
+        },
+        "sourceConsumerExit": 0,
+        "knownIssues": [
+          "host_sqlite_unknown",
+          "unknown:expected_tuple",
+          "unknown:artifact_manifest",
+          "readiness_no_package_identity",
+          "support_not_supplied",
+          "doctor_warn:executor_codex",
+          "instance_stopped"
+        ],
+        "mode": "--install exact W35 directory"
+      },
+      "notReached": [
+        "review-restored startup/REUSED",
+        "upgrade continuity and old-permission inference",
+        "W35 E verdict"
+      ]
+    },
+    "C4_installCohortE": {
+      "status": "PARTIAL_CONTROLLED_COHORT_ONLY",
+      "cohort": {
+        "humanProvided": false,
+        "label": "controlled_automated_only",
+        "steps": 10,
+        "humanFeedback": "NOT_PROVIDED",
+        "value": "NOT_MEASURED"
+      },
+      "eHandoff": {
+        "subject": "W35 inner 599de3e/11027, outer 39c",
+        "requires": [
+          "E independent W35 verdict",
+          "actual native/installed/recovery scope"
+        ]
+      },
+      "notReached": [
+        "human trial/feedback/value",
+        "E independent W35 verdict"
+      ]
+    }
+  },
+  "legacyNine": {
+    "H1": "current exact consumer source",
+    "H2": "accept gate/delivery complete",
+    "H3": "model connection errors complete source",
+    "H4": "original same-run callbacks PARTIAL",
+    "H5": "interrupt/ACK/resources PARTIAL",
+    "H6": "recovered candidate/scheduler PARTIAL",
+    "H7": "nonempty persistent complete installed reopen; review/upgrade missing",
+    "H8": "field W35 install complete tool",
+    "H9": "controlled cohort only; human/E missing"
+  },
+  "tests": {
+    "wave36": [
+      {
+        "file": "accept-gate.case.mjs",
+        "passed": 4,
+        "failed": 0
+      },
+      {
+        "file": "connection.case.mjs",
+        "passed": 1,
+        "failed": 0
+      },
+      {
+        "file": "join.case.mjs",
+        "passed": 1,
+        "failed": 0
+      },
+      {
+        "file": "successor.case.mjs",
+        "passed": 1,
+        "failed": 0
+      },
+      {
+        "file": "windows2.case.mjs",
+        "passed": 3,
+        "failed": 0
+      }
+    ],
+    "total": {
+      "passed": 10,
+      "failed": 0
+    },
+    "lifecycleDirect": {
+      "status": "OK"
+    },
+    "fieldInstall": {
+      "result": "DEGRADED"
+    }
+  },
+  "remaining": [
+    "human cohort/feedback/value",
+    "B original Application/QuestionBroker recovery and ACK-loss",
+    "B post-exit quiesce/reused-PID readoption P1",
+    "original scheduler 2/4 release",
+    "main completion/history default consumer independent H evidence",
+    "review-restored/upgrade continuity",
+    "E independent W35 verdict; native/installed release",
+    "H/B/I source not merged into main"
+  ],
+  "usage": {
+    "modelCalls": 0,
+    "vendorTurns": 0,
+    "nativeTurns": 0,
+    "tokenBudget": null,
+    "humanMessages": 0,
+    "userServices": "5180/8796..5191/8807 untouched",
+    "realSignals": 0,
+    "packageInstances": "private /tmp roots stopped by package own-path",
+    "globalDiscovery": false,
+    "foreignSignals": 0
+  },
+  "errors": [
+    {
+      "id": "contracts-dist-stale",
+      "status": "fixed test setup",
+      "detail": "contracts build needed for current main completion-history imports; generated dist only"
+    },
+    {
+      "id": "w35-inner-tar-absent",
+      "status": "known subject limit",
+      "detail": "W35 preview preserves install folder/outer ZIP but not inner tar; H uses exact install folder and lists inner tar sha from package-result, does not relabel it as consumed tar"
+    },
+    {
+      "id": "main-history-test-observed-fail",
+      "status": "owner observation",
+      "detail": "node --test tests/integration/completion-history.case.mjs: 0 pass/4 fail with HTTP 422 and missing cursor in this checkout environment; H did not modify main and does not claim history consumer verified"
+    }
+  ],
+  "hashes": {
+    "reports/trial-operations/wave36/selected-current/report.json": "f59bc3e51e4b904edb269ec6453962b499a56371335c91e8dd38a113dae9e0da",
+    "reports/trial-operations/wave36/model-connection/report.json": "c40b27dce2ca79926e5cd3da17396a0c18f6718c709a7e191ef977873cf0dcad",
+    "reports/trial-operations/wave36/package-w35/lifecycle/report.json": "c7dc3c9754b2e1c6763c907cb2c4bd523dcd413ae240e7b7de1135c14052d19f",
+    "reports/trial-operations/wave36/package-w35/restore/report.json": "34656996286b4bb4f4cb763e69b910764b92676956547e38302f633adc6b7fc6",
+    "reports/trial-operations/wave36/field-w35/support-summary.json": "c5fcbebad18d29c075dbc56ef2a6786314fc3ce476e04d6f76a8d5ab0c3701b8",
+    "reports/trial-operations/wave36/join/report.json": "90ec4574849271d1b40dd2160cdf52fa36cfb8ce991fe207be5bf79870aa9f95",
+    "reports/trial-operations/wave36/successor/report.json": "f9727f2cbf118c9520e3413e89c7e647e094a420015cd962552a1c35ce8d7f0f",
+    "reports/trial-operations/wave36/windows/windows.json": "172bcba0e40bd833205771609ff7d8675aa4aa905fde5fe28794d81bbc0ad5f5",
+    "reports/trial-operations/wave36/cohort/cohort.json": "773a5731b45ef82ad20c34cdba73bfea5eac707d27d73b92dfe76f75bd64866c"
+  }
+}

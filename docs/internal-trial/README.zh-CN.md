@@ -175,3 +175,13 @@ H 的材料是原始观测。E 会按自己的 required 断言独立核验；不
 - W33 包内受控 Work `ca73397f…` 等待 `actions.available` 后 accept/delivered，重启重开 delivered；非空 restore 原 Work `94012e1a…` native_applied。review-restored/升级连续仍未测。
 - 当前 cohort 只有 controlled 自动旅程（10 步），humanProvided=false、humanFeedback=NOT_PROVIDED、value=NOT_MEASURED；E 独立 W33 verdict 未交。
 - field-kit W33 结果 46 PASS/3 UNKNOWN/0 FAIL，source consumer exit0；UNKNOWN/known issues 保留，不填 PASS。
+
+## 3i. wave-36 W35 安装目录、field --install 与四闭环
+
+- 当前 exact source：B `88e472e6`、I `b21698fa`、main `5860da13`；当前 consumer I 12/12、B 8/8。main 新 completion/history consumer 是 main-owned，H 只做独立支持，不把它当原 Broker 恢复。
+- W35 预览 `PersonalAgent-Preview-599de3e`：inner source `edfe5e14`、build `599de3e98c02de0b`、inner tar `11027a37…`、outer ZIP `39c0fff0…`。这是 W35 安装目录 subject；旧 f880 不能贴成含 W35 model GUI。
+- 安装目录 lifecycle 实际通过：first-run/start/readiness/health/console/SSE/REUSED/受控 Work accept recorded/delivered/重开 delivered/stop。非空 backup→verify→restore 到第二根通过，原 Work `94012e1a…` native_applied；review/upgrade 仍 NOT_REACHED。
+- `trial-field-kit --install <install-root>` 支持已展开同包目录：W35 结果 42 PASS/5 UNKNOWN/0 FAIL，source consumer exit0；不把 install 目录名当 tar identity，inner/outer 另列。
+- 受控 cohort 仍无真人；humanFeedback=NOT_PROVIDED、value=NOT_MEASURED。E 独立 W35 verdict 未交。
+- B post-exit 物理 quiesce 和 reused-PID readopt 是 owner 新 P1；H 不运行 unsafe live 工具，仍只提供原始资源/故障材料。
+- H 在本 checkout 直接运行 main-owned `completion-history.case.mjs` 得到 4 fail（HTTP 422/缺 cursor）；这是 main 侧观察，未改 main，也未作为 H 的 history/交付证据。

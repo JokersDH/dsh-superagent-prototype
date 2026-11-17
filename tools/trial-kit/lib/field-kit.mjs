@@ -66,10 +66,10 @@ function knownIssues(report) {
   return issues
 }
 
-export function runFieldKit({ tar, artifact, out, readinessFixture = false, timeoutMs = 600000, expectations = {}, sourceConsumer = false, commits = {} }) {
+export function runFieldKit({ tar, artifact, install, out, readinessFixture = false, timeoutMs = 600000, expectations = {}, sourceConsumer = false, commits = {} }) {
   mkdirSync(out, { recursive: true, mode: 0o700 })
   const machineDir = join(out, 'machinecheck')
-  const args = ['--tar', tar, '--artifact', artifact, '--out', machineDir]
+  const args = install === undefined ? ['--tar', tar, '--artifact', artifact, '--out', machineDir] : ['--install', install, '--out', machineDir]
   if (readinessFixture) args.push('--readiness-fixture')
   const flags = { 'expect-sha256': expectations.sha256, 'expect-build': expectations.build, 'expect-schema': expectations.schema, 'expect-source': expectations.source }
   for (const [flag, value] of Object.entries(flags)) if (value !== undefined && value !== null) args.push(`--${flag}`, String(value))
@@ -119,7 +119,7 @@ export function runFieldKit({ tar, artifact, out, readinessFixture = false, time
       native: 'NOT_MEASURED',
     },
     reproduction: [
-      `node tools/trial-kit/bin/trial-field-kit.mjs --tar <exact.tar.gz> --artifact <install-artifact.json> --out <new-dir>${readinessFixture ? ' --readiness-fixture' : ''}`,
+      `node tools/trial-kit/bin/trial-field-kit.mjs ${install === undefined ? '--tar <exact.tar.gz> --artifact <install-artifact.json>' : '--install <exact-install-dir>'} --out <new-dir>${readinessFixture ? ' --readiness-fixture' : ''}`,
       'open machinecheck/machinecheck-report.json and diagnostics-bundle.json',
       'never paste tokens, headers, conversation bodies or private database content',
     ],

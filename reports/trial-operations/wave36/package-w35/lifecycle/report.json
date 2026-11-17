@@ -1,0 +1,148 @@
+{
+  "status": "OK",
+  "failed": [],
+  "checks": {
+    "firstRunOk": true,
+    "startRunning": true,
+    "sameOwnInstance": true,
+    "readinessModeFixture": true,
+    "readinessAuthorizationNone": true,
+    "healthOk": true,
+    "consoleServed": true,
+    "sseConnected": true,
+    "snapshotVisible": true,
+    "configurationVisible": true,
+    "installedWorkCreated": true,
+    "installedCandidateSeen": true,
+    "staleCandidateRejected": true,
+    "installedAcceptGateObserved": true,
+    "installedAcceptRecorded": true,
+    "installedDelivered": true,
+    "reusedSamePid": true,
+    "reviewOnFixtureRefused": true,
+    "stoppedOwnInstance": true,
+    "stoppedStatus": true,
+    "stoppedNotServing": true,
+    "reopenedSameWork": true,
+    "noHSignal": true
+  },
+  "instance": {
+    "protocol": "personal-product-instance/1",
+    "pid": 76592,
+    "processStart": "Tue Nov 17 11:32:38 2026",
+    "apiPid": 76615,
+    "consolePid": 76592,
+    "apiURL": "http://127.0.0.1:49449",
+    "consoleURL": "http://127.0.0.1:49448",
+    "state": "/private/tmp/h-w36-life/run/data",
+    "install": "~/Desktop/joker/pa-artifacts/wave35-preview-599de3e/PersonalAgent-Preview-599de3e/install/app",
+    "buildId": "599de3e98c02de0b",
+    "mode": "fixture",
+    "access": "local-development",
+    "startupMode": "normal",
+    "launcherArgv": [
+      "~/.nvm/versions/node/v24.21.0/bin/node",
+      "~/Desktop/joker/pa-artifacts/wave35-preview-599de3e/PersonalAgent-Preview-599de3e/install/app/apps/launcher/bin/pa.mjs",
+      "start",
+      "--fixture",
+      "--discussion-only",
+      "--port",
+      "49448",
+      "--api-port",
+      "49449",
+      "--install",
+      "~/Desktop/joker/pa-artifacts/wave35-preview-599de3e/PersonalAgent-Preview-599de3e/install/app",
+      "--config-root",
+      "/tmp/h-w36-life/run/config",
+      "--data-root",
+      "/tmp/h-w36-life/run/data",
+      "--cache-root",
+      "/tmp/h-w36-life/run/cache",
+      "--logs-root",
+      "/tmp/h-w36-life/run/logs",
+      "--workspace-root",
+      "/tmp/h-w36-life/run/workspace",
+      "--json"
+    ],
+    "launcherCwd": "~/Desktop/joker/superagent-agent-h",
+    "apiArgv": [
+      "~/.nvm/versions/node/v24.21.0/bin/node",
+      "~/Desktop/joker/pa-artifacts/wave35-preview-599de3e/PersonalAgent-Preview-599de3e/install/app/apps/coordinator/product/demo.ts",
+      "--port",
+      "49449",
+      "--state",
+      "/private/tmp/h-w36-life/run/data",
+      "--console-origin",
+      "http://127.0.0.1:49448",
+      "--startup-mode",
+      "normal",
+      "--assistant",
+      "--local-access"
+    ],
+    "apiProcessStart": "Tue Nov 17 11:32:39 2026",
+    "apiUid": 501,
+    "startedAt": "2026-11-17T03:32:40.053Z",
+    "configRoot": "/tmp/h-w36-life/run/config"
+  },
+  "installedWork": {
+    "createStatus": 200,
+    "createBody": {
+      "commandId": "h32-installed-work-1",
+      "workId": "ca73397f13d97d6e419d8a4ca76cb205",
+      "seq": 6,
+      "status": "recorded"
+    },
+    "workId": "ca73397f13d97d6e419d8a4ca76cb205",
+    "acceptAttempted": true,
+    "staleStatus": 200,
+    "staleBody": {
+      "commandId": "h32-installed-stale-1",
+      "seq": 52,
+      "status": "rejected",
+      "error": {
+        "code": "verification_failed",
+        "message": "Trusted artifact review is unavailable",
+        "retry": "user_action"
+      }
+    },
+    "acceptStatus": 200,
+    "acceptBody": {
+      "commandId": "h32-installed-accept-1",
+      "workId": "ca73397f13d97d6e419d8a4ca76cb205",
+      "seq": 51,
+      "status": "recorded"
+    },
+    "final": {
+      "phase": "delivered",
+      "artifactIds": [
+        "2dc7d1c1f160e2d68983a822782ff6b7312ac6e33339675c7bddee5d74c7b110",
+        "57f2162bd14e3cc029b4cd1c23a5bbe9768b8e669db1fb878123d106fb580506",
+        "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+        "10cd2c58eb36e5164c5e091f55b35b4be7ff4a1f1ecc2de1cd5f6e162e394c51"
+      ],
+      "resourceStatus": "quiescent",
+      "available": [
+        "continue_work"
+      ]
+    },
+    "reopened": {
+      "phase": "delivered",
+      "workId": "ca73397f13d97d6e419d8a4ca76cb205",
+      "artifactIds": [
+        "2dc7d1c1f160e2d68983a822782ff6b7312ac6e33339675c7bddee5d74c7b110",
+        "57f2162bd14e3cc029b4cd1c23a5bbe9768b8e669db1fb878123d106fb580506",
+        "48a8a47ce3ef812051d4fc107151f7fff35fe3880f384363060e02a44968277b",
+        "10cd2c58eb36e5164c5e091f55b35b4be7ff4a1f1ecc2de1cd5f6e162e394c51"
+      ]
+    }
+  },
+  "statuses": {
+    "firstRun": "OK",
+    "start": "STARTED",
+    "status": "RUNNING",
+    "restart": "REUSED_OR_RUNNING",
+    "reviewNegative": "BLOCKED",
+    "stop": "STOPPED",
+    "afterStop": "STOPPED"
+  }
+}

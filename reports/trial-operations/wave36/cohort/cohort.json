@@ -1,0 +1,91 @@
+{
+  "protocol": "wave36-cohort-handoff/1",
+  "humanProvided": false,
+  "cohortLabel": "controlled_automated_only",
+  "package": {
+    "name": "PersonalAgent-Preview-599de3e",
+    "innerSource": "edfe5e14f2f8fbc7f395a84520c781c7f07ce9e7",
+    "innerBuild": "599de3e98c02de0b",
+    "innerTarSha256": "11027a375848c25c2d2ae8e18755f65fa77272db533dcee7bb9ff27ba8ba50db",
+    "outerZipSha256": "39c0fff0e13d61c59198f8a55f0ed692b887194aaa4e2782b2b3e9cbd623f6c5",
+    "subject": "install folder /install (no preserved tar consumed)"
+  },
+  "journey": [
+    {
+      "step": "first-run",
+      "actor": "automated",
+      "status": "PASS"
+    },
+    {
+      "step": "start fixture discussion-only",
+      "status": "PASS"
+    },
+    {
+      "step": "readiness/health/console/SSE",
+      "status": "PASS"
+    },
+    {
+      "step": "create controlled Work",
+      "status": "PASS",
+      "workId": "ca73397f13d97d6e419d8a4ca76cb205"
+    },
+    {
+      "step": "wait available accept_candidate",
+      "status": "PASS"
+    },
+    {
+      "step": "explicit accept",
+      "status": "PASS"
+    },
+    {
+      "step": "delivered",
+      "status": "PASS"
+    },
+    {
+      "step": "restart same Work reopen",
+      "status": "PASS"
+    },
+    {
+      "step": "stop own instance",
+      "status": "PASS"
+    },
+    {
+      "step": "nonempty backup/verify/second-root restore",
+      "status": "OK_WITH_NOT_REACHED",
+      "workId": "94012e1a1c7265c033f285a944656a04"
+    }
+  ],
+  "humanFeedback": "NOT_PROVIDED",
+  "value": "NOT_MEASURED",
+  "field": {
+    "result": "DEGRADED",
+    "counts": {
+      "pass": 42,
+      "warn": 0,
+      "unknown": 5,
+      "fail": 0
+    },
+    "sourceConsumerExit": 0,
+    "knownIssues": [
+      "host_sqlite_unknown",
+      "unknown:expected_tuple",
+      "unknown:artifact_manifest",
+      "readiness_no_package_identity",
+      "support_not_supplied",
+      "doctor_warn:executor_codex",
+      "instance_stopped"
+    ]
+  },
+  "limits": [
+    "No human trial/interview/time measurement provided.",
+    "Fixture/discussion-only, no vendor/model/native turn.",
+    "H is not E; W35 E independent verdict not provided."
+  ],
+  "eHandoff": {
+    "subject": "W35 inner 599de3e/11027, outer 39c",
+    "requires": [
+      "E independent W35 verdict",
+      "actual native/installed/recovery scope"
+    ]
+  }
+}

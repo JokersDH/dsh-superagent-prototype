@@ -1,0 +1,43 @@
+{
+  "protocol": "package-backup-restore/1",
+  "surface": "immutable package launcher backup/verify-backup/restore + original A readers",
+  "packageRoot": "~/Desktop/joker/pa-artifacts/wave35-preview-599de3e/PersonalAgent-Preview-599de3e/install/app",
+  "bundle": "/tmp/h-w36-restore/work/backup.pab",
+  "restoredRoot": "/tmp/h-w36-restore/work/restored",
+  "commandExits": {
+    "backup": 0,
+    "verify": 0,
+    "restore": 0,
+    "secondRestore": 2,
+    "missingBundle": 2,
+    "emptyBackup": 2
+  },
+  "statuses": {
+    "backup": "CREATED",
+    "verify": "VERIFIED",
+    "restore": "RESTORED",
+    "secondRestore": "BLOCKED",
+    "emptyBackup": "BLOCKED"
+  },
+  "readback": {
+    "work": "94012e1a1c7265c033f285a944656a04",
+    "question": "30253ea76a07bf7960f996f86a27d904",
+    "questionVersion": 2,
+    "answer": "30253ea76a07bf7960f996f86a27d904",
+    "delivery": "native_applied",
+    "command": "recorded"
+  },
+  "checks": {
+    "backupCreated": true,
+    "verifyOk": true,
+    "restoreOk": true,
+    "sameWork": true,
+    "sameQuestionAnswer": true,
+    "nativeApplied": true,
+    "commandRecorded": true,
+    "secondRestoreRefused": true,
+    "missingBundleRefused": true,
+    "emptyStateRefused": true
+  },
+  "reviewStartup": "NOT_REACHED: restore does not start a daemon; explicit review-restored selection/health/PID REUSED path was not exercised."
+}

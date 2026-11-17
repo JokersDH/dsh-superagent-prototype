@@ -1,0 +1,74 @@
+{
+  "protocol": "model-connection-source/1",
+  "surface": "main PrivateModelProvider configure/status (no reply/network)",
+  "modelCalls": 0,
+  "vendorTurns": 0,
+  "networkFetches": 0,
+  "observations": {
+    "initial": {
+      "protocol": "assistant-provider/1",
+      "configured": false,
+      "baseURL": null,
+      "model": null,
+      "models": [],
+      "state": "not_configured",
+      "secureTransport": false
+    },
+    "valid": {
+      "protocol": "assistant-provider/1",
+      "configured": true,
+      "baseURL": "https://model.example.invalid/v1",
+      "model": "fixture-model",
+      "models": [
+        "fixture-model"
+      ],
+      "state": "configured",
+      "secureTransport": true,
+      "suggestionsEnabled": false
+    },
+    "file": {
+      "mode": "600",
+      "uid": 501,
+      "bytes": 218
+    },
+    "directory": {
+      "mode": "700"
+    },
+    "statusFields": [
+      "protocol",
+      "configured",
+      "baseURL",
+      "model",
+      "models",
+      "state",
+      "secureTransport",
+      "suggestionsEnabled"
+    ]
+  },
+  "errors": {
+    "invalidHttp": "ZodError",
+    "invalidKey": "ZodError",
+    "symlink": "configuration_invalid",
+    "visibleDirectory": "configuration_invalid"
+  },
+  "checks": {
+    "initiallyNotConfigured": true,
+    "invalidHttpRefused": true,
+    "invalidKeyRefused": true,
+    "validConfigured": true,
+    "privateFile0600": true,
+    "privateDir0700": true,
+    "apiKeyNotExposed": true,
+    "sameBaseAccumulatesModels": true,
+    "differentBaseResetsModels": true,
+    "symlinkRefused": true,
+    "visibleDirectoryRefused": true,
+    "noModelRequest": true
+  },
+  "limits": [
+    "source-level provider only; not installed W33 package",
+    "no HTTP UI form, no app screenshot",
+    "no key from a human account",
+    "no execution/profile/agent grant"
+  ]
+}
