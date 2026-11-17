@@ -86,5 +86,40 @@
     "cap4UnknownUnspendable": true,
     "noNew": "no second coordinator/queue/ledger/candidate table/Work/migration/shared schema/HTTP/App/transport edit; no new Driver/CAC/desktop/auto-accept/writer racing/DAG/second lifecycle; no unsafe live SIGKILL/procguard/global discovery; no real CLI fallback",
     "installed": "not installed; source/controlled only, not a complete product delivery"
+  },
+  "recoveryMilestone01": {
+    "date": "2026-11-17",
+    "subject": "same original Work after coordinator failure: original Runner new-coordinator explicit bind, fact replay, original command reception, normal cancel",
+    "baseline": "main 42f6daab controlled normal chain; B sources 579c40bc; merged main da88552b",
+    "productSourceChange": "NONE required for this path: the current B runner-service/recovery-transport/attached-attempt already supported the actual consumer; only a B-owned acceptance harness was added.",
+    "actualConsumer": "tests/native-acceptance/b37-recovery-ack.mjs drives a real spawned waiting-user Runner: coordinator A binds, receives original fact fact-attempt-1-1 and holds the ACK (unknown); A drops; coordinator B explicitly binds generation 3 on the SAME Runner/attempt (attempt-1, epoch 1), receives the SAME fact id and replies exactly once; no begin replay; B then feeds the original deliver command and performs the original normal cancel; shutdown is graceful (exit 0, no SIGKILL fallback).",
+    "commands": [
+      "node tests/native-acceptance/b37-recovery-ack.mjs -> exit 0, 4 PASS/0 FAIL/1 NOT_TESTED",
+      "node --test tests/integration/original-native-callback-flow.case.mjs -> exit 0, 2/2 (after rebuilding main-owned contracts dist for the new schema; no main source edited)",
+      "node --test tests/integration/recovery-crash.case.mjs -> 2/2; recovery-activation-record 4/4; recovery-facts 7/7; recovery-intents 5/5",
+      "node --test --test-force-exit apps/runner/test/*.test.ts -> 156/156",
+      "root tsc exit 0, attached strict exit 0"
+    ],
+    "originalIds": {
+      "attemptId": "attempt-1",
+      "fenceEpoch": 1,
+      "factId": "fact-attempt-1-1",
+      "beginReceptions": 1,
+      "beginCommandId": "cmd-ms1-begin",
+      "deliverCommandId": "cmd-ms1-deliver",
+      "leases": [
+        "lease-recovery-a",
+        "lease-recovery-b"
+      ]
+    },
+    "realSignals": 0,
+    "remaining": [
+      "payload-read callback was not raised by the waiting-user lane in this consumer, so it stays NOT_TESTED here; the fact path and original command reception are proven.",
+      "original Store/Broker check/currentCandidate/manual acceptance/delivery is main-owned and not re-implemented by B.",
+      "B readoption second-snapshot birth issue remains registered and the signal tool stays disabled/unused; no generic process framework was started.",
+      "physical crash recovery and original 2/4 resource return remain NOT_REACHED.",
+      "no tar/ZIP, no installed/native/value admission."
+    ],
+    "scope": "controlled real spawned Runner; no installed agent, model, gateway or signal"
   }
 }
