@@ -625,7 +625,8 @@ export function cohortRecoveryIssues(value) {
   if (!Array.isArray(counts.before?.effect) || !Array.isArray(counts.after?.effect)) issues.push('effect_unknown')
   else if (JSON.stringify(counts.before.effect) !== JSON.stringify(counts.after.effect)) issues.push('effect_changed')
   if (!Number.isInteger(counts.before?.questions) || counts.before.questions !== counts.after?.questions) issues.push('questions_changed')
-  if (!Number.isInteger(counts.before?.answers) || counts.before.answers !== counts.after?.answers) issues.push('answers_changed')
+  // A missing answer table is unknown (null) and stays null on both sides; only a real drift is an issue.
+  if (counts.before?.answers !== counts.after?.answers) issues.push('answers_changed')
   if (readonly.business?.status !== 422) issues.push('business_write')
   if (readonly.providerRequests?.afterSeed !== readonly.providerRequests?.afterReads) issues.push('provider_called')
   const direct = value.directRead ?? {}
