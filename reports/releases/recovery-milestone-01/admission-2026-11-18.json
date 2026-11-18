@@ -108,5 +108,76 @@
     "newTar": 0,
     "externalReviewUnstaged": true,
     "automaticScoreChange": false
+  },
+  "continuation": {
+    "mainSource": "e2261ef5",
+    "terminalSource": "83b3ece3",
+    "fixedInputs": {
+      "B": "4703a11c440d2f347968df3e4932df3ce346ed1e",
+      "H": "59133df7b7827ff1a89004ce1e90284d7c325fd3"
+    },
+    "B": {
+      "decision": "ACTUAL_MAIN_FAKE_DRIVER_EOF_TRANSPORT_COMPONENT_PASS",
+      "independentCommand": "node /tmp/pa-rm01-b38-currentmain.mjs",
+      "result": "4PASS/0FAIL/1NOT_TESTED, original Runner PID37611, generation3, same fact-attempt-1-1, old lease stale_lease, one original begin/deliver, natural exit0/no signal",
+      "entry": "apps/runner/src/runner-service-entry.ts already had EPIPE handling before this B commit",
+      "import": "Only actual service receiver diagnostic body slice from B; not unused exported mainRunnerService stdout wrapper, old scenario-env override, RunnerLink.spawnIntent or signal tooling",
+      "safeProbeAdaptation": "B38 actual consumer imports current main with identical core assertions; failure cleanup changed to retain UNKNOWN root and unref rather than remove material. Candidate untouched.",
+      "remaining": "B original script still deletes its root after an unknown child exit; fix before reusing actual consumer. It proves Runner transport, not original Work/Broker durability or full real native process recovery."
+    },
+    "H": {
+      "decision": "INDEPENDENT_CONTROLLED_ORIGINAL_WORK_PASS",
+      "details": "reports/releases/recovery-milestone-01/h-admission-2026-11-18.json",
+      "result": "2PASS (owner-exit delivery and correct graceful-close rejection)",
+      "limits": "Original2/4/unknown business write not exercised; concurrency evidence must bind Work/candidate/assignment/artifact and actual begin receiver, not global last-N or turn count."
+    },
+    "main": {
+      "newClosedControlledWindows": [
+        "Original question-window owner exit",
+        "Original answer written to virtual native peer while protocol resolution is held, owner exits, same recorded HTTP command replay does not send again; successor observes original native_applied and delivers",
+        "Original terminal fact ACK committed before owner exit, still-readable authenticated terminated endpoint plus original observation/payload/canonical fact receipt restores original completion through barrier/check/manualaccept"
+      ],
+      "negatives": [
+        "Missing terminal fact receipt cannot produce accept action",
+        "Revoked authority",
+        "Changed profile",
+        "Changed policy",
+        "UNKNOWN resource"
+      ],
+      "originalCapacity": "Existing ProductExecution/Effects/Store current bindings only; internal2|4(default4), all non-ended bindings count including UNKNOWN/stopping. Original third/fifth Work waits; WorkA UNKNOWN retains slot, distinct WorkB own barrier releases only its slot, waiting original Work progresses, other slots untouched.",
+      "verification": {
+        "tests": 40,
+        "failed": 0,
+        "exit": 0,
+        "command": "node --test tests/integration/original-capacity.case.mjs tests/integration/original-native-recovery.case.mjs tests/integration/original-native-callback-flow.case.mjs tests/integration/native-attach-callbacks.case.mjs tests/integration/attached-port.case.mjs apps/runner/test/recovery-endpoint.test.ts apps/runner/test/recovery-interop.test.ts",
+        "strict": [
+          "coordinator/product exit0",
+          "coordinator exit0"
+        ],
+        "receiver": "Full original begin/answer command body count, attempt/assignment/contract identities are asserted in all8 recovery modes"
+      },
+      "retainedUnknownFixtureRoots": [
+        "/tmp/pa-original-capacity-XLQMQl",
+        "/tmp/pa-original-capacity-EGCc35"
+      ],
+      "scope": "Three positive recovery windows and2/4 queue/barrier logic use virtual native resources and self-exiting coordinator Workers. Actual real Runner EOF is a separate fake-driver observation, not a combined true native/OS product claim.",
+      "testCorrection": "Initial capacity test expected UNKNOWN to become quiescent by flipping an observation flag; the original barrier correctly refused. Test now retains that UNKNOWN and proves independent WorkB release; no gate weakened. Final UNKNOWN fixture material retained.",
+      "review": "Read-only terminal provenance and capacity reviews found no new authority bypass. Pending physical/endpoint and combined concurrency limits remain."
+    },
+    "remaining": [
+      "Actual product same-Work path with an independent Runner and real coordinator EOF together, including terminal endpoint lifetime after entry shutdown",
+      "Independent same-run combination of owner fault/write-unknown/acceptance with original2/4 occupancy/third-fifth progression",
+      "Full real native physical resource proof; no new model/native/signal allowance"
+    ],
+    "next": "main end-to-end integration; B original terminal endpoint/lifecycle consumer and UNKNOWN cleanup; H same-run fault+capacity independent acceptance; others on demand only",
+    "preserved": {
+      "realModelNative": 0,
+      "realSignals": 0,
+      "userServiceOperations": 0,
+      "newTar": 0,
+      "newWorktree": 0,
+      "candidateWorkingTreeEdits": 0,
+      "externalReviewUntouched": true
+    }
   }
 }

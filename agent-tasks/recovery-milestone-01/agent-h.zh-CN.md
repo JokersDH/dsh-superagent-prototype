@@ -1,12 +1,12 @@
-# H：同原Work接管与原槽的独立消费者
+# H：故障接管、交付与原2/4容量的同run独立验收
 
-目录 `/Users/hh/Desktop/joker/superagent-agent-h`，分支 `codex/g4-trial-operations`。保留原历史/状态，fetch并merge origin/main；读AGENTS、共同README和[验收](../../reports/releases/recovery-milestone-01/admission-2026-11-18.json)。当前main `d6244e63`，本轮H `caa48df7`。
+原目录 `/Users/hh/Desktop/joker/superagent-agent-h`，原分支 `codex/g4-trial-operations`。保留成果后fetch/merge origin/main，读AGENTS、共同README与[本轮续验](../../reports/releases/recovery-milestone-01/admission-2026-11-18.json)。main **e2261ef5**，本轮H59133df7已验收。
 
-**主动，只复验同一原恢复结果。** 旧reopen测试明确调用product.close，binding真实ended，拒绝旧问题是正确行为；保留为graceful-close反例，不要求ended复活，不把它当存活Runner的crash恢复或新source回归。
+**主动，一个完整结果：同一个原Work在有并行占位时故障接管→检查/人工接受→其原槽归还，后续原Work前进。** 现有单Work正例/正常close反例已过，不重复铺正常矩阵。
 
-1. 独立消费main新original-native-recovery原入口：一个未完成Work已有问题，旧coordinator worker自行process.exit绕过close，父宿主保留原Runner；旧Store退出后新Store接管。核同Work/attempt/question/session、原native_applied/check/currentCandidate/available人工accept/原产物，而非仅看main自报PASS。
-2. 保留主线撤销授权/profile/policy变化/资源UNKNOWN拒绝对照，独立核原receiver写/Runner/begin计数。虚拟ProcessHost明确标注；真实EOF/旧stdout寿命由B实际consumer交来再复验，不把父宿主保流当真实进程证明。
-3. 在同一个原执行/Store/core/queue消费者覆盖写入已发生但回复丢失的窗口，核原commandId/回执调和、无自动重发；再核原2/4容量、第五项等待、UNKNOWN占位、已确认资源归还后的前进。缺产品入口先给main最小复现，不能另建scheduler/ledger或直接改原表。
-4. 只在tools/trial-kit/tests/operational-soak原owned范围交消费者/原始事实，不改main/B/I生产或E断言。真实模型/native/信号0，不运行liveSIGKILL、危险close fallback或global discovery；物理证据未达保持NOT_TESTED。
+1. 独立消费main新增8模式（原问题/写后resolution延迟/已ACKterminal三正向与五拒绝），核原HTTP command receipt、native_applied和实际receiver begin/answer次数；恢复时同ID只读回，不重发。已ACKterminal必须原observation/payload/fact receipt与当前完整资源proof一起成立，不能只用terminated字符串。
+2. 在原ProductRuntime的Node组合参数maxActiveAttempts=2/4下，用原Store/Application/core/Effects创建并行Work；参照新original-capacity消费者，但把owner退出、同原Work交付和第3/5项前进组合在同run。UNKNOWN/stopping原binding保留占位，另一Work的证明不释放它；取得自身新完整证明后允许合法释放，不能把UNKNOWN当永久锁。
+3. 每份检查/接受/产物必须绑定那个Work的当前candidate/原assignment，按view.artifactIds读取；不读全库最后N或仅ticket最新行。原begin接收次数用receiver原command/body，不能以turn/start计数代替。old/foreign/缺proof/迟到不能影响其他槽；缺产品行为给main最小repro，不改原表或创建scheduler。
+4. B真实terminal endpoint consumer就绪后，同实际source复验其原端点/退出事实。现阶段虚拟native资源、真实Runner fake-driver与完整真实原生物理分层，不把两个独立PASS拼成同run结论。
 
-交可运行最小source及同run原IDs/实际exit/未达层，与main/B持续同结果复验；无剩余阻断待命。不要重做正常矩阵、固定包安装或独立维护队列。只推原origin分支，保留所有用户实例与状态。
+仅H原tools/trial-kit/tests/operational-soak范围交独立consumer/原事实，E断言及main/B/I生产仍原owner。source早交后持续同一组合结果复验；更新原报告中准确subject即可，不再复制全轮次状态。真实模型/native/信号0；UNKNOWN保留材料、不绕产品拒绝清理，十二用户实例不操作。其他八位继续按需待命，不扩新功能、长soak或打包。

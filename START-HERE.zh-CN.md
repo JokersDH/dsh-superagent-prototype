@@ -2,7 +2,7 @@
 
 **当前唯一工程入口：[原 Work 恢复里程碑01](agent-tasks/recovery-milestone-01/README.zh-CN.md)。** 2026-11-18仅main/B/H继续原恢复；D/E固定W36子集验收完成转待命，其余六位仍按需。新版[分角色话术](agent-tasks/recovery-milestone-01/forward-prompts.zh-CN.md)只派剩余传输/ACK未知/原槽结果，不新开wave、不扩队列。
 
-本轮[验收](reports/releases/recovery-milestone-01/admission-2026-11-18.json)：main **d6244e63**已使原问题窗口coordinator worker绕过close退出后，继任者接回同Store/原Runner到检查/接受/三产物，Runner1/begin1；四拒绝对照及35测试/strict过。真实stdio EOF/OS故障/业务ACK未知/原2&4物理仍未证，见[0095](docs/rfcs/WP-16/0095-main-original-running-callback-composition.md)。D199/199来源修正、E七项同W36实际安装/配置/非空恢复/历史点击子集已[独立核验](reports/releases/recovery-milestone-01/install-admission-2026-11-18.json)，不据此认证新恢复source，不再追main重包。
+本轮[续验](reports/releases/recovery-milestone-01/admission-2026-11-18.json)continuation：main **e2261ef5**补过原问题/回答写后resolution丢失/terminal已ACK三受控窗口，以及原Store绑定计数的2/4容量、UNKNOWN占位和独立屏障释放，40测试/strict通过。B实际main entry的真实Runner EOF传输4PASS/1NT、H独立单Work2PASS成立。下一步只B真实终态endpoint寿命、H故障交付与原槽**同run组合**；不把分离PASS当完整真实原生物理结论。D/E固定W36子集继续保其[已验范围](reports/releases/recovery-milestone-01/install-admission-2026-11-18.json)，不重包。
 
 用户确认本阶段不推进复核价值试点、依赖它的第二协议复核和路由收益研究；价值未测，原材料/ledger/预算保留。自动真实vendor/model/native/信号0，十二用户实例及状态不操作。完整B/CAC后置，进度最近评估76/100与58.6%未因任务数或研究退出自动调整。
 
