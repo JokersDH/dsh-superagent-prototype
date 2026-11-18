@@ -1,5 +1,8 @@
 /**
- * Recovery milestone H: independent replay of the same unfinished original Work.
+ * Recovery milestone H: graceful-close counterexample, not crash recovery.
+ *
+ * Calling product.close() really ends the binding, so the reopened ended Work must not revive the old
+ * question. This is retained to prevent treating graceful close as owner-exit takeover.
  *
  * Uses the actual main ProductRuntime/Application/QuestionBroker/Store and the main Node-only virtual
  * native link. A native Work opens its original question, then the first coordinator closes before the

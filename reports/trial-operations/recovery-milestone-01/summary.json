@@ -1,10 +1,10 @@
 {
   "protocol": "recovery-milestone-01-h/1",
-  "generatedAt": "2026-11-17T08:10:57.454Z",
+  "generatedAt": "2026-11-18T14:46:08.236Z",
   "source": {
-    "H": "74b4166a",
-    "main": "42f6daab",
-    "mainMerge": "d4ddd0d1",
+    "H": "caa48df7",
+    "main": "d6244e63",
+    "merge": "d350143e",
     "B": "88e472e6",
     "I": "b21698fa"
   },
@@ -60,17 +60,136 @@
     "owner": "main (B/I support as needed)"
   },
   "layers": {
-    "source": "actual main ProductRuntime/Application/Store",
-    "controlled": "virtual ProcessHost; no OS process",
+    "source": "main d6244e63 owner-exit takeover + main recovery worker",
+    "controlled": "parent-owned virtual Runner; no OS process",
     "native": "0",
-    "recovered": "NOT_REACHED",
+    "recovered": "CONTROLLED_OWNER_EXIT_TAKEOVER",
+    "ackLost": "NOT_TESTED",
+    "schedulerSlots": "NOT_REACHED",
     "installed": "not used",
-    "physical": "NOT_TESTED"
+    "physical": "NOT_TESTED",
+    "realEof": "NOT_TESTED"
   },
   "limits": [
     "virtual ProcessHost only",
     "no model/vendor/native turn",
     "no real signal",
     "no second coordinator/ledger"
+  ],
+  "commands": [
+    {
+      "command": "node --test --test-timeout=60000 tests/operational-soak/recovery/main-recovery.case.mjs",
+      "exitCode": 0,
+      "result": "1 pass; independent same Work takeover"
+    },
+    {
+      "command": "node --test --test-timeout=60000 tests/operational-soak/recovery/reopen-native.case.mjs",
+      "exitCode": 0,
+      "result": "1 pass; graceful-close counterexample"
+    }
+  ],
+  "mainRecovery": {
+    "original": {
+      "workId": "6e49147cccc83c361f7668e6dbe864a2",
+      "attemptId": "attempt-d2318444-40b7-4689-901d-dfdfd49a12a7",
+      "questionId": "codex-question-4f01e8e18a049e9ea7ff3edfa60c5703eb9a3951f9f9d370",
+      "contract": {
+        "workId": "6e49147cccc83c361f7668e6dbe864a2",
+        "revision": 1,
+        "digest": "649fb85ff7d75e3358f41ed7d4ab8f4c4617548626a85d8417a203f4aade1f14"
+      }
+    },
+    "successor": {
+      "workId": "6e49147cccc83c361f7668e6dbe864a2",
+      "attemptId": "attempt-d2318444-40b7-4689-901d-dfdfd49a12a7",
+      "phase": "delivered",
+      "artifacts": 3,
+      "originalQuestionId": "codex-question-4f01e8e18a049e9ea7ff3edfa60c5703eb9a3951f9f9d370",
+      "suppressedSignals": 1
+    },
+    "trace": {
+      "virtualResources": 1,
+      "nativeEffects": 1,
+      "turnStarts": 1,
+      "errors": []
+    },
+    "readback": {
+      "workId": "6e49147cccc83c361f7668e6dbe864a2",
+      "questionId": "codex-question-4f01e8e18a049e9ea7ff3edfa60c5703eb9a3951f9f9d370",
+      "questionValidity": "answered",
+      "bindingAfter": "ended",
+      "commandReceipt": {
+        "status": "recorded",
+        "seq": 27,
+        "result": {
+          "status": "recorded",
+          "workId": "6e49147cccc83c361f7668e6dbe864a2",
+          "entityRefs": {
+            "questionId": "codex-question-4f01e8e18a049e9ea7ff3edfa60c5703eb9a3951f9f9d370"
+          }
+        }
+      },
+      "verification": {
+        "id": "verification:d0066f71-6011-4827-bd31-ff2f802e7a43",
+        "results": [
+          {
+            "criterionId": "machine",
+            "outcome": "PASS",
+            "evidenceRefs": [
+              "check:output-check:r1:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            ]
+          }
+        ]
+      },
+      "acceptance": {
+        "id": "8133d7ae45a792097064c7f1bbbbf446",
+        "criterionIds": [
+          "human"
+        ],
+        "actorRef": "recovery-authority"
+      },
+      "artifactCount": 3,
+      "artifacts": [
+        {
+          "id": "e449a07f0bf57772dd6e3adad2b8328b42cbc8f162d4a49c5f558dd2e4e29283",
+          "bytes": 177
+        },
+        {
+          "id": "f1962bee38f1ce4cff94098439722e651bd0659e4f792c773ba1a762b6f62229",
+          "bytes": 850
+        },
+        {
+          "id": "fbff573b9398b9da22ed9a167a5a5ca028e29f2cbf916d66579f6efdaf7bb8d4",
+          "bytes": 849
+        }
+      ],
+      "workCount": 1
+    },
+    "checks": {
+      "bindingWasActiveBeforeTakeover": true,
+      "oneVirtualRunner": true,
+      "oneTurnStartNoBeginReplay": true,
+      "nativeEffectAppliedOnce": true,
+      "originalReturned": true,
+      "deliveredThreeArtifacts": true,
+      "sameStoreWork": true,
+      "questionAnswered": true,
+      "bindingEnded": true,
+      "commandRecorded": true,
+      "machineCheckPassed": true,
+      "acceptanceRecorded": true,
+      "allArtifactsReadable": true,
+      "noProtocolErrors": true
+    }
+  },
+  "gracefulClose": {
+    "path": "tests/operational-soak/recovery/reopen-native.case.mjs",
+    "result": "product.close ends binding; reopened ended Work rejects old question with stale_binding; this is not crash recovery"
+  },
+  "remaining": [
+    "ACK-written/reply-lost original command reconciliation entry",
+    "original scheduler 2/4 fifth-item/UNKNOWN occupancy/resource release",
+    "real OS stdio EOF / old stdout lifetime (wait for B consumer)",
+    "physical resource quiescence"
   ]
 }

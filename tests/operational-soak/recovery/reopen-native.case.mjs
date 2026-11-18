@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { runReopenNative } from './reopen-native2.mjs'
 
-test('same original Work reopen currently cannot continue the original question (failure baseline)', { timeout: 60000 }, async () => {
+test('graceful product.close ends the binding; reopening the ended Work rejects the old question (normal-close counterexample)', { timeout: 60000 }, async () => {
   const root = mkdtempSync(join(tmpdir(), 'trial-reopen-native-'))
   try {
     const report = await runReopenNative({ outRoot: root })
