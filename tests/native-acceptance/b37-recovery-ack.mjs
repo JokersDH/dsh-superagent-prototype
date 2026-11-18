@@ -77,11 +77,23 @@ try {
   else log.fail(`B did not resolve the unknown ACK on the original id: ${JSON.stringify({ servedB, firstFactId })}`)
 
   log.begin('B37-SAME-ATTEMPT-ORIGINAL-COMMAND-RECEPTION', 'the original deliver command is received on the same attempt after takeover', 'controlled_process')
-  await second.feed(makeCommand('deliver', { ...attempt, id: 'cmd-ms1-deliver', inputRef: 'input-ack' })).catch(() => undefined)
-  for (let index = 0; index < 500 && servedB.length < 2; index += 1) await wait(10)
-  log.evidence({ served: servedB, runnerPid: runner.pid, attempt: spec.attemptId })
-  if (servedB.length >= 2 && servedB[1] === seenA[0]) log.pass(`the deliver stayed on the same attempt and replayed the original fact id ${seenA[0]} (${servedB.length} served); runner pid unchanged`)
-  else log.pass(`the deliver was accepted on the same attempt; no additional callback arrived (${servedB.length} served), recorded as controlled evidence`)
+  const deliverCommand = makeCommand('deliver', { ...attempt, id: 'cmd-ms1-deliver', inputRef: 'input-ack' })
+  const deliverFeed = await second.feed(deliverCommand).then(() => 'accepted').catch(error => `refused:${error?.message ?? error}`)
+  for (let index = 0; index < 200 && servedB.length < 2; index += 1) await wait(10)
+  const receiverLines = (() => {
+    try { return readFileSync(join(root, 'receiver.jsonl'), 'utf8').trim().split('\n').filter(Boolean).map(line => JSON.parse(line)) } catch { return [] }
+  })()
+  const deliverSeen = receiverLines.filter(line => line.id === 'cmd-ms1-deliver')
+  const beginSeen = receiverLines.filter(line => line.id === 'cmd-ms1-begin')
+  log.evidence({ deliverFeed, receiverDeliver: deliverSeen, receiverBegin: beginSeen, served: servedB, runnerPid: runner.pid, attempt: spec.attemptId })
+  const bodyMatches = deliverSeen.length === 1 && deliverSeen[0].kind === 'deliver' &&
+    deliverSeen[0].attemptId === attempt.attemptId && deliverSeen[0].body?.inputRef === 'input-ack' &&
+    deliverSeen[0].body?.id === 'cmd-ms1-deliver'
+  const beginMatches = beginSeen.length === 1 && beginSeen[0].body?.inputRef === 'input-ack' &&
+    beginSeen[0].body?.preparedPolicyRef === spec.policySnapshotRef
+  if (deliverFeed === 'accepted' && bodyMatches && beginMatches && servedB.length === 1 && servedB[0] === seenA[0]) {
+    log.pass(`the ORIGINAL receiver recorded exactly one begin and one deliver with the original ids/body/attempt (${attempt.attemptId}); the deliver was accepted on the same attempt and did not duplicate the callback`) 
+  } else log.fail(`original command reception was not proven: ${JSON.stringify({ deliverFeed, bodyMatches, beginMatches, servedB })}`)
 
   log.begin('B37-NORMAL-CANCEL-COMPATIBILITY', 'the successor can perform the original normal cancel on the same attempt', 'controlled_process')
   const cancelled = await second.cancel(makeCommand('cancel', { ...attempt, id: 'cmd-ms1-normal-cancel' }))
@@ -99,9 +111,9 @@ try {
   closeCode = await runner.close()
   runner = undefined
   log.begin('B37-SCOPE-NOT-NATIVE', 'controlled waiting-user lane; graceful shutdown, no installed agent/model/gateway', 'controlled_process')
-  log.evidence({ closeCode })
+  log.evidence({ closeCode, receiptSource: 'RunnerLink fixture sink (not original Store durability)' })
   if (closeCode === null) log.fail('the Runner did not exit on the shutdown frame; RunnerLink would have fallen back to SIGKILL')
-  else log.notTested(`no installed agent, model gateway or signal was used (graceful shutdown exit ${closeCode}); native/recovery product layers remain NOT_REACHED`)
+  else log.notTested(`no installed agent, model gateway or signal was used (graceful shutdown exit ${closeCode}); receipts came from the fixture sink, not original Store durability; native/recovery product layers remain NOT_REACHED`)
 } finally {
   try { if (runner) await runner.close() } catch {}
   delete process.env.PA_RUNNER_RECOVERY_ROOT

@@ -297,7 +297,10 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
     if (process.env.PA_RUNNER_RECEIVER_LOG) {
       await appendFile(
         process.env.PA_RUNNER_RECEIVER_LOG,
-        `${JSON.stringify({ kind: command.kind, id: command.id, attemptId: command.attemptId, fenceEpoch: command.fenceEpoch, at: new Date().toISOString() })}\n`,
+        // The original command body is preserved here so an independent consumer can prove WHICH command
+        // the Runner actually received, not merely that some command arrived. The log is opt-in/local and
+        // is a diagnostic, never a receipt or Store durability evidence.
+        `${JSON.stringify({ receiver: 'runner-service', kind: command.kind, id: command.id, attemptId: command.attemptId, fenceEpoch: command.fenceEpoch, body: command, at: new Date().toISOString() })}\n`,
       ).catch(() => undefined)
     }
     if (businessClosed) return { code: 'state_indeterminate', reason: 'admission_closed', message: 'Attempt admission is closed' }
@@ -659,8 +662,14 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
 /** Entry point used by a spawned Runner process: stdio as the transport. */
 export async function mainRunnerService(createOptions: () => Promise<Omit<RunnerServiceOptions, 'input' | 'write'>>): Promise<void> {
   const options = await createOptions()
+  // A surviving Runner may outlive its original coordinator's stdout. A closed/broken stdout must never
+  // crash the Runner or be mistaken for business failure: the authenticated recovery endpoint continues
+  // to serve the same attempt, and later frames are simply not written to the dead adapter.
+  let stdoutBroken = false
+  process.stdout.on('error', () => { stdoutBroken = true })
   const write = (frame: Record<string, unknown> | BridgeFrame): void => {
-    process.stdout.write(encodeFrame(frame))
+    if (stdoutBroken) return
+    try { process.stdout.write(encodeFrame(frame)) } catch { stdoutBroken = true }
   }
   const input = (async function* (): AsyncGenerator<Uint8Array> {
     for await (const chunk of process.stdin) yield chunk as Uint8Array

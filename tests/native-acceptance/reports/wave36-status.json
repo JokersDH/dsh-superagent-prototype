@@ -120,6 +120,43 @@
       "physical crash recovery and original 2/4 resource return remain NOT_REACHED.",
       "no tar/ZIP, no installed/native/value admission."
     ],
-    "scope": "controlled real spawned Runner; no installed agent, model, gateway or signal"
+    "scope": "controlled real spawned Runner; no installed agent, model, gateway or signal",
+    "round2": {
+      "date": "2026-11-18",
+      "mainMerged": "d6244e63 line (merge 10abaf3c)",
+      "b37AssertionFix": "b37 no longer swallows deliver errors and no longer passes both branches: it now reads the opt-in runner-service receiver log (which now records the RECEIVED command body) and requires exactly one begin and one deliver with original id/body/attempt on attempt-1; the fixture sink receipt is explicitly labelled not original Store durability.",
+      "b38ProductFix": "runner-service's spawned-entry stdout writer now tolerates a closed/broken stdout (error listener + safe write): a Runner outliving the old coordinator's stdout does not crash or treat EPIPE as business failure. On old stdin EOF the same Runner survives with its authenticated endpoint; the successor explicitly binds a new lease and continues.",
+      "actualConsumer": "tests/native-acceptance/b38-eof-recovery.mjs: real spawned waiting-user Runner -> old coordinator binds, receives original fact, holds ACK (unknown); old stdout destroyed and stdin ended (coordinator death); the SAME pid survives; new lease binds generation 3 on the same attempt-1/epoch 1, receives the SAME fact id and replies once, old lease reply is refused stale_lease; original deliver id/body/attempt is received exactly once after EOF (begin not replayed); normal cancel stops the same Runner gracefully (exit 0, no signal).",
+      "commands": [
+        "node tests/native-acceptance/b37-recovery-ack.mjs -> exit 0, 4 PASS/0 FAIL/1 NOT_TESTED",
+        "node tests/native-acceptance/b38-eof-recovery.mjs -> exit 0, 4 PASS/0 FAIL/1 NOT_TESTED",
+        "node --test --test-force-exit apps/runner/test/*.test.ts -> 156/156",
+        "npx tsc -p tests/native-acceptance/tsconfig.attached.json -> exit 0",
+        "node --test tests/integration/original-native-callback-flow.case.mjs -> 2/2 (main-owned; requires rebuilt main contracts dist)",
+        "root npx tsc --noEmit -p tsconfig.json -> main-owned tests/integration/fixtures/native-callback-link.ts TS2719 (its fake RunnerLink lacks B SpawnedRunner.spawnIntent); B did not edit that main-owned fixture"
+      ],
+      "originalIds": {
+        "attemptId": "attempt-1",
+        "fenceEpoch": 1,
+        "factId": "fact-attempt-1-1",
+        "beginCommandId": "cmd-eof-begin",
+        "deliverCommandId": "cmd-eof-deliver",
+        "cancelCommandId": "cmd-eof-cancel",
+        "leases": [
+          "lease-eof-old",
+          "lease-eof-new"
+        ],
+        "runnerPid": "same process; no replacement"
+      },
+      "realSignals": 0,
+      "remaining": [
+        "payload-read callback not raised by waiting-user lane (NOT_TESTED here)",
+        "receipt is a fixture reply, not original Store durability; original Store/Broker question window/check/accept/delivery is main-owned",
+        "original physical crash recovery and original 2/4 slot/resource return NOT_REACHED; virtual ProcessHost not physical",
+        "readoption second-snapshot birth issue remains registered/disabled; signal tools unused",
+        "root tsc has one main-owned fixture type error; runner/attached scoped typechecks and tests pass",
+        "no tar/ZIP, no installed/native/value admission"
+      ]
+    }
   }
 }
