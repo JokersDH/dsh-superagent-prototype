@@ -1,10 +1,10 @@
 {
   "protocol": "recovery-milestone-status/1",
   "date": "2026-11-18",
-  "source": "d6244e63",
+  "source": "e2261ef5",
   "normalOriginalComposition": "CONTROLLED_PASS",
-  "sameOriginalWorkCrashRecovery": "NOT_REACHED_REAL_OS_STDIO_EOF_AND_ALL_WINDOWS",
-  "originalSchedulerTwoFourResources": "NOT_REACHED",
+  "sameOriginalWorkCrashRecovery": "THREE_CONTROLLED_WINDOWS_PASS_ACTUAL_EOF_TRANSPORT_COMPONENT_PASS_FULL_COMBINED_NATIVE_OS_NOT_REACHED",
+  "originalSchedulerTwoFourResources": "CONTROLLED_ORIGINAL_QUEUE_CAPACITY_UNKNOWN_RETENTION_AND_SEPARATE_BARRIER_PASS_COMBINED_FAULT_PHYSICAL_PENDING",
   "realNativePhysicalQuiescence": "NOT_TESTED",
   "independentFixedW36Installed": "NAMED_SEVEN_CASE_SUBSET_ADMITTED_NOT_FULL_PRODUCT",
   "latestHistoricalEstimate": {
@@ -20,7 +20,7 @@
     "historicalProtocolFixturesLedgerReportsChanged": false,
     "newAllowance": 0
   },
-  "nextResponsibility": "main/B/H only: actual transport disconnect/unknown business ACK/original2&4 queue and resource proof. D/E current fixed subset complete, standby; other agents standby.",
+  "nextResponsibility": "main integrates same milestone; B actual terminal endpoint lifetime and UNKNOWN fixture retention; H independent combined same-run fault/delivery/capacity. Others on demand only.",
   "forwardPrompts": "agent-tasks/recovery-milestone-01/forward-prompts.zh-CN.md",
   "externalPromptsSent": false,
   "staticVerification": {
@@ -40,11 +40,11 @@
   },
   "externalReview": "Preserved unstaged; its root-log removals were external changes, not performed or restored by this task",
   "firstKnownGap": {
-    "closed": "ProductExecution.start can now resume current original native registration in controlled question window",
-    "remaining": "Real stdio EOF/old stdout lifetime, business ACK unknown, already-ACK terminal crash window, original2&4 resources"
+    "closed": "Original question/answer-written-resolution-held/terminal-ACK controlled owner takeover; actual main fake-driver Runner EOF transport; original2/4 queue occupancy logic",
+    "remaining": "Real terminal endpoint lifetime; independent same-run fault+delivery+capacity+resource proof; full real native physical"
   },
   "independentMaintenanceQueues": false,
   "unusedCandidateDefects": "Remain recorded and disabled, not automatic prerequisites for the original recovery path",
-  "controlledOriginalQuestionWindowTakeover": "PASS: surviving parent-owned virtual Runner, coordinator Worker exits without close; same Store/original Work question to manualaccept/artifacts, one Runner/one begin",
+  "controlledOriginalQuestionWindowTakeover": "PASS plus answer-written/resolution-held and committed-terminal-ACK original delivery windows; one actual receiver begin/answer",
   "admission": "reports/releases/recovery-milestone-01/admission-2026-11-18.json"
 }

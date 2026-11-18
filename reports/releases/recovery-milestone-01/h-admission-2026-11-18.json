@@ -1,0 +1,53 @@
+{
+  "date": "2026-11-18",
+  "status": "CONTROLLED_ORIGINAL_QUESTION_WINDOW_TAKEOVER_INDEPENDENT_CONSUMER_PASS",
+  "fixedInput": {
+    "H": "59133df7b7827ff1a89004ce1e90284d7c325fd3",
+    "implementationCommit": "860f4529a31f1ff1b0aeeaa56953c7b2abf357d1",
+    "mainSource": "d6244e63",
+    "mainCurrentAtReview": "55fc0708",
+    "candidateDirtyBeforeAfter": "clean; untouched",
+    "consumerBlobs": {
+      "tests/operational-soak/recovery/main-recovery.case.mjs": "58862d94a4de3e068cf12101a6b9e101dfaa604d",
+      "tests/operational-soak/recovery/main-recovery2.mjs": "868041f2b90b288716536ecd99becc96c7dc64c5"
+    },
+    "actualSourceClosure": "H production execution/native-attempt and main recovery Worker/virtual-host fixture have no diff against main55fc; old summary B88/Ib216 labels do not identify new consumers"
+  },
+  "independentCheck": {
+    "command": "node --test --test-timeout=60000 tests/operational-soak/recovery/main-recovery.case.mjs tests/operational-soak/recovery/reopen-native.case.mjs",
+    "cwd": "/Users/hh/Desktop/joker/superagent-agent-h",
+    "exitCode": 0,
+    "passed": 2,
+    "failed": 0,
+    "actualConsumer": "H owns a parent-held original virtual Runner, executes original main recovery Worker in two sequential coordinator threads, then independently opens the original Store and reads original Work/question/answer command/check/acceptance/artifacts",
+    "positive": "Primary exits without product.close while original binding is active; successor opens same Store, resumes same Work/attempt/question and reaches original registered checkPASS/manual acceptance/delivered/three nonempty artifacts. One virtual Runner, one native turn/start and one virtual answer effect; original question answered and binding ended",
+    "negative": "Separate graceful-close case genuinely ends binding and rejects original question stale_binding. This remains correct normal-close behavior, not a crash-recovery failure or ended-to-active requirement",
+    "safetyReview": "Virtual ProcessHost overrides spawn/write/inventory/stop, both coordinator Workers exit themselves, process.kill is replaced with a no-op in the Worker. Only fixture Git and registered Node check actually execute; parent input is deliberately kept alive"
+  },
+  "evidenceBoundaries": [
+    {
+      "item": "One begin claim",
+      "observed": "H checks protocolMethods turn/start count, not original RunnerCommand begin receiver count. This proves no second native turn in this fixture; it does not independently prove no duplicate begin command was received and ignored",
+      "nextRelevantConsumer": "Use B exact receiver command id/body/attempt evidence when combining real transport with original Work; do not expand a separate instrumentation platform"
+    },
+    {
+      "item": "Artifact/check/acceptance independent binding",
+      "observed": "H queries ticket's latest check/acceptance without comparing assignment/candidate generation and opens the global artifacts table's last N rows. The present single-Work positive is genuine and inherited main Worker separately checks delivered Work's artifactIds; H's own reader is insufficient as a general multiple-Work/slot oracle",
+      "nextRelevantConsumer": "Bind independent evidence to the actual delivered Work/current candidate and original assignment when H next covers original2/4 concurrent Works; no automatic generic hardening queue"
+    },
+    {
+      "item": "Summary temporal labels",
+      "observed": "summary.json retains old graceful-close original/observed/false checks at top level while its layers and mainRecovery describe the successful owner-exit run. The dedicated main-recovery.json and executed command are the reliable new subject; avoid treating the whole summary as one same-run result"
+    }
+  ],
+  "remaining": {
+    "unknownBusinessAckOrWrittenResponseLost": "NOT_TESTED; no such fault injection in this consumer",
+    "originalTwoFourSlotsFifthWaitUnknownOccupancyAndRelease": "NOT_TESTED; exactly one Work/one Runner, no original capacity consumer",
+    "actualStdInEofOrClosedStdOut": "NOT_TESTED; H parent keeps virtual service stream alive, new B source not consumed here",
+    "alreadyAckedTerminalCrashWindow": "NOT_TESTED",
+    "physicalNativeQuiescence": "NOT_TESTED; virtual resource and suppressed verifier signal do not prove physical ownership/release",
+    "installedOrRealVendorModelNative": "NOT_TESTED"
+  },
+  "decision": "Accept this independent controlled original-question-window result. Keep H focused on same original recovery, unknown business acknowledgement and original capacity evidence; no new feature lines or release authority from this pass",
+  "reviewerEffects": { "candidateOrMainSourceEdits": 0, "realVendorModelNative": 0, "realSignals": 0, "globalProcessDiscovery": 0, "userServicesOperated": 0, "newArchives": 0, "allSessionsComplete": true }
+}

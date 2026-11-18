@@ -202,14 +202,38 @@ export class NativeProductAttempt {
     this.recovered = true
     const proof = await this.connection().inspect(), inspection = verifiedRunnerInspection(proof).value
     const binding = this.store.bindings.current<IngressBinding>(this.spec.ticketId)
-    if (!binding || binding.state !== 'active' || !this.current() || inspection.state !== 'serving' ||
-        inspection.admission !== 'open' || inspection.coverage !== 'complete_owned_resources' ||
+    const terminal = inspection.state === 'terminated'
+    if (!binding || binding.state !== 'active' || !this.current() ||
+        (!terminal && (inspection.state !== 'serving' || inspection.admission !== 'open')) ||
+        inspection.coverage !== 'complete_owned_resources' ||
         inspection.resources.some(resource => resource.writer === 'indeterminate') ||
+        (terminal && inspection.resources.some(resource => resource.writer !== 'quiescent')) ||
         ownedResourceManifestDigest(binding.resources) !== ownedResourceManifestDigest(inspection.resources))
       throw new Error('Native resume requires the same active complete original resource set')
     registerRecoveryRunner(this.store, proof)
-    try { return await this.attachCallbacks(new RunnerPayloadStore(join(this.stateRoot, 'payloads')), () => {}) }
+    if (terminal) await this.restoreTerminal()
+    try { return await this.attachCallbacks(new RunnerPayloadStore(join(this.stateRoot, 'payloads')), () => {}, !terminal) }
     catch (error) { await this.stopCallbacks(); throw error }
+  }
+  /** An already-ACKed terminal must come from its original committed fact/payload, never inspection. */
+  private async restoreTerminal() {
+    const rows = this.store.observations.forAttempt(this.spec.attemptId, 10001)
+    if (rows.length > 10000) throw new Error('Original terminal history exceeds the recovery bound')
+    const row = rows.findLast(value => value.kind === 'turn.ended' && value.disposition === 'business')
+    if (!row || row.ticketId !== this.spec.ticketId || row.assignmentId !== this.spec.assignmentId ||
+        row.fenceEpoch !== this.spec.fenceEpoch || canonicalDigest(JsonSchema.parse(row.contract)) !== canonicalDigest(JsonSchema.parse(this.spec.contract)))
+      throw new Error('Original committed terminal fact is missing')
+    const fact = CriticalFactSchema.parse({ ...this.producer.attempt, factId: row.factId,
+      source: this.producer.source, kind: 'turn.ended', payloadRef: row.payloadRef })
+    const payload = await storedAttemptPayloads(this.store).read(row.payloadRef)
+    const digest = canonicalDigest(JsonSchema.parse(payload)), receipt = this.store.facts.get(row.factId)
+    if (digest !== row.payloadSha256 || row.payloadRef !== `payload:${digest}` ||
+        receipt?.payloadDigest !== canonicalDigest(JsonSchema.parse({ fact, payloadDigest: digest })))
+      throw new Error('Original terminal fact has no matching durable receipt')
+    const parsed = parseRuntimeFactPayload(fact, payload)
+    if (parsed.kind !== 'turn.ended') throw new Error('Original terminal payload has another kind')
+    this.terminal = { reason: parsed.value.outcome === 'completed' ? 'terminal' : parsed.value.outcome === 'cancelled' ? 'cancelled' : 'error',
+      evidenceRefs: [row.factId] }
   }
   /** A failed takeover owns only its local connection/temp root, never the original Runner's state. */
   async releaseRecoveryConnection(): Promise<void> {
@@ -217,7 +241,7 @@ export class NativeProductAttempt {
     await this.stopCallbacks()
     rmSync(this.recoveryRoot, { recursive: true, force: true })
   }
-  private async attachCallbacks(local: RunnerPayloadStore, prepared: () => void): Promise<RunningAttempt> {
+  private async attachCallbacks(local: RunnerPayloadStore, prepared: () => void, connect = true): Promise<RunningAttempt> {
     const endpoint = this.endpoint!
     const running: RunningAttempt = {
       attemptId: this.spec.attemptId,
@@ -250,6 +274,7 @@ export class NativeProductAttempt {
         return { quiescence: 'confirmed', evidenceRefs: ['native-owned-resource-barrier'] }
       },
     }
+    if (!connect) return running
     // Each coordinator connection owns a distinct lease. An old poller cannot share a successor lease.
     const owner = attachRunningAttempt(running, key('native-callback-owner', running.attemptId, randomUUID()))
     // Bind before begin. Immutable pending preparation facts may replay with their original IDs.

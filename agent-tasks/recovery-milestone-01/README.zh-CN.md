@@ -8,9 +8,11 @@
 
 **main端到端负责这个出口。** 当前主动仅main/B/H。D/E固定W36安装验收本项已结束，转按需待命；其余六位继续待命，没有原恢复的具体阻断不自行找维护任务或扩接口。
 
-首个业务接管缺口已在main **d6244e63** 实现并受控通过：原coordinator worker在未完成问题窗口直接退出，原Runner由父宿主持有，新coordinator打开同一Store、核原合同/profile/policy/项目/资源/registration后以新lease接回原问题，继续检查/人工接受/三产物重开，Runner1/begin1。四项拒绝对照和35测试/strict过。物理reconcile仍只核对/停止，不冒业务接管。
+当前main **e2261ef5**（终态source83b3ece3）已有三种受控原Work故障窗口：原问题等待、原回答写出但resolution尚未返回、terminal事实已ACK但尚未交付；均同原ID/一次写到检查/接受/三产物重开。缺terminal receipt及原四拒绝对照保持。原receiver实际begin/answer body计数已断言，不仅用turn/start。40相关测试/strict过，物理reconcile仍只核对/停止。
 
-尚缺真实stdio EOF/旧stdout关闭、业务ACK未知窗口、已ACK terminal后故障及原2/4槽/完整物理归还。父host维持输入流的受控证明不覆盖这些；下一步B真实传输/H独立消费者/main原容量，只补这些剩余结果。[本轮验收](../../reports/releases/recovery-milestone-01/admission-2026-11-18.json)。
+本轮B真实Runner EOF/旧stdout关闭的fake-driver传输4PASS/1NT已在main entry复验；入口此前已有EPIPE处理，新增未使用wrapper不计默认产品修复。H单Work独立正例与正常关闭反例2PASS。原2/4容量现按原Store未ended绑定计数，UNKNOWN保留、另一Work自己的屏障释放后第3/5项前进两场景过，无新scheduler/ledger。
+
+剩余只两块：B真实entry终态后endpoint关闭的恢复寿命；H将原故障交付与原2/4占位/UNKNOWN/后续前进合进**同一个run**独立验收。真实原生物理仍未测，不把分离的transport/虚拟host PASS拼成完整结论。[本轮续验](../../reports/releases/recovery-milestone-01/admission-2026-11-18.json)continuation、[H独立结果](../../reports/releases/recovery-milestone-01/h-admission-2026-11-18.json)。
 
 ## 已具备与先修缺口
 
