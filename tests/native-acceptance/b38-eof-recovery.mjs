@@ -15,7 +15,7 @@ import { fileURLToPath } from 'node:url'
 import { spawn } from 'node:child_process'
 import { CaseLog, writeReport } from './harness.mjs'
 import { endpointDirectory } from '../../apps/runner/src/recovery-endpoint.ts'
-import { connectRunnerRecovery } from '../../packages/execution/src/recovery-transport.ts'
+import { connectRunnerRecovery, verifiedRunnerInspection } from '../../packages/execution/src/recovery-transport.ts'
 import { makeAttemptSpec, makeCommand } from '../../packages/testing/src/index.ts'
 
 const log = new CaseLog()
@@ -113,22 +113,29 @@ try {
   if (deliverFeed === 'accepted' && bodyOk && beginSeen.length === 1) log.pass(`the original deliver id/body/attempt was received exactly once after EOF and begin was not replayed (${beginSeen.length})`)
   else log.fail(`original command reception after EOF was not proven: ${JSON.stringify({ deliverFeed, deliverSeen, beginSeen })}`)
 
-  log.begin('B38-NORMAL-CANCEL-AND-GRACEFUL-EXIT', 'the successor normal cancel stops the same Runner; no SIGKILL fallback', 'controlled_process')
+  log.begin('B38-NORMAL-CANCEL-AND-TERMINAL-BARRIER-COLLECTED', 'the successor normal-cancels and then collects the terminal barrier; the same Runner exits', 'controlled_process')
   const cancel = await successor.cancel(makeCommand('cancel', { ...attempt, id: 'cmd-eof-cancel' }), 'lease-eof-new')
-    .then(proof => ({ ok: true, state: proof?.value?.state ?? null })).catch(error => ({ ok: false, serverError: error?.serverError ?? null }))
+    .then(proof => ({ ok: true, state: verifiedRunnerInspection(proof).value.state })).catch(error => ({ ok: false, serverError: error?.serverError ?? null }))
+  // The old stdin is EOF and its owner is gone: the terminal endpoint stays until the successor collects
+  // the already-recorded barrier with the original no-lease physical cancel.
+  const barrier = await successor.cancel(makeCommand('cancel', { ...attempt, id: 'cmd-eof-barrier' }))
+    .then(proof => { const value = verifiedRunnerInspection(proof).value; return { ok: true, state: value.state, admission: value.admission } })
+    .catch(error => ({ ok: false, serverError: error?.serverError ?? null }))
   for (let index = 0; index < 800 && exited === null; index += 1) await wait(10)
-  log.evidence({ cancel, exited, pid: child.pid })
-  if (cancel.ok && exited && exited.code === 0 && exited.signal === null) log.pass(`the normal cancel stopped the same Runner gracefully (exit ${exited.code}, no signal)`)
-  else log.fail(`cancel/exit failed: ${JSON.stringify({ cancel, exited })}`)
+  log.evidence({ cancel, barrier, exited, pid: child.pid })
+  if (cancel.ok && barrier.ok && barrier.state === 'terminated' && exited && exited.code === 0 && exited.signal === null) log.pass(`the normal cancel reached terminal state, the successor collected the barrier from the surviving endpoint, and the same Runner exited ${exited.code} with no signal`)
+  else log.fail(`normal cancel/barrier/exit failed: ${JSON.stringify({ cancel, barrier, exited })}`)
 
   log.begin('B38-SCOPE-NOT-NATIVE', 'controlled waiting-user lane; fixture receipt, no installed agent/model/gateway/signal', 'controlled_process')
   log.notTested('no installed agent, model gateway or real signal was used; the receipt is a fixture reply, not original Store durability; original Store/Broker acceptance and physical slots remain main-owned/NOT_REACHED')
 } finally {
   if (exited === null) {
-    // Never signal the Runner: wait briefly for a natural exit; otherwise report UNKNOWN and leave it.
+    // Never signal the Runner: wait briefly for a natural exit; otherwise retain EVERYTHING (root,
+    // journal, payloads, credential) as UNKNOWN material instead of deleting evidence around a refusal.
     for (let index = 0; index < 500 && exited === null; index += 1) await wait(10)
   }
-  rmSync(root, { recursive: true, force: true })
+  if (exited !== null) rmSync(root, { recursive: true, force: true })
+  else process.stdout.write(`RETAINED_UNKNOWN_ROOT ${root}\n`)
 }
 const report = writeReport({ cases: log.cases, environment: { note: 'recovery milestone 01 old-coordinator EOF/EPIPE survival', modelCalls: 0, nativeTurns: 0 }, extra: { scope: 'real spawned Runner; no signal/kill; original Store/Broker main-owned' } }, undefined)
 for (const item of report.cases) process.stdout.write(`${item.status.padEnd(10)} ${item.id.padEnd(52)} ${item.detail.join(' | ')}\n`)

@@ -143,6 +143,14 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
   /** Last generation observed on the channel; readable after terminal close without reviving it. */
   let channelGeneration = 0
   let physicallyStopped = false
+  /** A real (non-adapter) callback lease has attached at least once; only then does a terminal barrier wait apply. */
+  let remoteAttached = false
+  /** The driver ended naturally rather than through an explicit shutdown frame. */
+  let naturalTerminal = false
+  /** The original coordinator asked for shutdown on stdio; no barrier wait is needed then. */
+  let explicitShutdown = false
+  let resolveTerminalBarrier!: () => void
+  const terminalBarrier = new Promise<void>(resolve => { resolveTerminalBarrier = resolve })
   const preparation = new AbortController()
   const processHost = options.processHost ?? new ProcessHost()
   const closeAdmission = () => {
@@ -333,6 +341,7 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
     return attach.hooks.beforeNativeWrite(command)
   } }
 
+  const collectTerminalBarrier = (): void => { resolveTerminalBarrier() }
   const finish = (): void => {
     closed = true
     clearInterval(timer)
@@ -353,10 +362,12 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
       },
     })
     void running.then(async result => {
+      naturalTerminal = true
       await stopPhysical()
       write({ type: 'exited', id: spec!.attemptId, exit: (result as { exit: unknown }).exit })
       finish()
     }).catch(async error => {
+      naturalTerminal = true
       await stopPhysical()
       write({ type: 'error', id: spec!.attemptId, ...toBridgeFailure(error) })
       write({ type: 'exited', id: spec!.attemptId, exit: { reason: 'error', evidenceRefs: ['runner-preparation-or-driver-failed'] } })
@@ -368,6 +379,12 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
     for (;;) {
       const frame = await next()
       if (!frame) break
+      // A terminal service may already be closed when the live coordinator finally asks for shutdown:
+      // that request still marks the ordinary explicit path and must skip the successor-barrier wait.
+      if ((frame as { type?: string }).type === 'shutdown') {
+        explicitShutdown = true
+        if (closed) break
+      }
       if (closed) break
 
       // Artifact registration is an upstream extension handled before the typed dispatch.
@@ -466,6 +483,8 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
                   if (auth?.leaseId) throw Object.assign(new Error('stale_lease'), { code: 'stale_connection', reason: 'stale_lease' })
                   if (auth?.producer && channelProducer && !sameCoordinatorChannelProducer(auth.producer as never, channelProducer))
                     throw Object.assign(new Error('foreign_producer'), { code: 'identity_mismatch', reason: 'foreign_producer' })
+                  // The successor collected the already-recorded terminal barrier; the entry may now exit.
+                  collectTerminalBarrier()
                   return
                 }
                 // Identity/lease is certified BEFORE the physical stop mutates anything; a foreign cancel
@@ -540,6 +559,7 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
                 const page = attach!.next(leaseId, producer as never)
                 if (!page.ok) throw channelError(page.refused, page.refused === 'identity_mismatch' ? 'foreign_producer' : 'lease_not_current')
                 channelGeneration = page.generation
+                remoteAttached = true
                 // The page is the delivery for a remote pull connection; never mirror it onto stdio.
                 return { generation: page.generation, request: page.request, remainingMs: page.remainingMs }
               },
@@ -552,6 +572,7 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
                 if (closed || businessClosed) return { accepted: false, generation: channelGeneration }
                 const routed = attach!.receive(leaseId, asChannelReply(reply as object), producer as never)
                 if (routed.accepted) dispatched.delete(leaseId)
+                remoteAttached = true
                 channelGeneration = routed.generation
                 return { accepted: routed.accepted, generation: routed.generation }
               },
@@ -622,6 +643,7 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
         }
 
         case 'shutdown': {
+          explicitShutdown = true
           closeAdmission()
           finish()
           break
@@ -633,14 +655,6 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
     }
   } finally {
     await pumping.catch(() => undefined)
-  }
-
-  const shutdown = async (): Promise<void> => {
-    closeAdmission()
-    finish()
-    await recoveryEndpoint?.close().catch(() => undefined)
-    await stopPhysical().catch(() => undefined)
-    journal?.close()
   }
 
   const done = (async () => {
@@ -656,7 +670,27 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
   })()
   void done.catch(() => undefined)
 
-  return { done, shutdown }
+  /**
+   * The terminal endpoint lifetime: when the driver ended naturally with a remote lease attached and the
+   * coordinator died before recording the barrier, keep the endpoint alive until a successor collects it.
+   * A normal explicit shutdown, no remote attach, or a still-running driver resolves immediately.
+   */
+  const awaitTerminalBarrier = async (): Promise<void> => {
+    if (!recoveryEndpoint || !remoteAttached || !naturalTerminal || explicitShutdown) return
+    await terminalBarrier
+    // The barrier is collected inside the successor's cancel handler; give that HTTP response a moment
+    // to flush before shutdown closes the endpoint socket. This is local settling, not a retry or a
+    // promise about physical quiescence (the barrier evidence was already recorded by the cancel).
+    await new Promise<void>(resolve => setTimeout(resolve, 50))
+  }
+  const shutdown = async (): Promise<void> => {
+    closeAdmission()
+    finish()
+    await recoveryEndpoint?.close().catch(() => undefined)
+    await stopPhysical().catch(() => undefined)
+    journal?.close()
+  }
+  return { done, shutdown, awaitTerminalBarrier }
 }
 
 /** Entry point used by a spawned Runner process: stdio as the transport. */

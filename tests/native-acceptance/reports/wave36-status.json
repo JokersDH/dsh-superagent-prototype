@@ -157,6 +157,42 @@
         "root tsc has one main-owned fixture type error; runner/attached scoped typechecks and tests pass",
         "no tar/ZIP, no installed/native/value admission"
       ]
+    },
+    "round3": {
+      "date": "2026-11-19",
+      "mainMerged": "e2261ef5 line (merged 7eae0729)",
+      "productFix": "Real entry terminal endpoint lifetime: runner-service tracks whether a real (non-adapter) lease ever attached, whether the driver ended naturally, and whether the coordinator explicitly shut down. When the driver ended naturally with a remote lease attached and no explicit shutdown, the spawned entry awaits the terminal barrier before closing the authenticated endpoint. A successor's original no-lease physical cancel collects that barrier (the cancel response is given a local settle window before shutdown); an explicit shutdown frame after the terminal close still marks the ordinary path and skips the wait. No new host/protocol/ledger/queue.",
+      "actualConsumer": "tests/native-acceptance/b39-terminal-endpoint.mjs (real spawned waiting-user entry): owner binds/begins/ACKs fact/cancels terminal, then destroys stdout and ends stdin before recording the barrier; the SAME pid still serves the endpoint; successor reads the original terminated/closed proof and collects the barrier with a no-lease cancel; entry exits 0 with no signal. Ordinary terminal with live coordinator exits 0 on explicit shutdown (no lingering wait). 3 PASS/0 FAIL/1 NOT_TESTED, deterministic across repeats.",
+      "b38UnknownRetention": "b38 no longer deletes its root on an unconfirmed exit: if the Runner's exit is not observed it waits briefly, then retains root/journal/payloads/credential and prints RETAINED_UNKNOWN_ROOT; b39 likewise retains unconfirmed roots (RETAINED_UNKNOWN_ROOTS).",
+      "b38Updated": "b38 now also collects the terminal barrier from the surviving endpoint before exit (successor no-lease cancel) and asserts exit 0/no signal: 4 PASS/0 FAIL/1 NOT_TESTED, deterministic across 3 runs.",
+      "commands": [
+        "node tests/native-acceptance/b39-terminal-endpoint.mjs -> exit 0, 3 PASS/0 FAIL/1 NOT_TESTED (3 consecutive runs)",
+        "node tests/native-acceptance/b38-eof-recovery.mjs -> exit 0, 4 PASS/0 FAIL/1 NOT_TESTED (3 consecutive runs)",
+        "node tests/native-acceptance/b37-recovery-ack.mjs -> exit 0, 4/0/1",
+        "node --test --test-force-exit apps/runner/test/*.test.ts -> 156/156",
+        "npx tsc -p tests/native-acceptance/tsconfig.attached.json -> exit 0",
+        "b31 4/0/1, b32 5/0/1, b36 2/0/1, b27-sigkill 7/0/1, b27-chain 4/0/1"
+      ],
+      "originalIds": {
+        "attemptId": "attempt-1",
+        "fenceEpoch": 1,
+        "factId": "fact-attempt-1-1",
+        "beginCommandId": "cmd-terminal-begin",
+        "cancelCommandId": "cmd-terminal-cancel",
+        "barrierCommandId": "cmd-terminal-barrier",
+        "ordinaryShutdown": "explicit shutdown frame",
+        "sameRunnerPid": "same process throughout; no replacement"
+      },
+      "realSignals": 0,
+      "remaining": [
+        "payload-read still not raised by this waiting-user lane (NOT_TESTED)",
+        "receipts are controlled replies, not original Store durability; original Store/Broker question window/check/accept/delivery remains main-owned",
+        "physical crash recovery and original 2/4 slot/resource return NOT_REACHED; the barrier wait is an endpoint lifetime rule, not physical quiescence",
+        "main-owned tests/integration/fixtures/native-callback-link.ts TS2719 remains in root tsc; B does not edit it; runner/attached scoped checks are green",
+        "readoption second-snapshot birth issue remains registered/disabled; no signal tools used",
+        "no tar/ZIP, no installed/native/value admission"
+      ],
+      "headAtRecord": "7eae0729"
     }
   }
 }
