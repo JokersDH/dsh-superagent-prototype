@@ -1,10 +1,10 @@
 # 产品进度、完成度与当前可用范围
 
-日期：2026-11-17。本次核对十位A–J的固定最新提交、主线代码、必要正反例和准确安装字节；不是按“Agent说完成”统计。读者入口：[如何使用](../ASSISTANT-GUIDE.zh-CN.md)、[架构](ARCHITECTURE.zh-CN.md)、[创新](INNOVATION.zh-CN.md)。
+日期：2026-11-18。本次只核主动B/H/D/E固定交付、主线必要正反例和准确安装字节；其他六位待命，没有为凑满人数重验未用候选。读者入口：[如何使用](../ASSISTANT-GUIDE.zh-CN.md)、[架构](ARCHITECTURE.zh-CN.md)、[创新](INNOVATION.zh-CN.md)。
 
-最新续交：wave36十位已按[本轮验收](../../reports/releases/wave37-admission/README.zh-CN.md)固定提交复核。main `42f6daab` 已激活原Native.launch回调，受控原Work问答→检查→人工接受→产物重开及撤销授权反例通过；尚非崩溃恢复/真实物理/原2&4槽证明。下一步收敛到[原Work恢复里程碑01](../../agent-tasks/recovery-milestone-01/README.zh-CN.md)：main/B/H恢复主线、D/E固定包主动工作，A/C/F/G/I/J按具体阻断参与，否则待命，不以用满Agent为目标。
+最新续交：[2026-11-18验收](../../reports/releases/recovery-milestone-01/admission-2026-11-18.json)。main **d6244e63**已在原问题窗口完成受控coordinator owner异常退出后的接管：同Store/原Runner/原问题到检查/人工接受/三产物重开，Runner1/begin1，撤销/profile/policy/资源UNKNOWN四项拒绝及35测试/strict过。D/E固定W36的七项独立安装子集已验完，转待命；只main/B/H继续真实传输断连、ACK未知和原槽，不扩功能线。
 
-首要缺口已经在代码定位：重启时活动native绑定进入stopping，原reconcile只核对/取消旧Runner且businessResumed:false，新进程未重建原业务连接。下一次进展以同一未完成Work重开后能继续原问答为准，不以更多正常链/未用候选修复或文档替代。
+原“新coordinator不重建业务连接”缺口已在受控问题窗口闭合；物理reconcile仍只核对/停止，业务接管由原ProductExecution/Native.resume负责。当前父宿主维持原Runner输入，不能证明真实OS进程退出/stdio EOF、已ACK terminal后故障、业务ACK未知或原2/4资源，下一步只补这些剩余范围。
 
 **用户已确认：本阶段不推进复核价值试点、依赖它的第二协议复核和路由收益研究，价值未测。** 原协议、ledger、fixture、报告保留，不重置/退款/补样/研究计价；自动模型/native仍0。此范围决定不自动改变既有分母和历史最近评估。
 
@@ -54,19 +54,19 @@
 
 | 层 | 准确身份 | 已证范围 | 未证范围 |
 | --- | --- | --- | --- |
-| main运行代码 | 原回调组合42f6daab，继承分类历史/模型GUI | 原Native.launch受控正常问答/检查/人工接受/三产物重开；撤销授权拒绝，30测试及strict过 | 不是崩溃恢复/物理quiescence/原2&4槽；新source未安装独立验 |
+| main运行代码 | d6244e63原Native.resume，继承原回调/历史/模型GUI | 受控owner退出、同原问题接管到检查/人工接受/三产物重开，四拒绝对照，35测试/strict | 非真实OS/stdin EOF/全故障窗口/物理/原2&4槽；新source未安装独立验 |
 | R1 | source82ee5b8f / build8296720d8a25f38c / tarSHA04926739… | E最新290PASS/0FAIL/20NT，recorded普通197/功能198过；合法启停保留，同fixture Work真重开found=true新增 | 两原project完整旅程仍未达，oracle仍会接不足材料；新ZIPcase实际只用R1tar；无新观察download，非全原生/全产品 |
 | R2 | source c0a1f897 / build4dcd28f758bbb265 / tarSHA405ecd02… | 6864清单项/209closure，实际包含main303严格导出；D开发受控证据 | E尚无同R2独立结果；不含本轮新A/C/F/G/J候选 |
 | W32候选 | sourcee8348a86 / build88eb8c69b0671171 / innerSHA65c386d1… / outerSHA0a46cd36… | 全量静态；E新actual ZIP包内Node/启动/非空原Work备份/readonly HTTP读取是真实进展 | E306/20NT、普通199/功能200是R1+W32 aggregate，不是W32全套或W33；未含fc38 |
 | 已测子集W33 | source048f0184 / buildf880e5bc9c6c1c57 / innerSHAee45c92c… / outerSHA46e01c8c… | 原静态不变；D两Work/8产物bytes与真实rollback retry；E同W33 outer/非空recovery/upgrade子集 | E336/21NT、普通204/功能205仍mixed legacy范围，full206native拒；未含23d/4cde新功能 |
 | W35已测子集 | sourceedfe5e14 / build599de3e98c02de0b / innerSHA11027a37… / outerSHA39c0fff0… | E真实同W35 outer/model-save/非空恢复/upgrade；D原重试CONFIRMED。聚合347PASS/22NT、普通212/功能213通过 | 聚合还含R1/W33/W32，不是所有要求同W35；full214native拒，历史404属时间范围 |
-| 当前固定W36 | source087a598e / build14a6b457ea285988 / innerSHA13798190… / outerSHA43e06d5b… | 6889inner/6897outer清单；全量静态、同manifest安装history HTTP200/verification1 | E同W36及实际App历史点击未达；selected audit5条旧hash待纠，非包内缺字节 |
+| 固定W36已测子集 | source087a598e / build14a6b457ea285988 / innerSHA13798190… / outerSHA43e06d5b… | D199/199来源匹配，原包未变；E七项同包安装/配置/非空恢复/受控交付/三kind点击成立 | 聚合219/220非全部同W36，full221native拒；不认证d624新恢复，不含新同包managed upgrade |
 | 十位候选 | 固定HEAD见[清单](../../reports/releases/wave37-admission/workspaces.json) | 真实source/受控修复见最新分报告 | 候选/静态/正常链不等完整恢复或安装准入 |
 | 用户旧5180–5191实例 | 每个实例独立state与启动代码 | 保留原历史 | 不自动升级/迁移，不据仓库HEAD推它们的能力 |
 
 R1 archive有6849个manifest项，R2为6864；目录tar entries与文件/链接manifest项不是同一计数，不能混成“漏文件”。准确路径/SHA/大小/环境见[发行验收](../../reports/releases/wave32-admission/delivery.json)。
 
-E现已真实消费W35固定包，D原W35 upgrade重试也已CONFIRMED，旧BLOCKED记录保留。下一独立目标只锁已有W36，不追移动main；外部selected audit修正不重包。准确范围见[当前发行验收](../../reports/releases/wave37-admission/delivery.json)，独立子集不等全部功能在同包通过。
+E已完成固定W36七项独立子集，D来源报告修正没有重包，双方此项结束待命。旧W35 upgrade及聚合/未测仍各守范围，见[当前发行验收](../../reports/releases/recovery-milestone-01/install-admission-2026-11-18.json)。主线恢复稳定后才明确后继，不追移动HEAD。
 
 ## 此前Wave31验收快照
 
@@ -102,8 +102,8 @@ E现已真实消费W35固定包，D原W35 upgrade重试也已CONFIRMED，旧BLOC
 
 先收口以上实际缺口，减少继续造helper/接口/大包。三个完整产品结果优先：
 
-1. **一个准确新版可重复用。** 保留已独立W35子集，锁已有W36让E完成准确同包结论；修selected audit不重包。两个不同原项目各自preview/apply/create/check/candidate/manualaccept，再同安装重开读到原Work，不用fixture替原项目。
-2. **一条同原Work恢复到交付。** 修terminal lease/newcaller和工具出生边界，使用原Store/Application/QuestionBroker，从同一Work故障接管到检查/候选/接受及原2/4槽实际归还。
+1. **固定包本项结束，保留准确范围。** W36七项独立子集与selected audit更正已通过，D/E转待命；完整原项目、原生及新source不借此准入。恢复稳定后才选明确后继，不追移动main重包。
+2. **继续同原Work恢复的剩余窗口。** 受控问题窗口接管到交付已实现，只main/B/H补真实stdio断连、业务ACK未知、terminal故障和原2/4槽/完整资源归还；未用候选工具不作为前置，不增加功能线。
 3. **现有能力的维护与准确观察。** 保留质量、等待、人时代理和费用unknown的真实记录；本阶段不推进复核价值、第二协议复核和路由收益研究，不为研究退出宣称负结论或新增完成分。
 
 当前只派[恢复里程碑01](../../agent-tasks/recovery-milestone-01/README.zh-CN.md)，source早交后持续集成/联调/复验和包内维护，不逐小修重派；由用户转发，不声称自动启动外部chat。未重启实例、执行真实模型、替换包或刷新预算。CAC/桌面/自动接受后置；暂停的研究保留历史设计，当前不扩第二协议功能。
