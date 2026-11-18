@@ -3,7 +3,7 @@
   "agent": "E",
   "branch": "codex/g3-product-acceptance",
   "base": "7e550991",
-  "checkpoint": "105595d2",
+  "checkpoint": "d199cd90",
   "head": "d199cd90888069df2fe6bcc7d30f8ae8ddd90f78",
   "worktreeDirtyAtRun": false,
   "checkedAt": "2026-11-17T09:05:22.559Z",
@@ -1322,8 +1322,8 @@
     "cohortUpgrade": "PASS"
   },
   "functional": {
-    "alphaVerdict": "PASS",
-    "verdict": "PASS",
+    "alphaVerdict": "FAIL",
+    "verdict": "FAIL",
     "detector": "PASS",
     "functionalCase": "PASS",
     "evidence": {
@@ -4390,11 +4390,12 @@
   ],
   "tiers": {
     "controlled": "PASS",
-    "installedAlpha": "PASS",
-    "installedFunctional": "PASS",
-    "localAlpha": "PASS",
+    "installedAlpha": "FAIL",
+    "installedFunctional": "FAIL",
+    "localAlpha": "FAIL",
     "fullProduct": "FAIL",
     "fullProductFailures": [
+      "stale_report",
       "missing_required_case",
       "case_not_pass",
       "layer_not_allowed",
@@ -5325,11 +5326,12 @@
       "status": "PASS",
       "tiers": {
         "controlled": "PASS",
-        "installedAlpha": "PASS",
-        "installedFunctional": "PASS",
-        "localAlpha": "PASS",
+        "installedAlpha": "FAIL",
+        "installedFunctional": "FAIL",
+        "localAlpha": "FAIL",
         "fullProduct": "FAIL",
         "fullProductFailures": [
+          "stale_report",
           "missing_required_case",
           "case_not_pass",
           "layer_not_allowed",
@@ -6284,11 +6286,12 @@
       },
       "tiers": {
         "controlled": "PASS",
-        "installedAlpha": "PASS",
-        "installedFunctional": "PASS",
-        "localAlpha": "PASS",
+        "installedAlpha": "FAIL",
+        "installedFunctional": "FAIL",
+        "localAlpha": "FAIL",
         "fullProduct": "FAIL",
         "fullProductFailures": [
+          "stale_report",
           "missing_required_case",
           "case_not_pass",
           "layer_not_allowed",
@@ -6574,6 +6577,49 @@
       "slotsNative": "NOT_TESTED: no original 2/4 slot or native fault-recovery consumer is published into this package",
       "dAudit": "D selected audit reports five old hashes; this is a D source-report defect and does not change the measured W36 bytes",
       "value": "user confirmed the review-value pilot and its research are not advanced in this milestone"
+    },
+    "standby": {
+      "state": "DONE_PARENT_STANDBY",
+      "verifiedCases": [
+        {
+          "id": "E37-W36-OUTER",
+          "status": "PASS"
+        },
+        {
+          "id": "E37-W36-OUTER-OPERATION",
+          "status": "PASS"
+        },
+        {
+          "id": "E37-W36-MODEL-SAVE",
+          "status": "PASS"
+        },
+        {
+          "id": "E37-W36-MODEL-SAVE-OPERATION",
+          "status": "PASS"
+        },
+        {
+          "id": "E37-W36-RECOVERY",
+          "status": "PASS"
+        },
+        {
+          "id": "E37-W36-RECOVERY-OPERATION",
+          "status": "PASS"
+        },
+        {
+          "id": "E37-W36-HISTORY",
+          "status": "PASS"
+        }
+      ],
+      "aggregateScope": {
+        "219/220": "aggregate installed requirements are not all the same W36 cohort: legacy R1/W33/W35 cases remain in the aggregate; the seven E37 cases above are the same-package W36 evidence",
+        "nativeFull221": "NOT PASSED: native/full 221 stays refused for missing native delivery/control and original Work recovery; no aggregate count is presented as a whole-W36 or native pass"
+      },
+      "noFurtherWork": [
+        "do not expand the install matrix",
+        "do not keep hardening the oracle queue"
+      ],
+      "w36HistoryIssues": "the existing validator and residual registration suffice; add gate consumption only when a new report must be gated by it",
+      "nextTrigger": "wait for main/H to publish the selected recovery consumer, then make targeted independent assertions on that new subject; never certify a new source with the old W36 result"
     },
     "finalRun": {
       "command": "node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record",

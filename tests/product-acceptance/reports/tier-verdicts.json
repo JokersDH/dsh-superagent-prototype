@@ -2,9 +2,9 @@
   "module": {
     "schema": "product-acceptance-release/1",
     "tier": "module",
-    "status": "PASS",
-    "ok": true,
-    "checkedAt": "2026-11-17T09:16:16.355Z",
+    "status": "FAIL",
+    "ok": false,
+    "checkedAt": "2026-11-18T14:42:18.688Z",
     "source": {
       "commit": "d199cd90888069df2fe6bcc7d30f8ae8ddd90f78",
       "dirty": false
@@ -507,7 +507,12 @@
         "status": "PASS"
       }
     ],
-    "failures": [],
+    "failures": [
+      {
+        "code": "stale_report",
+        "detail": "Report checkedAt is older than 21600000ms or unparseable: 2026-11-17T09:05:22.559Z"
+      }
+    ],
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
@@ -522,9 +527,9 @@
   "controlled-product": {
     "schema": "product-acceptance-release/1",
     "tier": "controlled-product-workflow",
-    "status": "PASS",
-    "ok": true,
-    "checkedAt": "2026-11-17T09:16:16.360Z",
+    "status": "FAIL",
+    "ok": false,
+    "checkedAt": "2026-11-18T14:42:18.693Z",
     "source": {
       "commit": "d199cd90888069df2fe6bcc7d30f8ae8ddd90f78",
       "dirty": false
@@ -1307,7 +1312,16 @@
         "status": "PASS"
       }
     ],
-    "failures": [],
+    "failures": [
+      {
+        "code": "stale_report",
+        "detail": "Report checkedAt is older than 21600000ms or unparseable: 2026-11-17T09:05:22.559Z"
+      },
+      {
+        "code": "self_declared_pass_rejected",
+        "detail": "Report declares release PASS while the gate found blocking evidence"
+      }
+    ],
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
@@ -1324,7 +1338,7 @@
     "tier": "actual-native-control",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-17T09:16:16.362Z",
+    "checkedAt": "2026-11-18T14:42:18.695Z",
     "source": {
       "commit": "d199cd90888069df2fe6bcc7d30f8ae8ddd90f78",
       "dirty": false
@@ -2114,6 +2128,10 @@
     ],
     "failures": [
       {
+        "code": "stale_report",
+        "detail": "Report checkedAt is older than 21600000ms or unparseable: 2026-11-17T09:05:22.559Z"
+      },
+      {
         "code": "case_not_pass",
         "detail": "Required case E5-NATIVE-CONTROL is NOT_TESTED",
         "caseId": "E5-NATIVE-CONTROL"
@@ -2143,9 +2161,9 @@
   "installed-alpha": {
     "schema": "product-acceptance-release/1",
     "tier": "installed-alpha",
-    "status": "PASS",
-    "ok": true,
-    "checkedAt": "2026-11-17T09:16:16.363Z",
+    "status": "FAIL",
+    "ok": false,
+    "checkedAt": "2026-11-18T14:42:18.697Z",
     "source": {
       "commit": "d199cd90888069df2fe6bcc7d30f8ae8ddd90f78",
       "dirty": false
@@ -3248,7 +3266,12 @@
         "status": "PASS"
       }
     ],
-    "failures": [],
+    "failures": [
+      {
+        "code": "stale_report",
+        "detail": "Report checkedAt is older than 21600000ms or unparseable: 2026-11-17T09:05:22.559Z"
+      }
+    ],
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
@@ -3263,9 +3286,9 @@
   "installed-functional": {
     "schema": "product-acceptance-release/1",
     "tier": "installed-functional",
-    "status": "PASS",
-    "ok": true,
-    "checkedAt": "2026-11-17T09:16:16.367Z",
+    "status": "FAIL",
+    "ok": false,
+    "checkedAt": "2026-11-18T14:42:18.701Z",
     "source": {
       "commit": "d199cd90888069df2fe6bcc7d30f8ae8ddd90f78",
       "dirty": false
@@ -4373,7 +4396,12 @@
         "status": "PASS"
       }
     ],
-    "failures": [],
+    "failures": [
+      {
+        "code": "stale_report",
+        "detail": "Report checkedAt is older than 21600000ms or unparseable: 2026-11-17T09:05:22.559Z"
+      }
+    ],
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
@@ -4390,7 +4418,7 @@
     "tier": "advisory-routing",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-17T09:16:16.369Z",
+    "checkedAt": "2026-11-18T14:42:18.703Z",
     "source": {
       "commit": "d199cd90888069df2fe6bcc7d30f8ae8ddd90f78",
       "dirty": false
@@ -5185,6 +5213,10 @@
     ],
     "failures": [
       {
+        "code": "stale_report",
+        "detail": "Report checkedAt is older than 21600000ms or unparseable: 2026-11-17T09:05:22.559Z"
+      },
+      {
         "code": "case_not_pass",
         "detail": "Required case E2-ROUTE-ADVICE is NOT_TESTED",
         "caseId": "E2-ROUTE-ADVICE"
@@ -5216,7 +5248,7 @@
     "tier": "controlled-review",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-17T09:16:16.371Z",
+    "checkedAt": "2026-11-18T14:42:18.706Z",
     "source": {
       "commit": "d199cd90888069df2fe6bcc7d30f8ae8ddd90f78",
       "dirty": false
@@ -6021,6 +6053,10 @@
     ],
     "failures": [
       {
+        "code": "stale_report",
+        "detail": "Report checkedAt is older than 21600000ms or unparseable: 2026-11-17T09:05:22.559Z"
+      },
+      {
         "code": "case_not_pass",
         "detail": "Required case E2-ROUTE-ADVICE is NOT_TESTED",
         "caseId": "E2-ROUTE-ADVICE"
@@ -6062,7 +6098,7 @@
     "tier": "actual-heterogeneous-review",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-17T09:16:16.372Z",
+    "checkedAt": "2026-11-18T14:42:18.707Z",
     "source": {
       "commit": "d199cd90888069df2fe6bcc7d30f8ae8ddd90f78",
       "dirty": false
@@ -6872,6 +6908,10 @@
     ],
     "failures": [
       {
+        "code": "stale_report",
+        "detail": "Report checkedAt is older than 21600000ms or unparseable: 2026-11-17T09:05:22.559Z"
+      },
+      {
         "code": "case_not_pass",
         "detail": "Required case E2-ROUTE-ADVICE is NOT_TESTED",
         "caseId": "E2-ROUTE-ADVICE"
@@ -6918,7 +6958,7 @@
     "tier": "review-value",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-17T09:16:16.373Z",
+    "checkedAt": "2026-11-18T14:42:18.709Z",
     "source": {
       "commit": "d199cd90888069df2fe6bcc7d30f8ae8ddd90f78",
       "dirty": false
@@ -7708,6 +7748,10 @@
     ],
     "failures": [
       {
+        "code": "stale_report",
+        "detail": "Report checkedAt is older than 21600000ms or unparseable: 2026-11-17T09:05:22.559Z"
+      },
+      {
         "code": "case_not_pass",
         "detail": "Required case E6-REVIEW-PILOT is NOT_TESTED",
         "caseId": "E6-REVIEW-PILOT"
@@ -7737,9 +7781,9 @@
   "local-alpha": {
     "schema": "product-acceptance-release/1",
     "tier": "local-alpha",
-    "status": "PASS",
-    "ok": true,
-    "checkedAt": "2026-11-17T09:16:16.374Z",
+    "status": "FAIL",
+    "ok": false,
+    "checkedAt": "2026-11-18T14:42:18.711Z",
     "source": {
       "commit": "d199cd90888069df2fe6bcc7d30f8ae8ddd90f78",
       "dirty": false
@@ -8842,7 +8886,12 @@
         "status": "PASS"
       }
     ],
-    "failures": [],
+    "failures": [
+      {
+        "code": "stale_report",
+        "detail": "Report checkedAt is older than 21600000ms or unparseable: 2026-11-17T09:05:22.559Z"
+      }
+    ],
     "claimedBy": {
       "status": "PASS",
       "tier": "controlled-product-workflow",
@@ -8859,7 +8908,7 @@
     "tier": "full-product",
     "status": "FAIL",
     "ok": false,
-    "checkedAt": "2026-11-17T09:16:16.376Z",
+    "checkedAt": "2026-11-18T14:42:18.713Z",
     "source": {
       "commit": "d199cd90888069df2fe6bcc7d30f8ae8ddd90f78",
       "dirty": false
@@ -9973,6 +10022,10 @@
       }
     ],
     "failures": [
+      {
+        "code": "stale_report",
+        "detail": "Report checkedAt is older than 21600000ms or unparseable: 2026-11-17T09:05:22.559Z"
+      },
       {
         "code": "missing_required_case",
         "detail": "Required case E5-NATIVE-DELIVERY is absent",

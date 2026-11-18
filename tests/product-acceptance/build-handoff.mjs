@@ -1748,6 +1748,19 @@ const wave36Status = {
       dAudit: 'D selected audit reports five old hashes; this is a D source-report defect and does not change the measured W36 bytes',
       value: 'user confirmed the review-value pilot and its research are not advanced in this milestone',
     },
+    standby: {
+      state: 'DONE_PARENT_STANDBY',
+      verifiedCases: ['E37-W36-OUTER', 'E37-W36-OUTER-OPERATION', 'E37-W36-MODEL-SAVE', 'E37-W36-MODEL-SAVE-OPERATION',
+        'E37-W36-RECOVERY', 'E37-W36-RECOVERY-OPERATION', 'E37-W36-HISTORY']
+        .map(id => ({ id, status: byId.get(id)?.status ?? 'MISSING' })),
+      aggregateScope: {
+        '219/220': 'aggregate installed requirements are not all the same W36 cohort: legacy R1/W33/W35 cases remain in the aggregate; the seven E37 cases above are the same-package W36 evidence',
+        nativeFull221: 'NOT PASSED: native/full 221 stays refused for missing native delivery/control and original Work recovery; no aggregate count is presented as a whole-W36 or native pass',
+      },
+      noFurtherWork: ['do not expand the install matrix', 'do not keep hardening the oracle queue'],
+      w36HistoryIssues: 'the existing validator and residual registration suffice; add gate consumption only when a new report must be gated by it',
+      nextTrigger: 'wait for main/H to publish the selected recovery consumer, then make targeted independent assertions on that new subject; never certify a new source with the old W36 result',
+    },
     finalRun: { command: 'node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record', source: report.source },
   },
   finalRun: { command: 'node tests/product-acceptance/run.mjs --suites=selftest,e2,e3,e4 --record', exitCode: 0, source: report.source },

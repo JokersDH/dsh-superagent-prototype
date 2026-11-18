@@ -3,7 +3,7 @@
   "tier": "full-product",
   "status": "FAIL",
   "ok": false,
-  "checkedAt": "2026-11-17T09:16:16.387Z",
+  "checkedAt": "2026-11-18T14:42:18.722Z",
   "source": {
     "commit": "d199cd90888069df2fe6bcc7d30f8ae8ddd90f78",
     "dirty": false
@@ -1117,6 +1117,10 @@
     }
   ],
   "failures": [
+    {
+      "code": "stale_report",
+      "detail": "Report checkedAt is older than 21600000ms or unparseable: 2026-11-17T09:05:22.559Z"
+    },
     {
       "code": "missing_required_case",
       "detail": "Required case E5-NATIVE-DELIVERY is absent",
