@@ -23,7 +23,7 @@ class ControlledProtocolHost extends ProcessHost {
   override resources() { return this.finished ? [] : ['controlled-protocol-resource'] }
   override inventory() {
     return [{ ref: 'controlled-protocol-resource', ownership: 'spawned_process' as const,
-      writer: this.finished ? 'quiescent' as const : 'active' as const,
+      writer: this.trace.inventoryUnknown ? 'indeterminate' as const : this.finished ? 'quiescent' as const : 'active' as const,
       evidence: [this.finished ? 'virtual-resource-closed-not-os-proof' : 'virtual-resource-not-os-process'] }]
   }
   override async spawn() {
@@ -71,6 +71,7 @@ class ControlledProtocolHost extends ProcessHost {
 export type CallbackTrace = {
   virtualResources: number; nativeEffects: number; stdioFacts: string[]; stdioPayloads: number; stdioGuards: number;
   protocolMethods: string[]; errors: string[]; closers: (() => Promise<void>)[]
+  inventoryUnknown?: boolean
 }
 export function nativeCallbackLink(trace: CallbackTrace): NativeRunnerLinkFactory {
   return options => ({

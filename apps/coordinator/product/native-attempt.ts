@@ -1,14 +1,16 @@
 import { lstatSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { randomUUID } from 'node:crypto'
 import {
   CriticalFactSchema,
   JsonSchema,
   PreparedExecutionPolicySchema,
   RunnerCommandSchema,
+  parseRuntimeFactPayload,
 } from '@personal-agent/contracts'
 import { canonicalDigest } from '@personal-agent/contracts/canonical'
-import type { AttemptSpec, RunnerCommand } from '@personal-agent/contracts'
+import type { AttemptSpec, RunnerCommand, ServeExit } from '@personal-agent/contracts'
 import type { ProductStore } from '@personal-agent/storage'
 import type { FactSink, RunningAttempt } from '../../../packages/execution/src/contracts.ts'
 import { RunnerLink } from '../../runner/src/runner-link-client.ts'
@@ -20,7 +22,7 @@ import { endpointDirectory } from '../../runner/src/recovery-endpoint.ts'
 import { connectRunnerRecovery, verifiedRunnerInspection } from '../runner-link.ts'
 import type { RunnerEndpoint } from '../runner-link.ts'
 import { registerRecoveryRunner } from '../runner-registry.ts'
-import { confirmOwnedQuiescence } from '../resource-barrier.ts'
+import { confirmOwnedQuiescence, ownedResourceManifestDigest } from '../resource-barrier.ts'
 import type { IngressBinding, RuntimeProducer } from '../runtime-ingress.ts'
 import { storedAttemptPayloads } from '../stored-ingress.ts'
 import { key } from '@personal-agent/orchestrator-core'
@@ -28,7 +30,7 @@ import { key } from '@personal-agent/orchestrator-core'
 /** Trusted Node composition only; no profile, environment flag or public request can select it. */
 export type NativeRunnerLinkFactory = (options: RunnerLinkOptions) => Pick<RunnerLink, 'spawnAttempt'>
 
-/** Owns one independent Runner; recovery can inspect/cancel it but cannot replay native business. */
+/** Owns one original Runner connection. Recovery may reattach; it never replays native business. */
 export class NativeProductAttempt {
   readonly spec: AttemptSpec
   preparedPolicyRef: string | undefined
@@ -47,6 +49,9 @@ export class NativeProductAttempt {
   private callbackOwner: AttachedAttempt | undefined
   private callbackTask: Promise<void> | undefined
   private callbacksStopped = false
+  private recovered = false
+  private terminal: ServeExit | undefined
+  get connected(): boolean { return !!this.callbackOwner && !this.callbacksStopped }
   private readonly environment: { planRef: string; capture(): void } | undefined
   constructor(
     spec: AttemptSpec,
@@ -141,6 +146,13 @@ export class NativeProductAttempt {
     await this.register()
     if (fact.kind === 'policy.prepared') this.environment?.capture()
     const receipt = await this.sink.record(fact)
+    if (fact.kind === 'turn.ended') {
+      const parsed = parseRuntimeFactPayload(fact, payload)
+      if (parsed.kind === 'turn.ended') this.terminal = {
+        reason: parsed.value.outcome === 'completed' ? 'terminal' : parsed.value.outcome === 'cancelled' ? 'cancelled' : 'error',
+        evidenceRefs: [fact.factId],
+      }
+    }
     if (fact.kind === 'policy.prepared') {
       const policy = PreparedExecutionPolicySchema.parse((payload as { value: unknown }).value)
       this.preparedPolicyRef = this.store.payloads.write(JsonSchema.parse(policy)).ref
@@ -181,16 +193,54 @@ export class NativeProductAttempt {
     if (!this.current()) throw new Error('Work changed during native preparation')
     const endpoint = this.endpoint
     if (!endpoint) throw new Error('Native Runner registration is unavailable')
+    return this.attachCallbacks(local, prepared)
+  }
+  /** Reconnect only to the original durable registration; never spawn or resend begin. */
+  async resume(endpoint: RunnerEndpoint): Promise<RunningAttempt> {
+    if (this.child || this.callbackOwner || !this.current()) throw new Error('Native resume has no current original attempt')
+    this.endpoint = structuredClone(endpoint)
+    this.recovered = true
+    const proof = await this.connection().inspect(), inspection = verifiedRunnerInspection(proof).value
+    const binding = this.store.bindings.current<IngressBinding>(this.spec.ticketId)
+    if (!binding || binding.state !== 'active' || !this.current() || inspection.state !== 'serving' ||
+        inspection.admission !== 'open' || inspection.coverage !== 'complete_owned_resources' ||
+        inspection.resources.some(resource => resource.writer === 'indeterminate') ||
+        ownedResourceManifestDigest(binding.resources) !== ownedResourceManifestDigest(inspection.resources))
+      throw new Error('Native resume requires the same active complete original resource set')
+    registerRecoveryRunner(this.store, proof)
+    try { return await this.attachCallbacks(new RunnerPayloadStore(join(this.stateRoot, 'payloads')), () => {}) }
+    catch (error) { await this.stopCallbacks(); throw error }
+  }
+  /** A failed takeover owns only its local connection/temp root, never the original Runner's state. */
+  async releaseRecoveryConnection(): Promise<void> {
+    if (this.child) throw new Error('A launched Runner must use its original lifecycle')
+    await this.stopCallbacks()
+    rmSync(this.recoveryRoot, { recursive: true, force: true })
+  }
+  private async attachCallbacks(local: RunnerPayloadStore, prepared: () => void): Promise<RunningAttempt> {
+    const endpoint = this.endpoint!
     const running: RunningAttempt = {
       attemptId: this.spec.attemptId,
       attachPort: structuredClone({ registration: endpoint, producer: this.producer }),
       attachCallbacks: {
-        fact: recordFact,
+        fact: incoming => this.recordFact(incoming, local, prepared),
         payload: request => this.readPayload(request.reference),
         nativeWrite: intent => this.nativeWriteDecision(intent.command),
       },
       feed: (command) => this.feed(command),
       waitExit: async () => {
+        if (this.recovered) {
+          for (;;) {
+            const inspection = verifiedRunnerInspection(await this.connection().inspect()).value
+            if (inspection.state === 'terminated') {
+              if (!this.terminal) throw new Error('Original terminal fact has not been durably observed')
+              await this.stopCallbacks()
+              return this.terminal
+            }
+            if (this.callbacksStopped) throw new Error('Original callback lease is no longer current')
+            await new Promise(resolve => setTimeout(resolve, 20))
+          }
+        }
         const value = await this.child!.waitExit()
         await this.stopCallbacks()
         return value.exit
@@ -200,10 +250,12 @@ export class NativeProductAttempt {
         return { quiescence: 'confirmed', evidenceRefs: ['native-owned-resource-barrier'] }
       },
     }
-    const owner = attachRunningAttempt(running, key('native-callback-owner', running.attemptId))
+    // Each coordinator connection owns a distinct lease. An old poller cannot share a successor lease.
+    const owner = attachRunningAttempt(running, key('native-callback-owner', running.attemptId, randomUUID()))
     // Bind before begin. Immutable pending preparation facts may replay with their original IDs.
-    await owner.pollOnce()
     this.callbackOwner = owner
+    try { await owner.pollOnce() }
+    catch (error) { await this.stopCallbacks(); throw error }
     if (!this.current()) { await this.stopCallbacks(); throw new Error('Work changed during callback attachment') }
     this.callbackTask = (async () => {
       while (!this.callbacksStopped) {
@@ -227,9 +279,13 @@ export class NativeProductAttempt {
     this.answerWrites.set(id, beforeWrite)
   }
   async feed(command: RunnerCommand) {
-    if (!this.current() || !this.child) throw new Error('Native command has no current Runner')
+    if (!this.current() || this.callbacksStopped || (!this.child && !this.recovered)) throw new Error('Native command has no current Runner')
     if (command.kind === 'begin') this.environment?.capture()
-    await this.child.command(command)
+    if (this.recovered) {
+      if (command.kind === 'begin') throw new Error('A recovered Runner cannot receive another begin')
+      if (!this.callbackOwner) throw new Error('Original callback attachment is unavailable')
+      await this.callbackOwner.feed(command)
+    } else await this.child!.command(command)
   }
   async quiesce() {
     const command = RunnerCommandSchema.parse({
