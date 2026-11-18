@@ -27,3 +27,11 @@
 协调器故障后的同原 Work 接管、真实厂商/OS 原生控制、原调度器2/4槽归还、准确安装版独立复验和操作者收益均未由本次证明。I 新 host 的 borrowed-parent 删除问题与 B 工具重登记出生身份竞态继续阻断各自采用；不将它们混作这四个控制文件的失败。
 
 下一步由 main 端到端负责原 Work 恢复；B/I/H 提供原接口所需支持。统一任务入口为 `agent-tasks/recovery-milestone-01/`，保持固定安装 cohort，不扩新功能线。用户已确认本阶段不推进复核价值试点、依赖它的第二协议复核及路由收益研究；历史材料和预算不变，价值未测。
+
+## 2026-11-18：原问题窗口的受控故障接管
+
+ProductExecution重启时，对原active native绑定先核原product-start receipt及digest、running Assignment、当前合同/用户授权、profile、原项目/workspace、原执行policy和环境；Native.resume再核原注册endpoint/完整资源清单及serving/open状态。符合才以新随机lease接管同一Runner，不恢复ended绑定、不重新spawn/begin。原payload/fact/写前guard与watch检查/接受链复用，nativeFence仅在callback连接仍有效时返回current。接管安装失败仅收掉本地回调和本次临时根，原物理核对逻辑独立保留。
+
+新增测试由父宿主持有真实serveRunner和生产Codex Driver的虚拟ProcessHost，原coordinator worker在未完成问题窗口直接process.exit(0)，绕过product.close；退出后才由新worker打开同一Store。原问题/attempt/session接续到native_applied、已登记Node检查、currentCandidate、人工接受、delivered和三产物重开，Runner1/begin1/虚拟写1。撤销授权、profile变化、policy变化、资源UNKNOWN四负例均拒绝，虚拟写0。35项相关测试和coordinator/product strict通过，无模型/native/真实信号；verifier信号仍由测试屏蔽。
+
+此结果只关闭“原问题窗口、受控coordinator owner退出后的业务接管”。真实OS coordinator崩溃/stdio EOF/旧stdout EPIPE、已ACK terminal后崩溃、ACK未知业务调和及原2/4槽/物理资源尚未验收；不能把父host保留输入流的测试当它们的证明。B/H继续这些实际依赖，D/E已有固定W36子集验收完成后待命，不重新冻结移动main。

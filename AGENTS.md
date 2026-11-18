@@ -7,7 +7,7 @@
 - Read START-HERE.zh-CN.md, product-spec/README.md and your assigned packet before implementation.
 - Current work is agent-tasks/recovery-milestone-01/README.zh-CN.md. It replaces wave36 NEW expansion dispatch, while retaining all prior outcomes and evidence.
 - The one milestone is the SAME original Work through coordinator failure, original Store/Application/QuestionBroker continuation, original check/currentCandidate/manual acceptance/delivery and original 2/4 slot/resource return.
-- Main owns the end-to-end result. Main/B/H actively close original recovery; D/E actively close the fixed existing installation cohort. A/C/F/G/I/J are on demand only when those actual consumers expose a concrete blocking issue; otherwise stay idle.
+- Main owns the end-to-end result. Main/B/H actively close original recovery. D/E completed the fixed W36 measured installation subset and return to on-demand standby; all other agents stay idle unless the original recovery consumer exposes a concrete owned blocker.
 - Do not start another feature-expansion wave before that exit. Larger tasks mean continuous integration, repair and acceptance responsibility, not more numbered deliverables.
 - Publish runnable source early, then finish the SAME result through integration and acceptance. No independent maintenance queues or busywork to use all agents; unused candidate defects stay disabled and do not automatically block the active path. SOURCE_READY is not whole-product completion. No same-day deadline, duration promise or token allowance.
 - Full Scheme B engineering remains the goal. CAC, desktop, new Driver, automatic acceptance, writer racing and dynamic DAG work are outside this milestone.
@@ -37,18 +37,18 @@
 
 ## Current Verified Source And Limits
 
-- Main42f6daab/0095 activates callbacks from actual NativeProductAttempt.launch-returned RunningAttempt, binds before begin, and retains original stdio feed/physical barrier.
+- Maind6244e63/0095 adds original Native.resume with canonical start/profile/policy/project/environment/registration/resource checks and a new random callback lease; retains42f6 normal launch and original physical barrier. No replacement Runner/begin or stopping/ended revival.
 - Its trusted Node-only RunnerLink factory defaults to the original RunnerLink; no profile/env/HTTP fallback. Poll lease loss stops, never automatically rebinds.
-- Controlled original HTTP Work/question/answer/native_applied/check/currentCandidate/manualaccept/artifact reopen passes; revoked authority rejects with zero effect. The ProcessHost/protocol peer is virtual and verifier signals are suppressed: no crash-recovery, physical or original2/4-slot proof.
+- Controlled original question-window coordinator Worker process.exit bypasses product.close; the successor opens the same Store and continues the original Work to check/manualaccept/three artifacts, Runner1/begin1. Revoked authority/changed profile/changed policy/UNKNOWN resources reject,35tests/strict pass. Virtual ProcessHost and parent-held input do NOT prove real OS/stdin-EOF crash recovery, already-ACK terminal windows, physical or original2/4 slots.
 - B579's four control sources plus two related tests are imported together. Old/new cancel protocol mixing refuses; no bare-command downgrade. B signal tools and I host are NOT imported.
 - Closed: B natural-terminal original no-lease cancel/barrier compatibility, C synchronous superseded/digest checks, E queryUNKNOWN/missing-booleans/operation-copy negatives.
 - Still blocked: B readoption second-snapshot birth refresh; I shutdown deleting borrowed parent state; G wrong launcher/empty argv identity promotion and self-labelled provenance. Fix pure controls before adoption/live actions.
 - A's reader is already byte-identical to main. F optional history consumer and J config/history tests do not imply new default algorithms or installed acceptance.
-- E genuinely tested W35 install/config/nonempty recovery/upgrade subsets; 347PASS/22NT is a multi-cohort aggregate. Ordinary212/functional213 pass; full214native does not.
+- Earlier E W35 install/config/nonempty recovery/upgrade and347PASS/22NT remain historical multi-cohort evidence; they are not the current W36 whole-product verdict.
 - Fixed next independent cohort is existing W36 source087a598e5b6f357bd2cc40556cbf693257febc66/build14a6b457ea285988, Node24.21.0/ABI137/schema18/darwin-arm64.
 - W36 innerSHA13798190ae43b28628eaf7131dfb8192bdb786b9bcfe4e1e0b6f9217ab33a8af; outerSHA43e06d5bc7606e8283c1c5f58463f402018d4c9c9b223a2c7c021d429ccb8995. Paths and scope are in the milestone README.
-- Its full inventory/static and developer-installed history HTTP200 are real; E same-W36/default App click remain separate. Correct D's five stale selected-source hashes from frozen git087, preserving old evidence; no archive rebuild for report-only corrections.
-- D freeze precedes E final; E first finishes this fixed cohort, never follows moving HEAD or relabels old PASS. A necessary changed-runtime successor needs an explicit source/subject handoff; docs/tests-only do not refreeze.
+- D's199/199 selected-source hashes now match frozen git087, old evidence preserved and archives unchanged. E's seven same-W36 installation cases include modelGUI/nonempty restore/controlled check/manualaccept and actual three-kind history clicks.354PASS/22NT and219/220 tiers are multi-cohort aggregates; full221native refuses. Fixed subset complete, not newmain/native/full release.
+- D/E now wait for an actual original-recovery consumer or selected stable successor. D freeze precedes E final; never follow moving HEAD/relabel old PASS or refreeze for docs/tests. Keep oracle residuals recorded without a new hardening queue.
 - source/controlled/installed/native/recovered/value stay separate. Historical latest76/100 and55.7/95=58.6% are not automatically raised by tests, staffing or scope withdrawal.
 
 ## Budget, Resources And Preservation
