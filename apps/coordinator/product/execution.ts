@@ -132,6 +132,7 @@ export class ProductExecution {
   private readonly nativeRunnerLinkFactory: NativeRunnerLinkFactory | undefined
   private readonly environments: ProductEnvironments | undefined
   private readonly projectForContract: ((contract: ContractRevision) => NativeProductConfiguration['projects'][number] | undefined) | undefined
+  private readonly maxActiveAttempts: 2 | 4
   constructor(
     store: ProductStore,
     application: ProductApplication,
@@ -144,7 +145,10 @@ export class ProductExecution {
     environments?: ProductEnvironments,
     projectForContract?: (contract: ContractRevision) => NativeProductConfiguration['projects'][number] | undefined,
     nativeRunnerLinkFactory?: NativeRunnerLinkFactory,
+    maxActiveAttempts: 2 | 4 = 4,
   ) {
+    if (maxActiveAttempts !== 2 && maxActiveAttempts !== 4) throw new RangeError('Execution capacity must be 2 or 4')
+    this.maxActiveAttempts = maxActiveAttempts
     this.store = store
     this.application = application
     this.workspaces = workspaces
@@ -528,7 +532,13 @@ export class ProductExecution {
         return
       throw new UnknownSend('Earlier begin needs physical reconciliation', 'start_unknown')
     }
-    if (this.attempts.size >= 4) throw new Later('The four controlled execution slots are in use')
+    // Persisted current bindings occupy capacity across owner loss, including unknown/stopping ones.
+    // Only the original resource barrier can end those bindings; an empty in-memory map releases nothing.
+    const occupied = new Set(this.store.domain.tickets.list<Ticket>().flatMap(value => {
+      const current = this.store.bindings.current<IngressBinding>(value.id)
+      return current && current.state !== 'ended' ? [current.attemptId] : []
+    }))
+    if (occupied.size >= this.maxActiveAttempts) throw new Later('Execution capacity is occupied until the original resource barrier confirms release')
     for (const link of this.store.product.links.listByWork(intent.contract.workId)) {
       const binding = this.store.bindings.current<IngressBinding>(link.ticketId)
       if (binding && binding.state !== 'ended') throw new Later('Previous writer barrier is not confirmed')

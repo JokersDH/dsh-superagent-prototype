@@ -2,9 +2,9 @@
 
 日期：2026-11-18。本次只核主动B/H/D/E固定交付、主线必要正反例和准确安装字节；其他六位待命，没有为凑满人数重验未用候选。读者入口：[如何使用](../ASSISTANT-GUIDE.zh-CN.md)、[架构](ARCHITECTURE.zh-CN.md)、[创新](INNOVATION.zh-CN.md)。
 
-最新续交：[2026-11-18验收](../../reports/releases/recovery-milestone-01/admission-2026-11-18.json)。main **d6244e63**已在原问题窗口完成受控coordinator owner异常退出后的接管：同Store/原Runner/原问题到检查/人工接受/三产物重开，Runner1/begin1，撤销/profile/policy/资源UNKNOWN四项拒绝及35测试/strict过。D/E固定W36的七项独立安装子集已验完，转待命；只main/B/H继续真实传输断连、ACK未知和原槽，不扩功能线。
+最新续交：[2026-11-18验收](../../reports/releases/recovery-milestone-01/admission-2026-11-18.json)continuation。main **e2261ef5**三种受控故障窗口到同原Work交付、原Store绑定计数的2/4容量/UNKNOWN保留/独立屏障放行均过，40测试/strict；B真实Runner EOF传输4PASS/1NT、H独立单Work2PASS成立。只main/B/H继续真实终态endpoint寿命及故障交付与原槽的同run组合，其他八位待命。
 
-原“新coordinator不重建业务连接”缺口已在受控问题窗口闭合；物理reconcile仍只核对/停止，业务接管由原ProductExecution/Native.resume负责。当前父宿主维持原Runner输入，不能证明真实OS进程退出/stdio EOF、已ACK terminal后故障、业务ACK未知或原2/4资源，下一步只补这些剩余范围。
+原业务接管、写后resolution未返回、已ACK terminal在原可认证端点仍可读时的窗口已有受控证据，原物理屏障未放松。真实Runner EOF与虚拟host原Work仍是分离消费者，2/4队列逻辑也尚未与故障交付组合；真实终态entry关闭endpoint、完整同run物理恢复和全部ACK窗口仍不能据此通过。
 
 **用户已确认：本阶段不推进复核价值试点、依赖它的第二协议复核和路由收益研究，价值未测。** 原协议、ledger、fixture、报告保留，不重置/退款/补样/研究计价；自动模型/native仍0。此范围决定不自动改变既有分母和历史最近评估。
 
@@ -54,7 +54,7 @@
 
 | 层 | 准确身份 | 已证范围 | 未证范围 |
 | --- | --- | --- | --- |
-| main运行代码 | d6244e63原Native.resume，继承原回调/历史/模型GUI | 受控owner退出、同原问题接管到检查/人工接受/三产物重开，四拒绝对照，35测试/strict | 非真实OS/stdin EOF/全故障窗口/物理/原2&4槽；新source未安装独立验 |
+| main运行代码 | e2261ef5，终态83b3ece3 | 三种受控恢复、五拒绝、原2/4容量及UNKNOWN/独立屏障，40测试/strict | 分离的真实EOF组件/虚拟host/容量不能拼成同run物理通过；新source未安装独立验 |
 | R1 | source82ee5b8f / build8296720d8a25f38c / tarSHA04926739… | E最新290PASS/0FAIL/20NT，recorded普通197/功能198过；合法启停保留，同fixture Work真重开found=true新增 | 两原project完整旅程仍未达，oracle仍会接不足材料；新ZIPcase实际只用R1tar；无新观察download，非全原生/全产品 |
 | R2 | source c0a1f897 / build4dcd28f758bbb265 / tarSHA405ecd02… | 6864清单项/209closure，实际包含main303严格导出；D开发受控证据 | E尚无同R2独立结果；不含本轮新A/C/F/G/J候选 |
 | W32候选 | sourcee8348a86 / build88eb8c69b0671171 / innerSHA65c386d1… / outerSHA0a46cd36… | 全量静态；E新actual ZIP包内Node/启动/非空原Work备份/readonly HTTP读取是真实进展 | E306/20NT、普通199/功能200是R1+W32 aggregate，不是W32全套或W33；未含fc38 |

@@ -14,6 +14,7 @@ const call = (method, value) => new Promise((resolve, reject) => {
   const id = ++serial; pending.set(id, { resolve, reject }); parentPort.postMessage({ type: 'call', id, method, value })
 })
 parentPort.on('message', async message => {
+  if (message.type === 'exit-owner') process.exit(0)
   if (message.type === 'result') {
     const waiter = pending.get(message.id); pending.delete(message.id)
     message.error ? waiter?.reject(new Error(message.error)) : waiter?.resolve(message.value)
@@ -40,6 +41,10 @@ const profile = { id: 'controlled-original-recovery', revision: stage === 'succe
   expectedVersion: process.version, nativeConfigRef: 'controlled-config', permissionPolicyRevision: 'controlled-policy', requiredFeatures: [] }
 const scope = { projectId: 'one', allowedPaths: ['.'], excludedPaths: ['.git'], externalActions: [] }
 const store = new ProductStore({ path: join(root, 'db.sqlite') })
+if (stage === 'successor' && mode === 'terminal-proof-missing') {
+  const get = store.facts.get.bind(store.facts)
+  store.facts.get = id => store.observations.get(id)?.kind === 'turn.ended' ? undefined : get(id)
+}
 const principal = { userId: 'recovery-user', authorityRef: 'recovery-authority' }
 let suppressedSignals = 0
 process.kill = () => { suppressedSignals++; return true }
@@ -75,13 +80,27 @@ try {
     const question = waiting.questions[0], target = question.targets[0]
     assert.equal(store.bindings.binding(target.attemptId).state, 'active')
     parentPort.postMessage({ type: 'primary-ready', value: { workId: created.workId, question, target } })
+    if (['terminal-acked', 'terminal-proof-missing', 'answer-written-reply-lost'].includes(mode)) {
+      assert.equal((await post({ kind: 'answer_question', commandId: 'recovery-answer', questionId: question.id,
+        expectedVersion: question.version, answer: { kind: 'form', values: { 'field-0': 'option-1' } } })).status, 'recorded')
+      // The parent interrupts at the chosen original effect/terminal boundary, without calling close.
+      await new Promise(() => {})
+    }
     // Deliberately bypass product.close: only this isolated coordinator thread exits. The parent-owned
     // original virtual Runner stays alive; no process signal or graceful resource cancellation occurs.
     process.exit(0)
   }
   const { workId, question, target } = workerData.original
-  if (mode !== 'resume') {
+  if (!['resume', 'terminal-acked', 'answer-written-reply-lost'].includes(mode)) {
     await until(() => store.bindings.binding(target.attemptId), value => value.state !== 'active', 'recovery refused')
+    if (mode === 'terminal-proof-missing') {
+      const view = (await product.application.inspect({ workId })).works[0]
+      assert.equal(view.actions.available.includes('accept_candidate'), false)
+      assert.notEqual(view.phase, 'delivered')
+      await product.close(); store.close()
+      parentPort.postMessage({ type: 'done', value: { mode, rejected: true, terminalProofRejected: true, suppressedSignals } })
+      process.exit(0)
+    }
     const rejected = await post({ kind: 'answer_question', commandId: 'recovery-answer', questionId: question.id,
       expectedVersion: question.version, answer: { kind: 'form', values: { 'field-0': 'option-1' } } })
     assert.equal(rejected.status, 'rejected')
@@ -89,15 +108,16 @@ try {
     parentPort.postMessage({ type: 'done', value: { mode, rejected: true, suppressedSignals } })
     process.exit(0)
   }
-  await until(async () => {
+  if (mode !== 'terminal-acked') await until(async () => {
     const failure = store.commands.get(key('product-runtime-failure', target.attemptId))
     if (failure) throw new Error(`Original recovery held: ${JSON.stringify(failure.result)}`)
     return { view: await product.application.inspect({ workId }), fence: product.execution.nativeFence(target) }
   },
-    value => value.fence === 'current' && value.view.questions.some(q => q.id === question.id), 'same question reattached')
+    value => value.fence === 'current' && (mode === 'answer-written-reply-lost' || value.view.questions.some(q => q.id === question.id)), 'same question reattached')
   const answered = await post({ kind: 'answer_question', commandId: 'recovery-answer', questionId: question.id,
     expectedVersion: question.version, answer: { kind: 'form', values: { 'field-0': 'option-1' } } })
   assert.equal(answered.status, 'recorded')
+  if (mode === 'answer-written-reply-lost') await call('release-resolution')
   const ready = await until(() => product.application.inspect({ workId }),
     value => value.works[0]?.actions.available.includes('accept_candidate'), 'recovered original candidate')
   assert.equal(product.application.questions.currentDeliveries(question.id)[0].status, 'native_applied')

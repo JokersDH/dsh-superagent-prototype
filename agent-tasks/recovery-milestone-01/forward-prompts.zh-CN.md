@@ -1,44 +1,30 @@
-# 当前阶段分别转发的话术
+# 下一阶段转发话术：仍是原恢复里程碑
 
-2026-11-18。继续同一个恢复里程碑，不开新wave。只有B/H主动；D/E本固定W36事项验收完成，转按需待命。其余六位继续待命。主线source `d6244e63` 已发布。
+2026-11-18续验：main **e2261ef5**（终态source83b3ece3）已发布。真实Runner EOF传输组件4PASS；H原单Work独立正例2PASS；main三种受控故障窗口与原2/4逻辑容量、拒绝对照共40测试/strict过。完整同run物理恢复仍未准入，故不新建wave。
 
 ## 发给B：主动开工
 
 ```text
-继续原目录 /Users/hh/Desktop/joker/superagent-agent-b、原分支codex/g1-runtime。保留dirty后fetch/merge origin/main，读取AGENTS及agent-tasks/recovery-milestone-01/agent-b.zh-CN.md。
-主线d6244e63已完成原问题窗口的受控owner-exit接管到交付。这轮你只补真实RunnerLink/serveRunner在旧stdin EOF、stdout关闭/EPIPE后的同Runner接续，保留原IDs、新lease、旧reply拒绝和fresh guard，不新增宿主/协议/队列。
-先纠正b37吞deliver异常且两分支都PASS的断言，必须核实际原receiver的commandId/body/attempt；fixture receipt不能冒Store durability。真实模型/native/信号仍0，不运行危险fallback。
-交可运行最小source后与main/H持续同结果集成/复验，无剩余阻断即待命，不扩维护队列。main负责原Work整链和槽位。
+继续 /Users/hh/Desktop/joker/superagent-agent-b、codex/g1-runtime，保留dirty后fetch/merge origin/main，读AGENTS和agent-tasks/recovery-milestone-01/agent-b.zh-CN.md。
+b38的真实EOF/关闭stdout/同PID新lease/旧reply拒绝已在main实际entry复验，不重做或重复计修复；mainRunnerService不是默认入口。
+本轮只闭合真实终态endpoint寿命：原terminal已ACK但coordinator尚未记录屏障即退出时，真实entry当前done后shutdown会关闭endpoint。请给同一个原Runner的实际复现和owned生命周期修复，覆盖普通结束、继任读取原proof/cancel、正常退出；与main/H持续集成同一恢复结果，不造新宿主/protocol/ledger或借旧事实造物理证明。
+同时改本次实际b38的UNKNOWN失败收尾：未确认退出不得删除root/journal/credential。真实模型/native/信号仍0，禁危险fallback/global discovery。最小source早交后持续该结果复验，不扩独立维护任务。
 ```
 
 ## 发给H：主动开工
 
 ```text
-继续原目录 /Users/hh/Desktop/joker/superagent-agent-h、原分支codex/g4-trial-operations。保留成果后fetch/merge origin/main，读取AGENTS及agent-tasks/recovery-milestone-01/agent-h.zh-CN.md。
-旧测试调用product.close导致binding ended，保留为正常关闭反例，不能要求ended复活。请独立消费主线d6244e63的新原Work owner-exit接管测试，核同原问题→native_applied→原check/currentCandidate/人工accept/产物，不仅引用main的PASS。
-围绕同原run补写入已发生而回复丢失的原command调和、原2/4容量/第五项等待/UNKNOWN占位与资源确认后前进；缺入口给main最小复现，不造scheduler或改原表。B真实EOF消费者就绪后再复验真实传输，虚拟资源与物理层分开。
-只在原owned范围交消费者，真实模型/native/信号0。交source后持续同结果复验，不重做安装包或正常路径大矩阵。
+继续 /Users/hh/Desktop/joker/superagent-agent-h、codex/g4-trial-operations，保留成果后fetch/merge origin/main，读AGENTS和agent-tasks/recovery-milestone-01/agent-h.zh-CN.md。
+本轮单一完整结果：把main e2261ef5的原Work故障接管/检查/人工接受，与原2/4槽占位、UNKNOWN保留和第3/5项前进放进同一个run独立验收，不能再拿两个独立PASS拼接。
+已有8恢复模式和original-capacity消费者可直接消费。每份检查/接受/产物绑定原Work/currentCandidate/assignment及view.artifactIds，begin次数读原receiver的实际command，不能读全库最后N或用turn/start代替。
+B真实终态端点source就绪后按同source复验；未测真实物理保持未测。只交H owned消费者，缺生产行为给main最小repro，不造队列/改原表。source早交后持续同结果复验；真实模型/native/信号0，UNKNOWN材料保留。
 ```
 
-## 发给D：本项完成，转待命
+## 发给其余八位：继续按需待命
 
 ```text
-固定W36本项已验收：199条来源记录均匹配git087，五条旧hash已改，原包字节不变，E同包实际历史点击等子集成立。保留原报告/包/状态，本项结束，转按需待命。
-不要新freeze、追移动main或主动扩运维功能。只有main后续选定稳定恢复source，或E提出同一包实际阻断时再参与。未提交改动保留，不reset。
+继续待命，保留所有成果、dirty和用户状态。本轮仍只main/B/H闭合原恢复；D/E固定W36本项已经完成，不追新main重包。
+没有主线实际consumer的具体阻断就不新增代码、接口、独立维护队列或报告。需要你owned模块时再带最小复现激活，预算与所有权保持原约束。
 ```
 
-## 发给E：本项完成，转待命
-
-```text
-固定W36的七个独立安装case已核：配置、非空恢复、受控检查/人工接受及三kind实际点击成立。本项结束，转按需待命；保留聚合219/220不是全部同W36、native/full221未过等准确scope。
-不要继续扩安装矩阵或oracle硬化队列。现有w36HistoryIssues覆盖残余登记即可，下次要作为唯一gate消费新报告时再补。待main/H给出选定恢复consumer后再做针对性独立断言，不以旧W36认证新source。
-```
-
-## 发给A/C/F/G/I/J：继续待命（分别发送同一段）
-
-```text
-继续按需待命，不自动执行旧整包、备用职责或独立维护队列。当前只main/B/H闭合原恢复；D/E固定包本项已完成。
-保留所有已交成果、未提交改动、用户状态及预算。只有上述实际consumer出现涉及你owned模块的具体阻断时，再处理main给出的最小复现；没有触发项就不新增功能或报告。未采用候选保持禁用，不作为当前前置。
-```
-
-[本轮验收](../../reports/releases/recovery-milestone-01/admission-2026-11-18.json) · [固定包验收](../../reports/releases/recovery-milestone-01/install-admission-2026-11-18.json)。话术尚未代发外部chat，所有权/十二实例保护/预算不变。
+[本轮续验](../../reports/releases/recovery-milestone-01/admission-2026-11-18.json) · [H独立验收](../../reports/releases/recovery-milestone-01/h-admission-2026-11-18.json)。本文件尚未代发外部chat。
