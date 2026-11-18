@@ -1,8 +1,8 @@
 # 从这里开始：仓库、代码位置和并行开发
 
-**当前唯一工程入口：[原 Work 恢复里程碑01](agent-tasks/recovery-milestone-01/README.zh-CN.md)。** main/B/H主动闭合同原Work故障接管到交付，D/E主动完成固定W36验收；A/C/F/G/I/J只在这两条实际路径出现具体阻断时按需参与，否则待命。不再要求用满十位，不扩独立维护队列。已有[转发说明](agent-tasks/recovery-milestone-01/forward-prompts.zh-CN.md)已更正投入方式，旧整包不再同时开工。
+**当前唯一工程入口：[原 Work 恢复里程碑01](agent-tasks/recovery-milestone-01/README.zh-CN.md)。** 2026-11-18仅main/B/H继续原恢复；D/E固定W36子集验收完成转待命，其余六位仍按需。新版[分角色话术](agent-tasks/recovery-milestone-01/forward-prompts.zh-CN.md)只派剩余传输/ACK未知/原槽结果，不新开wave、不扩队列。
 
-本轮[固定提交验收](reports/releases/wave37-admission/README.zh-CN.md)已完成。main42f6daab已实接原Native.launch回调并通过受控正常Work问答→检查→人工接受→产物重开，撤销授权零效果；30测试/strict过，仍未证明崩溃恢复/真实物理/原槽。见[0095](docs/rfcs/WP-16/0095-main-original-running-callback-composition.md)。E确已W35安装/配置/非空恢复/upgrade子集，D已有W36含历史固定包，下一步E只验同W36，不追移动main。
+本轮[验收](reports/releases/recovery-milestone-01/admission-2026-11-18.json)：main **d6244e63**已使原问题窗口coordinator worker绕过close退出后，继任者接回同Store/原Runner到检查/接受/三产物，Runner1/begin1；四拒绝对照及35测试/strict过。真实stdio EOF/OS故障/业务ACK未知/原2&4物理仍未证，见[0095](docs/rfcs/WP-16/0095-main-original-running-callback-composition.md)。D199/199来源修正、E七项同W36实际安装/配置/非空恢复/历史点击子集已[独立核验](reports/releases/recovery-milestone-01/install-admission-2026-11-18.json)，不据此认证新恢复source，不再追main重包。
 
 用户确认本阶段不推进复核价值试点、依赖它的第二协议复核和路由收益研究；价值未测，原材料/ledger/预算保留。自动真实vendor/model/native/信号0，十二用户实例及状态不操作。完整B/CAC后置，进度最近评估76/100与58.6%未因任务数或研究退出自动调整。
 

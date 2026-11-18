@@ -7,13 +7,13 @@
 | 项目 | 当前事实 |
 | --- | --- |
 | 仓库 | `https://github.com/JokersDH/dsh-superagent-prototype` |
-| 本文基线 | 2026-11-17；main42f6daab原Native.launch回调已实接受控正常Work；分类历史/模型GUI/诊断保持，故障恢复仍单独验 |
+| 本文基线 | 2026-11-18；maind6244e63原Native.resume在受控问题窗口接管到交付，真实OS/stdin EOF/原槽仍单独验 |
 | 首个用户界面 | React网页工作台；本机CLI负责启停/发行，暂无桌面壳 |
 | 技术栈 | TypeScript、Node24、pnpm workspace、React18/Vite、Hono、Zod、SQLite、Git worktree |
 | 原生执行 | 当前生产路径为Codex app-server；历史准入版本`codex-cli 0.164.0`，新版本需重新验证 |
 | 本机范围 | darwin/arm64、Node24.21.0/ABI137为本次冻结包实测组合；其它平台和真实跨机部署不借此认证 |
 | 证据范围 | 源码/受控流程/准确安装包/真实原生/恢复/收益分别验，不以测试总数替代 |
-| 可信度 | 下述主路径有代码直接支持；当前原任务崩溃恢复和学习效果仍未达 |
+| 可信度 | 主路径及受控owner退出后原问题接续有实际consumer；真实OS故障/全窗口/物理/原槽与收益未达 |
 
 ### 先理解三件事
 
@@ -47,6 +47,8 @@ flowchart LR
 网页模型配置已沿原ModelPanel/typedtransport/认证POST接到原PrivateModelProvider原子私有写；保存不发送模型请求，原后续SDK streaming仍唯一对话调用。F组件在main修复StrictMode/身份迟到后消费，未新增设置中心/模型循环。[0089](../rfcs/WP-16/0089-main-model-configuration-consumer.md)列出契约和边界。
 
 最新接线见[0095](../rfcs/WP-16/0095-main-original-running-callback-composition.md)：原NativeProductAttempt.launch登记与policy-ready后，从实际返回的RunningAttempt取同源port/callbacks，bind完成后才返回发送begin；原attempt持有poll任务，lease丢失即停，不自动重绑/业务重放。fact/payload/native-write共用原Store和一次性guard，stdio业务命令与原物理屏障保留。Node-only RunnerLink依赖默认仍是原真实连接，不能由HTTP/profile/env切换。
+
+2026-11-18的原start/resume在新coordinator中核原start receipt/current合同/profile/policy/project/environment和原注册endpoint/资源，才以随机lease接管同一active Runner；原watch负责最终检查/人工接受。受控旧coordinator worker直接退出、父宿主原Runner仍存活时，同原问题到交付已通过，四拒绝对照成立。未改变只做物理核对的reconcile语义，也没有第二调度/ledger。真实stdio EOF/已ACK terminal和原2/4资源不由此推断。
 
 该原入口的受控Work已实际问答、native_applied、注册Node检查、当前候选、人工接受及三产物重开；撤销授权反例零效果。ProcessHost/协议对端为受控虚拟资源，verifier信号被屏蔽，不能充当崩溃恢复/真实物理/原2&4槽证明。Gmetadata支持仍是认证只读GET到App下载；候选新runtime-identity未采用，未知安装身份保持null。
 
