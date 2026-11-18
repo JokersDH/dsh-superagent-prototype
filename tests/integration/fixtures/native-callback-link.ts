@@ -53,6 +53,7 @@ class ControlledProtocolHost extends ProcessHost {
         this.trace.nativeEffects++
         mkdirSync(join(this.cwd, 'src'), { recursive: true })
         writeFileSync(join(this.cwd, 'src/controlled-output.txt'), 'Beta\n')
+        await this.trace.afterNativeEffect?.()
         this.emit({ method: 'serverRequest/resolved', params: { threadId: 'controlled-thread', requestId: 42 } })
         this.emit({ method: 'turn/completed', params: { threadId: 'controlled-thread', turn: { id: 'controlled-turn', status: 'completed' } } })
       } else if (message.method === 'turn/interrupt') {
@@ -72,6 +73,7 @@ export type CallbackTrace = {
   virtualResources: number; nativeEffects: number; stdioFacts: string[]; stdioPayloads: number; stdioGuards: number;
   protocolMethods: string[]; errors: string[]; closers: (() => Promise<void>)[]
   inventoryUnknown?: boolean
+  afterNativeEffect?: () => Promise<void>
 }
 export function nativeCallbackLink(trace: CallbackTrace): NativeRunnerLinkFactory {
   return options => ({

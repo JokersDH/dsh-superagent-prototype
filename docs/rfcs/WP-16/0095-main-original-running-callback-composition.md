@@ -35,3 +35,11 @@ ProductExecution重启时，对原active native绑定先核原product-start rece
 新增测试由父宿主持有真实serveRunner和生产Codex Driver的虚拟ProcessHost，原coordinator worker在未完成问题窗口直接process.exit(0)，绕过product.close；退出后才由新worker打开同一Store。原问题/attempt/session接续到native_applied、已登记Node检查、currentCandidate、人工接受、delivered和三产物重开，Runner1/begin1/虚拟写1。撤销授权、profile变化、policy变化、资源UNKNOWN四负例均拒绝，虚拟写0。35项相关测试和coordinator/product strict通过，无模型/native/真实信号；verifier信号仍由测试屏蔽。
 
 此结果只关闭“原问题窗口、受控coordinator owner退出后的业务接管”。真实OS coordinator崩溃/stdio EOF/旧stdout EPIPE、已ACK terminal后崩溃、ACK未知业务调和及原2/4槽/物理资源尚未验收；不能把父host保留输入流的测试当它们的证明。B/H继续这些实际依赖，D/E已有固定W36子集验收完成后待命，不重新冻结移动main。
+
+## 2026-11-18续交：终态回读和写后回复窗口
+
+在仍可认证读取的原端点已terminated且完整原资源quiescent时，Native.resume从原business turn.ended observation、不可变payload和重建的canonical fact receipt恢复终态；未命中/超过10000历史界限则拒绝。不重新bind闭channel，仍由原watch调用物理cancel/资源屏障再走检查、当前候选和人工接受。端点已消失时不由旧事实制造新物理证明。
+
+新增“terminal已ACK但原watch尚未交付”“原回答已写出、协议resolution暂未返回即owner退出”两个受控原Work窗口，均一次写入到交付；原命令同ID重放只回读receipt。缺terminal receipt的对照不能产生accept动作。原Runner receiver诊断现记录完整command，8个恢复场景断言实际begin接收1次/answer最多1次及原attempt/assignment/contract；不再仅以turn/start计数替代。
+
+B4703的b38在当前真实main entry复验4PASS/1NOT_TESTED：旧stdin EOF/关闭stdout、同PID新lease、原fact重放、旧reply拒绝、原deliver接收与正常无信号退出。main entry此前已有EPIPE处理；B新增mainRunnerService防护无默认consumer，未导入该片段，仅采用receiver记录片段。该真实Runner fake-driver传输结果与上述虚拟nativehost的原Work结果分别成立，不能拼称完整真实原生故障恢复。B脚本失败分支仍会删UNKNOWN根，不原样复跑该分支；独立复验保留UNKNOWN材料。

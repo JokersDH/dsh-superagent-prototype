@@ -297,7 +297,10 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
     if (process.env.PA_RUNNER_RECEIVER_LOG) {
       await appendFile(
         process.env.PA_RUNNER_RECEIVER_LOG,
-        `${JSON.stringify({ kind: command.kind, id: command.id, attemptId: command.attemptId, fenceEpoch: command.fenceEpoch, at: new Date().toISOString() })}\n`,
+        // The original command body is preserved here so an independent consumer can prove WHICH command
+        // the Runner actually received, not merely that some command arrived. The log is opt-in/local and
+        // is a diagnostic, never a receipt or Store durability evidence.
+        `${JSON.stringify({ receiver: 'runner-service', kind: command.kind, id: command.id, attemptId: command.attemptId, fenceEpoch: command.fenceEpoch, body: command, at: new Date().toISOString() })}\n`,
       ).catch(() => undefined)
     }
     if (businessClosed) return { code: 'state_indeterminate', reason: 'admission_closed', message: 'Attempt admission is closed' }
