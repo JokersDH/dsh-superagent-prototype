@@ -3,7 +3,7 @@
   "agent": "E",
   "branch": "codex/g3-product-acceptance",
   "base": "7e550991",
-  "checkpoint": "105595d2",
+  "checkpoint": "d199cd90",
   "head": "d199cd90888069df2fe6bcc7d30f8ae8ddd90f78",
   "worktreeDirtyAtRun": false,
   "checkedAt": "2026-11-17T09:05:22.559Z",
@@ -1322,8 +1322,8 @@
     "cohortUpgrade": "PASS"
   },
   "functional": {
-    "alphaVerdict": "PASS",
-    "verdict": "PASS",
+    "alphaVerdict": "FAIL",
+    "verdict": "FAIL",
     "detector": "PASS",
     "functionalCase": "PASS",
     "evidence": {
@@ -4369,11 +4369,12 @@
   ],
   "tiers": {
     "controlled": "PASS",
-    "installedAlpha": "PASS",
-    "installedFunctional": "PASS",
-    "localAlpha": "PASS",
+    "installedAlpha": "FAIL",
+    "installedFunctional": "FAIL",
+    "localAlpha": "FAIL",
     "fullProduct": "FAIL",
     "fullProductFailures": [
+      "stale_report",
       "missing_required_case",
       "case_not_pass",
       "layer_not_allowed",
