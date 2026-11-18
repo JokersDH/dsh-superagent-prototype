@@ -1,10 +1,10 @@
 {
   "protocol": "recovery-milestone-01-h/1",
-  "generatedAt": "2026-11-18T14:46:08.236Z",
+  "generatedAt": "2026-11-18T16:28:01.530Z",
   "source": {
     "H": "caa48df7",
-    "main": "d6244e63",
-    "merge": "d350143e",
+    "main": "e2261ef5",
+    "merge": "e9d19a5e",
     "B": "88e472e6",
     "I": "b21698fa"
   },
@@ -63,9 +63,9 @@
     "source": "main d6244e63 owner-exit takeover + main recovery worker",
     "controlled": "parent-owned virtual Runner; no OS process",
     "native": "0",
-    "recovered": "CONTROLLED_OWNER_EXIT_TAKEOVER",
-    "ackLost": "NOT_TESTED",
-    "schedulerSlots": "NOT_REACHED",
+    "recovered": "CONTROLLED_OWNER_EXIT_TAKEOVER_DELIVERED",
+    "ackLost": "NOT_TESTED_IN_COMBINED",
+    "schedulerSlots": "ORIGINAL_CAPACITY_OCCUPIED_UNKNOWN_RETAINED_NEXT_SLOT_BLOCKED",
     "installed": "not used",
     "physical": "NOT_TESTED",
     "realEof": "NOT_TESTED"
@@ -80,12 +80,17 @@
     {
       "command": "node --test --test-timeout=60000 tests/operational-soak/recovery/main-recovery.case.mjs",
       "exitCode": 0,
-      "result": "1 pass; independent same Work takeover"
+      "result": "1 pass independent owner-exit takeover"
     },
     {
       "command": "node --test --test-timeout=60000 tests/operational-soak/recovery/reopen-native.case.mjs",
       "exitCode": 0,
-      "result": "1 pass; graceful-close counterexample"
+      "result": "1 pass graceful-close counterexample"
+    },
+    {
+      "command": "node --test --test-timeout=90000 tests/operational-soak/recovery/combined-recovery.case.mjs",
+      "exitCode": 0,
+      "result": "1 pass; combined recovery delivered, next 3rd/5th blocked baseline"
     }
   ],
   "mainRecovery": {
@@ -187,9 +192,133 @@
     "result": "product.close ends binding; reopened ended Work rejects old question with stale_binding; this is not crash recovery"
   },
   "remaining": [
-    "ACK-written/reply-lost original command reconciliation entry",
-    "original scheduler 2/4 fifth-item/UNKNOWN occupancy/resource release",
-    "real OS stdio EOF / old stdout lifetime (wait for B consumer)",
+    "main must release the delivered target original slot so queued 3rd/5th Work progresses while UNKNOWN filler remains",
+    "ACK-written/reply-lost original command reconciliation inside combined run",
+    "real OS stdio EOF/old stdout lifetime (B consumer)",
     "physical resource quiescence"
-  ]
+  ],
+  "combined": {
+    "status": "RECOVERY_DELIVERED_CAPACITY_UNKNOWN_NEXT_SLOT_BLOCKED",
+    "capacity2": {
+      "target": {
+        "workId": "4e20564ee6ab6350a30ae1876eebec6e",
+        "attemptId": "attempt-9d2cd9bc-0523-4858-99db-f31556e52d81",
+        "questionId": "codex-question-fd19967ab4a95b22d302db7768e16964a074c3f1b6861a81",
+        "phase": "delivered",
+        "artifacts": [
+          "459e4b2ea3c017baf2b0434a485d3a731cc02b025bb1fcb429bf69e21f38ae0f",
+          "e449a07f0bf57772dd6e3adad2b8328b42cbc8f162d4a49c5f558dd2e4e29283",
+          "191b4140aae56ed002686d3f4d2a3e0121b38174e17400a053bcbf2d81bd2538"
+        ],
+        "verification": {
+          "id": "verification:7bebf6fa-c866-40a6-a50b-bad48e7bf194",
+          "results": [
+            {
+              "criterionId": "machine",
+              "outcome": "PASS",
+              "evidenceRefs": [
+                "check:output-check:r1:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+              ]
+            }
+          ]
+        },
+        "acceptance": "recorded"
+      },
+      "fillerState": "stopping",
+      "held": "held",
+      "nextWorkId": "669c72db602b57f5f35431c21835b897",
+      "nextProgressed": false,
+      "receiver": {
+        "targetBegin": 1,
+        "targetAnswer": 1,
+        "fillerBegin": 1,
+        "rows": 3
+      },
+      "checks": {
+        "oneRunnerPerCapacityWork": true,
+        "targetReceiverBeginOnce": true,
+        "targetReceiverAnswerOnce": true,
+        "fillerNoAnswer": true,
+        "targetDelivered": true,
+        "targetQuestionAnswered": true,
+        "targetBindingEnded": true,
+        "fillerUnknownRetained": true,
+        "machineCheckPassed": true,
+        "candidateAssignmentMatches": true,
+        "acceptanceRecorded": true,
+        "exactArtifactsReadable": true,
+        "nextWorkProgressed": false,
+        "noNewWork": true,
+        "nativeEffectOnlyTarget": true,
+        "commandRecorded": true
+      },
+      "gap": {
+        "stage": "next_work_progress",
+        "observed": "next queued Work progressed: {\"cursor\":87,\"works\":[{\"work\":{\"id\":\"669c72db602b57f5f35431c21835b897\",\"projectId\":\"one\",\"conversationId\":\"combined\",\"title\":\"Combined queued Work 2\",\"createdAt\":\"2026-11-18T16:25:34.006Z\"},\"contract\":{\"workId\":\"669c72db602b57f5f35431c21835b897\",\"revision\":1,\"digest\":\"a9bc24b538c45f9dbd0a9aa1cf061f19de1102c7a1fd67323d58ba7dddf6a1c6\",\"goal\":\"Combined queued Work 2\",\"scope\":{\"projectId\":\"one\",\"allowedPaths\":[\".\"],\"excludedPaths\":[\".git\"],\"externalActions\":[]},\"criteria\":[{\"id\":\"machine\",\"descripti",
+        "note": "target delivered and binding ended; filler held UNKNOWN; next Work question did not appear",
+        "minimalRepro": "same-run combined consumer capacity=2"
+      }
+    },
+    "capacity4": {
+      "target": {
+        "workId": "4e20564ee6ab6350a30ae1876eebec6e",
+        "attemptId": "attempt-8d106979-f7fc-4b32-af6d-1f57d803084f",
+        "questionId": "codex-question-50ccc7ad171426e9c4216f83c22ee9f89e1ac1e6fbdee52d",
+        "phase": "delivered",
+        "artifacts": [
+          "2fae68fd03d4578e0854a06edf8385155b0f77603e09798d259884b671cf221f",
+          "e449a07f0bf57772dd6e3adad2b8328b42cbc8f162d4a49c5f558dd2e4e29283",
+          "07668b2713b1bf5e0f280f8f945129b09d07dc0b5c1f60e5fe2a50373c3204f1"
+        ],
+        "verification": {
+          "id": "verification:60049134-3920-4f0a-9f7f-00196cebc354",
+          "results": [
+            {
+              "criterionId": "machine",
+              "outcome": "PASS",
+              "evidenceRefs": [
+                "check:output-check:r1:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+              ]
+            }
+          ]
+        },
+        "acceptance": "recorded"
+      },
+      "fillerState": "stopping",
+      "held": "held",
+      "nextWorkId": "4b4d78ee4a51a6f33754804a156f6bb2",
+      "nextProgressed": false,
+      "receiver": {
+        "targetBegin": 1,
+        "targetAnswer": 1,
+        "fillerBegin": 1,
+        "rows": 5
+      },
+      "checks": {
+        "oneRunnerPerCapacityWork": true,
+        "targetReceiverBeginOnce": true,
+        "targetReceiverAnswerOnce": true,
+        "fillerNoAnswer": true,
+        "targetDelivered": true,
+        "targetQuestionAnswered": true,
+        "targetBindingEnded": true,
+        "fillerUnknownRetained": true,
+        "machineCheckPassed": true,
+        "candidateAssignmentMatches": true,
+        "acceptanceRecorded": true,
+        "exactArtifactsReadable": true,
+        "nextWorkProgressed": false,
+        "noNewWork": true,
+        "nativeEffectOnlyTarget": true,
+        "commandRecorded": true
+      },
+      "gap": {
+        "stage": "next_work_progress",
+        "observed": "next queued Work progressed: {\"cursor\":139,\"works\":[{\"work\":{\"id\":\"4b4d78ee4a51a6f33754804a156f6bb2\",\"projectId\":\"one\",\"conversationId\":\"combined\",\"title\":\"Combined queued Work 4\",\"createdAt\":\"2026-11-18T16:25:56.856Z\"},\"contract\":{\"workId\":\"4b4d78ee4a51a6f33754804a156f6bb2\",\"revision\":1,\"digest\":\"f7f17ff1a2c121b19678da3c554da6fca759e7edc42c3ec5ad94e81fc3d7f0e4\",\"goal\":\"Combined queued Work 4\",\"scope\":{\"projectId\":\"one\",\"allowedPaths\":[\".\"],\"excludedPaths\":[\".git\"],\"externalActions\":[]},\"criteria\":[{\"id\":\"machine\",\"descript",
+        "note": "target delivered and binding ended; filler held UNKNOWN; next Work question did not appear",
+        "minimalRepro": "same-run combined consumer capacity=4"
+      }
+    },
+    "note": "Same run: original owner-exit recovery/check/accept/artifacts pass; UNKNOWN filler retained; queued 3rd/5th Work does not progress after delivered target binding ends. This is the remaining main gap; not two independent PASSes."
+  }
 }

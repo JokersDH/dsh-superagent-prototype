@@ -1,0 +1,498 @@
+{
+  "protocol": "combined-recovery-capacity/1",
+  "capacity": 4,
+  "original": {
+    "works": [
+      {
+        "workId": "4e20564ee6ab6350a30ae1876eebec6e",
+        "question": {
+          "id": "codex-question-50ccc7ad171426e9c4216f83c22ee9f89e1ac1e6fbdee52d",
+          "version": 1,
+          "kind": "clarification",
+          "contract": {
+            "workId": "4e20564ee6ab6350a30ae1876eebec6e",
+            "revision": 1,
+            "digest": "228a1b17dce5dbaf073f7a80ed7dc8eb78a8ef3d6d6494115d7711e8b3c73d7a"
+          },
+          "scope": {
+            "projectId": "one",
+            "allowedPaths": [
+              "."
+            ],
+            "excludedPaths": [
+              ".git"
+            ],
+            "externalActions": []
+          },
+          "prompt": "Choose output",
+          "nativePayloadRef": "payload:bb1dd4ee4198c044919b57c4d709fdf34072f1f216426dc9de7311b48d5ff3a4",
+          "presentation": {
+            "kind": "form",
+            "fields": [
+              {
+                "id": "field-0",
+                "label": "Choose output",
+                "required": true,
+                "kind": "single",
+                "options": [
+                  {
+                    "id": "option-0",
+                    "label": "Alpha",
+                    "semantic": "business_choice"
+                  },
+                  {
+                    "id": "option-1",
+                    "label": "Beta",
+                    "semantic": "business_choice"
+                  }
+                ]
+              }
+            ]
+          },
+          "targets": [
+            {
+              "ticketId": "9e3015480307df9d00a0f8794ff2bf37",
+              "assignmentId": "108b7822155760d8608244c51877f5fb",
+              "contract": {
+                "workId": "4e20564ee6ab6350a30ae1876eebec6e",
+                "revision": 1,
+                "digest": "228a1b17dce5dbaf073f7a80ed7dc8eb78a8ef3d6d6494115d7711e8b3c73d7a"
+              },
+              "attemptId": "attempt-8d106979-f7fc-4b32-af6d-1f57d803084f",
+              "fenceEpoch": 1,
+              "id": "codex-target-50ccc7ad171426e9c4216f83c22ee9f89e1ac1e6fbdee52d",
+              "connectionEpoch": 1,
+              "nativeRequestId": {
+                "kind": "integer",
+                "decimal": "42"
+              },
+              "nativeMethod": "item/tool/requestUserInput",
+              "provenanceRef": "payload:bb1dd4ee4198c044919b57c4d709fdf34072f1f216426dc9de7311b48d5ff3a4"
+            }
+          ],
+          "openedAt": "2026-11-18T16:25:55.812Z",
+          "validity": "open"
+        },
+        "target": {
+          "ticketId": "9e3015480307df9d00a0f8794ff2bf37",
+          "assignmentId": "108b7822155760d8608244c51877f5fb",
+          "contract": {
+            "workId": "4e20564ee6ab6350a30ae1876eebec6e",
+            "revision": 1,
+            "digest": "228a1b17dce5dbaf073f7a80ed7dc8eb78a8ef3d6d6494115d7711e8b3c73d7a"
+          },
+          "attemptId": "attempt-8d106979-f7fc-4b32-af6d-1f57d803084f",
+          "fenceEpoch": 1,
+          "id": "codex-target-50ccc7ad171426e9c4216f83c22ee9f89e1ac1e6fbdee52d",
+          "connectionEpoch": 1,
+          "nativeRequestId": {
+            "kind": "integer",
+            "decimal": "42"
+          },
+          "nativeMethod": "item/tool/requestUserInput",
+          "provenanceRef": "payload:bb1dd4ee4198c044919b57c4d709fdf34072f1f216426dc9de7311b48d5ff3a4"
+        }
+      },
+      {
+        "workId": "21911df71162050b096302b5b861f3fb",
+        "question": {
+          "id": "codex-question-6a7a0a28a02173dbdc59e175a62d2e2d7fa8429c90406e45",
+          "version": 1,
+          "kind": "clarification",
+          "contract": {
+            "workId": "21911df71162050b096302b5b861f3fb",
+            "revision": 1,
+            "digest": "ac25de96db28a82e934954997faffd03aa80a107ede5355dfb3862bb58c4e443"
+          },
+          "scope": {
+            "projectId": "one",
+            "allowedPaths": [
+              "."
+            ],
+            "excludedPaths": [
+              ".git"
+            ],
+            "externalActions": []
+          },
+          "prompt": "Choose output",
+          "nativePayloadRef": "payload:bb1dd4ee4198c044919b57c4d709fdf34072f1f216426dc9de7311b48d5ff3a4",
+          "presentation": {
+            "kind": "form",
+            "fields": [
+              {
+                "id": "field-0",
+                "label": "Choose output",
+                "required": true,
+                "kind": "single",
+                "options": [
+                  {
+                    "id": "option-0",
+                    "label": "Alpha",
+                    "semantic": "business_choice"
+                  },
+                  {
+                    "id": "option-1",
+                    "label": "Beta",
+                    "semantic": "business_choice"
+                  }
+                ]
+              }
+            ]
+          },
+          "targets": [
+            {
+              "ticketId": "aa7e67235f0e422c3476d709fcfa5103",
+              "assignmentId": "75d87d4b53999568c96d433161c1cc5b",
+              "contract": {
+                "workId": "21911df71162050b096302b5b861f3fb",
+                "revision": 1,
+                "digest": "ac25de96db28a82e934954997faffd03aa80a107ede5355dfb3862bb58c4e443"
+              },
+              "attemptId": "attempt-7c30caac-4238-4b1f-a39a-1bc462eb4818",
+              "fenceEpoch": 1,
+              "id": "codex-target-6a7a0a28a02173dbdc59e175a62d2e2d7fa8429c90406e45",
+              "connectionEpoch": 1,
+              "nativeRequestId": {
+                "kind": "integer",
+                "decimal": "42"
+              },
+              "nativeMethod": "item/tool/requestUserInput",
+              "provenanceRef": "payload:bb1dd4ee4198c044919b57c4d709fdf34072f1f216426dc9de7311b48d5ff3a4"
+            }
+          ],
+          "openedAt": "2026-11-18T16:25:56.133Z",
+          "validity": "open"
+        },
+        "target": {
+          "ticketId": "aa7e67235f0e422c3476d709fcfa5103",
+          "assignmentId": "75d87d4b53999568c96d433161c1cc5b",
+          "contract": {
+            "workId": "21911df71162050b096302b5b861f3fb",
+            "revision": 1,
+            "digest": "ac25de96db28a82e934954997faffd03aa80a107ede5355dfb3862bb58c4e443"
+          },
+          "attemptId": "attempt-7c30caac-4238-4b1f-a39a-1bc462eb4818",
+          "fenceEpoch": 1,
+          "id": "codex-target-6a7a0a28a02173dbdc59e175a62d2e2d7fa8429c90406e45",
+          "connectionEpoch": 1,
+          "nativeRequestId": {
+            "kind": "integer",
+            "decimal": "42"
+          },
+          "nativeMethod": "item/tool/requestUserInput",
+          "provenanceRef": "payload:bb1dd4ee4198c044919b57c4d709fdf34072f1f216426dc9de7311b48d5ff3a4"
+        }
+      },
+      {
+        "workId": "669c72db602b57f5f35431c21835b897",
+        "question": {
+          "id": "codex-question-5f09eb330b4a7922ca948c5dc2de48550db5725d08d2ae24",
+          "version": 1,
+          "kind": "clarification",
+          "contract": {
+            "workId": "669c72db602b57f5f35431c21835b897",
+            "revision": 1,
+            "digest": "6b06925ee984bc55cb026b607d0ddfd01095548db875b2d92f276ca4d798b64b"
+          },
+          "scope": {
+            "projectId": "one",
+            "allowedPaths": [
+              "."
+            ],
+            "excludedPaths": [
+              ".git"
+            ],
+            "externalActions": []
+          },
+          "prompt": "Choose output",
+          "nativePayloadRef": "payload:bb1dd4ee4198c044919b57c4d709fdf34072f1f216426dc9de7311b48d5ff3a4",
+          "presentation": {
+            "kind": "form",
+            "fields": [
+              {
+                "id": "field-0",
+                "label": "Choose output",
+                "required": true,
+                "kind": "single",
+                "options": [
+                  {
+                    "id": "option-0",
+                    "label": "Alpha",
+                    "semantic": "business_choice"
+                  },
+                  {
+                    "id": "option-1",
+                    "label": "Beta",
+                    "semantic": "business_choice"
+                  }
+                ]
+              }
+            ]
+          },
+          "targets": [
+            {
+              "ticketId": "8d42f0e46f191b4f9d3a9996e7ef4f55",
+              "assignmentId": "ca7fb741b1aa18f7d47d289dc77178e5",
+              "contract": {
+                "workId": "669c72db602b57f5f35431c21835b897",
+                "revision": 1,
+                "digest": "6b06925ee984bc55cb026b607d0ddfd01095548db875b2d92f276ca4d798b64b"
+              },
+              "attemptId": "attempt-8f4c9121-b5a9-4eac-b4b4-734ac955e759",
+              "fenceEpoch": 1,
+              "id": "codex-target-5f09eb330b4a7922ca948c5dc2de48550db5725d08d2ae24",
+              "connectionEpoch": 1,
+              "nativeRequestId": {
+                "kind": "integer",
+                "decimal": "42"
+              },
+              "nativeMethod": "item/tool/requestUserInput",
+              "provenanceRef": "payload:bb1dd4ee4198c044919b57c4d709fdf34072f1f216426dc9de7311b48d5ff3a4"
+            }
+          ],
+          "openedAt": "2026-11-18T16:25:56.478Z",
+          "validity": "open"
+        },
+        "target": {
+          "ticketId": "8d42f0e46f191b4f9d3a9996e7ef4f55",
+          "assignmentId": "ca7fb741b1aa18f7d47d289dc77178e5",
+          "contract": {
+            "workId": "669c72db602b57f5f35431c21835b897",
+            "revision": 1,
+            "digest": "6b06925ee984bc55cb026b607d0ddfd01095548db875b2d92f276ca4d798b64b"
+          },
+          "attemptId": "attempt-8f4c9121-b5a9-4eac-b4b4-734ac955e759",
+          "fenceEpoch": 1,
+          "id": "codex-target-5f09eb330b4a7922ca948c5dc2de48550db5725d08d2ae24",
+          "connectionEpoch": 1,
+          "nativeRequestId": {
+            "kind": "integer",
+            "decimal": "42"
+          },
+          "nativeMethod": "item/tool/requestUserInput",
+          "provenanceRef": "payload:bb1dd4ee4198c044919b57c4d709fdf34072f1f216426dc9de7311b48d5ff3a4"
+        }
+      },
+      {
+        "workId": "83010cbd73b056df7cf81553758294cf",
+        "question": {
+          "id": "codex-question-d1f535e2e00a853cb08c5af08cce27562b730d0797af0804",
+          "version": 1,
+          "kind": "clarification",
+          "contract": {
+            "workId": "83010cbd73b056df7cf81553758294cf",
+            "revision": 1,
+            "digest": "a53276755ad4d9b6352c0f36bbd4a5024e814df080c54152428786d9df008206"
+          },
+          "scope": {
+            "projectId": "one",
+            "allowedPaths": [
+              "."
+            ],
+            "excludedPaths": [
+              ".git"
+            ],
+            "externalActions": []
+          },
+          "prompt": "Choose output",
+          "nativePayloadRef": "payload:bb1dd4ee4198c044919b57c4d709fdf34072f1f216426dc9de7311b48d5ff3a4",
+          "presentation": {
+            "kind": "form",
+            "fields": [
+              {
+                "id": "field-0",
+                "label": "Choose output",
+                "required": true,
+                "kind": "single",
+                "options": [
+                  {
+                    "id": "option-0",
+                    "label": "Alpha",
+                    "semantic": "business_choice"
+                  },
+                  {
+                    "id": "option-1",
+                    "label": "Beta",
+                    "semantic": "business_choice"
+                  }
+                ]
+              }
+            ]
+          },
+          "targets": [
+            {
+              "ticketId": "756a37d7f0295362789251584f04239d",
+              "assignmentId": "ee125d54268f34eb4bed42fb33f85ec8",
+              "contract": {
+                "workId": "83010cbd73b056df7cf81553758294cf",
+                "revision": 1,
+                "digest": "a53276755ad4d9b6352c0f36bbd4a5024e814df080c54152428786d9df008206"
+              },
+              "attemptId": "attempt-d8a9af80-2649-4c67-9d02-c17d5ba56639",
+              "fenceEpoch": 1,
+              "id": "codex-target-d1f535e2e00a853cb08c5af08cce27562b730d0797af0804",
+              "connectionEpoch": 1,
+              "nativeRequestId": {
+                "kind": "integer",
+                "decimal": "42"
+              },
+              "nativeMethod": "item/tool/requestUserInput",
+              "provenanceRef": "payload:bb1dd4ee4198c044919b57c4d709fdf34072f1f216426dc9de7311b48d5ff3a4"
+            }
+          ],
+          "openedAt": "2026-11-18T16:25:56.803Z",
+          "validity": "open"
+        },
+        "target": {
+          "ticketId": "756a37d7f0295362789251584f04239d",
+          "assignmentId": "ee125d54268f34eb4bed42fb33f85ec8",
+          "contract": {
+            "workId": "83010cbd73b056df7cf81553758294cf",
+            "revision": 1,
+            "digest": "a53276755ad4d9b6352c0f36bbd4a5024e814df080c54152428786d9df008206"
+          },
+          "attemptId": "attempt-d8a9af80-2649-4c67-9d02-c17d5ba56639",
+          "fenceEpoch": 1,
+          "id": "codex-target-d1f535e2e00a853cb08c5af08cce27562b730d0797af0804",
+          "connectionEpoch": 1,
+          "nativeRequestId": {
+            "kind": "integer",
+            "decimal": "42"
+          },
+          "nativeMethod": "item/tool/requestUserInput",
+          "provenanceRef": "payload:bb1dd4ee4198c044919b57c4d709fdf34072f1f216426dc9de7311b48d5ff3a4"
+        }
+      }
+    ],
+    "nextWorkId": "4b4d78ee4a51a6f33754804a156f6bb2",
+    "capacity": 4
+  },
+  "successor": {
+    "target": {
+      "workId": "4e20564ee6ab6350a30ae1876eebec6e",
+      "attemptId": "attempt-8d106979-f7fc-4b32-af6d-1f57d803084f",
+      "questionId": "codex-question-50ccc7ad171426e9c4216f83c22ee9f89e1ac1e6fbdee52d",
+      "assignmentId": "108b7822155760d8608244c51877f5fb",
+      "candidate": {
+        "ticketId": "9e3015480307df9d00a0f8794ff2bf37",
+        "assignmentId": "108b7822155760d8608244c51877f5fb",
+        "contract": {
+          "workId": "4e20564ee6ab6350a30ae1876eebec6e",
+          "revision": 1,
+          "digest": "228a1b17dce5dbaf073f7a80ed7dc8eb78a8ef3d6d6494115d7711e8b3c73d7a"
+        },
+        "candidateGeneration": 3
+      }
+    },
+    "phase": "delivered",
+    "artifacts": [
+      "2fae68fd03d4578e0854a06edf8385155b0f77603e09798d259884b671cf221f",
+      "e449a07f0bf57772dd6e3adad2b8328b42cbc8f162d4a49c5f558dd2e4e29283",
+      "07668b2713b1bf5e0f280f8f945129b09d07dc0b5c1f60e5fe2a50373c3204f1"
+    ],
+    "verification": {
+      "id": "verification:60049134-3920-4f0a-9f7f-00196cebc354",
+      "results": [
+        {
+          "criterionId": "machine",
+          "outcome": "PASS",
+          "evidenceRefs": [
+            "check:output-check:r1:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          ]
+        }
+      ]
+    },
+    "acceptance": "recorded",
+    "fillerState": "stopping",
+    "held": "held",
+    "suppressedSignals": 1,
+    "nextWorkId": "4b4d78ee4a51a6f33754804a156f6bb2",
+    "nextQuestion": null,
+    "nextProgressed": false,
+    "nextError": "next queued Work progressed: {\"cursor\":139,\"works\":[{\"work\":{\"id\":\"4b4d78ee4a51a6f33754804a156f6bb2\",\"projectId\":\"one\",\"conversationId\":\"combined\",\"title\":\"Combined queued Work 4\",\"createdAt\":\"2026-11-18T16:25:56.856Z\"},\"contract\":{\"workId\":\"4b4d78ee4a51a6f33754804a156f6bb2\",\"revision\":1,\"digest\":\"f7f17ff1a2c121b19678da3c554da6fca759e7edc42c3ec5ad94e81fc3d7f0e4\",\"goal\":\"Combined queued Work 4\",\"scope\":{\"projectId\":\"one\",\"allowedPaths\":[\".\"],\"excludedPaths\":[\".git\"],\"externalActions\":[]},\"criteria\":[{\"id\":\"machine\",\"descript",
+    "targetBindingAfter": "ended",
+    "fillerBindingAfter": "stopping"
+  },
+  "receiver": {
+    "targetBegin": 1,
+    "targetAnswer": 1,
+    "fillerBegin": 1,
+    "rows": 5
+  },
+  "totalNativeEffects": 1,
+  "readback": {
+    "workId": "4e20564ee6ab6350a30ae1876eebec6e",
+    "questionId": "codex-question-50ccc7ad171426e9c4216f83c22ee9f89e1ac1e6fbdee52d",
+    "validity": "answered",
+    "targetBinding": "ended",
+    "fillerBinding": "stopping",
+    "nextQuestionId": null,
+    "nextValidity": null,
+    "command": "recorded",
+    "verification": {
+      "id": "verification:60049134-3920-4f0a-9f7f-00196cebc354",
+      "results": [
+        {
+          "criterionId": "machine",
+          "outcome": "PASS",
+          "evidenceRefs": [
+            "check:output-check:r1:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          ]
+        }
+      ]
+    },
+    "acceptance": {
+      "criterionIds": [
+        "human"
+      ],
+      "actorRef": "combined-recovery-authority"
+    },
+    "artifacts": [
+      {
+        "id": "2fae68fd03d4578e0854a06edf8385155b0f77603e09798d259884b671cf221f",
+        "bytes": 977
+      },
+      {
+        "id": "e449a07f0bf57772dd6e3adad2b8328b42cbc8f162d4a49c5f558dd2e4e29283",
+        "bytes": 177
+      },
+      {
+        "id": "07668b2713b1bf5e0f280f8f945129b09d07dc0b5c1f60e5fe2a50373c3204f1",
+        "bytes": 363
+      }
+    ],
+    "workCount": 5
+  },
+  "checks": {
+    "oneRunnerPerCapacityWork": true,
+    "targetReceiverBeginOnce": true,
+    "targetReceiverAnswerOnce": true,
+    "fillerNoAnswer": true,
+    "targetDelivered": true,
+    "targetQuestionAnswered": true,
+    "targetBindingEnded": true,
+    "fillerUnknownRetained": true,
+    "machineCheckPassed": true,
+    "candidateAssignmentMatches": true,
+    "acceptanceRecorded": true,
+    "exactArtifactsReadable": true,
+    "nextWorkProgressed": false,
+    "noNewWork": true,
+    "nativeEffectOnlyTarget": true,
+    "commandRecorded": true
+  },
+  "gap": {
+    "stage": "next_work_progress",
+    "observed": "next queued Work progressed: {\"cursor\":139,\"works\":[{\"work\":{\"id\":\"4b4d78ee4a51a6f33754804a156f6bb2\",\"projectId\":\"one\",\"conversationId\":\"combined\",\"title\":\"Combined queued Work 4\",\"createdAt\":\"2026-11-18T16:25:56.856Z\"},\"contract\":{\"workId\":\"4b4d78ee4a51a6f33754804a156f6bb2\",\"revision\":1,\"digest\":\"f7f17ff1a2c121b19678da3c554da6fca759e7edc42c3ec5ad94e81fc3d7f0e4\",\"goal\":\"Combined queued Work 4\",\"scope\":{\"projectId\":\"one\",\"allowedPaths\":[\".\"],\"excludedPaths\":[\".git\"],\"externalActions\":[]},\"criteria\":[{\"id\":\"machine\",\"descript",
+    "note": "target delivered and binding ended; filler held UNKNOWN; next Work question did not appear",
+    "minimalRepro": "same-run combined consumer capacity=4"
+  },
+  "layers": {
+    "source": "main e2261ef5 ProductRuntime/recovery/capacity",
+    "controlled": "virtual ProcessHost per Work",
+    "native": 0,
+    "physical": "NOT_TESTED",
+    "ackLost": "not part of capacity run",
+    "schedulerSlots": "original ProductExecution maxActiveAttempts only; OS resources NOT_TESTED"
+  }
+}
