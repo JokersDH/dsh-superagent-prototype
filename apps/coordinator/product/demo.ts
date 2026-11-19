@@ -63,12 +63,12 @@ try {
     principal,
     stateRoot,
     startupMode: recovery ? 'recovery_readonly' : 'normal',
-    scratchProject: executionUnavailable || recovery ? join(stateRoot, 'discussion-scratch') : ensureScratchProject(stateRoot),
+    scratchProject: personal || recovery ? join(stateRoot, 'discussion-scratch') : ensureScratchProject(stateRoot),
     projects: [
       ...(personalStartup?.projects ?? []),
       ...restoredProjects.filter(project => project.id !== 'project-atlas'),
       ...(personal ? [DISCUSSION_PROJECT] : []),
-      ...(!executionUnavailable ? [{
+      ...(!personal ? [{
         id: 'project-atlas',
         displayName: '流程测试项目',
         scope: {

@@ -81,6 +81,7 @@
                 "unsupported_platform",
                 "probe_failed",
                 "not_admitted",
+                "needs_auth",
                 "operator_disabled",
                 "recovery_readonly"
               ],
