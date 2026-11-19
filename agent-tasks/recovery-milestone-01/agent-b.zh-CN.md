@@ -1,12 +1,15 @@
-# B：真实终态端点到原恢复消费者的生命周期闭合
+# B：原终态证明持久确认到正常退出的完整责任包
 
-原目录 `/Users/hh/Desktop/joker/superagent-agent-b`，原分支 `codex/g1-runtime`。保留dirty后fetch/merge origin/main。读AGENTS、共同README和[本轮续验](../../reports/releases/recovery-milestone-01/admission-2026-11-18.json)的continuation。main source **e2261ef5**，本轮B4703a11c。
+原目录 `/Users/hh/Desktop/joker/superagent-agent-b`，原分支 `codex/g1-runtime`。保留dirty后fetch/merge最新origin/main，读AGENTS、共同README和[11-19验收](../../reports/releases/recovery-milestone-01/admission-2026-11-19.json)。当前main **6d309128**，本轮B **91ba4f9a**。
 
-**主动，只闭合同原恢复的真实Runner生命周期。** b38旧stdin EOF/关闭stdout→同PID新lease→原命令→正常无信号退出，已在实际main entry复验4PASS/1NT；不重复修这项。mainRunnerService不是默认启动入口，其新增防护不当产品默认行为。main只采用原receiver诊断片段，未采用旧scenario-env/SpawnedRunner工具候选；不要要求main补未用spawnIntent类型。
+**主动，一个结果做到主线实际采用并独立验收，不在单个fix或SOURCE_READY处结束。** 目标仅是同一个原Runner的终态证明，在原main屏障持久提交前始终可恢复，提交后明确确认才退出。不是新增宿主、运维框架或另一条产品线。
 
-1. 先修本次实际b38失败收尾：exited仍UNKNOWN就不得rm root/journal/credential。未知保留、精确报告、无信号、不全局清理；不能以这个改动扩成通用process工具工程。
-2. 下一实际缺口是**原真实entry的终态endpoint寿命**：main现在可用原terminal receipt+仍可认证的terminated/quiescent endpoint继续检查/接受，但真实runner-service-entry在done后shutdown会关endpoint。用同一个实际原Runner复现“terminal事实已ACK、coordinator尚未确认屏障就退出”的窗口；不能用父host人为保流替证明。
-3. 在你owned原service/entry/transport生命周期内给出可运行修复与原consumer，覆盖普通结束、意外旧连接断开、新连接原cancel/proof和正常退出。不要让ended复活、丢原IDs、重begin、迁移批准或据旧terminal事实虚构新物理证明。若必须变共享语义，交最小实际repro/所需不变量给main，不另造protocol/ledger/宿主。
-4. 与main/H把同一真实Runner的原业务/终态消费者联调到结果闭合，不仅写export或状态汇总。先交最小source后持续同结果复验；预算下无法证明的物理/原生层明确NOT_TESTED。
+当前源码HOLD：awaitTerminalBarrier未进RunnerServiceHandle，实际entry+service直接strict报TS2339/TS2353；closed/noLease cancel里resolve、50ms后清endpoint早于main持久confirm，丢回复/第二次故障仍丢证明，UNKNOWN资源也不能清退。保留b38已改好的UNKNOWN材料保留，不回归。B39的fixture cancel正例不是自然turn终态/持久确认。
 
-只用受控fake/protocol peer、纯transport fault或Node进程自行退出；真实vendor/model/native/信号0，无危险RunnerLink.close fallback/global discovery。B排除I子树，其他八位待命；只推原origin分支，原历史/dirty/十二实例及全部state/profile/tar/ledger保留。无新Driver/框架/队列/独立维护线或打包。
+实施约定读[0095“唯一剩余生命周期接口约定”](../../docs/rfcs/WP-16/0095-main-original-running-callback-composition.md)：原inspect/cancel只给证明/关业务/停原资源，不负责endpoint最终清退；原main确认Store receipt/event成功提交后，再通过原认证连接做可选私有postcommit-finalize。B拥有service/entry/recovery-transport/endpoint，main独占Store适配。可选扩展不改冻结Bridge v1/hash，不新队列/ledger/公共用户命令；不要用50ms代替提交。
+
+连续负责以下同一链路直到闭合：把实际entry/handle类型/所有直接consumer对齐；证明普通自然terminal与显式shutdown兼容；proof/cancel回复丢失或confirm前owner再退出时原endpoint仍在；main提交后finalize前退出可由原receipt继任；合法finalize响应丢失可按同确认ID调和；wrong/foreign/缺确认/资源UNKNOWN绝不清退。Finalize只允许已terminated/closed且完整原manifest和每资源quiescent的原对象，不带新停止/执行权限。无明确证明就保留材料。
+
+先交一个可运行最小source和正负consumer，让main接原Store确认与H独立验证；随后持续处理这条链的集成缺口/类型/重放/收尾至同原Work检查接受与原容量组合通过。不能拿export、fixture receipt、cancel200或两个分离PASS充当完成，不必增加长报告或阶段数。
+
+执行受控Node/fake协议与无信号故障，真实vendor/model/native/信号0；无global discovery/危险fallback/借凭据。只改B owned，排除I通信子树，显式推原origin分支；保留十二用户实例、原dirty、state/profile/tar/ledger。遇主线依赖交最小repro/接口差异并继续本链已有负例，不扩独立维护队列或通用进程管理。

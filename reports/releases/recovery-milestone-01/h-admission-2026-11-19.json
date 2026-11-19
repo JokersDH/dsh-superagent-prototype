@@ -1,0 +1,58 @@
+{
+  "date": "2026-11-19",
+  "status": "COMBINED_CONTROLLED_RECOVERY_DELIVERY_VALID_NEXT_SLOT_PRODUCTION_GAP_NOT_SUBSTANTIATED",
+  "fixedInput": {
+    "H": "1a1be9dbfbaabd68df6fb4ce4c9b419a47b9e44c",
+    "implementation": "59de54141eb638b476fdda707d64a78b67ac3633",
+    "root": "/Users/hh/Desktop/joker/superagent-agent-h",
+    "production": "Main e2261ef5 execution/native-attempt/capacity and virtual native fixture have no diff in this candidate",
+    "candidateDirtyBeforeAfter": "clean; untouched",
+    "consumerBlobs": {
+      "combined-recovery.case.mjs": "a2a5b3d63bfe867987f1516f05f6c4e2ab627752",
+      "combined-recovery2.mjs": "cdf3a99629e6e6f20fd8a62bc244c72bac76de61",
+      "combined-recovery-worker.mjs": "3e6e564ad563ba0e8fbc59f7ca5080207cde53c1"
+    }
+  },
+  "realProgress": "H combines original Work owner-exit takeover, parallel original bindings, target native_applied/check/currentCandidate/manualaccept/delivered and filler UNKNOWN retention in one controlled Store/run at capacities2 and4. Parent host owns one virtual Runner per original active Work; original target receiver now really counts begin1/answer1 rather than inferring from turn/start. Artifacts come from the target WorkView artifactIds, not global last-N rows",
+  "primaryFinding": {
+    "scope": "H test consumer, not demonstrated main production capacity failure",
+    "file": "/Users/hh/Desktop/joker/superagent-agent-h/tests/operational-soak/recovery/combined-recovery-worker.mjs",
+    "line": 45,
+    "issue": "Injected nativeRunnerLinkFactory asserts stage===primary for every spawn. This also forbids the already-created queued third/fifth Work's legitimate FIRST spawn in the successor coordinator. Parent oneRunnerPerCapacityWork requires cumulative handles/spawn count exactly capacity, excluding legitimate capacity+1 total births after release. The case then explicitly expects nextWorkProgressed:false and calls this a main gap",
+    "unchangedConsumerReproduction": {
+      "command": "node /tmp/h-admission-inspect-20261119.mjs",
+      "exit": 0,
+      "capacity": 2,
+      "retainedRoot": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/h-admission-combined2-f1nfGd",
+      "actual": "Original next Work already has application.execution.prepared at event76 and its own attempt/binding. Original application.execute parks with begin_unknown: Controlled begin requires reconciliation: AssertionError successor must not spawn (+successor/-primary). Thus original capacity release and dispatch happened before H's factory stopped the legitimate new Work",
+      "targetAndUnknown": "Target delivered/binding ended, filler stopping/held, target begin1/answer1 and single native effect remain true"
+    },
+    "correctedConsumerControl": {
+      "command": "node /tmp/h-admission-corrected-run-20261119.mjs",
+      "exit": 0,
+      "temporaryMaterializationOnly": "Exact H parent/worker files copied to reviewer-owned /tmp with absolute imports; the sole behavior correction allows spawn when stage primary OR spec.contract.workId equals original.nextWorkId. Recovered original target remains forbidden to respawn. All production source and candidate assertions/files stay unchanged",
+      "results": [
+        { "capacity": 2, "nextWorkProgressed": true, "gap": null, "targetDelivered": true, "targetBindingEnded": true, "fillerUnknownRetained": true, "targetReceiverBegin": 1, "targetReceiverAnswer": 1, "totalNativeEffects": 1, "retainedRoot": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/h-admission-corrected-2-5sEi0m" },
+        { "capacity": 4, "nextWorkProgressed": true, "gap": null, "targetDelivered": true, "targetBindingEnded": true, "fillerUnknownRetained": true, "targetReceiverBegin": 1, "targetReceiverAnswer": 1, "totalNativeEffects": 1, "retainedRoot": "/var/folders/kk/hqr7y6h93x9g7gh9n1xt0px40000gn/T/h-admission-corrected-4-4qQQ9E" }
+      ],
+      "counterInterpretation": "Old oneRunnerPerCapacityWork is false because cumulative births are now capacity+1, which is correct progression of a distinct queued Work after a slot release; this is not an extra concurrent slot or original target replay",
+      "originalStoreTimeline": "Capacity2 original target barrier.confirmed event72 precedes queued next Work application.execution.prepared event77. Native receiver log has target begin/answer once plus next Work's own begin/attempt/contract body. No production capacity change was needed"
+    }
+  },
+  "remainingEvidenceBindings": [
+    "Current H SQL selects check/acceptance by ticket and takes first row, despite selecting assignment_id/candidate_generation. Assertions must compare actual verification ID, assignment and candidateGeneration to successor.target.candidate before this becomes a multi-attempt oracle. Current one-attempt data independently matches original assignment and generation3",
+    "Actual receiver begin/answer counts are improved and genuine. H still filters kind+attempt only and does not assert canonical id/body/contract/nativeBindingRef against original command index; reviewer raw logs contain those exact fields and current target remains one write",
+    "Next Work's distinct allowed first spawn must be counted separately from original target no-respawn. Store Work count remains capacity+1 and should not increase by inventing a replacement Work",
+    "combined case currently expects failure, so its PASS means gap-detection baseline, not successful whole recovery-capacity exit. H should repair the consumer and assert positive nextWork progression rather than main weakening production guards",
+    "The committed case finally deletes its test root even with UNKNOWN bindings. Reviewer runs preserve own state roots listed above; H should retain unknown source material in its corrected consumer. All resources in this review are virtual"
+  ],
+  "limits": {
+    "sourceControlledOnly": true,
+    "businessAckLostWindow": "Not part of this combined capacity run",
+    "realNativeOSPhysicalQuiescence": "NOT_TESTED",
+    "trueStdInEofOldStdOutOrTerminalEndpoint": "Not consumed by this H virtual-host run; separate B subject",
+    "installedReleaseOrCompletionScore": "No authority or automatic change"
+  },
+  "nextDecision": "Do not change main capacity for this claimed gap. H corrects its existing injected consumer/positive assertion, exact identity binding and UNKNOWN retention, then independently re-runs the SAME combined result. Main may use this temporary-control evidence to make the failure's origin reviewable; no new feature, scheduler, ledger or task line",
+  "reviewerEffects": { "productionChanges": 0, "candidateChanges": 0, "modelVendorNative": 0, "realSignals": 0, "globalProcessDiscovery": 0, "userServicesOperated": 0, "newArchives": 0, "allExecSessionsComplete": true }
+}

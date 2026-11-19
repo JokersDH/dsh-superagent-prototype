@@ -1,18 +1,18 @@
 # 产品进度、完成度与当前可用范围
 
-日期：2026-11-18。本次只核主动B/H/D/E固定交付、主线必要正反例和准确安装字节；其他六位待命，没有为凑满人数重验未用候选。读者入口：[如何使用](../ASSISTANT-GUIDE.zh-CN.md)、[架构](ARCHITECTURE.zh-CN.md)、[创新](INNOVATION.zh-CN.md)。
+日期：2026-11-19。本次只核主动B/H固定交付并继续原主线；其余八位待命，不为用满人数扩任务。读者入口：[如何使用](../ASSISTANT-GUIDE.zh-CN.md)、[架构](ARCHITECTURE.zh-CN.md)、[创新](INNOVATION.zh-CN.md)。
 
-最新续交：[2026-11-18验收](../../reports/releases/recovery-milestone-01/admission-2026-11-18.json)continuation。main **e2261ef5**三种受控故障窗口到同原Work交付、原Store绑定计数的2/4容量/UNKNOWN保留/独立屏障放行均过，40测试/strict；B真实Runner EOF传输4PASS/1NT、H独立单Work2PASS成立。只main/B/H继续真实终态endpoint寿命及故障交付与原槽的同run组合，其他八位待命。
+当前新增结果：[11-19验收](../../reports/releases/recovery-milestone-01/admission-2026-11-19.json)。main **6d309128**已通过2/4同run原Work故障恢复→检查/人工接受→自身槽归还→原第3/5项前进，UNKNOWN其余槽保留，42测试/strict。H原next-slot失败是测试factory禁止排队Work首次spawn，生产容量无需放松。B91终态源码因类型及持久确认前清退窗口暂HOLD；下一包只负责证明保留→原Store屏障提交→明确终态finalize→正常退出并独立复验。真实native/物理未证，历史最近估算不自动上调。以下旧日期结果按当时范围阅读。
 
-原业务接管、写后resolution未返回、已ACK terminal在原可认证端点仍可读时的窗口已有受控证据，原物理屏障未放松。真实Runner EOF与虚拟host原Work仍是分离消费者，2/4队列逻辑也尚未与故障交付组合；真实终态entry关闭endpoint、完整同run物理恢复和全部ACK窗口仍不能据此通过。
+此前[11-18验收](../../reports/releases/recovery-milestone-01/admission-2026-11-18.json)的三种受控故障窗口及独立容量测试保留；11-19已进一步组合成同run。真实Runner EOF的fake-driver组件与virtual ProcessHost组合仍不是同一真实物理消费者，不能据此宣称完整真实原生恢复。
 
 **用户已确认：本阶段不推进复核价值试点、依赖它的第二协议复核和路由收益研究，价值未测。** 原协议、ledger、fixture、报告保留，不重置/退款/补样/研究计价；自动模型/native仍0。此范围决定不自动改变既有分母和历史最近评估。
 
 ## 现在到哪一步
 
-本轮重点：B自然terminal原cancel/屏障兼容、C同步superseded/digest、EqueryUNKNOWN/缺booleans/operation-copy旧缺口确已关闭。E已真正完成W35安装/配置/非空恢复/升级子集；D原upgrade retry确为CONFIRMED。W36含历史后继已有准确静态和安装HTTP200，锁该包给E，尚无独立同W36结论。新B重登记出生竞态、I误删借用状态树、G身份错误晋级和D来源audit旧hash分层修复，候选工具不直接纳入默认。
+本轮重点是main/B/H同一个终态生命周期的持久确认和独立验收。D/E固定W36七项安装子集已独立核验，来源audit199/199匹配、归档未变，本项结束待命；它不认证当前6d恢复source。未采用的B信号工具/I host/G身份模块缺陷继续禁用并登记，不自动加入当前前置或新任务线。
 
-用户已澄清当前优先级：加速完成方案B整体工程（CAC暂不包含），随后在完整工程中构建可本机使用、可分享同事的安装交付。工程目标不缩成一个临时预览包；功能、原任务恢复、数据与上下文、工作台、运行时和发行并行建设，main持续集成。M系列Mac是先支持的平台，不是让全员先停下功能去突击ZIP；研究收益与实际native能力仍按证据独立验收，不能由源码推断。
+用户目标仍是完成方案B整体工程（CAC暂不包含），最终提供本机可用、可分享同事的安装交付。当前按关键路径顺序完成已有目标，仅main/B/H主动，其余按具体阻断调用；不以全员并行或扩大功能范围代替进度。M系列Mac是先支持的平台，当前不追移动main突击ZIP。
 
 已经是有真实产品流程的**本机个人开发助理预览**：主对话、显式委托、隔离工作区、问题中心、检查/patch/人工接受、会话项目管理、受限上下文与来源、明确决定、模板和使用观察。不是只有聊天页面，也不是八/十个生产执行器已经接入。
 
@@ -54,7 +54,7 @@
 
 | 层 | 准确身份 | 已证范围 | 未证范围 |
 | --- | --- | --- | --- |
-| main运行代码 | e2261ef5，终态83b3ece3 | 三种受控恢复、五拒绝、原2/4容量及UNKNOWN/独立屏障，40测试/strict | 分离的真实EOF组件/虚拟host/容量不能拼成同run物理通过；新source未安装独立验 |
+| main运行代码 | 6d309128，继承e226/83b3 | 三受控窗口、原2/4同run故障交付/UNKNOWN占位/第3&5项前进，42测试/strict | 虚拟host组合不等真实native/物理通过；B终态持久确认未闭，新source未安装独立验 |
 | R1 | source82ee5b8f / build8296720d8a25f38c / tarSHA04926739… | E最新290PASS/0FAIL/20NT，recorded普通197/功能198过；合法启停保留，同fixture Work真重开found=true新增 | 两原project完整旅程仍未达，oracle仍会接不足材料；新ZIPcase实际只用R1tar；无新观察download，非全原生/全产品 |
 | R2 | source c0a1f897 / build4dcd28f758bbb265 / tarSHA405ecd02… | 6864清单项/209closure，实际包含main303严格导出；D开发受控证据 | E尚无同R2独立结果；不含本轮新A/C/F/G/J候选 |
 | W32候选 | sourcee8348a86 / build88eb8c69b0671171 / innerSHA65c386d1… / outerSHA0a46cd36… | 全量静态；E新actual ZIP包内Node/启动/非空原Work备份/readonly HTTP读取是真实进展 | E306/20NT、普通199/功能200是R1+W32 aggregate，不是W32全套或W33；未含fc38 |

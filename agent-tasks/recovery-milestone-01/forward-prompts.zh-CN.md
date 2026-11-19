@@ -1,30 +1,31 @@
-# 下一阶段转发话术：仍是原恢复里程碑
+# 下一阶段转发话术：一个生命周期结果持续做到验收
 
-2026-11-18续验：main **e2261ef5**（终态source83b3ece3）已发布。真实Runner EOF传输组件4PASS；H原单Work独立正例2PASS；main三种受控故障窗口与原2/4逻辑容量、拒绝对照共40测试/strict过。完整同run物理恢复仍未准入，故不新建wave。
+2026-11-19。仍是恢复里程碑01，不新开wave。main **6d309128** 已修正H测试自阻并通过2/4同run组合，42相关测试/strict通过。B91终态清退仍HOLD，具体见[本轮验收](../../reports/releases/recovery-milestone-01/admission-2026-11-19.json)。
 
-## 发给B：主动开工
-
-```text
-继续 /Users/hh/Desktop/joker/superagent-agent-b、codex/g1-runtime，保留dirty后fetch/merge origin/main，读AGENTS和agent-tasks/recovery-milestone-01/agent-b.zh-CN.md。
-b38的真实EOF/关闭stdout/同PID新lease/旧reply拒绝已在main实际entry复验，不重做或重复计修复；mainRunnerService不是默认入口。
-本轮只闭合真实终态endpoint寿命：原terminal已ACK但coordinator尚未记录屏障即退出时，真实entry当前done后shutdown会关闭endpoint。请给同一个原Runner的实际复现和owned生命周期修复，覆盖普通结束、继任读取原proof/cancel、正常退出；与main/H持续集成同一恢复结果，不造新宿主/protocol/ledger或借旧事实造物理证明。
-同时改本次实际b38的UNKNOWN失败收尾：未确认退出不得删除root/journal/credential。真实模型/native/信号仍0，禁危险fallback/global discovery。最小source早交后持续该结果复验，不扩独立维护任务。
-```
-
-## 发给H：主动开工
+## 发给B：主动，负责完整生命周期到集成验收
 
 ```text
-继续 /Users/hh/Desktop/joker/superagent-agent-h、codex/g4-trial-operations，保留成果后fetch/merge origin/main，读AGENTS和agent-tasks/recovery-milestone-01/agent-h.zh-CN.md。
-本轮单一完整结果：把main e2261ef5的原Work故障接管/检查/人工接受，与原2/4槽占位、UNKNOWN保留和第3/5项前进放进同一个run独立验收，不能再拿两个独立PASS拼接。
-已有8恢复模式和original-capacity消费者可直接消费。每份检查/接受/产物绑定原Work/currentCandidate/assignment及view.artifactIds，begin次数读原receiver的实际command，不能读全库最后N或用turn/start代替。
-B真实终态端点source就绪后按同source复验；未测真实物理保持未测。只交H owned消费者，缺生产行为给main最小repro，不造队列/改原表。source早交后持续同结果复验；真实模型/native/信号0，UNKNOWN材料保留。
+继续 /Users/hh/Desktop/joker/superagent-agent-b、codex/g1-runtime，保留dirty后fetch/merge最新origin/main。读AGENTS、agent-tasks/recovery-milestone-01/agent-b.zh-CN.md和WP-16/0095末尾postcommit约定。
+本轮粒度是同一个完整结果：原Runner终态证明在main持久确认前保持可恢复，持久确认后明确finalize才正常退出。源码、实际entry、类型、正负消费者、与main原Store适配及H独立复验都要做到，不在单fix/SOURCE_READY停止。
+当前91ba4f9a未准入：awaitTerminalBarrier缺handle类型；cancel handler内就解除等待，50ms关endpoint早于confirmOwnedQuiescence提交，回复丢失/第二次故障或UNKNOWN仍会失去证明。不要再以cancel200/等待时间当持久确认。
+沿原service/entry/私有transport实现可选postcommit-finalize，不改冻结Bridge/hash、不加ledger/队列/宿主；Store侧确认仍由main负责。覆盖确认前/后退出、回复丢失、重放、UNKNOWN/foreign与普通自然terminal/显式shutdown。
+最小可运行source早交后持续该结果联调/修复/复验，真实模型/native/信号0，原dirty/状态/预算及十二实例保留，排除I owned，不扩独立维护线。
 ```
 
-## 发给其余八位：继续按需待命
+## 发给H：主动，负责同run独立闭环到最终复验
 
 ```text
-继续待命，保留所有成果、dirty和用户状态。本轮仍只main/B/H闭合原恢复；D/E固定W36本项已经完成，不追新main重包。
-没有主线实际consumer的具体阻断就不新增代码、接口、独立维护队列或报告。需要你owned模块时再带最小复现激活，预算与所有权保持原约束。
+继续 /Users/hh/Desktop/joker/superagent-agent-h、codex/g4-trial-operations，保留成果后fetch/merge最新origin/main。读AGENTS和agent-tasks/recovery-milestone-01/agent-h.zh-CN.md。
+先修combined consumer自身限制：继任不得重spawn原target，但应允许original.nextWorkId首次spawn，累计capacity+1。main6d309128已按此完成2/4同run恢复→检查/接受→原槽归还→原排队Work前进，生产容量不需放松。纠正gap/正向断言、按原candidate+assignment绑定检查接受/产物/receiver完整命令，UNKNOWN材料保留。
+随后持续负责同一个原Work结果的独立最终验收，结合B/main的postcommit终态清退：proof/cancel后回复丢失与提交前退出仍可恢复；提交后finalize前退出按原receipt继任；合法finalize丢回复可调和；UNKNOWN/foreign不能清退。B源码早交即采用并复验，不把分离PASS拼成同run物理证明。
+只交H owned消费者，缺生产行为给最小repro，真实模型/native/信号0，不改他人源码/原表或新建框架。做到同结果闭合，无需逐fix重新派工，不扩安装/研究/独立维护队列。
 ```
 
-[本轮续验](../../reports/releases/recovery-milestone-01/admission-2026-11-18.json) · [H独立验收](../../reports/releases/recovery-milestone-01/h-admission-2026-11-18.json)。本文件尚未代发外部chat。
+## 发给其他八位：继续待命（同一段分别发送）
+
+```text
+继续按需待命。当前仍仅main/B/H闭合原恢复的同一个生命周期结果，D/E固定W36本项已验完，不追移动main重包。
+保留所有成果、dirty、状态、归档和预算，不执行旧整包/备用职责/独立维护队列。只有main当前consumer出现涉及你owned模块的具体阻断时，再带最小复现激活；没有触发项就不新增任务或报告。
+```
+
+这些话术尚未代发外部chat。大粒度是负责到同一结果被实际采用和独立验收，不是增加范围、阶段或模型额度。

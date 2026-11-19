@@ -1,6 +1,6 @@
 # 里程碑01：同一个原 Work 恢复到交付
 
-2026-11-18续交。继续同一个里程碑，不新建wave。用户明确：增加Agent为加快已有目标，不是增加范围；任务变大指负责同一个结果直到完成，不要求资源全开。当前完整方案B不含CAC。
+2026-11-19续交。继续同一个里程碑，不新建wave。任务粒度扩大为同一个生命周期从实现到main采用、独立复验和收尾完成，不按单fix结束，不增加功能线。当前完整方案B不含CAC。
 
 ## 唯一产品出口
 
@@ -12,7 +12,9 @@
 
 本轮B真实Runner EOF/旧stdout关闭的fake-driver传输4PASS/1NT已在main entry复验；入口此前已有EPIPE处理，新增未使用wrapper不计默认产品修复。H单Work独立正例与正常关闭反例2PASS。原2/4容量现按原Store未ended绑定计数，UNKNOWN保留、另一Work自己的屏障释放后第3/5项前进两场景过，无新scheduler/ledger。
 
-剩余只两块：B真实entry终态后endpoint关闭的恢复寿命；H将原故障交付与原2/4占位/UNKNOWN/后续前进合进**同一个run**独立验收。真实原生物理仍未测，不把分离的transport/虚拟host PASS拼成完整结论。[本轮续验](../../reports/releases/recovery-milestone-01/admission-2026-11-18.json)continuation、[H独立结果](../../reports/releases/recovery-milestone-01/h-admission-2026-11-18.json)。
+11-19验收：H的nextWork gap来自测试factory拒绝继任者为原排队Work首次spawn，生产已实际放行。main **6d309128**在自有integration消费者修正这一限制，原target仍禁止重spawn，累计Runner为capacity+1；按Work/currentCandidate/assignment绑定证据。2/4同run均完成owner退出→原Work检查/接受/三产物→目标自身槽归还→原第3/5项前进，UNKNOWN其他槽保留，42测试/strict通过。无需放松生产容量。[准确验收](../../reports/releases/recovery-milestone-01/admission-2026-11-19.json)、[H独立复现](../../reports/releases/recovery-milestone-01/h-admission-2026-11-19.json)。
+
+只剩同一个真实终态生命周期：B91ba4f9a暂HOLD，直接strict类型缺失，且cancel内解除等待/50ms清endpoint早于main持久屏障确认；回复丢失或再次故障、资源UNKNOWN时仍可能失去证明。按[0095 postcommit约定](../../docs/rfcs/WP-16/0095-main-original-running-callback-composition.md)，B完成原service/entry/私有transport，main完成原Store确认适配，H纠正原consumer并独立同run复验，直到证明保留→持久确认→明确finalize→正常退出闭合。真实native/物理未证仍保留，不以受控组合冒充。
 
 ## 已具备与先修缺口
 

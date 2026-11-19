@@ -7,7 +7,7 @@
 | 项目 | 当前事实 |
 | --- | --- |
 | 仓库 | `https://github.com/JokersDH/dsh-superagent-prototype` |
-| 本文基线 | 2026-11-18；maind6244e63原Native.resume在受控问题窗口接管到交付，真实OS/stdin EOF/原槽仍单独验 |
+| 本文基线 | 2026-11-19；main6d309128受控同run原Work恢复/交付/原2&4槽/第3&5项前进；真实终态持久确认/清退仍待闭合 |
 | 首个用户界面 | React网页工作台；本机CLI负责启停/发行，暂无桌面壳 |
 | 技术栈 | TypeScript、Node24、pnpm workspace、React18/Vite、Hono、Zod、SQLite、Git worktree |
 | 原生执行 | 当前生产路径为Codex app-server；历史准入版本`codex-cli 0.164.0`，新版本需重新验证 |

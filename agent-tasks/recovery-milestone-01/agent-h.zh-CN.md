@@ -1,12 +1,13 @@
-# H：故障接管、交付与原2/4容量的同run独立验收
+# H：同原Work恢复到终态退出的独立完整验收责任包
 
-原目录 `/Users/hh/Desktop/joker/superagent-agent-h`，原分支 `codex/g4-trial-operations`。保留成果后fetch/merge origin/main，读AGENTS、共同README与[本轮续验](../../reports/releases/recovery-milestone-01/admission-2026-11-18.json)。main **e2261ef5**，本轮H59133df7已验收。
+原目录 `/Users/hh/Desktop/joker/superagent-agent-h`，原分支 `codex/g4-trial-operations`。保留成果后fetch/merge最新origin/main，读AGENTS、共同README及[11-19验收](../../reports/releases/recovery-milestone-01/admission-2026-11-19.json)。当前main **6d309128**，本轮H **1a1be9db**。
 
-**主动，一个完整结果：同一个原Work在有并行占位时故障接管→检查/人工接受→其原槽归还，后续原Work前进。** 现有单Work正例/正常close反例已过，不重复铺正常矩阵。
+**主动，一个同run结果持续做到最后复验，不扩功能或矩阵平台。** 目标仍是同一个原Work在并行占位下owner退出，原问答/检查/人工接受/原槽归还/原排队Work前进，最终在持久屏障确认后原Runner正常退出。虚拟资源与真实受控Runner及vendor物理分层。
 
-1. 独立消费main新增8模式（原问题/写后resolution延迟/已ACKterminal三正向与五拒绝），核原HTTP command receipt、native_applied和实际receiver begin/answer次数；恢复时同ID只读回，不重发。已ACKterminal必须原observation/payload/fact receipt与当前完整资源proof一起成立，不能只用terminated字符串。
-2. 在原ProductRuntime的Node组合参数maxActiveAttempts=2/4下，用原Store/Application/core/Effects创建并行Work；参照新original-capacity消费者，但把owner退出、同原Work交付和第3/5项前进组合在同run。UNKNOWN/stopping原binding保留占位，另一Work的证明不释放它；取得自身新完整证明后允许合法释放，不能把UNKNOWN当永久锁。
-3. 每份检查/接受/产物必须绑定那个Work的当前candidate/原assignment，按view.artifactIds读取；不读全库最后N或仅ticket最新行。原begin接收次数用receiver原command/body，不能以turn/start计数代替。old/foreign/缺proof/迟到不能影响其他槽；缺产品行为给main最小repro，不改原表或创建scheduler。
-4. B真实terminal endpoint consumer就绪后，同实际source复验其原端点/退出事实。现阶段虚拟native资源、真实Runner fake-driver与完整真实原生物理分层，不把两个独立PASS拼成同run结论。
+先修原consumer自阻：successor禁止再次spawn原target正确，但必须允许original.nextWorkId首次spawn；累计Runner应capacity+1。主线自有组合consumer已用这个限制完成2/4同run，生产容量源码无须修改。同步修原报告gap和assert：nextWorkProgressed必须真的为true，不能旧失败当成功、也不要求ended复活。参照main新combined-original-recovery及fixture实现，别再自建调度。
 
-仅H原tools/trial-kit/tests/operational-soak范围交独立consumer/原事实，E断言及main/B/I生产仍原owner。source早交后持续同一组合结果复验；更新原报告中准确subject即可，不再复制全轮次状态。真实模型/native/信号0；UNKNOWN保留材料、不绕产品拒绝清理，十二用户实例不操作。其他八位继续按需待命，不扩新功能、长soak或打包。
+每份检查/接受按原ticket+assignment+candidateGeneration匹配，产物按那个Work的view.artifactIds；原receiver核command ID/body/attempt/contract和begin1/answer1。UNKNOWN填充Work保留占位/原状态/注册材料，其他Work的证明不能释放它；取得它自己的完整新证明后允许合法释放。不要继续读全ticket第一行或删UNKNOWN root完成测试。
+
+B终态生命周期暂未准入；独立围绕[0095 postcommit约定](../../docs/rfcs/WP-16/0095-main-original-running-callback-composition.md)准备同实际consumer的确认前/后故障窗口：读proof/cancel响应丢失或main提交前再次退出仍可恢复；原屏障持久提交后finalize前退出从原receipt继任；有效finalize响应丢失不重做业务；UNKNOWN/foreign/wrong subject不关endpoint。B/main source早交即采用、复验、交最小具体缺口，持续到这个同run结果闭合，不需要每个修复再派工。
+
+只在H原tools/trial-kit/tests/operational-soak交独立consumer/精确source和原始事实，不改main/B/I生产或E断言、不新增持久指标。真实模型/native/信号0，无global discovery/unsafe kill/绕拒绝清理；纯/受控Node进程自行退出可用，未知现场保留。其他八位待命，不自行扩UX/安装/研究；完成本结果无剩余阻断即可交回。

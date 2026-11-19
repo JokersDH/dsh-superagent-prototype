@@ -1,7 +1,7 @@
 {
   "protocol": "recovery-milestone-workspaces/1",
-  "date": "2026-11-18",
-  "mainSource": "e2261ef5",
+  "date": "2026-11-19",
+  "mainSource": "6d309128",
   "previousDispatch": "agent-tasks/product-wave-36/dispatch.json",
   "createdWorktrees": 0,
   "externalPromptsSent": false,
@@ -24,7 +24,7 @@
       "id": "B",
       "root": "/Users/hh/Desktop/joker/superagent-agent-b",
       "branch": "codex/g1-runtime",
-      "acceptedInput": "4703a11c440d2f347968df3e4932df3ce346ed1e",
+      "acceptedInput": "91ba4f9a5922cc6daaa2e17e14cbc1be108db6ec",
       "packet": "agent-tasks/recovery-milestone-01/agent-b.zh-CN.md",
       "ownedPaths": [
         "packages/execution/",
@@ -40,7 +40,8 @@
         "apps/runner/src/attach-channel/",
         "apps/runner/test/attach-channel/"
       ],
-      "executionMode": "active_current_result_only"
+      "executionMode": "active_current_result_only",
+      "reviewDecision": "HOLD_TERMINAL_SOURCE"
     },
     {
       "id": "C",
@@ -112,7 +113,7 @@
       "id": "H",
       "root": "/Users/hh/Desktop/joker/superagent-agent-h",
       "branch": "codex/g4-trial-operations",
-      "acceptedInput": "59133df7b7827ff1a89004ce1e90284d7c325fd3",
+      "acceptedInput": "1a1be9dbfbaabd68df6fb4ce4c9b419a47b9e44c",
       "packet": "agent-tasks/recovery-milestone-01/agent-h.zh-CN.md",
       "ownedPaths": [
         "tools/trial-kit/",
@@ -120,7 +121,8 @@
         "docs/internal-trial/",
         "reports/trial-operations/"
       ],
-      "executionMode": "active_current_result_only"
+      "executionMode": "active_current_result_only",
+      "reviewDecision": "TEST_SELF_BLOCK_CORRECTED_MAIN_CONTROLLED_COMBINATION_PASS"
     },
     {
       "id": "I",
