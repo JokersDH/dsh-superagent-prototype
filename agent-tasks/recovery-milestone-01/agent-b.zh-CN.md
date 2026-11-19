@@ -1,21 +1,15 @@
-# B：原执行路径与不可变资源归属
+# B：原终态证明持久确认到正常退出的完整责任包
 
-**投入模式：主动，仅完成共同README里的当前路径。** 没有当前consumer的剩余阻断即可交回待命，不扩独立维护队列。
+原目录 `/Users/hh/Desktop/joker/superagent-agent-b`，原分支 `codex/g1-runtime`。保留dirty后fetch/merge最新origin/main，读AGENTS、共同README和[11-19验收](../../reports/releases/recovery-milestone-01/admission-2026-11-19.json)。当前main **6d309128**，本轮B **09216f1c**。
 
-目录 `/Users/hh/Desktop/joker/superagent-agent-b`，分支 `codex/g1-runtime`；本轮已验输入 `579c40bca3a2fc06f5510f468e0f6ab19f693fd7`。
-先读[共同里程碑](README.zh-CN.md)、AGENTS/START-HERE/product-spec/README和[验收](../../reports/releases/wave37-admission/README.zh-CN.md)。保留dirty后fetch/merge origin/main，固定实际consumer source。原owned/excluded路径仍以[原表](../product-wave-36/dispatch.json)为准。
+**主动，一个结果做到主线实际采用并独立验收，不在单个fix或SOURCE_READY处结束。** 主线已采用09216f的postcommit组件并通过受控回归；当前只收尾同一生命周期的finalize响应丢失/同confirmationId调和、UNKNOWN现场保留和entry正负复验。不是新增宿主、运维框架或另一条产品线。
 
-你负责 main 原 Work 恢复所需的原 Runner/控制与资源边界，支持到同一链路交付，不另外实现恢复产品。主线42f6daab已成套接入你579的四个控制文件/两测试，并在真实 Native.launch 的受控正常 Work 上完成问答到人工接受。
+旧HOLD已关闭：`awaitPostcommitFinalize`已进入RunnerServiceHandle，B direct strict通过；`cancel`不再清退endpoint，finalize要求精确subject/完整quiescent manifest/confirmationId。主线已在Store receipt/event提交后发送完整digest finalize。B39仍是组件证据，不冒充原Store durability。
 
-B37-READOPTION-SECOND-SNAPSHOT-REBASES-ORIGINAL-BIRTH继续登记、未准入工具保持禁用；只有原恢复consumer确需采用此工具时才修：precheck 后 registerIntent 的第二 snapshot 不得刷新原不可变 birth。用原 spawn 的私有记录发能力，每次观察都与同一个原记录核对；保留 constant-reuse 已通过反例，再测 old→foreign 的交错及 UNKNOWN，全部纯 mock、真实信号0。
+实施约定读[0095](../../docs/rfcs/WP-16/0095-main-original-running-callback-composition.md)：原inspect/cancel只给证明/关业务/停原资源，main确认Store receipt/event成功提交后，再通过原认证连接做私有postcommit-finalize。B拥有service/entry/recovery-endpoint/transport，main独占Store适配。冻结Bridge v1/hash不变，不另建队列/ledger；不要用50ms代替提交。
 
-只有当前原恢复consumer需要完整资源证明时，才在既有ProcessHost/execution边界补足原spawn私有记录/opaque handle；不启动通用进程框架或跨仓迁移。PID/start/UID/ordered argv/root/config/operation/full resources均须核对，UNKNOWN不释放，真实信号仍0。
+连续负责以下同一链路直到闭合：把实际entry/handle类型/所有直接consumer对齐；证明普通自然terminal与显式shutdown兼容；proof/cancel回复丢失或confirm前owner再退出时原endpoint仍在；main提交后finalize前退出可由原receipt继任；合法finalize响应丢失可按同确认ID调和；wrong/foreign/缺确认/资源UNKNOWN绝不清退。Finalize只允许已terminated/closed且完整原manifest和每资源quiescent的原对象，不带新停止/执行权限。无明确证明就保留材料。
 
-继续原 same attempt 的 detach/rebind、ACK unknown 调和和正常/终态 cancel 兼容；原 ID、begin 次数、原 child/session 不变，业务发送仍经 main/current/Broker。给 main 可运行的最小受控 fault 入口与 source；不得以新 SlotScheduler/4 channel 代替原 core queue。
+先交一个可运行最小source和正负consumer，让main接原Store确认与H独立验证；随后持续处理这条链的集成缺口/类型/重放/收尾至同原Work检查接受与原容量组合通过。不能拿export、fixture receipt、cancel200或两个分离PASS充当完成，不必增加长报告或阶段数。
 
-
-完成出口：main/H的同原Work恢复consumer所需控制修复实际采用，旧/foreign/终态零效果；未用工具的birth缺陷单独保留，不插入整链前置。真实物理与恢复层未达到则明确NOT_REACHED。
-
-被激活的具体事项交可运行source后，继续解决同一个consumer的集成和复验；无剩余实际阻断即可交回待命，不新建任务或独立队列。仅在现有状态文件补commit/命令exit/原IDs/剩余缺口，不额外生成大套报告。只显式owned路径提交到原origin分支，保留其他人的候选。
-
-自动vendor/model/native和真实信号均0；Bcap4UNKNOWN不可花，原E试点本阶段不推进，材料/ledger不变。十二用户实例及state/profile/tar/历史保留；不新Driver/CAC/desktop/自动接受/第二生命周期，不global discovery、借凭据或绕stop拒绝清理。无工时/当天deadline/新token预算；无需用重复测试填执行时间。
+执行受控Node/fake协议与无信号故障，真实vendor/model/native/信号0；无global discovery/危险fallback/借凭据。只改B owned，排除I通信子树，显式推原origin分支；保留十二用户实例、原dirty、state/profile/tar/ledger。遇主线依赖交最小repro/接口差异并继续本链已有负例，不扩独立维护队列或通用进程管理。

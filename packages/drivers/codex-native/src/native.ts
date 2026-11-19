@@ -38,6 +38,7 @@ export const NativeCodexSettingsSchema = z.strictObject({
   scope: ScopeSchema,
   model: z.string().max(160).optional(),
   approvalPolicy: z.enum(['untrusted', 'on-request']).default('untrusted'),
+  collaborationMode: z.enum(['plan', 'default']).optional(),
   timeoutMs: z.number().int().min(1000).max(1800000).default(600000),
 })
 type Settings = z.infer<typeof NativeCodexSettingsSchema>
@@ -247,11 +248,17 @@ export class CodexProductDriver implements AgentDriverV1 {
             began = true
             const input = ExecutionInputSchema.parse(await io.payloads.read(command.inputRef))
             if (!same(input.contract, spec.contract)) throw new Error('Native input has another contract')
+            if (settings.collaborationMode === 'plan' && typeof started.model !== 'string')
+              throw new Error('Native plan mode requires its actual applied model identity')
+            const collaborationModel = typeof started.model === 'string' ? started.model : ''
             const result = (await connection.request('turn/start', {
               threadId,
               cwd: workspace,
               input: [{ type: 'text', text: input.text }],
               effort: 'low',
+              ...(settings.collaborationMode === 'plan' ? {
+                collaborationMode: { mode: 'plan', settings: { model: collaborationModel, reasoning_effort: 'low', developer_instructions: null } },
+              } : {}),
             })) as Record<string, JsonValue>
             const turn = result.turn as Record<string, JsonValue>
             if (typeof turn?.id !== 'string') throw new Error('No native turn identity')

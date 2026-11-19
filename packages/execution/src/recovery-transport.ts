@@ -1,6 +1,6 @@
 import { request, createServer } from 'node:http'
 import type { IncomingMessage, ServerResponse } from 'node:http'
-import { randomBytes, timingSafeEqual } from 'node:crypto'
+import { createHash, randomBytes, timingSafeEqual } from 'node:crypto'
 import { appendFileSync, openSync, writeSync, fsyncSync, closeSync, lstatSync, readFileSync, chmodSync } from 'node:fs'
 import { dirname, isAbsolute } from 'node:path'
 import { performance } from 'node:perf_hooks'
@@ -28,6 +28,21 @@ export type RunnerState = Pick<RunnerInspection, 'state' | 'admission' | 'covera
 export type RunnerEndpoint = { socketPath: string; credentialPath: string; socketIdentity: { dev: number; ino: number } }
 /** The authenticated caller for a control action: current registration producer plus its attach lease. */
 export type RunnerControlAuth = { producer: RuntimeProducer; leaseId: string | null }
+/** Postcommit finalize: the coordinator's authenticated confirmation that its original Store committed. */
+export type RunnerFinalizeConfirmation = {
+  attempt: RuntimeProducer['attempt']
+  confirmationId: string
+  resourceManifestDigest: string
+  proofRef?: string
+}
+export type RunnerFinalizeResult = { finalized: true; alreadyFinalized: boolean }
+/** Canonical digest of the complete owned-resource manifest (refs, ownership, writer, evidence). */
+export function runnerResourceManifestDigest(resources: readonly { ref: string; ownership: string; writer: string; evidence?: readonly string[] }[]): string {
+  const canonical = resources
+    .map(resource => ({ ref: resource.ref, ownership: resource.ownership, writer: resource.writer, evidence: [...(resource.evidence ?? [])] }))
+    .sort((left, right) => left.ref < right.ref ? -1 : left.ref > right.ref ? 1 : 0)
+  return createHash('sha256').update(JSON.stringify(canonical)).digest('hex')
+}
 export interface RecoveryRunnerPort {
   /** Inventory must include every owned writer; terminated/closed is irreversible for this endpoint. */
   inspect(): Promise<RunnerState>
@@ -60,6 +75,8 @@ export interface RecoveryRunnerPort {
    * child; this is admission of an authenticated command, not a second execution lifecycle.
    */
   command?(command: ReturnType<typeof RunnerCommandSchema.parse>, auth?: RunnerControlAuth): Promise<RunnerState>
+  /** Optional, backward-compatible postcommit finalize; only a fully terminal/quiescent Runner accepts it. */
+  finalize?(auth: RunnerControlAuth, confirmation: RunnerFinalizeConfirmation): Promise<RunnerFinalizeResult>
 }
 export class RunnerLinkError extends Error {
   /**
@@ -332,6 +349,30 @@ export async function serveRunnerRecovery(endpoint: Pick<RunnerEndpoint, 'socket
       }
       return
     }
+    if (req.method === 'POST' && req.url === '/v1/terminal/finalize') {
+      if (!backend.finalize) { reply(res, 404, { error: 'unsupported_recovery_action' }); return }
+      const raw = await body(req) as { producer?: unknown; confirmation?: Record<string, unknown>; leaseId?: unknown }
+      if (!raw || typeof raw !== 'object' || !raw.producer || typeof raw.producer !== 'object') { reply(res, 409, { error: 'identity_mismatch', reason: 'missing_producer' }); return }
+      let finProducer: RuntimeProducer
+      try { finProducer = identity(raw.producer as RuntimeProducer) } catch { reply(res, 409, { error: 'identity_mismatch' }); return }
+      if (!matches(finProducer, trusted)) { reply(res, 409, { error: 'identity_mismatch' }); return }
+      const confirmation = raw.confirmation as RunnerFinalizeConfirmation | undefined
+      if (!confirmation || typeof confirmation !== 'object') { reply(res, 400, { error: 'invalid_confirmation' }); return }
+      if (!confirmation.attempt || !matchesCommandIdentity(finProducer.attempt, confirmation.attempt as unknown as Record<string, unknown>)) { reply(res, 409, { error: 'identity_mismatch', reason: 'wrong_subject' }); return }
+      if (typeof confirmation.confirmationId !== 'string' || !/^[A-Za-z0-9._:-]{1,128}$/.test(confirmation.confirmationId)) { reply(res, 400, { error: 'invalid_confirmation_id' }); return }
+      if (typeof confirmation.resourceManifestDigest !== 'string' || !/^[a-f0-9]{64}$/.test(confirmation.resourceManifestDigest)) { reply(res, 400, { error: 'invalid_resource_manifest' }); return }
+      if (confirmation.proofRef !== undefined && (typeof confirmation.proofRef !== 'string' || confirmation.proofRef.length > 512)) { reply(res, 400, { error: 'invalid_proof_ref' }); return }
+      const leaseHeader = typeof req.headers['x-pa-lease'] === 'string' ? req.headers['x-pa-lease'].trim() : ''
+      try {
+        const result = await backend.finalize({ producer: finProducer, leaseId: leaseHeader || null }, confirmation)
+        reply(res, 200, result)
+      } catch (error) {
+        const refusal = error as { code?: unknown; reason?: unknown; message?: unknown }
+        reply(res, 409, { error: typeof refusal.code === 'string' ? refusal.code : 'unknown_outcome',
+          ...(typeof refusal.reason === 'string' ? { reason: refusal.reason } : {}), message: String(refusal.message ?? '').slice(0, 200) })
+      }
+      return
+    }
     if (req.method !== 'POST' || req.url !== '/v1/cancel') { reply(res, 404, { error: 'unsupported_recovery_action' }); return }
     const raw = await body(req) as { producer?: unknown; command?: unknown; leaseId?: unknown }
     const commandBody = raw && typeof raw === 'object' && 'command' in raw ? raw.command : raw
@@ -453,6 +494,13 @@ export function connectRunnerRecovery(input: RunnerEndpoint, context: RuntimePro
       return { producer: pageProducer, frames: replay.frames as unknown[], next: replay.next as number, done: replay.done as boolean }
     },
     command: (command: ReturnType<typeof RunnerCommandSchema.parse>, leaseId?: string) => call('POST', '/v1/commands', { producer: trusted, command }, leaseId ? { 'x-pa-lease': leaseId } : undefined),
+    finalize: async (confirmation: Omit<RunnerFinalizeConfirmation, 'attempt'> & { attempt?: RunnerFinalizeConfirmation['attempt'] }, leaseId?: string) => {
+      const body = { producer: trusted, confirmation: { ...confirmation, attempt: confirmation.attempt ?? trusted.attempt } }
+      const response = await invoke('POST', '/v1/terminal/finalize', body, leaseId ? { 'x-pa-lease': leaseId } : undefined) as { value: unknown }
+      const result = response?.value as RunnerFinalizeResult | undefined
+      if (!result || result.finalized !== true || typeof result.alreadyFinalized !== 'boolean') throw new RunnerLinkError('invalid_response', 'Runner finalize response did not match the private protocol')
+      return result
+    },
     channelState: async () => {
       const { value } = await invoke('GET', '/v1/channel/state', undefined, { 'x-pa-producer': Buffer.from(JSON.stringify(trusted), 'utf8').toString('base64') }) as { value: unknown }
       const state = value as { generation?: unknown }

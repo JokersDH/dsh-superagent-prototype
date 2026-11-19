@@ -1,13 +1,15 @@
 # Repository Instructions
 
+2026-11-19 current: User authorized milestone03 DAILY USABLE DELIVERY and at most4 actual Codex turn/start sends. Scope, six exit items and copyable D/E prompts: docs/product/MILESTONE-03.zh-CN.md. Only main/D/E active; B/F on concrete blockers, others idle. Main reserves1 turn, E at most3, D0; old grants never roll over. No extra fault signals or new wave. Preserve original roots/ownership and twelve user instances. Recovery01/native-control02 remain CLOSED6/6; historical score82/100, SchemeB excludingCAC63.1%, not release approval. Their summary stays docs/product/MILESTONES-01-02.zh-CN.md. Temporary main B/H ownership ended. Three-line checkpoints and one final completion summary remain.
+
 ## Entry And Current Work
 
 - Delivery repository: https://github.com/JokersDH/dsh-superagent-prototype.
 - origin is the user's fork; upstream is DeepSeek. Push only to origin, never upstream.
 - Read START-HERE.zh-CN.md, product-spec/README.md and your assigned packet before implementation.
-- Current work is agent-tasks/recovery-milestone-01/README.zh-CN.md. It replaces wave36 NEW expansion dispatch, while retaining all prior outcomes and evidence.
-- The one milestone is the SAME original Work through coordinator failure, original Store/Application/QuestionBroker continuation, original check/currentCandidate/manual acceptance/delivery and original 2/4 slot/resource return.
-- Main owns the end-to-end result. Main/B/H actively close original recovery; D/E actively close the fixed existing installation cohort. A/C/F/G/I/J are on demand only when those actual consumers expose a concrete blocking issue; otherwise stay idle.
+- Current work is docs/product/MILESTONE-03.zh-CN.md, explicitly accepted by the user. Completed recovery/native-control packets and older waves are historical; do not execute their old active queues.
+- The one current result is normal first use through two real projects, workbench controls, checked/manual-accepted/applicable patches, normal reopening and independent use of the SAME frozen installation. Keep the original Store/Application/QuestionBroker, Work identities and physical resource barriers; recovery/native controls already completed remain regression boundaries, not reopened research.
+- Main owns daily-use end-to-end integration, D the selected-source installation, E independent acceptance of the same fixed package. Only actual blockers activate B/F or other original owners; no independent maintenance queues or feature expansion.
 - Do not start another feature-expansion wave before that exit. Larger tasks mean continuous integration, repair and acceptance responsibility, not more numbered deliverables.
 - Publish runnable source early, then finish the SAME result through integration and acceptance. No independent maintenance queues or busywork to use all agents; unused candidate defects stay disabled and do not automatically block the active path. SOURCE_READY is not whole-product completion. No same-day deadline, duration promise or token allowance.
 - Full Scheme B engineering remains the goal. CAC, desktop, new Driver, automatic acceptance, writer racing and dynamic DAG work are outside this milestone.
@@ -37,18 +39,21 @@
 
 ## Current Verified Source And Limits
 
-- Main42f6daab/0095 activates callbacks from actual NativeProductAttempt.launch-returned RunningAttempt, binds before begin, and retains original stdio feed/physical barrier.
+- Mainbde57d42/0095 retains original Native.resume/current checks and now commits Store barrier before sending B postcommit finalize with the full runner manifest digest and stable confirmation ID. Already-ACKed terminal restoration requires original business observation/immutable payload/canonical fact receipt and complete original quiescence. No closed-channel rebind or stopping/ended revival.
 - Its trusted Node-only RunnerLink factory defaults to the original RunnerLink; no profile/env/HTTP fallback. Poll lease loss stops, never automatically rebinds.
-- Controlled original HTTP Work/question/answer/native_applied/check/currentCandidate/manualaccept/artifact reopen passes; revoked authority rejects with zero effect. The ProcessHost/protocol peer is virtual and verifier signals are suppressed: no crash-recovery, physical or original2/4-slot proof.
+- Earlier40tests/strict cover three controlled owner-exit windows plus five refusals and separate original2/4 queue controls. Capacity is internal2|4(default4), counted from original non-ended Store bindings, no new queue. Current same-run result is below; real physical/native remains unproved.
+- Main6d309128 now proves controlled SAME-RUN owner exit/target delivery/original2&4 release/queued third-fifth Work first-start,42tests/strict. H1a1be9 next-slot gap was its injected factory forbidding successor spawn of the distinct queued Work; production capacity unchanged. Count cumulative capacity+1, keep original target begin1/answer1, exact Work/candidate/assignment evidence and UNKNOWN material.
+- B09216f1 component is admitted: RunnerServiceHandle finalize type/direct strict, cancel retains endpoint, finalize requires exact subject/full quiescent manifest/confirmation ID. Main adapter is controlled verified; remaining is same-ID finalize response-loss reconciliation and H UNKNOWN test cleanup. No new queue/ledger/host/feature line; Bridge v1 remains frozen.
+- B4703 actual main-entry stdinEOF/closedstdout fake-driver consumer4PASS/1NT is independently reproduced; old entry already had EPIPE handling. Imported only actual receiver body logging, not unused mainRunnerService wrapper/scenario-env/RunnerLink.spawnIntent. B38 UNKNOWN roots are retained; separate finalization component is now in the main path but response-loss reconciliation remains.
 - B579's four control sources plus two related tests are imported together. Old/new cancel protocol mixing refuses; no bare-command downgrade. B signal tools and I host are NOT imported.
 - Closed: B natural-terminal original no-lease cancel/barrier compatibility, C synchronous superseded/digest checks, E queryUNKNOWN/missing-booleans/operation-copy negatives.
 - Still blocked: B readoption second-snapshot birth refresh; I shutdown deleting borrowed parent state; G wrong launcher/empty argv identity promotion and self-labelled provenance. Fix pure controls before adoption/live actions.
 - A's reader is already byte-identical to main. F optional history consumer and J config/history tests do not imply new default algorithms or installed acceptance.
-- E genuinely tested W35 install/config/nonempty recovery/upgrade subsets; 347PASS/22NT is a multi-cohort aggregate. Ordinary212/functional213 pass; full214native does not.
+- Earlier E W35 install/config/nonempty recovery/upgrade and347PASS/22NT remain historical multi-cohort evidence; they are not the current W36 whole-product verdict.
 - Fixed next independent cohort is existing W36 source087a598e5b6f357bd2cc40556cbf693257febc66/build14a6b457ea285988, Node24.21.0/ABI137/schema18/darwin-arm64.
 - W36 innerSHA13798190ae43b28628eaf7131dfb8192bdb786b9bcfe4e1e0b6f9217ab33a8af; outerSHA43e06d5bc7606e8283c1c5f58463f402018d4c9c9b223a2c7c021d429ccb8995. Paths and scope are in the milestone README.
-- Its full inventory/static and developer-installed history HTTP200 are real; E same-W36/default App click remain separate. Correct D's five stale selected-source hashes from frozen git087, preserving old evidence; no archive rebuild for report-only corrections.
-- D freeze precedes E final; E first finishes this fixed cohort, never follows moving HEAD or relabels old PASS. A necessary changed-runtime successor needs an explicit source/subject handoff; docs/tests-only do not refreeze.
+- D's199/199 selected-source hashes now match frozen git087, old evidence preserved and archives unchanged. E's seven same-W36 installation cases include modelGUI/nonempty restore/controlled check/manualaccept and actual three-kind history clicks.354PASS/22NT and219/220 tiers are multi-cohort aggregates; full221native refuses. Fixed subset complete, not newmain/native/full release.
+- D/E now wait for an actual original-recovery consumer or selected stable successor. D freeze precedes E final; never follow moving HEAD/relabel old PASS or refreeze for docs/tests. Keep oracle residuals recorded without a new hardening queue.
 - source/controlled/installed/native/recovered/value stay separate. Historical latest76/100 and55.7/95=58.6% are not automatically raised by tests, staffing or scope withdrawal.
 
 ## Budget, Resources And Preservation
@@ -56,6 +61,7 @@
 - User explicitly confirmed this phase does NOT pursue review-value pilot, its dependent second-protocol review, or routing-benefit research. Value is unmeasured, not disproven.
 - Preserve original experiment protocol/fixtures/reports/ledger unchanged. Do not reset/refund/top up/replace samples or research pricing/allowance/feasibility.
 - Automatic real vendor/model/native calls and real signals are zero. B original cap4 UNKNOWN is unspendable. E original24turn/200000token/USD5/one-in-flight pilot is phase-withdrawn, with historical ledger unchanged.
+- Exception authorized for milestone03 only: at most4 actual Codex turn/start sends total, main1/E3/D0 under its current packet. No automatic extra discussion-model calls or fault signals. Setup before any actual send spends none; unknown business sends retain occupancy/identity and are reconciled, never replayed under a new ID. Prior grants and ledgers stay unchanged.
 - Preserve twelve user UI5180-5191/API8796-8807 services and all state/profile/tar/ledger/history/runs/dirty. No automatic restart, migration, state clearing or credential borrowing.
 - Process authority must originate from a private immutable original spawn record: exact PID/start/UID/ordered full argv/root/config/operation and complete resources.
 - Prevalidate the whole resource plan before any signal and recheck fresh identity before EACH escalation. Missing observation, failure, timeout or incomplete inventory is UNKNOWN, never exited/empty/clean.

@@ -1,0 +1,64 @@
+{
+  "date": "2026-11-18",
+  "status": "FIXED_W36_MEASURED_INSTALL_SUBSET_ADMITTED_FULL_PRODUCT_NOT_ADMITTED",
+  "fixedSources": {
+    "D": "069447b7a65e473b4e730819cabed551a0e8df90",
+    "E": "e7a8b1b0848af4dd202e32b20f70f59db3045765",
+    "EMeasuredSource": "d199cd90888069df2fe6bcc7d30f8ae8ddd90f78",
+    "candidateWorkingTrees": "Both clean before and after; untouched"
+  },
+  "subject": {
+    "source": "087a598e5b6f357bd2cc40556cbf693257febc66",
+    "buildId": "14a6b457ea285988",
+    "schema": 18,
+    "node": "24.21.0",
+    "abi": "137",
+    "platform": "darwin-arm64",
+    "inner": "/Users/hh/Desktop/joker/pa-artifacts/wave36-target/wave36-target-14a6b45.tar.gz",
+    "innerSha256": "13798190ae43b28628eaf7131dfb8192bdb786b9bcfe4e1e0b6f9217ab33a8af",
+    "innerBytes": 20625055,
+    "outer": "/Users/hh/Desktop/joker/pa-artifacts/wave36-preview-14a6b45/PersonalAgent-Preview-14a6b45.zip",
+    "outerSha256": "43e06d5bc7606e8283c1c5f58463f402018d4c9c9b223a2c7c021d429ccb8995",
+    "outerBytes": 63565262
+  },
+  "independentReadonlyChecks": {
+    "archiveHashAndSize": "Both existing files independently match the fixed tuple; no archive changed or executed",
+    "selectedSourceAudit": "All199 records independently recomputed with git show087:path match byte size and SHA256; five old core hashes fixed, source-closure-pre-correction.json preserved",
+    "recordedOracle": "Current E gate equals measured-source gate; evaluateRelease with resolveFixtureDigest at original checkedAt+1s, not renewed freshness",
+    "aggregate": { "PASS": 354, "FAIL": 0, "NOT_TESTED": 22 },
+    "recordedTierResults": { "installedAlpha": "PASS219", "installedFunctional": "PASS220", "localAlpha": "PASS219", "fullProduct": "FAIL221: native delivery absent and native control NOT_TESTED" },
+    "aggregateScope": "Requirements include legacy R1/W33/W35 and current W36 named subsets; these counts are NOT219/220 cases all executed on W36"
+  },
+  "actualW36Subset": {
+    "evidence": "/Users/hh/Desktop/joker/superagent-agent-e/tests/product-acceptance/reports/runs/2026-11-17T08-54-30-978Z/report.json",
+    "cases": ["E37-W36-OUTER", "E37-W36-OUTER-OPERATION", "E37-W36-MODEL-SAVE", "E37-W36-MODEL-SAVE-OPERATION", "E37-W36-RECOVERY", "E37-W36-RECOVERY-OPERATION", "E37-W36-HISTORY"],
+    "identityLifecycle": "Same fixed outer/inner source/build/runtime/license manifests, actual package start/status/stop/reopen/reuse/import/port-conflict observations",
+    "modelGui": "Actual packaged settings save to0600, invalid endpoint refused, HTTP consent, no key echo, restart config present and loopback model requests0",
+    "nonemptyRestore": "Original controlled delivered Work4f5057192f07bcb6549888d18cfc9314, actual registered checkPASS and available accept, all4 artifact bytes; second pending Work/question/effects and26 registry rows preserved through backup/restore to read-only root, writes refused/provider0",
+    "history": "Original packaged controlled Work5db5ab1c55cc22d0b677ac1b931eeb4d: delivered after registered checkPASS/manualaccept,4 artifacts; API contracts/verifications/acceptances each200/available1/returned1, actual packaged select clicks show corresponding generation/contract row with source1/shown1",
+    "historyNegatives": "Bad kind and limit0/21 return400; headerless loopback local-accessGET200, explicitly wrong bearer401; no unauthenticated-public claim",
+    "physicalScope": "Recorded original package-stop and before/after owned-process observations for these installed cases are genuine; this reviewer did not repeat live operations, and this does not prove native writer/crash-recovery resources",
+    "DAppProgress": "D also delivered actual installed history click/raw text/screenshot and stop, separate from E independent observations"
+  },
+  "remainingLimits": [
+    "Same original active Work coordinator-fault business continuation and original2/4 scheduler/resource return remain NOT_REACHED",
+    "The original registered non-fixture project applicability remains NOT_REACHED; installed controlled project-atlas is explicit, not substituted as original-project completion",
+    "W36 managed upgrade/rollback was not independently executed in these new cases; existing W35 upgrade remains bound to W35",
+    "Current42f6 main callback composition and later recovery source are not certified by W36 source087",
+    "Native vendor/control, cross-machine/signing/long-run and user benefit remain unmeasured"
+  ],
+  "nonBlockingOracleCoverageResidual": {
+    "scope": "Existing E w36HistoryIssues report validator, separate from authentic recorded positive and runCase assertions",
+    "pureMutations": "Setting API returned=0, UI source/shown=0, or wrongToken.status=200 independently yields issues=[]",
+    "interpretation": "Actual positive has nonempty API/UI rows and wrong bearer401; those facts stand. Generic report gate coverage is narrower than the actual case assertions. Keep this recorded; do not launch a new platform/hardening queue or invalidate measured positive because of unexecuted hypothetical product behavior. Before reusing this validator as sole admission for altered/future history reports, E should bind returned/UI cardinality and required bearer refusal.",
+    "newDefaultProductBypassDemonstrated": false
+  },
+  "nextWorkDecision": {
+    "D": "FixedW36 source-audit correction and handoff complete; can return to on-demand standby for an E/main concrete blocker, no new freeze",
+    "E": "FixedW36 named independent subset verdict complete; can return to on-demand standby, preserve above limits and await main/H actual recovered original-Work consumer for the next relevant independent assertion",
+    "noNewFeatureLines": true,
+    "completionScoreAutomaticallyChanged": false,
+    "fullProductReleaseApproved": false
+  },
+  "reviewerEffects": { "runtimeStartStop": 0, "modelNative": 0, "signals": 0, "processDiscovery": 0, "newArchive": 0, "candidateSourceOrAssertionsEdited": 0, "allSessionsComplete": true }
+}

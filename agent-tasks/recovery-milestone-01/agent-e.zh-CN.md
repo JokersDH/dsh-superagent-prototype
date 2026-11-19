@@ -1,6 +1,6 @@
 # E：固定 W36 的独立安装结论
 
-**投入模式：主动，仅完成共同README里的当前路径。** 没有当前consumer的剩余阻断即可交回待命，不扩独立维护队列。
+**2026-11-18：固定W36本项已独立验收，转按需待命。** 不执行以下旧主动任务，不新freeze/扩大验收矩阵；仅在main选定后继或原consumer出现具体阻断时参与。详见[本轮验收](../../reports/releases/recovery-milestone-01/install-admission-2026-11-18.json)。
 
 目录 `/Users/hh/Desktop/joker/superagent-agent-e`，分支 `codex/g3-product-acceptance`；本轮已验输入 `95d48acc06b437a2a14a8cd46be430215cc3df5d`。
 先读[共同里程碑](README.zh-CN.md)、AGENTS/START-HERE/product-spec/README和[验收](../../reports/releases/wave37-admission/README.zh-CN.md)。保留dirty后fetch/merge origin/main，固定实际consumer source。原owned/excluded路径仍以[原表](../product-wave-36/dispatch.json)为准。
