@@ -8,9 +8,10 @@
  */
 import { Worker } from 'node:worker_threads'
 import { execFileSync } from 'node:child_process'
-import { cpSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { ProductStore } from '../../packages/storage/dist/index.js'
+import { loadRecoveryRunner } from '../../apps/coordinator/runner-registry.ts'
 import { nativeCallbackLink } from './fixtures/native-callback-link.ts'
 
 const WORKER = new URL('./fixtures/combined-recovery-worker.mjs', import.meta.url)
@@ -117,16 +118,21 @@ export async function runCombined(capacity, root) {
     }
     return { protocol: 'combined-recovery-capacity/1', capacity, original, successor, receiver: { targetBegin, targetAnswer, fillerBegin, rows: receiver.length }, totalNativeEffects, readback, checks, gap: successor.nextProgressed ? null : { stage: 'next_work_progress', observed: successor.nextError, note: 'target delivered and binding ended; filler held UNKNOWN; next Work question did not appear', minimalRepro: 'same-run combined consumer capacity='+capacity }, layers: { source: 'main e2261ef5 ProductRuntime/recovery/capacity', controlled: 'virtual ProcessHost per Work', native: 0, physical: 'NOT_TESTED', ackLost: 'not part of capacity run', schedulerSlots: 'original ProductExecution maxActiveAttempts only; OS resources NOT_TESTED' } }
   } finally {
+    const inspectStore = new ProductStore({ path: join(stateRoot, 'db.sqlite') })
+    const unknownCredentials = []
+    try {
+      for (const ticket of inspectStore.domain.tickets.list()) {
+        const binding = inspectStore.bindings.current(ticket.id)
+        if (binding && binding.state !== 'ended') {
+          const registration = loadRecoveryRunner(inspectStore, binding.attemptId)
+          if (registration) unknownCredentials.push(registration.body.endpoint.credentialPath)
+        }
+      }
+    } finally { inspectStore.close() }
     for (const close of closers) { try { await close() } catch { /* virtual */ } }
     process.env.PA_RUNNER_RECEIVER_LOG = priorLog ?? ''
     if (priorLog === undefined) delete process.env.PA_RUNNER_RECEIVER_LOG
-    // Preserve every runner root before closing in-process services; UNKNOWN/stopping evidence must
-    // survive the test cleanup even though the virtual host itself is then closed.
-    const retained = join(root, 'retained-unknown')
-    mkdirSync(retained, { recursive: true, mode: 0o700 })
-    for (const [index, source] of recoveryRoots.entries()) {
-      try { cpSync(source, join(retained, String(index)), { recursive: true, force: true }) } catch {}
-    }
+    for (const credential of unknownCredentials) assert.ok(existsSync(credential), 'Original UNKNOWN credential must survive transport cleanup')
     console.log(`Retained combined original state: ${root}`)
   }
 }

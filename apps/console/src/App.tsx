@@ -2727,7 +2727,13 @@ function QuestionCard({
                 {field.label}
                 {field.required ? '（必填）' : ''}
               </span>
-              {field.kind === 'boolean' ? (
+              {field.kind === 'single' && field.options?.length ? (
+                <select required={field.required} value={String(form[field.id] ?? '')}
+                  onChange={event => setForm(previous => ({ ...previous, [field.id]: event.target.value }))}>
+                  <option value="">请选择</option>
+                  {field.options.map(option => <option key={option.id} value={option.id}>{option.label}</option>)}
+                </select>
+              ) : field.kind === 'boolean' ? (
                 <input
                   type="checkbox"
                   checked={Boolean(form[field.id])}

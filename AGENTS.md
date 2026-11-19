@@ -1,13 +1,15 @@
 # Repository Instructions
 
+2026-11-19 current: Recovery01 and native-control02 are both CLOSED6/6. Recovery used1 actual turn+1 SIGKILL to its own isolated coordinator and reached sameWork delivered/begin1; native-control used5/6 actual turns for real workbench approval/denial/plan clarification/steer/physical stop/readonly unknown reconciliation. Final original-rubric score82/100, SchemeB excludingCAC63.1%; not release approval. Summary: docs/product/MILESTONES-01-02.zh-CN.md. Temporary main authority over B/H paths has ended; original owners below are restored. All agents idle; do not send more native/model tasks/signals or start another wave/milestone without a new user decision. Non-P0 new windows go to backlog. Three-line checkpoints and one final summary replace old per-wave JSON/dispatch generation.
+
 ## Entry And Current Work
 
 - Delivery repository: https://github.com/JokersDH/dsh-superagent-prototype.
 - origin is the user's fork; upstream is DeepSeek. Push only to origin, never upstream.
 - Read START-HERE.zh-CN.md, product-spec/README.md and your assigned packet before implementation.
-- Current work is agent-tasks/recovery-milestone-01/README.zh-CN.md. It replaces wave36 NEW expansion dispatch, while retaining all prior outcomes and evidence.
+- Current work is complete as recorded in docs/product/MILESTONES-01-02.zh-CN.md. The recovery task packets are historical; do not execute their old active queues.
 - The one milestone is the SAME original Work through coordinator failure, original Store/Application/QuestionBroker continuation, original check/currentCandidate/manual acceptance/delivery and original 2/4 slot/resource return.
-- Main owns the end-to-end result. Main/B/H actively close original recovery. D/E completed the fixed W36 measured installation subset and return to on-demand standby; all other agents stay idle unless the original recovery consumer exposes a concrete owned blocker.
+- Main completed the two authorized end-to-end milestones. All original roles now remain idle; no external maintenance dispatch or new expansion is active.
 - Do not start another feature-expansion wave before that exit. Larger tasks mean continuous integration, repair and acceptance responsibility, not more numbered deliverables.
 - Publish runnable source early, then finish the SAME result through integration and acceptance. No independent maintenance queues or busywork to use all agents; unused candidate defects stay disabled and do not automatically block the active path. SOURCE_READY is not whole-product completion. No same-day deadline, duration promise or token allowance.
 - Full Scheme B engineering remains the goal. CAC, desktop, new Driver, automatic acceptance, writer racing and dynamic DAG work are outside this milestone.

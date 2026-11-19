@@ -723,8 +723,8 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
   const shutdown = async (): Promise<void> => {
     closeAdmission()
     finish()
-    await recoveryEndpoint?.close().catch(() => undefined)
     await stopPhysical().catch(() => undefined)
+    await recoveryEndpoint?.close().catch(() => undefined)
     journal?.close()
   }
   const handle: RunnerServiceHandle = { done, shutdown, awaitPostcommitFinalize }
