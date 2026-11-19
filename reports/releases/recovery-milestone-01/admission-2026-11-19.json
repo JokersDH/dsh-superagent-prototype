@@ -101,5 +101,54 @@
       "H UNKNOWN material cleanup in consumer",
       "real native/physical/OS lifecycle and installed revalidation"
     ]
+  },
+  "closeoutOptionA": {
+    "authorizedDate": "2026-11-19",
+    "budget": {
+      "realCodexShortTasksAuthorized": 3,
+      "realCodexShortTasksUsed": 2,
+      "physicalCoordinatorSigkillAuthorized": 1,
+      "physicalCoordinatorSigkillUsed": 0,
+      "unknownRetries": 0,
+      "instancesTouched": 0
+    },
+    "checklist": [
+      {
+        "id": 1,
+        "status": "PASS",
+        "evidence": "6d309128 controlled three windows + same-run 2/4; subsequent 42/combined tests"
+      },
+      {
+        "id": 2,
+        "status": "PASS_CONTROLLED",
+        "evidence": "main Store barrier commit -> full B digest/same confirmation finalize; B idempotent/lost-reply component probe; main retries same ID on transport unknown",
+        "limit": "no live response-loss OS proof"
+      },
+      {
+        "id": 3,
+        "status": "PASS_CONTROLLED",
+        "evidence": "main combined consumer now snapshots retained runner roots before closing virtual services; exact Work/candidate/assignment/artifact/receiver assertions",
+        "limit": "H branch historical consumer cleanup remains separate"
+      },
+      {
+        "id": 4,
+        "status": "UNKNOWN_STOPPED",
+        "evidence": "isolated coordinator probe setup failed before issuing SIGKILL; no retry per user decision; temporary roots retained",
+        "limit": "no physical coordinator SIGKILL evidence"
+      },
+      {
+        "id": 5,
+        "status": "PASS",
+        "evidence": "one real Codex short task: /tmp/pa-native-product-tuYPa7, profile codex-cli 0.164.0, five cases pass, report reports/releases/native-mvp/native-product.json",
+        "limit": "normal real Codex delivery; no physical crash proof"
+      },
+      {
+        "id": 6,
+        "status": "PENDING",
+        "evidence": "recompute 12-item rubric after all checkboxes; not closed because item4 is UNKNOWN"
+      }
+    ],
+    "closed": false,
+    "next": "No further physical retries. Main/B/H only finish same-ID finalize reconciliation and retain evidence; if item4 remains UNKNOWN, report milestone incomplete and stop. Do not open a new wave."
   }
 }

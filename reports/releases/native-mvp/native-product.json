@@ -1,10 +1,10 @@
 {
   "status": "PASS_REAL_NATIVE_PRODUCT",
-  "checkedAt": "2026-11-09T08:13:22.795Z",
-  "sourceCommit": "98dfbc9f380537dd541e1253a93a40d9d61beab9",
+  "checkedAt": "2026-11-19T04:18:08.752Z",
+  "sourceCommit": "a3becff2c7f3105ba061fcfdae0a87f5355c03d1",
   "profileVersion": "codex-cli 0.164.0",
-  "root": "/tmp/pa-native-product-GRxeYA",
-  "elapsedMs": 32437,
+  "root": "/tmp/pa-native-product-tuYPa7",
+  "elapsedMs": 35481,
   "cases": [
     {
       "id": "NATIVE-DELEGATION",
