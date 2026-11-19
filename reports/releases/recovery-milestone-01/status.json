@@ -1,10 +1,10 @@
 {
   "protocol": "recovery-milestone-status/1",
-  "date": "2026-11-18",
-  "source": "e2261ef5",
+  "date": "2026-11-19",
+  "source": "6d309128",
   "normalOriginalComposition": "CONTROLLED_PASS",
-  "sameOriginalWorkCrashRecovery": "THREE_CONTROLLED_WINDOWS_PASS_ACTUAL_EOF_TRANSPORT_COMPONENT_PASS_FULL_COMBINED_NATIVE_OS_NOT_REACHED",
-  "originalSchedulerTwoFourResources": "CONTROLLED_ORIGINAL_QUEUE_CAPACITY_UNKNOWN_RETENTION_AND_SEPARATE_BARRIER_PASS_COMBINED_FAULT_PHYSICAL_PENDING",
+  "sameOriginalWorkCrashRecovery": "CONTROLLED_SAME_RUN_COMBINATION_PASS_REAL_TERMINAL_POSTCOMMIT_LIFETIME_PENDING",
+  "originalSchedulerTwoFourResources": "SAME_RUN_CONTROLLED_OWNER_EXIT_DELIVERY_ORIGINAL_CAPACITY_THIRD_FIFTH_PROGRESSION_PASS_PHYSICAL_NOT_TESTED",
   "realNativePhysicalQuiescence": "NOT_TESTED",
   "independentFixedW36Installed": "NAMED_SEVEN_CASE_SUBSET_ADMITTED_NOT_FULL_PRODUCT",
   "latestHistoricalEstimate": {
@@ -20,7 +20,7 @@
     "historicalProtocolFixturesLedgerReportsChanged": false,
     "newAllowance": 0
   },
-  "nextResponsibility": "main integrates same milestone; B actual terminal endpoint lifetime and UNKNOWN fixture retention; H independent combined same-run fault/delivery/capacity. Others on demand only.",
+  "nextResponsibility": "One complete result until integration/independent acceptance: B service/entry/transport postcommit finalization and real consumer; main original Store receipt/event adapter; H corrected exact-subject same-run independent consumer. Other eight remain on demand.",
   "forwardPrompts": "agent-tasks/recovery-milestone-01/forward-prompts.zh-CN.md",
   "externalPromptsSent": false,
   "staticVerification": {
@@ -40,11 +40,12 @@
   },
   "externalReview": "Preserved unstaged; its root-log removals were external changes, not performed or restored by this task",
   "firstKnownGap": {
-    "closed": "Original question/answer-written-resolution-held/terminal-ACK controlled owner takeover; actual main fake-driver Runner EOF transport; original2/4 queue occupancy logic",
-    "remaining": "Real terminal endpoint lifetime; independent same-run fault+delivery+capacity+resource proof; full real native physical"
+    "closed": "Controlled SAME-RUN target recovery/check/manualaccept/original2&4 slot release/queued Work first-start; old next-slot alleged production gap was H factory assertion",
+    "remaining": "Real terminal endpoint retention until original durable barrier commit and explicit finalize; confirmation/response-loss and UNKNOWN controls; full native physical layer"
   },
   "independentMaintenanceQueues": false,
   "unusedCandidateDefects": "Remain recorded and disabled, not automatic prerequisites for the original recovery path",
   "controlledOriginalQuestionWindowTakeover": "PASS plus answer-written/resolution-held and committed-terminal-ACK original delivery windows; one actual receiver begin/answer",
-  "admission": "reports/releases/recovery-milestone-01/admission-2026-11-18.json"
+  "admission": "reports/releases/recovery-milestone-01/admission-2026-11-19.json",
+  "researchStatus": "User-withdrawn this phase, original materials unchanged"
 }
