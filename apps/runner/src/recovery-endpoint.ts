@@ -3,7 +3,7 @@ import { existsSync, mkdirSync, rmdirSync, unlinkSync } from 'node:fs'
 import { IdSchema } from '@personal-agent/contracts'
 import type { AttemptSpec, RunnerCommand } from '../../../packages/contracts/src/types.ts'
 import { createRunnerCredential, serveRunnerRecovery } from '../../../packages/execution/src/recovery-transport.ts'
-import type { RunnerControlAuth, RunnerInspection, RunnerState } from '../../../packages/execution/src/recovery-transport.ts'
+import type { RunnerControlAuth, RunnerFinalizeConfirmation, RunnerFinalizeResult, RunnerInspection, RunnerState } from '../../../packages/execution/src/recovery-transport.ts'
 
 export type { RunnerInspection }
 export type RunnerResourceState = RunnerState['resources'][number]
@@ -23,6 +23,8 @@ export type RecoveryEndpointOptions = {
   channelReply?: (producer: unknown, reply: unknown, leaseId: string) => Promise<{ accepted: boolean; generation: number }>
   /** Business command intake for an attached client; applied to the same attempt and child. */
   command?: (command: RunnerCommand, auth?: RunnerControlAuth) => Promise<void>
+  /** Optional postcommit finalize; only a terminal, fully quiescent Runner accepts it. */
+  finalize?: (auth: RunnerControlAuth, confirmation: RunnerFinalizeConfirmation) => Promise<RunnerFinalizeResult>
   now?: () => string
 }
 export const CREDENTIAL_FILE = 'runner.credential'
@@ -78,6 +80,7 @@ export async function serveRecoveryEndpoint(options: RecoveryEndpointOptions): P
     ...(options.channelNext ? { channelNext: options.channelNext } : {}),
     ...(options.channelReply ? { channelReply: options.channelReply } : {}),
     ...(options.command ? { command: async (command, auth) => { await options.command!(command, auth); return state() } } : {}),
+    ...(options.finalize ? { finalize: options.finalize } : {}),
   })
   return {
     socketPath,
@@ -96,6 +99,11 @@ export async function serveRecoveryEndpoint(options: RecoveryEndpointOptions): P
       closed = true
       admission = 'closed'
       await server.close()
+      // Closing a transport is not evidence that its owned resources stopped. Preserve the original
+      // credential/reference material whenever the resource observation is active or unknown.
+      let resourcesQuiescent = false
+      try { resourcesQuiescent = options.resources().every(resource => resource.writer === 'quiescent') } catch {}
+      if (!resourcesQuiescent) return
       // A closed endpoint returns EVERY resource it created. The socket file and the credential used to
       // survive a normal close, so a stopped Runner left both behind; only the short-path case cleaned up.
       const ignoreMissing = (error: unknown): void => {

@@ -1,0 +1,183 @@
+{
+  "date": "2026-11-18",
+  "baseline": "1f2cd5d2",
+  "mainSource": "d6244e63",
+  "activeInput": [
+    {
+      "id": "B",
+      "head": "928b21533aca98b4d2553e90e06164c45bf97f19",
+      "branch": "codex/g1-runtime",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-b",
+      "dirty": "M reports/releases/wave11-admission/runtime.json\n M reports/releases/wave12-admission/runtime.json\n?? tests/native-acceptance/b16-real-begin.mjs"
+    },
+    {
+      "id": "D",
+      "head": "069447b7a65e473b4e730819cabed551a0e8df90",
+      "branch": "codex/g3-local-distribution",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-d",
+      "dirty": ""
+    },
+    {
+      "id": "E",
+      "head": "e7a8b1b0848af4dd202e32b20f70f59db3045765",
+      "branch": "codex/g3-product-acceptance",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-e",
+      "dirty": ""
+    },
+    {
+      "id": "H",
+      "head": "caa48df758572fa48bf5ac05f7ef1242490240e5",
+      "branch": "codex/g4-trial-operations",
+      "root": "/Users/hh/Desktop/joker/superagent-agent-h",
+      "dirty": ""
+    }
+  ],
+  "B": {
+    "admission": "COMPONENT_SOURCE_EVIDENCE_ONLY_NO_PRODUCTION_CHANGE_TO_IMPORT",
+    "observed": "928b adds actual same-Runner attach/unknown fact ACK test; original IDs/generation observations useful",
+    "notAdmitted": "deliver catch suppresses errors and both assertion branches pass without original receiver/body proof; receipts are callback fixtures, not original Store/Broker durability",
+    "probeRerun": false,
+    "why": "Do not run its real RunnerLink.close fallback signal path to repeat an insufficient assertion; inspect and repair actual consumer next"
+  },
+  "H": {
+    "admission": "GRACEFUL_CLOSE_REOPEN_FAILURE_BASELINE_ONLY",
+    "observed": "Original Work question opens, product.close ends original binding, new runtime rejects answer stale_binding; no new Work",
+    "limit": "Not a crash with a surviving Runner: explicit close cancels it and ended must never revive. It is not a required-failure regression against the new controlled owner-exit path.",
+    "probeRerun": false
+  },
+  "DE": {
+    "admission": "FIXED_W36_NAMED_INSTALL_SUBSET_ADMITTED",
+    "details": "reports/releases/recovery-milestone-01/install-admission-2026-11-18.json",
+    "next": "D/E on demand, no new freeze or hardening queue"
+  },
+  "main": {
+    "admission": "CONTROLLED_ORIGINAL_QUESTION_WINDOW_OWNER_EXIT_TAKEOVER_PASS",
+    "entry": "Original ProductExecution.start -> Native.resume -> original registered endpoint/new random lease/shared ingress+fresh guard -> original watcher/check/currentCandidate/manualaccept",
+    "fixture": "Parent owns actual serveRunner/production Codex Driver with virtual ProcessHost. Primary coordinator Worker exits via process.exit(0), no product.close; successor opens same Store after exit, no simultaneous writer.",
+    "positive": "Same Work/attempt/question/session, native_applied, actual registered Node checkPASS, explicit manual accept, delivered/3artifact bytes/reopen; one Runner/one begin/one virtual native write",
+    "negative": [
+      "authority revoked",
+      "profile changed",
+      "execution policy changed",
+      "resource writer UNKNOWN"
+    ],
+    "effects": {
+      "newModelsNative": 0,
+      "realSignals": 0,
+      "verifierSignalCallsSuppressed": 1,
+      "replacementRunner": 0
+    },
+    "tests": [
+      {
+        "command": "node --test tests/integration/original-native-recovery.case.mjs tests/integration/original-native-callback-flow.case.mjs tests/integration/native-attach-callbacks.case.mjs tests/integration/attached-port.case.mjs apps/runner/test/recovery-endpoint.test.ts apps/runner/test/recovery-interop.test.ts",
+        "passed": 35,
+        "failed": 0,
+        "exit": 0
+      },
+      {
+        "command": "pnpm exec tsc -p apps/coordinator/tsconfig.product.json --noEmit",
+        "exit": 0
+      },
+      {
+        "command": "pnpm exec tsc -p apps/coordinator/tsconfig.json --noEmit",
+        "exit": 0
+      }
+    ],
+    "review": "Read-only review found local callback cleanup gap after failed installation; fixed before final35/strict by releaseRecoveryConnection without cancelling/deleting original registration. Initial integration rejected /tmp vs /private/tmp path aliases; compare realpaths, keeping original root check.",
+    "remaining": [
+      "real OS coordinator exit / stdio EOF and old stdout closure",
+      "already-ACK terminal crash window",
+      "unknown business ACK reconciliation",
+      "original 2/4 scheduler/resources and fifth-item progression",
+      "real native physical quiescence",
+      "this new source independent installed verdict"
+    ]
+  },
+  "next": {
+    "main": "Continue the SAME recovery milestone: original capacity/UNKNOWN accounting and actual B transport composition",
+    "B": "Actual same-Runner EOF/EPIPE/old socket fence and receiver-based assertions, no new framework",
+    "H": "Independent adoption of d6244e63 original owner-exit chain, unknown response window and original core/queue capacity proof",
+    "others": "On demand only; D/E fixed cohort complete"
+  },
+  "preservation": {
+    "candidateEdits": 0,
+    "userServiceOperations": 0,
+    "stateProfileArchivesLedgerResets": 0,
+    "realModelNative": 0,
+    "realSignals": 0,
+    "newTar": 0,
+    "externalReviewUnstaged": true,
+    "automaticScoreChange": false
+  },
+  "continuation": {
+    "mainSource": "e2261ef5",
+    "terminalSource": "83b3ece3",
+    "fixedInputs": {
+      "B": "4703a11c440d2f347968df3e4932df3ce346ed1e",
+      "H": "59133df7b7827ff1a89004ce1e90284d7c325fd3"
+    },
+    "B": {
+      "decision": "ACTUAL_MAIN_FAKE_DRIVER_EOF_TRANSPORT_COMPONENT_PASS",
+      "independentCommand": "node /tmp/pa-rm01-b38-currentmain.mjs",
+      "result": "4PASS/0FAIL/1NOT_TESTED, original Runner PID37611, generation3, same fact-attempt-1-1, old lease stale_lease, one original begin/deliver, natural exit0/no signal",
+      "entry": "apps/runner/src/runner-service-entry.ts already had EPIPE handling before this B commit",
+      "import": "Only actual service receiver diagnostic body slice from B; not unused exported mainRunnerService stdout wrapper, old scenario-env override, RunnerLink.spawnIntent or signal tooling",
+      "safeProbeAdaptation": "B38 actual consumer imports current main with identical core assertions; failure cleanup changed to retain UNKNOWN root and unref rather than remove material. Candidate untouched.",
+      "remaining": "B original script still deletes its root after an unknown child exit; fix before reusing actual consumer. It proves Runner transport, not original Work/Broker durability or full real native process recovery."
+    },
+    "H": {
+      "decision": "INDEPENDENT_CONTROLLED_ORIGINAL_WORK_PASS",
+      "details": "reports/releases/recovery-milestone-01/h-admission-2026-11-18.json",
+      "result": "2PASS (owner-exit delivery and correct graceful-close rejection)",
+      "limits": "Original2/4/unknown business write not exercised; concurrency evidence must bind Work/candidate/assignment/artifact and actual begin receiver, not global last-N or turn count."
+    },
+    "main": {
+      "newClosedControlledWindows": [
+        "Original question-window owner exit",
+        "Original answer written to virtual native peer while protocol resolution is held, owner exits, same recorded HTTP command replay does not send again; successor observes original native_applied and delivers",
+        "Original terminal fact ACK committed before owner exit, still-readable authenticated terminated endpoint plus original observation/payload/canonical fact receipt restores original completion through barrier/check/manualaccept"
+      ],
+      "negatives": [
+        "Missing terminal fact receipt cannot produce accept action",
+        "Revoked authority",
+        "Changed profile",
+        "Changed policy",
+        "UNKNOWN resource"
+      ],
+      "originalCapacity": "Existing ProductExecution/Effects/Store current bindings only; internal2|4(default4), all non-ended bindings count including UNKNOWN/stopping. Original third/fifth Work waits; WorkA UNKNOWN retains slot, distinct WorkB own barrier releases only its slot, waiting original Work progresses, other slots untouched.",
+      "verification": {
+        "tests": 40,
+        "failed": 0,
+        "exit": 0,
+        "command": "node --test tests/integration/original-capacity.case.mjs tests/integration/original-native-recovery.case.mjs tests/integration/original-native-callback-flow.case.mjs tests/integration/native-attach-callbacks.case.mjs tests/integration/attached-port.case.mjs apps/runner/test/recovery-endpoint.test.ts apps/runner/test/recovery-interop.test.ts",
+        "strict": [
+          "coordinator/product exit0",
+          "coordinator exit0"
+        ],
+        "receiver": "Full original begin/answer command body count, attempt/assignment/contract identities are asserted in all8 recovery modes"
+      },
+      "retainedUnknownFixtureRoots": [
+        "/tmp/pa-original-capacity-XLQMQl",
+        "/tmp/pa-original-capacity-EGCc35"
+      ],
+      "scope": "Three positive recovery windows and2/4 queue/barrier logic use virtual native resources and self-exiting coordinator Workers. Actual real Runner EOF is a separate fake-driver observation, not a combined true native/OS product claim.",
+      "testCorrection": "Initial capacity test expected UNKNOWN to become quiescent by flipping an observation flag; the original barrier correctly refused. Test now retains that UNKNOWN and proves independent WorkB release; no gate weakened. Final UNKNOWN fixture material retained.",
+      "review": "Read-only terminal provenance and capacity reviews found no new authority bypass. Pending physical/endpoint and combined concurrency limits remain."
+    },
+    "remaining": [
+      "Actual product same-Work path with an independent Runner and real coordinator EOF together, including terminal endpoint lifetime after entry shutdown",
+      "Independent same-run combination of owner fault/write-unknown/acceptance with original2/4 occupancy/third-fifth progression",
+      "Full real native physical resource proof; no new model/native/signal allowance"
+    ],
+    "next": "main end-to-end integration; B original terminal endpoint/lifecycle consumer and UNKNOWN cleanup; H same-run fault+capacity independent acceptance; others on demand only",
+    "preserved": {
+      "realModelNative": 0,
+      "realSignals": 0,
+      "userServiceOperations": 0,
+      "newTar": 0,
+      "newWorktree": 0,
+      "candidateWorkingTreeEdits": 0,
+      "externalReviewUntouched": true
+    }
+  }
+}

@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import { mkdirSync } from 'node:fs'
+import { mkdirSync, realpathSync } from 'node:fs'
 import { join } from 'node:path'
 import { z } from 'zod'
 import {
@@ -28,6 +28,7 @@ import type {
   WorkView,
   ContractRevision,
 } from '@personal-agent/contracts'
+import type { RunningAttempt } from '../../../packages/execution/src/contracts.ts'
 import { ApplicationFault } from '@personal-agent/application'
 import type { ProductApplication } from '@personal-agent/application'
 import { Effects, Later, UnknownSend } from '@personal-agent/effects'
@@ -43,7 +44,7 @@ import type { CommandKey } from '../../../packages/execution/src/supervisor.ts'
 import { handleQuestionAnswers } from '../http/question-effects.ts'
 import { handleRunnerRecovery } from '../recovery-effects.ts'
 import { createStoredRuntimeIngress } from '../stored-ingress.ts'
-import { producerForBinding } from '../runner-registry.ts'
+import { loadRecoveryRunner, producerForBinding } from '../runner-registry.ts'
 import type { IngressBinding } from '../runtime-ingress.ts'
 import { ownedResourceManifestDigest } from '../resource-barrier.ts'
 import { ControlledProductAttempt } from './controlled-attempt.ts'
@@ -120,6 +121,7 @@ export class ProductExecution {
   private timer: ReturnType<typeof setInterval> | undefined
   private closing = false
   private started = false
+  private recoveryTask: Promise<void> | undefined
   private readonly store: ProductStore
   private readonly application: ProductApplication
   private readonly workspaces: WorkspaceManager
@@ -130,6 +132,7 @@ export class ProductExecution {
   private readonly nativeRunnerLinkFactory: NativeRunnerLinkFactory | undefined
   private readonly environments: ProductEnvironments | undefined
   private readonly projectForContract: ((contract: ContractRevision) => NativeProductConfiguration['projects'][number] | undefined) | undefined
+  private readonly maxActiveAttempts: 2 | 4
   constructor(
     store: ProductStore,
     application: ProductApplication,
@@ -142,7 +145,10 @@ export class ProductExecution {
     environments?: ProductEnvironments,
     projectForContract?: (contract: ContractRevision) => NativeProductConfiguration['projects'][number] | undefined,
     nativeRunnerLinkFactory?: NativeRunnerLinkFactory,
+    maxActiveAttempts: 2 | 4 = 4,
   ) {
+    if (maxActiveAttempts !== 2 && maxActiveAttempts !== 4) throw new RangeError('Execution capacity must be 2 or 4')
+    this.maxActiveAttempts = maxActiveAttempts
     this.store = store
     this.application = application
     this.workspaces = workspaces
@@ -240,7 +246,8 @@ export class ProductExecution {
   nativeFence(target: NativeQuestionBinding): 'current' | 'stale' | 'unknown' {
     const binding = this.store.bindings.current<IngressBinding>(target.ticketId)
     if (!binding || !same(attemptOf(binding), attemptOf(target)) || binding.state !== 'active') return 'stale'
-    return this.attempts.has(target.attemptId) && target.connectionEpoch === 1 ? 'current' : 'unknown'
+    const runtime = this.attempts.get(target.attemptId)
+    return runtime && (!(runtime instanceof NativeProductAttempt) || runtime.connected) && target.connectionEpoch === 1 ? 'current' : 'unknown'
   }
   private verificationRows() {
     return this.store.queue.dueRows('application.verify', Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER)
@@ -296,7 +303,9 @@ export class ProductExecution {
     if (this.closing) throw new Error('A closed execution consumer cannot start')
     if (this.started) return
     this.started = true
-    // A same-process host cannot survive a coordinator crash. Preserve uncertainty on reopen.
+    const recoverable: IngressBinding[] = []
+    // Fixture hosts cannot survive. Native hosts have an authenticated original endpoint and may
+    // survive; retain their active identity while reconnecting, with nativeFence unknown until ready.
     this.store.uow.atomic(() => {
       for (const ticket of this.store.domain.tickets.list<Ticket>()) {
         const binding = this.store.bindings.current<IngressBinding>(ticket.id)
@@ -305,14 +314,67 @@ export class ProductExecution {
           ['controlled-product-fixture', 'codex-native'].includes(binding.source) &&
           binding.state !== 'ended'
         ) {
+          if (binding.source === 'codex-native' && binding.state === 'active' && this.native) {
+            recoverable.push(binding)
+            continue
+          }
           this.store.bindings.record({ ...binding, state: 'stopping' })
           this.enqueue('runtime.reconcile', binding.attemptId, ticket.id)
         }
       }
     })
-    this.effects.start()
-    this.timer = setInterval(() => this.effects.kick(), 50)
-    this.timer.unref()
+    this.recoveryTask = (async () => {
+      for (const binding of recoverable) {
+        try { await this.resumeNative(binding) }
+        catch (error) { this.recordFailure(binding, error) }
+      }
+      if (this.closing) return
+      this.effects.start()
+      this.timer = setInterval(() => this.effects.kick(), 50)
+      this.timer.unref()
+    })()
+  }
+  private async resumeNative(binding: IngressBinding): Promise<void> {
+    const ticket = this.current(binding)
+    const saved = this.store.commands.get(key('product-start', binding.assignmentId))
+    const prepared = saved && StartSchema.parse(saved.result)
+    if (!ticket || latestAssignment(ticket)?.state !== 'running' || !prepared || saved?.status !== 'recorded' ||
+        saved.payloadDigest !== canonicalDigest(JsonSchema.parse(prepared)) || prepared.mode !== 'native' ||
+        !same(attemptOf(prepared.spec), attemptOf(binding)) || !same(prepared.spec.profile, this.native?.profile))
+      throw new Error('Original native begin/profile is not eligible for recovery')
+    const registration = loadRecoveryRunner(this.store, binding.attemptId)
+    if (!registration) throw new Error('Original native registration is missing')
+    const location = this.workspaces.location(binding)
+    const contract = this.store.product.contracts.getByRef(binding.contract)!
+    const project = this.projectForContract ? this.projectForContract(contract)
+      : this.native?.projects.find(value => value.id === contract.scope.projectId)
+    if (!project || realpathSync(project.path) !== realpathSync(location.projectPath)) throw new Error('Original project registration changed')
+    const policy = NativeCodexSettingsSchema.parse((await this.store.payloads.read(prepared.spec.policySnapshotRef)).value)
+    if (realpathSync(policy.workspacePath) !== realpathSync(location.path) || !same(policy.scope, contract.scope) ||
+        policy.approvalPolicy !== this.native?.approvalPolicy || policy.model !== this.native?.model ||
+        policy.collaborationMode !== this.native?.collaborationMode)
+      throw new Error('Original native execution policy changed')
+    this.environments?.current({ assignment: binding, workspacePath: location.path })
+    const producer = registration.body.producer
+    const runtime = new NativeProductAttempt(prepared.spec, this.store, location.path,
+      join(this.stateRoot, 'runners', binding.attemptId), producer, this.ingress.bind(producer),
+      () => !this.closing && !!this.current(binding))
+    let installed = false
+    try {
+      const running = await runtime.resume(registration.body.endpoint)
+      if (this.closing || !this.current(binding)) throw new Error('Original native authorization changed during recovery')
+      this.store.events.append({ topic: 'application.execution.reattached', entityRef: binding.contract.workId,
+        payload: { workId: binding.contract.workId, attemptId: binding.attemptId } })
+      this.attempts.set(binding.attemptId, runtime)
+      this.watch(runtime, running, { kind: 'start', ticketId: binding.ticketId,
+        assignmentId: binding.assignmentId, contract: binding.contract })
+      installed = true
+    } finally {
+      if (!installed) {
+        this.attempts.delete(binding.attemptId)
+        await runtime.releaseRecoveryConnection()
+      }
+    }
   }
   private enqueue(kind: string, id: string, payload: unknown) {
     this.store.queue.enqueue(
@@ -471,7 +533,13 @@ export class ProductExecution {
         return
       throw new UnknownSend('Earlier begin needs physical reconciliation', 'start_unknown')
     }
-    if (this.attempts.size >= 4) throw new Later('The four controlled execution slots are in use')
+    // Persisted current bindings occupy capacity across owner loss, including unknown/stopping ones.
+    // Only the original resource barrier can end those bindings; an empty in-memory map releases nothing.
+    const occupied = new Set(this.store.domain.tickets.list<Ticket>().flatMap(value => {
+      const current = this.store.bindings.current<IngressBinding>(value.id)
+      return current && current.state !== 'ended' ? [current.attemptId] : []
+    }))
+    if (occupied.size >= this.maxActiveAttempts) throw new Later('Execution capacity is occupied until the original resource barrier confirms release')
     for (const link of this.store.product.links.listByWork(intent.contract.workId)) {
       const binding = this.store.bindings.current<IngressBinding>(link.ticketId)
       if (binding && binding.state !== 'ended') throw new Later('Previous writer barrier is not confirmed')
@@ -522,6 +590,7 @@ export class ProductExecution {
               workspacePath: workspace.path,
               scope,
               approvalPolicy: this.native!.approvalPolicy,
+              ...(this.native!.collaborationMode ? { collaborationMode: this.native!.collaborationMode } : {}),
               ...(this.native!.model ? { model: this.native!.model } : {}),
               timeoutMs: 600000,
             })
@@ -636,37 +705,7 @@ export class ProductExecution {
       }
       if (command.kind !== 'begin') throw new Error('Attempt profile capture requires the initial begin command')
       await captureAttemptProfile(this.store, spec, command.preparedPolicyRef)
-      const run = (async () => {
-        try {
-          const exit = await running.waitExit()
-          const barrier = await runtime.quiesce()
-          this.store.uow.atomic(() => {
-            const current = this.current(intent)
-            if (!current || this.store.bindings.current(ticket.id)?.attemptId !== attempt.attemptId) return
-            if (exit.reason !== 'terminal' || current.undelivered.length) {
-              this.application.core.reportAssignment(ticket.id, intent.assignmentId, {
-                state: 'failed',
-                summary: '执行结束，未形成输入已完整消费的当前候选',
-              })
-              return
-            }
-            this.application.core.reportAssignment(ticket.id, intent.assignmentId, {
-              state: 'ready',
-              summary: '当前变更已停止写入，等待注册检查与人工审阅',
-            })
-            const candidate = this.application.core.completionCandidate(ticket.id)
-            if (candidate) this.enqueue('application.verify', attempt.attemptId, { candidate, barrier })
-          })
-        } finally {
-          if (this.store.bindings.binding<IngressBinding>(attempt.attemptId)?.state === 'ended') {
-            await runtime.dispose()
-            this.attempts.delete(attempt.attemptId)
-            this.pendingBegins.delete(attempt.attemptId)
-          }
-        }
-      })()
-      this.runs.add(run)
-      void run.catch((error) => this.recordFailure(attempt, error)).finally(() => this.runs.delete(run))
+      this.watch(runtime, running, intent)
       this.pendingBegins.set(attempt.attemptId, command)
       await this.begin(runtime, command, intent)
     } catch (error) {
@@ -680,6 +719,40 @@ export class ProductExecution {
       })
       throw new UnknownSend(`Controlled begin requires reconciliation: ${String(error)}`, 'begin_unknown')
     }
+  }
+  private watch(runtime: ControlledProductAttempt | NativeProductAttempt, running: RunningAttempt, intent: Intent) {
+    const attempt = runtime.spec
+    const run = (async () => {
+      try {
+        const exit = await running.waitExit()
+        const barrier = await runtime.quiesce()
+        this.store.uow.atomic(() => {
+          const current = this.current(intent)
+          if (!current || this.store.bindings.current(intent.ticketId)?.attemptId !== attempt.attemptId) return
+          if (exit.reason !== 'terminal' || current.undelivered.length) {
+            this.application.core.reportAssignment(intent.ticketId, intent.assignmentId, {
+              state: 'failed',
+              summary: '执行结束，未形成输入已完整消费的当前候选',
+            })
+            return
+          }
+          this.application.core.reportAssignment(intent.ticketId, intent.assignmentId, {
+            state: 'ready',
+            summary: '当前变更已停止写入，等待注册检查与人工审阅',
+          })
+          const candidate = this.application.core.completionCandidate(intent.ticketId)
+          if (candidate) this.enqueue('application.verify', attempt.attemptId, { candidate, barrier })
+        })
+      } finally {
+        if (this.store.bindings.binding<IngressBinding>(attempt.attemptId)?.state === 'ended') {
+          await runtime.dispose()
+          this.attempts.delete(attempt.attemptId)
+          this.pendingBegins.delete(attempt.attemptId)
+        }
+      }
+    })()
+    this.runs.add(run)
+    void run.catch((error) => this.recordFailure(attempt, error)).finally(() => this.runs.delete(run))
   }
   private async begin(
     runtime: ControlledProductAttempt | NativeProductAttempt,
@@ -758,6 +831,7 @@ export class ProductExecution {
   }
   async close(): Promise<void> {
     this.closing = true
+    await this.recoveryTask
     if (this.timer) clearInterval(this.timer)
     await this.effects.drain()
     await Promise.allSettled([...this.attempts.values()].map((runtime) => runtime.dispose()))

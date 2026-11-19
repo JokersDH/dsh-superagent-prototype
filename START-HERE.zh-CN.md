@@ -1,8 +1,14 @@
 # 从这里开始：仓库、代码位置和并行开发
 
-**当前唯一工程入口：[原 Work 恢复里程碑01](agent-tasks/recovery-milestone-01/README.zh-CN.md)。** main/B/H主动闭合同原Work故障接管到交付，D/E主动完成固定W36验收；A/C/F/G/I/J只在这两条实际路径出现具体阻断时按需参与，否则待命。不再要求用满十位，不扩独立维护队列。已有[转发说明](agent-tasks/recovery-milestone-01/forward-prompts.zh-CN.md)已更正投入方式，旧整包不再同时开工。
+**2026-11-19当前：用户已开启[里程碑03“日常可用版交付”](docs/product/MILESTONE-03.zh-CN.md)。** 只main/D/E主动，B/F具体阻断时参与；六项正常使用与同包验收，最多4次真实Codex（main预留1、E最多3、D0）。该文含D/E可直接转发的话术，是当前唯一任务入口。先正常源码使用，再冻结同一源码安装包给E独立验收；不新wave，不给其他agent开维护队列。以下“待命”“当前恢复”等均为旧检查点。
 
-本轮[固定提交验收](reports/releases/wave37-admission/README.zh-CN.md)已完成。main42f6daab已实接原Native.launch回调并通过受控正常Work问答→检查→人工接受→产物重开，撤销授权零效果；30测试/strict过，仍未证明崩溃恢复/真实物理/原槽。见[0095](docs/rfcs/WP-16/0095-main-original-running-callback-composition.md)。E确已W35安装/配置/非空恢复/upgrade子集，D已有W36含历史固定包，下一步E只验同W36，不追移动main。
+**2026-11-19当前：Recovery01与原生控制02均6/6关闭。** 真实同原Work SIGKILL恢复、原工作台审批/拒绝/plan澄清/steer/物理停止/未知结果核对通过；分别使用1 turn+1自有coordinator SIGKILL、5/6真实turn。原口径重评**82/100、方案B63.1%**，不是发行准入。唯一完成汇总在[这里](docs/product/MILESTONES-01-02.zh-CN.md)。临时B/H修改权结束，原所有权恢复，全部agent待命，不自动开新wave或里程碑；下文旧派工只作历史。
+
+**当前唯一工程入口：[原 Work 恢复里程碑01](agent-tasks/recovery-milestone-01/README.zh-CN.md)。** 2026-11-19仍仅main/B/H持续同一个真实终态生命周期到集成验收；其余八位待命。新版[分角色话术](agent-tasks/recovery-milestone-01/forward-prompts.zh-CN.md)扩大同一结果的持续责任，不增加功能线/阶段数，不新开wave。
+
+**11-19续验：mainbde57d42已接入B postcommit finalize，并保留2/4同run原Work故障恢复→检查/接受→自身槽归还→原第3/5项前进，UNKNOWN其余槽，相关回归通过。H的next-slot失败是测试注入factory自阻，未改生产容量。** 下一责任包只做finalize响应丢失同ID调和、H UNKNOWN材料清理和真实层验收，B/main/H持续到同结果独立验收，其余八位待命。[本轮验收](reports/releases/recovery-milestone-01/admission-2026-11-19.json)/[可转发话术](agent-tasks/recovery-milestone-01/forward-prompts.zh-CN.md)，以下旧检查点按历史读。
+
+本轮[续验](reports/releases/recovery-milestone-01/admission-2026-11-18.json)continuation：main **e2261ef5**补过原问题/回答写后resolution丢失/terminal已ACK三受控窗口，以及原Store绑定计数的2/4容量、UNKNOWN占位和独立屏障释放，40测试/strict通过。B实际main entry的真实Runner EOF传输4PASS/1NT、H独立单Work2PASS成立。下一步只B真实终态endpoint寿命、H故障交付与原槽**同run组合**；不把分离PASS当完整真实原生物理结论。D/E固定W36子集继续保其[已验范围](reports/releases/recovery-milestone-01/install-admission-2026-11-18.json)，不重包。
 
 用户确认本阶段不推进复核价值试点、依赖它的第二协议复核和路由收益研究；价值未测，原材料/ledger/预算保留。自动真实vendor/model/native/信号0，十二用户实例及状态不操作。完整B/CAC后置，进度最近评估76/100与58.6%未因任务数或研究退出自动调整。
 

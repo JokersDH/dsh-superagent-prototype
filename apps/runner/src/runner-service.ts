@@ -25,6 +25,8 @@ import type { AgentDriverV1, AttemptIO } from '../../../packages/contracts/src/p
 import type { AttemptSpec, CriticalFact, DurableReceipt, Json, RunnerCommand } from '../../../packages/contracts/src/types.ts'
 import { JsonLineDecoder, encodeFrame } from '../../../packages/driver-kit/src/index.ts'
 import { createHash } from 'node:crypto'
+import { canonicalJson } from '../../../packages/contracts/src/canonical.ts'
+import { runnerResourceManifestDigest } from '../../../packages/execution/src/recovery-transport.ts'
 import { FileCriticalJournal } from './file-journal.ts'
 import { AttemptArtifactManifest } from './artifact-manifest.ts'
 import { serveRecoveryEndpoint, endpointDirectory, type RecoveryEndpoint } from './recovery-endpoint.ts'
@@ -83,6 +85,11 @@ export type RunnerServiceHandle = {
   done: Promise<{ reason: string; evidenceRefs: string[] }>
   /** Stop the owned process group and end the service. */
   shutdown(): Promise<void>
+  /**
+   * Retain a naturally terminal endpoint until the original coordinator's authenticated postcommit
+   * finalize arrives; explicit shutdown / no remote attach / still-running attempts return immediately.
+   */
+  awaitPostcommitFinalize(): Promise<void>
 }
 
 /** Run the service over already-decoded streams. Returns when the attempt ends or shutdown arrives. */
@@ -143,6 +150,17 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
   /** Last generation observed on the channel; readable after terminal close without reviving it. */
   let channelGeneration = 0
   let physicallyStopped = false
+  /** A real (non-adapter) callback lease has attached at least once; only then does a terminal barrier wait apply. */
+  let remoteAttached = false
+  /** The driver ended naturally rather than through an explicit shutdown frame. */
+  let naturalTerminal = false
+  /** The original coordinator asked for shutdown on stdio; no barrier wait is needed then. */
+  let explicitShutdown = false
+  let resolvedPostcommit = false
+  let finalizeRequested = false
+  let finalizedConfirmationId: string | undefined
+  let resolvePostcommitFinalize!: () => void
+  const postcommitFinalize = new Promise<void>(resolve => { resolvePostcommitFinalize = resolve })
   const preparation = new AbortController()
   const processHost = options.processHost ?? new ProcessHost()
   const closeAdmission = () => {
@@ -297,7 +315,10 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
     if (process.env.PA_RUNNER_RECEIVER_LOG) {
       await appendFile(
         process.env.PA_RUNNER_RECEIVER_LOG,
-        `${JSON.stringify({ kind: command.kind, id: command.id, attemptId: command.attemptId, fenceEpoch: command.fenceEpoch, at: new Date().toISOString() })}\n`,
+        // The original command body is preserved here so an independent consumer can prove WHICH command
+        // the Runner actually received, not merely that some command arrived. The log is opt-in/local and
+        // is a diagnostic, never a receipt or Store durability evidence.
+        `${JSON.stringify({ receiver: 'runner-service', kind: command.kind, id: command.id, attemptId: command.attemptId, fenceEpoch: command.fenceEpoch, body: command, at: new Date().toISOString() })}\n`,
       ).catch(() => undefined)
     }
     if (businessClosed) return { code: 'state_indeterminate', reason: 'admission_closed', message: 'Attempt admission is closed' }
@@ -350,10 +371,12 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
       },
     })
     void running.then(async result => {
+      naturalTerminal = true
       await stopPhysical()
       write({ type: 'exited', id: spec!.attemptId, exit: (result as { exit: unknown }).exit })
       finish()
     }).catch(async error => {
+      naturalTerminal = true
       await stopPhysical()
       write({ type: 'error', id: spec!.attemptId, ...toBridgeFailure(error) })
       write({ type: 'exited', id: spec!.attemptId, exit: { reason: 'error', evidenceRefs: ['runner-preparation-or-driver-failed'] } })
@@ -365,6 +388,12 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
     for (;;) {
       const frame = await next()
       if (!frame) break
+      // A terminal service may already be closed when the live coordinator finally asks for shutdown:
+      // that request still marks the ordinary explicit path and must skip the successor-barrier wait.
+      if ((frame as { type?: string }).type === 'shutdown') {
+        explicitShutdown = true
+        if (closed) break
+      }
       if (closed) break
 
       // Artifact registration is an upstream extension handled before the typed dispatch.
@@ -463,6 +492,8 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
                   if (auth?.leaseId) throw Object.assign(new Error('stale_lease'), { code: 'stale_connection', reason: 'stale_lease' })
                   if (auth?.producer && channelProducer && !sameCoordinatorChannelProducer(auth.producer as never, channelProducer))
                     throw Object.assign(new Error('foreign_producer'), { code: 'identity_mismatch', reason: 'foreign_producer' })
+                  // A cancel observes/stops and returns the recorded barrier, but it NEVER finalizes the
+                  // terminal endpoint: only a postcommit finalize after main's Store commit may do that.
                   return
                 }
                 // Identity/lease is certified BEFORE the physical stop mutates anything; a foreign cancel
@@ -473,6 +504,35 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
                 // Cancel closes admission first (the endpoint does that) and then stops owned work.
                 await stopPhysical()
                 void command
+              },
+              finalize: async (auth, confirmation) => {
+                // Postcommit finalize: the coordinator's original Store has already committed the barrier
+                // receipt/event. This only closes the retained terminal endpoint; it grants no stop/business
+                // authority, does not restart, and refuses while any owned resource is not quiescent.
+                if (auth?.producer && channelProducer && !sameCoordinatorChannelProducer(auth.producer as never, channelProducer))
+                  throw Object.assign(new Error('foreign_producer'), { code: 'identity_mismatch', reason: 'foreign_producer' })
+                if (!channelProducer) throw Object.assign(new Error('not_registered'), { code: 'identity_mismatch', reason: 'not_registered' })
+                const expected = channelProducer.attempt
+                const claimed = confirmation?.attempt
+                if (!claimed || claimed.ticketId !== expected.ticketId || claimed.assignmentId !== expected.assignmentId ||
+                    claimed.attemptId !== expected.attemptId || claimed.fenceEpoch !== expected.fenceEpoch ||
+                    canonicalJson(claimed.contract as never) !== canonicalJson(expected.contract as never))
+                  throw Object.assign(new Error('wrong_subject'), { code: 'identity_mismatch', reason: 'wrong_subject' })
+                if (!closed) throw Object.assign(new Error('terminal_not_reached'), { code: 'terminal_not_reached', reason: 'terminal_not_reached' })
+                if (!physicallyStopped) throw Object.assign(new Error('physical_not_stopped'), { code: 'physical_not_stopped', reason: 'physical_not_stopped' })
+                const inventory = processHost.inventory()
+                if (inventory.some(resource => resource.writer !== 'quiescent'))
+                  throw Object.assign(new Error('unknown_resources'), { code: 'unknown_resources', reason: 'unknown_resources' })
+                if (runnerResourceManifestDigest(inventory) !== confirmation.resourceManifestDigest)
+                  throw Object.assign(new Error('resource_manifest_mismatch'), { code: 'identity_mismatch', reason: 'resource_manifest_mismatch' })
+                if (finalizedConfirmationId !== undefined)
+                  return finalizedConfirmationId === confirmation.confirmationId
+                    ? { finalized: true as const, alreadyFinalized: true }
+                    : (() => { throw Object.assign(new Error('confirmation_conflict'), { code: 'protocol_error', reason: 'confirmation_conflict' }) })()
+                finalizedConfirmationId = confirmation.confirmationId
+                finalizeRequested = true
+                if (!resolvedPostcommit) { resolvedPostcommit = true; resolvePostcommitFinalize() }
+                return { finalized: true as const, alreadyFinalized: false }
               },
               // Business attach: facts come from this Runner's own durable journal, so a second client
               // recovers the original work instead of trusting its own memory or a second ledger.
@@ -537,6 +597,7 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
                 const page = attach!.next(leaseId, producer as never)
                 if (!page.ok) throw channelError(page.refused, page.refused === 'identity_mismatch' ? 'foreign_producer' : 'lease_not_current')
                 channelGeneration = page.generation
+                remoteAttached = true
                 // The page is the delivery for a remote pull connection; never mirror it onto stdio.
                 return { generation: page.generation, request: page.request, remainingMs: page.remainingMs }
               },
@@ -549,6 +610,7 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
                 if (closed || businessClosed) return { accepted: false, generation: channelGeneration }
                 const routed = attach!.receive(leaseId, asChannelReply(reply as object), producer as never)
                 if (routed.accepted) dispatched.delete(leaseId)
+                remoteAttached = true
                 channelGeneration = routed.generation
                 return { accepted: routed.accepted, generation: routed.generation }
               },
@@ -619,6 +681,7 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
         }
 
         case 'shutdown': {
+          explicitShutdown = true
           closeAdmission()
           finish()
           break
@@ -630,14 +693,6 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
     }
   } finally {
     await pumping.catch(() => undefined)
-  }
-
-  const shutdown = async (): Promise<void> => {
-    closeAdmission()
-    finish()
-    await recoveryEndpoint?.close().catch(() => undefined)
-    await stopPhysical().catch(() => undefined)
-    journal?.close()
   }
 
   const done = (async () => {
@@ -653,14 +708,40 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
   })()
   void done.catch(() => undefined)
 
-  return { done, shutdown }
+  /**
+   * Terminal endpoint lifetime: when the driver ended naturally with a remote lease attached and the
+   * original coordinator exited before its Store committed the barrier, retain the endpoint until the
+   * coordinator's authenticated postcommit finalize arrives. A normal explicit shutdown, no remote
+   * attach, or a still-running driver returns immediately.
+   */
+  const awaitPostcommitFinalize = async (): Promise<void> => {
+    if (!recoveryEndpoint || !remoteAttached || !naturalTerminal || explicitShutdown) return
+    await postcommitFinalize
+    // The finalize response is on the wire before shutdown; this local drain is not proof of persistence.
+    await new Promise<void>(resolve => setTimeout(resolve, 50))
+  }
+  const shutdown = async (): Promise<void> => {
+    closeAdmission()
+    finish()
+    await stopPhysical().catch(() => undefined)
+    await recoveryEndpoint?.close().catch(() => undefined)
+    journal?.close()
+  }
+  const handle: RunnerServiceHandle = { done, shutdown, awaitPostcommitFinalize }
+  return handle
 }
 
 /** Entry point used by a spawned Runner process: stdio as the transport. */
 export async function mainRunnerService(createOptions: () => Promise<Omit<RunnerServiceOptions, 'input' | 'write'>>): Promise<void> {
   const options = await createOptions()
+  // A surviving Runner may outlive its original coordinator's stdout. A closed/broken stdout must never
+  // crash the Runner or be mistaken for business failure: the authenticated recovery endpoint continues
+  // to serve the same attempt, and later frames are simply not written to the dead adapter.
+  let stdoutBroken = false
+  process.stdout.on('error', () => { stdoutBroken = true })
   const write = (frame: Record<string, unknown> | BridgeFrame): void => {
-    process.stdout.write(encodeFrame(frame))
+    if (stdoutBroken) return
+    try { process.stdout.write(encodeFrame(frame)) } catch { stdoutBroken = true }
   }
   const input = (async function* (): AsyncGenerator<Uint8Array> {
     for await (const chunk of process.stdin) yield chunk as Uint8Array

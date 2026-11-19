@@ -1,7 +1,7 @@
 {
   "protocol": "recovery-milestone-workspaces/1",
-  "date": "2026-11-17",
-  "mainSource": "42f6daab",
+  "date": "2026-11-19",
+  "mainSource": "6d309128",
   "previousDispatch": "agent-tasks/product-wave-36/dispatch.json",
   "createdWorktrees": 0,
   "externalPromptsSent": false,
@@ -24,7 +24,7 @@
       "id": "B",
       "root": "/Users/hh/Desktop/joker/superagent-agent-b",
       "branch": "codex/g1-runtime",
-      "acceptedInput": "579c40bca3a2fc06f5510f468e0f6ab19f693fd7",
+      "acceptedInput": "09216f1cd7ed223e826a063cbd96c82a02ab408e",
       "packet": "agent-tasks/recovery-milestone-01/agent-b.zh-CN.md",
       "ownedPaths": [
         "packages/execution/",
@@ -40,7 +40,8 @@
         "apps/runner/src/attach-channel/",
         "apps/runner/test/attach-channel/"
       ],
-      "executionMode": "active_current_result_only"
+      "executionMode": "active_current_result_only",
+      "reviewDecision": "COMPONENT_ADMITTED_MAIN_ADAPTER_INTEGRATED_FINALIZE_RESPONSE_RECONCILIATION_PENDING"
     },
     {
       "id": "C",
@@ -60,25 +61,25 @@
       "id": "D",
       "root": "/Users/hh/Desktop/joker/superagent-agent-d",
       "branch": "codex/g3-local-distribution",
-      "acceptedInput": "652b6835b22e9c1b2b79793670d4cea534e0d1fb",
+      "acceptedInput": "069447b7a65e473b4e730819cabed551a0e8df90",
       "packet": "agent-tasks/recovery-milestone-01/agent-d.zh-CN.md",
       "ownedPaths": [
         "apps/launcher/",
         "tools/distribution/",
         "packages/portability/"
       ],
-      "executionMode": "active_current_result_only"
+      "executionMode": "on_demand_concrete_blocker_only"
     },
     {
       "id": "E",
       "root": "/Users/hh/Desktop/joker/superagent-agent-e",
       "branch": "codex/g3-product-acceptance",
-      "acceptedInput": "95d48acc06b437a2a14a8cd46be430215cc3df5d",
+      "acceptedInput": "623241c1a0dde057e2ec52da2ec0e46d0015c81e",
       "packet": "agent-tasks/recovery-milestone-01/agent-e.zh-CN.md",
       "ownedPaths": [
         "tests/product-acceptance/"
       ],
-      "executionMode": "active_current_result_only"
+      "executionMode": "on_demand_concrete_blocker_only"
     },
     {
       "id": "F",
@@ -112,7 +113,7 @@
       "id": "H",
       "root": "/Users/hh/Desktop/joker/superagent-agent-h",
       "branch": "codex/g4-trial-operations",
-      "acceptedInput": "74b4166a063d213882f30c54f6860b44bab2e71b",
+      "acceptedInput": "83deec021aac857fa7162c5b9fe3d857b827bc62",
       "packet": "agent-tasks/recovery-milestone-01/agent-h.zh-CN.md",
       "ownedPaths": [
         "tools/trial-kit/",
@@ -120,7 +121,8 @@
         "docs/internal-trial/",
         "reports/trial-operations/"
       ],
-      "executionMode": "active_current_result_only"
+      "executionMode": "active_current_result_only",
+      "reviewDecision": "COMBINED_CONTROLLED_PASS_UNKNOWN_CLEANUP_PENDING"
     },
     {
       "id": "I",
@@ -151,6 +153,6 @@
       "executionMode": "on_demand_concrete_blocker_only"
     }
   ],
-  "activationPolicy": "Only B/H original recovery and D/E fixed installation are active; A/C/F/G/I/J on demand for a concrete blocker from those consumers, otherwise idle",
+  "activationPolicy": "Only main/B/H original recovery active; D/E fixed W36 subset completed, all other agents on demand for a concrete original consumer blocker",
   "independentMaintenanceQueues": false
 }

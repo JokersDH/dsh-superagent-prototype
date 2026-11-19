@@ -1,6 +1,12 @@
 # 个人 Agent 助理：方案 B 产品实现蓝图
 
-2026-11-17现行工程入口：[原Work恢复里程碑01](../agent-tasks/recovery-milestone-01/README.zh-CN.md)，替代下面旧轮次的扩线派工。main/B/H主动闭合原恢复，D/E主动验已有固定W36；A/C/F/G/I/J只按具体阻断参与，否则待命，不扩独立维护队列。[0095已交正常组合](../docs/rfcs/WP-16/0095-main-original-running-callback-composition.md)与[最新验收](../reports/releases/wave37-admission/README.zh-CN.md)分清受控正常链/故障恢复/物理/安装。
+2026-11-19当前工程入口：用户已接受[里程碑03“日常可用版交付”](../docs/product/MILESTONE-03.zh-CN.md)，仅main/D/E主动，B/F按具体阻断参与；最多4次实际Codex turn，六项日常使用/同包验收，不开新wave。Recovery01/原生控制02已关闭，下文旧“待命”及派工描述按历史读；原方案B架构基线保留。
+
+2026-11-19最新：Recovery01与原生控制02均已按用户冻结清单6/6关闭，真实Codex恢复用了1 turn+1自有coordinator SIGKILL，原生工作台控制用了5/6 turn。原口径重评82/100，方案B不含CAC63.1%，非完整发行准入。唯一[完成汇总](../docs/product/MILESTONES-01-02.zh-CN.md)。全部agent待命、原所有权恢复，不自动开始新wave/里程碑；以下旧入口仅作历史。
+
+2026-11-19当前：[同一个恢复里程碑](../agent-tasks/recovery-milestone-01/README.zh-CN.md)，mainbde57d42已证受控同run恢复/交付/原槽/原排队Work前进，且Store屏障提交后调用B postcommit finalize。剩余同ID finalize响应调和、H测试清理与真实native/物理层，仅B/main/H持续闭合，不扩线。[验收](../reports/releases/recovery-milestone-01/admission-2026-11-19.json)/[话术](../agent-tasks/recovery-milestone-01/forward-prompts.zh-CN.md)。
+
+2026-11-18现行工程入口：[原Work恢复里程碑01](../agent-tasks/recovery-milestone-01/README.zh-CN.md)，替代下面旧轮次的扩线派工。maind6244e63已受控原问题窗口接管到交付，B/H继续真实传输/ACK未知/原槽；D/E固定W36子集验完转待命，其余六位按需。[0095](../docs/rfcs/WP-16/0095-main-original-running-callback-composition.md)与[最新验收](../reports/releases/recovery-milestone-01/admission-2026-11-18.json)区分受控/真实OS/物理/安装，不新开wave或独立队列。
 
 用户确认本阶段不推进复核价值试点、依赖它的第二协议复核与路由收益研究，价值未测；CAC仍后置。旧设计/协议/ledger按历史保留，不构成本阶段工作或新增预算。产品进度以[STATUS](../docs/product/STATUS.zh-CN.md)为准。以下旧日期的“当前”均按其历史时间阅读。
 

@@ -1,14 +1,20 @@
 # 里程碑01：同一个原 Work 恢复到交付
 
-2026-11-17。替代 wave36 的新增扩线派工，保留此前成果、未达项和证据。用户再次明确：增加Agent是为加快已有目标，不是增加范围。任务变大指负责同一个结果直到完成；不要求所有资源同时开工，没有当天截止或时长承诺。当前完整方案B不含CAC。
+2026-11-19续交。继续同一个里程碑，不新建wave。任务粒度扩大为同一个生命周期从实现到main采用、独立复验和收尾完成，不按单fix结束，不增加功能线。当前完整方案B不含CAC。
 
 ## 唯一产品出口
 
 同一个原 Work 在协调器故障后，由原 Store/Application/QuestionBroker 接管，保留原 attempt/合同/问题/命令/原生会话；不重复 begin、不重发 UNKNOWN 业务效果；继续原检查、currentCandidate、显式人工接受到 delivered，并证明原2/4调度槽和完整资源安全归还。原生/物理证据未达时保持未达，不能用组件或虚拟资源补足。
 
-**main端到端负责这个出口。** 当前主动工作仅main/B/H的恢复主线，以及D/E的固定包验收。A/C/F/G/I/J按需支持：没有这两条实际路径的具体阻断就待命，不自行找维护任务或扩接口。此出口关闭前不开扩线wave。
+**main端到端负责这个出口。** 当前主动仅main/B/H。D/E固定W36安装验收本项已结束，转按需待命；其余六位继续待命，没有原恢复的具体阻断不自行找维护任务或扩接口。
 
-首个实现缺口已定位：`ProductExecution.start()`把未结束的codex-native绑定改成stopping；`reconcileRegisteredRunner()`只核对/取消旧Runner，明确businessResumed:false。新coordinator的attempts映射也没有原业务连接。main先做同原任务重开后的业务接管入口与失败复现，再向B/I/A等提出实际缺失依赖，不能用正常交付或更多组件测试代替。
+当前main **e2261ef5**（终态source83b3ece3）已有三种受控原Work故障窗口：原问题等待、原回答写出但resolution尚未返回、terminal事实已ACK但尚未交付；均同原ID/一次写到检查/接受/三产物重开。缺terminal receipt及原四拒绝对照保持。原receiver实际begin/answer body计数已断言，不仅用turn/start。40相关测试/strict过，物理reconcile仍只核对/停止。
+
+本轮B真实Runner EOF/旧stdout关闭的fake-driver传输4PASS/1NT已在main entry复验；入口此前已有EPIPE处理，新增未使用wrapper不计默认产品修复。H单Work独立正例与正常关闭反例2PASS。原2/4容量现按原Store未ended绑定计数，UNKNOWN保留、另一Work自己的屏障释放后第3/5项前进两场景过，无新scheduler/ledger。
+
+11-19验收：H的nextWork gap来自测试factory拒绝继任者为原排队Work首次spawn，生产已实际放行。main **6d309128**在自有integration消费者修正这一限制，原target仍禁止重spawn，累计Runner为capacity+1；按Work/currentCandidate/assignment绑定证据。2/4同run均完成owner退出→原Work检查/接受/三产物→目标自身槽归还→原第3/5项前进，UNKNOWN其他槽保留，42测试/strict通过。无需放松生产容量。[准确验收](../../reports/releases/recovery-milestone-01/admission-2026-11-19.json)、[H独立复现](../../reports/releases/recovery-milestone-01/h-admission-2026-11-19.json)。
+
+主线已接入B postcommit组件并通过受控验证：原cancel/inspect→Store `confirmOwnedQuiescence` 提交→完整B manifest digest和同confirmationId finalize。B组件已直接strict、UDS纯负例和entry窗口通过；主线相关回归通过。剩余只有finalize响应丢失后的同ID调和、H消费者UNKNOWN材料清理和真实native/物理层。按[0095约定](../../docs/rfcs/WP-16/0095-main-original-running-callback-composition.md)继续同一个结果，不扩平台/队列/ledger。
 
 ## 已具备与先修缺口
 
@@ -24,8 +30,8 @@
 | main | 主动 | 原Work业务接管到交付和原槽归还的整链 | [main](main.zh-CN.md) |
 | B | 主动 | main原恢复consumer所需Runner/控制修复 | [B](agent-b.zh-CN.md) |
 | H | 主动 | 同原Work故障链的独立实际消费者 | [H](agent-h.zh-CN.md) |
-| D | 主动 | 已有W36来源更正与E同包支持 | [D](agent-d.zh-CN.md) |
-| E | 主动 | 固定W36独立验收结论 | [E](agent-e.zh-CN.md) |
+| D | 本项完成，按需 | 固定W36来源已纠；不重包不追main | [D](agent-d.zh-CN.md) |
+| E | 本项完成，按需 | W36七项独立子集已验；待恢复consumer | [E](agent-e.zh-CN.md) |
 | A | 按需 | 原恢复出现实际持久化/ACK缺口 | [A](agent-a.zh-CN.md) |
 | C | 按需 | 原恢复出现实际来源/决定授权缺口 | [C](agent-c.zh-CN.md) |
 | F | 按需 | 原恢复/固定包默认界面出现用户阻断 | [F](agent-f.zh-CN.md) |
@@ -39,12 +45,12 @@
 
 ## 固定安装 cohort
 
-已有W35由E完成安装/配置/恢复/升级子集；保留其347PASS/22NT的混合cohort scope。当前独立目标锁 **W36 source087a598e5b6f357bd2cc40556cbf693257febc66 / build14a6b457ea285988**，Node24.21.0/ABI137/schema18/darwin-arm64。
+固定 **W36 source087a598e5b6f357bd2cc40556cbf693257febc66 / build14a6b457ea285988** 的本项验收已结束，Node24.21.0/ABI137/schema18/darwin-arm64。D199/199来源hash真修、归档字节不变；E七项同包case覆盖实际配置/非空恢复/受控检查接受/三kind点击。聚合354PASS/22NT、219ordinary/220functional不是全同W36，full221native仍拒。[准确范围](../../reports/releases/recovery-milestone-01/install-admission-2026-11-18.json)。
 
 Inner：`/Users/hh/Desktop/joker/pa-artifacts/wave36-target/wave36-target-14a6b45.tar.gz`，20625055B，SHA256 `13798190ae43b28628eaf7131dfb8192bdb786b9bcfe4e1e0b6f9217ab33a8af`。
 Outer：`/Users/hh/Desktop/joker/pa-artifacts/wave36-preview-14a6b45/PersonalAgent-Preview-14a6b45.zip`，63565262B，SHA256 `43e06d5bc7606e8283c1c5f58463f402018d4c9c9b223a2c7c021d429ccb8995`。
 
-D纠正外部selected source audit不重包。E先完成这个包的准确结论，不追42f6及后续移动HEAD。只有运行字节确需修复/主线选定恢复版本才明确冻结后继，不能改名继承旧PASS；Dfreeze先于Efinal，无反向等待环。
+D/E此项结束待命，不为oracle残余或移动main继续扩队列。当前包不认证d624恢复source；只有主线选定稳定恢复版本或该包真实阻断才明确调用D/E，Dfreeze先于Efinal，不能改名继承旧PASS。
 
 ## 授权、保留与计分
 

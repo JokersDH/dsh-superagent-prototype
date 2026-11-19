@@ -56,6 +56,8 @@ export function createProductRuntime(
     native?: NativeProductConfiguration
     /** Trusted in-process test/host port; never read from configuration or HTTP. */
     nativeRunnerLinkFactory?: NativeRunnerLinkFactory
+    /** Trusted local composition capacity; the original queue/bindings remain the only owners. */
+    maxActiveAttempts?: 2 | 4
     executionUnavailable?: ExecutionUnavailableReason
     projectRegistry?: NativeProjectRegistry
     workspaceRoot?: string
@@ -169,6 +171,7 @@ export function createProductRuntime(
     projectSettings ? contract => projectSettings.has(contract.scope.projectId) ? projectSettings.forContract(contract)
       : nativeProjects.find(project => project.id === contract.scope.projectId) : undefined,
     options.nativeRunnerLinkFactory,
+    options.maxActiveAttempts,
   )
   const { store } = options
   const replyResults = options.assistantReplyResults ??
