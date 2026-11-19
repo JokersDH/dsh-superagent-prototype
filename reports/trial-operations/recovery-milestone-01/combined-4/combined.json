@@ -6,7 +6,7 @@
       {
         "workId": "4e20564ee6ab6350a30ae1876eebec6e",
         "question": {
-          "id": "codex-question-50ccc7ad171426e9c4216f83c22ee9f89e1ac1e6fbdee52d",
+          "id": "codex-question-21b4838d74e432af5555043fabe157ae98a5d88694844594",
           "version": 1,
           "kind": "clarification",
           "contract": {
@@ -51,16 +51,16 @@
           },
           "targets": [
             {
-              "ticketId": "9e3015480307df9d00a0f8794ff2bf37",
-              "assignmentId": "108b7822155760d8608244c51877f5fb",
+              "ticketId": "0fbd5630369cfe0da6105058d171c2b9",
+              "assignmentId": "f806fdf7025cfcfd6c17093f2089c169",
               "contract": {
                 "workId": "4e20564ee6ab6350a30ae1876eebec6e",
                 "revision": 1,
                 "digest": "228a1b17dce5dbaf073f7a80ed7dc8eb78a8ef3d6d6494115d7711e8b3c73d7a"
               },
-              "attemptId": "attempt-8d106979-f7fc-4b32-af6d-1f57d803084f",
+              "attemptId": "attempt-e47bc5a8-4aab-48f6-81db-6c4c93902b8f",
               "fenceEpoch": 1,
-              "id": "codex-target-50ccc7ad171426e9c4216f83c22ee9f89e1ac1e6fbdee52d",
+              "id": "codex-target-21b4838d74e432af5555043fabe157ae98a5d88694844594",
               "connectionEpoch": 1,
               "nativeRequestId": {
                 "kind": "integer",
@@ -70,20 +70,20 @@
               "provenanceRef": "payload:bb1dd4ee4198c044919b57c4d709fdf34072f1f216426dc9de7311b48d5ff3a4"
             }
           ],
-          "openedAt": "2026-11-18T16:25:55.812Z",
+          "openedAt": "2026-11-19T02:05:14.303Z",
           "validity": "open"
         },
         "target": {
-          "ticketId": "9e3015480307df9d00a0f8794ff2bf37",
-          "assignmentId": "108b7822155760d8608244c51877f5fb",
+          "ticketId": "0fbd5630369cfe0da6105058d171c2b9",
+          "assignmentId": "f806fdf7025cfcfd6c17093f2089c169",
           "contract": {
             "workId": "4e20564ee6ab6350a30ae1876eebec6e",
             "revision": 1,
             "digest": "228a1b17dce5dbaf073f7a80ed7dc8eb78a8ef3d6d6494115d7711e8b3c73d7a"
           },
-          "attemptId": "attempt-8d106979-f7fc-4b32-af6d-1f57d803084f",
+          "attemptId": "attempt-e47bc5a8-4aab-48f6-81db-6c4c93902b8f",
           "fenceEpoch": 1,
-          "id": "codex-target-50ccc7ad171426e9c4216f83c22ee9f89e1ac1e6fbdee52d",
+          "id": "codex-target-21b4838d74e432af5555043fabe157ae98a5d88694844594",
           "connectionEpoch": 1,
           "nativeRequestId": {
             "kind": "integer",
@@ -96,7 +96,7 @@
       {
         "workId": "21911df71162050b096302b5b861f3fb",
         "question": {
-          "id": "codex-question-6a7a0a28a02173dbdc59e175a62d2e2d7fa8429c90406e45",
+          "id": "codex-question-7c8ba356fcdf35b404a5de322dcd0db9099841ac4d735bb8",
           "version": 1,
           "kind": "clarification",
           "contract": {
@@ -141,16 +141,16 @@
           },
           "targets": [
             {
-              "ticketId": "aa7e67235f0e422c3476d709fcfa5103",
-              "assignmentId": "75d87d4b53999568c96d433161c1cc5b",
+              "ticketId": "e5c85914fb342f5a3af99cf6e9326c5a",
+              "assignmentId": "0911ab9959d9c3a6de8c47b579909eee",
               "contract": {
                 "workId": "21911df71162050b096302b5b861f3fb",
                 "revision": 1,
                 "digest": "ac25de96db28a82e934954997faffd03aa80a107ede5355dfb3862bb58c4e443"
               },
-              "attemptId": "attempt-7c30caac-4238-4b1f-a39a-1bc462eb4818",
+              "attemptId": "attempt-45b5b49a-08ba-4691-86e5-b502681af028",
               "fenceEpoch": 1,
-              "id": "codex-target-6a7a0a28a02173dbdc59e175a62d2e2d7fa8429c90406e45",
+              "id": "codex-target-7c8ba356fcdf35b404a5de322dcd0db9099841ac4d735bb8",
               "connectionEpoch": 1,
               "nativeRequestId": {
                 "kind": "integer",
@@ -160,20 +160,20 @@
               "provenanceRef": "payload:bb1dd4ee4198c044919b57c4d709fdf34072f1f216426dc9de7311b48d5ff3a4"
             }
           ],
-          "openedAt": "2026-11-18T16:25:56.133Z",
+          "openedAt": "2026-11-19T02:05:14.641Z",
           "validity": "open"
         },
         "target": {
-          "ticketId": "aa7e67235f0e422c3476d709fcfa5103",
-          "assignmentId": "75d87d4b53999568c96d433161c1cc5b",
+          "ticketId": "e5c85914fb342f5a3af99cf6e9326c5a",
+          "assignmentId": "0911ab9959d9c3a6de8c47b579909eee",
           "contract": {
             "workId": "21911df71162050b096302b5b861f3fb",
             "revision": 1,
             "digest": "ac25de96db28a82e934954997faffd03aa80a107ede5355dfb3862bb58c4e443"
           },
-          "attemptId": "attempt-7c30caac-4238-4b1f-a39a-1bc462eb4818",
+          "attemptId": "attempt-45b5b49a-08ba-4691-86e5-b502681af028",
           "fenceEpoch": 1,
-          "id": "codex-target-6a7a0a28a02173dbdc59e175a62d2e2d7fa8429c90406e45",
+          "id": "codex-target-7c8ba356fcdf35b404a5de322dcd0db9099841ac4d735bb8",
           "connectionEpoch": 1,
           "nativeRequestId": {
             "kind": "integer",
@@ -186,7 +186,7 @@
       {
         "workId": "669c72db602b57f5f35431c21835b897",
         "question": {
-          "id": "codex-question-5f09eb330b4a7922ca948c5dc2de48550db5725d08d2ae24",
+          "id": "codex-question-20ecfb5dd0f92a72a18d5e5c9e5e9bd77fb91b1fbb92fac9",
           "version": 1,
           "kind": "clarification",
           "contract": {
@@ -231,16 +231,16 @@
           },
           "targets": [
             {
-              "ticketId": "8d42f0e46f191b4f9d3a9996e7ef4f55",
-              "assignmentId": "ca7fb741b1aa18f7d47d289dc77178e5",
+              "ticketId": "f741da6e7d87c510a6b20cf77530b285",
+              "assignmentId": "563ed01c97fe5bbebc5c5abe02969e15",
               "contract": {
                 "workId": "669c72db602b57f5f35431c21835b897",
                 "revision": 1,
                 "digest": "6b06925ee984bc55cb026b607d0ddfd01095548db875b2d92f276ca4d798b64b"
               },
-              "attemptId": "attempt-8f4c9121-b5a9-4eac-b4b4-734ac955e759",
+              "attemptId": "attempt-31390171-8444-4de1-afd4-1365b3787986",
               "fenceEpoch": 1,
-              "id": "codex-target-5f09eb330b4a7922ca948c5dc2de48550db5725d08d2ae24",
+              "id": "codex-target-20ecfb5dd0f92a72a18d5e5c9e5e9bd77fb91b1fbb92fac9",
               "connectionEpoch": 1,
               "nativeRequestId": {
                 "kind": "integer",
@@ -250,20 +250,20 @@
               "provenanceRef": "payload:bb1dd4ee4198c044919b57c4d709fdf34072f1f216426dc9de7311b48d5ff3a4"
             }
           ],
-          "openedAt": "2026-11-18T16:25:56.478Z",
+          "openedAt": "2026-11-19T02:05:14.950Z",
           "validity": "open"
         },
         "target": {
-          "ticketId": "8d42f0e46f191b4f9d3a9996e7ef4f55",
-          "assignmentId": "ca7fb741b1aa18f7d47d289dc77178e5",
+          "ticketId": "f741da6e7d87c510a6b20cf77530b285",
+          "assignmentId": "563ed01c97fe5bbebc5c5abe02969e15",
           "contract": {
             "workId": "669c72db602b57f5f35431c21835b897",
             "revision": 1,
             "digest": "6b06925ee984bc55cb026b607d0ddfd01095548db875b2d92f276ca4d798b64b"
           },
-          "attemptId": "attempt-8f4c9121-b5a9-4eac-b4b4-734ac955e759",
+          "attemptId": "attempt-31390171-8444-4de1-afd4-1365b3787986",
           "fenceEpoch": 1,
-          "id": "codex-target-5f09eb330b4a7922ca948c5dc2de48550db5725d08d2ae24",
+          "id": "codex-target-20ecfb5dd0f92a72a18d5e5c9e5e9bd77fb91b1fbb92fac9",
           "connectionEpoch": 1,
           "nativeRequestId": {
             "kind": "integer",
@@ -276,7 +276,7 @@
       {
         "workId": "83010cbd73b056df7cf81553758294cf",
         "question": {
-          "id": "codex-question-d1f535e2e00a853cb08c5af08cce27562b730d0797af0804",
+          "id": "codex-question-4febcb9d7b7393c572d231f76427ff674580673fc9bc3df0",
           "version": 1,
           "kind": "clarification",
           "contract": {
@@ -321,16 +321,16 @@
           },
           "targets": [
             {
-              "ticketId": "756a37d7f0295362789251584f04239d",
-              "assignmentId": "ee125d54268f34eb4bed42fb33f85ec8",
+              "ticketId": "f2cbebcbc2477dbdc9b04798e2e88855",
+              "assignmentId": "21932080f0f34fb972cf653147468b23",
               "contract": {
                 "workId": "83010cbd73b056df7cf81553758294cf",
                 "revision": 1,
                 "digest": "a53276755ad4d9b6352c0f36bbd4a5024e814df080c54152428786d9df008206"
               },
-              "attemptId": "attempt-d8a9af80-2649-4c67-9d02-c17d5ba56639",
+              "attemptId": "attempt-24c5953e-895a-42d2-9f73-84aab9b85842",
               "fenceEpoch": 1,
-              "id": "codex-target-d1f535e2e00a853cb08c5af08cce27562b730d0797af0804",
+              "id": "codex-target-4febcb9d7b7393c572d231f76427ff674580673fc9bc3df0",
               "connectionEpoch": 1,
               "nativeRequestId": {
                 "kind": "integer",
@@ -340,20 +340,20 @@
               "provenanceRef": "payload:bb1dd4ee4198c044919b57c4d709fdf34072f1f216426dc9de7311b48d5ff3a4"
             }
           ],
-          "openedAt": "2026-11-18T16:25:56.803Z",
+          "openedAt": "2026-11-19T02:05:15.294Z",
           "validity": "open"
         },
         "target": {
-          "ticketId": "756a37d7f0295362789251584f04239d",
-          "assignmentId": "ee125d54268f34eb4bed42fb33f85ec8",
+          "ticketId": "f2cbebcbc2477dbdc9b04798e2e88855",
+          "assignmentId": "21932080f0f34fb972cf653147468b23",
           "contract": {
             "workId": "83010cbd73b056df7cf81553758294cf",
             "revision": 1,
             "digest": "a53276755ad4d9b6352c0f36bbd4a5024e814df080c54152428786d9df008206"
           },
-          "attemptId": "attempt-d8a9af80-2649-4c67-9d02-c17d5ba56639",
+          "attemptId": "attempt-24c5953e-895a-42d2-9f73-84aab9b85842",
           "fenceEpoch": 1,
-          "id": "codex-target-d1f535e2e00a853cb08c5af08cce27562b730d0797af0804",
+          "id": "codex-target-4febcb9d7b7393c572d231f76427ff674580673fc9bc3df0",
           "connectionEpoch": 1,
           "nativeRequestId": {
             "kind": "integer",
@@ -370,12 +370,12 @@
   "successor": {
     "target": {
       "workId": "4e20564ee6ab6350a30ae1876eebec6e",
-      "attemptId": "attempt-8d106979-f7fc-4b32-af6d-1f57d803084f",
-      "questionId": "codex-question-50ccc7ad171426e9c4216f83c22ee9f89e1ac1e6fbdee52d",
-      "assignmentId": "108b7822155760d8608244c51877f5fb",
+      "attemptId": "attempt-e47bc5a8-4aab-48f6-81db-6c4c93902b8f",
+      "questionId": "codex-question-21b4838d74e432af5555043fabe157ae98a5d88694844594",
+      "assignmentId": "f806fdf7025cfcfd6c17093f2089c169",
       "candidate": {
-        "ticketId": "9e3015480307df9d00a0f8794ff2bf37",
-        "assignmentId": "108b7822155760d8608244c51877f5fb",
+        "ticketId": "0fbd5630369cfe0da6105058d171c2b9",
+        "assignmentId": "f806fdf7025cfcfd6c17093f2089c169",
         "contract": {
           "workId": "4e20564ee6ab6350a30ae1876eebec6e",
           "revision": 1,
@@ -386,12 +386,12 @@
     },
     "phase": "delivered",
     "artifacts": [
-      "2fae68fd03d4578e0854a06edf8385155b0f77603e09798d259884b671cf221f",
+      "4b523db8870555b72e8aee239efce693882566ee873150235be778c74fa364f4",
       "e449a07f0bf57772dd6e3adad2b8328b42cbc8f162d4a49c5f558dd2e4e29283",
-      "07668b2713b1bf5e0f280f8f945129b09d07dc0b5c1f60e5fe2a50373c3204f1"
+      "e0f4029684409a179ef02c405fd7d474501387a5f5619d40291648893cdf194f"
     ],
     "verification": {
-      "id": "verification:60049134-3920-4f0a-9f7f-00196cebc354",
+      "id": "verification:39e7a46b-7ff0-449f-a47f-41008f18e12e",
       "results": [
         {
           "criterionId": "machine",
@@ -407,9 +407,9 @@
     "held": "held",
     "suppressedSignals": 1,
     "nextWorkId": "4b4d78ee4a51a6f33754804a156f6bb2",
-    "nextQuestion": null,
-    "nextProgressed": false,
-    "nextError": "next queued Work progressed: {\"cursor\":139,\"works\":[{\"work\":{\"id\":\"4b4d78ee4a51a6f33754804a156f6bb2\",\"projectId\":\"one\",\"conversationId\":\"combined\",\"title\":\"Combined queued Work 4\",\"createdAt\":\"2026-11-18T16:25:56.856Z\"},\"contract\":{\"workId\":\"4b4d78ee4a51a6f33754804a156f6bb2\",\"revision\":1,\"digest\":\"f7f17ff1a2c121b19678da3c554da6fca759e7edc42c3ec5ad94e81fc3d7f0e4\",\"goal\":\"Combined queued Work 4\",\"scope\":{\"projectId\":\"one\",\"allowedPaths\":[\".\"],\"excludedPaths\":[\".git\"],\"externalActions\":[]},\"criteria\":[{\"id\":\"machine\",\"descript",
+    "nextQuestion": "codex-question-c6d3d3943e580fc3d86bc5dcf2836d49726fe57d327539bd",
+    "nextProgressed": true,
+    "nextError": null,
     "targetBindingAfter": "ended",
     "fillerBindingAfter": "stopping"
   },
@@ -417,20 +417,21 @@
     "targetBegin": 1,
     "targetAnswer": 1,
     "fillerBegin": 1,
-    "rows": 5
+    "rows": 6
   },
   "totalNativeEffects": 1,
   "readback": {
     "workId": "4e20564ee6ab6350a30ae1876eebec6e",
-    "questionId": "codex-question-50ccc7ad171426e9c4216f83c22ee9f89e1ac1e6fbdee52d",
+    "questionId": "codex-question-21b4838d74e432af5555043fabe157ae98a5d88694844594",
     "validity": "answered",
     "targetBinding": "ended",
     "fillerBinding": "stopping",
-    "nextQuestionId": null,
-    "nextValidity": null,
+    "nextQuestionId": "codex-question-c6d3d3943e580fc3d86bc5dcf2836d49726fe57d327539bd",
+    "nextValidity": "open",
+    "nextQuestionWorkId": "4b4d78ee4a51a6f33754804a156f6bb2",
     "command": "recorded",
     "verification": {
-      "id": "verification:60049134-3920-4f0a-9f7f-00196cebc354",
+      "id": "verification:39e7a46b-7ff0-449f-a47f-41008f18e12e",
       "results": [
         {
           "criterionId": "machine",
@@ -447,9 +448,11 @@
       ],
       "actorRef": "combined-recovery-authority"
     },
+    "exactVerificationCount": 1,
+    "exactAcceptanceCount": 1,
     "artifacts": [
       {
-        "id": "2fae68fd03d4578e0854a06edf8385155b0f77603e09798d259884b671cf221f",
+        "id": "4b523db8870555b72e8aee239efce693882566ee873150235be778c74fa364f4",
         "bytes": 977
       },
       {
@@ -457,7 +460,7 @@
         "bytes": 177
       },
       {
-        "id": "07668b2713b1bf5e0f280f8f945129b09d07dc0b5c1f60e5fe2a50373c3204f1",
+        "id": "e0f4029684409a179ef02c405fd7d474501387a5f5619d40291648893cdf194f",
         "bytes": 363
       }
     ],
@@ -474,19 +477,15 @@
     "fillerUnknownRetained": true,
     "machineCheckPassed": true,
     "candidateAssignmentMatches": true,
+    "exactCurrentCandidateEvidence": true,
     "acceptanceRecorded": true,
     "exactArtifactsReadable": true,
-    "nextWorkProgressed": false,
+    "nextWorkProgressed": true,
     "noNewWork": true,
     "nativeEffectOnlyTarget": true,
     "commandRecorded": true
   },
-  "gap": {
-    "stage": "next_work_progress",
-    "observed": "next queued Work progressed: {\"cursor\":139,\"works\":[{\"work\":{\"id\":\"4b4d78ee4a51a6f33754804a156f6bb2\",\"projectId\":\"one\",\"conversationId\":\"combined\",\"title\":\"Combined queued Work 4\",\"createdAt\":\"2026-11-18T16:25:56.856Z\"},\"contract\":{\"workId\":\"4b4d78ee4a51a6f33754804a156f6bb2\",\"revision\":1,\"digest\":\"f7f17ff1a2c121b19678da3c554da6fca759e7edc42c3ec5ad94e81fc3d7f0e4\",\"goal\":\"Combined queued Work 4\",\"scope\":{\"projectId\":\"one\",\"allowedPaths\":[\".\"],\"excludedPaths\":[\".git\"],\"externalActions\":[]},\"criteria\":[{\"id\":\"machine\",\"descript",
-    "note": "target delivered and binding ended; filler held UNKNOWN; next Work question did not appear",
-    "minimalRepro": "same-run combined consumer capacity=4"
-  },
+  "gap": null,
   "layers": {
     "source": "main e2261ef5 ProductRuntime/recovery/capacity",
     "controlled": "virtual ProcessHost per Work",

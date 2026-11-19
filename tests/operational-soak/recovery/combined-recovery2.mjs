@@ -40,7 +40,7 @@ export async function runCombined(capacity, root) {
           if (message.method === 'spawn') {
             const { spec, options } = message.value
             const attemptId = spec.attemptId
-            const trace = { virtualResources: 0, nativeEffects: 0, stdioFacts: [], stdioPayloads: 0, stdioGuards: 0, protocolMethods: [], errors: [], closers: [], inventoryUnknown: spawnIndex > 0 }
+            const trace = { virtualResources: 0, nativeEffects: 0, stdioFacts: [], stdioPayloads: 0, stdioGuards: 0, protocolMethods: [], errors: [], closers: [], inventoryUnknown: spawnIndex > 0 && spawnIndex < capacity }
             traces.set(attemptId, trace); spawnIndex += 1
             recoveryRoots.push(options.env.PA_RUNNER_RECOVERY_ROOT)
             const handle = await nativeCallbackLink(trace)({ ...options,
@@ -73,16 +73,17 @@ export async function runCombined(capacity, root) {
       const question = store.product.questions.get(successor.target.questionId)
       const filler = original.works[1]
       const nextQuestion = store.product.questions.get(successor.nextQuestion)
-      const verifications = store.db.prepare('SELECT id, assignment_id, candidate_generation, results FROM completion_verifications WHERE ticket_id = ?').all(original.works[0].target.ticketId)
-      const acceptances = store.db.prepare('SELECT id, assignment_id, candidate_generation, criterion_ids, actor_ref FROM completion_acceptances WHERE ticket_id = ?').all(original.works[0].target.ticketId)
+      const targetCandidate = successor.target.candidate
+      const verifications = store.db.prepare('SELECT id, assignment_id, candidate_generation, results FROM completion_verifications WHERE ticket_id = ? AND assignment_id = ? AND candidate_generation = ?').all(original.works[0].target.ticketId, targetCandidate.assignmentId, targetCandidate.candidateGeneration)
+      const acceptances = store.db.prepare('SELECT id, assignment_id, candidate_generation, criterion_ids, actor_ref FROM completion_acceptances WHERE ticket_id = ? AND assignment_id = ? AND candidate_generation = ?').all(original.works[0].target.ticketId, targetCandidate.assignmentId, targetCandidate.candidateGeneration)
       readback = {
         workId: work?.id ?? null, questionId: question?.id ?? null, validity: question?.validity ?? null,
         targetBinding: store.bindings.binding(successor.target.attemptId)?.state ?? null,
         fillerBinding: store.bindings.binding(filler.target.attemptId)?.state ?? null,
-        nextQuestionId: nextQuestion?.id ?? null, nextValidity: nextQuestion?.validity ?? null,
+        nextQuestionId: nextQuestion?.id ?? null, nextValidity: nextQuestion?.validity ?? null, nextQuestionWorkId: nextQuestion?.contract?.workId ?? null,
         command: store.commands.get('combined-answer-target')?.status ?? null,
         verification: verifications[0] === undefined ? null : { id: String(verifications[0].id), results: JSON.parse(String(verifications[0].results)) },
-        acceptance: acceptances[0] === undefined ? null : { criterionIds: JSON.parse(String(acceptances[0].criterion_ids)), actorRef: String(acceptances[0].actor_ref) },
+        acceptance: acceptances[0] === undefined ? null : { criterionIds: JSON.parse(String(acceptances[0].criterion_ids)), actorRef: String(acceptances[0].actor_ref) }, exactVerificationCount: verifications.length, exactAcceptanceCount: acceptances.length,
         artifacts: successor.artifacts.map(id => ({ id, bytes: store.artifacts.read(id)?.data?.length ?? 0 })),
         workCount: store.product.works.listByProject('one', { limit: 20 }).length,
       }
@@ -93,7 +94,7 @@ export async function runCombined(capacity, root) {
     const fillerBegin = receiver.filter(row => row.kind === 'begin' && row.attemptId === original.works[1].target.attemptId).length
     const totalNativeEffects = [...traces.values()].reduce((sum, trace) => sum + trace.nativeEffects, 0)
     const checks = {
-      oneRunnerPerCapacityWork: handles.size === capacity && spawnIndex === capacity,
+      oneRunnerPerCapacityWork: handles.size === capacity + 1 && spawnIndex === capacity + 1,
       targetReceiverBeginOnce: targetBegin === 1,
       targetReceiverAnswerOnce: targetAnswer === 1,
       fillerNoAnswer: fillerBegin === 1 && receiver.filter(row => row.kind === 'answer' && row.attemptId === original.works[1].target.attemptId).length === 0,
@@ -102,10 +103,11 @@ export async function runCombined(capacity, root) {
       targetBindingEnded: readback.targetBinding === 'ended',
       fillerUnknownRetained: ['active','stopping'].includes(readback.fillerBinding) && ['active','stopping'].includes(successor.fillerState) && successor.held === 'held',
       machineCheckPassed: readback.verification?.results?.some(row => row.criterionId === 'machine' && row.outcome === 'PASS') === true,
-      candidateAssignmentMatches: successor.target.candidate.assignmentId === successor.target.assignmentId,
+      candidateAssignmentMatches: successor.target.candidate.assignmentId === successor.target.assignmentId && successor.target.candidate.contract.workId === original.works[0].workId,
+      exactCurrentCandidateEvidence: readback.exactVerificationCount === 1 && readback.exactAcceptanceCount === 1 && readback.verification?.id === successor.verification.id,
       acceptanceRecorded: readback.acceptance !== null && readback.acceptance.criterionIds.includes('human'),
       exactArtifactsReadable: readback.artifacts.length === 3 && readback.artifacts.every(entry => entry.bytes > 0),
-      nextWorkProgressed: readback.nextQuestionId === successor.nextQuestion && readback.nextValidity === 'open',
+      nextWorkProgressed: readback.nextQuestionId === successor.nextQuestion && readback.nextValidity === 'open' && readback.nextQuestionWorkId === original.nextWorkId,
       noNewWork: readback.workCount === capacity + 1,
       nativeEffectOnlyTarget: totalNativeEffects === 1,
       commandRecorded: readback.command === 'recorded',

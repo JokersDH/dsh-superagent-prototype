@@ -6,7 +6,7 @@
   "base": "e14c9597d1df3f084b21048de5e9338f24de54c8",
   "mergedMain": "296254d8",
   "currentH": "78b62ce3",
-  "updatedAt": "2026-11-18T16:29:06.953Z",
+  "updatedAt": "2026-11-19T02:05:49.488Z",
   "goal": {
     "wholeSubsystem": true,
     "closures": 4,
@@ -403,11 +403,11 @@
   },
   "evidenceCommit": "78b62ce3",
   "recoveryMilestone01": {
-    "status": "COMBINED_RECOVERY_DELIVERED_NEXT_SLOT_BLOCKED",
+    "status": "SAME_RUN_RECOVERY_CAPACITY_PASS",
     "source": {
-      "H": "caa48df7",
-      "main": "e2261ef5",
-      "merge": "e9d19a5e",
+      "H": "1a1be9db",
+      "main": "6d309128",
+      "merge": "85ffacce",
       "B": "88e472e6",
       "I": "b21698fa"
     },
@@ -436,24 +436,24 @@
       {
         "command": "node --test --test-timeout=90000 tests/operational-soak/recovery/combined-recovery.case.mjs",
         "exitCode": 0,
-        "result": "1 pass; combined recovery delivered, next 3rd/5th blocked baseline"
+        "result": "1 pass; same-run recovery/capacity 2 and 4"
       }
     ],
     "combined": {
-      "status": "RECOVERY_DELIVERED_CAPACITY_UNKNOWN_NEXT_SLOT_BLOCKED",
+      "status": "SAME_RUN_RECOVERY_CAPACITY_PASS",
       "capacity2": {
         "target": {
           "workId": "4e20564ee6ab6350a30ae1876eebec6e",
-          "attemptId": "attempt-9d2cd9bc-0523-4858-99db-f31556e52d81",
-          "questionId": "codex-question-fd19967ab4a95b22d302db7768e16964a074c3f1b6861a81",
+          "attemptId": "attempt-23b6d21f-3f4c-491e-940f-b66d6afe26e8",
+          "questionId": "codex-question-300f653cda3a3762a0a08386ee57bd3c54c81e5102572af9",
           "phase": "delivered",
           "artifacts": [
-            "459e4b2ea3c017baf2b0434a485d3a731cc02b025bb1fcb429bf69e21f38ae0f",
+            "6565b51d36acbecc2a0ca40e4b009c346fc258930fa050eadaf8de1da9dd2e65",
             "e449a07f0bf57772dd6e3adad2b8328b42cbc8f162d4a49c5f558dd2e4e29283",
-            "191b4140aae56ed002686d3f4d2a3e0121b38174e17400a053bcbf2d81bd2538"
+            "a08da14f57032ac96298a60e0e3db019c0ef5e64c2df00469d4d21729d48a37f"
           ],
           "verification": {
-            "id": "verification:7bebf6fa-c866-40a6-a50b-bad48e7bf194",
+            "id": "verification:c17e8a88-f8c1-460d-a05b-ec621f103353",
             "results": [
               {
                 "criterionId": "machine",
@@ -469,12 +469,12 @@
         "fillerState": "stopping",
         "held": "held",
         "nextWorkId": "669c72db602b57f5f35431c21835b897",
-        "nextProgressed": false,
+        "nextProgressed": true,
         "receiver": {
           "targetBegin": 1,
           "targetAnswer": 1,
           "fillerBegin": 1,
-          "rows": 3
+          "rows": 4
         },
         "checks": {
           "oneRunnerPerCapacityWork": true,
@@ -487,33 +487,29 @@
           "fillerUnknownRetained": true,
           "machineCheckPassed": true,
           "candidateAssignmentMatches": true,
+          "exactCurrentCandidateEvidence": true,
           "acceptanceRecorded": true,
           "exactArtifactsReadable": true,
-          "nextWorkProgressed": false,
+          "nextWorkProgressed": true,
           "noNewWork": true,
           "nativeEffectOnlyTarget": true,
           "commandRecorded": true
         },
-        "gap": {
-          "stage": "next_work_progress",
-          "observed": "next queued Work progressed: {\"cursor\":87,\"works\":[{\"work\":{\"id\":\"669c72db602b57f5f35431c21835b897\",\"projectId\":\"one\",\"conversationId\":\"combined\",\"title\":\"Combined queued Work 2\",\"createdAt\":\"2026-11-18T16:25:34.006Z\"},\"contract\":{\"workId\":\"669c72db602b57f5f35431c21835b897\",\"revision\":1,\"digest\":\"a9bc24b538c45f9dbd0a9aa1cf061f19de1102c7a1fd67323d58ba7dddf6a1c6\",\"goal\":\"Combined queued Work 2\",\"scope\":{\"projectId\":\"one\",\"allowedPaths\":[\".\"],\"excludedPaths\":[\".git\"],\"externalActions\":[]},\"criteria\":[{\"id\":\"machine\",\"descripti",
-          "note": "target delivered and binding ended; filler held UNKNOWN; next Work question did not appear",
-          "minimalRepro": "same-run combined consumer capacity=2"
-        }
+        "gap": null
       },
       "capacity4": {
         "target": {
           "workId": "4e20564ee6ab6350a30ae1876eebec6e",
-          "attemptId": "attempt-8d106979-f7fc-4b32-af6d-1f57d803084f",
-          "questionId": "codex-question-50ccc7ad171426e9c4216f83c22ee9f89e1ac1e6fbdee52d",
+          "attemptId": "attempt-e47bc5a8-4aab-48f6-81db-6c4c93902b8f",
+          "questionId": "codex-question-21b4838d74e432af5555043fabe157ae98a5d88694844594",
           "phase": "delivered",
           "artifacts": [
-            "2fae68fd03d4578e0854a06edf8385155b0f77603e09798d259884b671cf221f",
+            "4b523db8870555b72e8aee239efce693882566ee873150235be778c74fa364f4",
             "e449a07f0bf57772dd6e3adad2b8328b42cbc8f162d4a49c5f558dd2e4e29283",
-            "07668b2713b1bf5e0f280f8f945129b09d07dc0b5c1f60e5fe2a50373c3204f1"
+            "e0f4029684409a179ef02c405fd7d474501387a5f5619d40291648893cdf194f"
           ],
           "verification": {
-            "id": "verification:60049134-3920-4f0a-9f7f-00196cebc354",
+            "id": "verification:39e7a46b-7ff0-449f-a47f-41008f18e12e",
             "results": [
               {
                 "criterionId": "machine",
@@ -529,12 +525,12 @@
         "fillerState": "stopping",
         "held": "held",
         "nextWorkId": "4b4d78ee4a51a6f33754804a156f6bb2",
-        "nextProgressed": false,
+        "nextProgressed": true,
         "receiver": {
           "targetBegin": 1,
           "targetAnswer": 1,
           "fillerBegin": 1,
-          "rows": 5
+          "rows": 6
         },
         "checks": {
           "oneRunnerPerCapacityWork": true,
@@ -547,37 +543,33 @@
           "fillerUnknownRetained": true,
           "machineCheckPassed": true,
           "candidateAssignmentMatches": true,
+          "exactCurrentCandidateEvidence": true,
           "acceptanceRecorded": true,
           "exactArtifactsReadable": true,
-          "nextWorkProgressed": false,
+          "nextWorkProgressed": true,
           "noNewWork": true,
           "nativeEffectOnlyTarget": true,
           "commandRecorded": true
         },
-        "gap": {
-          "stage": "next_work_progress",
-          "observed": "next queued Work progressed: {\"cursor\":139,\"works\":[{\"work\":{\"id\":\"4b4d78ee4a51a6f33754804a156f6bb2\",\"projectId\":\"one\",\"conversationId\":\"combined\",\"title\":\"Combined queued Work 4\",\"createdAt\":\"2026-11-18T16:25:56.856Z\"},\"contract\":{\"workId\":\"4b4d78ee4a51a6f33754804a156f6bb2\",\"revision\":1,\"digest\":\"f7f17ff1a2c121b19678da3c554da6fca759e7edc42c3ec5ad94e81fc3d7f0e4\",\"goal\":\"Combined queued Work 4\",\"scope\":{\"projectId\":\"one\",\"allowedPaths\":[\".\"],\"excludedPaths\":[\".git\"],\"externalActions\":[]},\"criteria\":[{\"id\":\"machine\",\"descript",
-          "note": "target delivered and binding ended; filler held UNKNOWN; next Work question did not appear",
-          "minimalRepro": "same-run combined consumer capacity=4"
-        }
+        "gap": null
       },
-      "note": "Same run: original owner-exit recovery/check/accept/artifacts pass; UNKNOWN filler retained; queued 3rd/5th Work does not progress after delivered target binding ends. This is the remaining main gap; not two independent PASSes."
+      "note": "Same run: owner-exit target recovery/check/currentCandidate/manual accept/artifacts; UNKNOWN filler retained; target binding ended; next original Work first-starts (capacity+1 runners). Previous next-slot block was H fixture successor spawn/inventoryUnknown assertion, not production."
     },
     "layers": {
       "source": "main d6244e63 owner-exit takeover + main recovery worker",
       "controlled": "parent-owned virtual Runner; no OS process",
       "native": "0",
-      "recovered": "CONTROLLED_OWNER_EXIT_TAKEOVER_DELIVERED",
+      "recovered": "CONTROLLED_SAME_RUN_RECOVERY_DELIVERED",
       "ackLost": "NOT_TESTED_IN_COMBINED",
-      "schedulerSlots": "ORIGINAL_CAPACITY_OCCUPIED_UNKNOWN_RETAINED_NEXT_SLOT_BLOCKED",
+      "schedulerSlots": "ORIGINAL_CAPACITY_2_4_SAME_RUN_UNKNOWN_RETAINED_NEXT_PROGRESS_PASS_VIRTUAL",
       "installed": "not used",
       "physical": "NOT_TESTED",
       "realEof": "NOT_TESTED"
     },
     "remaining": [
-      "main must release the delivered target original slot so queued 3rd/5th Work progresses while UNKNOWN filler remains",
-      "ACK-written/reply-lost original command reconciliation inside combined run",
-      "real OS stdio EOF/old stdout lifetime (B consumer)",
+      "B/main postcommit terminal finalize windows and real terminal consumer",
+      "ACK-written/reply-lost and pre/postcommit finalize response-loss independent windows",
+      "real OS stdio EOF/old stdout lifetime",
       "physical resource quiescence"
     ],
     "evidence": [
@@ -588,13 +580,11 @@
       "reports/trial-operations/recovery-milestone-01/reopen-failure.json"
     ],
     "hashes": {
-      "reports/trial-operations/recovery-milestone-01/summary.json": "060c69ff4ad72b149ab4c5b6c4127c7a7f480fff9c55a19878c1340a89ab0d90",
+      "reports/trial-operations/recovery-milestone-01/summary.json": "7518f502961b3b815857e18d814d2750f0c0b49fd34b9d26d5a49c0db9a6c11d",
       "reports/trial-operations/recovery-milestone-01/main-recovery.json": "0c49803501ae6cc616cda0824f9d9862f3470f197160aed0c948751012993e51",
-      "reports/trial-operations/recovery-milestone-01/combined-2/combined.json": "d658dd3f3e4187c0904b0ba58a44f1e2055c6257be46f501f5b93a1bf0bb9c64",
-      "reports/trial-operations/recovery-milestone-01/combined-4/combined.json": "9aba970a467f2c7e383680ce7d645380fcf2954a92f3f46f630d55e594dd0279",
+      "reports/trial-operations/recovery-milestone-01/combined-2/combined.json": "ca4276dd57d74b034c58dcf86fc71ee6ae4a3109455afded134ace9b09f6a04d",
+      "reports/trial-operations/recovery-milestone-01/combined-4/combined.json": "b5e22226abd23b987fa8c4ef0b4bafdad7b5da5d107eeb28f46e2e5215e1d640",
       "reports/trial-operations/recovery-milestone-01/reopen-failure.json": "ff4b74aff44e326ea9261337686c7139a3b4a312dcc91d5cd9f7552f5d384c4d"
-    },
-    "commit": "59de5414",
-    "evidenceCommit": "59de5414"
+    }
   }
 }

@@ -6,7 +6,7 @@
       {
         "workId": "4e20564ee6ab6350a30ae1876eebec6e",
         "question": {
-          "id": "codex-question-fd19967ab4a95b22d302db7768e16964a074c3f1b6861a81",
+          "id": "codex-question-300f653cda3a3762a0a08386ee57bd3c54c81e5102572af9",
           "version": 1,
           "kind": "clarification",
           "contract": {
@@ -51,16 +51,16 @@
           },
           "targets": [
             {
-              "ticketId": "a81a1ef3135191ca1b7d353517fa8847",
-              "assignmentId": "f17f317c84d05b53845b5cc561f8608a",
+              "ticketId": "5b619f34089d067a52fd370398d808b4",
+              "assignmentId": "5b7304253bcb1f5a6b56ab3f7630d899",
               "contract": {
                 "workId": "4e20564ee6ab6350a30ae1876eebec6e",
                 "revision": 1,
                 "digest": "228a1b17dce5dbaf073f7a80ed7dc8eb78a8ef3d6d6494115d7711e8b3c73d7a"
               },
-              "attemptId": "attempt-9d2cd9bc-0523-4858-99db-f31556e52d81",
+              "attemptId": "attempt-23b6d21f-3f4c-491e-940f-b66d6afe26e8",
               "fenceEpoch": 1,
-              "id": "codex-target-fd19967ab4a95b22d302db7768e16964a074c3f1b6861a81",
+              "id": "codex-target-300f653cda3a3762a0a08386ee57bd3c54c81e5102572af9",
               "connectionEpoch": 1,
               "nativeRequestId": {
                 "kind": "integer",
@@ -70,20 +70,20 @@
               "provenanceRef": "payload:bb1dd4ee4198c044919b57c4d709fdf34072f1f216426dc9de7311b48d5ff3a4"
             }
           ],
-          "openedAt": "2026-11-18T16:25:33.629Z",
+          "openedAt": "2026-11-19T02:05:12.193Z",
           "validity": "open"
         },
         "target": {
-          "ticketId": "a81a1ef3135191ca1b7d353517fa8847",
-          "assignmentId": "f17f317c84d05b53845b5cc561f8608a",
+          "ticketId": "5b619f34089d067a52fd370398d808b4",
+          "assignmentId": "5b7304253bcb1f5a6b56ab3f7630d899",
           "contract": {
             "workId": "4e20564ee6ab6350a30ae1876eebec6e",
             "revision": 1,
             "digest": "228a1b17dce5dbaf073f7a80ed7dc8eb78a8ef3d6d6494115d7711e8b3c73d7a"
           },
-          "attemptId": "attempt-9d2cd9bc-0523-4858-99db-f31556e52d81",
+          "attemptId": "attempt-23b6d21f-3f4c-491e-940f-b66d6afe26e8",
           "fenceEpoch": 1,
-          "id": "codex-target-fd19967ab4a95b22d302db7768e16964a074c3f1b6861a81",
+          "id": "codex-target-300f653cda3a3762a0a08386ee57bd3c54c81e5102572af9",
           "connectionEpoch": 1,
           "nativeRequestId": {
             "kind": "integer",
@@ -96,7 +96,7 @@
       {
         "workId": "21911df71162050b096302b5b861f3fb",
         "question": {
-          "id": "codex-question-d9410429e06bb3867a165438f574ca2b4371c3afb31e1edc",
+          "id": "codex-question-03cafc48ac272fd12c93bafb260f524ffaba5fa5704a9390",
           "version": 1,
           "kind": "clarification",
           "contract": {
@@ -141,16 +141,16 @@
           },
           "targets": [
             {
-              "ticketId": "30dbc385430dbefe13eb43a8be2c4ea1",
-              "assignmentId": "69762332c899d0750f99e9df7301a49c",
+              "ticketId": "cd42d843d28fee035137a3c6e27d979a",
+              "assignmentId": "53a4fea350b1f765167c273ea6fc0812",
               "contract": {
                 "workId": "21911df71162050b096302b5b861f3fb",
                 "revision": 1,
                 "digest": "ac25de96db28a82e934954997faffd03aa80a107ede5355dfb3862bb58c4e443"
               },
-              "attemptId": "attempt-672cd2be-fbba-4110-930f-2f6808973e39",
+              "attemptId": "attempt-8ef82ebf-a9b8-4eda-a17f-409ab986e580",
               "fenceEpoch": 1,
-              "id": "codex-target-d9410429e06bb3867a165438f574ca2b4371c3afb31e1edc",
+              "id": "codex-target-03cafc48ac272fd12c93bafb260f524ffaba5fa5704a9390",
               "connectionEpoch": 1,
               "nativeRequestId": {
                 "kind": "integer",
@@ -160,20 +160,20 @@
               "provenanceRef": "payload:bb1dd4ee4198c044919b57c4d709fdf34072f1f216426dc9de7311b48d5ff3a4"
             }
           ],
-          "openedAt": "2026-11-18T16:25:33.963Z",
+          "openedAt": "2026-11-19T02:05:12.543Z",
           "validity": "open"
         },
         "target": {
-          "ticketId": "30dbc385430dbefe13eb43a8be2c4ea1",
-          "assignmentId": "69762332c899d0750f99e9df7301a49c",
+          "ticketId": "cd42d843d28fee035137a3c6e27d979a",
+          "assignmentId": "53a4fea350b1f765167c273ea6fc0812",
           "contract": {
             "workId": "21911df71162050b096302b5b861f3fb",
             "revision": 1,
             "digest": "ac25de96db28a82e934954997faffd03aa80a107ede5355dfb3862bb58c4e443"
           },
-          "attemptId": "attempt-672cd2be-fbba-4110-930f-2f6808973e39",
+          "attemptId": "attempt-8ef82ebf-a9b8-4eda-a17f-409ab986e580",
           "fenceEpoch": 1,
-          "id": "codex-target-d9410429e06bb3867a165438f574ca2b4371c3afb31e1edc",
+          "id": "codex-target-03cafc48ac272fd12c93bafb260f524ffaba5fa5704a9390",
           "connectionEpoch": 1,
           "nativeRequestId": {
             "kind": "integer",
@@ -190,12 +190,12 @@
   "successor": {
     "target": {
       "workId": "4e20564ee6ab6350a30ae1876eebec6e",
-      "attemptId": "attempt-9d2cd9bc-0523-4858-99db-f31556e52d81",
-      "questionId": "codex-question-fd19967ab4a95b22d302db7768e16964a074c3f1b6861a81",
-      "assignmentId": "f17f317c84d05b53845b5cc561f8608a",
+      "attemptId": "attempt-23b6d21f-3f4c-491e-940f-b66d6afe26e8",
+      "questionId": "codex-question-300f653cda3a3762a0a08386ee57bd3c54c81e5102572af9",
+      "assignmentId": "5b7304253bcb1f5a6b56ab3f7630d899",
       "candidate": {
-        "ticketId": "a81a1ef3135191ca1b7d353517fa8847",
-        "assignmentId": "f17f317c84d05b53845b5cc561f8608a",
+        "ticketId": "5b619f34089d067a52fd370398d808b4",
+        "assignmentId": "5b7304253bcb1f5a6b56ab3f7630d899",
         "contract": {
           "workId": "4e20564ee6ab6350a30ae1876eebec6e",
           "revision": 1,
@@ -206,12 +206,12 @@
     },
     "phase": "delivered",
     "artifacts": [
-      "459e4b2ea3c017baf2b0434a485d3a731cc02b025bb1fcb429bf69e21f38ae0f",
+      "6565b51d36acbecc2a0ca40e4b009c346fc258930fa050eadaf8de1da9dd2e65",
       "e449a07f0bf57772dd6e3adad2b8328b42cbc8f162d4a49c5f558dd2e4e29283",
-      "191b4140aae56ed002686d3f4d2a3e0121b38174e17400a053bcbf2d81bd2538"
+      "a08da14f57032ac96298a60e0e3db019c0ef5e64c2df00469d4d21729d48a37f"
     ],
     "verification": {
-      "id": "verification:7bebf6fa-c866-40a6-a50b-bad48e7bf194",
+      "id": "verification:c17e8a88-f8c1-460d-a05b-ec621f103353",
       "results": [
         {
           "criterionId": "machine",
@@ -227,9 +227,9 @@
     "held": "held",
     "suppressedSignals": 1,
     "nextWorkId": "669c72db602b57f5f35431c21835b897",
-    "nextQuestion": null,
-    "nextProgressed": false,
-    "nextError": "next queued Work progressed: {\"cursor\":87,\"works\":[{\"work\":{\"id\":\"669c72db602b57f5f35431c21835b897\",\"projectId\":\"one\",\"conversationId\":\"combined\",\"title\":\"Combined queued Work 2\",\"createdAt\":\"2026-11-18T16:25:34.006Z\"},\"contract\":{\"workId\":\"669c72db602b57f5f35431c21835b897\",\"revision\":1,\"digest\":\"a9bc24b538c45f9dbd0a9aa1cf061f19de1102c7a1fd67323d58ba7dddf6a1c6\",\"goal\":\"Combined queued Work 2\",\"scope\":{\"projectId\":\"one\",\"allowedPaths\":[\".\"],\"excludedPaths\":[\".git\"],\"externalActions\":[]},\"criteria\":[{\"id\":\"machine\",\"descripti",
+    "nextQuestion": "codex-question-ccffd09075b2e8c070d5cf7bf998f2f52c702ec9572ce4ee",
+    "nextProgressed": true,
+    "nextError": null,
     "targetBindingAfter": "ended",
     "fillerBindingAfter": "stopping"
   },
@@ -237,20 +237,21 @@
     "targetBegin": 1,
     "targetAnswer": 1,
     "fillerBegin": 1,
-    "rows": 3
+    "rows": 4
   },
   "totalNativeEffects": 1,
   "readback": {
     "workId": "4e20564ee6ab6350a30ae1876eebec6e",
-    "questionId": "codex-question-fd19967ab4a95b22d302db7768e16964a074c3f1b6861a81",
+    "questionId": "codex-question-300f653cda3a3762a0a08386ee57bd3c54c81e5102572af9",
     "validity": "answered",
     "targetBinding": "ended",
     "fillerBinding": "stopping",
-    "nextQuestionId": null,
-    "nextValidity": null,
+    "nextQuestionId": "codex-question-ccffd09075b2e8c070d5cf7bf998f2f52c702ec9572ce4ee",
+    "nextValidity": "open",
+    "nextQuestionWorkId": "669c72db602b57f5f35431c21835b897",
     "command": "recorded",
     "verification": {
-      "id": "verification:7bebf6fa-c866-40a6-a50b-bad48e7bf194",
+      "id": "verification:c17e8a88-f8c1-460d-a05b-ec621f103353",
       "results": [
         {
           "criterionId": "machine",
@@ -267,9 +268,11 @@
       ],
       "actorRef": "combined-recovery-authority"
     },
+    "exactVerificationCount": 1,
+    "exactAcceptanceCount": 1,
     "artifacts": [
       {
-        "id": "459e4b2ea3c017baf2b0434a485d3a731cc02b025bb1fcb429bf69e21f38ae0f",
+        "id": "6565b51d36acbecc2a0ca40e4b009c346fc258930fa050eadaf8de1da9dd2e65",
         "bytes": 977
       },
       {
@@ -277,7 +280,7 @@
         "bytes": 177
       },
       {
-        "id": "191b4140aae56ed002686d3f4d2a3e0121b38174e17400a053bcbf2d81bd2538",
+        "id": "a08da14f57032ac96298a60e0e3db019c0ef5e64c2df00469d4d21729d48a37f",
         "bytes": 363
       }
     ],
@@ -294,19 +297,15 @@
     "fillerUnknownRetained": true,
     "machineCheckPassed": true,
     "candidateAssignmentMatches": true,
+    "exactCurrentCandidateEvidence": true,
     "acceptanceRecorded": true,
     "exactArtifactsReadable": true,
-    "nextWorkProgressed": false,
+    "nextWorkProgressed": true,
     "noNewWork": true,
     "nativeEffectOnlyTarget": true,
     "commandRecorded": true
   },
-  "gap": {
-    "stage": "next_work_progress",
-    "observed": "next queued Work progressed: {\"cursor\":87,\"works\":[{\"work\":{\"id\":\"669c72db602b57f5f35431c21835b897\",\"projectId\":\"one\",\"conversationId\":\"combined\",\"title\":\"Combined queued Work 2\",\"createdAt\":\"2026-11-18T16:25:34.006Z\"},\"contract\":{\"workId\":\"669c72db602b57f5f35431c21835b897\",\"revision\":1,\"digest\":\"a9bc24b538c45f9dbd0a9aa1cf061f19de1102c7a1fd67323d58ba7dddf6a1c6\",\"goal\":\"Combined queued Work 2\",\"scope\":{\"projectId\":\"one\",\"allowedPaths\":[\".\"],\"excludedPaths\":[\".git\"],\"externalActions\":[]},\"criteria\":[{\"id\":\"machine\",\"descripti",
-    "note": "target delivered and binding ended; filler held UNKNOWN; next Work question did not appear",
-    "minimalRepro": "same-run combined consumer capacity=2"
-  },
+  "gap": null,
   "layers": {
     "source": "main e2261ef5 ProductRuntime/recovery/capacity",
     "controlled": "virtual ProcessHost per Work",

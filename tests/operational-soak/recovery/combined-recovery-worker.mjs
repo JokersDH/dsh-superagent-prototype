@@ -42,7 +42,7 @@ let suppressedSignals = 0
 process.kill = () => { suppressedSignals++; return true }
 const product = createProductRuntime({ store, stateRoot: root, scratchProject: projectPath, principal, actionSecret: Buffer.alloc(32, 71), maxActiveAttempts: capacity,
   projects: [{ id: 'one', displayName: 'Combined recovery', scope }],
-  nativeRunnerLinkFactory: options => ({ async spawnAttempt(spec, sink) { assert.equal(stage, 'primary', 'successor must not spawn'); sinks.set(spec.attemptId, sink); optionMap.set(spec.attemptId, options); const value = await call('spawn', { spec, options: { stateRoot: options.stateRoot, env: options.env, producer: options.producer, attemptId: spec.attemptId } }); const handle = { ...value, command: command => call('command', command), waitExit: () => call('waitExit', { attemptId: spec.attemptId }), close: () => call('close', { attemptId: spec.attemptId }) }; workHandles.set(spec.attemptId, handle); return handle } }),
+  nativeRunnerLinkFactory: options => ({ async spawnAttempt(spec, sink) { assert.ok(stage === 'primary' || spec.contract.workId === original?.nextWorkId, 'successor may only first-start the original queued Work'); sinks.set(spec.attemptId, sink); optionMap.set(spec.attemptId, options); const value = await call('spawn', { spec, options: { stateRoot: options.stateRoot, env: options.env, producer: options.producer, attemptId: spec.attemptId } }); const handle = { ...value, command: command => call('command', command), waitExit: () => call('waitExit', { attemptId: spec.attemptId }), close: () => call('close', { attemptId: spec.attemptId }) }; workHandles.set(spec.attemptId, handle); return handle } }),
   native: { profile, approvalPolicy: 'on-request', projects: [{ id: 'one', path: projectPath, check: { id: 'output-check', revision: 1, executable: process.execPath, argv: ['-e', "if(require('node:fs').readFileSync('src/controlled-output.txt','utf8')!=='Beta\\n')process.exit(1)"], deadlineMs: 1000, outputLimitBytes: 1024 } }] } })
 const api = createLocalHttpApp({ application: product.application, principal, apiToken: 'a'.repeat(64), bootstrapToken: 'b'.repeat(64), mode: 'fixture', allowedOrigins: [], read: product.read, operations: product.operations })
 const post = async value => { const response = await api.request('http://127.0.0.1/v1/commands', { method: 'POST', headers: { authorization: `Bearer ${'a'.repeat(64)}`, 'content-type': 'application/json' }, body: JSON.stringify({ conversationId: 'combined', ...value }) }); const result = await response.json(); assert.equal(response.status, 200, JSON.stringify(result)); return result }
@@ -82,15 +82,13 @@ try {
   assert.equal(delivered.work.id, target.workId)
   for (const id of view.artifactIds) assert.ok(store.artifacts.read(id).data.length > 0)
   assert.equal(store.bindings.binding(target.target.attemptId).state, 'ended')
-  // Filler UNKNOWN remains; the delivered target's own Runner is closed and its own resource barrier is reconciled.
-  try { await workHandles.get(target.target.attemptId)?.close(); await workHandles.get(target.target.attemptId)?.waitExit() } catch { /* virtual runner close retained */ }
+  // Filler UNKNOWN remains; the delivered target's own resource barrier is reconciled.
   try { await reconcileRegisteredRunner(store, target.target.attemptId) } catch { /* target binding is already ended */ }
   await product.execution.effects.idle('application.execute')
   product.execution.effects.kick()
-  let progressed = null
-  let nextError = null
-  try { progressed = await until(() => product.application.inspect({ workId: nextWorkId }), value => value.questions.length === 1, 'next queued Work progressed') } catch (error) { nextError = String(error.message) }
-  const nextProgressed = progressed !== null
+  const progressed = await until(() => product.application.inspect({ workId: nextWorkId }), value => value.questions.length === 1, 'next queued Work progressed')
+  const nextProgressed = true
+  const nextError = null
   assert.ok(['active','stopping'].includes(fillerStateAfterStop), String(fillerStateAfterStop))
   const targetBindingAfter = store.bindings.binding(target.target.attemptId)?.state
   const fillerBindingAfter = store.bindings.binding(filler.target.attemptId)?.state
