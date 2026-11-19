@@ -193,6 +193,48 @@
         "no tar/ZIP, no installed/native/value admission"
       ],
       "headAtRecord": "7eae0729"
+    },
+    "round4": {
+      "date": "2026-11-19",
+      "mainMerged": "6d309128 line (merged 97eafd63)",
+      "holdResolution": "The 91ba4f9a hold is resolved without reusing cancel/50ms as persistence proof. RunnerServiceHandle is exported with done/shutdown/awaitPostcommitFinalize (direct strict tsc passes). `cancel` now only observes/stops and returns the recorded barrier; it never closes the terminal endpoint and never resolves teardown. The spawned entry awaits the authenticated postcommit finalize before shutdown only when a real lease attached, the driver ended naturally, and no explicit shutdown arrived.",
+      "transport": "Optional, backward-compatible POST /v1/terminal/finalize in the private recovery transport (frozen Bridge v1/hash unchanged, no queue/ledger/host). Envelope: producer + {attempt, confirmationId, resourceManifestDigest, proofRef?}. Runner validates authenticated producer, exact attempt/epoch/contract, closed + physicallyStopped, a COMPLETE owned-resource inventory with every writer quiescent, and the canonical manifest digest. Missing/wrong subject/foreign producer/conflict/UNKNOWN all refuse by name and retain the endpoint/material. Same confirmationId before teardown is idempotent (alreadyFinalized); no new stop/business authority and no restart/borrowed-dir deletion.",
+      "actualConsumer": "tests/native-acceptance/b39-terminal-endpoint.mjs (real spawned entry): (1) owner cancels to terminal then dies before confirm; same pid endpoint stays; (2) successor inspects original terminated/closed proof, cancel returns barrier but endpoint stays readable by a SECOND successor; (3) foreign finalize refused; (4) concurrent same-confirmation finalize: one finalized + one alreadyFinalized; (5) finalize reply lost (coordinator sends then dies) still finalizes/exits by the original confirmationId; (6) ordinary terminal with live coordinator exits on explicit shutdown. 6 PASS/0 FAIL/1 NOT_TESTED.",
+      "unknownConsumer": "tests/native-acceptance/b40-finalize-unknown.mjs (in-process service with an indeterminate owned resource): finalize is refused physical_not_stopped and the endpoint stays readable; a foreign confirmation is refused identity_mismatch. 2 PASS/0 FAIL/1 NOT_TESTED.",
+      "b38Updated": "b38 now cancels (observe/stop), asserts the endpoint stays alive, then postcommit-finalizes with the canonical manifest digest and exits 0 with no signal: 4 PASS/0 FAIL/1 NOT_TESTED.",
+      "commands": [
+        "node tests/native-acceptance/b39-terminal-endpoint.mjs -> exit 0, 6 PASS/0 FAIL/1 NOT_TESTED",
+        "node tests/native-acceptance/b40-finalize-unknown.mjs -> exit 0, 2 PASS/0 FAIL/1 NOT_TESTED",
+        "node tests/native-acceptance/b38-eof-recovery.mjs -> exit 0, 4/0/1",
+        "node tests/native-acceptance/b37-recovery-ack.mjs -> exit 0, 4/0/1",
+        "node --test --test-force-exit apps/runner/test/*.test.ts -> 156/156",
+        "npx tsc -p tests/native-acceptance/tsconfig.attached.json -> exit 0; -p tsconfig.direct.json -> exit 0",
+        "b31 4/0/1, b32 5/0/1, b36 2/0/1, b27-sigkill 7/0/1, b27-chain 4/0/1"
+      ],
+      "originalIds": {
+        "attemptId": "attempt-1",
+        "fenceEpoch": 1,
+        "factId": "fact-attempt-1-1",
+        "terminalCancelCommandId": "cmd-terminal-cancel",
+        "barrierCommandId": "cmd-terminal-barrier",
+        "confirmationIds": [
+          "confirm-terminal-1",
+          "confirm-reply-lost",
+          "confirm-eof-1"
+        ],
+        "sameRunnerPid": "same process in each scenario; no replacement"
+      },
+      "realSignals": 0,
+      "remaining": [
+        "main Store adapter must commit confirmOwnedQuiescence + original receipt/event and only then call finalize with the committed confirmationId/manifestDigest; B does not read the Store or fabricate that receipt",
+        "H independent same-run verification of this finalize window still required",
+        "physical crash recovery and original 2/4 slot return remain NOT_REACHED; no physical quiescence claim",
+        "payload-read not raised in this waiting-user lane (NOT_TESTED)",
+        "root tsc still has the main-owned tests/integration/fixtures/native-callback-link.ts TS2719; B did not edit it",
+        "readoption second-snapshot birth remains registered/disabled; no signal tools used",
+        "no tar/ZIP, no installed/native/value admission"
+      ],
+      "headAtRecord": "97eafd63"
     }
   }
 }

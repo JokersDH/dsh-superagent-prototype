@@ -9,14 +9,15 @@
  * and serve the successor's inspect + no-lease cancel; then it exits gracefully. A second child covers the
  * ordinary terminal path where the coordinator stays until explicit shutdown.
  */
-import { lstatSync, mkdtempSync, rmSync } from 'node:fs'
+import { lstatSync, mkdtempSync, readFileSync, rmSync } from 'node:fs'
+import { request } from 'node:http'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { spawn } from 'node:child_process'
 import { CaseLog, writeReport } from './harness.mjs'
 import { endpointDirectory } from '../../apps/runner/src/recovery-endpoint.ts'
-import { connectRunnerRecovery, verifiedRunnerInspection } from '../../packages/execution/src/recovery-transport.ts'
+import { connectRunnerRecovery, runnerResourceManifestDigest, verifiedRunnerInspection } from '../../packages/execution/src/recovery-transport.ts'
 import { makeAttemptSpec, makeCommand } from '../../packages/testing/src/index.ts'
 
 const log = new CaseLog()
@@ -98,25 +99,74 @@ try {
   if (cancel.ok && terminalSeen && aliveAfterOwnerExit) log.pass(`terminal state was reached and cancelled; after the owner exited the same Runner pid ${oldPid} still serves its endpoint (barrier not yet recorded)`)
   else log.fail(`terminal endpoint lifetime failed: ${JSON.stringify({ cancel, terminalSeen, aliveAfterOwnerExit, exit: a.getExit() })}`)
 
-  log.begin('B39-SUCCESSOR-READS-ORIGINAL-PROOF-AND-BARRIER', 'a successor inspects the original terminal proof and collects the barrier with a no-lease cancel', 'controlled_process')
+  log.begin('B39-SUCCESSOR-READS-PROOF-CANCEL-RETAINS-ENDPOINT', 'a successor inspects proof and cancels; the endpoint is NOT finalized by cancel', 'controlled_process')
   let successor = null
   for (let index = 0; index < 100 && !successor; index += 1) {
-    try {
-      successor = connectRunnerRecovery(a.registered, a.context, 3000)
-      await successor.inspect()
-    } catch { successor = null; await wait(20) }
+    try { successor = connectRunnerRecovery(a.registered, a.context, 3000); await successor.inspect() }
+    catch { successor = null; await wait(20) }
   }
-  const proof = await successor.inspect()
-  const inspection = verifiedRunnerInspection(proof).value
+  const inspection = verifiedRunnerInspection(await successor.inspect()).value
   const finalCancel = await successor.cancel(makeCommand('cancel', { ...a.attempt, id: 'cmd-terminal-barrier' }))
     .then(value => ({ ok: true, state: verifiedRunnerInspection(value).value.state, admission: verifiedRunnerInspection(value).value.admission }))
     .catch(error => ({ ok: false, error: String(error?.message ?? error) }))
+  await wait(300)
+  const aliveAfterCancel = a.getExit() === null && a.child.exitCode === null
+  // A second successor (the "owner failed again before durable confirm" window) must still read the proof.
+  const second = connectRunnerRecovery(a.registered, a.context, 3000)
+  const secondProof = await second.inspect().then(value => verifiedRunnerInspection(value).value).catch(() => null)
+  log.evidence({ inspection: { state: inspection.state, admission: inspection.admission, resources: inspection.resources?.length ?? 0 }, finalCancel, aliveAfterCancel, secondState: secondProof?.state ?? null })
+  if (inspection.state === 'terminated' && inspection.admission === 'closed' && finalCancel.ok && aliveAfterCancel && secondProof?.state === 'terminated') {
+    log.pass('the successor read the original terminated/closed proof; the no-lease cancel returned the barrier but the endpoint stayed alive and readable by a second successor')
+  } else log.fail(`proof/cancel retention failed: ${JSON.stringify({ state: inspection.state, admission: inspection.admission, finalCancel, aliveAfterCancel, secondState: secondProof?.state })}`)
+
+  log.begin('B39-FOREIGN-FINALIZE-REFUSED-BEFORE-COMMIT', 'a foreign producer cannot finalize the retained endpoint', 'controlled_process')
+  const foreign = connectRunnerRecovery(a.registered, { ...a.context, runnerIdentityRef: 'foreign-terminal-runner' }, 3000)
+  const foreignFinalize = await foreign.finalize({ confirmationId: 'foreign-confirm', resourceManifestDigest: runnerResourceManifestDigest(inspection.resources) })
+    .then(() => ({ ok: true })).catch(error => ({ ok: false, serverError: error?.serverError ?? null }))
+  const aliveAfterForeign = a.getExit() === null && a.child.exitCode === null
+  log.evidence({ foreignFinalize, aliveAfterForeign })
+  if (!foreignFinalize.ok && foreignFinalize.serverError === 'identity_mismatch' && aliveAfterForeign) log.pass('the foreign finalize was refused (identity_mismatch) and the terminal endpoint/material stayed retained')
+  else log.fail(`foreign finalize was not refused: ${JSON.stringify({ foreignFinalize, aliveAfterForeign })}`)
+
+  log.begin('B39-POSTCOMMIT-FINALIZE-EXITS', 'an authenticated postcommit finalize closes the retained terminal endpoint and exits', 'controlled_process')
+  const digest = runnerResourceManifestDigest(inspection.resources)
+  const finalizeCalls = await Promise.allSettled([
+    second.finalize({ confirmationId: 'confirm-terminal-1', resourceManifestDigest: digest, proofRef: 'proof-terminal-1' }),
+    second.finalize({ confirmationId: 'confirm-terminal-1', resourceManifestDigest: digest, proofRef: 'proof-terminal-1' }),
+  ])
+  const finalize = finalizeCalls.map(entry => entry.status === 'fulfilled' ? { ok: true, result: entry.value } : { ok: false, serverError: entry.reason?.serverError ?? null })
   for (let index = 0; index < 800 && a.getExit() === null; index += 1) await wait(10)
   const exit = a.getExit()
-  log.evidence({ inspection: { state: inspection.state, admission: inspection.admission, resources: inspection.resources?.length ?? 0 }, finalCancel, exit, pid: a.child.pid })
-  if (inspection.state === 'terminated' && inspection.admission === 'closed' && finalCancel.ok && exit && exit.code === 0 && exit.signal === null) {
-    log.pass(`the successor read the original terminated/closed proof and collected the barrier; the same Runner exited ${exit.code} with no signal`)
-  } else log.fail(`successor barrier collection failed: ${JSON.stringify({ state: inspection.state, admission: inspection.admission, finalCancel, exit })}`)
+  const firstAccepted = finalize.some(entry => entry.ok && entry.result.finalized === true)
+  const replayOk = finalize.some(entry => entry.ok && entry.result.alreadyFinalized === true)
+  const replayClosed = finalize.some(entry => !entry.ok && entry.serverError === 'unavailable')
+  log.evidence({ digest, finalize, firstAccepted, replayOk, replayClosed, exit, pid: a.child.pid })
+  if (firstAccepted && (replayOk || replayClosed) && exit && exit.code === 0 && exit.signal === null) log.pass(`the postcommit finalize closed the endpoint; a same-confirmation replay was idempotent (${replayOk ? 'alreadyFinalized' : 'endpoint already closed'}) and the same Runner exited ${exit.code} with no signal`)
+  else log.fail(`postcommit finalize/replay failed: ${JSON.stringify({ finalize, exit })}`)
+
+  log.begin('B39-FINALIZE-REPLY-LOST-STILL-EXITS', 'a finalize whose reply is lost still closes the terminal endpoint and exits', 'controlled_process')
+  const loss = await spawnRunner('reply-loss')
+  await loss.client.cancel(makeCommand('cancel', { ...loss.attempt, id: 'cmd-loss-cancel' }), 'lease-terminal').catch(() => undefined)
+  for (let index = 0; index < 400 && !loss.frames.some(frame => frame.type === 'exited'); index += 1) await wait(10)
+  loss.child.stdout.removeAllListeners('data'); loss.child.stdout.destroy(); loss.child.stdin.end()
+  await wait(400)
+  const lossInspection = verifiedRunnerInspection(await connectRunnerRecovery(loss.registered, loss.context, 3000).inspect()).value
+  const token = readFileSync(loss.registered.credentialPath, 'utf8').trim()
+  const body = JSON.stringify({ v: 1, producer: loss.context, confirmation: { attempt: loss.attempt, confirmationId: 'confirm-reply-lost', resourceManifestDigest: runnerResourceManifestDigest(lossInspection.resources), proofRef: 'proof-reply-lost' } })
+  await new Promise(resolve => {
+    const req = request({ socketPath: loss.registered.socketPath, method: 'POST', path: '/v1/terminal/finalize', agent: false,
+      headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json', 'content-length': Buffer.byteLength(body) } }, res => { res.resume(); res.on('end', resolve); res.on('error', resolve) })
+    req.on('error', resolve)
+    req.end(body)
+    // The coordinator sends the confirmation, then dies before reading the reply.
+    setTimeout(() => { req.destroy(); resolve() }, 15)
+  })
+  for (let index = 0; index < 800 && loss.getExit() === null; index += 1) await wait(10)
+  const lossExit = loss.getExit()
+  const endpointGone = await (async () => { try { await connectRunnerRecovery(loss.registered, loss.context, 500).inspect(); return false } catch { return true } })()
+  log.evidence({ lossExit, endpointGone, confirmationId: 'confirm-reply-lost' })
+  if (lossExit && lossExit.code === 0 && lossExit.signal === null && endpointGone) log.pass(`the lost finalize reply still finalized by the original confirmation id; the Runner exited ${lossExit.code} with no signal and the endpoint is closed (Store reconcile remains main-owned)`)
+  else log.fail(`lost-reply finalize failed: ${JSON.stringify({ lossExit, endpointGone })}`)
 
   log.begin('B39-ORDINARY-TERMINAL-EXPLICIT-SHUTDOWN', 'the ordinary terminal path with a live coordinator still exits on explicit shutdown', 'controlled_process')
   const b = await spawnRunner('ordinary')

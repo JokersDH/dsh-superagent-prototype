@@ -15,7 +15,7 @@ import { fileURLToPath } from 'node:url'
 import { spawn } from 'node:child_process'
 import { CaseLog, writeReport } from './harness.mjs'
 import { endpointDirectory } from '../../apps/runner/src/recovery-endpoint.ts'
-import { connectRunnerRecovery, verifiedRunnerInspection } from '../../packages/execution/src/recovery-transport.ts'
+import { connectRunnerRecovery, runnerResourceManifestDigest, verifiedRunnerInspection } from '../../packages/execution/src/recovery-transport.ts'
 import { makeAttemptSpec, makeCommand } from '../../packages/testing/src/index.ts'
 
 const log = new CaseLog()
@@ -118,13 +118,17 @@ try {
     .then(proof => ({ ok: true, state: verifiedRunnerInspection(proof).value.state })).catch(error => ({ ok: false, serverError: error?.serverError ?? null }))
   // The old stdin is EOF and its owner is gone: the terminal endpoint stays until the successor collects
   // the already-recorded barrier with the original no-lease physical cancel.
-  const barrier = await successor.cancel(makeCommand('cancel', { ...attempt, id: 'cmd-eof-barrier' }))
-    .then(proof => { const value = verifiedRunnerInspection(proof).value; return { ok: true, state: value.state, admission: value.admission } })
+  const barrierProof = await successor.cancel(makeCommand('cancel', { ...attempt, id: 'cmd-eof-barrier' }))
+    .then(proof => ({ ok: true, value: verifiedRunnerInspection(proof).value }))
     .catch(error => ({ ok: false, serverError: error?.serverError ?? null }))
+  const barrier = barrierProof.ok ? { ok: true, state: barrierProof.value.state, admission: barrierProof.value.admission } : barrierProof
+  const endpointAliveAfterCancel = exited === null && child.exitCode === null
+  const finalize = await successor.finalize({ confirmationId: 'confirm-eof-1', resourceManifestDigest: runnerResourceManifestDigest(barrierProof.value.resources), proofRef: 'proof-eof-1' })
+    .then(result => ({ ok: true, result })).catch(error => ({ ok: false, serverError: error?.serverError ?? null }))
   for (let index = 0; index < 800 && exited === null; index += 1) await wait(10)
-  log.evidence({ cancel, barrier, exited, pid: child.pid })
-  if (cancel.ok && barrier.ok && barrier.state === 'terminated' && exited && exited.code === 0 && exited.signal === null) log.pass(`the normal cancel reached terminal state, the successor collected the barrier from the surviving endpoint, and the same Runner exited ${exited.code} with no signal`)
-  else log.fail(`normal cancel/barrier/exit failed: ${JSON.stringify({ cancel, barrier, exited })}`)
+  log.evidence({ cancel, barrier, endpointAliveAfterCancel, finalize, exited, pid: child.pid })
+  if (cancel.ok && barrier.ok && barrier.state === 'terminated' && endpointAliveAfterCancel && finalize.ok && finalize.result.finalized === true && exited && exited.code === 0 && exited.signal === null) log.pass(`the cancel only observed/stopped, the endpoint stayed alive, and the postcommit finalize closed it; the same Runner exited ${exited.code} with no signal`)
+  else log.fail(`normal cancel/finalize/exit failed: ${JSON.stringify({ cancel, barrier, endpointAliveAfterCancel, finalize, exited })}`)
 
   log.begin('B38-SCOPE-NOT-NATIVE', 'controlled waiting-user lane; fixture receipt, no installed agent/model/gateway/signal', 'controlled_process')
   log.notTested('no installed agent, model gateway or real signal was used; the receipt is a fixture reply, not original Store durability; original Store/Broker acceptance and physical slots remain main-owned/NOT_REACHED')

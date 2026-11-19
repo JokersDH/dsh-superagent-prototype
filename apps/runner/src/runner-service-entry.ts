@@ -57,5 +57,5 @@ const handle = await serveRunner({
 await handle.done
 // Terminal endpoint lifetime: if the original coordinator exited after the terminal state but before
 // recording the barrier, keep the authenticated endpoint alive for the successor's proof/cancel.
-await handle.awaitTerminalBarrier()
+await handle.awaitPostcommitFinalize()
 await handle.shutdown()
