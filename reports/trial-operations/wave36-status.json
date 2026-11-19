@@ -6,7 +6,7 @@
   "base": "e14c9597d1df3f084b21048de5e9338f24de54c8",
   "mergedMain": "296254d8",
   "currentH": "78b62ce3",
-  "updatedAt": "2026-11-19T02:05:49.488Z",
+  "updatedAt": "2026-11-19T02:07:45.180Z",
   "goal": {
     "wholeSubsystem": true,
     "closures": 4,
@@ -585,6 +585,8 @@
       "reports/trial-operations/recovery-milestone-01/combined-2/combined.json": "ca4276dd57d74b034c58dcf86fc71ee6ae4a3109455afded134ace9b09f6a04d",
       "reports/trial-operations/recovery-milestone-01/combined-4/combined.json": "b5e22226abd23b987fa8c4ef0b4bafdad7b5da5d107eeb28f46e2e5215e1d640",
       "reports/trial-operations/recovery-milestone-01/reopen-failure.json": "ff4b74aff44e326ea9261337686c7139a3b4a312dcc91d5cd9f7552f5d384c4d"
-    }
+    },
+    "commit": "2337ecfe",
+    "evidenceCommit": "2337ecfe"
   }
 }
