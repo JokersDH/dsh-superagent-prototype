@@ -1,5 +1,7 @@
 # 个人 Agent 助理：方案 B 产品实现蓝图
 
+2026-11-19当前工程入口：用户已接受[里程碑03“日常可用版交付”](../docs/product/MILESTONE-03.zh-CN.md)，仅main/D/E主动，B/F按具体阻断参与；最多4次实际Codex turn，六项日常使用/同包验收，不开新wave。Recovery01/原生控制02已关闭，下文旧“待命”及派工描述按历史读；原方案B架构基线保留。
+
 2026-11-19最新：Recovery01与原生控制02均已按用户冻结清单6/6关闭，真实Codex恢复用了1 turn+1自有coordinator SIGKILL，原生工作台控制用了5/6 turn。原口径重评82/100，方案B不含CAC63.1%，非完整发行准入。唯一[完成汇总](../docs/product/MILESTONES-01-02.zh-CN.md)。全部agent待命、原所有权恢复，不自动开始新wave/里程碑；以下旧入口仅作历史。
 
 2026-11-19当前：[同一个恢复里程碑](../agent-tasks/recovery-milestone-01/README.zh-CN.md)，mainbde57d42已证受控同run恢复/交付/原槽/原排队Work前进，且Store屏障提交后调用B postcommit finalize。剩余同ID finalize响应调和、H测试清理与真实native/物理层，仅B/main/H持续闭合，不扩线。[验收](../reports/releases/recovery-milestone-01/admission-2026-11-19.json)/[话术](../agent-tasks/recovery-milestone-01/forward-prompts.zh-CN.md)。

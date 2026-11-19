@@ -1,5 +1,7 @@
 # 从这里开始：仓库、代码位置和并行开发
 
+**2026-11-19当前：用户已开启[里程碑03“日常可用版交付”](docs/product/MILESTONE-03.zh-CN.md)。** 只main/D/E主动，B/F具体阻断时参与；六项正常使用与同包验收，最多4次真实Codex（main预留1、E最多3、D0）。该文含D/E可直接转发的话术，是当前唯一任务入口。先正常源码使用，再冻结同一源码安装包给E独立验收；不新wave，不给其他agent开维护队列。以下“待命”“当前恢复”等均为旧检查点。
+
 **2026-11-19当前：Recovery01与原生控制02均6/6关闭。** 真实同原Work SIGKILL恢复、原工作台审批/拒绝/plan澄清/steer/物理停止/未知结果核对通过；分别使用1 turn+1自有coordinator SIGKILL、5/6真实turn。原口径重评**82/100、方案B63.1%**，不是发行准入。唯一完成汇总在[这里](docs/product/MILESTONES-01-02.zh-CN.md)。临时B/H修改权结束，原所有权恢复，全部agent待命，不自动开新wave或里程碑；下文旧派工只作历史。
 
 **当前唯一工程入口：[原 Work 恢复里程碑01](agent-tasks/recovery-milestone-01/README.zh-CN.md)。** 2026-11-19仍仅main/B/H持续同一个真实终态生命周期到集成验收；其余八位待命。新版[分角色话术](agent-tasks/recovery-milestone-01/forward-prompts.zh-CN.md)扩大同一结果的持续责任，不增加功能线/阶段数，不新开wave。

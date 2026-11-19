@@ -1,15 +1,15 @@
 # Repository Instructions
 
-2026-11-19 current: Recovery01 and native-control02 are both CLOSED6/6. Recovery used1 actual turn+1 SIGKILL to its own isolated coordinator and reached sameWork delivered/begin1; native-control used5/6 actual turns for real workbench approval/denial/plan clarification/steer/physical stop/readonly unknown reconciliation. Final original-rubric score82/100, SchemeB excludingCAC63.1%; not release approval. Summary: docs/product/MILESTONES-01-02.zh-CN.md. Temporary main authority over B/H paths has ended; original owners below are restored. All agents idle; do not send more native/model tasks/signals or start another wave/milestone without a new user decision. Non-P0 new windows go to backlog. Three-line checkpoints and one final summary replace old per-wave JSON/dispatch generation.
+2026-11-19 current: User authorized milestone03 DAILY USABLE DELIVERY and at most4 actual Codex turn/start sends. Scope, six exit items and copyable D/E prompts: docs/product/MILESTONE-03.zh-CN.md. Only main/D/E active; B/F on concrete blockers, others idle. Main reserves1 turn, E at most3, D0; old grants never roll over. No extra fault signals or new wave. Preserve original roots/ownership and twelve user instances. Recovery01/native-control02 remain CLOSED6/6; historical score82/100, SchemeB excludingCAC63.1%, not release approval. Their summary stays docs/product/MILESTONES-01-02.zh-CN.md. Temporary main B/H ownership ended. Three-line checkpoints and one final completion summary remain.
 
 ## Entry And Current Work
 
 - Delivery repository: https://github.com/JokersDH/dsh-superagent-prototype.
 - origin is the user's fork; upstream is DeepSeek. Push only to origin, never upstream.
 - Read START-HERE.zh-CN.md, product-spec/README.md and your assigned packet before implementation.
-- Current work is complete as recorded in docs/product/MILESTONES-01-02.zh-CN.md. The recovery task packets are historical; do not execute their old active queues.
-- The one milestone is the SAME original Work through coordinator failure, original Store/Application/QuestionBroker continuation, original check/currentCandidate/manual acceptance/delivery and original 2/4 slot/resource return.
-- Main completed the two authorized end-to-end milestones. All original roles now remain idle; no external maintenance dispatch or new expansion is active.
+- Current work is docs/product/MILESTONE-03.zh-CN.md, explicitly accepted by the user. Completed recovery/native-control packets and older waves are historical; do not execute their old active queues.
+- The one current result is normal first use through two real projects, workbench controls, checked/manual-accepted/applicable patches, normal reopening and independent use of the SAME frozen installation. Keep the original Store/Application/QuestionBroker, Work identities and physical resource barriers; recovery/native controls already completed remain regression boundaries, not reopened research.
+- Main owns daily-use end-to-end integration, D the selected-source installation, E independent acceptance of the same fixed package. Only actual blockers activate B/F or other original owners; no independent maintenance queues or feature expansion.
 - Do not start another feature-expansion wave before that exit. Larger tasks mean continuous integration, repair and acceptance responsibility, not more numbered deliverables.
 - Publish runnable source early, then finish the SAME result through integration and acceptance. No independent maintenance queues or busywork to use all agents; unused candidate defects stay disabled and do not automatically block the active path. SOURCE_READY is not whole-product completion. No same-day deadline, duration promise or token allowance.
 - Full Scheme B engineering remains the goal. CAC, desktop, new Driver, automatic acceptance, writer racing and dynamic DAG work are outside this milestone.
@@ -61,6 +61,7 @@
 - User explicitly confirmed this phase does NOT pursue review-value pilot, its dependent second-protocol review, or routing-benefit research. Value is unmeasured, not disproven.
 - Preserve original experiment protocol/fixtures/reports/ledger unchanged. Do not reset/refund/top up/replace samples or research pricing/allowance/feasibility.
 - Automatic real vendor/model/native calls and real signals are zero. B original cap4 UNKNOWN is unspendable. E original24turn/200000token/USD5/one-in-flight pilot is phase-withdrawn, with historical ledger unchanged.
+- Exception authorized for milestone03 only: at most4 actual Codex turn/start sends total, main1/E3/D0 under its current packet. No automatic extra discussion-model calls or fault signals. Setup before any actual send spends none; unknown business sends retain occupancy/identity and are reconciled, never replayed under a new ID. Prior grants and ledgers stay unchanged.
 - Preserve twelve user UI5180-5191/API8796-8807 services and all state/profile/tar/ledger/history/runs/dirty. No automatic restart, migration, state clearing or credential borrowing.
 - Process authority must originate from a private immutable original spawn record: exact PID/start/UID/ordered full argv/root/config/operation and complete resources.
 - Prevalidate the whole resource plan before any signal and recheck fresh identity before EACH escalation. Missing observation, failure, timeout or incomplete inventory is UNKNOWN, never exited/empty/clean.
