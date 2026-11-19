@@ -2,7 +2,7 @@
 
 **当前唯一工程入口：[原 Work 恢复里程碑01](agent-tasks/recovery-milestone-01/README.zh-CN.md)。** 2026-11-19仍仅main/B/H持续同一个真实终态生命周期到集成验收；其余八位待命。新版[分角色话术](agent-tasks/recovery-milestone-01/forward-prompts.zh-CN.md)扩大同一结果的持续责任，不增加功能线/阶段数，不新开wave。
 
-**11-19续验：main6d309128已通过2/4同run原Work故障恢复→检查/接受→自身槽归还→原第3/5项前进，42测试/strict。H的next-slot失败是测试注入factory自阻，未改生产容量。** B91终态清退暂HOLD：缺类型且cancel先清退早于main持久confirm；下一大责任包仅做证明保留→原持久确认→明确finalize→正常退出，B/main/H持续到同结果独立验收，其余八位待命。[本轮验收](reports/releases/recovery-milestone-01/admission-2026-11-19.json)/[可转发话术](agent-tasks/recovery-milestone-01/forward-prompts.zh-CN.md)，以下旧检查点按历史读。
+**11-19续验：mainbde57d42已接入B postcommit finalize，并保留2/4同run原Work故障恢复→检查/接受→自身槽归还→原第3/5项前进，UNKNOWN其余槽，相关回归通过。H的next-slot失败是测试注入factory自阻，未改生产容量。** 下一责任包只做finalize响应丢失同ID调和、H UNKNOWN材料清理和真实层验收，B/main/H持续到同结果独立验收，其余八位待命。[本轮验收](reports/releases/recovery-milestone-01/admission-2026-11-19.json)/[可转发话术](agent-tasks/recovery-milestone-01/forward-prompts.zh-CN.md)，以下旧检查点按历史读。
 
 本轮[续验](reports/releases/recovery-milestone-01/admission-2026-11-18.json)continuation：main **e2261ef5**补过原问题/回答写后resolution丢失/terminal已ACK三受控窗口，以及原Store绑定计数的2/4容量、UNKNOWN占位和独立屏障释放，40测试/strict通过。B实际main entry的真实Runner EOF传输4PASS/1NT、H独立单Work2PASS成立。下一步只B真实终态endpoint寿命、H故障交付与原槽**同run组合**；不把分离PASS当完整真实原生物理结论。D/E固定W36子集继续保其[已验范围](reports/releases/recovery-milestone-01/install-admission-2026-11-18.json)，不重包。
 

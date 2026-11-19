@@ -1,6 +1,6 @@
 # main：原 Work 恢复的端到端负责人
 
-目录 `/Users/hh/Desktop/joker/superagent`，分支 `codex/g2-execution-integration`。读[共同出口](README.zh-CN.md)、[0095 postcommit约定](../../docs/rfcs/WP-16/0095-main-original-running-callback-composition.md)和[11-19验收](../../reports/releases/recovery-milestone-01/admission-2026-11-19.json)。source **6d309128** 已完成受控同run故障恢复/交付/原2&4槽/原排队Work前进，42测试/strict过；不再重做该测试自阻或修改生产容量。
+目录 `/Users/hh/Desktop/joker/superagent`，分支 `codex/g2-execution-integration`。读[共同出口](README.zh-CN.md)、[0095 postcommit约定](../../docs/rfcs/WP-16/0095-main-original-running-callback-composition.md)和[11-19验收](../../reports/releases/recovery-milestone-01/admission-2026-11-19.json)。source **bde57d42** 已接B postcommit finalize并通过受控回归；继续负责同ID响应调和、H UNKNOWN清理和真实层限制，不重做旧成果。
 
 1. 持续负责同一个真实Runner生命周期到实际采用/独立验收：B最小postcommit-finalize源码就绪后，main在原confirmOwnedQuiescence提交后核原receipt/event/ended绑定，才通过原认证连接确认清退；读proof/普通cancel不触发清退，禁止50ms替commit。缺确认/UNKNOWN/错subject保持原端点和材料。
 2. 保留原current/index/allowAnswer/Broker授权，写前授权fresh；ACK已记录但响应丢失要调和原命令，UNKNOWN绝不重新begin、换ID或自动重发。ended不可恢复成active，权限撤销、旧target、旧lease和错body要在同实际入口拒绝。

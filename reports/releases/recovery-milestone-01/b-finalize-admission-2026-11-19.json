@@ -9,7 +9,11 @@
     "apps/runner/src/recovery-endpoint.ts",
     "packages/execution/src/recovery-transport.ts"
   ],
-  "typeCheck": { "directStrictCommand": "exit 0 with Node types and explicit strict options", "serviceHandle": "awaitPostcommitFinalize is declared and returned", "bridgeV1Changed": false },
+  "typeCheck": {
+    "directStrictCommand": "exit 0 with Node types and explicit strict options",
+    "serviceHandle": "awaitPostcommitFinalize is declared and returned",
+    "bridgeV1Changed": false
+  },
   "pureSocketProbe": {
     "result": "PASS 5/0/0",
     "command": "node /tmp/pa-rm01-finalize-readonly.mjs",
@@ -32,7 +36,16 @@
     "native": "NOT_TESTED; no vendor/model/native/signal/global process discovery"
   },
   "securityChecks": {
-    "finalizeRequires": ["authenticated exact producer", "exact attempt/assignment/epoch/contract", "closed terminal", "physicallyStopped", "complete inventory", "all writers quiescent", "full resource manifest digest", "confirmation ID"],
+    "finalizeRequires": [
+      "authenticated exact producer",
+      "exact attempt/assignment/epoch/contract",
+      "closed terminal",
+      "physicallyStopped",
+      "complete inventory",
+      "all writers quiescent",
+      "full resource manifest digest",
+      "confirmation ID"
+    ],
     "negativeBehavior": "cancel only observes/stops and retains endpoint; missing/foreign/wrong subject/wrong digest/UNKNOWN/conflicting confirmation refuse before finalization; same confirmation is idempotent",
     "lostReply": "HTTP finalize may complete before caller destroys response; endpoint exits after original confirmation ID, while main Store reconciliation remains separate"
   },
@@ -58,5 +71,12 @@
     "admitDefaultProductPath": false,
     "holdMainRecovery": true,
     "nextMinimalWork": "main-owned postcommit Store adapter and one same-original-Work consumer; no new platform/ledger/host/feature wave"
+  },
+  "mainIntegration": {
+    "status": "CONTROLLED_VERIFIED",
+    "source": "bde57d42",
+    "sequence": "confirmOwnedQuiescence Store commit -> full runnerResourceManifestDigest -> same confirmationId finalize",
+    "tests": "27 related main regressions + direct strict exit0",
+    "remaining": "finalize response-loss reconciliation, no real vendor/native/physical"
   }
 }
