@@ -222,6 +222,16 @@ export const INSTALL_CASES = [
   case_('E37-W36-RECOVERY', { layers: [LAYERS.INSTALLED], evidence: ['cohortRecovery'] }),
   case_('E37-W36-RECOVERY-OPERATION', { layers: [LAYERS.INSTALLED], evidence: ['cohortRecoveryOperation'] }),
   case_('E37-W36-HISTORY', { layers: [LAYERS.INSTALLED], evidence: ['w36History'] }),
+  // Milestone-03 preparation: zero-model evidence, optional until D freezes the milestone package.
+  { id: 'E-M03-PREFLIGHT', required: false, layers: [LAYERS.INSTALLED], evidence: ['m03Preflight'] },
+  { id: 'E-M03-NO-EXECUTOR', required: false, layers: [LAYERS.INSTALLED], evidence: ['m03NoExecutor'] },
+  { id: 'E-M03-IMPORT-TWO', required: false, layers: [LAYERS.INSTALLED], evidence: ['m03ImportTwo'] },
+  { id: 'E-M03-APPLY-VERIFY', required: false, layers: [LAYERS.INSTALLED], evidence: ['m03Apply'] },
+  { id: 'E-M03-BUDGET', required: false, layers: [LAYERS.READONLY], evidence: ['m03Budget'] },
+  { id: 'E-M03-DUAL-DELIVERY', required: false, layers: [LAYERS.INSTALLED], evidence: ['m03Dual'] },
+  { id: 'E-M03-WORKBENCH-CONTROLS', required: false, layers: [LAYERS.INSTALLED], evidence: ['m03Controls'] },
+  { id: 'E-M03-REOPEN', required: false, layers: [LAYERS.INSTALLED], evidence: ['m03Reopen'] },
+  { id: 'E-M03-INSTALLED-JOURNEY', required: false, layers: [LAYERS.INSTALLED], evidence: ['m03Installed'] },
   { id: 'E8-ORIGINAL-WORK-RECOVERY', required: false, layers: [LAYERS.INSTALLED], evidence: ['originalWorkRecovery'] },
   // Tracked gaps: installed F identity fields and a wired G summary need successor frozen bytes.
   { id: 'E11-TRIAL-IDENTITY-FIELDS', required: false, layers: [LAYERS.INSTALLED], evidence: ['trialIdentity'] },
