@@ -14,7 +14,7 @@
 
 11-19验收：H的nextWork gap来自测试factory拒绝继任者为原排队Work首次spawn，生产已实际放行。main **6d309128**在自有integration消费者修正这一限制，原target仍禁止重spawn，累计Runner为capacity+1；按Work/currentCandidate/assignment绑定证据。2/4同run均完成owner退出→原Work检查/接受/三产物→目标自身槽归还→原第3/5项前进，UNKNOWN其他槽保留，42测试/strict通过。无需放松生产容量。[准确验收](../../reports/releases/recovery-milestone-01/admission-2026-11-19.json)、[H独立复现](../../reports/releases/recovery-milestone-01/h-admission-2026-11-19.json)。
 
-只剩同一个真实终态生命周期：B91ba4f9a暂HOLD，直接strict类型缺失，且cancel内解除等待/50ms清endpoint早于main持久屏障确认；回复丢失或再次故障、资源UNKNOWN时仍可能失去证明。按[0095 postcommit约定](../../docs/rfcs/WP-16/0095-main-original-running-callback-composition.md)，B完成原service/entry/私有transport，main完成原Store确认适配，H纠正原consumer并独立同run复验，直到证明保留→持久确认→明确finalize→正常退出闭合。真实native/物理未证仍保留，不以受控组合冒充。
+主线已接入B postcommit组件并通过受控验证：原cancel/inspect→Store `confirmOwnedQuiescence` 提交→完整B manifest digest和同confirmationId finalize。B组件已直接strict、UDS纯负例和entry窗口通过；主线相关回归通过。剩余只有finalize响应丢失后的同ID调和、H消费者UNKNOWN材料清理和真实native/物理层。按[0095约定](../../docs/rfcs/WP-16/0095-main-original-running-callback-composition.md)继续同一个结果，不扩平台/队列/ledger。
 
 ## 已具备与先修缺口
 

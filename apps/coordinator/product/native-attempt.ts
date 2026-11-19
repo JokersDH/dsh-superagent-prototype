@@ -19,7 +19,7 @@ import { attachRunningAttempt } from '../../../packages/execution/src/attached-a
 import type { AttachedAttempt } from '../../../packages/execution/src/attached-attempt.ts'
 import { RunnerPayloadStore } from '../../runner/src/payload-store.ts'
 import { endpointDirectory } from '../../runner/src/recovery-endpoint.ts'
-import { connectRunnerRecovery, verifiedRunnerInspection } from '../runner-link.ts'
+import { connectRunnerRecovery, runnerResourceManifestDigest, verifiedRunnerInspection } from '../runner-link.ts'
 import type { RunnerEndpoint } from '../runner-link.ts'
 import { registerRecoveryRunner } from '../runner-registry.ts'
 import { confirmOwnedQuiescence, ownedResourceManifestDigest } from '../resource-barrier.ts'
@@ -323,8 +323,21 @@ export class NativeProductAttempt {
       kind: 'cancel',
     })
     if (command.kind !== 'cancel') throw new Error('Native close requires cancellation')
-    const proof = await this.connection().cancel(command)
+    const connection = this.connection()
+    const proof = await connection.cancel(command)
+    const inspection = verifiedRunnerInspection(proof).value
     const receipt = confirmOwnedQuiescence(this.store, proof).result
+    // The Store barrier is committed before this call. B's endpoint only accepts the full
+    // runner inventory digest (writer/evidence included) and an idempotent confirmation ID;
+    // it never creates the Store receipt or ends the binding itself.
+    const confirmationId = key('terminal-finalize', this.spec.attemptId, receipt.proofRef)
+    if (!connection.finalize) throw new Error('Runner does not expose postcommit terminal finalize')
+    await connection.finalize({
+      attempt: this.spec,
+      confirmationId,
+      resourceManifestDigest: runnerResourceManifestDigest(inspection.resources),
+      proofRef: receipt.proofRef,
+    })
     await this.stopCallbacks()
     return receipt
   }

@@ -2,7 +2,7 @@
 
 日期：2026-11-19。本次只核主动B/H固定交付并继续原主线；其余八位待命，不为用满人数扩任务。读者入口：[如何使用](../ASSISTANT-GUIDE.zh-CN.md)、[架构](ARCHITECTURE.zh-CN.md)、[创新](INNOVATION.zh-CN.md)。
 
-当前新增结果：[11-19验收](../../reports/releases/recovery-milestone-01/admission-2026-11-19.json)。main **6d309128**已通过2/4同run原Work故障恢复→检查/人工接受→自身槽归还→原第3/5项前进，UNKNOWN其余槽保留，42测试/strict。H原next-slot失败是测试factory禁止排队Work首次spawn，生产容量无需放松。B91终态源码因类型及持久确认前清退窗口暂HOLD；下一包只负责证明保留→原Store屏障提交→明确终态finalize→正常退出并独立复验。真实native/物理未证，历史最近估算不自动上调。以下旧日期结果按当时范围阅读。
+当前新增结果：[11-19验收](../../reports/releases/recovery-milestone-01/admission-2026-11-19.json)。main **6d309128**已通过2/4同run原Work故障恢复→检查/人工接受→自身槽归还→原第3/5项前进，UNKNOWN其余槽保留，42测试/strict。H原next-slot失败是测试factory禁止排队Work首次spawn，生产容量无需放松。B postcommit组件已被主线接入，Store屏障提交后以完整manifest digest和同confirmationId finalize；相关回归通过。剩余是finalize响应丢失同ID调和、H测试UNKNOWN清理和真实native/物理未测，历史最近估算不自动上调。以下旧日期结果按当时范围阅读。
 
 此前[11-18验收](../../reports/releases/recovery-milestone-01/admission-2026-11-18.json)的三种受控故障窗口及独立容量测试保留；11-19已进一步组合成同run。真实Runner EOF的fake-driver组件与virtual ProcessHost组合仍不是同一真实物理消费者，不能据此宣称完整真实原生恢复。
 

@@ -1,0 +1,62 @@
+{
+  "date": "2026-11-19",
+  "candidate": "09216f1cd7ed223e826a063cbd96c82a02ab408e",
+  "scope": "Read-only B postcommit terminal endpoint and private transport; no main Store adapter",
+  "status": "COMPONENT_ADMISSIBLE_MAIN_ADAPTER_REQUIRED",
+  "sourceFiles": [
+    "apps/runner/src/runner-service.ts",
+    "apps/runner/src/runner-service-entry.ts",
+    "apps/runner/src/recovery-endpoint.ts",
+    "packages/execution/src/recovery-transport.ts"
+  ],
+  "typeCheck": { "directStrictCommand": "exit 0 with Node types and explicit strict options", "serviceHandle": "awaitPostcommitFinalize is declared and returned", "bridgeV1Changed": false },
+  "pureSocketProbe": {
+    "result": "PASS 5/0/0",
+    "command": "node /tmp/pa-rm01-finalize-readonly.mjs",
+    "cases": [
+      "active terminal finalize refused terminal_not_reached",
+      "cancel does not finalize; after 130ms second successor still reads terminated proof",
+      "foreign producer, wrong epoch and resource manifest refuse with endpoint retained",
+      "one postcommit confirmation settles; same ID replay idempotent; conflicting ID refused",
+      "indeterminate resource refuses physical_not_stopped/unknown_resources and retains endpoint"
+    ],
+    "realSignals": 0,
+    "osChildSpawns": 0,
+    "modelNativeCalls": 0,
+    "scopeLimit": "virtual ProcessHost plus real authenticated UDS/HTTP; no Store commit or real spawned entry proof"
+  },
+  "BConsumerEvidence": {
+    "b39": "6 PASS/0 FAIL/1 NOT_TESTED; real spawned entry endpoint retention, second successor, foreign finalize, concurrent idempotence and lost reply",
+    "b40": "2 PASS/0 FAIL/1 NOT_TESTED; unknown resource/foreign finalize refusal",
+    "receipt": "B controlled reports use fixture receipts and do not persist original Store confirmOwnedQuiescence",
+    "native": "NOT_TESTED; no vendor/model/native/signal/global process discovery"
+  },
+  "securityChecks": {
+    "finalizeRequires": ["authenticated exact producer", "exact attempt/assignment/epoch/contract", "closed terminal", "physicallyStopped", "complete inventory", "all writers quiescent", "full resource manifest digest", "confirmation ID"],
+    "negativeBehavior": "cancel only observes/stops and retains endpoint; missing/foreign/wrong subject/wrong digest/UNKNOWN/conflicting confirmation refuse before finalization; same confirmation is idempotent",
+    "lostReply": "HTTP finalize may complete before caller destroys response; endpoint exits after original confirmation ID, while main Store reconciliation remains separate"
+  },
+  "mainAdapterContract": {
+    "requiredSequence": [
+      "successor inspects authenticated terminated/closed proof",
+      "main verifies current registered binding and complete resource proof",
+      "main calls confirmOwnedQuiescence in its own Store transaction and commits receipt/event/binding end",
+      "only after commit main calls private finalize with the committed confirmationId/proofRef and the B full inventory digest",
+      "finalize refusal retains endpoint/material and main treats lost response as unknown, retrying the same confirmation ID after Store reconciliation"
+    ],
+    "digestWarning": "B digest includes sorted ref, ownership, writer and evidence; main's ownedResourceManifestDigest currently covers only ref and ownership. Main must compute/pass the B full inspection digest, not reuse the shorter Store digest as finalize resourceManifestDigest.",
+    "noClaim": "B finalization closes endpoint lifecycle; it does not itself create Store receipt/event, end binding, prove original scheduler 2/4 slots or prove native crash recovery"
+  },
+  "blockingGaps": [
+    "main Store confirmOwnedQuiescence/finalize adapter not yet implemented or independently admitted",
+    "B reports use controlled receipts rather than original Store durability",
+    "physical native and original 2/4 slot/resource recovery remain NOT_REACHED",
+    "payload-read not exercised by these waiting-user cases; readoption birth candidate remains disabled"
+  ],
+  "decision": {
+    "admitBComponent": true,
+    "admitDefaultProductPath": false,
+    "holdMainRecovery": true,
+    "nextMinimalWork": "main-owned postcommit Store adapter and one same-original-Work consumer; no new platform/ledger/host/feature wave"
+  }
+}
