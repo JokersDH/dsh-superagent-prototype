@@ -1,0 +1,38 @@
+{
+  "date": "2026-11-19",
+  "mainBase": "5c35176b",
+  "runnableSource": "6d309128",
+  "fixedInputs": { "B": "91ba4f9a5922cc6daaa2e17e14cbc1be108db6ec", "H": "1a1be9dbfbaabd68df6fb4ce4c9b419a47b9e44c" },
+  "B": {
+    "decision": "HOLD_TERMINAL_LIFETIME_SOURCE_NOT_IMPORTED",
+    "progress": "Real entry now attempts to retain its terminal endpoint; b38 UNKNOWN root deletion corrected in candidate. These improvements are recognized but not durable-barrier admission.",
+    "directStrict": { "command": "pnpm exec tsc -p /tmp/pa-rm01-nov19-b-direct.tsconfig.json", "exit": 2, "errors": ["runner-service-entry.ts60 TS2339 awaitTerminalBarrier missing on RunnerServiceHandle", "runner-service.ts693 TS2353 returned awaitTerminalBarrier missing on RunnerServiceHandle"] },
+    "blockingLifecycle": "closed/no-lease cancel resolves terminalBarrier BEFORE HTTP response and BEFORE main confirmOwnedQuiescence commit;50ms later entry can close original endpoint. A lost reply or second owner failure before commit leaves no fresh proof. closed with resource UNKNOWN can also release that wait.",
+    "consumerScope": "B39 uses waiting-user FakeDriver terminated by cancel and fixture receipt, no original Store/barrier commit; not a natural Codex turn/ACK or postcommit proof.",
+    "probeExecuted": false,
+    "required": "Keep proof reads/cancel endpoint alive; original main Store commits barrier first, then a distinct authenticated terminal-finalize confirmation. Actual entry/types/consumer must agree; UNKNOWN/foreign/missing proof keep endpoint. Exact minimal semantics in0095 postcommit section."
+  },
+  "H": {
+    "decision": "ORIGINAL_DELIVERY_TRUE_NEXT_SLOT_GAP_IS_TEST_INJECTION_NOT_PRODUCTION_BUG",
+    "details": "reports/releases/recovery-milestone-01/h-admission-2026-11-19.json",
+    "rootCause": "Factory requires stage primary for EVERY spawn, but successor must legally first-spawn original.nextWorkId. Original queue recorded prepared/new attempt and hit that AssertionError, not capacity refusal. handles==capacity also forbids expected cumulative capacity+1.",
+    "admitted": "Original target Work recovery/check/manualaccept/artifacts, actual receiver begin1/answer1 and UNKNOWN filler retained are real.",
+    "notAdmitted": "Candidate original consumer did not reach the next Work question; do not relabel it PASS or patch production capacity.",
+    "correction": "Main materialized its own integration consumer; only queued original.nextWorkId may first-spawn on successor, original target never respawns; total capacity+1 expected. Check/acceptance filtered by ticket+assignment+candidateGeneration, artifacts by view IDs; UNKNOWN material retained."
+  },
+  "main": {
+    "decision": "SAME_RUN_CONTROLLED_RECOVERY_DELIVERY_ORIGINAL_CAPACITY_PASS",
+    "capacities": [2,4],
+    "actualPath": "N original Work questions plus original queued N+1 Work; primary coordinator worker exits without close; same Store/original Runner target resumes, question answered/native_applied/checkPASS/currentCandidate/manualaccept/delivered/3artifacts; its own ended binding releases capacity and original third/fifth Work first-spawns. UNKNOWN fillers retain their own occupancy.",
+    "receiver": "Actual target begin1/answer1, one native effect, exact original Work/candidate/assignment check+acceptance, original Work count capacity+1.",
+    "productionChangesForHGap": 0,
+    "source": ["tests/integration/combined-original-recovery.case.mjs", "tests/integration/fixtures/combined-recovery-worker.mjs"],
+    "checks": { "relatedTests": "42PASS/0FAIL", "coordinatorProductStrict": "exit0", "coordinatorStrict": "exit0" },
+    "command": "node --test tests/integration/combined-original-recovery.case.mjs tests/integration/original-capacity.case.mjs tests/integration/original-native-recovery.case.mjs tests/integration/original-native-callback-flow.case.mjs tests/integration/native-attach-callbacks.case.mjs tests/integration/attached-port.case.mjs apps/runner/test/recovery-endpoint.test.ts apps/runner/test/recovery-interop.test.ts",
+    "retainedUnknownRoots": ["/tmp/pa-combined-original-6YCdjn", "/tmp/pa-combined-original-Q6ZyDF", "/tmp/pa-original-capacity-PgWVeh", "/tmp/pa-original-capacity-uSSM7j"],
+    "scope": "Virtual ProcessHost and parent-held original services, coordinator Worker self-exit; actual registered Node check and Git execute. This closes the controlled SAME-RUN composition, not real OS/native physical recovery.",
+    "releaseApproved": false
+  },
+  "nextWholeResult": "Same original Runner proof retained until original main durable barrier confirmation; postcommit explicit finalize, successor/reply-loss reconciliation and clean exit; original Work+capacity independently verified on that exact source. B owns lifecycle implementation/consumer, main owns Store adapter/integration, H owns independent consumer. Other eight stay on demand, D/E no refreeze.",
+  "preservation": { "candidateSourceEdits": 0, "realModelNativeTurns": 0, "realSignals": 0, "userServicesOperated": 0, "globalProcessDiscovery": 0, "newArchive": 0, "newWorktree": 0, "externalReviewEditedOrStaged": false, "completionScoreAutomaticallyChanged": false }
+}
