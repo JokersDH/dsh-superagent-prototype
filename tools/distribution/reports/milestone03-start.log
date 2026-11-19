@@ -1,0 +1,17 @@
+原启动器尚未确认可用的开发执行器，本次明确以仅对话模式启动。
+个人预览 d3ba0ec6dccc5eac
+私有数据：/tmp/m03-home/Library/Application Support/PersonalAgent/Preview-d3ba0ec6dccc5eac
+模型配置：/tmp/m03-home/Library/Application Support/PersonalAgent/Preview-d3ba0ec6dccc5eac/config/model.json
+请保留启动窗口；结束时双击 Stop.command。
+[daemon:out] Personal product API: http://127.0.0.1:59401/v1/health
+[daemon:out] Private state/credential references: /private/tmp/m03-home/Library/Application Support/PersonalAgent/Preview-d3ba0ec6dccc5eac/data
+[daemon:out] Personal discussion mode: execution unavailable (operator_disabled); business queues are retained.
+Workbench: http://127.0.0.1:59400
+  api: http://127.0.0.1:59401
+  mode: personal access: local-development startup: normal
+  state: /private/tmp/m03-home/Library/Application Support/PersonalAgent/Preview-d3ba0ec6dccc5eac/data
+  build: d3ba0ec6dccc5eac
+daemon 已退出（code 0）；日志: /private/tmp/m03-home/Library/Application Support/PersonalAgent/Preview-d3ba0ec6dccc5eac/logs/daemon-d3ba0ec6dccc5eac.log
+  Personal product API: http://127.0.0.1:59401/v1/health
+  Private state/credential references: /private/tmp/m03-home/Library/Application Support/PersonalAgent/Preview-d3ba0ec6dccc5eac/data
+  Personal discussion mode: execution unavailable (operator_disabled); business queues are retained.

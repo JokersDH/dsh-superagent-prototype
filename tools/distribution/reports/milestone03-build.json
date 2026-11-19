@@ -1,0 +1,40 @@
+{
+  "status": "OK",
+  "buildId": "d3ba0ec6dccc5eac",
+  "config": "/tmp/m03-buildcfg/release.json",
+  "output": "/tmp/m03-dev/install",
+  "tag": null,
+  "staged": {
+    "path": "/tmp/m03-dev/install",
+    "installManifest": "/tmp/m03-dev/install/install.json"
+  },
+  "source": {
+    "commit": "83f79e8249efd68f429f2b6828ea233278071737",
+    "branch": "HEAD",
+    "dirty": false
+  },
+  "producer": {
+    "node": "24.21.0",
+    "sqlite": "3.53.4",
+    "abi": "137",
+    "platform": "darwin",
+    "arch": "arm64"
+  },
+  "artifacts": {
+    "count": 1043,
+    "bytes": 10250426
+  },
+  "dependencies": {
+    "count": 8,
+    "files": 5803
+  },
+  "console": {
+    "mode": "http",
+    "digest": "22ea7db4af11213560b5869e6037a50bb35e5ecb9e751b3fbd135b2d691884b9"
+  },
+  "limitations": [
+    "Same-machine install model: node_modules and the native SQLite binding are not portable evidence for another machine.",
+    "Only darwin/arm64 with Node 24.21.x is a measured candidate; other platforms are NOT_TESTED.",
+    "No credentials, account homes, native sessions or model keys are included in this manifest."
+  ]
+}

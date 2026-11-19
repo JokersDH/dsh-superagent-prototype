@@ -1,0 +1,205 @@
+{
+  "status": "DEGRADED",
+  "exitCode": 1,
+  "checkedAt": "2026-11-19T08:07:56.801Z",
+  "installRoot": "/Users/hh/Desktop/joker/pa-artifacts/m03-preview-d3ba0ec/PersonalAgent-Preview-d3ba0ec/install/app",
+  "roots": {
+    "install": "/Users/hh/Desktop/joker/pa-artifacts/m03-preview-d3ba0ec/PersonalAgent-Preview-d3ba0ec/install/app",
+    "config": "/tmp/m03-home/Library/Application Support/PersonalAgent/Preview-d3ba0ec6dccc5eac/config",
+    "data": "/tmp/m03-home/Library/Application Support/PersonalAgent/Preview-d3ba0ec6dccc5eac/data",
+    "cache": "/tmp/m03-home/Library/Application Support/PersonalAgent/Preview-d3ba0ec6dccc5eac/cache",
+    "logs": "/tmp/m03-home/Library/Application Support/PersonalAgent/Preview-d3ba0ec6dccc5eac/logs",
+    "workspace": "/tmp/m03-home/Library/Application Support/PersonalAgent/Preview-d3ba0ec6dccc5eac/workspaces"
+  },
+  "checks": [
+    {
+      "id": "node_version",
+      "status": "PASS",
+      "detail": {
+        "node": "24.21.0",
+        "supported": ">=24.21.0 <25"
+      }
+    },
+    {
+      "id": "platform",
+      "status": "PASS",
+      "detail": {
+        "platform": "darwin",
+        "arch": "arm64"
+      }
+    },
+    {
+      "id": "sqlite_binding",
+      "status": "PASS",
+      "detail": {
+        "sqlite": "3.53.4",
+        "abi": "137",
+        "node": "24.21.0"
+      }
+    },
+    {
+      "id": "upgrade_journal",
+      "status": "PASS",
+      "detail": {
+        "status": "none"
+      }
+    },
+    {
+      "id": "release_binding",
+      "status": "PASS",
+      "detail": {
+        "buildId": "d3ba0ec6dccc5eac",
+        "digest": "6f041eecfab45a4558bd85f9bd970ef88dc8e33bb0071eadf4c20b8c8f55ae51"
+      }
+    },
+    {
+      "id": "release_manifest",
+      "status": "PASS",
+      "detail": {
+        "buildId": "d3ba0ec6dccc5eac",
+        "artifacts": 1043,
+        "deep": false
+      }
+    },
+    {
+      "id": "console_assets",
+      "status": "PASS",
+      "detail": {
+        "root": "apps/console/dist"
+      }
+    },
+    {
+      "id": "console_mode",
+      "status": "PASS",
+      "detail": {
+        "mode": "http",
+        "digest": "22ea7db4af11213560b5869e6037a50bb35e5ecb9e751b3fbd135b2d691884b9"
+      }
+    },
+    {
+      "id": "runtime_dependencies",
+      "status": "PASS",
+      "detail": {
+        "checked": 8
+      }
+    },
+    {
+      "id": "source_identity",
+      "status": "PASS",
+      "detail": {
+        "commit": "83f79e8249efd68f429f2b6828ea233278071737",
+        "dirty": false
+      }
+    },
+    {
+      "id": "runtime_abi",
+      "status": "PASS",
+      "detail": {
+        "node": "24.21.0",
+        "modulesAbi": "137",
+        "platform": "darwin",
+        "arch": "arm64",
+        "sqlite": "3.53.4",
+        "releaseAbi": "137"
+      }
+    },
+    {
+      "id": "support_matrix",
+      "status": "PASS",
+      "detail": {
+        "measured": [
+          "darwin-arm64",
+          "node >=24.21.0 <25"
+        ],
+        "node": ">=24.21.0 <25",
+        "abi": "137",
+        "sqlite": ">=3.53.4",
+        "notTested": [
+          "linux",
+          "win32",
+          "darwin-x64",
+          "other Node ABIs",
+          "other machines"
+        ]
+      }
+    },
+    {
+      "id": "roots",
+      "status": "PASS",
+      "detail": {
+        "count": 6
+      }
+    },
+    {
+      "id": "instance",
+      "status": "WARN",
+      "detail": {
+        "message": "No managed instance is recorded; run `pa start`."
+      }
+    },
+    {
+      "id": "state",
+      "status": "PASS",
+      "detail": {
+        "database": "present"
+      }
+    },
+    {
+      "id": "recovery_marker",
+      "status": "PASS",
+      "detail": {
+        "startupMode": "normal"
+      }
+    },
+    {
+      "id": "ports",
+      "status": "WARN",
+      "detail": {
+        "busy": [
+          {
+            "name": "console",
+            "port": 5190,
+            "ok": false,
+            "code": "EADDRINUSE"
+          },
+          {
+            "name": "api",
+            "port": 8790,
+            "ok": false,
+            "code": "EADDRINUSE"
+          }
+        ],
+        "hint": "Choose other --port/--api-port values; do not stop an unverified process."
+      }
+    },
+    {
+      "id": "executor_codex",
+      "status": "WARN",
+      "detail": {
+        "required": false,
+        "expectedVersion": "codex-cli 0.164.0",
+        "available": true,
+        "version": "codex-cli 0.164.0",
+        "authPresent": false,
+        "authMode": null,
+        "codexHome": "/tmp/m03-home/.codex",
+        "evidence": {
+          "status": "PASS_REAL_NATIVE_PRODUCT",
+          "profileVersion": "codex-cli 0.164.0",
+          "sourceCommit": "a3becff2c7f3105ba061fcfdae0a87f5355c03d1"
+        },
+        "hint": "Install and admit Codex CLI in your own account; this launcher never installs/upgrades it or reads credentials.",
+        "message": "No private author auth file was found; native execution stays disabled."
+      }
+    },
+    {
+      "id": "review_executor",
+      "status": "WARN",
+      "detail": {
+        "reason": "no_executor_interface",
+        "message": "B/main have not published a second-executor capability interface; the review entry stays experimental and disabled by default.",
+        "hint": "Author execution remains available; required review mode is BLOCKED until an admitted reviewer is configured."
+      }
+    }
+  ]
+}

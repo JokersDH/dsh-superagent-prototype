@@ -1,0 +1,44 @@
+{
+  "protocol": "milestone03-d/1",
+  "date": "2026-11-19",
+  "source": "83f79e8249efd68f429f2b6828ea233278071737",
+  "buildId": "d3ba0ec6dccc5eac",
+  "package": {
+    "inner": "/Users/hh/Desktop/joker/pa-artifacts/m03-target/m03-target-d3ba0ec.tar.gz",
+    "innerSha256": "52eee9083b4d2256a58189327c93605c157e38f5cd44894482a82c6198f56123",
+    "innerBytes": 20631227,
+    "outer": "/Users/hh/Desktop/joker/pa-artifacts/m03-preview-d3ba0ec/PersonalAgent-Preview-d3ba0ec.zip",
+    "outerSha256": "163b32170680bcbdb324a4fd8edc631bdfb685633911a787c3b3de353577075b",
+    "outerBytes": 63575237,
+    "archiveEntries": 7457,
+    "innerEntries": 6889
+  },
+  "static": "VERIFIED_STATIC",
+  "normalStartup": {
+    "isolatedHomeNoAuth": "DEGRADED discussion-only, no fixture, exit0 start/stop",
+    "doctorExecutor": "WARN authPresent=falseCodex0.164.0available",
+    "codexInstall": "present on host; user own auth required for E"
+  },
+  "platform": {
+    "node": "24.21.0",
+    "abi": "137",
+    "schema": 18,
+    "arch": "darwin-arm64"
+  },
+  "unchanged": {
+    "w33": "f880/46e",
+    "w35": "599de3/39c0",
+    "w36": "14a6b45/43e0"
+  },
+  "remaining": [
+    "E same-package six-item acceptance with user Codex auth",
+    "cross-machine/signing/native/value untested"
+  ],
+  "sourcePatches": "none; selected main source 83f79 already contains normal-start/login fix",
+  "budget": {
+    "DCodexTurns": 0,
+    "realVendor": 0,
+    "realModel": 0,
+    "realNative": 0
+  }
+}
