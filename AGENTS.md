@@ -37,7 +37,9 @@
 - F/G/H/J retain their original owned boundaries. Do not modify another candidate working tree. Main may import a reviewed minimal exact source closure after its owner has completed it.
 - For dependencies, publish the smallest actual consumer/repro and continue independent owned work. Do not broaden shared authority to make a test pass.
 
-## Current Verified Source And Limits
+## Historical Source Checkpoints And Limits
+
+The current selected daily-use source is 83f79e8249efd68f429f2b6828ea233278071737; D may freeze this source and E verifies that exact package under docs/product/MILESTONE-03.zh-CN.md. The older checkpoints below remain historical evidence and candidate limits, not active recovery work or a direction to re-test W36. Milestones01/02 closed scopes remain as recorded in their completion summary.
 
 - Mainbde57d42/0095 retains original Native.resume/current checks and now commits Store barrier before sending B postcommit finalize with the full runner manifest digest and stable confirmation ID. Already-ACKed terminal restoration requires original business observation/immutable payload/canonical fact receipt and complete original quiescence. No closed-channel rebind or stopping/ended revival.
 - Its trusted Node-only RunnerLink factory defaults to the original RunnerLink; no profile/env/HTTP fallback. Poll lease loss stops, never automatically rebinds.
