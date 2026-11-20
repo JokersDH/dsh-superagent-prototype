@@ -20,19 +20,14 @@ export function createTurnLedger(path) {
   mkdirSync(join(path, '..'), { recursive: true, mode: 0o700 })
   if (!existsSync(path)) writeFileSync(path, '', { mode: 0o600 })
   const read = () => readFileSync(path, 'utf8').split('\n').filter(Boolean).map(line => JSON.parse(line))
-  const activeReservations = () => {
-    const entries = read()
-    const cancelled = new Set(entries.filter(entry => entry.kind === 'cancelled').map(entry => entry.id))
-    const finished = new Set(entries.filter(entry => ['sent', 'unknown'].includes(entry.kind)).map(entry => entry.id))
-    return [...new Set(entries.filter(entry => entry.kind === 'reserved').map(entry => entry.id))]
-      .filter(id => !cancelled.has(id) && !finished.has(id))
+  // The latest entry per id is authoritative, so a later reserve is not shadowed by an earlier cancel.
+  const latest = () => {
+    const state = new Map()
+    for (const entry of read()) if (['reserved', 'sent', 'unknown', 'cancelled', 'unsent_confirmed'].includes(entry.kind)) state.set(entry.id, entry)
+    return state
   }
-  // The last terminal state per id wins: an explicitly proven-unsent send does not consume.
-  const consumed = () => {
-    const last = new Map()
-    for (const entry of read()) if (['sent', 'unknown', 'cancelled', 'unsent_confirmed'].includes(entry.kind)) last.set(entry.id, entry.kind)
-    return new Set([...last].filter(([, kind]) => kind === 'sent' || kind === 'unknown').map(([id]) => id))
-  }
+  const activeReservations = () => [...latest()].filter(([, entry]) => entry.kind === 'reserved').map(([id]) => id)
+  const consumed = () => new Set([...latest()].filter(([, entry]) => entry.kind === 'sent' || entry.kind === 'unknown').map(([id]) => id))
   return {
     path,
     entries: read,
@@ -44,7 +39,8 @@ export function createTurnLedger(path) {
       : consumed().size + activeReservations().length >= E_TURN_CAP ? { ok: false, reason: 'concurrent_reservation' }
         : { ok: true, remaining: E_TURN_CAP - consumed().size, inFlight: activeReservations().length },
     reserve(id, { grant = 'milestone03-e' } = {}) {
-      if (consumed().has(id) || activeReservations().includes(id)) return { ok: false, reason: 'duplicate_id' }
+      const previous = latest().get(id)?.kind
+      if (previous && previous !== 'cancelled') return { ok: false, reason: 'duplicate_id' }
       if (consumed().size >= E_TURN_CAP) return { ok: false, reason: 'cap_reached' }
       if (consumed().size + activeReservations().length >= E_TURN_CAP) return { ok: false, reason: 'concurrent_reservation' }
       const entry = { id, grant, kind: 'reserved', at: new Date().toISOString() }
@@ -56,6 +52,13 @@ export function createTurnLedger(path) {
       if (!activeReservations().includes(id)) return { ok: false, reason: 'not_reserved' }
       writeFileSync(path, `${JSON.stringify({ id, kind: 'sent', turnStart, at: new Date().toISOString() })}\n`, { flag: 'a', mode: 0o600 })
       return { ok: true, used: consumed().size }
+    },
+    /** Reconciles an UNKNOWN send only when the product's own attempt start/end facts prove it was written. */
+    reconcileUnknownAsSent(id, evidence) {
+      if (latest().get(id)?.kind !== 'unknown') return { ok: false, reason: 'not_unknown' }
+      if (!evidence || typeof evidence !== 'string') return { ok: false, reason: 'evidence_required' }
+      writeFileSync(path, `${JSON.stringify({ id, kind: 'sent', reconciled: true, evidence, at: new Date().toISOString() })}\n`, { flag: 'a', mode: 0o600 })
+      return { ok: true, used: consumed().size, remaining: E_TURN_CAP - consumed().size }
     },
     unknown(id, reason) {
       if (!activeReservations().includes(id)) return { ok: false, reason: 'not_reserved' }
@@ -69,16 +72,11 @@ export function createTurnLedger(path) {
       return { ok: true, used: consumed().size }
     },
     /**
-     * Corrects an earlier send record only when a consumed consumer proved the native turn was never
-     * written (for example the product blocked dependency preparation before any attempt start).
+     * Free-form un-sending is disabled. A consumed send/unknown cannot be revoked by a self-authored
+     * string; historical unsent_confirmed entries are preserved but new corrections are refused.
      */
-    correctUnsent(id, { reason = 'proven_unsent_setup_failure', evidence = '' } = {}) {
-      const entries = read()
-      const send = entries.filter(entry => entry.id === id && ['sent', 'unknown'].includes(entry.kind))
-      if (send.length === 0) return { ok: false, reason: 'no_send_recorded' }
-      if (entries.some(entry => entry.id === id && entry.kind === 'unsent_confirmed')) return { ok: false, reason: 'already_corrected' }
-      writeFileSync(path, `${JSON.stringify({ id, kind: 'unsent_confirmed', reason, evidence, at: new Date().toISOString() })}\n`, { flag: 'a', mode: 0o600 })
-      return { ok: true, used: consumed().size, remaining: E_TURN_CAP - consumed().size }
+    correctUnsent() {
+      return { ok: false, reason: 'correction_disabled' }
     },
     canRetry(id) {
       const last = read().filter(entry => entry.id === id).at(-1)?.kind

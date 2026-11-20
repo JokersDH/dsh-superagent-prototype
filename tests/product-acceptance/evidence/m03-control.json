@@ -1,0 +1,187 @@
+{
+ "at": "2026-11-20T08:41:11.682Z",
+ "package": {
+  "outer": "163b32170680bcbdb324a4fd8edc631bdfb685633911a787c3b3de353577075b",
+  "source": "83f79e8249efd68f429f2b6828ea233278071737",
+  "build": "d3ba0ec6dccc5eac"
+ },
+ "instance": {
+  "pid": 15710,
+  "consoleURL": "http://127.0.0.1:57528",
+  "apiURL": "http://127.0.0.1:57529",
+  "state": "/Users/hh/Library/Application Support/PersonalAgent/Preview-d3ba0ec6dccc5eac/data"
+ },
+ "goal": "这是短控制链验证，不要修改源码、测试或配置文件，不要新建 Work。\n在运行任何命令之前，必须先通过用户提问工具向我提出一个确认问题，询问是否允许运行沙箱外的探针命令 `touch /tmp/m03-control-approval`，并停下来等待我在问题中心回答；不得自行假定允许或绕过提问。\n如果你没有可用的用户提问工具，就直接运行 `touch /tmp/m03-control-approval`，让沙箱审批请求上浮并等待回答。\n收到回答（允许或拒绝）后，立即运行 `sleep 60`。\n然后运行 `node --test` 并简要报告结果。",
+ "priorUsed": 3,
+ "question": null,
+ "answer": null,
+ "supplement": null,
+ "stop": {
+  "terminalCleanupOnly": true,
+  "buttonPresent": false,
+  "enabledBeforeClick": true,
+  "ended": {
+   "at": "2026-11-20T08:56:38.159Z",
+   "by": "human",
+   "outcome": "stopped"
+  },
+  "bindingBefore": "ended",
+  "bindingAfter": "ended",
+  "beforeDetail": "\n这是短控制链验证，不要修改源码、测试或配置文件，不要新建 Work。\n合同详情\n\n写者已静止\n\n这是短控制链验证，不要修改源码、测试或配置文件，不要新建 Work。 在运行任何命令之前，必须先通过用户提问工具向我提出一个确认问题，询问是否允许运行沙箱外的探针命令 `touch /tmp/m03-control-approval`，并停下来等待我在问题中心回答；不得自行假定允许或绕过提问。 如果你没有可用的用户提问工具，就直接运行 `touch /tmp/m03-control-approval`，让沙箱审批请求上浮并等待回答。 收到回答（允许或拒绝）后，立即运行 `sleep 60`。 然后运行 `node --test` 并简要报告结果。\n\n依赖环境\n\n已准备并复验 · 现有依赖\n\n环境指纹\n代码位置\n原项目\n/private/tmp/pa-e-m03-live/projects3/token-engine-b\n工作区\n/Users/hh/.local/share/superagent-personal/workspaces/630a4573d9edb314189e49e7/attempts/attempt-b5f967fe-022d-45ad-b838-70dc20e87a6b\n基线\nbe4baf013f00\n完成标准\n项目注册的检查通过\n机器检查 · 必需\n审阅并接受当前变更\n人工验收 · 必需\n验证结果\n验证详情\n项目注册的检查通过\n通过\n证据引用\n当前候选产物\n37b68d8ad106e72e5a…\n交付清单\ne3b0c44298fc1c149a…\n完整变更补丁\n65bbd2312ed50332f6…\n检查证据\n交付记录\n工作历史\n可用动作\n接受当前候选\n暂停派工\n停止工作\n修订合同\n\n派工控制 revision 0 · 未暂停\n\n待决定\n0\n\n没有待决定问题。",
+  "afterDetail": "工作上下文\n工作详情\n已结束\n这是短控制链验证，不要修改源码、测试或配置文件，不要新建 Work。\n合同详情\n\n写者已静止\n\n这是短控制链验证，不要修改源码、测试或配置文件，不要新建 Work。 在运行任何命令之前，必须先通过用户提问工具向我提出一个确认问题，询问是否允许运行沙箱外的探针命令 `touch /tmp/m03-control-approval`，并停下来等待我在问题中心回答；不得自行假定允许或绕过提问。 如果你没有可用的用户提问工具，就直接运行 `touch /tmp/m03-control-approval`，让沙箱审批请求上浮并等待回答。 收到回答（允许或拒绝）后，立即运行 `sleep 60`。 然后运行 `node --test` 并简要报告结果。\n\n依赖环境\n\n已准备并复验 · 现有依赖\n\n环境指纹\n代码位置\n原项目\n/private/tmp/pa-e-m03-live/projects3/token-engine-b\n工作区\n/Users/hh/.local/share/superagent-personal/workspaces/630a4573d9edb314189e49e7/attempts/attempt-b5f967fe-022d-45ad-b838-70dc20e87a6b\n基线\nbe4baf013f00\n完成标准\n项目注册的检查通过\n机器检查 · 必需\n审阅并接受当前变更\n人工验收 · 必需\n验证结果\n\n还没有当前候选的验证。\n\n当前候选产物\n\n当前候选还没有已发布的产物。\n\n交付记录\n工作历史\n可用动作\n继续工作\n\n派工控制 revision 0 · 未暂停\n\n待决定\n0\n\n没有待决定问题。"
+ },
+ "resources": {
+  "beforePids": [
+   {
+    "pid": 15729,
+    "command": "/private/tmp/pa-e-m03-live/install/runtime/bin/node /private/tmp/pa-e-m03-live/install/install/app/apps/coordinator/product/demo.ts --port 57529 --state /Users/"
+   }
+  ],
+  "afterPids": [
+   {
+    "pid": 15729,
+    "command": "/private/tmp/pa-e-m03-live/install/runtime/bin/node /private/tmp/pa-e-m03-live/install/install/app/apps/coordinator/product/demo.ts --port 57529 --state /Users/"
+   }
+  ],
+  "survivingNew": [],
+  "runtimeCurrent": [
+   {
+    "ticket_id": "f2febf3bab08511c803747b028cefee4",
+    "attempt_id": "attempt-4f7a7bf2-b211-4a77-9f77-89e8a5cbde12"
+   },
+   {
+    "ticket_id": "483eb7a614729f278c48475ff94704a7",
+    "attempt_id": "attempt-55bb7c23-2776-4c9f-89dd-d7be3c911c1e"
+   },
+   {
+    "ticket_id": "5d719b3c5ca3cd7e5612784ea4c28202",
+    "attempt_id": "attempt-a434b420-65f0-4ba0-8760-206c03df2250"
+   },
+   {
+    "ticket_id": "e3b4318e4061d48965ebd08db9ad50be",
+    "attempt_id": "attempt-b2863822-aadb-4c2d-a0a7-82eee22259ea"
+   },
+   {
+    "ticket_id": "a7c31233b1859ba7515169eab72e6275",
+    "attempt_id": "attempt-b5f967fe-022d-45ad-b838-70dc20e87a6b"
+   }
+  ],
+  "bindings": [
+   {
+    "attempt_id": "attempt-b5f967fe-022d-45ad-b838-70dc20e87a6b",
+    "state": "ended"
+   },
+   {
+    "attempt_id": "attempt-b2863822-aadb-4c2d-a0a7-82eee22259ea",
+    "state": "ended"
+   },
+   {
+    "attempt_id": "attempt-a434b420-65f0-4ba0-8760-206c03df2250",
+    "state": "ended"
+   },
+   {
+    "attempt_id": "attempt-55bb7c23-2776-4c9f-89dd-d7be3c911c1e",
+    "state": "ended"
+   },
+   {
+    "attempt_id": "attempt-4f7a7bf2-b211-4a77-9f77-89e8a5cbde12",
+    "state": "ended"
+   }
+  ]
+ },
+ "commands": null,
+ "created": {
+  "status": 200,
+  "workId": "6dd113a40e7656be47c023494c61c3e7",
+  "receipt": {
+   "commandId": "cmd-work-77430404-98a1-44de-8797-5501a92acd16",
+   "workId": "6dd113a40e7656be47c023494c61c3e7",
+   "seq": 320,
+   "status": "recorded"
+  }
+ },
+ "reconciledAt": "2026-11-20T08:56:37.212Z",
+ "actualAttempt": {
+  "ticketId": "a7c31233b1859ba7515169eab72e6275",
+  "assignmentState": "running",
+  "report": {
+   "state": "ready",
+   "summary": "当前变更已停止写入，等待注册检查与人工审阅",
+   "at": "2026-11-20T08:46:40.069Z"
+  },
+  "attemptId": "attempt-b5f967fe-022d-45ad-b838-70dc20e87a6b",
+  "bindingBefore": "ended",
+  "begun": "2026-11-20T08:41:12.531Z",
+  "turnEnded": true,
+  "dispatch": [
+   {
+    "command_id": "cmd-attempt-b5f967fe-022d-45ad-b838-70dc20e87a6b-1-begin-3d312eeb586a9b315973ad9cc1581434a840380a6f87a915d96a013006f0b80d",
+    "target": "attempt-b5f967fe-022d-45ad-b838-70dc20e87a6b",
+    "delivery": "native_accepted",
+    "native_ref": null,
+    "error": null,
+    "updated_at": "2026-11-20T08:41:12.531Z"
+   }
+  ],
+  "questions": [],
+  "steerReceipts": [],
+  "turnEndedInUI": true
+ },
+ "result": {
+  "ok": false,
+  "question": false,
+  "answer": false,
+  "steer": false,
+  "runningStop": false,
+  "terminalCleanupStopped": true,
+  "bindingEnded": true,
+  "noSurvivingNewProcess": true,
+  "reason": "native turn completed without a question, running steer window, or running stop; only terminal cleanup was possible"
+ },
+ "budget": {
+  "priorUsed": 3,
+  "controlSends": 1,
+  "totalUsed": 4,
+  "cap": 4,
+  "remaining": 0,
+  "ledgerEntries": [
+   {
+    "kind": "reserved",
+    "id": "m03-control-v4",
+    "priorUsed": 3,
+    "at": "2026-11-20T08:41:11.477Z"
+   },
+   {
+    "kind": "unknown",
+    "id": "m03-control-v4",
+    "reason": "attempt_start_not_observed",
+    "at": "2026-11-20T08:42:55.410Z"
+   },
+   {
+    "id": "m03-control-v4",
+    "kind": "sent",
+    "reconciled": true,
+    "evidence": "attempt-b5f967fe-022d-45ad-b838-70dc20e87a6b assignment.started 08:41:12, dispatch.observed fact-3, turn.ended completed 08:46:40, runtime_binding active",
+    "at": "2026-11-20T08:54:56.380Z"
+   }
+  ],
+  "note": "Prior 3 actual sends are recorded in m03-final.json/main Store; this control Work is the fourth and last actual native send. The earlier UNKNOWN was reconciled to sent only from assignment.started/dispatch.observed/turn.ended facts, not by a free-form correction."
+ },
+ "nativeFacts": {
+  "assignmentStartedAt": "2026-11-20T08:41:12.531Z",
+  "attemptId": "attempt-b5f967fe-022d-45ad-b838-70dc20e87a6b",
+  "dispatchObserved": true,
+  "turnEnded": true,
+  "candidateAvailable": true,
+  "machineCheckPassed": true,
+  "userQuestionsCreated": 0,
+  "steerReceipts": 0
+ },
+ "limitations": [
+  "The single control turn completed without creating an original user question or an approval request, so the question-centre answer path has no this-package evidence.",
+  "No running steer was possible: the native turn ended before the consumer observed it. A post-terminal stop was executed only as cleanup and is explicitly not counted as a running stop.",
+  "The consumer exited early on a wrong ticket JSON path while the turn was actually running; the UNKNOWN was later reconciled to sent from assignment.started/dispatch.observed/turn.ended facts. No resend or extra model turn was attempted.",
+  "Budget is now 4/4 actual sends; no further model turns were sent.",
+  "Cross-machine remains NOT_TESTED."
+ ]
+}

@@ -327,13 +327,25 @@ export async function runM03Prep() {
     const unknown = ledger.unknown('project-b', 'transport_closed_after_write')
     const retry = ledger.canRetry('project-b')
     const duplicate = ledger.reserve('project-a')
-    evidence.budget = { first, second, third, fourth, sent, unknown, retry, duplicate, used: ledger.used(), remaining: ledger.remaining() }
+    const control = createTurnLedger(join(root, 'control.jsonl'))
+    const controlReserved = control.reserve('control-work')
+    const controlCancelled = control.cancel('control-work', 'setup_failed_unsent')
+    const controlAgain = control.reserve('control-work')
+    const controlSent = control.sent('control-work', { turnStart: 'turn-control' })
+    const controlUnsend = control.correctUnsent('control-work', { evidence: '' })
+    evidence.budget = { first, second, third, fourth, sent, unknown, retry, duplicate, used: ledger.used(), remaining: ledger.remaining(),
+      control: { reserved: controlReserved, cancelled: controlCancelled, again: controlAgain, sent: controlSent,
+        unsend: controlUnsend, used: control.used(), remaining: control.remaining() } }
     assert('M03_BUDGET_RESERVES', first.ok === true && second.ok === true && third.ok === true, JSON.stringify(evidence.budget))
     assert('M03_BUDGET_CAP', fourth.ok === false && ['cap_reached', 'concurrent_reservation'].includes(fourth.reason), JSON.stringify(fourth))
     // Reservation never consumes: only the actually sent and the unknown send count.
     assert('M03_BUDGET_UNKNOWN_HELD', unknown.ok === true && retry === false && ledger.used() === 2 &&
       ledger.inFlight().length === 1 && ledger.remaining() === 1, JSON.stringify({ unknown, retry, used: ledger.used(), inFlight: ledger.inFlight() }))
     assert('M03_BUDGET_DUPLICATE', duplicate.ok === false && duplicate.reason === 'duplicate_id', JSON.stringify(duplicate))
+    assert('M03_BUDGET_CANCEL_RERESERVE', controlReserved.ok === true && controlCancelled.ok === true &&
+      controlAgain.ok === true && controlSent.ok === true && control.used() === 1, JSON.stringify(evidence.budget.control))
+    assert('M03_BUDGET_NO_FREE_UNSEND', controlUnsend.ok === false && controlUnsend.reason === 'correction_disabled' &&
+      control.used() === 1, JSON.stringify(controlUnsend))
     rmSync(root, { recursive: true, force: true })
   }))
 
