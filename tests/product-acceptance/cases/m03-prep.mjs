@@ -3,7 +3,9 @@ import { mkdirSync, readFileSync, writeFileSync, existsSync, rmSync, statSync } 
 import { join, resolve } from 'node:path'
 import { runCase, notTested, LAYERS } from '../lib/status.mjs'
 import { openBrowser } from '../lib/browser.mjs'
-import { createTurnLedger, applyPatchToCopy, prepareBackupProject } from '../lib/m03.mjs'
+import { createTurnLedger, applyPatchToCopy, prepareRealProject, runProjectCheck } from '../lib/m03.mjs'
+import { createHash } from 'node:crypto'
+const sha256File = path => createHash('sha256').update(readFileSync(path)).digest('hex')
 import { extractOuterZip, privateHome, verifyOuterZip, W36_ZIP_DIR, W36_ZIP_NAME } from '../lib/outer-zip.mjs'
 import { freePort, launcher, privateRoot, startOwned, stopOwned } from '../lib/packaged-instance.mjs'
 import { LocalProductClient } from '../lib/http-client.mjs'
@@ -17,11 +19,19 @@ import { LocalProductClient } from '../lib/http-client.mjs'
  * existing W36 package and is labeled as such, never as the milestone verdict.
  */
 const here = resolve('.')
+// The only admitted milestone cohort: main source 83f79e82 / build d3ba0ec6.
 const COHORT = {
-  id: process.env.PA_E_M03_COHORT ?? 'w36-provisional',
-  dir: process.env.PA_E_M03_DIR ?? W36_ZIP_DIR,
-  name: process.env.PA_E_M03_ZIP ?? W36_ZIP_NAME,
+  id: 'm03-frozen',
+  dir: process.env.PA_E_M03_DIR ?? '/Users/hh/Desktop/joker/pa-artifacts/m03-preview-d3ba0ec',
+  name: process.env.PA_E_M03_ZIP ?? 'PersonalAgent-Preview-d3ba0ec.zip',
+  expected: { source: '83f79e8249efd68f429f2b6828ea233278071737', buildId: 'd3ba0ec6dccc5eac',
+    innerTarSha256: '52eee9083b4d2256a58189327c93605c157e38f5cd44894482a82c6198f56123',
+    innerTarBytes: 20631227, outerZipSha256: '163b32170680bcbdb324a4fd8edc631bdfb685633911a787c3b3de353577075b' },
 }
+const REAL_PROJECTS = [
+  { name: 'tokens-a', source: process.env.PA_E_M03_PROJECT_A ?? '/tmp/pa-e-m03-live/projects3/token-engine-a' },
+  { name: 'tokens-b', source: process.env.PA_E_M03_PROJECT_B ?? '/tmp/pa-e-m03-live/projects3/token-engine-b' },
+]
 
 const runner = (root, home) => (args, { timeoutMs = 40_000 } = {}) => {
   const result = spawnSync(join(root, 'runtime/bin/node'), [join(root, 'personal-preview-launcher.mjs'), ...args], {
@@ -51,7 +61,17 @@ async function startCohort({ env = {} } = {}) {
   const home = privateHome('pa-e-m03home-')
   stage(home)
   const zip = verifyOuterZip(COHORT.dir, COHORT.name)
+  const inner = zip.result?.inner ?? {}
+  const identity = { outer: zip.sha256, buildId: inner.buildId, source: inner.source,
+    innerTarSha256: inner.tarSha256, innerTarBytes: inner.tarBytes }
+  const expected = COHORT.expected
+  if (identity.outer !== expected.outerZipSha256 || identity.buildId !== expected.buildId ||
+    identity.source !== expected.source || identity.innerTarSha256 !== expected.innerTarSha256 ||
+    identity.innerTarBytes !== expected.innerTarBytes)
+    throw new Error(`refusing a non-milestone package: ${JSON.stringify(identity)}`)
   const extracted = extractOuterZip(zip, home)
+  const manifestDigest = sha256File(join(extracted.install, 'install.json'))
+  if (manifestDigest !== inner.installManifestSha256) throw new Error('inner install manifest differs from package-result')
   root.install = extracted.install
   const first = launcher(root.install, ['first-run', '--json'], { env: { PA_CONFIG_ROOT: root.config, PA_DATA_ROOT: root.state } })
   if (first.status !== 0) throw new Error(`first-run ${first.status}: ${first.stderr}`)
@@ -135,8 +155,11 @@ export async function runM03Prep() {
     } finally { if (value) await stopOwned(value.root, { birth: value.started.birth }).catch(() => {}) }
     const pf = evidence.preflight ?? {}
     assert('M03_PREFLIGHT_START', pf.status === 'RUNNING', JSON.stringify(pf))
+    // A fresh instance may still need an explicit project import: native can be admitted while
+    // development is needs_project. Fixture/controlled execution must never appear.
     assert('M03_PREFLIGHT_CODEX', pf.readiness?.body?.execution?.state === 'available' &&
-      pf.readiness?.body?.development === 'configuration_present' && (pf.readiness?.body?.profiles?.admittedNative ?? 0) >= 1 &&
+      pf.readiness?.body?.execution?.kind === 'native' && ['configuration_present', 'needs_project'].includes(String(pf.readiness?.body?.development)) &&
+      (pf.readiness?.body?.profiles?.admittedNative ?? 0) >= 1 &&
       pf.codex?.version?.status === 0 && /codex-cli/u.test(pf.codex.version.text) && pf.codex?.auth?.status === 0,
       JSON.stringify({ readiness: pf.readiness?.body, codex: pf.codex }))
     assert('M03_PREFLIGHT_UI', /Codex|执行器|版本|认证/u.test(String(pf.ui?.executorText ?? '') + String(pf.ui?.trialTail ?? '')), JSON.stringify(pf.ui?.executorText?.slice(0, 400)))
@@ -208,24 +231,30 @@ export async function runM03Prep() {
       else process.env.PA_MODEL_CONFIG = previousModel
       if (value.value.status !== 'RUNNING') throw new Error(`start ${value.value.status}/${value.value.code ?? 'none'}`)
       const projectsRoot = join(value.home, 'projects')
-      // Real repository sources copied as backups; the live milestone run will use their real checks.
-      const projectA = prepareBackupProject({ source: join(here, 'product-spec'), target: join(projectsRoot, 'spec-tools'), name: 'spec-tools-backup', check: 'node_test' })
-      const projectB = prepareBackupProject({ source: join(here, 'tools/acceptance'), target: join(projectsRoot, 'accept-tools'), name: 'accept-tools-backup', check: 'node_test' })
+      // Real repositories copied as backups with their original package/check/dependencies (no .git).
+      const projectA = prepareRealProject({ source: REAL_PROJECTS[0].source, target: join(projectsRoot, REAL_PROJECTS[0].name), name: REAL_PROJECTS[0].name })
+      const projectB = prepareRealProject({ source: REAL_PROJECTS[1].source, target: join(projectsRoot, REAL_PROJECTS[1].name), name: REAL_PROJECTS[1].name })
+      const checkA = runProjectCheck(projectA.path)
+      const checkB = runProjectCheck(projectB.path)
       const browser = await openBrowser({ root: here })
       const ui = []
       try {
         const page = browser.page
         await page.goto(value.value.instance.consoleURL, { waitUntil: 'domcontentloaded' })
         for (const project of [projectA, projectB]) {
+          await page.getByRole('button', { name: '主对话视图', exact: true }).click().catch(() => {})
+          await page.waitForTimeout(500)
           await page.getByRole('button', { name: '试用准备', exact: true }).click()
-          await page.getByRole('button', { name: '导入项目', exact: true }).click()
-          const form = page.getByRole('form', { name: '导入本地项目', exact: true })
-          await form.waitFor()
+          await page.waitForTimeout(1_000)
+          await page.getByRole('button', { name: '导入项目', exact: true }).first().click()
+          await page.waitForTimeout(1_000)
+          const form = page.locator('input[name=project-path]').locator('xpath=ancestor::form[1]')
           await form.locator('input[name=project-path]').fill(project.path)
           await form.locator('input[name=project-name]').fill(project.name)
-          await form.locator('select[name=project-check]').selectOption(project.check)
-          await form.getByRole('button', { name: '导入项目', exact: true }).click()
-          await page.waitForTimeout(900)
+          await form.locator('select[name=project-check]').selectOption('node_test')
+          await form.locator('select[name=environment-policy]').selectOption('existing_only')
+          await form.locator('button[type=submit]').click()
+          await page.waitForTimeout(1_500)
           ui.push({ name: project.name, text: (await page.locator('body').innerText()).slice(-400) })
         }
       } finally { await browser.close().catch(() => {}) }
@@ -236,15 +265,18 @@ export async function runM03Prep() {
       const works = (configuration.body?.projects ?? []).filter(item => item.dispatchAllowed).length
       evidence.importTwo = { status: configuration.status, names, projectIds, dispatchable: works,
         distinct: new Set(projectIds).size === projectIds.length, ui, modelTurns: 0,
-        backups: [{ name: projectA.name, head: projectA.head, check: projectA.check }, { name: projectB.name, head: projectB.head, check: projectB.check }] }
+        backups: [{ name: projectA.name, head: projectA.head, testScript: projectA.testScript, check: checkA },
+          { name: projectB.name, head: projectB.head, testScript: projectB.testScript, check: checkB }] }
       await stopOwned(value.root, { birth: value.started.birth })
     } finally { if (value) await stopOwned(value.root, { birth: value.started.birth }).catch(() => {}) }
     const it = evidence.importTwo ?? {}
-    assert('M03_IMPORT_TWO_PROJECTS', it.names?.includes('spec-tools-backup') && it.names?.includes('accept-tools-backup'),
+    assert('M03_IMPORT_TWO_PROJECTS', it.names?.includes('tokens-a') && it.names?.includes('tokens-b'),
       JSON.stringify(it.names))
     assert('M03_IMPORT_DISTINCT', it.distinct === true && it.projectIds?.length >= 2, JSON.stringify(it.projectIds))
-    assert('M03_IMPORT_CHECKS', it.backups?.every(item => item.check === 'node_test' && /^[a-f0-9]{40}$/u.test(item.head)), JSON.stringify(it.backups))
+    assert('M03_IMPORT_CHECKS', it.backups?.every(item => (item.check?.passed ?? 0) > 0 && /^[a-f0-9]{40}$/u.test(item.head)) &&
+      it.backups?.some(item => item.check?.failed === 0), JSON.stringify(it.backups))
     assert('M03_IMPORT_UI', it.ui?.length === 2 && it.ui.every(item => item.text?.length > 0), JSON.stringify(it.ui?.map(item => item.text?.slice(-120))))
+    assert('M03_REAL_CHECK_NONZERO', it.backups?.every(item => (item.check?.passed ?? 0) >= 1), JSON.stringify(it.backups?.map(item => item.check?.passed)))
     assert('M03_IMPORT_NO_TURN', it.modelTurns === 0, String(it.modelTurns))
   }))
 
@@ -293,12 +325,14 @@ export async function runM03Prep() {
     const fourth = ledger.reserve('overflow')
     const sent = ledger.sent('project-a', { turnStart: 'turn-a' })
     const unknown = ledger.unknown('project-b', 'transport_closed_after_write')
-    const retry = ledger.canRetryAfterUnknown('project-b')
+    const retry = ledger.canRetry('project-b')
     const duplicate = ledger.reserve('project-a')
     evidence.budget = { first, second, third, fourth, sent, unknown, retry, duplicate, used: ledger.used(), remaining: ledger.remaining() }
     assert('M03_BUDGET_RESERVES', first.ok === true && second.ok === true && third.ok === true, JSON.stringify(evidence.budget))
-    assert('M03_BUDGET_CAP', fourth.ok === false && fourth.reason === 'cap_reached', JSON.stringify(fourth))
-    assert('M03_BUDGET_UNKNOWN_HELD', unknown.ok === true && retry === false && ledger.used() === 3 && ledger.remaining() === 0, JSON.stringify({ unknown, retry }))
+    assert('M03_BUDGET_CAP', fourth.ok === false && ['cap_reached', 'concurrent_reservation'].includes(fourth.reason), JSON.stringify(fourth))
+    // Reservation never consumes: only the actually sent and the unknown send count.
+    assert('M03_BUDGET_UNKNOWN_HELD', unknown.ok === true && retry === false && ledger.used() === 2 &&
+      ledger.inFlight().length === 1 && ledger.remaining() === 1, JSON.stringify({ unknown, retry, used: ledger.used(), inFlight: ledger.inFlight() }))
     assert('M03_BUDGET_DUPLICATE', duplicate.ok === false && duplicate.reason === 'duplicate_id', JSON.stringify(duplicate))
     rmSync(root, { recursive: true, force: true })
   }))

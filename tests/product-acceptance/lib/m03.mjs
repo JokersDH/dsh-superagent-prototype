@@ -1,6 +1,6 @@
-import { execFileSync } from 'node:child_process'
-import { existsSync, mkdirSync, readFileSync, writeFileSync, cpSync } from 'node:fs'
-import { join } from 'node:path'
+import { execFileSync, spawnSync } from 'node:child_process'
+import { existsSync, mkdirSync, readFileSync, writeFileSync, cpSync, realpathSync } from 'node:fs'
+import { dirname, join, resolve } from 'node:path'
 
 /**
  * Milestone-03 preparation helpers (zero model).
@@ -12,80 +12,150 @@ import { join } from 'node:path'
 
 export const E_TURN_CAP = 3
 
-/** A ledger that only ever appends: reserved -> sent | unknown. Unknown occupies the budget. */
+/**
+ * Turn ledger: a reservation prevents concurrent sends but is NOT consumption. Only a turn that was
+ * actually written (sent, or an UNKNOWN send whose write may have happened) consumes the cap.
+ */
 export function createTurnLedger(path) {
   mkdirSync(join(path, '..'), { recursive: true, mode: 0o700 })
   if (!existsSync(path)) writeFileSync(path, '', { mode: 0o600 })
   const read = () => readFileSync(path, 'utf8').split('\n').filter(Boolean).map(line => JSON.parse(line))
-  // One turn id counts once across reserved -> sent|unknown.
-  const used = () => new Set(read().filter(entry => ['reserved', 'sent', 'unknown'].includes(entry.kind)).map(entry => entry.id)).size
+  const activeReservations = () => {
+    const entries = read()
+    const cancelled = new Set(entries.filter(entry => entry.kind === 'cancelled').map(entry => entry.id))
+    const finished = new Set(entries.filter(entry => ['sent', 'unknown'].includes(entry.kind)).map(entry => entry.id))
+    return [...new Set(entries.filter(entry => entry.kind === 'reserved').map(entry => entry.id))]
+      .filter(id => !cancelled.has(id) && !finished.has(id))
+  }
+  // The last terminal state per id wins: an explicitly proven-unsent send does not consume.
+  const consumed = () => {
+    const last = new Map()
+    for (const entry of read()) if (['sent', 'unknown', 'cancelled', 'unsent_confirmed'].includes(entry.kind)) last.set(entry.id, entry.kind)
+    return new Set([...last].filter(([, kind]) => kind === 'sent' || kind === 'unknown').map(([id]) => id))
+  }
   return {
     path,
     entries: read,
-    used,
-    remaining: () => Math.max(0, E_TURN_CAP - used()),
+    consumed,
+    used: () => consumed().size,
+    inFlight: activeReservations,
+    remaining: () => Math.max(0, E_TURN_CAP - consumed().size),
+    canReserve: () => consumed().size >= E_TURN_CAP ? { ok: false, reason: 'cap_reached' }
+      : consumed().size + activeReservations().length >= E_TURN_CAP ? { ok: false, reason: 'concurrent_reservation' }
+        : { ok: true, remaining: E_TURN_CAP - consumed().size, inFlight: activeReservations().length },
     reserve(id, { grant = 'milestone03-e' } = {}) {
-      const entries = read()
-      if (entries.some(entry => entry.id === id && entry.kind !== 'refused'))
-        return { ok: false, reason: 'duplicate_id' }
-      if (used() >= E_TURN_CAP) return { ok: false, reason: 'cap_reached' }
+      if (consumed().has(id) || activeReservations().includes(id)) return { ok: false, reason: 'duplicate_id' }
+      if (consumed().size >= E_TURN_CAP) return { ok: false, reason: 'cap_reached' }
+      if (consumed().size + activeReservations().length >= E_TURN_CAP) return { ok: false, reason: 'concurrent_reservation' }
       const entry = { id, grant, kind: 'reserved', at: new Date().toISOString() }
       writeFileSync(path, `${JSON.stringify(entry)}\n`, { flag: 'a', mode: 0o600 })
-      return { ok: true, entry, remaining: E_TURN_CAP - used() }
+      return { ok: true, entry, used: consumed().size, remaining: E_TURN_CAP - consumed().size }
     },
+    /** Only a turnover of an active reservation; the reservation itself never counted. */
     sent(id, { turnStart = null } = {}) {
-      if (!read().some(entry => entry.id === id && entry.kind === 'reserved')) return { ok: false, reason: 'not_reserved' }
-      const entry = { id, kind: 'sent', turnStart, at: new Date().toISOString() }
-      writeFileSync(path, `${JSON.stringify(entry)}\n`, { flag: 'a', mode: 0o600 })
-      return { ok: true, entry }
+      if (!activeReservations().includes(id)) return { ok: false, reason: 'not_reserved' }
+      writeFileSync(path, `${JSON.stringify({ id, kind: 'sent', turnStart, at: new Date().toISOString() })}\n`, { flag: 'a', mode: 0o600 })
+      return { ok: true, used: consumed().size }
     },
     unknown(id, reason) {
-      if (!read().some(entry => entry.id === id && entry.kind === 'reserved')) return { ok: false, reason: 'not_reserved' }
-      const entry = { id, kind: 'unknown', reason, at: new Date().toISOString() }
-      writeFileSync(path, `${JSON.stringify(entry)}\n`, { flag: 'a', mode: 0o600 })
-      return { ok: true, entry }
+      if (!activeReservations().includes(id)) return { ok: false, reason: 'not_reserved' }
+      writeFileSync(path, `${JSON.stringify({ id, kind: 'unknown', reason, at: new Date().toISOString() })}\n`, { flag: 'a', mode: 0o600 })
+      return { ok: true, used: consumed().size }
     },
-    /** An unknown send is never retried with a new id; a retry needs the original id reconciled first. */
-    canRetryAfterUnknown(id) {
-      return !read().some(entry => entry.kind === 'unknown' && entry.id === id)
+    /** Setup failed before any write: cancel the in-flight reservation without consuming a turn. */
+    cancel(id, reason = 'setup_failed_unsent') {
+      if (!activeReservations().includes(id)) return { ok: false, reason: 'not_reserved' }
+      writeFileSync(path, `${JSON.stringify({ id, kind: 'cancelled', reason, at: new Date().toISOString() })}\n`, { flag: 'a', mode: 0o600 })
+      return { ok: true, used: consumed().size }
+    },
+    /**
+     * Corrects an earlier send record only when a consumed consumer proved the native turn was never
+     * written (for example the product blocked dependency preparation before any attempt start).
+     */
+    correctUnsent(id, { reason = 'proven_unsent_setup_failure', evidence = '' } = {}) {
+      const entries = read()
+      const send = entries.filter(entry => entry.id === id && ['sent', 'unknown'].includes(entry.kind))
+      if (send.length === 0) return { ok: false, reason: 'no_send_recorded' }
+      if (entries.some(entry => entry.id === id && entry.kind === 'unsent_confirmed')) return { ok: false, reason: 'already_corrected' }
+      writeFileSync(path, `${JSON.stringify({ id, kind: 'unsent_confirmed', reason, evidence, at: new Date().toISOString() })}\n`, { flag: 'a', mode: 0o600 })
+      return { ok: true, used: consumed().size, remaining: E_TURN_CAP - consumed().size }
+    },
+    canRetry(id) {
+      const last = read().filter(entry => entry.id === id).at(-1)?.kind
+      return last !== 'unknown'
     },
   }
 }
 
 /**
- * Applies a patch to an independent copy of the project baseline and runs its original check.
- * The baseline tree is never modified; the copy is a fresh directory.
+ * Applies a patch to an isolated export of the project baseline and runs its original check.
+ * The export is `git archive HEAD` (no .git, no linked-worktree pointer, no external symlinks); the
+ * baseline index/HEAD/worktree is verified unchanged before and after. A non-empty target is refused.
  */
-export function applyPatchToCopy({ baseline, copy, patchPath, checkArgs = ['--test'] }) {
+export function applyPatchToCopy({ baseline, copy, patchPath, checkArgs = ['--test'], checkCommand = null, gitTop = null }) {
+  const top = gitTop ?? baseline
+  const gitBaseline = args => execFileSync('git', ['-C', top, ...args], { encoding: 'utf8', timeout: 60_000 })
+  const before = { head: gitBaseline(['rev-parse', 'HEAD']).trim(), index: gitBaseline(['write-tree']).trim(),
+    status: gitBaseline(['status', '--porcelain']).trim() }
+  if (existsSync(copy) && readdirSyncSafe(copy).length > 0) return { refused: 'target_not_empty' }
   mkdirSync(copy, { recursive: true })
-  cpSync(baseline, copy, { recursive: true, filter: source => !source.includes('/.git/') })
-  const git = args => execFileSync('git', args, { cwd: copy, encoding: 'utf8', timeout: 60_000 })
-  git(['init', '-q'])
-  git(['add', '-A'])
-  git(['-c', 'core.hooksPath=/dev/null', '-c', 'commit.gpgsign=false', '-c', 'user.name=Fixture', '-c', 'user.email=fixture@localhost', 'commit', '-qm', 'baseline'])
-  const applied = execFileSync('git', ['apply', '--check', patchPath], { cwd: copy, encoding: 'utf8', timeout: 60_000 })
-  execFileSync('git', ['apply', patchPath], { cwd: copy, timeout: 60_000 })
-  const check = execFileSync(process.execPath, checkArgs, { cwd: copy, encoding: 'utf8', timeout: 120_000 })
-  return { applied: applied === '' || true, check: String(check).slice(-400) }
+  execFileSync('sh', ['-c', `git -C "${top}" archive HEAD | tar -x -C "${copy}"`], { timeout: 300_000 })
+  // Refuse an export that kept any .git pointer, link or out-of-bounds symlink.
+  const pointers = walk(copy).filter(entry => entry.endsWith('.git') || entry.includes('/.git/'))
+  const links = walkLinks(copy)
+  if (pointers.length > 0) return { refused: 'git_pointer_in_export', pointers }
+  if (links.length > 0) return { refused: 'symlink_out_of_bounds', links }
+  // git apply runs on the plain exported tree; no index or repository is created in the copy.
+  execFileSync('git', ['-C', copy, 'apply', '--check', patchPath], { timeout: 60_000 })
+  execFileSync('git', ['-C', copy, 'apply', patchPath], { timeout: 60_000 })
+  const check = checkCommand
+    ? execFileSync(process.execPath, ['-e', checkCommand], { cwd: copy, encoding: 'utf8', timeout: 300_000 })
+    : execFileSync('npm', ['test', '--silent'], { cwd: copy, encoding: 'utf8', timeout: 300_000 })
+  const after = { head: gitBaseline(['rev-parse', 'HEAD']).trim(), index: gitBaseline(['write-tree']).trim(),
+    status: gitBaseline(['status', '--porcelain']).trim() }
+  return { exported: true, check: String(check).slice(-400), applied: true,
+    baselineUnchanged: before.head === after.head && before.index === after.index && before.status === after.status,
+    before, after }
+}
+
+function readdirSyncSafe(dir) { try { return execFileSync('sh', ['-c', `ls -A "${dir}"`], { encoding: 'utf8' }).split('\n').filter(Boolean) } catch { return [] } }
+function walk(dir) { return execFileSync('sh', ['-c', `find "${dir}" -name .git -print`], { encoding: 'utf8' }).split('\n').filter(Boolean) }
+function walkLinks(dir) {
+  const realRoot = realpathSync(dir)
+  const out = execFileSync('sh', ['-c', `find "${dir}" -type l -print`], { encoding: 'utf8' }).split('\n').filter(Boolean)
+  return out.filter(link => {
+    const target = execFileSync('readlink', [link], { encoding: 'utf8' }).trim()
+    if (target.startsWith('/')) return true
+    const resolved = resolve(dirname(link), target)
+    return resolved !== realRoot && !resolved.startsWith(`${realRoot}/`)
+  })
 }
 
 /**
- * Makes an importable Git project from a real source backup: copies the source tree, adds the
- * named check script if the source has no test entry, and commits. `check` is the project's declared
- * verification command for the product import form.
+ * Makes an importable Git project from a real repository working tree. The source is copied as-is
+ * (node_modules included, so the project's own checks are runnable) but its .git is never copied:
+ * the backup gets a fresh repository, so no index/HEAD/link points at the original project.
  */
-export function prepareBackupProject({ source, target, name, testSource = null, check = 'node_test' }) {
+export function prepareRealProject({ source, target, name }) {
   mkdirSync(target, { recursive: true })
-  cpSync(source, target, { recursive: true, filter: path => !path.includes('/node_modules/') })
-  if (testSource) {
-    mkdirSync(join(target, 'test'), { recursive: true })
-    cpSync(testSource, join(target, 'test', 'project.test.mjs'))
-  }
-  writeFileSync(join(target, 'package.json'), `${JSON.stringify({ name, private: true, type: 'module', scripts: { test: 'node --test' } }, null, 2)}\n`)
-  const git = args => execFileSync('git', args, { cwd: target, stdio: 'pipe' })
+  // cp -R preserves the dependency tree (including pnpm links inside it); .git is excluded by name.
+  execFileSync('sh', ['-c', `cd "${source}" && tar --exclude=.git -cf - . | tar -xf - -C "${target}"`], { timeout: 300_000 })
+  const git = args => execFileSync('git', ['-C', target, ...args], { encoding: 'utf8', timeout: 60_000 })
   git(['init', '-q'])
   git(['add', '-A'])
-  git(['-c', 'core.hooksPath=/dev/null', '-c', 'commit.gpgsign=false', '-c', 'user.name=Fixture', '-c', 'user.email=fixture@localhost', 'commit', '-qm', 'real source backup'])
-  const head = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: target, encoding: 'utf8' }).trim()
-  return { path: target, name, check, head }
+  git(['-c', 'core.hooksPath=/dev/null', '-c', 'commit.gpgsign=false', '-c', 'user.name=Fixture', '-c', 'user.email=fixture@localhost', 'commit', '-qm', 'real project backup'])
+  const head = git(['rev-parse', 'HEAD']).trim()
+  const packageJson = JSON.parse(readFileSync(join(target, 'package.json'), 'utf8'))
+  return { path: target, name, head, packageJson, testScript: packageJson.scripts?.test ?? null }
+}
+
+/** Runs the project's original test command and extracts the non-zero test count. */
+export function runProjectCheck(projectPath, { timeoutMs = 180_000 } = {}) {
+  const started = Date.now()
+  const result = spawnSync('npm', ['test', '--silent'], { cwd: projectPath, encoding: 'utf8', timeout: timeoutMs })
+  const output = `${result.stdout ?? ''}${result.stderr ?? ''}`
+  const passed = output.match(/Tests\s+(\d+)\s+passed/iu) ?? output.match(/# pass (\d+)/u) ?? output.match(/ℹ pass (\d+)/u)
+  const failed = output.match(/Tests\s+(\d+)\s+failed/iu) ?? output.match(/ℹ fail (\d+)/u)
+  return { exit: result.status, passed: passed ? Number(passed[1]) : null, failed: failed ? Number(failed[1]) : 0,
+    tail: output.slice(-600), durationMs: Date.now() - started }
 }

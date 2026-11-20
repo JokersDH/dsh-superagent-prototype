@@ -1,0 +1,223 @@
+{
+  "milestone": "03",
+  "kind": "final-scope-evidence",
+  "at": "2026-11-20T05:29:50.825Z",
+  "package": {
+    "zip": "/Users/hh/Desktop/joker/pa-artifacts/m03-preview-d3ba0ec/PersonalAgent-Preview-d3ba0ec.zip",
+    "outerSha256": "163b32170680bcbdb324a4fd8edc631bdfb685633911a787c3b3de353577075b",
+    "outerBytes": 63575237,
+    "expectedOuterSha256": "163b32170680bcbdb324a4fd8edc631bdfb685633911a787c3b3de353577075b",
+    "outerMatches": true,
+    "source": "83f79e8249efd68f429f2b6828ea233278071737",
+    "buildId": "d3ba0ec6dccc5eac",
+    "innerTarSha256": "52eee9083b4d2256a58189327c93605c157e38f5cd44894482a82c6198f56123",
+    "innerTarBytes": 20631227,
+    "identityMatches": true,
+    "installDir": "/tmp/pa-e-m03-live/install",
+    "consoleURL": "http://127.0.0.1:56993",
+    "apiURL": "http://127.0.0.1:56994",
+    "stateRoot": "/Users/hh/Library/Application Support/PersonalAgent/Preview-d3ba0ec6dccc5eac/data",
+    "instancePid": 93025,
+    "startEntry": "Start.command -> personal-preview-launcher.mjs start (bundled runtime/bin/node)"
+  },
+  "readiness": {
+    "status": 200,
+    "execution": {
+      "state": "available",
+      "kind": "native"
+    },
+    "development": "configuration_present",
+    "admittedNative": 1,
+    "reviewActivityAvailable": true,
+    "modelSavedNotConnected": true,
+    "modelMode": 384,
+    "modelPath": "/tmp/pa-e-m03-live/model/model.json"
+  },
+  "executor": {
+    "status": "PASS",
+    "available": true,
+    "authPresent": true,
+    "version": "codex-cli 0.164.0",
+    "evidenceStatus": "PASS_REAL_NATIVE_PRODUCT"
+  },
+  "storage": {
+    "localKeys": [],
+    "sessionKeys": [],
+    "cookieNames": [],
+    "containsModelKey": false,
+    "credentialsInBrowserStorage": false
+  },
+  "ledger": {
+    "used": 3,
+    "remaining": 0,
+    "entries": [
+      {
+        "id": "m03-project-alpha",
+        "grant": "milestone03-e",
+        "kind": "reserved",
+        "at": "2026-11-20T03:03:24.234Z"
+      },
+      {
+        "id": "m03-project-alpha",
+        "kind": "sent",
+        "turnStart": "2026-11-20T03:03:25.400Z",
+        "at": "2026-11-20T03:03:25.400Z"
+      },
+      {
+        "id": "m03-alpha-v2",
+        "grant": "milestone03-e",
+        "kind": "reserved",
+        "at": "2026-11-20T04:39:28.316Z"
+      },
+      {
+        "id": "m03-alpha-v2",
+        "kind": "sent",
+        "turnStart": "2026-11-20T04:39:29.994Z",
+        "at": "2026-11-20T04:39:29.994Z"
+      },
+      {
+        "id": "m03-alpha-v2",
+        "kind": "unsent_confirmed",
+        "reason": "environment_preparation_blocked_before_native_start",
+        "evidence": "ticket 483eb7a6 assignment pending; UI 依赖环境 准备受阻/环境未获确认; no native attempt or candidate; no codex child",
+        "at": "2026-11-20T04:58:25.715Z"
+      },
+      {
+        "id": "m03-a-v3",
+        "grant": "milestone03-e",
+        "kind": "reserved",
+        "at": "2026-11-20T05:10:40.327Z"
+      },
+      {
+        "id": "m03-a-v3",
+        "kind": "sent",
+        "turnStart": "2026-11-20T05:11:13.000Z",
+        "at": "2026-11-20T05:12:26.697Z"
+      },
+      {
+        "id": "m03-b-v3",
+        "grant": "milestone03-e",
+        "kind": "reserved",
+        "at": "2026-11-20T05:16:47.321Z"
+      },
+      {
+        "id": "m03-b-v3",
+        "kind": "sent",
+        "turnStart": "2026-11-20T05:17:23.692Z",
+        "at": "2026-11-20T05:17:23.692Z"
+      }
+    ]
+  },
+  "works": {
+    "alpha3": {
+      "workId": "a68880e9f1a46085f044fad0c74ff191",
+      "project": "tokens-a",
+      "task": "bug_fix",
+      "goal": "修复当前项目中 `npm test` 的失败：运行测试定位回归，修改实现使全部测试通过；不要修改或删除任何测试文件。完成后简要说明根因。",
+      "outcome": "candidate",
+      "accepted": true,
+      "patchBytes": 470,
+      "machineCheckPass": true,
+      "liveCheck": {
+        "viewed": true,
+        "pass": true,
+        "tail": "s\",\n    \"checkDefinitionRef\": \"check-project-00ce3048af7981fb883268de\",\n    \"definitionRevision\": 1\n  }\n]\n关闭预览\n交付记录\n更新于 13:29\n接受记录可核对\n就绪后等待\n3 分 29 秒\n可见活动\n部分\n2 秒\n交付结果已记录\n11/20 13:14\n记录来源\n人工接受已记录\n11/20 13:14\n记录来源\n检查结果已记录\n11/20 13:11\n记录来源\n执行状态已记录\n11/20 13:11\n记录来源\n执行状态已记录\n11/20 13:11\n记录来源\n执行状态已记录\n11/20 13:10\n记录来源\n执行状态已记录\n11/20 13:10\n记录来源\n执行状态已记录\n11/20 13:10\n记录来源\n合同已修订\n11/20 13:10\n合同版本 1\n记录来源\n执行任务已关联\n11/20 13:10\n合同版本 1\n记录来源\n工作已创建\n11/20 13:10\n记录来源\n工作历史\n可用动作\n继续工作\n\n派工控制 revision 0 · 未暂停\n\n待决定\n0\n\n没有待决定问题。"
+      },
+      "verification": {
+        "applied": true,
+        "baselineUnchanged": true,
+        "check": "the complete path (0.226291ms)\n✔ returns only values changed by a mode (0.375625ms)\n✔ creates a mode-complete catalog for visual authoring consumers (0.175583ms)\nℹ tests 6\nℹ suites 0\nℹ pass 6\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 44.951417\n"
+      },
+      "baseline": {
+        "path": "/tmp/pa-e-m03-live/projects3/token-engine-a",
+        "head": "057bf1d7d551151334e71ea4bc91f547bc9f3e98",
+        "status": "",
+        "remotes": "",
+        "branches": "main"
+      }
+    },
+    "beta3": {
+      "workId": "749f5756c3dd284886dd008de2341a18",
+      "project": "tokens-b",
+      "task": "feature",
+      "goal": "为当前包增加一个小功能：新增导出函数 resolveTokenValue(document, name)，返回该 token 解析后的 value，未找到时返回 null；新增对应测试覆盖命中与未命中；确保 `npm test` 全部通过，不要修改现有测试断言。",
+      "outcome": "candidate",
+      "accepted": true,
+      "patchBytes": 2230,
+      "machineCheckPass": true,
+      "liveCheck": {
+        "viewed": true,
+        "pass": true,
+        "tail": "ts\",\n    \"checkDefinitionRef\": \"check-project-701f9d683fd4197e072d35f1\",\n    \"definitionRevision\": 1\n  }\n]\n关闭预览\n交付记录\n更新于 13:29\n接受记录可核对\n就绪后等待\n1 分 5 秒\n可见活动\n部分\n2 秒\n交付结果已记录\n11/20 13:18\n记录来源\n人工接受已记录\n11/20 13:18\n记录来源\n检查结果已记录\n11/20 13:17\n记录来源\n执行状态已记录\n11/20 13:17\n记录来源\n执行状态已记录\n11/20 13:17\n记录来源\n执行状态已记录\n11/20 13:16\n记录来源\n执行状态已记录\n11/20 13:16\n记录来源\n执行状态已记录\n11/20 13:16\n记录来源\n合同已修订\n11/20 13:16\n合同版本 1\n记录来源\n执行任务已关联\n11/20 13:16\n合同版本 1\n记录来源\n工作已创建\n11/20 13:16\n记录来源\n工作历史\n可用动作\n继续工作\n\n派工控制 revision 0 · 未暂停\n\n待决定\n0\n\n没有待决定问题。"
+      },
+      "verification": {
+        "applied": true,
+        "baselineUnchanged": true,
+        "check": "h the complete path (0.166042ms)\n✔ returns only values changed by a mode (0.088084ms)\n✔ creates a mode-complete catalog for visual authoring consumers (0.27725ms)\nℹ tests 8\nℹ suites 0\nℹ pass 8\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 45.62125\n"
+      },
+      "baseline": {
+        "path": "/tmp/pa-e-m03-live/projects3/token-engine-b",
+        "head": "e38861b8d67cfc1b32b8bce69d94313dfb393d4b",
+        "status": "",
+        "remotes": "",
+        "branches": "main"
+      }
+    }
+  },
+  "reopen": {
+    "stopped": "STOPPED",
+    "running": "RUNNING",
+    "console": "http://127.0.0.1:56993",
+    "works": [
+      {
+        "key": "alpha3",
+        "workId": "a68880e9f1a46085f044fad0c74ff191",
+        "projectPath": "/tmp/pa-e-m03-live/projects3/token-engine-a",
+        "projectVisible": true,
+        "goalVisible": true,
+        "delivered": true,
+        "candidate": true,
+        "acceptanceRecord": true,
+        "acceptanceBody": "交付记录\n更新于 13:20\n接受记录可核对\n就绪后等待\n3 分 29 秒\n可见活动\n部分\n2 秒\n交付结果已记录\n11/20 13:14\n记录来源\n人工接受已记录\n11/20 13:14\n记录来源\n检查结果已记录\n11/20 13:11\n记录来源\n执行状态已记录\n11/20 13:11\n记录来源\n执行状态已记录\n11/20 13:11\n记录来源\n执行状态已记录\n11/20 13:10\n记录来源\n执行状态已记录\n11/20 13:10\n记录来源\n执行状态已记录\n11/20 13:10\n记录来源\n合同已修订\n11/20 13:10\n合同版本 1\n记录来源\n执行任务已关联\n11/20 13:10\n合同版本 1\n记录来源\n工作已创建\n11/20 13:10\n记录来源\n工作历史\n可用动作\n继续工作\n\n派工控制 revision 0 · 未暂停\n\n待决定\n0\n\n没有待决定问题。"
+      },
+      {
+        "key": "beta3",
+        "workId": "749f5756c3dd284886dd008de2341a18",
+        "projectPath": "/tmp/pa-e-m03-live/projects3/token-engine-b",
+        "projectVisible": true,
+        "goalVisible": true,
+        "delivered": true,
+        "candidate": true,
+        "acceptanceRecord": true,
+        "acceptanceBody": "交付记录\n更新于 13:20\n接受记录可核对\n就绪后等待\n1 分 5 秒\n可见活动\n部分\n2 秒\n交付结果已记录\n11/20 13:18\n记录来源\n人工接受已记录\n11/20 13:18\n记录来源\n检查结果已记录\n11/20 13:17\n记录来源\n执行状态已记录\n11/20 13:17\n记录来源\n执行状态已记录\n11/20 13:17\n记录来源\n执行状态已记录\n11/20 13:16\n记录来源\n执行状态已记录\n11/20 13:16\n记录来源\n执行状态已记录\n11/20 13:16\n记录来源\n合同已修订\n11/20 13:16\n合同版本 1\n记录来源\n执行任务已关联\n11/20 13:16\n合同版本 1\n记录来源\n工作已创建\n11/20 13:16\n记录来源\n工作历史\n可用动作\n继续工作\n\n派工控制 revision 0 · 未暂停\n\n待决定\n0\n\n没有待决定问题。"
+      }
+    ],
+    "at": "2026-11-20T05:20:51.055Z"
+  },
+  "commands": [
+    "node tests/product-acceptance/m03-e-acceptance.mjs --prep",
+    "node tests/product-acceptance/m03-e-acceptance.mjs --prepare3",
+    "node tests/product-acceptance/m03-e-acceptance.mjs --work3=alpha",
+    "node tests/product-acceptance/m03-e-acceptance.mjs --resume3=alpha",
+    "node tests/product-acceptance/m03-e-acceptance.mjs --accept3=alpha",
+    "node tests/product-acceptance/m03-e-acceptance.mjs --work3=beta",
+    "node tests/product-acceptance/m03-e-acceptance.mjs --accept3=beta",
+    "node tests/product-acceptance/m03-e-acceptance.mjs --reopen",
+    "node tests/product-acceptance/m03-audit.mjs"
+  ],
+  "scope": {
+    "1-normal-first-start": "PASS same-machine: exact package identity, private model GUI save (0600, saved != connected), Codex version/auth PASS, execution native available, development configuration_present; no credentials in browser storage/package.",
+    "2-two-real-projects": "PASS: two different upstream repositories (OpenBitFun and bitfun_ade_sdk token-engine) imported as Git backups with original package.json/tests/engines; one seeded real regression fixed and one feature added; each original check rerun.",
+    "3-workbench": "PARTIAL: real progress phases and explicit stop observed through normal UI; no original question/approval trigger occurred; same-Work supplement not exercised because the 3-turn E budget was exhausted.",
+    "4-machine-check-and-human-accept": "PASS: machine check PASS viewed in UI, explicit accept recorded, downloaded patch applied only to an independent baseline export; original check passed; baseline HEAD/index/status unchanged; no merge/push.",
+    "5-normal-reopen": "PASS: packaged launcher stop/start, both original projects, Works, candidates, artifacts and acceptance records visible.",
+    "6-installed-journey": "PASS same-machine: fixed source/build package installed in a new directory with private roots and ports through Start.command only; cross-machine NOT_TESTED (no second Mac)."
+  },
+  "limitations": [
+    "Same-machine darwin-arm64 package only; cross-machine is NOT_TESTED (no second Mac).",
+    "E used exactly 3 actual Codex turns: one early attempt was blocked before any native start (recorded unsent_confirmed), plus the two accepted deliveries.",
+    "No pending original question or approval/clarification trigger occurred, so the question centre was not exercised with a live question; plan-mode limits were not triggered.",
+    "A same-Work supplement would require another native turn; the 3-turn budget was exhausted, so it is reported as not exercised rather than passed.",
+    "The two real projects are standalone Git backups of token-engine from two different upstream repositories (OpenBitFun, bitfun_ade_sdk), preserving origin package.json, tests and engine declarations."
+  ]
+}
