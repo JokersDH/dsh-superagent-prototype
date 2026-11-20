@@ -5,7 +5,7 @@ export const CONFIGURATION_PROTOCOL = 'application-configuration/1' as const
 const label = z.string().trim().min(1).max(160)
 const ids = z.array(IdSchema).max(128).readonly()
 const unique = (values: readonly { id: string }[]) => new Set(values.map((value) => value.id)).size === values.length
-export const ExecutionUnavailableReasonSchema = z.enum(['not_installed', 'incompatible_version', 'unsupported_platform', 'probe_failed', 'not_admitted', 'operator_disabled', 'recovery_readonly'])
+export const ExecutionUnavailableReasonSchema = z.enum(['not_installed', 'incompatible_version', 'unsupported_platform', 'probe_failed', 'not_admitted', 'needs_auth', 'operator_disabled', 'recovery_readonly'])
 export const ExecutionAvailabilitySchema = z.discriminatedUnion('state', [
   z.strictObject({ state: z.literal('available'), kind: z.enum(['native', 'controlled_fixture']) }),
   z.strictObject({ state: z.literal('unavailable'), reason: ExecutionUnavailableReasonSchema }),

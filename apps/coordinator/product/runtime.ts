@@ -77,7 +77,8 @@ export function createProductRuntime(
 ) {
   const unavailable = options.executionUnavailable === undefined ? undefined : ExecutionUnavailableReasonSchema.parse(options.executionUnavailable)
   if (unavailable && options.native) throw new TypeError('Unavailable execution cannot contain an admitted native runtime')
-  const fixtureProfiles = unavailable ? [] : FIXTURE_PROFILES
+  // A real native runtime never offers the fixed scratch executors as a selectable alternative.
+  const fixtureProfiles = unavailable || options.native ? [] : FIXTURE_PROFILES
   options = {
     ...options,
     principal: structuredClone(options.principal),
@@ -387,8 +388,8 @@ export function createProductRuntime(
         })),
         profiles: [
           ...(unavailable ? [{ id: 'profile-codex-native', revision: 1, driverId: 'codex-native', kind: 'native' as const,
-            displayName: `Codex · ${{ not_installed: '未安装', incompatible_version: '版本未准入', unsupported_platform: '平台未准入', probe_failed: '检测未完成', not_admitted: '尚未准入', operator_disabled: '未启用', recovery_readonly: '恢复只读' }[unavailable]}`,
-            readiness: unavailable === 'not_installed' ? 'missing' as const : unavailable === 'incompatible_version' || unavailable === 'unsupported_platform' ? 'incompatible' as const : 'needs_setup' as const }] : []),
+            displayName: `Codex · ${{ not_installed: '未安装', incompatible_version: '版本未准入', unsupported_platform: '平台未准入', probe_failed: '检测未完成', not_admitted: '尚未准入', needs_auth: '尚未登录', operator_disabled: '未启用', recovery_readonly: '恢复只读' }[unavailable]}`,
+            readiness: unavailable === 'not_installed' ? 'missing' as const : unavailable === 'needs_auth' ? 'needs_auth' as const : unavailable === 'incompatible_version' || unavailable === 'unsupported_platform' ? 'incompatible' as const : 'needs_setup' as const }] : []),
           ...(options.native
             ? [
                 {
@@ -410,7 +411,7 @@ export function createProductRuntime(
             readiness: 'fixture_ready' as const,
           })),
         ],
-        checks: (unavailable ? [] : [...new Set([FIXTURE_CHECK, ...currentNative.map(project => project.check.id)])])
+        checks: (unavailable ? [] : [...new Set([...(fixtureProfiles.length ? [FIXTURE_CHECK] : []), ...currentNative.map(project => project.check.id)])])
           .map((id) => ({ id, revision: checks.require(id).revision, displayName: checks.require(id).title ?? id })),
         enabledProfileIds: options.startupMode === 'recovery_readonly' ? [] : [...(options.native ? [options.native.profile.id] : []), ...fixtureProfiles],
         executionAvailability: options.startupMode === 'recovery_readonly' ? { state: 'unavailable', reason: 'recovery_readonly' }

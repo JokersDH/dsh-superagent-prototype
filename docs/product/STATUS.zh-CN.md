@@ -1,5 +1,7 @@
 # 产品进度、完成度与当前可用范围
 
+2026-11-19当前：用户已开启[里程碑03日常可用版交付](MILESTONE-03.zh-CN.md)，main/D/E主动，B/F按实际阻断参与。main已指定83f79e82为D可冻结源码，正常启动/登录提示/明确导入/重开有source层证据；真实两项目与同包验收尚未完成，不增加下列82/100、63.1%计分。下文关闭后“全部待命”及旧恢复派工仅作历史。
+
 日期：2026-11-19。本次只核主动B/H固定交付并继续原主线；其余八位待命，不为用满人数扩任务。读者入口：[如何使用](../ASSISTANT-GUIDE.zh-CN.md)、[架构](ARCHITECTURE.zh-CN.md)、[创新](INNOVATION.zh-CN.md)。
 
 当前以[两里程碑完成汇总](MILESTONES-01-02.zh-CN.md)为准：Recovery01真实Codex运行中自有coordinator SIGKILL后同原Work检查/人工接受/delivered成功，1 turn/1 SIGKILL/原begin1；Milestone02真实工作台审批允许/拒绝、plan澄清、steer、物理停止、未知结果只读核对均通过，5/6实际turn。两者均6/6关闭，临时修改权恢复原表、全部agent待命，不自动开新里程碑。原十二项重评**82/100、方案B不含CAC63.1%**；非完整发行准入。以下旧估算和未关闭描述按历史阅读。

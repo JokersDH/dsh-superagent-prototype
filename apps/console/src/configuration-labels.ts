@@ -6,6 +6,7 @@ export const executionUnavailableLabel: Record<ExecutionUnavailableReason, strin
   unsupported_platform: '当前平台尚未通过验证',
   probe_failed: 'Codex 检测未完成',
   not_admitted: 'Codex 尚未通过验证',
+  needs_auth: 'Codex 尚未登录，请先在终端运行 codex login，再重开本实例',
   operator_disabled: '开发执行已关闭',
   recovery_readonly: '恢复数据只读',
 }

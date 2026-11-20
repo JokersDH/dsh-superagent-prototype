@@ -9,7 +9,7 @@ const unavailable = { protocol: 'application-configuration/1', revision: 'a'.rep
   executionAvailability: { state: 'unavailable', reason: 'not_installed' } }
 test('unavailable execution exposes discussion without inventing a machine check or dispatch grant', () => {
   assert.ok(ApplicationConfigurationSchema.safeParse(unavailable).success)
-  for (const reason of ['not_installed', 'incompatible_version', 'unsupported_platform', 'probe_failed', 'not_admitted', 'operator_disabled', 'recovery_readonly'])
+  for (const reason of ['not_installed', 'incompatible_version', 'unsupported_platform', 'probe_failed', 'not_admitted', 'needs_auth', 'operator_disabled', 'recovery_readonly'])
     assert.ok(ApplicationConfigurationSchema.safeParse({ ...unavailable, executionAvailability: { state: 'unavailable', reason } }).success)
   assert.equal(ApplicationConfigurationSchema.safeParse({ ...unavailable, executionAvailability: { state: 'unavailable', reason: '/private/raw-diagnostic' } }).success, false)
   assert.equal(ApplicationConfigurationSchema.safeParse({ ...unavailable, executionAvailability: { state: 'available', kind: 'native' } }).success, false)
