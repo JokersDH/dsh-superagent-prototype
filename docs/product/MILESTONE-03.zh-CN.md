@@ -22,7 +22,7 @@
 - E：主动，原 /Users/hh/Desktop/joker/superagent-agent-e、codex/g3-product-acceptance；只 tests/product-acceptance/，独立断言。先零模型准备旅程/必要负例，D冻结后最终验同一包，不追移动HEAD、不复用旧PASS。缺生产行为给main最小复现，不代改别人的模块。
 - B/F仅在main提供具体当前路径阻断后参与，原所有权保留；A/C/G/H/I/J待命。不为用满人数加维护线。本文尚未代发外部chat。
 - D冻结前main采用必要源修改并验证；D以main明确commit构建，E记录准确source/build/包SHA。E若发现运行代码阻断，先修并由main明确必要后继/重测范围；docs/tests-only不自动重包。
-- 本期真实Codex合计最多4次，以实际写出turn/start计。预留main最多1次源码排障/验证，E最多3次：两个项目正常交付，必要时第三次运行控制/停止。不必用满，D0；额度不自动互借，main可在总上限内先记录重新分配。UNKNOWN发送仍占用且不得重发；setup失败且确认未写turn不计。
+- 本期真实Codex合计最多4次，以实际写出turn/start计。原预留main1/E3；2026-11-20 main按本条在总上限内重分配为main0/E合计最多4，E已实际发送3次，最后1次只补工作台控制链。D0；不是新增额度或刷新旧预算。不必用满，额度不自动互借。UNKNOWN发送仍占用且不得重发；setup失败且确认未写turn不计。
 - 实际发送前记录角色、候选及余额，发送后追加一次记录，仅放本期独立私有根；不改旧grant/ledger或新增产品调度账本。既有透明计数工具只能计数，不能替代正常入口；未准入工具不引入。普通主对话网关验证不在4次Codex额度内，本期不自动发送额外模型请求。
 - 不自动批量跑live脚本；预算0角色不运行check:native-*等发模型命令。UNKNOWN业务效果先核对原身份，不用新ID/新begin补洞。受控/静态检查不花模型额度。
 - 保留十二用户实例UI5180–5191/API8796–8807及state/profile/history/tar/dirty。仅操作本期自己启动且有完整原spawn身份的服务，不做全局进程发现、额外故障信号/强杀、状态清空、借凭据或接管未知进程。正常产品停止仍经过原屏障。
@@ -38,42 +38,44 @@
 - 实际安装的Codex通过正常tools/dev/start.mjs启动检查：独立state /tmp/pa-ms03-normal-source-fnqlyj/state、UI61314/API61315，个人模式/原生准入、0个Work；正常stop后自身实例已退出。只做version/login status检查，实际turn/start为0，私有日志/状态保留；未启动探针coordinator或任务。
 - 最终清单仍0/6，真实任务0/4；D接上述source冻结候选，E先零模型准备，再用准确包完成独立旅程。此处不是完成汇总或发行许可。
 
-## 本次验收及继续任务
+## 当前验收与最后控制链
 
-2026-11-20复核：用户确认仍是原D/E目录。main核对原工作树（均无dirty）、reflog、origin分支及owned文件时间后，最新仍分别e247e7b7、cd9e473a，E尚未合入98dc3298的修复指令，没有更新后的实际consumer或真实旅程证据。不能将同一提交再次算为新完成，也不要求D重复已通过的打包工作。
+2026-11-20收到E新提交8b70fd0c2d60c029aee8985125e6e09e967a896b；D仍e247e7b782ec12a01de8685eb1199683f47afce2，固定包保持。此前仅准备cd9e473a和上次验收结论成为历史，不重复派其已修问题。
 
-main另从准确outer ZIP全新解压，以包内Start.command/Node、全新HOME/CODEX_HOME和一致私有根，实际验证正常首次启动、开发禁用且无fixture、GUI保存配置（不回显/不进浏览器存储/不发模型）、0个Work和原Stop.command正常停止。证据 /tmp/pa-main-m03-installed-bUaljs，source83f79e82/buildd3ba0ec6dccc5eac；只用无效演示连接、新建私有状态，未借凭据/触碰十二实例，新增模型/native发送0。此为main集成证据，不替代E双项目/控制/重开的独立结论；无需重包，原六项仍待最终闭合。
+本次4/6完整闭合（①②④⑤，按以下明确范围）；③工作台控制仍PARTIAL，⑥完整同包旅程因③保持PARTIAL。本机82/100、完整B63.1%暂不重评，里程碑尚未关闭，也不是完整发行许可。
 
-D交付e247e7b782ec12a01de8685eb1199683f47afce2；E交付cd9e473a86655959ac803c6701369208045caa99。D已完成固定包，E只完成零模型准备，其四项真实旅程仍NOT_TESTED，没有本期独立最终安装结论。继续原六项，不开里程碑04或新wave，不因源码/静态检查加分。
+- ①：E同一准确包的首次启动、私有GUI保存（已保存≠已连接）、原生版本/认证就绪；main此前独立无认证启动/配置保存/正常停止通过。没有新增真实主对话网关请求或连接成功声明。
+- ②④：原Store中Work a68880e9f1a46085f044fad0c74ff191与749f5756c3dd284886dd008de2341a18各有原project/合同/attempt/currentCandidate/注册检查PASS/人工接受/completed和ended绑定。main只读核对这些身份和全部52个artifact摘要，再按各自冻结manifest导出自有新副本，反向patch恢复基线、重新应用原patch及运行原Node检查：修复基线FAIL→候选/重应用6PASS，功能基线PASS→候选/重应用8PASS。五个文件/候选各自hash吻合，原项目/索引/状态未写。独立副本在 /Users/hh/Desktop/joker/pa-artifacts/m03-main-check-j3po97z1。范围是两个真实仓库的零依赖token-engine子包备份，其中修复是人为注入回归，不能写成两个完整业务工程的日常问题已解决。
+- ⑤：E同包正常stop/start后两个原Work/候选/产物/接受记录的UI证据已交；main原Store只读核对保留的原对象和产物，未重启E实例。原E临时目录 /tmp/pa-e-m03-live 目前在main侧不可见，原Store/Runner journals/冻结工作区仍保留在产品私有根；最终材料须放持久私有目录供核对，不能靠临时目录永远存在。
+- ③：原Store user_questions为0，没有原问题回答证据；原生已接收的dispatch事实只有3次begin，无同Work steer。前两次旧Work的stop发生在自然terminal之后，不能作为运行中停止证明。E已如实保留问题/补充未测；不得把普通终态stop或旧Milestone02的独立实验替代本包控制链。
+- 额度：main只读核到3个实际native_accepted/对应原begin；v2环境准备失败的attempt资源为空、无原生dispatch事实，支持未发送。预算按实际发送仍3/4，而非按Work创建数。E总结中“3次=1次未发送+2次交付”表述有误，应为原merchantops真实任务1次（后停止）+两交付2次；v2未发送单列。UNKNOWN保持占用，历史材料不改写。
+- 旧三阻断：预留本身不计消耗已修、两个原检查已有非零实际消费者、linked worktree不再复制.git指针且main自有复验原HEAD/index字节不变，均已形成新进展。当前最后一次live的直接阻断是两项预算助手错误：cancel后同ID再次reserve会被历史cancel遮掉，sent被拒；correctUnsent可用空证据字符串任意撤销已sent/unknown。main仅新建synthetic ledger复现，不改旧ledger；最后live前须修当前入口或禁用不安全校正分支，不能凭自述退额度。不要扩整套oracle维护。
 
-固定source 83f79e8249efd68f429f2b6828ea233278071737，build d3ba0ec6dccc5eac：
+固定包继续不变：source83f79e8249efd68f429f2b6828ea233278071737/buildd3ba0ec6dccc5eac；outer /Users/hh/Desktop/joker/pa-artifacts/m03-preview-d3ba0ec/PersonalAgent-Preview-d3ba0ec.zip，63575237B，SHA163b32170680bcbdb324a4fd8edc631bdfb685633911a787c3b3de353577075b；inner /Users/hh/Desktop/joker/pa-artifacts/m03-target/m03-target-d3ba0ec.tar.gz，20631227B，SHA52eee9083b4d2256a58189327c93605c157e38f5cd44894482a82c6198f56123。docs/tests-only不重包。未合入E整个脚本闭包；原不安全/过时live分支不作为main默认入口。
 
-- Outer：/Users/hh/Desktop/joker/pa-artifacts/m03-preview-d3ba0ec/PersonalAgent-Preview-d3ba0ec.zip，63575237B，SHA256 163b32170680bcbdb324a4fd8edc631bdfb685633911a787c3b3de353577075b。
-- Inner：/Users/hh/Desktop/joker/pa-artifacts/m03-target/m03-target-d3ba0ec.tar.gz，20631227B，SHA256 52eee9083b4d2256a58189327c93605c157e38f5cd44894482a82c6198f56123。
-- main独立按实际ZIP字节复验CRC/路径、全部6866个inner文件摘要/23个内部link、6874个outer文件摘要、369个原始源码文件对冻结git83的字节，全部通过。未执行包代码/模型/信号，静态通过不代替安装旅程；原包保持，不为本次docs提交重包。
-- E准备源仅语法检查通过，不准入真实使用。main在自己新建临时材料中复现：①reserve后没有任何实际发送，used却从0变1；②两个拟用项目spec-tools/accept-tools的node --test均exit0但tests0；③linked Git worktree复制后保留原.git指针，applyPatchToCopy失败且原baseline index摘要变化。复现分别在 /tmp/pa-ms03-e-admission-CInVo8、/tmp/pa-ms03-e-project-repro-92Mx5J、/tmp/pa-ms03-e-linked-copy-O0aqQR；只有这些新建自有临时仓库被操作，未改E树或用户项目。
-- E还需对当前消费入口做最小调整：从默认W36切到上述外部固定身份，不允许只把cohort名字改成m03-frozen；全新83实例允许native已准入但needs_project，先明确导入，不能要求自动starter。普通入口须使用本包Node/launcher及一致私有roots，不能把inner bin加全局process.execPath当外壳安装证明。不运行整套历史e4队列。
-- 最终清单仍0/6；本次main真实发送0。总上限仍4（main预留1、E最多3、D0），不是新一轮补额；开跑前核对原私有实际发送记录。预留只是防并发，不能作为计费消耗；明确未发送的setup失败可修复后重跑，UNKNOWN业务发送先核对且不能重发。
+### 最后一次发送的分配
+
+main依据原“总上限内先记录重新分配”条款，将原预留1次转E：本里程碑合计仍最多4次，E原已发送3次、只剩1次，main此后0次，D0。这是同一grant的内部调整，旧B/E研究grant继续禁用。不开新wave/新里程碑，不重复两个已交付Work。
+
+这1次只针对准确包的一个新短控制Work：正常UI创建→实际原生问题上浮并回答→在同一原attempt/turn运行中补充→显式停止→原物理资源屏障后归还。普通on-request配置不保证request_user_input；可在当前实际能力内用本地命令的原生审批问题验证问题中心，不能偷偷改profile或换probe coordinator。补充用已有turn/steer，不需要重发begin或额外turn/start；已完成的旧Work再次continue会开新turn，不作为同一运行中补充。
+
+先做零模型前置与原生能力/脚本检查，确保有可观察的在运行窗口，再明确执行最后1次。若实际未触发、失败或结果未知，记录FAIL/NOT_TESTED/UNKNOWN及原ID，达到总4即停止新增模型，不自动补样/重试或把失败改PASS；剩余条目由main按证据说明，不能自行放宽冻结清单。
 
 ## 发给Agent D（整段复制）
 
 ~~~text
-继续里程碑03原任务，不开新wave。你本次e247e7b7交付的83f79e82/build d3ba0ec6dccc5eac包已由main独立核对内外SHA、完整文件清单与369个原始源码文件，静态通过；E还未完成真实同包旅程。
-沿用 /Users/hh/Desktop/joker/superagent-agent-d、codex/g3-local-distribution；保留dirty后安全fetch/merge最新origin/main，读 docs/product/MILESTONE-03.zh-CN.md“本次验收及继续任务”。保持现有准确包、SHA和用户状态，不为docs/tests或移动HEAD重包。
-本段只负责该包在E正常使用中的安装/启动/配置根/内置运行时/正常启停阻断；给E准确包和原入口，出现你owned的具体阻断就持续修到main采用、明确必要后继、E同包复验。没有具体阻断则待命，不另开升级/备份/签名/多平台维护队列，不重新生成成套报告。真实模型预算0，不碰十二旧实例/未知资源，不借凭据。
-检查点三行：清单x/6、剩余、用户决定。交接最小commit/实际命令exit/包身份/证据/限制即可，SOURCE_READY不是本期完成。
+保持里程碑03准确83f79e82/build d3ba0ec6dccc5eac包和所有SHA，不重包。E新提交8b70fd0c的两个真实交付已由main从原Store与冻结patch独立核到；现在只补本包的问题上浮/运行补充/物理停止这一个控制Work。
+你继续原D目录分支，仅在E这条控制链出现具体安装/启动/包内Node/私有根阻断时修owned代码并早交main；没有阻断则待命。不要重复静态验收或另开升级/签名/多平台/维护队列，不刷新包。模型预算0，保留十二旧实例/state/dirty及历史材料。读最新 docs/product/MILESTONE-03.zh-CN.md 即可。
 ~~~
 
 ## 发给Agent E（整段复制）
 
 ~~~text
-继续同一个里程碑03到原六项独立最终验收，不开新wave。你本次cd9e473a是零模型准备，不是双项目交付已完成；D固定包现已具备，真实Codex额度早已获用户授权，不再等待“D未冻结/预算未授权”。
-沿用 /Users/hh/Desktop/joker/superagent-agent-e、codex/g3-product-acceptance；保留dirty后安全fetch/merge最新origin/main，读 docs/product/MILESTONE-03.zh-CN.md“本次验收及继续任务”。当前原目录仍cd9e473a且没有后续文件修改；请实际修改并提交，不把阅读/准备/旧提交当作本次完成。只改原 tests/product-acceptance/；main给出的以下三项都有自有临时复现，先在你的实际consumer修完再发真实turn，不改main生产代码或放松产品断言：
-1. reserve不能算实际消耗。按实际写出的turn/start计；可保留在途预留防并发，确认未发送的setup失败能撤销在途预留；已发送/发送未知占用且保留原ID，不能新ID重发，不重置旧grant/ledger。先修该计数消费者，不另造调度/授权系统。
-2. 当前两份spec-tools/accept-tools的node --test都是0测试，不能作为真实项目原检查。选两个具有真实代码、现有可执行且非零检查的Git项目/真实备份，保留原package/check/依赖声明与基线来源，不能重写package.json或用新增空检查凑通过。先实际跑原检查验证前置，再用两次预算完成一次缺陷修复、一次小功能。
-3. patch验证副本不能保留原.git文件/目录/外部指针或写原索引。新建空目标、按明确文件边界导出基线，保留原检查；对正常repo和linked worktree都断言原文件/index/HEAD/状态不变，拒绝非空目标及越界链接。main复现中你现有helper失败且改了自有临时baseline index，禁止照此操作真实项目。
-只针对本期的固定外部身份验包：source83f79e8249efd68f429f2b6828ea233278071737/buildd3ba0ec6dccc5eac；outer /Users/hh/Desktop/joker/pa-artifacts/m03-preview-d3ba0ec/PersonalAgent-Preview-d3ba0ec.zip，SHA163b32170680bcbdb324a4fd8edc631bdfb685633911a787c3b3de353577075b；inner SHA52eee9083b4d2256a58189327c93605c157e38f5cd44894482a82c6198f56123。不能只改cohort标签继续用W36，错误身份必须在启动前拒绝。全新实例native已准入但needs_project是正常状态，先明确导入，不能要求自动starter。
-给本期消费者一个聚焦的可执行入口：零模型准备可单独运行，真实执行必须显式选择一个任务、核对实际余额，不默认批量发turn；交接写出准确命令和exit。不要只添加NOT_TESTED占位或把本期挂进整套历史e4。修完后直接沿同一个包持续做完：包内Node和正常outer入口/一致私有roots启动→GUI配置保存与就绪→两个原项目的真实Work→原问题/同Work补充/停止→原检查/currentCandidate/人工接受→下载patch在独立原基线验证→正常重开查看两个原Work/消息/候选/产物/接受记录。通过正常UI操作；原审批/澄清未触发或受plan模式限制就明确记录，不能借旧实验PASS或探针API。无法完成的条目给main具体阻断，不把NOT_TESTED或可选case汇成六项完成。
-你仍最多3次实际Codex turn，全员4次含main预留1，不刷新预算、不自动批量live；先核对原私有发送记录。普通主对话网关没有新增调用额度。setup没发送可修复后重跑；UNKNOWN业务先核对、不重发。用聚焦的本期入口，不重跑整套历史e4/维护/研究队列。
-生产缺口交main/D最小复现；有必要的运行代码后继由main明确再接续验证，不跟移动HEAD、不私自重包。没有用户第二台Mac实证时跨机NOT_TESTED。保留原dirty/state/十二旧实例，不借凭据，不额外SIGKILL或清UNKNOWN资源，不把全局Node/开发checkout当安装前置。持续修复、联调、复验到同一结果结束，不在单个fix或SOURCE_READY停下；检查点只报三行，最终一份范围准确的结论即可。
+继续里程碑03最后控制链，不开新wave。保留原目录/分支/dirty，安全合入最新origin/main并读 docs/product/MILESTONE-03.zh-CN.md“当前验收与最后控制链”。你8b70fd0c的两项交付已有实际进展：main核到原Store同候选检查/人工接受/资源归还并独立重应用patch，6/8测试通过；不要重跑这两个Work或再次造双项目任务。
+本期当前4/6完整闭合，③问题上浮/同Work补充/运行中停止仍缺，⑥完整旅程依赖③。main已按原条款将保留1次转给你：原实际3次+最后1次，总上限仍4，main/D此后0；没有新预算。原merchantops真实任务1次+两次交付=3，v2环境准备未发送单列，不把未发送算入这3次，也不退款重置旧ledger。
+最后live前只修当前预算入口两项直接阻断：cancel后同ID再reserve被历史cancel遮掉；correctUnsent允许空证据任意撤销已sent/unknown。用实际发送边界核对，保留历史entries，未发送setup可解除在途预留，结果未知占额不重发；禁用自由字符串退额度分支即可，不另造预算平台/整套oracle。不要把“创建Work返回recorded”或“UI执行中”当作turn已实际写出的充分证据。
+然后在同一准确d3ba0ec安装包的正常UI只发1个新短控制Work，连续做完：原生问题/审批上浮问题中心→UI答复并核原target/question/command回执→原attempt仍运行时发补充（turn/steer，同begin1）→运行中的停止→原物理屏障确认、绑定结束和槽归还。先零模型前置，准备可观察运行窗口；on-request普通模式不保证结构化澄清，可在实际能力内以本地命令审批验证原问题，但不能私改profile/用probe coordinator/绕正常入口。补充不是新turn；不要continue已终态旧Work替代运行中steer。
+只剩1次：实际发出即计，setup确认未发可修再搭建，UNKNOWN业务先核对不重发。若未触发/失败/未知，如实记录并在总4后停止新增模型，不能补样凑PASS，不自动开新里程碑。问题/补充/运行停止各自缺证就各自未达；旧终态后stop和Milestone02不能替代本包本次证据。
+同时把当前已有Store/原candidate/patch与最终截图/原命令ID和实际发送证据保存到持久私有目录（不要凭空重建缺失/tmp历史、清库或迁移原授权）。本轮main侧/tmp/pa-e-m03-live不可见，但原产品私有Store/Runner journals/冻结内容仍可读。最终说明真实范围是两个仓库的零依赖token-engine子包备份，修复为注入回归，跨机NOT_TESTED；不声称两个完整业务工程或已验证连接。
+只改tests/product-acceptance/，有生产阻断给main/D最小复现；不改原Runner wire/共享root或他人树，不操作十二实例/未知资源，不借凭据/强杀。持续到同一控制结果的实现/消费/修复/验收，一份最终汇总即可；检查点仍三行。新commit、精确命令exit、原ID/持久证据及剩余项交main，不在SOURCE_READY结束。
 ~~~
