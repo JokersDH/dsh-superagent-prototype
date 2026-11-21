@@ -1,5 +1,7 @@
 # Repository Instructions
 
+2026-11-21 startup support: user requested a macOS installer and product manual after a locale-dependent process identity refusal. Desktop0.1.1/source9cb4bb00/builde561bae3a0747acb fixes strict birth comparison and wraps the original launcher in a native AppKit app/DMG. See docs/product/MACOS-0.1.1.zh-CN.md and docs/PRODUCT-GUIDE.zh-CN.md. Only zero-model installed startup/status/duplicate-path/normal-stop/restart checks were run on this new artifact; do not transfer M03 native acceptance to it. Old previews/data/instances remain untouched. D's isolated concrete-blocker fix is imported; no new wave, model allowance or standing dispatch.
+
 2026-11-21 current: milestone03 DAILY USABLE DELIVERY is CLOSED6/6 within the exact package/platform/sample scope. Summary: docs/product/MILESTONE-03-COMPLETION.zh-CN.md. Original4/4 and supplemental main2/2 actual Codex turn/start grants are both exhausted, UNKNOWN writes0 in the supplemental run; all agents standby, main/D/E0 remaining. Historical failures and all old grants/ledgers/roots/dirty/twelve user instances are preserved. Score85/100, full SchemeB excludingCAC65.3%, not full Beta/cross-machine/long-run release approval. No automatic new wave, model task, signals or maintenance dispatch. Original ownership remains; temporary B/H authority stays ended. Three-line checkpoints and one final summary remain.
 
 ## Entry And Current Work

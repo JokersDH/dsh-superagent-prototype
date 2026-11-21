@@ -1,5 +1,7 @@
 # 从这里开始：仓库、代码位置和并行开发
 
+**2026-11-21 安装与启动修复：已有M系列Mac的DMG安装版0.1.1。** 打开DMG，把Personal Agent.app拖到“应用程序”，打开后在浏览器工作台使用。先读[产品使用手册](docs/PRODUCT-GUIDE.zh-CN.md)，安装包位置、准确身份和零模型启动验证见[本次交付](docs/product/MACOS-0.1.1.zh-CN.md)。修复中文环境下process_start误判和重复解压入口；新桌面版使用独立Desktop数据根，旧Preview数据不迁移、不清理。以下M03/W系列保留各自历史验收范围。
+
 **2026-11-21当前：里程碑03日常可用版6/6关闭。** [安装、使用与唯一完成汇总](docs/product/MILESTONE-03-COMPLETION.zh-CN.md) · [使用指南](docs/ASSISTANT-GUIDE.zh-CN.md) · [进度](docs/product/STATUS.zh-CN.md)。M03固定source83f79e82/buildd3ba0ec6dccc5eac在M系列Mac、Codex0.164.0完成同包两项目/问题审批/运行补充停止/正常重开限定验收。本机85/100、完整B不含CAC65.3%，非跨机长期Beta。
 
 原4/4与本次补验2/2额度均已用尽，D/E及其余agent待命，不自动新增模型任务、维护派工或wave。旧任务包已关闭；以下检查点、待办和开工话术仅为历史。

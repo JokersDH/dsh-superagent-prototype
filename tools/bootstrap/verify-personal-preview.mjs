@@ -176,8 +176,11 @@ export function verifyDirectory(input, expected = {}) {
   const checked = inventory(root, outer.files, { self: 'preview-manifest.json', modes: true, policy: true })
   const topFiles = new Set(['Start.command', 'Stop.command', 'Settings.command', 'README.zh-CN.md', 'personal-preview-launcher.mjs',
     'runtime/bin/node', 'runtime/LICENSE', 'preview-manifest.json'])
+  const productDocs = ['产品使用手册.md', '产品使用手册.html']
   for (const path of topFiles) if (path !== 'preview-manifest.json') demand(checked.cache.has(path), 'required_outer_file_missing', path)
-  for (const path of checked.cache.keys()) demand(path.startsWith('install/') || topFiles.has(path), 'unexpected_outer_payload', path)
+  for (const path of checked.cache.keys()) demand(path.startsWith('install/') || topFiles.has(path) || productDocs.includes(path), 'unexpected_outer_payload', path)
+  if (productDocs.some(path => checked.cache.has(path)))
+    demand(productDocs.every(path => checked.cache.has(path)), 'incomplete_product_guide')
   const installRoot = join(root, 'install')
   demand(lstatSync(installRoot).isDirectory() && !lstatSync(installRoot).isSymbolicLink(), 'inner_directory_required')
   const install = jsonFile(join(installRoot, 'install.json')), release = jsonFile(join(installRoot, 'var/config/release.json'))

@@ -14,7 +14,7 @@ if (existsSync(output)) throw new Error('Output already exists; no overwrite')
 const sha = bytes => createHash('sha256').update(bytes).digest('hex')
 const run = (bin, args, options = {}) => {
   const r = spawnSync(bin, args, { encoding: 'utf8', timeout: 120000, maxBuffer: 8 * 1024 * 1024, ...options })
-  if (r.status !== 0 || r.error) throw new Error(basename(bin) + ' failed: ' + (r.error?.message ?? r.stderr).slice(-1600))
+  if (r.status !== 0 || r.error) throw new Error(basename(bin) + ' failed: ' + (r.error?.message || r.stderr.trim() || r.stdout.trim()).slice(-1600))
   return r.stdout
 }
 const sourceRoot = fileURLToPath(new URL('../../', import.meta.url))

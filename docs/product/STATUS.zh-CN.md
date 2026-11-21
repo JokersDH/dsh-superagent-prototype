@@ -2,11 +2,13 @@
 
 2026-11-21。**里程碑03日常可用版6/6关闭**。唯一[完成汇总与安装入口](MILESTONE-03-COMPLETION.zh-CN.md)记录准确包、原Work/问题/命令/资源证据、实际额度及使用方式。[使用指南](../ASSISTANT-GUIDE.zh-CN.md) · [架构](ARCHITECTURE.zh-CN.md) · [创新](INNOVATION.zh-CN.md)。
 
+**当前安装入口改为0.1.1 DMG。** 根据用户反馈，修复中文Terminal造成的process_start身份误判，并提供原生桌面启动窗口和离线[产品手册](../PRODUCT-GUIDE.zh-CN.md)。准确包/来源/验证见[启动修复交付](MACOS-0.1.1.zh-CN.md)。本次新包仅追加零模型启动验证，不增加完成度、不继承旧包真实任务验收。
+
 ## 现在可用什么
 
-M系列Mac上的本地开发助理预览：主对话、明确委托、Git项目导入、隔离worktree、真实Codex执行、集中权限问题、同Work运行补充/停止、注册检查/patch/人工接受、正常重开及历史。当前安装形式为内置Node的ZIP和Start/Stop命令，网页为工作台。
+M系列Mac上的本地开发助理预览：主对话、明确委托、Git项目导入、隔离worktree、真实Codex执行、集中权限问题、同Work运行补充/停止、注册检查/patch/人工接受、正常重开及历史。当前安装形式为内置Node的DMG/.app，开发操作仍在浏览器工作台；历史M03另有ZIP和Start/Stop命令。
 
-准确安装包：source83f79e8249efd68f429f2b6828ea233278071737/buildd3ba0ec6dccc5eac；outer SHA163b32170680bcbdb324a4fd8edc631bdfb685633911a787c3b3de353577075b，inner SHA52eee9083b4d2256a58189327c93605c157e38f5cd44894482a82c6198f56123。原包未因验收工具/文档更新重建。Node24.21.0/ABI137/darwin-arm64、Codex CLI0.164.0是实测组合。
+M03原验收包：source83f79e8249efd68f429f2b6828ea233278071737/buildd3ba0ec6dccc5eac；outer SHA163b32170680bcbdb324a4fd8edc631bdfb685633911a787c3b3de353577075b，inner SHA52eee9083b4d2256a58189327c93605c157e38f5cd44894482a82c6198f56123。原包保持不变。Node24.21.0/ABI137/darwin-arm64、Codex CLI0.164.0是原真实任务实测组合。
 
 E两个真实仓库的零依赖token-engine子包备份交付、原检查/人工接受/patch重应用及重开通过；main在同一冻结包的另一独立安装实例完成真实原生审批答复、同attempt/turn steer、运行停止/屏障归还及正常重开。不同state如实单列，不写成同一次运行。补丁检查在独立基线副本分别6/8测试通过，新增审批和运行控制各原begin1。
 
@@ -50,13 +52,13 @@ E两个真实仓库的零依赖token-engine子包备份交付、原检查/人工
 
 ## 当前版本与历史
 
-- 当前可个人试用的固定包为M03，准确身份/路径见完成汇总。main随后变化仅是验收工具、测试和文档，不将旧运行实例自动升级。
+- 当前安装入口为0.1.1，保留M03原固定包与其限定真实任务证据；新包包含进程语言修复及桌面封装，只追加零模型启动验收。不将旧运行实例自动升级。
 - 用户UI5180–5191/API8796–8807仍是各自启动时的旧代码和状态；不能据仓库HEAD推断它们已具有本包能力。
 - R1/R2/W32/W33/W35/W36的准入与聚合数据仍按各自历史范围，不升级为本包结论。旧未采用候选/信号工具保持原边界，本期没有接入它们。
 - Recovery01/原生控制02分别6/6的[旧汇总](MILESTONES-01-02.zh-CN.md)保留。本期[原任务说明](MILESTONE-03.zh-CN.md)已经关闭，旧开工话术不再执行。
 
 ## 后续方向
 
-先由用户真实使用当前预览包，再针对具体项目阻断或第二台M系列Mac的实测结果决定下一里程碑。当前不自动派维护任务、不重包、不重启已暂停研究；完整方案B后续工程目标仍保留。
+先由用户真实使用当前安装包，再针对具体项目阻断或第二台M系列Mac的实测结果决定下一里程碑。当前按用户反馈完成启动修复封装，不自动派维护任务或重启已暂停研究；完整方案B后续工程目标仍保留。
 
 历史索引：[W36安装范围](../../reports/releases/recovery-milestone-01/install-admission-2026-11-18.json)、[原计分机器记录](../../reports/releases/wave32-admission/progress.json)、[更早计分](../../reports/releases/wave13-admission/progress.json)、[历史派工](../history/agents-waves.md)。
