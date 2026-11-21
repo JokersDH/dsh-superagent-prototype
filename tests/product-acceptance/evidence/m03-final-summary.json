@@ -1,0 +1,174 @@
+{
+ "milestone": "03",
+ "at": "2026-11-21T03:02:03.507Z",
+ "kind": "final-scope-summary",
+ "package": {
+  "source": "83f79e8249efd68f429f2b6828ea233278071737",
+  "buildId": "d3ba0ec6dccc5eac",
+  "outerSha256": "163b32170680bcbdb324a4fd8edc631bdfb685633911a787c3b3de353577075b",
+  "innerTarSha256": "52eee9083b4d2256a58189327c93605c157e38f5cd44894482a82c6198f56123"
+ },
+ "budget": {
+  "cap": 4,
+  "used": 4,
+  "remaining": 0,
+  "priorSends": 3,
+  "controlSends": 1,
+  "evidence": "control-send.jsonl reserved->unknown->sent(reconciled from assignment.started/dispatch.observed/turn.ended); no resend",
+  "note": "No model turn was sent in this zero-model segment; --run refuses with exit 2."
+ },
+ "realControlFailure": {
+  "workId": "6dd113a40e7656be47c023494c61c3e7",
+  "ticketId": "a7c31233b1859ba7515169eab72e6275",
+  "attemptId": "attempt-b5f967fe-022d-45ad-b838-70dc20e87a6b",
+  "nativeBegins": 1,
+  "dispatchAt": "2026-11-20T08:41:12.531Z",
+  "turnEndedAt": "2026-11-20T08:46:39.983Z",
+  "humanStopAt": "2026-11-20T08:56:38.159Z",
+  "questions": 0,
+  "answers": 0,
+  "steerReceipts": 0,
+  "candidateAvailable": true,
+  "machineCheckPassed": true,
+  "items": {
+   "question": "NOT_TRIGGERED",
+   "answer": "NOT_TRIGGERED",
+   "steer": "UNKNOWN",
+   "runningStop": "FAIL",
+   "barrier": "FAIL",
+   "resources": "PASS"
+  },
+  "overall": "FAIL",
+  "conclusion": "Only a natural-terminal Work stop is proven. Original question answer, same-turn steer and running stop are NOT proven. This live result remains FAIL and is not converted to PASS.",
+  "action": "no_running_stop"
+ },
+ "observationDefect": {
+  "historicalJsonPathHits": 0,
+  "primaryTicketLinkHits": 1,
+  "actualJsonPathHits": 1,
+  "explanation": "The earlier live consumer resolved the ticket from a JSON path that returns no row on this original data, so it kept treating the attempt as not observed and wrote UNKNOWN at 08:42:55 while the native facts show dispatch.observed at 08:41:12 and turn.ended at 08:46:39. This is a consumer observation defect proven against the original Store; it is not a claim about the product cause.",
+  "notClaimedAsSoleProductCause": true
+ },
+ "controlledResult": {
+  "ok": true,
+  "assertions": {
+   "fullChain": true,
+   "noQuestionDoesNotBlock": true,
+   "terminalStopRejected": true,
+   "unknownAnswerHeld": true,
+   "unknownResourceHeld": true,
+   "noGlobalProcessEnumeration": true,
+   "executedControlledChain": true,
+   "sameOriginalIdentity": true
+  },
+  "chain": [
+   {
+    "step": 0,
+    "action": "answer_question",
+    "phase": "native_running",
+    "items": {
+     "question": "UNKNOWN",
+     "answer": "UNKNOWN",
+     "steer": "UNKNOWN",
+     "runningStop": "UNKNOWN",
+     "barrier": "UNKNOWN",
+     "resources": "UNKNOWN"
+    }
+   },
+   {
+    "step": 1,
+    "action": "send_supplement_steer",
+    "phase": "native_running",
+    "items": {
+     "question": "PASS",
+     "answer": "PASS",
+     "steer": "UNKNOWN",
+     "runningStop": "UNKNOWN",
+     "barrier": "UNKNOWN",
+     "resources": "UNKNOWN"
+    }
+   },
+   {
+    "step": 2,
+    "action": "stop_running_work",
+    "phase": "native_running",
+    "items": {
+     "question": "PASS",
+     "answer": "PASS",
+     "steer": "PASS",
+     "runningStop": "UNKNOWN",
+     "barrier": "UNKNOWN",
+     "resources": "UNKNOWN"
+    }
+   },
+   {
+    "step": 3,
+    "action": "none",
+    "phase": "native_running",
+    "items": {
+     "question": "PASS",
+     "answer": "PASS",
+     "steer": "PASS",
+     "runningStop": "PASS",
+     "barrier": "PASS",
+     "resources": "PASS"
+    }
+   }
+  ],
+  "final": "PASS",
+  "scope": "Controlled records reuse the original work/contract/ticket/assignment/attempt identities; question/target/command values are synthetic controlled data. The chain actually executes answer_question -> send_supplement_steer -> stop_running_work -> none. This is zero-model component evidence only, not live repair proof."
+ },
+ "systemBoundary": {
+  "globalProcessEnumerationRemoved": true,
+  "pidDiffRemoved": true,
+  "resourceSource": "original runtime_observations/resource_observations and runtime.barrier.confirmed only",
+  "missingOrTimeout": "UNKNOWN, resources held; no signal, no cleanup, no PID guessing"
+ },
+ "milestoneScore": {
+  "completed": 4,
+  "partial": 2,
+  "overall": "4/6",
+  "items": {
+   "1": "PASS",
+   "2": "PASS",
+   "3": "PARTIAL — real question/answer/steer/runningStop not proven",
+   "4": "PASS",
+   "5": "PASS",
+   "6": "PARTIAL — same-machine installed journey passed for prior deliveries; full six-item journey remains partial because 3 is not proven"
+  },
+  "oldSnapshotCorrection": "m03-final.json is a historical snapshot. Its old 3/3 budget and item-6 PASS wording do not describe the current 4/4 or the failed control chain."
+ },
+ "commands": [
+  {
+   "command": "node tests/product-acceptance/m03-control.mjs --preflight",
+   "exit": 0
+  },
+  {
+   "command": "node tests/product-acceptance/m03-control.mjs --audit",
+   "exit": 0
+  },
+  {
+   "command": "node tests/product-acceptance/m03-control.mjs --controlled",
+   "exit": 0
+  },
+  {
+   "command": "node tests/product-acceptance/m03-control.mjs --run",
+   "exit": 2,
+   "result": "refused: budget 4/4"
+  }
+ ],
+ "evidence": {
+  "audit": "tests/product-acceptance/evidence/m03-control-audit.json",
+  "controlled": "tests/product-acceptance/evidence/m03-control-controlled.json",
+  "realFailure": "tests/product-acceptance/evidence/m03-control.json",
+  "privateRoot": "/Users/hh/Desktop/joker/pa-artifacts/m03-e-live/evidence/",
+  "store": "~/Library/Application Support/PersonalAgent/Preview-d3ba0ec6dccc5eac/data/state.sqlite",
+  "runnerJournal": "~/Library/Application Support/PersonalAgent/Preview-d3ba0ec6dccc5eac/data/runners/attempt-b5f967fe-022d-45ad-b838-70dc20e87a6b/critical.journal"
+ },
+ "limitations": [
+  "Controlled PASS is not live PASS.",
+  "Cross-machine NOT_TESTED.",
+  "No new model turn, Work, continue or begin was sent.",
+  "Original user instances and credentials were not touched."
+ ]
+}

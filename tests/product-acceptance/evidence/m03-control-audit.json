@@ -1,0 +1,128 @@
+{
+  "at": "2026-11-21T03:01:41.595Z",
+  "kind": "original-store-audit",
+  "original": {
+    "workId": "6dd113a40e7656be47c023494c61c3e7",
+    "contractDigest": "65dac49411e34936225ed3c7042a1fca5152983cbabbf53b26cdb9795bbb3a0a",
+    "ticketId": "a7c31233b1859ba7515169eab72e6275",
+    "assignmentId": "e9dbd4b2882d8ea51428267d17099a88",
+    "attemptId": "attempt-b5f967fe-022d-45ad-b838-70dc20e87a6b"
+  },
+  "observationGap": {
+    "historicalPathHits": 0,
+    "primaryLinkHits": 1,
+    "actualPathHits": 1,
+    "explanation": "The earlier live consumer resolved the ticket from a JSON path that returns no row on this original data, so it kept treating the attempt as not observed and wrote UNKNOWN at 08:42:55 while the native facts show dispatch.observed at 08:41:12 and turn.ended at 08:46:39. This is a consumer observation defect proven against the original Store; it is not a claim about the product cause."
+  },
+  "observation": {
+    "resolved": true,
+    "workId": "6dd113a40e7656be47c023494c61c3e7",
+    "contractDigest": "65dac49411e34936225ed3c7042a1fca5152983cbabbf53b26cdb9795bbb3a0a",
+    "ticketId": "a7c31233b1859ba7515169eab72e6275",
+    "assignmentId": "e9dbd4b2882d8ea51428267d17099a88",
+    "attemptId": "attempt-b5f967fe-022d-45ad-b838-70dc20e87a6b",
+    "events": [
+      {
+        "kind": "writer.observed",
+        "at": "2026-11-20T08:41:12.202Z"
+      },
+      {
+        "kind": "policy.prepared",
+        "at": "2026-11-20T08:41:12.467Z"
+      },
+      {
+        "kind": "dispatch.observed",
+        "delivery": "native_accepted",
+        "at": "2026-11-20T08:41:12.531Z"
+      },
+      {
+        "kind": "turn.ended",
+        "outcome": "completed",
+        "at": "2026-11-20T08:46:39.983Z"
+      },
+      {
+        "kind": "writer.observed",
+        "at": "2026-11-20T08:46:40.068Z"
+      }
+    ],
+    "begin": [
+      {
+        "commandId": "cmd-attempt-b5f967fe-022d-45ad-b838-70dc20e87a6b-1-begin-3d312eeb586a9b315973ad9cc1581434a840380a6f87a915d96a013006f0b80d",
+        "delivery": "native_accepted",
+        "at": "2026-11-20T08:41:12.531Z"
+      }
+    ],
+    "steers": [],
+    "questions": [],
+    "answers": [],
+    "stop": {
+      "requestedAt": "2026-11-20T08:56:38.159Z",
+      "endedAt": "2026-11-20T08:56:38.159Z",
+      "by": "human",
+      "outcome": "stopped"
+    },
+    "barrier": {
+      "at": "2026-11-20T08:46:40.068Z",
+      "writerFactId": "f75f91aa513d4f1896aadae7f7ee3922",
+      "barrierCommandId": "68ba1103dda24d887535fd64a7b4260e"
+    },
+    "resources": [
+      {
+        "factId": "fact-attempt-b5f967fe-022d-45ad-b838-70dc20e87a6b-1",
+        "resourceRef": "res-19852-d95a5a6fa82e",
+        "ownership": "spawned_process",
+        "kind": "writer.observed",
+        "status": "active",
+        "observedAt": "2026-11-20T08:41:12.202Z"
+      },
+      {
+        "factId": "f75f91aa513d4f1896aadae7f7ee3922",
+        "resourceRef": "res-19852-d95a5a6fa82e",
+        "ownership": "spawned_process",
+        "kind": "writer.observed",
+        "status": "quiescent",
+        "observedAt": "2026-11-20T08:46:40.068Z"
+      }
+    ],
+    "binding": {
+      "attempt_id": "attempt-b5f967fe-022d-45ad-b838-70dc20e87a6b",
+      "state": "ended"
+    },
+    "assignmentState": "ended"
+  },
+  "decision": {
+    "ok": false,
+    "status": "FAIL",
+    "phase": "native_ended",
+    "turnEndAt": "2026-11-20T08:46:39.983Z",
+    "dispatchAt": "2026-11-20T08:41:12.531Z",
+    "stopBeforeTurnEnd": false,
+    "questionId": null,
+    "answerId": null,
+    "steerCommandId": null,
+    "barrierAt": "2026-11-20T08:46:40.068Z",
+    "assignmentState": "ended",
+    "items": {
+      "question": "NOT_TRIGGERED",
+      "answer": "NOT_TRIGGERED",
+      "steer": "UNKNOWN",
+      "runningStop": "FAIL",
+      "barrier": "FAIL",
+      "resources": "PASS"
+    },
+    "action": "no_running_stop"
+  },
+  "physicalVsCore": {
+    "coreAssignmentState": "ended",
+    "nativeDispatchAt": "2026-11-20T08:41:12.531Z",
+    "nativeTurnEndedAt": "2026-11-20T08:46:39.983Z",
+    "caveat": "Core assignment.state is a business state and can remain running while waiting for acceptance after the native turn ended. Physical running is inferred only from dispatch.observed without a later turn.ended plus the original resource observations.",
+    "consumerTimeline": {
+      "unknownWrittenAt": "2026-11-20T08:42:55.410Z",
+      "dispatchObservedAt": "2026-11-20T08:41:12.531Z",
+      "turnEndedAt": "2026-11-20T08:46:39.983Z",
+      "humanStopAt": "2026-11-20T08:56:38.159Z"
+    }
+  },
+  "scope": "This is read-only original evidence. It preserves the failed live control chain; controlled results are reported separately."
+}

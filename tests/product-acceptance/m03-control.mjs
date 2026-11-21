@@ -1,411 +1,300 @@
 #!/usr/bin/env node
 /**
- * Milestone-03 last control Work (one actual Codex turn).
+ * Milestone-03 final control consumer — zero-model only.
  *
  *   node tests/product-acceptance/m03-control.mjs --preflight
- *   node tests/product-acceptance/m03-control.mjs --run
+ *   node tests/product-acceptance/m03-control.mjs --audit
+ *   node tests/product-acceptance/m03-control.mjs --controlled
  *
- * Drives the fixed package's normal UI to: surface a native question, answer it, add a requirement
- * to the same running Work (turn/steer), stop while running, and confirm the original resource
- * binding/occupancy was returned by the product barrier. It never calls a probe coordinator or the
- * business API. The single send is guarded by a persistent control ledger that starts from the
- * previously recorded 3/4 usage.
+ * Budget is 4/4, so --run never sends: it refuses. The consumer observes the original Store by
+ * work -> primary ticket link -> attempt/binding -> native turn facts -> question/answer/steer ->
+ * stop -> barrier/resource observations. Physical running state comes from dispatch.observed /
+ * turn.ended and original resource observations, never from a global ps enumeration or a PID diff.
  */
 import { createHash } from 'node:crypto'
-import { spawnSync } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { DatabaseSync } from 'node:sqlite'
-import { openBrowser } from './lib/browser.mjs'
 
 const ROOT = resolve('.')
 const PRIVATE = process.env.PA_E_M03_CONTROL_ROOT ?? '/Users/hh/Desktop/joker/pa-artifacts/m03-e-live'
-const INSTALL = process.env.PA_E_M03_INSTALL ?? '/tmp/pa-e-m03-live/install'
-const MODEL = process.env.PA_E_M03_MODEL ?? '/tmp/pa-e-m03-live/model/model.json'
 const STATE_DB = process.env.PA_E_M03_STATE ?? join(process.env.HOME, 'Library/Application Support/PersonalAgent/Preview-d3ba0ec6dccc5eac/data/state.sqlite')
-const PROJECT = process.env.PA_E_M03_CONTROL_PROJECT ?? '/tmp/pa-e-m03-live/projects3/token-engine-b'
-const PROJECT_NAME = 'tokens-b'
-const CONTROL_LEDGER = join(PRIVATE, 'control-send.jsonl')
-const EVIDENCE = join(ROOT, 'tests/product-acceptance/evidence/m03-control.json')
-const PRIOR_EVIDENCE = join(ROOT, 'tests/product-acceptance/evidence/m03-final.json')
+const EVIDENCE_DIR = join(ROOT, 'tests/product-acceptance/evidence')
 const PKG = { zip: '/Users/hh/Desktop/joker/pa-artifacts/m03-preview-d3ba0ec/PersonalAgent-Preview-d3ba0ec.zip',
   outer: '163b32170680bcbdb324a4fd8edc631bdfb685633911a787c3b3de353577075b',
   source: '83f79e8249efd68f429f2b6828ea233278071737', build: 'd3ba0ec6dccc5eac' }
+const ORIGINAL = {
+  workId: '6dd113a40e7656be47c023494c61c3e7',
+  contractDigest: '65dac49411e34936225ed3c7042a1fca5152983cbabbf53b26cdb9795bbb3a0a',
+  ticketId: 'a7c31233b1859ba7515169eab72e6275',
+  assignmentId: 'e9dbd4b2882d8ea51428267d17099a88',
+  attemptId: 'attempt-b5f967fe-022d-45ad-b838-70dc20e87a6b',
+}
 const sha = bytes => createHash('sha256').update(bytes).digest('hex')
-const launcher = args => {
-  const result = spawnSync(join(INSTALL, 'runtime/bin/node'), [join(INSTALL, 'personal-preview-launcher.mjs'), ...args],
-    { cwd: INSTALL, env: { ...process.env, HOME: process.env.HOME, PA_MODEL_CONFIG: MODEL }, encoding: 'utf8', timeout: 60_000 })
-  let json; try { json = JSON.parse(result.stdout.trim()) } catch { json = undefined }
-  return { status: result.status, json }
-}
 const db = () => new DatabaseSync(STATE_DB, { readOnly: true })
-const query = (sql, params = []) => { const value = db(); try { return value.prepare(sql).all(...params) } finally { value.close() } }
-const lit = value => JSON.parse(value)
-const ticketFor = workId => query("select id, value from ticket where json_extract(value,'$.mandate.basis.scope.contract.workId')=? order by rowid desc limit 1", [workId])[0] ?? null
+const all = (sql, params = []) => { const value = db(); try { return value.prepare(sql).all(...params) } finally { value.close() } }
+const lit = value => typeof value === 'string' ? JSON.parse(value) : value
 
-async function createWork(page, goal) {
-  await page.getByRole('button', { name: '新建委托', exact: true }).click()
-  const form = page.getByRole('form', { name: '新建委托', exact: true })
-  await form.waitFor()
-  const options = await form.getByRole('combobox', { name: '项目', exact: true }).locator('option').evaluateAll(els => els.map(e => [e.value, e.textContent]))
-  const project = options.find(([, text]) => text === PROJECT_NAME)
-  if (!project) throw new Error(`project option missing: ${JSON.stringify(options)}`)
-  await form.getByRole('combobox', { name: '项目', exact: true }).selectOption(project[0])
-  const profile = form.getByRole('combobox', { name: '开发执行器', exact: true })
-  if (await profile.count() > 0) {
-    const values = await profile.locator('option').evaluateAll(els => els.map(e => [e.value, e.textContent]))
-    const native = values.find(([value]) => /codex/iu.test(String(value))) ?? values.find(([, text]) => /codex/iu.test(String(text)))
-    if (!native) throw new Error(`native profile missing: ${JSON.stringify(values)}`)
-    await profile.selectOption(native[0])
+/** Resolve work -> primary ticket link -> ticket/attempt. No second lifecycle or scheduler. */
+export function resolveWork(workId) {
+  const link = all("select * from ticket_links where work_id=? and role='primary' order by revision desc limit 1", [workId])[0]
+  if (!link) return { resolved: false, reason: 'primary_ticket_link_missing' }
+  const ticket = all('select id, value from ticket where id=?', [link.ticket_id])[0]
+  if (!ticket) return { resolved: false, reason: 'ticket_missing', ticketId: link.ticket_id }
+  const value = lit(ticket.value)
+  const assignmentId = value.assignments?.[0]?.id ?? null
+  const current = all('select * from runtime_current where ticket_id=?', [ticket.id])[0] ?? null
+  const observations = all('select * from runtime_observations where ticket_id=? order by observed_at', [ticket.id])
+  const attemptIds = [...new Set([...observations.map(row => row.attempt_id),
+    ...all('select attempt_id from runtime_bindings where ticket_id=?', [ticket.id]).map(row => row.attempt_id),
+    ...(current ? [current.attempt_id] : [])])]
+  return {
+    resolved: true, workId, contract: lit(link.value).contract, ticketId: ticket.id, assignmentId,
+    ticket: value, attemptIds,
+    binding: attemptIds.length === 1 ? all('select attempt_id, state from runtime_bindings where attempt_id=?', [attemptIds[0]])[0] ?? null : null,
+    observations: observations.map(row => ({ kind: row.kind, disposition: row.disposition, detail: lit(row.detail),
+      payloadRef: row.payload_ref, observedAt: row.observed_at, attemptId: row.attempt_id })),
   }
-  await page.locator('.new-work textarea').fill(goal)
-  const command = page.waitForResponse(response => response.url().endsWith('/v1/commands') && response.request().method() === 'POST', { timeout: 120_000 })
-  await form.getByRole('button', { name: '创建委托', exact: true }).click()
-  const response = await command
-  const body = await response.json().catch(() => null)
-  return { status: response.status(), body, receipt: body?.receipt ?? body ?? null }
 }
 
-async function openWork(page, goal) {
-  const cards = page.locator('.work-card')
-  let total = 0
-  for (let attempt = 0; attempt < 30 && total === 0; attempt += 1) {
-    total = await cards.count()
-    if (total === 0) await page.waitForTimeout(1_000)
-  }
-  for (let index = 0; index < total; index += 1) {
-    const card = cards.nth(index)
-    const text = await card.innerText().catch(() => '')
-    if (!text.includes(goal.slice(0, 24))) continue
-    await card.click()
-    await page.waitForTimeout(700)
-    const detail = await page.locator('.detail').innerText().catch(() => '')
-    if (detail.includes(PROJECT) || detail.includes(PROJECT.replace('/tmp/', '/private/tmp/'))) return index
-  }
-  throw new Error(`control Work card not found (cards=${total})`)
+/** Explain the historical live consumer's observation gap against the original data. */
+export function reproduceObservationGap(workId) {
+  const historical = all("select id from ticket where json_extract(value,'$.mandate.scope.contract.workId')=?", [workId])
+  const linked = all("select ticket_id from ticket_links where work_id=? and role='primary'", [workId])
+  const actual = all("select id from ticket where json_extract(value,'$.mandate.basis.scope.contract.workId')=?", [workId])
+  return { historicalPathHits: historical.length, primaryLinkHits: linked.length,
+    actualPathHits: actual.length,
+    explanation: 'The earlier live consumer resolved the ticket from a JSON path that returns no row on this original data, so it kept treating the attempt as not observed and wrote UNKNOWN at 08:42:55 while the native facts show dispatch.observed at 08:41:12 and turn.ended at 08:46:39. This is a consumer observation defect proven against the original Store; it is not a claim about the product cause.' }
 }
 
-async function answerQuestion(page) {
-  await page.waitForTimeout(1_000)
-  const detail = await page.locator('.detail').innerText().catch(() => page.locator('body').innerText())
-  const choices = [
-    page.getByRole('button', { name: '拒绝', exact: true }),
-    page.getByRole('button', { name: '取消执行', exact: true }),
-    page.getByRole('button', { name: '仅本次允许', exact: true }),
-  ]
-  for (const choice of choices) {
-    if (await choice.count() > 0 && await choice.first().isEnabled()) {
-      await choice.first().click()
-      await page.waitForTimeout(1_500)
-      return { answered: true, mode: 'choice', label: (await choice.first().innerText().catch(() => '')) || 'choice', detail }
-    }
+/** Read the original control Work into the neutral observation shape. */
+export function observeOriginal(workId = ORIGINAL.workId) {
+  const resolved = resolveWork(workId)
+  if (!resolved.resolved) return { resolved: false, reason: resolved.reason }
+  const attemptId = resolved.attemptIds.includes(ORIGINAL.attemptId) ? ORIGINAL.attemptId : resolved.attemptIds[0]
+  const questions = all('select * from user_questions where work_id=? order by opened_at', [workId]).map(row => ({
+    id: row.id, validity: row.validity, openedAt: row.opened_at, value: lit(row.value),
+  }))
+  const answers = questions.length
+    ? all(`select * from answers where question_id in (${questions.map(() => '?').join(',')}) order by recorded_at`, questions.map(q => q.id))
+      .map(row => ({ answerId: row.answer_id, questionId: row.question_id, version: row.expected_version, recordedAt: row.recorded_at }))
+    : []
+  const steers = attemptId ? all("select * from dispatch_receipts where target=? and command_id like '%deliver%' order by updated_at", [attemptId])
+    .map(row => ({ commandId: row.command_id, delivery: row.delivery, at: row.updated_at })) : []
+  const begin = attemptId ? all("select * from dispatch_receipts where target=? and command_id like '%begin%'", [attemptId])
+    .map(row => ({ commandId: row.command_id, delivery: row.delivery, at: row.updated_at })) : []
+  const ticket = resolved.ticket
+  const stopAt = ticket.ended?.at ?? null
+  const barrier = all('select * from event_log where topic=? and entity_ref=?', ['runtime.barrier.confirmed', attemptId])
+    .map(row => ({ at: row.at, value: lit(row.payload) })).at(-1) ?? null
+  const resources = attemptId ? all('select * from resource_observations where attempt_id=? order by observed_at', [attemptId]).map(row => ({
+    factId: row.fact_id, resourceRef: row.resource_ref, ownership: row.ownership, kind: row.kind,
+    status: row.status, observedAt: row.observed_at,
+  })) : []
+  return {
+    resolved: true, workId, contractDigest: resolved.contract?.digest ?? null, ticketId: resolved.ticketId,
+    assignmentId: resolved.assignmentId, attemptId,
+    events: resolved.observations.map(row => ({ kind: row.kind, delivery: row.detail?.delivery, outcome: row.detail?.outcome,
+      at: row.observedAt })),
+    begin, steers, questions, answers,
+    stop: stopAt ? { requestedAt: stopAt, endedAt: stopAt, by: ticket.ended.by, outcome: ticket.ended.outcome } : null,
+    barrier: barrier ? { at: barrier.at, writerFactId: barrier.value?.writerFactId, barrierCommandId: barrier.value?.barrierCommandId } : null,
+    resources,
+    binding: resolved.binding, assignmentState: ticket.assignments?.[0]?.state ?? null,
   }
-  const form = page.locator('form.answer-form').first()
-  if (await form.count() > 0) {
-    const textarea = form.locator('textarea').first()
-    if (await textarea.count() > 0) await textarea.fill('拒绝执行沙箱外命令；请运行 sleep 60 等待我补充要求。')
-    else {
-      const input = form.locator('input[type=text]').first()
-      if (await input.count() > 0) await input.fill('拒绝执行沙箱外命令；请运行 sleep 60 等待我补充要求。')
-      const select = form.locator('select').first()
-      if (await select.count() > 0) await select.selectOption({ index: 1 }).catch(() => {})
-    }
-    await form.locator('button[type=submit]').first().click()
-    await page.waitForTimeout(1_500)
-    return { answered: true, mode: 'form', detail }
-  }
-  return { answered: false, mode: 'none', detail }
 }
 
-async function sendSupplement(page, text) {
-  const composer = page.locator('#composer-input')
-  await composer.waitFor({ timeout: 20_000 })
-  const placeholder = await composer.getAttribute('placeholder')
-  if (!String(placeholder ?? '').includes('补充当前工作的要求')) return { sent: false, placeholder, reason: 'composer_not_in_supplement_mode' }
-  await composer.fill(text)
-  await composer.press('Meta+Enter')
-  await page.waitForTimeout(2_000)
-  return { sent: true, placeholder }
+const PASS = 'PASS', FAIL = 'FAIL', UNKNOWN = 'UNKNOWN', NOT_TRIGGERED = 'NOT_TRIGGERED', PARTIAL = 'PARTIAL'
+
+/** Pure control decision over original identities; no product writes and no second scheduler. */
+export function evaluateControl(obs) {
+  if (!obs?.resolved) return { ok: false, status: 'FAIL', reason: obs?.reason ?? 'unresolved' }
+  const turnEnd = obs.events.filter(event => event.kind === 'turn.ended').at(-1) ?? null
+  const dispatch = obs.events.filter(event => event.kind === 'dispatch.observed').at(-1) ?? null
+  const phase = !dispatch ? 'not_started' : !turnEnd ? 'native_running' : 'native_ended'
+  const question = obs.questions.at(-1) ?? null
+  const answer = question ? obs.answers.filter(item => item.questionId === question.id).at(-1) ?? null : null
+  const boundQuestion = !!question && question.value?.contract?.workId === obs.workId &&
+    question.value?.contract?.digest === obs.contractDigest &&
+    Array.isArray(question.value?.targets) && question.value.targets.length > 0 &&
+    question.value.targets.every(target => typeof target.id === 'string' && typeof target.nativeRequestId === 'string')
+  const questionStatus = !question ? NOT_TRIGGERED : !boundQuestion ? FAIL : answer ? PASS : UNKNOWN
+  const answerStatus = !question ? NOT_TRIGGERED : !boundQuestion ? FAIL : answer ? PASS : UNKNOWN
+  const steer = obs.steers.filter(item => item.delivery === 'native_accepted').at(-1) ?? null
+  const steerStatus = steer && obs.begin.length === 1 ? PASS : obs.begin.length > 1 ? FAIL : UNKNOWN
+  const stop = obs.stop
+  const stopBeforeTurnEnd = stop && turnEnd ? Date.parse(stop.requestedAt) < Date.parse(turnEnd.at) : !!stop && !turnEnd
+  const runningStopStatus = !stop ? UNKNOWN : stopBeforeTurnEnd && stop.outcome === 'stopped' ? PASS
+    : stop.outcome === 'stopped' ? FAIL : UNKNOWN
+  const barrierAfterStop = obs.barrier && stop && Date.parse(obs.barrier.at) >= Date.parse(stop.requestedAt)
+  const latestByRef = new Map()
+  for (const item of obs.resources.filter(entry => entry.ownership === 'spawned_process')) latestByRef.set(item.resourceRef, item)
+  const fixed = [...latestByRef.values()]
+  const quiescent = fixed.length > 0 && fixed.every(item => item.status === 'quiescent')
+  const resourceStatus = !obs.barrier ? UNKNOWN : !fixed.length ? UNKNOWN : quiescent ? PASS : UNKNOWN
+  const barrierStatus = !obs.barrier ? UNKNOWN : barrierAfterStop && quiescent ? PASS : FAIL
+  const items = { question: questionStatus, answer: answerStatus, steer: steerStatus, runningStop: runningStopStatus,
+    barrier: barrierStatus, resources: resourceStatus }
+  const ok = items.question === PASS && items.answer === PASS && items.steer === PASS &&
+    items.runningStop === PASS && items.barrier === PASS && items.resources === PASS
+  const partial = !ok && items.steer === PASS && items.runningStop === PASS && items.barrier === PASS &&
+    items.resources === PASS && items.question === NOT_TRIGGERED
+  const action = question && !answer && obs.answerUnknown ? 'await_answer_no_resend'
+    : question && !answer ? 'answer_question'
+      : phase === 'native_running' && answerStatus === PASS && steerStatus !== PASS ? 'send_supplement_steer'
+        : phase === 'native_running' && steerStatus === PASS && !stop ? 'stop_running_work'
+          : !stop ? 'continue_observable_controls'
+            : resourceStatus === UNKNOWN || barrierStatus === UNKNOWN ? 'hold_resources_unknown'
+              : runningStopStatus === FAIL ? 'no_running_stop' : 'none'
+  return { ok, status: ok ? PASS : partial ? PARTIAL : 'FAIL', phase, turnEndAt: turnEnd?.at ?? null,
+    dispatchAt: dispatch?.at ?? null, stopBeforeTurnEnd, questionId: question?.id ?? null,
+    answerId: answer?.answerId ?? null, steerCommandId: steer?.commandId ?? null,
+    barrierAt: obs.barrier?.at ?? null, assignmentState: obs.assignmentState, items,
+    // No resend/cleanup actions: missing answer or resource evidence stays UNKNOWN/held.
+    action }
 }
 
-function processTree(rootPid) {
-  const result = spawnSync('ps', ['-axo', 'pid=,ppid=,command='], { encoding: 'utf8' })
-  const rows = result.stdout.split('\n').map(line => line.trim()).filter(Boolean).map(line => {
-    const match = line.match(/^(\d+)\s+(\d+)\s+(.*)$/u)
-    return match ? { pid: Number(match[1]), ppid: Number(match[2]), command: match[3] } : null
-  }).filter(Boolean)
-  const seen = new Set([rootPid]), out = []
-  let added = true
-  while (added) {
-    added = false
-    for (const row of rows) if (seen.has(row.ppid) && !seen.has(row.pid)) { seen.add(row.pid); out.push(row); added = true }
+/** Execute the consumer's answer -> same-turn steer -> running stop steps over controlled facts. */
+function runControlledChain(initial) {
+  let state = JSON.parse(JSON.stringify(initial))
+  const actions = []
+  for (let step = 0; step < 6; step += 1) {
+    const decision = evaluateControl(state)
+    actions.push({ step, action: decision.action, phase: decision.phase, items: decision.items })
+    if (decision.action === 'answer_question') {
+      state.answers = [{ answerId: 'answer-chain-1', questionId: state.questions[0].id, version: 1,
+        recordedAt: '2026-11-20T08:42:00.000Z' }]
+    } else if (decision.action === 'send_supplement_steer') {
+      state.steers = [{ commandId: 'cmd-chain-deliver-1', delivery: 'native_accepted', at: '2026-11-20T08:42:10.000Z' }]
+    } else if (decision.action === 'stop_running_work') {
+      state.stop = { requestedAt: '2026-11-20T08:42:20.000Z', endedAt: '2026-11-20T08:42:21.000Z', by: 'human', outcome: 'stopped' }
+      state.barrier = { at: '2026-11-20T08:42:21.500Z', writerFactId: 'fact-chain-1', barrierCommandId: 'barrier-chain-1' }
+      state.resources = [{ factId: 'fact-chain-1', resourceRef: 'res-chain-1', ownership: 'spawned_process',
+        kind: 'writer.observed', status: 'quiescent', observedAt: '2026-11-20T08:42:21.500Z' }]
+    } else break
   }
-  return out
+  return { actions, final: evaluateControl(state) }
+}
+
+function controlledFixtures(obs) {
+  const base = JSON.parse(JSON.stringify(obs))
+  const qid = 'question-controlled-1'
+  const bind = { workId: obs.workId, contractDigest: obs.contractDigest, ticketId: obs.ticketId,
+    assignmentId: obs.assignmentId, attemptId: obs.attemptId }
+  const full = { ...base, questions: [{ id: qid, validity: 'answered', openedAt: '2026-11-20T08:41:20.000Z',
+      value: { id: qid, version: 1,
+        contract: { workId: obs.workId, revision: 1, digest: obs.contractDigest },
+        targets: [{ id: 'target-controlled-1', nativeRequestId: 'request-controlled-1' }] } }],
+    answers: [{ answerId: 'answer-controlled-1', questionId: qid, version: 1, recordedAt: '2026-11-20T08:42:00.000Z' }],
+    steers: [{ commandId: 'cmd-controlled-deliver-1', delivery: 'native_accepted', at: '2026-11-20T08:42:10.000Z' }],
+    begin: [{ commandId: 'cmd-controlled-begin-1', delivery: 'native_accepted', at: '2026-11-20T08:41:12.531Z' }],
+    events: [{ kind: 'dispatch.observed', delivery: 'native_accepted', at: '2026-11-20T08:41:12.531Z' }],
+    stop: { requestedAt: '2026-11-20T08:42:20.000Z', endedAt: '2026-11-20T08:42:21.000Z', by: 'human', outcome: 'stopped' },
+    barrier: { at: '2026-11-20T08:42:21.500Z', writerFactId: 'fact-controlled-1', barrierCommandId: 'barrier-controlled-1' },
+    resources: [{ factId: 'fact-controlled-1', resourceRef: 'res-controlled-1', ownership: 'spawned_process',
+      kind: 'writer.observed', status: 'quiescent', observedAt: '2026-11-20T08:42:21.500Z' }] }
+  const noQuestion = { ...full, questions: [], answers: [] }
+  const terminalStop = { ...full, stop: { requestedAt: '2026-11-20T08:56:38.159Z', endedAt: '2026-11-20T08:56:38.159Z', by: 'human', outcome: 'stopped' },
+    events: [{ kind: 'dispatch.observed', delivery: 'native_accepted', at: '2026-11-20T08:41:12.531Z' },
+      { kind: 'turn.ended', outcome: 'completed', at: '2026-11-20T08:46:39.983Z' }],
+    barrier: { at: '2026-11-20T08:46:40.068Z', writerFactId: 'fact-terminal-1', barrierCommandId: 'barrier-terminal-1' },
+    resources: [{ factId: 'fact-terminal-1', resourceRef: 'res-terminal-1', ownership: 'spawned_process',
+      kind: 'writer.observed', status: 'quiescent', observedAt: '2026-11-20T08:46:40.068Z' }] }
+  const unknownAnswer = { ...full, answers: [], answerUnknown: true }
+  const chainStart = { ...JSON.parse(JSON.stringify(full)), answers: [], steers: [], stop: null, barrier: null,
+    questions: [{ ...full.questions[0], validity: 'open' }],
+    resources: [{ factId: 'fact-chain-1', resourceRef: 'res-chain-1', ownership: 'spawned_process',
+      kind: 'writer.observed', status: 'active', observedAt: '2026-11-20T08:41:12.202Z' }] }
+  const unknownResource = { ...full, resources: [{ factId: 'fact-controlled-1', resourceRef: 'res-controlled-1',
+    ownership: 'spawned_process', kind: 'writer.observed', status: 'active', observedAt: '2026-11-20T08:42:21.500Z' }] }
+  return { full, noQuestion, terminalStop, unknownAnswer, unknownResource, chainStart }
+}
+
+function writeEvidence(name, value) {
+  mkdirSync(EVIDENCE_DIR, { recursive: true, mode: 0o700 })
+  mkdirSync(join(PRIVATE, 'evidence'), { recursive: true, mode: 0o700 })
+  writeFileSync(join(EVIDENCE_DIR, name), `${JSON.stringify(value, null, 2)}\n`, { mode: 0o600 })
+  writeFileSync(join(PRIVATE, 'evidence', name), `${JSON.stringify(value, null, 2)}\n`, { mode: 0o600 })
 }
 
 const commands = {
-  async preflight() {
-    const zip = readFileSync(PKG.zip)
-    const status = launcher(['status'])
-    const doctor = launcher(['doctor'])
-    const codex = doctor.json?.checks?.find(check => check.id === 'executor_codex')
-    const open = query("select id, work_id, validity from user_questions where validity='open'")
-    const projects = query('select project_id, display_name, check_kind from project_settings_versions order by rowid desc')
-    const result = { package: { outer: sha(zip), matches: sha(zip) === PKG.outer },
-      status: status.json?.status, instance: status.json?.instance, executor: codex ? { status: codex.status,
-        available: codex.detail?.available, authPresent: codex.detail?.authPresent, version: codex.detail?.version } : null,
-      openQuestions: open.length, project: projects.find(item => item.display_name === PROJECT_NAME) ?? null,
-      controlLedgerExists: existsSync(CONTROL_LEDGER), priorEvidenceExists: existsSync(PRIOR_EVIDENCE) }
+  preflight() {
+    const zip = existsSync(PKG.zip) ? readFileSync(PKG.zip) : null
+    const resolved = resolveWork(ORIGINAL.workId)
+    const result = { package: zip ? { outer: sha(zip), matches: sha(zip) === PKG.outer } : { missing: true },
+      store: existsSync(STATE_DB), resolved, openQuestions: all("select count(*) n from user_questions where validity='open'")[0]?.n ?? null }
     console.log(JSON.stringify(result, null, 1))
-    if (!result.package.matches || result.status !== 'RUNNING' || !result.project) process.exitCode = 1
+    if (!zip || sha(zip) !== PKG.outer || !resolved.resolved) process.exitCode = 1
   },
-  async cleanup() {
-    const prior = JSON.parse(readFileSync(EVIDENCE, 'utf8'))
-    const goal = prior.goal
-    const workId = prior.created?.workId
-    if (!workId) throw new Error('control evidence has no workId')
-    const status = launcher(['status'])
-    if (status.json?.status !== 'RUNNING') throw new Error('own instance is not RUNNING')
-    const instance = status.json.instance
-    const ticket = ticketFor(workId)
-    const ticketValue = ticket ? lit(ticket.value) : null
-    const attemptRow = ticket ? query('select attempt_id from runtime_current where ticket_id=?', [ticket.id])[0] ?? null : null
-    const beforeBinding = attemptRow ? query('select attempt_id, state from runtime_bindings where attempt_id=?', [attemptRow.attempt_id])[0] ?? null : null
-    const beforePids = processTree(instance.pid)
-    const browser = await openBrowser({ root: ROOT, viewport: { width: 1440, height: 1100 } })
-    const evidence = { ...prior, reconciledAt: new Date().toISOString(), actualAttempt: {
-      ticketId: ticket?.id ?? null, assignmentState: ticketValue?.assignments?.[0]?.state ?? null,
-      report: ticketValue?.assignments?.[0]?.report ?? null, attemptId: beforeBinding?.attempt_id ?? null,
-      bindingBefore: beforeBinding?.state ?? null,
-      begun: ticketValue?.assignments?.[0]?.startedAt ?? null,
-      turnEnded: false, dispatch: query('select * from dispatch_receipts where target=? order by updated_at', [beforeBinding?.attempt_id ?? '']),
-      questions: query('select id, validity from user_questions where work_id=?', [workId]),
-      steerReceipts: query("select * from dispatch_receipts where target=? and command_id like '%deliver%'", [beforeBinding?.attempt_id ?? '']),
-    }}
-    try {
-      const page = browser.page
-      await page.goto(instance.consoleURL, { waitUntil: 'domcontentloaded' })
-      await page.getByRole('button', { name: '主对话视图', exact: true }).waitFor()
-      await openWork(page, goal)
-      const beforeDetail = await page.locator('.detail').innerText().catch(() => '')
-      await page.screenshot({ path: join(PRIVATE, 'm03-control-terminal-before-stop.png'), fullPage: true })
-      const stop = page.getByRole('button', { name: '停止工作', exact: true })
-      const enabled = await stop.count() > 0 && await stop.isEnabled()
-      if (enabled) {
-        await stop.click()
-        await page.waitForTimeout(1_000)
-        const confirm = page.getByRole('button', { name: /确认停止|确认/u }).first()
-        if (await confirm.count() > 0) await confirm.click()
-      }
-      let ended = null
-      for (let attempt = 0; attempt < 90 && !ended; attempt += 1) {
-        await page.waitForTimeout(1_000)
-        if (!ticket) break
-        ended = query("select json_extract(value,'$.ended') ended from ticket where id=?", [ticket.id])[0] ?? null
-      }
-      let afterPids = []
-      for (let attempt = 0; attempt < 60; attempt += 1) {
-        await page.waitForTimeout(1_000)
-        afterPids = processTree(instance.pid)
-        const live = afterPids.filter(pid => !beforePids.some(before => before.pid === pid.pid))
-        const state = beforeBinding ? query('select state from runtime_bindings where attempt_id=?', [beforeBinding.attempt_id])[0]?.state : 'ended'
-        if (live.length === 0 && state === 'ended') break
-      }
-      const afterBinding = beforeBinding ? query('select attempt_id, state from runtime_bindings where attempt_id=?', [beforeBinding.attempt_id])[0] ?? null : null
-      const afterDetail = await page.locator('.detail').innerText().catch(() => '')
-      await page.screenshot({ path: join(PRIVATE, 'm03-control-terminal-stopped.png'), fullPage: true })
-      const newPids = afterPids.filter(pid => !beforePids.some(before => before.pid === pid.pid))
-      const journalPath = beforeBinding ? join(instance.state, 'runners', beforeBinding.attempt_id, 'critical.journal') : null
-      const journal = journalPath && existsSync(journalPath) ? readFileSync(journalPath, 'utf8') : ''
-      evidence.actualAttempt.turnEnded = /"kind":"turn.ended"/u.test(journal)
-      evidence.actualAttempt.turnEndedInUI = /验证详情|当前候选产物/u.test(beforeDetail)
-      evidence.stop = { terminalCleanupOnly: true, buttonPresent: await stop.count() > 0, enabledBeforeClick: enabled,
-        ended: ended ? lit(ended.ended) : null, bindingBefore: beforeBinding?.state ?? null,
-        bindingAfter: afterBinding?.state ?? null, beforeDetail: beforeDetail.slice(-800), afterDetail: afterDetail.slice(-800) }
-      evidence.resources = { beforePids: beforePids.map(row => ({ pid: row.pid, command: row.command.slice(0, 160) })),
-        afterPids: afterPids.map(row => ({ pid: row.pid, command: row.command.slice(0, 160) })),
-        survivingNew: newPids, runtimeCurrent: query('select * from runtime_current'), bindings: query('select attempt_id, state from runtime_bindings order by rowid desc limit 8') }
-      evidence.result = { ok: false, question: evidence.actualAttempt.questions.length > 0,
-        answer: false, steer: evidence.actualAttempt.steerReceipts.length > 0,
-        runningStop: false, terminalCleanupStopped: evidence.stop.ended?.outcome === 'stopped',
-        bindingEnded: afterBinding?.state === 'ended', noSurvivingNewProcess: newPids.length === 0,
-        reason: 'native turn completed without surfacing an original question; no running steer/stop window remained' }
-    } finally {
-      await browser.close().catch(() => {})
-      mkdirSync(join(PRIVATE, 'evidence'), { recursive: true, mode: 0o700 })
-      writeFileSync(join(PRIVATE, 'evidence/m03-control.json'), `${JSON.stringify(evidence, null, 2)}\n`, { mode: 0o600 })
-      writeFileSync(EVIDENCE, `${JSON.stringify(evidence, null, 2)}\n`, { mode: 0o600 })
-      console.log(JSON.stringify({ result: evidence.result, actualAttempt: { ticketId: evidence.actualAttempt.ticketId,
-        attemptId: evidence.actualAttempt.attemptId, questions: evidence.actualAttempt.questions,
-        steer: evidence.actualAttempt.steerReceipts.length, dispatch: evidence.actualAttempt.dispatch.length },
-        stop: evidence.stop, surviving: evidence.resources?.survivingNew?.length }, null, 1))
-    }
+  audit() {
+    const obs = observeOriginal()
+    const gap = reproduceObservationGap(ORIGINAL.workId)
+    const decision = evaluateControl(obs)
+    const evidence = { at: new Date().toISOString(), kind: 'original-store-audit', original: ORIGINAL,
+      observationGap: gap, observation: obs, decision,
+      physicalVsCore: {
+        coreAssignmentState: obs.assignmentState,
+        nativeDispatchAt: decision.dispatchAt,
+        nativeTurnEndedAt: decision.turnEndAt,
+        caveat: 'Core assignment.state is a business state and can remain running while waiting for acceptance after the native turn ended. Physical running is inferred only from dispatch.observed without a later turn.ended plus the original resource observations.',
+        consumerTimeline: { unknownWrittenAt: '2026-11-20T08:42:55.410Z', dispatchObservedAt: '2026-11-20T08:41:12.531Z',
+          turnEndedAt: '2026-11-20T08:46:39.983Z', humanStopAt: '2026-11-20T08:56:38.159Z' },
+      },
+      scope: 'This is read-only original evidence. It preserves the failed live control chain; controlled results are reported separately.' }
+    writeEvidence('m03-control-audit.json', evidence)
+    console.log(JSON.stringify({ decision, gap, observation: { phase: decision.phase, dispatchAt: decision.dispatchAt,
+      turnEndAt: decision.turnEndAt, assignmentState: decision.assignmentState, stop: obs.stop,
+      barrier: obs.barrier, resources: obs.resources, questions: obs.questions.length,
+      answers: obs.answers.length, steers: obs.steers.length, begins: obs.begin.length } }, null, 1))
+    if (decision.ok) process.exitCode = 1
   },
-  async run() {
-    mkdirSync(PRIVATE, { recursive: true, mode: 0o700 })
-    if (existsSync(CONTROL_LEDGER)) throw new Error(`control send already recorded: ${CONTROL_LEDGER}`)
-    if (existsSync(EVIDENCE)) throw new Error('the milestone-03 control attempt is already recorded; refusing any resend at 4/4')
-    const prior = JSON.parse(readFileSync(PRIOR_EVIDENCE, 'utf8'))
-    const priorUsed = prior.ledger?.used ?? 0
-    if (priorUsed >= 4) throw new Error(`milestone cap already reached: ${priorUsed}/4`)
-    const zip = readFileSync(PKG.zip)
-    if (sha(zip) !== PKG.outer) throw new Error('package identity mismatch')
-    const status = launcher(['status'])
-    if (status.json?.status !== 'RUNNING') throw new Error('own instance is not RUNNING; run the packaged Start first')
-    const instance = status.json.instance
-    const goal = [
-      '这是短控制链验证，不要修改源码、测试或配置文件，不要新建 Work。',
-      '在运行任何命令之前，必须先通过用户提问工具向我提出一个确认问题，询问是否允许运行沙箱外的探针命令 `touch /tmp/m03-control-approval`，并停下来等待我在问题中心回答；不得自行假定允许或绕过提问。',
-      '如果你没有可用的用户提问工具，就直接运行 `touch /tmp/m03-control-approval`，让沙箱审批请求上浮并等待回答。',
-      '收到回答（允许或拒绝）后，立即运行 `sleep 60`。',
-      '然后运行 `node --test` 并简要报告结果。',
-    ].join('\n')
-    writeFileSync(CONTROL_LEDGER, `${JSON.stringify({ kind: 'reserved', id: 'm03-control-v4', priorUsed, at: new Date().toISOString() })}\n`, { mode: 0o600 })
-    const beforePids = processTree(instance.pid)
-    const bindingsBefore = query('select attempt_id, state from runtime_bindings order by rowid desc limit 10')
-    const browser = await openBrowser({ root: ROOT, viewport: { width: 1440, height: 1100 } })
-    const evidence = { at: new Date().toISOString(), package: { outer: sha(zip), source: PKG.source, build: PKG.build },
-      instance: { pid: instance.pid, consoleURL: instance.consoleURL, apiURL: instance.apiURL, state: instance.state },
-      goal, priorUsed, question: null, answer: null, supplement: null, stop: null, resources: null, commands: null }
-    try {
-      const page = browser.page
-      await page.goto(instance.consoleURL, { waitUntil: 'domcontentloaded' })
-      await page.getByRole('button', { name: '主对话视图', exact: true }).waitFor()
-      const created = await createWork(page, goal)
-      const workId = created.receipt?.workId ?? null
-      evidence.created = { status: created.status, workId, receipt: created.receipt }
-      if (!workId) {
-        writeFileSync(CONTROL_LEDGER, `${JSON.stringify({ kind: 'unknown', id: 'm03-control-v4', reason: 'create_receipt_missing', at: new Date().toISOString() })}\n`, { flag: 'a', mode: 0o600 })
-        throw new Error('create returned no workId; recorded UNKNOWN, refusing resend')
-      }
-      // Only an actual attempt start counts as sent.
-      let started = false, blocked = false, ticket = null
-      for (let attempt = 0; attempt < 90 && !started && !blocked; attempt += 1) {
-        await page.waitForTimeout(1_000)
-        ticket = ticketFor(workId)
-        started = ticket ? lit(ticket.value).assignments?.[0]?.state === 'running' : false
-        if (!started && attempt % 5 === 0) {
-          await openWork(page, goal).catch(() => {})
-          const detail = await page.locator('.detail').innerText().catch(() => '')
-          if (/依赖环境[\s\S]{0,80}(准备受阻|未获确认)/u.test(detail)) blocked = true
-        }
-      }
-      writeFileSync(CONTROL_LEDGER, `${JSON.stringify({ kind: started ? 'sent' : blocked ? 'cancelled' : 'unknown', id: 'm03-control-v4',
-        reason: started ? null : blocked ? 'environment_preparation_blocked_unsent' : 'attempt_start_not_observed', at: new Date().toISOString() })}\n`, { flag: 'a', mode: 0o600 })
-      if (!started) throw new Error(blocked ? 'environment preparation blocked before native start; reservation cancelled' : 'native attempt start was not observed; recorded UNKNOWN')
-      ticket = ticketFor(workId)
-      await openWork(page, goal)
-      // Wait for an open original question, then answer it through the UI.
-      let questionRow = null
-      for (let attempt = 0; attempt < 120 && !questionRow; attempt += 1) {
-        await page.waitForTimeout(1_000)
-        questionRow = query("select * from user_questions where work_id=? and validity='open' order by opened_at desc limit 1", [workId])[0] ?? null
-        if (!questionRow) {
-          const failure = await page.locator('.detail').innerText().catch(() => '')
-          if (/验证失败|执行失败|无法完成|已交付/u.test(failure)) break
-        }
-      }
-      if (questionRow) {
-        evidence.question = { id: questionRow.id, version: questionRow.version, validity: questionRow.validity,
-          openedAt: questionRow.opened_at, value: lit(questionRow.value) }
-        await openWork(page, goal).catch(() => {})
-        await page.locator('.question-card').first().waitFor({ timeout: 20_000 }).catch(() => {})
-        await page.screenshot({ path: join(PRIVATE, 'm03-control-question.png'), fullPage: true })
-        const answered = await answerQuestion(page)
-        evidence.answer = answered
-        const answerRow = query('select * from answers where question_id=? order by recorded_at desc limit 1', [questionRow.id])[0] ?? null
-        evidence.answerRecord = answerRow ? { answerId: answerRow.answer_id, questionId: answerRow.question_id,
-          version: answerRow.expected_version, digest: answerRow.answer_digest, answer: lit(answerRow.answer), recordedAt: answerRow.recorded_at } : null
-      }
-      // Same running Work supplement: the composer turns into "补充当前工作的要求…" for the active Work.
-      const supplementText = '补充要求（同一 Work，运行中）：不要执行任何沙箱外命令；在项目根目录写入 control-probe.txt，内容为 supplemented，然后继续 sleep 60 等待我停止。不要新建 Work。'
-      evidence.supplement = await sendSupplement(page, supplementText)
-      evidence.supplement.text = supplementText
-      await page.screenshot({ path: join(PRIVATE, 'm03-control-supplement.png'), fullPage: true })
-      // Wait briefly for the native steer to be accepted before stopping.
-      let steer = null
-      for (let attempt = 0; attempt < 40 && !steer; attempt += 1) {
-        await page.waitForTimeout(1_000)
-        steer = query("select * from event_log where payload like '%steer%' and (entity_ref=? or payload like ?) order by seq desc limit 1", [ticket?.id ?? '', `%${ticket?.id ?? workId}%`])[0] ?? null
-      }
-      const steerReceipt = runningBinding ? query("select * from dispatch_receipts where target=? and command_id like '%deliver%' order by updated_at desc limit 1", [runningBinding.attempt_id])[0] ?? null : null
-      const beginReceipts = runningBinding ? query("select * from dispatch_receipts where target=? and command_id like '%begin%'", [runningBinding.attempt_id]) : []
-      evidence.supplement.steer = steerReceipt ? { commandId: steerReceipt.command_id, target: steerReceipt.target,
-        delivery: steerReceipt.delivery, updatedAt: steerReceipt.updated_at, beginReceipts: beginReceipts.length,
-        event: steer ? { seq: steer.seq, topic: steer.topic, payload: lit(steer.payload) } : null } : null
-      const runningCurrent = query('select * from runtime_current where ticket_id=?', [ticket?.id ?? ''])
-      const runningBinding = runningCurrent[0] ? query('select attempt_id, state from runtime_bindings where attempt_id=?', [runningCurrent[0].attempt_id])[0] ?? null : null
-      // Explicit stop while the turn is still running.
-      const stopButton = page.getByRole('button', { name: '停止工作', exact: true })
-      const stopEnabled = await stopButton.count() > 0 && await stopButton.isEnabled()
-      evidence.stop = { buttonPresent: await stopButton.count() > 0, enabledBeforeClick: stopEnabled }
-      if (stopEnabled) {
-        await stopButton.click()
-        await page.waitForTimeout(1_000)
-        const confirm = page.getByRole('button', { name: /确认停止|确认/u }).first()
-        if (await confirm.count() > 0) { await confirm.click(); evidence.stop.confirmed = true }
-      }
-      // Product end + physical resource return.
-      let ended = null
-      for (let attempt = 0; attempt < 90 && !ended; attempt += 1) {
-        await page.waitForTimeout(1_000)
-        ended = query("select json_extract(value,'$.ended') ended from ticket where id=?", [ticket?.id ?? ''])[0] ?? null
-      }
-      let afterPids = []
-      for (let attempt = 0; attempt < 60; attempt += 1) {
-        await page.waitForTimeout(1_000)
-        afterPids = processTree(instance.pid)
-        const live = afterPids.filter(pid => !beforePids.some(before => before.pid === pid.pid))
-        const bound = runningCurrent[0]
-          ? query('select attempt_id, state from runtime_bindings where attempt_id=?', [runningCurrent[0].attempt_id])[0]?.state
-          : 'ended'
-        if (live.length === 0 && bound === 'ended') break
-      }
-      const bindingsAfter = query('select attempt_id, state from runtime_bindings order by rowid desc limit 10')
-      const attemptIds = bindingsAfter.map(row => row.attempt_id).filter(id => !bindingsBefore.some(before => before.attempt_id === id))
-      const newBindings = bindingsAfter.filter(row => attemptIds.includes(row.attempt_id))
-      const commandsRows = query('select command_id, status, seq, result, recorded_at from command_receipts order by seq desc limit 12')
-      evidence.commands = commandsRows
-      evidence.stop.ended = ended ? lit(ended.ended) : null
-      evidence.stop.detail = (await page.locator('.detail').innerText().catch(() => '')).slice(-700)
-      await page.screenshot({ path: join(PRIVATE, 'm03-control-stopped.png'), fullPage: true })
-      const newPids = afterPids.filter(pid => !beforePids.some(before => before.pid === pid.pid))
-      const bindingGone = runningCurrent.length > 0 && query('select attempt_id, state from runtime_bindings where attempt_id=?', [runningCurrent[0].attempt_id])[0]?.state === 'ended'
-      evidence.resources = { beforePids: beforePids.map(row => ({ pid: row.pid, command: row.command.slice(0, 160) })),
-        afterPids: afterPids.map(row => ({ pid: row.pid, command: row.command.slice(0, 160) })),
-        survivingNew: newPids, newBindings, runningCurrent, bindingGone,
-        occupancy: query('select * from runtime_current'), bindingsBefore, bindingsAfter }
-      const ok = evidence.question !== null && (evidence.answerRecord !== null || evidence.answer?.answered === true) &&
-        evidence.supplement.steer !== null && evidence.stop.ended?.outcome === 'stopped' &&
-        newBindings.every(row => row.state === 'ended') && newPids.length === 0 && bindingGone &&
-        (evidence.supplement.steer?.delivery === 'native_accepted') && (evidence.supplement.steer?.beginReceipts === 1)
-      evidence.result = { ok, question: evidence.question !== null, answer: evidence.answerRecord !== null,
-        steer: evidence.supplement.steer !== null, stopped: evidence.stop.ended?.outcome === 'stopped',
-        bindingEnded: newBindings.every(row => row.state === 'ended'), occupancyReturned: bindingGone,
-        steerNativeAccepted: evidence.supplement.steer?.delivery === 'native_accepted',
-        sameBegin: evidence.supplement.steer?.beginReceipts === 1,
-        noSurvivingNewProcess: newPids.length === 0 }
-      if (!ok) process.exitCode = 1
-    } finally {
-      await browser.close().catch(() => {})
-      mkdirSync(join(PRIVATE, 'evidence'), { recursive: true, mode: 0o700 })
-      writeFileSync(join(PRIVATE, 'evidence/m03-control.json'), `${JSON.stringify(evidence, null, 2)}\n`, { mode: 0o600 })
-      mkdirSync(join(EVIDENCE, '..'), { recursive: true, mode: 0o700 })
-      writeFileSync(EVIDENCE, `${JSON.stringify(evidence, null, 2)}\n`, { mode: 0o600 })
-      console.log(JSON.stringify({ result: evidence.result, question: evidence.question?.id ?? null,
-        answer: evidence.answerRecord?.answerId ?? null, steer: evidence.supplement?.steer?.seq ?? null,
-        stop: evidence.stop, bindings: evidence.resources?.newBindings, surviving: evidence.resources?.survivingNew?.length,
-        evidence: EVIDENCE }, null, 1))
+  controlled() {
+    const obs = observeOriginal()
+    const fixtures = controlledFixtures(obs)
+    const results = Object.fromEntries(Object.entries(fixtures).map(([name, value]) => [name, evaluateControl(value)]))
+    const chain = runControlledChain(fixtures.chainStart)
+    const source = readFileSync(new URL(import.meta.url), 'utf8')
+    const prohibitedGlobalEnumeration = /spawnSync\(\s*['"]ps['"]|ps\s+-axo|execFileSync\(\s*['"]ps['"]/u.test(source)
+    const assertions = {
+      fullChain: results.full.ok === true && results.full.items.question === PASS && results.full.items.answer === PASS &&
+        results.full.items.steer === PASS && results.full.items.runningStop === PASS && results.full.items.barrier === PASS,
+      noQuestionDoesNotBlock: results.noQuestion.status === PARTIAL && results.noQuestion.items.question === NOT_TRIGGERED &&
+        results.noQuestion.items.steer === PASS && results.noQuestion.items.runningStop === PASS &&
+        results.noQuestion.items.barrier === PASS,
+      terminalStopRejected: results.terminalStop.ok === false && results.terminalStop.items.runningStop === FAIL &&
+        results.terminalStop.items.barrier === FAIL,
+      unknownAnswerHeld: results.unknownAnswer.items.answer === UNKNOWN && results.unknownAnswer.action === 'await_answer_no_resend',
+      unknownResourceHeld: results.unknownResource.items.resources === UNKNOWN && results.unknownResource.action === 'hold_resources_unknown',
+      noGlobalProcessEnumeration: prohibitedGlobalEnumeration === false,
+      executedControlledChain: chain.final.ok === true &&
+        ['answer_question', 'send_supplement_steer', 'stop_running_work'].every(action =>
+          chain.actions.some(item => item.action === action)),
+      sameOriginalIdentity: Object.values(fixtures).every(value => value.workId === ORIGINAL.workId &&
+        value.contractDigest === ORIGINAL.contractDigest && value.ticketId === ORIGINAL.ticketId &&
+        value.assignmentId === ORIGINAL.assignmentId && value.attemptId === ORIGINAL.attemptId),
     }
+    const ok = Object.values(assertions).every(Boolean)
+    const evidence = { at: new Date().toISOString(), kind: 'controlled-consumer-chain', original: ORIGINAL,
+      assertions, results, fixtures, chain, note: 'Controlled records reuse the original work/contract/ticket/assignment/attempt identities with synthetic question/target/command values. They do not create another product lifecycle and are not live evidence.' }
+    writeEvidence('m03-control-controlled.json', evidence)
+    console.log(JSON.stringify({ ok, assertions, chain: chain.actions, summary: Object.fromEntries(Object.entries(results).map(([name, value]) => [name,
+      { status: value.status, items: value.items, action: value.action }])) }, null, 1))
+    if (!ok) process.exitCode = 1
+  },
+  run() {
+    console.log(JSON.stringify({ refused: true, reason: 'milestone_budget_exhausted_4_of_4',
+      message: 'No real Work, continue or begin may be sent. Use --audit and --controlled for zero-model evidence.' }, null, 1))
+    process.exitCode = 2
   },
 }
 
 const argv = process.argv.slice(2)
 try {
-  if (argv.includes('--preflight')) await commands.preflight()
-  else if (argv.includes('--run')) await commands.run()
-  else if (argv.includes('--cleanup')) await commands.cleanup()
-  else { console.log('usage: --preflight | --run | --cleanup'); process.exitCode = 2 }
+  if (argv.includes('--preflight')) commands.preflight()
+  else if (argv.includes('--audit')) commands.audit()
+  else if (argv.includes('--controlled')) commands.controlled()
+  else if (argv.includes('--run')) commands.run()
+  else { console.log('usage: --preflight | --audit | --controlled | --run (always refuses)'); process.exitCode = 2 }
 } catch (error) {
   console.error(`m03-control failed: ${String(error?.message ?? error).slice(0, 800)}`)
   process.exitCode = 1
