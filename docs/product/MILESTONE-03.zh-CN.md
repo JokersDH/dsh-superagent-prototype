@@ -22,7 +22,7 @@
 - E：主动，原 /Users/hh/Desktop/joker/superagent-agent-e、codex/g3-product-acceptance；只 tests/product-acceptance/，独立断言。先零模型准备旅程/必要负例，D冻结后最终验同一包，不追移动HEAD、不复用旧PASS。缺生产行为给main最小复现，不代改别人的模块。
 - B/F仅在main提供具体当前路径阻断后参与，原所有权保留；A/C/G/H/I/J待命。不为用满人数加维护线。本文尚未代发外部chat。
 - D冻结前main采用必要源修改并验证；D以main明确commit构建，E记录准确source/build/包SHA。E若发现运行代码阻断，先修并由main明确必要后继/重测范围；docs/tests-only不自动重包。
-- 本期真实Codex合计最多4次，以实际写出turn/start计。原预留main1/E3；2026-11-20 main按本条在总上限内重分配为main0/E合计最多4，E已实际发送3次，最后1次只补工作台控制链。D0；不是新增额度或刷新旧预算。不必用满，额度不自动互借。UNKNOWN发送仍占用且不得重发；setup失败且确认未写turn不计。
+- 本期真实Codex合计最多4次，以实际写出turn/start计。原预留main1/E3；11-20 main将保留1次转E，总额仍4；11-21验收确认E已实际发送4/4，main/D/E现均无剩余额度。最后控制任务未通过，不能重试、补样或自动加额。不必用满，额度不自动互借。UNKNOWN发送仍占用且不得重发；setup失败且确认未写turn不计。
 - 实际发送前记录角色、候选及余额，发送后追加一次记录，仅放本期独立私有根；不改旧grant/ledger或新增产品调度账本。既有透明计数工具只能计数，不能替代正常入口；未准入工具不引入。普通主对话网关验证不在4次Codex额度内，本期不自动发送额外模型请求。
 - 不自动批量跑live脚本；预算0角色不运行check:native-*等发模型命令。UNKNOWN业务效果先核对原身份，不用新ID/新begin补洞。受控/静态检查不花模型额度。
 - 保留十二用户实例UI5180–5191/API8796–8807及state/profile/history/tar/dirty。仅操作本期自己启动且有完整原spawn身份的服务，不做全局进程发现、额外故障信号/强杀、状态清空、借凭据或接管未知进程。正常产品停止仍经过原屏障。
@@ -38,44 +38,52 @@
 - 实际安装的Codex通过正常tools/dev/start.mjs启动检查：独立state /tmp/pa-ms03-normal-source-fnqlyj/state、UI61314/API61315，个人模式/原生准入、0个Work；正常stop后自身实例已退出。只做version/login status检查，实际turn/start为0，私有日志/状态保留；未启动探针coordinator或任务。
 - 最终清单仍0/6，真实任务0/4；D接上述source冻结候选，E先零模型准备，再用准确包完成独立旅程。此处不是完成汇总或发行许可。
 
-## 当前验收与最后控制链
+## 当前验收：4/6，真实额度4/4已用尽
 
-2026-11-20收到E新提交8b70fd0c2d60c029aee8985125e6e09e967a896b；D仍e247e7b782ec12a01de8685eb1199683f47afce2，固定包保持。此前仅准备cd9e473a和上次验收结论成为历史，不重复派其已修问题。
+2026-11-21复验E最新8776934164812e0a698f4888501a5ea39ea427fa；D仍e247e7b782ec12a01de8685eb1199683f47afce2。仍是同一里程碑，①②④⑤按限定范围闭合，③和⑥仍PARTIAL；不得写6/6或完整日常使用验收通过。82/100、完整B63.1%暂保留，最终按原十二项重评，不因本轮测试数量加分。
 
-本次4/6完整闭合（①②④⑤，按以下明确范围）；③工作台控制仍PARTIAL，⑥完整同包旅程因③保持PARTIAL。本机82/100、完整B63.1%暂不重评，里程碑尚未关闭，也不是完整发行许可。
+### 已通过的实际结果，保持不重跑
 
-- ①：E同一准确包的首次启动、私有GUI保存（已保存≠已连接）、原生版本/认证就绪；main此前独立无认证启动/配置保存/正常停止通过。没有新增真实主对话网关请求或连接成功声明。
-- ②④：原Store中Work a68880e9f1a46085f044fad0c74ff191与749f5756c3dd284886dd008de2341a18各有原project/合同/attempt/currentCandidate/注册检查PASS/人工接受/completed和ended绑定。main只读核对这些身份和全部52个artifact摘要，再按各自冻结manifest导出自有新副本，反向patch恢复基线、重新应用原patch及运行原Node检查：修复基线FAIL→候选/重应用6PASS，功能基线PASS→候选/重应用8PASS。五个文件/候选各自hash吻合，原项目/索引/状态未写。独立副本在 /Users/hh/Desktop/joker/pa-artifacts/m03-main-check-j3po97z1。范围是两个真实仓库的零依赖token-engine子包备份，其中修复是人为注入回归，不能写成两个完整业务工程的日常问题已解决。
-- ⑤：E同包正常stop/start后两个原Work/候选/产物/接受记录的UI证据已交；main原Store只读核对保留的原对象和产物，未重启E实例。原E临时目录 /tmp/pa-e-m03-live 目前在main侧不可见，原Store/Runner journals/冻结工作区仍保留在产品私有根；最终材料须放持久私有目录供核对，不能靠临时目录永远存在。
-- ③：原Store user_questions为0，没有原问题回答证据；原生已接收的dispatch事实只有3次begin，无同Work steer。前两次旧Work的stop发生在自然terminal之后，不能作为运行中停止证明。E已如实保留问题/补充未测；不得把普通终态stop或旧Milestone02的独立实验替代本包控制链。
-- 额度：main只读核到3个实际native_accepted/对应原begin；v2环境准备失败的attempt资源为空、无原生dispatch事实，支持未发送。预算按实际发送仍3/4，而非按Work创建数。E总结中“3次=1次未发送+2次交付”表述有误，应为原merchantops真实任务1次（后停止）+两交付2次；v2未发送单列。UNKNOWN保持占用，历史材料不改写。
-- 旧三阻断：预留本身不计消耗已修、两个原检查已有非零实际消费者、linked worktree不再复制.git指针且main自有复验原HEAD/index字节不变，均已形成新进展。当前最后一次live的直接阻断是两项预算助手错误：cancel后同ID再次reserve会被历史cancel遮掉，sent被拒；correctUnsent可用空证据字符串任意撤销已sent/unknown。main仅新建synthetic ledger复现，不改旧ledger；最后live前须修当前入口或禁用不安全校正分支，不能凭自述退额度。不要扩整套oracle维护。
+- 准确包source83f79e8249efd68f429f2b6828ea233278071737/buildd3ba0ec6dccc5eac，内外摘要与完整静态清单已由main独立核过。E准确包正常首次启动/私有GUI配置/原生版本认证就绪成立；模型保存不等连接已验证，没有新增真实主对话网关请求。
+- 两Work a68880e9f1a46085f044fad0c74ff191和749f5756c3dd284886dd008de2341a18的原project/合同/attempt/currentCandidate/注册检查PASS/人工接受/completed/ended绑定，main已只读核对；全部52个原artifact摘要通过。按各冻结manifest导出自有副本，反向patch恢复基线、重应用原patch和原Node检查：修复FAIL→6PASS，功能原PASS→8PASS。副本在 /Users/hh/Desktop/joker/pa-artifacts/m03-main-check-j3po97z1。限定范围是两个真实仓库的零依赖token-engine子包备份，修复为人为注入回归，不是两个完整业务工程已广泛可用。
+- E原同包正常stop/start后两个原Work/候选/产物/接受记录UI证据保持；main原Store核到原对象和产物。原E的/tmp目录在main侧不可见，产品私有Store/Runner journals/冻结内容仍可读，持久证据不能依赖临时根永久存在。
+- 旧“预留被计消费”和.git指针复制问题已修；非零检查已有实际消费者，不再派这三个旧修复。最新cancel后同ID再reserve→sent正确，correctUnsent自由撤销已禁用，UNKNOWN调和不减少消费，main自有synthetic复验通过。
 
-固定包继续不变：source83f79e8249efd68f429f2b6828ea233278071737/buildd3ba0ec6dccc5eac；outer /Users/hh/Desktop/joker/pa-artifacts/m03-preview-d3ba0ec/PersonalAgent-Preview-d3ba0ec.zip，63575237B，SHA163b32170680bcbdb324a4fd8edc631bdfb685633911a787c3b3de353577075b；inner /Users/hh/Desktop/joker/pa-artifacts/m03-target/m03-target-d3ba0ec.tar.gz，20631227B，SHA52eee9083b4d2256a58189327c93605c157e38f5cd44894482a82c6198f56123。docs/tests-only不重包。未合入E整个脚本闭包；原不安全/过时live分支不作为main默认入口。
+### 最后真实控制任务的独立结论
 
-### 最后一次发送的分配
+原Work6dd113a40e7656be47c023494c61c3e7/ticketa7c31233b1859ba7515169eab72e6275/attempt-b5f967fe-022d-45ad-b838-70dc20e87a6b。原Store只读确认11-20北京时间16:41:12.531原begin获native_accepted，16:46:39.983原turn.ended completed，16:46:40 writer.observed；16:56:38.159才原Work stopped，绑定ended。原user_questions0、deliver/steer回执0。只成立自然终态后的业务停止，不是运行中停止；问题回答和补充仍未测通过。
 
-main依据原“总上限内先记录重新分配”条款，将原预留1次转E：本里程碑合计仍最多4次，E原已发送3次、只剩1次，main此后0次，D0。这是同一grant的内部调整，旧B/E研究grant继续禁用。不开新wave/新里程碑，不重复两个已交付Work。
+E如实提交result.ok=false，原未知发送后通过原事实核对为sent，没有重新begin。原Store全批恰有4个原生native_accepted/对应begin；v2环境准备阻断无原生发送，继续单列。当前预算4/4已用尽，main/D/E均0；旧研究grant仍不可用，不允许补样凑PASS。
 
-这1次只针对准确包的一个新短控制Work：正常UI创建→实际原生问题上浮并回答→在同一原attempt/turn运行中补充→显式停止→原物理资源屏障后归还。普通on-request配置不保证request_user_input；可在当前实际能力内用本地命令的原生审批问题验证问题中心，不能偷偷改profile或换probe coordinator。补充用已有turn/steer，不需要重发begin或额外turn/start；已完成的旧Work再次continue会开新turn，不作为同一运行中补充。
+持久E证据：/Users/hh/Desktop/joker/pa-artifacts/m03-e-live/control-send.jsonl 与 evidence/m03-control.json。E树中的 tests/product-acceptance/evidence/m03-control.json为本次失败记录；旧m03-final.json是之前双项目快照，不把其中旧3/3、⑥PASS或“3次=一次未发送+两交付”的表述当当前结论。历史快照保留并由最终汇总纠正。
 
-先做零模型前置与原生能力/脚本检查，确保有可观察的在运行窗口，再明确执行最后1次。若实际未触发、失败或结果未知，记录FAIL/NOT_TESTED/UNKNOWN及原ID，达到总4即停止新增模型，不自动补样/重试或把失败改PASS；剩余条目由main按证据说明，不能自行放宽冻结清单。
+### 只修直接阻断当前控制消费者的问题
+
+1. main用最新代码原片段加synthetic参数直接执行，确认读取runningBinding在其const初始化之前，必抛ReferenceError。node --check虽过，不能替代该分支运行。本次live未达到此分支，不把它谎称为已证明的本次唯一失败原因。
+2. main当前只读核到ticketFor使用的JSON路径能命中原ticket，无法证明E所写“错误JSON路径”就是live失败根因。要沿实际原数据重现观察误差，保留已观察的事实：原turn真实运行约5分钟，消费者在其间误报未观察到开始。不能仅凭core assignment.state=running认定物理turn仍运行，terminal后core也可能仍等待人工处理。
+3. m03-control的processTree实际调用ps -axo全局枚举，违反现行边界；其“没有新增PID”不作为完整资源/物理静止证明。本次未采信这部分，不宣称它结束或清理了用户资源。当前消费者改用原登记固定资源及对应新鲜身份/原屏障；缺失、查询错误/超时一律UNKNOWN，不把[]当空闲，不发额外信号或做全局补查。
+4. 问题未出现时，不应该让等待问题的消费者阻止其余可观察控制；受控验证需分别记录问题、原答复、同turn补充、运行停止/屏障，每项独立判定。未知发送不重试，终态后stop不能补作runningStop；组件/受控正例不冒充这次真实失败已修复通过。
+
+这是一份同结果消费者修复责任，不是维护队列。预算耗尽后当前仅做零模型静态、纯/受控执行及原证据核对，不重新运行live脚本，不重建真实Work，不改变生产配置来制造问题。没有具体生产阻断不修改main源码，不为docs/tests重包。等这条零模型链完成，才有可审核的后续真实复验建议；不自动进入下一里程碑。
+
+固定包继续不变：outer /Users/hh/Desktop/joker/pa-artifacts/m03-preview-d3ba0ec/PersonalAgent-Preview-d3ba0ec.zip，63575237B，SHA163b32170680bcbdb324a4fd8edc631bdfb685633911a787c3b3de353577075b；inner /Users/hh/Desktop/joker/pa-artifacts/m03-target/m03-target-d3ba0ec.tar.gz，20631227B，SHA52eee9083b4d2256a58189327c93605c157e38f5cd44894482a82c6198f56123。
 
 ## 发给Agent D（整段复制）
 
 ~~~text
-保持里程碑03准确83f79e82/build d3ba0ec6dccc5eac包和所有SHA，不重包。E新提交8b70fd0c的两个真实交付已由main从原Store与冻结patch独立核到；现在只补本包的问题上浮/运行补充/物理停止这一个控制Work。
-你继续原D目录分支，仅在E这条控制链出现具体安装/启动/包内Node/私有根阻断时修owned代码并早交main；没有阻断则待命。不要重复静态验收或另开升级/签名/多平台/维护队列，不刷新包。模型预算0，保留十二旧实例/state/dirty及历史材料。读最新 docs/product/MILESTONE-03.zh-CN.md 即可。
+本轮main已验E87769341：最后控制任务未通过，原总额度4/4已耗尽。保持当前83f79e82/buildd3ba0ec6dccc5eac安装包和全部SHA，不重包、不新增真实任务。你无新的主动开发项，按具体安装阻断待命；E下一段只修零模型控制消费者。保留原目录/dirty/十二实例和历史材料，不重复静态检查或扩升级/多平台/维护线。最新边界见origin/main的 docs/product/MILESTONE-03.zh-CN.md。
 ~~~
 
 ## 发给Agent E（整段复制）
 
 ~~~text
-继续里程碑03最后控制链，不开新wave。保留原目录/分支/dirty，安全合入最新origin/main并读 docs/product/MILESTONE-03.zh-CN.md“当前验收与最后控制链”。你8b70fd0c的两项交付已有实际进展：main核到原Store同候选检查/人工接受/资源归还并独立重应用patch，6/8测试通过；不要重跑这两个Work或再次造双项目任务。
-本期当前4/6完整闭合，③问题上浮/同Work补充/运行中停止仍缺，⑥完整旅程依赖③。main已按原条款将保留1次转给你：原实际3次+最后1次，总上限仍4，main/D此后0；没有新预算。原merchantops真实任务1次+两次交付=3，v2环境准备未发送单列，不把未发送算入这3次，也不退款重置旧ledger。
-最后live前只修当前预算入口两项直接阻断：cancel后同ID再reserve被历史cancel遮掉；correctUnsent允许空证据任意撤销已sent/unknown。用实际发送边界核对，保留历史entries，未发送setup可解除在途预留，结果未知占额不重发；禁用自由字符串退额度分支即可，不另造预算平台/整套oracle。不要把“创建Work返回recorded”或“UI执行中”当作turn已实际写出的充分证据。
-然后在同一准确d3ba0ec安装包的正常UI只发1个新短控制Work，连续做完：原生问题/审批上浮问题中心→UI答复并核原target/question/command回执→原attempt仍运行时发补充（turn/steer，同begin1）→运行中的停止→原物理屏障确认、绑定结束和槽归还。先零模型前置，准备可观察运行窗口；on-request普通模式不保证结构化澄清，可在实际能力内以本地命令审批验证原问题，但不能私改profile/用probe coordinator/绕正常入口。补充不是新turn；不要continue已终态旧Work替代运行中steer。
-只剩1次：实际发出即计，setup确认未发可修再搭建，UNKNOWN业务先核对不重发。若未触发/失败/未知，如实记录并在总4后停止新增模型，不能补样凑PASS，不自动开新里程碑。问题/补充/运行停止各自缺证就各自未达；旧终态后stop和Milestone02不能替代本包本次证据。
-同时把当前已有Store/原candidate/patch与最终截图/原命令ID和实际发送证据保存到持久私有目录（不要凭空重建缺失/tmp历史、清库或迁移原授权）。本轮main侧/tmp/pa-e-m03-live不可见，但原产品私有Store/Runner journals/冻结内容仍可读。最终说明真实范围是两个仓库的零依赖token-engine子包备份，修复为注入回归，跨机NOT_TESTED；不声称两个完整业务工程或已验证连接。
-只改tests/product-acceptance/，有生产阻断给main/D最小复现；不改原Runner wire/共享root或他人树，不操作十二实例/未知资源，不借凭据/强杀。持续到同一控制结果的实现/消费/修复/验收，一份最终汇总即可；检查点仍三行。新commit、精确命令exit、原ID/持久证据及剩余项交main，不在SOURCE_READY结束。
+继续同一里程碑03，做一个完整的零模型结果：把最后控制消费者修到原Work身份与运行状态可正确观察、正常UI控制链受控可执行、失败与UNKNOWN准确收尾，并保留本次真实失败材料。不是再发一次真实任务；4/4额度已用尽，main/D/E均0，不刷新任何ledger/grant，不跑--run/native或真实continue/begin，不开新wave。
+沿用原E目录/分支，先保留dirty、安全合入最新origin/main，读 docs/product/MILESTONE-03.zh-CN.md 当前验收。你87769341的两项预算修复已由main独立复验通过，不重复派工。原双项目交付也已验收，不重跑。
+本段一次连续做完以下同一消费者责任：
+① 修m03-control中runningBinding先读后const初始化的确定性ReferenceError，并实际执行到补充分支，不能只node --check。main用原代码片段已复现。
+② 用当前原ticket_links/原Store事实确认work→ticket→attempt；解释并复现本次16:41真实begin而16:42消费者仍报UNKNOWN的原因。main当前SQL同路径可命中，因此不要无证断言“错误JSON路径”就是原因。以原生已接收/turn终态/原binding/资源观察区分运行与终态等待接受，不能只用core assignment.state。先真实数据只读核对，再受控数据跑运行→原问题→答复→同attempt steer→停止→原屏障顺序。
+③ 删除当前consumer的ps -axo全局发现与PID差集静止推断，只消费原登记固定资源和新鲜完整身份/原物理屏障。缺观察/查询失败/超时保留UNKNOWN；不额外发信号，不按PID猜，不搜索十二实例或借凭据。受控正负用例覆盖已结束后停止、未触发问题但仍可观察补充/停止、未知答复不重发、资源UNKNOWN不得归还/清理。只补当前路径必要分支，不扩历史oracle维护。
+④ 给这个聚焦入口明确的零模型执行方式，live仍默认拒绝、额度4/4时不可用；用同一consumer跑完整受控链和必要拒绝，保证原Work/contract/attempt/question/target/command绑定，不造第二生命周期/独立模拟权限系统。SOURCE_READY后持续修到实际受控consumer通过，不在单个fix结束；若发现生产缺口只交main最小复现，不代改生产断言或他人代码。
+⑤ 保留m03-control真实失败及原日志/Store/candidate/patch，持久保存一份准确范围汇总：原begin4、最后问题0/steer0、16:46自然结束/16:56终态停止，③⑥PARTIAL、整体4/6。旧m03-final是之前快照，不能把旧⑥PASS/3次表述当当前结果；纠正应在最终汇总标明，不改旧事实。受控修复通过只计受控，不把本次live失败改PASS；只报告就绪的后续复验方案，不自动新增模型额度或里程碑。
+只改原tests/product-acceptance/并推自己的origin分支，不改其他工作树/根lock/共享文档，不清UNKNOWN/临时历史或用户状态。交一个可持续消费的源码闭包、实际零模型命令exit和持久证据位置；每个检查点三行，完成时一份汇总即可。
 ~~~
