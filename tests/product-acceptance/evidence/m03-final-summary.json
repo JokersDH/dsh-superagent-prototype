@@ -1,6 +1,6 @@
 {
  "milestone": "03",
- "at": "2026-11-21T07:22:34.386Z",
+ "at": "2026-11-21T07:47:49.175Z",
  "kind": "final-scope-summary",
  "package": {
   "source": "83f79e8249efd68f429f2b6828ea233278071737",
@@ -49,114 +49,10 @@
   "explanation": "The earlier live consumer resolved the ticket from a JSON path that returns no row on this original data, so it kept treating the attempt as not observed and wrote UNKNOWN at 08:42:55 while the native facts show dispatch.observed at 08:41:12 and turn.ended at 08:46:39. This is a consumer observation defect proven against the original Store; it is not a claim about the product cause.",
   "notClaimedAsSoleProductCause": true
  },
- "controlledResult": {
-  "ok": true,
-  "assertions": {
-   "fullChain": true,
-   "noQuestionDoesNotBlock": true,
-   "terminalStopRejected": true,
-   "unknownAnswerHeld": true,
-   "unknownResourceHeld": true,
-   "noGlobalProcessEnumeration": true,
-   "readOnlyStore": true,
-   "commandsBoundToOriginal": true,
-   "executedControlledChain": true,
-   "sameOriginalIdentity": true
-  },
-  "chain": [
-   {
-    "step": 0,
-    "action": "answer_question",
-    "phase": "native_running",
-    "items": {
-     "question": "UNKNOWN",
-     "answer": "UNKNOWN",
-     "steer": "UNKNOWN",
-     "runningStop": "UNKNOWN",
-     "barrier": "UNKNOWN",
-     "resources": "UNKNOWN"
-    }
-   },
-   {
-    "step": 1,
-    "action": "send_supplement_steer",
-    "phase": "native_running",
-    "items": {
-     "question": "PASS",
-     "answer": "PASS",
-     "steer": "UNKNOWN",
-     "runningStop": "UNKNOWN",
-     "barrier": "UNKNOWN",
-     "resources": "UNKNOWN"
-    }
-   },
-   {
-    "step": 2,
-    "action": "stop_running_work",
-    "phase": "native_running",
-    "items": {
-     "question": "PASS",
-     "answer": "PASS",
-     "steer": "PASS",
-     "runningStop": "UNKNOWN",
-     "barrier": "UNKNOWN",
-     "resources": "UNKNOWN"
-    }
-   },
-   {
-    "step": 3,
-    "action": "none",
-    "phase": "native_running",
-    "items": {
-     "question": "PASS",
-     "answer": "PASS",
-     "steer": "PASS",
-     "runningStop": "PASS",
-     "barrier": "PASS",
-     "resources": "PASS"
-    }
-   }
-  ],
-  "final": "PASS",
-  "boundCommands": {
-   "answer": {
-    "kind": "answer_question",
-    "commandId": "cmd-controlled-answer-1",
-    "questionId": "question-controlled-1",
-    "questionVersion": 1,
-    "targetId": "target-controlled-1",
-    "nativeRequestId": "request-controlled-1",
-    "workId": "6dd113a40e7656be47c023494c61c3e7",
-    "contractDigest": "65dac49411e34936225ed3c7042a1fca5152983cbabbf53b26cdb9795bbb3a0a",
-    "ticketId": "a7c31233b1859ba7515169eab72e6275",
-    "assignmentId": "e9dbd4b2882d8ea51428267d17099a88",
-    "attemptId": "attempt-b5f967fe-022d-45ad-b838-70dc20e87a6b"
-   },
-   "steer": {
-    "kind": "send_supplement_steer",
-    "commandId": "cmd-controlled-deliver-1",
-    "expectedTurnRef": "turn-controlled-1",
-    "beginReceipts": 1,
-    "workId": "6dd113a40e7656be47c023494c61c3e7",
-    "contractDigest": "65dac49411e34936225ed3c7042a1fca5152983cbabbf53b26cdb9795bbb3a0a",
-    "ticketId": "a7c31233b1859ba7515169eab72e6275",
-    "assignmentId": "e9dbd4b2882d8ea51428267d17099a88",
-    "attemptId": "attempt-b5f967fe-022d-45ad-b838-70dc20e87a6b"
-   },
-   "stop": {
-    "kind": "stop_running_work",
-    "commandId": "cmd-controlled-stop-1",
-    "ticketId": "a7c31233b1859ba7515169eab72e6275",
-    "assignmentId": "e9dbd4b2882d8ea51428267d17099a88",
-    "attemptId": "attempt-b5f967fe-022d-45ad-b838-70dc20e87a6b"
-   }
-  },
-  "scope": "Controlled records reuse the original work/contract/ticket/assignment/attempt identities; question/target/command values are synthetic controlled data. The chain actually executes answer_question -> send_supplement_steer -> stop_running_work -> none. This is zero-model component evidence only, not live repair proof."
- },
  "systemBoundary": {
   "globalProcessEnumerationRemoved": true,
   "pidDiffRemoved": true,
-  "resourceSource": "original runtime_observations/resource_observations and runtime.barrier.confirmed only",
+  "resourceSource": "independent audit reads original runtime_observations/resource_observations and runtime.barrier.confirmed only",
   "missingOrTimeout": "UNKNOWN, resources held; no signal, no cleanup, no PID guessing"
  },
  "milestoneScore": {
@@ -175,16 +71,24 @@
  },
  "commands": [
   {
-   "command": "node tests/product-acceptance/m03-control.mjs --preflight",
-   "exit": 0
+   "command": "node tests/product-acceptance/m03-real-consumer.mjs --verify",
+   "exit": 0,
+   "result": "4/4 scenarios independently audited"
+  },
+  {
+   "command": "node tests/product-acceptance/m03-real-consumer.mjs --audit /Users/hh/Desktop/joker/pa-artifacts/pa-control-app-tWp1ft",
+   "exit": 0,
+   "result": "mainline evidence independently audited"
   },
   {
    "command": "node tests/product-acceptance/m03-control.mjs --audit",
-   "exit": 0
+   "exit": 0,
+   "result": "original failed live Work facts preserved"
   },
   {
    "command": "node tests/product-acceptance/m03-control.mjs --controlled",
-   "exit": 0
+   "exit": 3,
+   "result": "self-filled simulation retired"
   },
   {
    "command": "node tests/product-acceptance/m03-control.mjs --run",
@@ -193,17 +97,77 @@
   }
  ],
  "evidence": {
-  "audit": "tests/product-acceptance/evidence/m03-control-audit.json",
-  "controlled": "tests/product-acceptance/evidence/m03-control-controlled.json",
-  "realFailure": "tests/product-acceptance/evidence/m03-control.json",
+  "independentConsumer": "tests/product-acceptance/evidence/m03-real-consumer.json",
+  "realFailureAudit": "tests/product-acceptance/evidence/m03-control-audit.json",
+  "independentPersistentRoot": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m03-real-independent/run-1795247242291/pa-control-app-hz4SA0",
+  "mainlineConsumerEvidence": "/Users/hh/Desktop/joker/pa-artifacts/pa-control-app-tWp1ft",
+  "originalFailure": "tests/product-acceptance/evidence/m03-control.json",
   "privateRoot": "/Users/hh/Desktop/joker/pa-artifacts/m03-e-live/evidence/",
-  "store": "~/Library/Application Support/PersonalAgent/Preview-d3ba0ec6dccc5eac/data/state.sqlite",
-  "runnerJournal": "~/Library/Application Support/PersonalAgent/Preview-d3ba0ec6dccc5eac/data/runners/attempt-b5f967fe-022d-45ad-b838-70dc20e87a6b/critical.journal"
+  "store": "~/Library/Application Support/PersonalAgent/Preview-d3ba0ec6dccc5eac/data/state.sqlite"
  },
  "limitations": [
-  "Controlled PASS is not live PASS.",
-  "Cross-machine NOT_TESTED.",
-  "No new model turn, Work, continue or begin was sent.",
-  "Original user instances and credentials were not touched."
- ]
+  "Independent real-consumer PASS is zero-model component evidence with a controlled protocol peer and virtual resources; it is not an installed-package, live native, or physical-resource pass.",
+  "The original real control chain remains FAIL: no question/answer/steer and only a terminal stop; budget 4/4 exhausted, no real resend.",
+  "The self-filled evaluateControl simulation is retired and cannot be used as evidence.",
+  "Cross-machine remains NOT_TESTED. No user instance, credential, Store, or grant was changed."
+ ],
+ "independentRealConsumer": {
+  "ok": true,
+  "producer": "tests/integration/original-control-browser.mjs@57243a54",
+  "producerExit": 0,
+  "evidenceRoot": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m03-real-independent/run-1795247242291/pa-control-app-hz4SA0",
+  "producerOutputTail": "PASS real App/HTTP/Store/Application/Broker/Driver question=true same-attempt steer and running stop; work=82e94fe86469550999cc97ac843cf3f5; original begin=1\nPASS real App/HTTP/Store/Application/Broker/Driver question=false same-attempt steer and running stop; work=ded55486e54a480e3f974f40c543bed5; original begin=1\nPASS real App/HTTP/Store/Application/Broker/Driver question=true same-attempt steer and running stop; work=edda32afc97a72940cc7bea12fcbf900; original begin=1\nPASS real App/HTTP/Store/Driver refuses UNKNOWN resource release; own original state retained: /Users/hh/Desktop/joker/pa-artifacts/pa-e-m03-real-independent/run-1795247242291/pa-control-app-hz4SA0/unknown-resource\nCompleted source UI control integration: /Users/hh/Desktop/joker/pa-artifacts/pa-e-m03-real-independent/run-1795247242291/pa-control-app-hz4SA0; virtual protocol/resource only; real vendor/model/native processes/signals=0. This does not certify installed/live controls or close milestone03.\n",
+  "results": [
+   {
+    "mode": "question",
+    "workId": "82e94fe86469550999cc97ac843cf3f5",
+    "ticketId": "a292e2047e2b96c308132e4ea5fdad87",
+    "assignmentId": "217cdcfec31c398aa9f6e2bb0cd1e178",
+    "attemptId": "attempt-e6a3a5d6-610f-4259-8f4c-16769cb394ec",
+    "failures": [],
+    "checksPassed": 17,
+    "totalChecks": 17
+   },
+   {
+    "mode": "questionless",
+    "workId": "ded55486e54a480e3f974f40c543bed5",
+    "ticketId": "f029ce7a9173c48049dd836e5dd09506",
+    "assignmentId": "40c6e35c2cb0829aa4862b436c207310",
+    "attemptId": "attempt-6bc05f98-d540-4517-b17a-f56fad3ac5ea",
+    "failures": [],
+    "checksPassed": 13,
+    "totalChecks": 13
+   },
+   {
+    "mode": "lost-answer-response",
+    "workId": "edda32afc97a72940cc7bea12fcbf900",
+    "ticketId": "1506eee16eb530917023e9d704c12b4b",
+    "assignmentId": "889a68935faa5d721ae90fc1bcf34998",
+    "attemptId": "attempt-0104a3bb-5fac-484e-9b74-47f0f72fd5c5",
+    "failures": [],
+    "checksPassed": 17,
+    "totalChecks": 17
+   },
+   {
+    "mode": "unknown-resource",
+    "workId": "da54c6d08c3b187338693c3ab253bfa7",
+    "ticketId": "4aaa0e9d6f252e850a05835baff99832",
+    "assignmentId": "5a37919df069c4b98e1d2eb4a8d7da67",
+    "attemptId": "attempt-00ddc3c8-f361-4648-a0ef-4557ac6908fa",
+    "failures": [],
+    "checksPassed": 16,
+    "totalChecks": 16
+   }
+  ],
+  "scope": "Based on mainline 57243a54 tests/integration/original-control-browser.mjs and its original fixture. The four scenarios run the real App/HTTP/Store/Application/QuestionBroker/production Driver/original Runner callback+barrier; only the protocol peer and virtual resources are controlled. No model/vendor/native process or signal. Independent assertions read the produced Stores, not the producer stdout.",
+  "limitations": [
+   "Controlled protocol peer and virtual resources only; no Codex/vendor/model/native process or signal.",
+   "This independently audits the original App/HTTP/Store/Application/QuestionBroker/Driver wiring and receipts; it is not an installed-package or live native pass.",
+   "No real Work/turn was sent; budget remains 4/4 exhausted."
+  ]
+ },
+ "retiredSimulation": {
+  "status": "RETIRED",
+  "reason": "The earlier in-memory evaluateControl fixtures filled answers/steers/barrier themselves; main correctly rejected them as self-filled PASS and not original product control."
+ }
 }

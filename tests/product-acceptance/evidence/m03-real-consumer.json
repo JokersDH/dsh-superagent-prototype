@@ -1,0 +1,827 @@
+{
+  "at": "2026-11-21T07:47:28.609Z",
+  "kind": "independent-real-workbench-consumer",
+  "producer": "tests/integration/original-control-browser.mjs@57243a54",
+  "producerExit": 0,
+  "producerOutputTail": "PASS real App/HTTP/Store/Application/Broker/Driver question=true same-attempt steer and running stop; work=82e94fe86469550999cc97ac843cf3f5; original begin=1\nPASS real App/HTTP/Store/Application/Broker/Driver question=false same-attempt steer and running stop; work=ded55486e54a480e3f974f40c543bed5; original begin=1\nPASS real App/HTTP/Store/Application/Broker/Driver question=true same-attempt steer and running stop; work=edda32afc97a72940cc7bea12fcbf900; original begin=1\nPASS real App/HTTP/Store/Driver refuses UNKNOWN resource release; own original state retained: /Users/hh/Desktop/joker/pa-artifacts/pa-e-m03-real-independent/run-1795247242291/pa-control-app-hz4SA0/unknown-resource\nCompleted source UI control integration: /Users/hh/Desktop/joker/pa-artifacts/pa-e-m03-real-independent/run-1795247242291/pa-control-app-hz4SA0; virtual protocol/resource only; real vendor/model/native processes/signals=0. This does not certify installed/live controls or close milestone03.\n",
+  "evidenceRoot": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m03-real-independent/run-1795247242291/pa-control-app-hz4SA0",
+  "audit": {
+    "root": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m03-real-independent/run-1795247242291/pa-control-app-hz4SA0",
+    "ok": true,
+    "results": [
+      {
+        "mode": "question",
+        "root": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m03-real-independent/run-1795247242291/pa-control-app-hz4SA0/question",
+        "workId": "82e94fe86469550999cc97ac843cf3f5",
+        "ticketId": "a292e2047e2b96c308132e4ea5fdad87",
+        "assignmentId": "217cdcfec31c398aa9f6e2bb0cd1e178",
+        "attemptId": "attempt-e6a3a5d6-610f-4259-8f4c-16769cb394ec",
+        "failures": [],
+        "checks": {
+          "work_identity": {
+            "ok": true,
+            "detail": {
+              "works": 1,
+              "project": "control-project",
+              "title": "在原工作中回答问题并等待运行中的补充和停止：question"
+            }
+          },
+          "primary_ticket_link": {
+            "ok": true,
+            "detail": {
+              "links": 1,
+              "contract": {
+                "workId": "82e94fe86469550999cc97ac843cf3f5",
+                "revision": 1,
+                "digest": "1fa51c47ad370905fa545c345c3bb41ddc22f8baf342a83d42ca3fb711febb83"
+              }
+            }
+          },
+          "ticket_assignment": {
+            "ok": true,
+            "detail": {
+              "ticket": "a292e2047e2b96c308132e4ea5fdad87",
+              "assignment": "217cdcfec31c398aa9f6e2bb0cd1e178"
+            }
+          },
+          "binding_identity": {
+            "ok": true,
+            "detail": {
+              "binding": "attempt-e6a3a5d6-610f-4259-8f4c-16769cb394ec",
+              "state": "ended",
+              "value": {
+                "ticketId": "a292e2047e2b96c308132e4ea5fdad87",
+                "assignmentId": "217cdcfec31c398aa9f6e2bb0cd1e178",
+                "contract": {
+                  "workId": "82e94fe86469550999cc97ac843cf3f5",
+                  "revision": 1,
+                  "digest": "1fa51c47ad370905fa545c345c3bb41ddc22f8baf342a83d42ca3fb711febb83"
+                },
+                "attemptId": "attempt-e6a3a5d6-610f-4259-8f4c-16769cb394ec",
+                "fenceEpoch": 1,
+                "runnerIdentityRef": "e221e3bf946d5e59a340ed6968c185a4",
+                "source": "codex-native",
+                "state": "ended",
+                "resources": [
+                  {
+                    "ref": "controlled-protocol-resource",
+                    "ownership": "spawned_process"
+                  }
+                ]
+              }
+            }
+          },
+          "one_begin": {
+            "ok": true,
+            "detail": [
+              {
+                "command_id": "cmd-attempt-e6a3a5d6-610f-4259-8f4c-16769cb394ec-1-begin-07fbe5d88a8fbaaba9ed65eda5ec37df0f9004f9581748668aa92640d4cb190c",
+                "target": "attempt-e6a3a5d6-610f-4259-8f4c-16769cb394ec",
+                "delivery": "native_accepted",
+                "native_ref": null,
+                "error": null,
+                "updated_at": "2026-11-21T07:47:23.728Z"
+              }
+            ]
+          },
+          "one_deliver": {
+            "ok": true,
+            "detail": [
+              {
+                "command_id": "cmd-attempt-e6a3a5d6-610f-4259-8f4c-16769cb394ec-1-deliver-db2bb2a4fec6f4f3c64109080c6c2b9a9fda760dd7931a1985019f4f2762abbf",
+                "target": "attempt-e6a3a5d6-610f-4259-8f4c-16769cb394ec",
+                "delivery": "native_accepted",
+                "native_ref": null,
+                "error": null,
+                "updated_at": "2026-11-21T07:47:24.241Z"
+              }
+            ]
+          },
+          "command_identity": {
+            "ok": true,
+            "detail": {
+              "work": 1,
+              "chat": 1,
+              "stop": 1,
+              "answer": 1
+            }
+          },
+          "request_order": {
+            "ok": true,
+            "detail": [
+              "2026-11-21T07:47:23.371Z",
+              "2026-11-21T07:47:23.968Z",
+              "2026-11-21T07:47:24.184Z",
+              "2026-11-21T07:47:24.314Z"
+            ]
+          },
+          "question_identity": {
+            "ok": true,
+            "detail": {
+              "question": "codex-question-e442e2f38a94b4959f05d786034bdfb575e6e085ceeba87f",
+              "target": {
+                "ticketId": "a292e2047e2b96c308132e4ea5fdad87",
+                "assignmentId": "217cdcfec31c398aa9f6e2bb0cd1e178",
+                "contract": {
+                  "workId": "82e94fe86469550999cc97ac843cf3f5",
+                  "revision": 1,
+                  "digest": "1fa51c47ad370905fa545c345c3bb41ddc22f8baf342a83d42ca3fb711febb83"
+                },
+                "attemptId": "attempt-e6a3a5d6-610f-4259-8f4c-16769cb394ec",
+                "fenceEpoch": 1,
+                "id": "codex-target-e442e2f38a94b4959f05d786034bdfb575e6e085ceeba87f",
+                "connectionEpoch": 1,
+                "nativeRequestId": {
+                  "kind": "integer",
+                  "decimal": "42"
+                },
+                "nativeMethod": "item/tool/requestUserInput",
+                "provenanceRef": "payload:bb1dd4ee4198c044919b57c4d709fdf34072f1f216426dc9de7311b48d5ff3a4"
+              }
+            }
+          },
+          "answer_identity": {
+            "ok": true,
+            "detail": {
+              "answer": "80adc382a6d3fad94a35ac023c2b1fdd",
+              "version": 1
+            }
+          },
+          "answer_command_identity": {
+            "ok": true,
+            "detail": {
+              "command": "cmd-answer-739d24dd-453a-4965-81bf-d80baf7b16e1",
+              "result": {
+                "status": "recorded",
+                "workId": "82e94fe86469550999cc97ac843cf3f5",
+                "entityRefs": {
+                  "questionId": "codex-question-e442e2f38a94b4959f05d786034bdfb575e6e085ceeba87f"
+                }
+              }
+            }
+          },
+          "answer_native_effect": {
+            "ok": true,
+            "detail": {
+              "deliveries": [
+                {
+                  "answer_id": "80adc382a6d3fad94a35ac023c2b1fdd",
+                  "target_binding_id": "codex-target-e442e2f38a94b4959f05d786034bdfb575e6e085ceeba87f",
+                  "status": "native_applied",
+                  "evidence": "answer-evidence:411ac23010343274ccd6af054ce48d9f",
+                  "updated_at": "2026-11-21T07:47:24.089Z"
+                }
+              ],
+              "answerObserved": 1
+            }
+          },
+          "lost_response_no_replay": {
+            "ok": true,
+            "detail": {
+              "mode": "question",
+              "answerCommands": 1,
+              "answers": 1
+            }
+          },
+          "supplement_same_attempt": {
+            "ok": true,
+            "detail": {
+              "dispatches": 2,
+              "deliver": 1
+            }
+          },
+          "stop_before_resource_stop": {
+            "ok": true,
+            "detail": {
+              "stop": "2026-11-21T07:47:24.314Z",
+              "barrier": "2026-11-21T07:47:24.378Z",
+              "resources": [
+                {
+                  "fact_id": "a023287d456f102a9b33fcfec431f4c5",
+                  "attempt_id": "attempt-e6a3a5d6-610f-4259-8f4c-16769cb394ec",
+                  "resource_ref": "controlled-protocol-resource",
+                  "ownership": "spawned_process",
+                  "kind": "writer.observed",
+                  "status": "quiescent",
+                  "exit_code": null,
+                  "signal": null,
+                  "observed_at": "2026-11-21T07:47:24.378Z"
+                }
+              ]
+            }
+          },
+          "barrier_then_ended": {
+            "ok": true,
+            "detail": {
+              "barriers": 1,
+              "binding": "ended",
+              "ended": {
+                "at": "2026-11-21T07:47:24.313Z",
+                "by": "human",
+                "outcome": "stopped"
+              }
+            }
+          },
+          "screenshot_present": {
+            "ok": true,
+            "detail": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m03-real-independent/run-1795247242291/pa-control-app-hz4SA0/question/same-work-running.png"
+          }
+        }
+      },
+      {
+        "mode": "questionless",
+        "root": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m03-real-independent/run-1795247242291/pa-control-app-hz4SA0/questionless",
+        "workId": "ded55486e54a480e3f974f40c543bed5",
+        "ticketId": "f029ce7a9173c48049dd836e5dd09506",
+        "assignmentId": "40c6e35c2cb0829aa4862b436c207310",
+        "attemptId": "attempt-6bc05f98-d540-4517-b17a-f56fad3ac5ea",
+        "failures": [],
+        "checks": {
+          "work_identity": {
+            "ok": true,
+            "detail": {
+              "works": 1,
+              "project": "control-project",
+              "title": "在原工作中回答问题并等待运行中的补充和停止：questionless"
+            }
+          },
+          "primary_ticket_link": {
+            "ok": true,
+            "detail": {
+              "links": 1,
+              "contract": {
+                "workId": "ded55486e54a480e3f974f40c543bed5",
+                "revision": 1,
+                "digest": "35ce1c512f020a581020c7a8d6ca88bf41ff0d0b27fbb1571eb671d56bc1d579"
+              }
+            }
+          },
+          "ticket_assignment": {
+            "ok": true,
+            "detail": {
+              "ticket": "f029ce7a9173c48049dd836e5dd09506",
+              "assignment": "40c6e35c2cb0829aa4862b436c207310"
+            }
+          },
+          "binding_identity": {
+            "ok": true,
+            "detail": {
+              "binding": "attempt-6bc05f98-d540-4517-b17a-f56fad3ac5ea",
+              "state": "ended",
+              "value": {
+                "ticketId": "f029ce7a9173c48049dd836e5dd09506",
+                "assignmentId": "40c6e35c2cb0829aa4862b436c207310",
+                "contract": {
+                  "workId": "ded55486e54a480e3f974f40c543bed5",
+                  "revision": 1,
+                  "digest": "35ce1c512f020a581020c7a8d6ca88bf41ff0d0b27fbb1571eb671d56bc1d579"
+                },
+                "attemptId": "attempt-6bc05f98-d540-4517-b17a-f56fad3ac5ea",
+                "fenceEpoch": 1,
+                "runnerIdentityRef": "227576b4829aabb69d1782e322e39946",
+                "source": "codex-native",
+                "state": "ended",
+                "resources": [
+                  {
+                    "ref": "controlled-protocol-resource",
+                    "ownership": "spawned_process"
+                  }
+                ]
+              }
+            }
+          },
+          "one_begin": {
+            "ok": true,
+            "detail": [
+              {
+                "command_id": "cmd-attempt-6bc05f98-d540-4517-b17a-f56fad3ac5ea-1-begin-46c7c4da5a5c8fbc0823d22f406be0603a7425d885faa2e611e7fb2fcbd90a71",
+                "target": "attempt-6bc05f98-d540-4517-b17a-f56fad3ac5ea",
+                "delivery": "native_accepted",
+                "native_ref": null,
+                "error": null,
+                "updated_at": "2026-11-21T07:47:25.148Z"
+              }
+            ]
+          },
+          "one_deliver": {
+            "ok": true,
+            "detail": [
+              {
+                "command_id": "cmd-attempt-6bc05f98-d540-4517-b17a-f56fad3ac5ea-1-deliver-b633b3ea8499bb80a8a252f0bccf8c47662559d8dd9f6728ae2f3a29a922ad79",
+                "target": "attempt-6bc05f98-d540-4517-b17a-f56fad3ac5ea",
+                "delivery": "native_accepted",
+                "native_ref": null,
+                "error": null,
+                "updated_at": "2026-11-21T07:47:25.203Z"
+              }
+            ]
+          },
+          "command_identity": {
+            "ok": true,
+            "detail": {
+              "work": 1,
+              "chat": 1,
+              "stop": 1,
+              "answer": 0
+            }
+          },
+          "request_order": {
+            "ok": true,
+            "detail": [
+              "2026-11-21T07:47:24.859Z",
+              "2026-11-21T07:47:25.153Z",
+              "2026-11-21T07:47:25.274Z"
+            ]
+          },
+          "no_question": {
+            "ok": true,
+            "detail": {
+              "questions": 0,
+              "answers": 0,
+              "deliveries": 0
+            }
+          },
+          "supplement_same_attempt": {
+            "ok": true,
+            "detail": {
+              "dispatches": 2,
+              "deliver": 1
+            }
+          },
+          "stop_before_resource_stop": {
+            "ok": true,
+            "detail": {
+              "stop": "2026-11-21T07:47:25.274Z",
+              "barrier": "2026-11-21T07:47:25.342Z",
+              "resources": [
+                {
+                  "fact_id": "89663242f82078b0b584b5f9b430d53d",
+                  "attempt_id": "attempt-6bc05f98-d540-4517-b17a-f56fad3ac5ea",
+                  "resource_ref": "controlled-protocol-resource",
+                  "ownership": "spawned_process",
+                  "kind": "writer.observed",
+                  "status": "quiescent",
+                  "exit_code": null,
+                  "signal": null,
+                  "observed_at": "2026-11-21T07:47:25.342Z"
+                }
+              ]
+            }
+          },
+          "barrier_then_ended": {
+            "ok": true,
+            "detail": {
+              "barriers": 1,
+              "binding": "ended",
+              "ended": {
+                "at": "2026-11-21T07:47:25.273Z",
+                "by": "human",
+                "outcome": "stopped"
+              }
+            }
+          },
+          "screenshot_present": {
+            "ok": true,
+            "detail": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m03-real-independent/run-1795247242291/pa-control-app-hz4SA0/questionless/same-work-running.png"
+          }
+        }
+      },
+      {
+        "mode": "lost-answer-response",
+        "root": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m03-real-independent/run-1795247242291/pa-control-app-hz4SA0/lost-answer-response",
+        "workId": "edda32afc97a72940cc7bea12fcbf900",
+        "ticketId": "1506eee16eb530917023e9d704c12b4b",
+        "assignmentId": "889a68935faa5d721ae90fc1bcf34998",
+        "attemptId": "attempt-0104a3bb-5fac-484e-9b74-47f0f72fd5c5",
+        "failures": [],
+        "checks": {
+          "work_identity": {
+            "ok": true,
+            "detail": {
+              "works": 1,
+              "project": "control-project",
+              "title": "在原工作中回答问题并等待运行中的补充和停止：lost-answer-response"
+            }
+          },
+          "primary_ticket_link": {
+            "ok": true,
+            "detail": {
+              "links": 1,
+              "contract": {
+                "workId": "edda32afc97a72940cc7bea12fcbf900",
+                "revision": 1,
+                "digest": "f1e67a7bda7e10123179fc4b121406a2734b2222b0e7674cc269e8c1f8e6d107"
+              }
+            }
+          },
+          "ticket_assignment": {
+            "ok": true,
+            "detail": {
+              "ticket": "1506eee16eb530917023e9d704c12b4b",
+              "assignment": "889a68935faa5d721ae90fc1bcf34998"
+            }
+          },
+          "binding_identity": {
+            "ok": true,
+            "detail": {
+              "binding": "attempt-0104a3bb-5fac-484e-9b74-47f0f72fd5c5",
+              "state": "ended",
+              "value": {
+                "ticketId": "1506eee16eb530917023e9d704c12b4b",
+                "assignmentId": "889a68935faa5d721ae90fc1bcf34998",
+                "contract": {
+                  "workId": "edda32afc97a72940cc7bea12fcbf900",
+                  "revision": 1,
+                  "digest": "f1e67a7bda7e10123179fc4b121406a2734b2222b0e7674cc269e8c1f8e6d107"
+                },
+                "attemptId": "attempt-0104a3bb-5fac-484e-9b74-47f0f72fd5c5",
+                "fenceEpoch": 1,
+                "runnerIdentityRef": "7c2a6caa44ecb58044c5ac3cad54f44f",
+                "source": "codex-native",
+                "state": "ended",
+                "resources": [
+                  {
+                    "ref": "controlled-protocol-resource",
+                    "ownership": "spawned_process"
+                  }
+                ]
+              }
+            }
+          },
+          "one_begin": {
+            "ok": true,
+            "detail": [
+              {
+                "command_id": "cmd-attempt-0104a3bb-5fac-484e-9b74-47f0f72fd5c5-1-begin-f643197f0fcfea86d780ee3aaaf37d9cac928aa3f77cd88e0f7e42e02d36f5a8",
+                "target": "attempt-0104a3bb-5fac-484e-9b74-47f0f72fd5c5",
+                "delivery": "native_accepted",
+                "native_ref": null,
+                "error": null,
+                "updated_at": "2026-11-21T07:47:26.138Z"
+              }
+            ]
+          },
+          "one_deliver": {
+            "ok": true,
+            "detail": [
+              {
+                "command_id": "cmd-attempt-0104a3bb-5fac-484e-9b74-47f0f72fd5c5-1-deliver-a8b5b5bf8c77eb872cbed8a88a027050167fc967710a36f2c939fab54a776aa3",
+                "target": "attempt-0104a3bb-5fac-484e-9b74-47f0f72fd5c5",
+                "delivery": "native_accepted",
+                "native_ref": null,
+                "error": null,
+                "updated_at": "2026-11-21T07:47:26.758Z"
+              }
+            ]
+          },
+          "command_identity": {
+            "ok": true,
+            "detail": {
+              "work": 1,
+              "chat": 1,
+              "stop": 1,
+              "answer": 1
+            }
+          },
+          "request_order": {
+            "ok": true,
+            "detail": [
+              "2026-11-21T07:47:25.824Z",
+              "2026-11-21T07:47:26.374Z",
+              "2026-11-21T07:47:26.720Z",
+              "2026-11-21T07:47:26.835Z"
+            ]
+          },
+          "question_identity": {
+            "ok": true,
+            "detail": {
+              "question": "codex-question-d85798f4517cdccf1bc52ada43bcbcc640d169ac445f335c",
+              "target": {
+                "ticketId": "1506eee16eb530917023e9d704c12b4b",
+                "assignmentId": "889a68935faa5d721ae90fc1bcf34998",
+                "contract": {
+                  "workId": "edda32afc97a72940cc7bea12fcbf900",
+                  "revision": 1,
+                  "digest": "f1e67a7bda7e10123179fc4b121406a2734b2222b0e7674cc269e8c1f8e6d107"
+                },
+                "attemptId": "attempt-0104a3bb-5fac-484e-9b74-47f0f72fd5c5",
+                "fenceEpoch": 1,
+                "id": "codex-target-d85798f4517cdccf1bc52ada43bcbcc640d169ac445f335c",
+                "connectionEpoch": 1,
+                "nativeRequestId": {
+                  "kind": "integer",
+                  "decimal": "42"
+                },
+                "nativeMethod": "item/tool/requestUserInput",
+                "provenanceRef": "payload:bb1dd4ee4198c044919b57c4d709fdf34072f1f216426dc9de7311b48d5ff3a4"
+              }
+            }
+          },
+          "answer_identity": {
+            "ok": true,
+            "detail": {
+              "answer": "6744f802912ab2e98d9caa0ca4653242",
+              "version": 1
+            }
+          },
+          "answer_command_identity": {
+            "ok": true,
+            "detail": {
+              "command": "cmd-answer-8392fb82-8731-43f1-9faf-4602a97c7779",
+              "result": {
+                "status": "recorded",
+                "workId": "edda32afc97a72940cc7bea12fcbf900",
+                "entityRefs": {
+                  "questionId": "codex-question-d85798f4517cdccf1bc52ada43bcbcc640d169ac445f335c"
+                }
+              }
+            }
+          },
+          "answer_native_effect": {
+            "ok": true,
+            "detail": {
+              "deliveries": [
+                {
+                  "answer_id": "6744f802912ab2e98d9caa0ca4653242",
+                  "target_binding_id": "codex-target-d85798f4517cdccf1bc52ada43bcbcc640d169ac445f335c",
+                  "status": "native_applied",
+                  "evidence": "answer-evidence:c47c0f1fc2d5c060b4684c08f781871b",
+                  "updated_at": "2026-11-21T07:47:26.448Z"
+                }
+              ],
+              "answerObserved": 1
+            }
+          },
+          "lost_response_no_replay": {
+            "ok": true,
+            "detail": {
+              "mode": "lost-answer-response",
+              "answerCommands": 1,
+              "answers": 1
+            }
+          },
+          "supplement_same_attempt": {
+            "ok": true,
+            "detail": {
+              "dispatches": 2,
+              "deliver": 1
+            }
+          },
+          "stop_before_resource_stop": {
+            "ok": true,
+            "detail": {
+              "stop": "2026-11-21T07:47:26.835Z",
+              "barrier": "2026-11-21T07:47:26.898Z",
+              "resources": [
+                {
+                  "fact_id": "881393ac089a8c35fc4bf50d59a31240",
+                  "attempt_id": "attempt-0104a3bb-5fac-484e-9b74-47f0f72fd5c5",
+                  "resource_ref": "controlled-protocol-resource",
+                  "ownership": "spawned_process",
+                  "kind": "writer.observed",
+                  "status": "quiescent",
+                  "exit_code": null,
+                  "signal": null,
+                  "observed_at": "2026-11-21T07:47:26.898Z"
+                }
+              ]
+            }
+          },
+          "barrier_then_ended": {
+            "ok": true,
+            "detail": {
+              "barriers": 1,
+              "binding": "ended",
+              "ended": {
+                "at": "2026-11-21T07:47:26.835Z",
+                "by": "human",
+                "outcome": "stopped"
+              }
+            }
+          },
+          "screenshot_present": {
+            "ok": true,
+            "detail": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m03-real-independent/run-1795247242291/pa-control-app-hz4SA0/lost-answer-response/same-work-running.png"
+          }
+        }
+      },
+      {
+        "mode": "unknown-resource",
+        "root": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m03-real-independent/run-1795247242291/pa-control-app-hz4SA0/unknown-resource",
+        "workId": "da54c6d08c3b187338693c3ab253bfa7",
+        "ticketId": "4aaa0e9d6f252e850a05835baff99832",
+        "assignmentId": "5a37919df069c4b98e1d2eb4a8d7da67",
+        "attemptId": "attempt-00ddc3c8-f361-4648-a0ef-4557ac6908fa",
+        "failures": [],
+        "checks": {
+          "work_identity": {
+            "ok": true,
+            "detail": {
+              "works": 1,
+              "project": "control-project",
+              "title": "在原工作中回答问题并等待运行中的补充和停止：unknown-resource"
+            }
+          },
+          "primary_ticket_link": {
+            "ok": true,
+            "detail": {
+              "links": 1,
+              "contract": {
+                "workId": "da54c6d08c3b187338693c3ab253bfa7",
+                "revision": 1,
+                "digest": "29a51fa41b01c4608b4429c7e37985a46c647edadca14f298e6e165c2701e36b"
+              }
+            }
+          },
+          "ticket_assignment": {
+            "ok": true,
+            "detail": {
+              "ticket": "4aaa0e9d6f252e850a05835baff99832",
+              "assignment": "5a37919df069c4b98e1d2eb4a8d7da67"
+            }
+          },
+          "binding_identity": {
+            "ok": true,
+            "detail": {
+              "binding": "attempt-00ddc3c8-f361-4648-a0ef-4557ac6908fa",
+              "state": "stopping",
+              "value": {
+                "ticketId": "4aaa0e9d6f252e850a05835baff99832",
+                "assignmentId": "5a37919df069c4b98e1d2eb4a8d7da67",
+                "contract": {
+                  "workId": "da54c6d08c3b187338693c3ab253bfa7",
+                  "revision": 1,
+                  "digest": "29a51fa41b01c4608b4429c7e37985a46c647edadca14f298e6e165c2701e36b"
+                },
+                "attemptId": "attempt-00ddc3c8-f361-4648-a0ef-4557ac6908fa",
+                "fenceEpoch": 1,
+                "runnerIdentityRef": "2822701c64e7db0c59e6e497cb7f610c",
+                "source": "codex-native",
+                "state": "stopping",
+                "resources": [
+                  {
+                    "ref": "controlled-protocol-resource",
+                    "ownership": "spawned_process"
+                  }
+                ]
+              }
+            }
+          },
+          "one_begin": {
+            "ok": true,
+            "detail": [
+              {
+                "command_id": "cmd-attempt-00ddc3c8-f361-4648-a0ef-4557ac6908fa-1-begin-ffc47b20d15b3b894e104a5639114c612576bbd1a3a930aabe28e86164a75d6e",
+                "target": "attempt-00ddc3c8-f361-4648-a0ef-4557ac6908fa",
+                "delivery": "native_accepted",
+                "native_ref": null,
+                "error": null,
+                "updated_at": "2026-11-21T07:47:27.671Z"
+              }
+            ]
+          },
+          "one_deliver": {
+            "ok": true,
+            "detail": [
+              {
+                "command_id": "cmd-attempt-00ddc3c8-f361-4648-a0ef-4557ac6908fa-1-deliver-cb242a07ec4f9cdedcc8a50965c53c2a6c1b5387a9b65568025b9f1ed9be5351",
+                "target": "attempt-00ddc3c8-f361-4648-a0ef-4557ac6908fa",
+                "delivery": "native_accepted",
+                "native_ref": null,
+                "error": null,
+                "updated_at": "2026-11-21T07:47:28.126Z"
+              }
+            ]
+          },
+          "command_identity": {
+            "ok": true,
+            "detail": {
+              "work": 1,
+              "chat": 1,
+              "stop": 1,
+              "answer": 1
+            }
+          },
+          "request_order": {
+            "ok": true,
+            "detail": [
+              "2026-11-21T07:47:27.357Z",
+              "2026-11-21T07:47:27.906Z",
+              "2026-11-21T07:47:28.089Z",
+              "2026-11-21T07:47:28.205Z"
+            ]
+          },
+          "question_identity": {
+            "ok": true,
+            "detail": {
+              "question": "codex-question-cd4ec64dddce425f7a314f25ee2edff895df3fb340e384ee",
+              "target": {
+                "ticketId": "4aaa0e9d6f252e850a05835baff99832",
+                "assignmentId": "5a37919df069c4b98e1d2eb4a8d7da67",
+                "contract": {
+                  "workId": "da54c6d08c3b187338693c3ab253bfa7",
+                  "revision": 1,
+                  "digest": "29a51fa41b01c4608b4429c7e37985a46c647edadca14f298e6e165c2701e36b"
+                },
+                "attemptId": "attempt-00ddc3c8-f361-4648-a0ef-4557ac6908fa",
+                "fenceEpoch": 1,
+                "id": "codex-target-cd4ec64dddce425f7a314f25ee2edff895df3fb340e384ee",
+                "connectionEpoch": 1,
+                "nativeRequestId": {
+                  "kind": "integer",
+                  "decimal": "42"
+                },
+                "nativeMethod": "item/tool/requestUserInput",
+                "provenanceRef": "payload:bb1dd4ee4198c044919b57c4d709fdf34072f1f216426dc9de7311b48d5ff3a4"
+              }
+            }
+          },
+          "answer_identity": {
+            "ok": true,
+            "detail": {
+              "answer": "f2049e5b76534ca2df7ba35cb6369ec4",
+              "version": 1
+            }
+          },
+          "answer_command_identity": {
+            "ok": true,
+            "detail": {
+              "command": "cmd-answer-f215e231-006c-4adb-9c5b-e1be275b741e",
+              "result": {
+                "status": "recorded",
+                "workId": "da54c6d08c3b187338693c3ab253bfa7",
+                "entityRefs": {
+                  "questionId": "codex-question-cd4ec64dddce425f7a314f25ee2edff895df3fb340e384ee"
+                }
+              }
+            }
+          },
+          "answer_native_effect": {
+            "ok": true,
+            "detail": {
+              "deliveries": [
+                {
+                  "answer_id": "f2049e5b76534ca2df7ba35cb6369ec4",
+                  "target_binding_id": "codex-target-cd4ec64dddce425f7a314f25ee2edff895df3fb340e384ee",
+                  "status": "native_applied",
+                  "evidence": "answer-evidence:77c307dde7d4d271fdfc177b60c56108",
+                  "updated_at": "2026-11-21T07:47:28.015Z"
+                }
+              ],
+              "answerObserved": 1
+            }
+          },
+          "lost_response_no_replay": {
+            "ok": true,
+            "detail": {
+              "mode": "unknown-resource",
+              "answerCommands": 1,
+              "answers": 1
+            }
+          },
+          "supplement_same_attempt": {
+            "ok": true,
+            "detail": {
+              "dispatches": 2,
+              "deliver": 1
+            }
+          },
+          "unknown_resource_held": {
+            "ok": true,
+            "detail": {
+              "binding": "stopping",
+              "resources": [
+                {
+                  "fact_id": "fact-attempt-00ddc3c8-f361-4648-a0ef-4557ac6908fa-1",
+                  "attempt_id": "attempt-00ddc3c8-f361-4648-a0ef-4557ac6908fa",
+                  "resource_ref": "controlled-protocol-resource",
+                  "ownership": "spawned_process",
+                  "kind": "writer.observed",
+                  "status": "active",
+                  "exit_code": null,
+                  "signal": null,
+                  "observed_at": "2026-11-21T07:47:27.523Z"
+                }
+              ],
+              "barriers": 0,
+              "ended": {
+                "at": "2026-11-21T07:47:28.204Z",
+                "by": "human",
+                "outcome": "stopped"
+              }
+            }
+          },
+          "screenshot_present": {
+            "ok": true,
+            "detail": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m03-real-independent/run-1795247242291/pa-control-app-hz4SA0/unknown-resource/same-work-running.png"
+          }
+        }
+      }
+    ]
+  },
+  "limitations": [
+    "Controlled protocol peer and virtual resources only; no Codex/vendor/model/native process or signal.",
+    "This independently audits the original App/HTTP/Store/Application/QuestionBroker/Driver wiring and receipts; it is not an installed-package or live native pass.",
+    "No real Work/turn was sent; budget remains 4/4 exhausted."
+  ]
+}

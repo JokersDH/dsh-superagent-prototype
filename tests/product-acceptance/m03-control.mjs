@@ -154,81 +154,6 @@ export function evaluateControl(obs) {
     action }
 }
 
-/** Commands the consumer would issue, bound to the original identities (controlled, never executed). */
-function boundCommandPlan(obs) {
-  const question = obs.questions?.[0] ?? null
-  return {
-    answer: question ? { kind: 'answer_question', commandId: 'cmd-controlled-answer-1', questionId: question.id,
-      questionVersion: question.value?.version ?? 1,
-      targetId: question.value?.targets?.[0]?.id ?? null,
-      nativeRequestId: question.value?.targets?.[0]?.nativeRequestId ?? null,
-      workId: obs.workId, contractDigest: obs.contractDigest, ticketId: obs.ticketId, assignmentId: obs.assignmentId,
-      attemptId: obs.attemptId } : null,
-    steer: { kind: 'send_supplement_steer', commandId: 'cmd-controlled-deliver-1',
-      expectedTurnRef: 'turn-controlled-1', beginReceipts: obs.begin?.length ?? 0,
-      workId: obs.workId, contractDigest: obs.contractDigest, ticketId: obs.ticketId, assignmentId: obs.assignmentId,
-      attemptId: obs.attemptId },
-    stop: { kind: 'stop_running_work', commandId: 'cmd-controlled-stop-1',
-      ticketId: obs.ticketId, assignmentId: obs.assignmentId, attemptId: obs.attemptId },
-  }
-}
-
-/** Execute the consumer's answer -> same-turn steer -> running stop steps over controlled facts. */
-function runControlledChain(initial) {
-  let state = JSON.parse(JSON.stringify(initial))
-  const actions = []
-  for (let step = 0; step < 6; step += 1) {
-    const decision = evaluateControl(state)
-    actions.push({ step, action: decision.action, phase: decision.phase, items: decision.items })
-    if (decision.action === 'answer_question') {
-      state.answers = [{ answerId: 'answer-chain-1', questionId: state.questions[0].id, version: 1,
-        recordedAt: '2026-11-20T08:42:00.000Z' }]
-    } else if (decision.action === 'send_supplement_steer') {
-      state.steers = [{ commandId: 'cmd-chain-deliver-1', delivery: 'native_accepted', at: '2026-11-20T08:42:10.000Z' }]
-    } else if (decision.action === 'stop_running_work') {
-      state.stop = { requestedAt: '2026-11-20T08:42:20.000Z', endedAt: '2026-11-20T08:42:21.000Z', by: 'human', outcome: 'stopped' }
-      state.barrier = { at: '2026-11-20T08:42:21.500Z', writerFactId: 'fact-chain-1', barrierCommandId: 'barrier-chain-1' }
-      state.resources = [{ factId: 'fact-chain-1', resourceRef: 'res-chain-1', ownership: 'spawned_process',
-        kind: 'writer.observed', status: 'quiescent', observedAt: '2026-11-20T08:42:21.500Z' }]
-    } else break
-  }
-  return { actions, final: evaluateControl(state) }
-}
-
-function controlledFixtures(obs) {
-  const base = JSON.parse(JSON.stringify(obs))
-  const qid = 'question-controlled-1'
-  const bind = { workId: obs.workId, contractDigest: obs.contractDigest, ticketId: obs.ticketId,
-    assignmentId: obs.assignmentId, attemptId: obs.attemptId }
-  const full = { ...base, questions: [{ id: qid, validity: 'answered', openedAt: '2026-11-20T08:41:20.000Z',
-      value: { id: qid, version: 1,
-        contract: { workId: obs.workId, revision: 1, digest: obs.contractDigest },
-        targets: [{ id: 'target-controlled-1', nativeRequestId: 'request-controlled-1' }] } }],
-    answers: [{ answerId: 'answer-controlled-1', questionId: qid, version: 1, recordedAt: '2026-11-20T08:42:00.000Z' }],
-    steers: [{ commandId: 'cmd-controlled-deliver-1', delivery: 'native_accepted', at: '2026-11-20T08:42:10.000Z' }],
-    begin: [{ commandId: 'cmd-controlled-begin-1', delivery: 'native_accepted', at: '2026-11-20T08:41:12.531Z' }],
-    events: [{ kind: 'dispatch.observed', delivery: 'native_accepted', at: '2026-11-20T08:41:12.531Z' }],
-    stop: { requestedAt: '2026-11-20T08:42:20.000Z', endedAt: '2026-11-20T08:42:21.000Z', by: 'human', outcome: 'stopped' },
-    barrier: { at: '2026-11-20T08:42:21.500Z', writerFactId: 'fact-controlled-1', barrierCommandId: 'barrier-controlled-1' },
-    resources: [{ factId: 'fact-controlled-1', resourceRef: 'res-controlled-1', ownership: 'spawned_process',
-      kind: 'writer.observed', status: 'quiescent', observedAt: '2026-11-20T08:42:21.500Z' }] }
-  const noQuestion = { ...full, questions: [], answers: [] }
-  const terminalStop = { ...full, stop: { requestedAt: '2026-11-20T08:56:38.159Z', endedAt: '2026-11-20T08:56:38.159Z', by: 'human', outcome: 'stopped' },
-    events: [{ kind: 'dispatch.observed', delivery: 'native_accepted', at: '2026-11-20T08:41:12.531Z' },
-      { kind: 'turn.ended', outcome: 'completed', at: '2026-11-20T08:46:39.983Z' }],
-    barrier: { at: '2026-11-20T08:46:40.068Z', writerFactId: 'fact-terminal-1', barrierCommandId: 'barrier-terminal-1' },
-    resources: [{ factId: 'fact-terminal-1', resourceRef: 'res-terminal-1', ownership: 'spawned_process',
-      kind: 'writer.observed', status: 'quiescent', observedAt: '2026-11-20T08:46:40.068Z' }] }
-  const unknownAnswer = { ...full, answers: [], answerUnknown: true }
-  const chainStart = { ...JSON.parse(JSON.stringify(full)), answers: [], steers: [], stop: null, barrier: null,
-    questions: [{ ...full.questions[0], validity: 'open' }],
-    resources: [{ factId: 'fact-chain-1', resourceRef: 'res-chain-1', ownership: 'spawned_process',
-      kind: 'writer.observed', status: 'active', observedAt: '2026-11-20T08:41:12.202Z' }] }
-  const unknownResource = { ...full, resources: [{ factId: 'fact-controlled-1', resourceRef: 'res-controlled-1',
-    ownership: 'spawned_process', kind: 'writer.observed', status: 'active', observedAt: '2026-11-20T08:42:21.500Z' }] }
-  return { full, noQuestion, terminalStop, unknownAnswer, unknownResource, chainStart }
-}
-
 function writeEvidence(name, value) {
   mkdirSync(EVIDENCE_DIR, { recursive: true, mode: 0o700 })
   mkdirSync(join(PRIVATE, 'evidence'), { recursive: true, mode: 0o700 })
@@ -268,46 +193,9 @@ const commands = {
     if (decision.ok) process.exitCode = 1
   },
   controlled() {
-    const obs = observeOriginal()
-    const fixtures = controlledFixtures(obs)
-    const results = Object.fromEntries(Object.entries(fixtures).map(([name, value]) => [name, evaluateControl(value)]))
-    const chain = runControlledChain(fixtures.chainStart)
-    const boundCommands = boundCommandPlan(fixtures.chainStart)
-    const source = readFileSync(new URL(import.meta.url), 'utf8')
-    const prohibitedGlobalEnumeration = /spawnSync\(\s*['"]ps['"]|ps\s+-axo|execFileSync\(\s*['"]ps['"]/u.test(source)
-    const assertions = {
-      fullChain: results.full.ok === true && results.full.items.question === PASS && results.full.items.answer === PASS &&
-        results.full.items.steer === PASS && results.full.items.runningStop === PASS && results.full.items.barrier === PASS,
-      noQuestionDoesNotBlock: results.noQuestion.status === PARTIAL && results.noQuestion.items.question === NOT_TRIGGERED &&
-        results.noQuestion.items.steer === PASS && results.noQuestion.items.runningStop === PASS &&
-        results.noQuestion.items.barrier === PASS,
-      terminalStopRejected: results.terminalStop.ok === false && results.terminalStop.items.runningStop === FAIL &&
-        results.terminalStop.items.barrier === FAIL,
-      unknownAnswerHeld: results.unknownAnswer.items.answer === UNKNOWN && results.unknownAnswer.action === 'await_answer_no_resend',
-      unknownResourceHeld: results.unknownResource.items.resources === UNKNOWN && results.unknownResource.action === 'hold_resources_unknown',
-      noGlobalProcessEnumeration: prohibitedGlobalEnumeration === false,
-      readOnlyStore: /new DatabaseSync\(STATE_DB, \{ readOnly: true \}\)/u.test(source),
-      commandsBoundToOriginal: boundCommands.answer?.workId === ORIGINAL.workId &&
-        boundCommands.answer?.contractDigest === ORIGINAL.contractDigest &&
-        boundCommands.answer?.ticketId === ORIGINAL.ticketId && boundCommands.answer?.attemptId === ORIGINAL.attemptId &&
-        boundCommands.answer?.questionId && boundCommands.answer?.targetId && boundCommands.answer?.nativeRequestId &&
-        boundCommands.steer.workId === ORIGINAL.workId && boundCommands.steer.attemptId === ORIGINAL.attemptId &&
-        boundCommands.steer.beginReceipts === 1 && boundCommands.stop.ticketId === ORIGINAL.ticketId &&
-        boundCommands.stop.attemptId === ORIGINAL.attemptId,
-      executedControlledChain: chain.final.ok === true &&
-        ['answer_question', 'send_supplement_steer', 'stop_running_work'].every(action =>
-          chain.actions.some(item => item.action === action)),
-      sameOriginalIdentity: Object.values(fixtures).every(value => value.workId === ORIGINAL.workId &&
-        value.contractDigest === ORIGINAL.contractDigest && value.ticketId === ORIGINAL.ticketId &&
-        value.assignmentId === ORIGINAL.assignmentId && value.attemptId === ORIGINAL.attemptId),
-    }
-    const ok = Object.values(assertions).every(Boolean)
-    const evidence = { at: new Date().toISOString(), kind: 'controlled-consumer-chain', original: ORIGINAL,
-      assertions, results, fixtures, chain, boundCommands, note: 'Controlled records reuse the original work/contract/ticket/assignment/attempt identities with synthetic question/target/command values. They do not create another product lifecycle and are not live evidence.' }
-    writeEvidence('m03-control-controlled.json', evidence)
-    console.log(JSON.stringify({ ok, assertions, chain: chain.actions, boundCommands, summary: Object.fromEntries(Object.entries(results).map(([name, value]) => [name,
-      { status: value.status, items: value.items, action: value.action }])) }, null, 1))
-    if (!ok) process.exitCode = 1
+    console.log(JSON.stringify({ refused: true, reason: 'self_filled_simulation_retired',
+      replacement: 'node tests/product-acceptance/m03-real-consumer.mjs --verify' }, null, 1))
+    process.exitCode = 3
   },
   run() {
     console.log(JSON.stringify({ refused: true, reason: 'milestone_budget_exhausted_4_of_4',
