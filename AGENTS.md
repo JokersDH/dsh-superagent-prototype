@@ -39,7 +39,7 @@
 
 ## Historical Source Checkpoints And Limits
 
-Current zero-model consumer handoff: main57243a54 tests/integration/original-control-browser.mjs drives actual App/HTTP/Store/Application/QuestionBroker/production Driver and original Runner with a virtual protocol/resource peer. Four source UI cases passed; E independently asserts original data/effects. Pure self-filled control records are not that consumer. Frozen runtime package remains83f79e82, budget4/4 exhausted, native/install conclusions unchanged.
+Current zero-model closeout is ADMITTED: main57243a54 actual App/HTTP/Store/Application/QuestionBroker/Driver/Runner control consumer plus E b90129fe independent readonly Store audit (exact standalone source imported in main37ddf21a). Main replay and wrong-answer/UNKNOWN-release refusal checks passed. D/E now standby; no more maintenance dispatch. Milestone03 remains4/6 and budget4/4 exhausted; the proposed at-most2 extra same-package real turns in its packet are NOT authorized. Frozen runtime remains83f79e82.
 
 The current selected daily-use source is 83f79e8249efd68f429f2b6828ea233278071737; D may freeze this source and E verifies that exact package under docs/product/MILESTONE-03.zh-CN.md. The older checkpoints below remain historical evidence and candidate limits, not active recovery work or a direction to re-test W36. Milestones01/02 closed scopes remain as recorded in their completion summary.
 

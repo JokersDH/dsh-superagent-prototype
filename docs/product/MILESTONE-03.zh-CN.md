@@ -78,18 +78,25 @@ E如实提交result.ok=false，原未知发送后通过原事实核对为sent，
 
 实际命令：node tests/integration/original-control-browser.mjs /Users/hh/Desktop/joker/pa-artifacts，exit0，四场景；持久材料 /Users/hh/Desktop/joker/pa-artifacts/pa-control-app-tWp1ft（每场景原SQLite/Runner材料/运行截图均保留）。原callback/拒绝和2/4组合恢复回归4PASS，coordinator product严格检查通过。源码/测试改动不改变已冻结包，D不重包。真实4/4仍耗尽、里程碑仍4/6，E接这个可运行消费者做独立原身份/副作用/拒绝断言后，才有下一次真实同包复验的就绪依据；当前不自动发送或申请补额。
 
-## 发给Agent D（整段复制）
+## 当前决定点：零模型收尾已验收，等待同包真实复验授权
 
-~~~text
-继续保持83f79e82/buildd3ba0ec6dccc5eac准确包和SHA，零模型待命，不重包。main新增的是零模型测试消费者57243a54，不是运行代码后继；不需要为docs/tests冻结新包。只有E当前路径暴露具体安装阻断才参与，别另开升级/签名/多平台维护。预算仍4/4耗尽，main/D/E均0，十二实例和原状态保留。
-~~~
+2026-11-21，E最新b90129fec7eee572b82f44df9e66153d8274c2b4已改为实际运行主线四场景消费者，再独立只读审计每个原Store。main审查后以原字节将唯一standalone入口 tests/product-acceptance/m03-real-consumer.mjs 纳入主线37ddf21a；其SHA256为ea37ee549d6d6b32cb90edacfca63d065f7da5028eea98d6912ff64360267e13，未改E的断言或其他候选代码。
 
-## 发给Agent E（整段复制）
+main从自己的持久私有目录重跑该入口对E真实生成的四个Store做审计，exit0、无失败；再用SQLite只读backup创建自己的隔离副本，改错answer.expected_version后exit1/answer_identity拒绝，UNKNOWN场景把binding伪改ended后exit1/unknown_resource_held拒绝。原E Store/文件未写，未启服务/模型/原生任务或发信号。复验证据在 /Users/hh/Desktop/joker/pa-artifacts/m03-main-independent-p3e1ftv7。该次实际审计消费E持久根 /Users/hh/Desktop/joker/pa-artifacts/pa-e-m03-real-independent/run-1795247242291/pa-control-app-hz4SA0 的原数据，未根据producer stdout或JSON里的PASS判定。
 
-~~~text
-继续同一里程碑03的一个完整零模型消费者收尾，不开新wave、不发真实任务。安全合入最新origin/main并读 docs/product/MILESTONE-03.zh-CN.md 最新准入。main已验你e4dcb9b4：删除全局枚举、live拒绝和真实失败保持有效；但runControlledChain只给内存answers/steers/barrier赋值，没有执行原产品；boundCommandPlan里的target/steer也不符合原wire/UserCommand，故纯函数PASS不能作原产品控制链消费者。
-主线已直接补好可执行输入：source57243a54，tests/integration/original-control-browser.mjs，命令 node tests/integration/original-control-browser.mjs <你新建的私有证据父目录>。它实际开原App/HTTP/Store/Application/QuestionBroker，走生产Driver和原Runner回调/屏障，仅协议peer与资源为受控替身，不发模型。四场景已过：问题回答→同turn steer→运行停止；无问题仍steer/stop；答案响应丢失不重发；UNKNOWN保留占用。原Callback/拒绝/2&4恢复回归保持。
-不要再扩evaluateControl和自填PASS样例。你持续负责独立复验这个现成真实消费者：在原tests/product-acceptance/加一个聚焦零模型入口，消费主线已有真实组件/消费者及其原Store/HTTP产物，用你独立的断言核work/project/contract/ticket/assignment/attempt和原question/target/command全身份、一个begin、一个答案原生效果、真实deliver/native_accepted、stop请求在原资源停止前、原屏障后ended；缺观察/错身份/UNKNOWN仍拒绝。不能只读取主线打印PASS或借其summary作为独立oracle，不向原Store写假答案/屏障，不造第二生命周期。可复用主线fixture和正常UI路径，无需从头写Runner或另一套浏览器框架。
-独立核对丢HTTP响应后的原answer表/回执/原native effect未重放，UNKNOWN场景原binding及材料保留、无barrier；四个fresh测试Store须放你自己新建持久目录，不碰之前真实Store/十二实例。补你发现的当前消费者问题，持续到一个实际独立入口exit0，不在加schema/记录或SOURCE_READY结束；若生产缺口只交main最小复现。
-4/4真实额度已用尽，--run继续拒绝，不能跑旧live/continue/begin或恢复旧grant。原83f79包不变、原真实控制FAIL与本期4/6保持，受控通过不替代live；不要再改写为完整同包通过或拿合成ID绑定当原请求证明。最后只交一个源闭包、可运行命令exit、独立原ID/持久证据和准确限制汇总；不生成逐轮报告集，也不增加维护队列。等这一就绪依据验收后再由用户决定真实复验，不自动补额。
-~~~
+因此这段零模型责任已完成，不继续派同类纯函数/审计/维护任务。D保持原包待命；E完成本段后待命；main负责汇总和下一决策，不要求使用其他agent填空。真实Milestone03仍4/6：①②④⑤按前述限定范围通过，③⑥待同包真实补验；原控制失败不改写，当前4/4总额度保持耗尽。源码工作台受控PASS与真实安装包PASS分别记录，82/100与63.1%待最终按原口径重评。
+
+### 建议后续：仅两次同包真实短任务，尚未授权
+
+建议由main端到端负责，E独立核对原数据，D仅响应具体安装阻断。继续用当前source83f79e82/buildd3ba0ec6dccc5eac和原外层ZIP/SHA，不扩功能、不换Driver、不为test/docs重包。以下是待用户决定的新小额复验，不修改、退款、重置或复用原4次及研究ledger。
+
+1. 原生审批与问题中心：正常工作台创建一个新短Work，只在其独立工作区请求一条本地只读命令的逐次审批，显式使用该CLI实际提供的请求审批能力；批准/拒绝由原问题中心完成，核对原target/question/command/native_applied和后续同会话行为。不得再要求写沙箱外/tmp标记、访问网络/凭据或仅依赖模型自由文本“请提问”；普通模式没有结构化澄清工具时明确降级，不能偷偷改profile或制造原生请求。
+2. 原运行中补充与停止：另一个新短Work执行工作区内已登记的有界本地等待命令，消费端先确认原begin已接收、turn尚未结束且原资源活动，再用正常UI发送同Work补充并核到同attempt/turn的turn/steer；运行中点击停止，以原资源屏障/完整固定资源静止证明后才接受槽归还。不要把原问题是否触发设为这一场景的前置，不continue终态旧Work替代运行补充。
+
+每个任务最多一次实际turn/start，总新增上限建议2；不必用满。新增额度未获用户明确批准前，所有live入口继续拒绝。搭建失败且确认未发可修复；结果未知业务发送先核对、不得换ID重发。任务未触发/FAIL/UNKNOWN如实结束，达到新上限即停，不自动追加、补样或开启下一wave。无需额外主对话网关请求、OS故障信号或跨机测试；审批仅对指定本地工作区命令，原sandbox/身份/权限守卫不放松。
+
+完成时只写一份Milestone03总汇：准确包、两原交付及补验的原身份/实际发送账、六项结论、原十二项重评、使用入口与已知限制。若仍未达，保留未达而不凑6/6；用户可另行决定受限个人预览或继续修复，不自动当作稳定发行。没有第二台Mac实证时跨机仍NOT_TESTED。
+
+## D、E当前安排
+
+本段已完成，无需再转发开发任务。D保留原包和全部SHA，E保留已验独立消费者和原失败/受控材料，均按需待命，不重跑已通过双项目或继续扩审计。等待用户对上述两次真实复验的明确决定；目前预算main/D/E仍0，旧live与continue/begin一律不自动执行。
