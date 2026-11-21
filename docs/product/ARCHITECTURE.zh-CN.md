@@ -1,5 +1,7 @@
 # 个人 Agent 助理：当前架构与代码地图
 
+2026-11-21当前：固定source83f79e82/buildd3ba0ec6dccc5eac同包日常使用里程碑03已6/6关闭，详见[唯一完成汇总](MILESTONE-03-COMPLETION.zh-CN.md)。仍是原Store/Application/QuestionBroker、Ticket/Assignment、原Runner/生产CodexDriver与资源屏障；新增外部验收观察器只转发stdio计数，未新增运行时/生命周期或改动冻结包。以下旧源码检查点仅按历史范围读。
+
 2026-11-19收尾：原同Work真实Codex/SIGKILL恢复与原工作台审批、plan澄清、steer、物理停止已完成两项冻结里程碑；具体版本、范围和实际发送数见唯一[汇总](MILESTONES-01-02.zh-CN.md)。原native profile支持可选plan/default模式，变更在恢复时重新核对；single澄清选项由原表单显示，执行生命周期/授权/验证权威保持原实现。临时B/H修改权已结束，以下图与历史检查点按其范围读。
 
 > 本地优先的开发工作台：讨论需求，明确委托已有 Agent，在隔离工作区执行，查看可核对的检查与变更，再人工接受交付。
