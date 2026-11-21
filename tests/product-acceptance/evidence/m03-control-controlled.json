@@ -1,5 +1,5 @@
 {
-  "at": "2026-11-21T03:01:41.624Z",
+  "at": "2026-11-21T07:22:16.198Z",
   "kind": "controlled-consumer-chain",
   "original": {
     "workId": "6dd113a40e7656be47c023494c61c3e7",
@@ -15,6 +15,8 @@
     "unknownAnswerHeld": true,
     "unknownResourceHeld": true,
     "noGlobalProcessEnumeration": true,
+    "readOnlyStore": true,
+    "commandsBoundToOriginal": true,
     "executedControlledChain": true,
     "sameOriginalIdentity": true
   },
@@ -689,6 +691,39 @@
         "resources": "PASS"
       },
       "action": "none"
+    }
+  },
+  "boundCommands": {
+    "answer": {
+      "kind": "answer_question",
+      "commandId": "cmd-controlled-answer-1",
+      "questionId": "question-controlled-1",
+      "questionVersion": 1,
+      "targetId": "target-controlled-1",
+      "nativeRequestId": "request-controlled-1",
+      "workId": "6dd113a40e7656be47c023494c61c3e7",
+      "contractDigest": "65dac49411e34936225ed3c7042a1fca5152983cbabbf53b26cdb9795bbb3a0a",
+      "ticketId": "a7c31233b1859ba7515169eab72e6275",
+      "assignmentId": "e9dbd4b2882d8ea51428267d17099a88",
+      "attemptId": "attempt-b5f967fe-022d-45ad-b838-70dc20e87a6b"
+    },
+    "steer": {
+      "kind": "send_supplement_steer",
+      "commandId": "cmd-controlled-deliver-1",
+      "expectedTurnRef": "turn-controlled-1",
+      "beginReceipts": 1,
+      "workId": "6dd113a40e7656be47c023494c61c3e7",
+      "contractDigest": "65dac49411e34936225ed3c7042a1fca5152983cbabbf53b26cdb9795bbb3a0a",
+      "ticketId": "a7c31233b1859ba7515169eab72e6275",
+      "assignmentId": "e9dbd4b2882d8ea51428267d17099a88",
+      "attemptId": "attempt-b5f967fe-022d-45ad-b838-70dc20e87a6b"
+    },
+    "stop": {
+      "kind": "stop_running_work",
+      "commandId": "cmd-controlled-stop-1",
+      "ticketId": "a7c31233b1859ba7515169eab72e6275",
+      "assignmentId": "e9dbd4b2882d8ea51428267d17099a88",
+      "attemptId": "attempt-b5f967fe-022d-45ad-b838-70dc20e87a6b"
     }
   },
   "note": "Controlled records reuse the original work/contract/ticket/assignment/attempt identities with synthetic question/target/command values. They do not create another product lifecycle and are not live evidence."

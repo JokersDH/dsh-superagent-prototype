@@ -154,6 +154,25 @@ export function evaluateControl(obs) {
     action }
 }
 
+/** Commands the consumer would issue, bound to the original identities (controlled, never executed). */
+function boundCommandPlan(obs) {
+  const question = obs.questions?.[0] ?? null
+  return {
+    answer: question ? { kind: 'answer_question', commandId: 'cmd-controlled-answer-1', questionId: question.id,
+      questionVersion: question.value?.version ?? 1,
+      targetId: question.value?.targets?.[0]?.id ?? null,
+      nativeRequestId: question.value?.targets?.[0]?.nativeRequestId ?? null,
+      workId: obs.workId, contractDigest: obs.contractDigest, ticketId: obs.ticketId, assignmentId: obs.assignmentId,
+      attemptId: obs.attemptId } : null,
+    steer: { kind: 'send_supplement_steer', commandId: 'cmd-controlled-deliver-1',
+      expectedTurnRef: 'turn-controlled-1', beginReceipts: obs.begin?.length ?? 0,
+      workId: obs.workId, contractDigest: obs.contractDigest, ticketId: obs.ticketId, assignmentId: obs.assignmentId,
+      attemptId: obs.attemptId },
+    stop: { kind: 'stop_running_work', commandId: 'cmd-controlled-stop-1',
+      ticketId: obs.ticketId, assignmentId: obs.assignmentId, attemptId: obs.attemptId },
+  }
+}
+
 /** Execute the consumer's answer -> same-turn steer -> running stop steps over controlled facts. */
 function runControlledChain(initial) {
   let state = JSON.parse(JSON.stringify(initial))
@@ -253,6 +272,7 @@ const commands = {
     const fixtures = controlledFixtures(obs)
     const results = Object.fromEntries(Object.entries(fixtures).map(([name, value]) => [name, evaluateControl(value)]))
     const chain = runControlledChain(fixtures.chainStart)
+    const boundCommands = boundCommandPlan(fixtures.chainStart)
     const source = readFileSync(new URL(import.meta.url), 'utf8')
     const prohibitedGlobalEnumeration = /spawnSync\(\s*['"]ps['"]|ps\s+-axo|execFileSync\(\s*['"]ps['"]/u.test(source)
     const assertions = {
@@ -266,6 +286,14 @@ const commands = {
       unknownAnswerHeld: results.unknownAnswer.items.answer === UNKNOWN && results.unknownAnswer.action === 'await_answer_no_resend',
       unknownResourceHeld: results.unknownResource.items.resources === UNKNOWN && results.unknownResource.action === 'hold_resources_unknown',
       noGlobalProcessEnumeration: prohibitedGlobalEnumeration === false,
+      readOnlyStore: /new DatabaseSync\(STATE_DB, \{ readOnly: true \}\)/u.test(source),
+      commandsBoundToOriginal: boundCommands.answer?.workId === ORIGINAL.workId &&
+        boundCommands.answer?.contractDigest === ORIGINAL.contractDigest &&
+        boundCommands.answer?.ticketId === ORIGINAL.ticketId && boundCommands.answer?.attemptId === ORIGINAL.attemptId &&
+        boundCommands.answer?.questionId && boundCommands.answer?.targetId && boundCommands.answer?.nativeRequestId &&
+        boundCommands.steer.workId === ORIGINAL.workId && boundCommands.steer.attemptId === ORIGINAL.attemptId &&
+        boundCommands.steer.beginReceipts === 1 && boundCommands.stop.ticketId === ORIGINAL.ticketId &&
+        boundCommands.stop.attemptId === ORIGINAL.attemptId,
       executedControlledChain: chain.final.ok === true &&
         ['answer_question', 'send_supplement_steer', 'stop_running_work'].every(action =>
           chain.actions.some(item => item.action === action)),
@@ -275,9 +303,9 @@ const commands = {
     }
     const ok = Object.values(assertions).every(Boolean)
     const evidence = { at: new Date().toISOString(), kind: 'controlled-consumer-chain', original: ORIGINAL,
-      assertions, results, fixtures, chain, note: 'Controlled records reuse the original work/contract/ticket/assignment/attempt identities with synthetic question/target/command values. They do not create another product lifecycle and are not live evidence.' }
+      assertions, results, fixtures, chain, boundCommands, note: 'Controlled records reuse the original work/contract/ticket/assignment/attempt identities with synthetic question/target/command values. They do not create another product lifecycle and are not live evidence.' }
     writeEvidence('m03-control-controlled.json', evidence)
-    console.log(JSON.stringify({ ok, assertions, chain: chain.actions, summary: Object.fromEntries(Object.entries(results).map(([name, value]) => [name,
+    console.log(JSON.stringify({ ok, assertions, chain: chain.actions, boundCommands, summary: Object.fromEntries(Object.entries(results).map(([name, value]) => [name,
       { status: value.status, items: value.items, action: value.action }])) }, null, 1))
     if (!ok) process.exitCode = 1
   },
