@@ -68,22 +68,28 @@ E如实提交result.ok=false，原未知发送后通过原事实核对为sent，
 
 固定包继续不变：outer /Users/hh/Desktop/joker/pa-artifacts/m03-preview-d3ba0ec/PersonalAgent-Preview-d3ba0ec.zip，63575237B，SHA163b32170680bcbdb324a4fd8edc631bdfb685633911a787c3b3de353577075b；inner /Users/hh/Desktop/joker/pa-artifacts/m03-target/m03-target-d3ba0ec.tar.gz，20631227B，SHA52eee9083b4d2256a58189327c93605c157e38f5cd44894482a82c6198f56123。
 
+## 最新准入：主线已补实际源码工作台消费者
+
+2026-11-21收到E的3e55b482/e4dcb9b4。删除全局进程枚举、live --run固定exit2和原生/受控范围分开保留有效；但新增controlled链只运行evaluateControl并自行给state.answers、steers、barrier赋成功值。boundCommandPlan输出也未经过原Application/QuestionBroker/Driver或浏览器执行。main复现其PASS样本的target不符合原NativeQuestionBindingSchema、steer计划不符合原UserCommandSchema，因此仅作为内存纯函数样例，不是已完成原产品控制消费者，不升里程碑分数。所谓历史错误JSON路径还缺当次实际消费源码摘要，两个不同路径在当前Store命中数不同并不足以证明当次使用了哪份源码。
+
+为直接推动同一结果，main已在57243a54fc1c5d6b1292b385d454081a93953521提供 tests/integration/original-control-browser.mjs，复用原 tests/integration/fixtures/native-callback-link.ts 的已有可信注入边界；不是新宿主、调度器或LLM循环。浏览器实际打开原App，通过原HTTP发送已由UserCommandSchema解析的创建/答案/锚定chat/stop命令，原Store/Application/QuestionBroker、生产CodexProductDriver、原Runner登记/回调/资源屏障真实消费。仅协议对端和资源由原受控ProcessHost替身提供，不启动Codex、vendor或模型，不声明物理进程/安装同包/native已验。
+
+四个实际消费者场景通过：①原问题真实选项→同target回答native_applied→同thread/turn steer→运行中原stop与原屏障→ended；②没有问题仍能同Work steer/stop；③答案Store已写后丢HTTP响应，刷新只读核对，无第二次answer或原生写；④资源UNKNOWN不归还/不记屏障，保留原binding与材料。所有场景都由浏览器操作生产入口，原begin各1、同attempt、原标准wire请求ID为integer/decimal42。没有在测试中给Store填造答案/接受/屏障PASS。
+
+实际命令：node tests/integration/original-control-browser.mjs /Users/hh/Desktop/joker/pa-artifacts，exit0，四场景；持久材料 /Users/hh/Desktop/joker/pa-artifacts/pa-control-app-tWp1ft（每场景原SQLite/Runner材料/运行截图均保留）。原callback/拒绝和2/4组合恢复回归4PASS，coordinator product严格检查通过。源码/测试改动不改变已冻结包，D不重包。真实4/4仍耗尽、里程碑仍4/6，E接这个可运行消费者做独立原身份/副作用/拒绝断言后，才有下一次真实同包复验的就绪依据；当前不自动发送或申请补额。
+
 ## 发给Agent D（整段复制）
 
 ~~~text
-本轮main已验E87769341：最后控制任务未通过，原总额度4/4已耗尽。保持当前83f79e82/buildd3ba0ec6dccc5eac安装包和全部SHA，不重包、不新增真实任务。你无新的主动开发项，按具体安装阻断待命；E下一段只修零模型控制消费者。保留原目录/dirty/十二实例和历史材料，不重复静态检查或扩升级/多平台/维护线。最新边界见origin/main的 docs/product/MILESTONE-03.zh-CN.md。
+继续保持83f79e82/buildd3ba0ec6dccc5eac准确包和SHA，零模型待命，不重包。main新增的是零模型测试消费者57243a54，不是运行代码后继；不需要为docs/tests冻结新包。只有E当前路径暴露具体安装阻断才参与，别另开升级/签名/多平台维护。预算仍4/4耗尽，main/D/E均0，十二实例和原状态保留。
 ~~~
 
 ## 发给Agent E（整段复制）
 
 ~~~text
-继续同一里程碑03，做一个完整的零模型结果：把最后控制消费者修到原Work身份与运行状态可正确观察、正常UI控制链受控可执行、失败与UNKNOWN准确收尾，并保留本次真实失败材料。不是再发一次真实任务；4/4额度已用尽，main/D/E均0，不刷新任何ledger/grant，不跑--run/native或真实continue/begin，不开新wave。
-沿用原E目录/分支，先保留dirty、安全合入最新origin/main，读 docs/product/MILESTONE-03.zh-CN.md 当前验收。你87769341的两项预算修复已由main独立复验通过，不重复派工。原双项目交付也已验收，不重跑。
-本段一次连续做完以下同一消费者责任：
-① 修m03-control中runningBinding先读后const初始化的确定性ReferenceError，并实际执行到补充分支，不能只node --check。main用原代码片段已复现。
-② 用当前原ticket_links/原Store事实确认work→ticket→attempt；解释并复现本次16:41真实begin而16:42消费者仍报UNKNOWN的原因。main当前SQL同路径可命中，因此不要无证断言“错误JSON路径”就是原因。以原生已接收/turn终态/原binding/资源观察区分运行与终态等待接受，不能只用core assignment.state。先真实数据只读核对，再受控数据跑运行→原问题→答复→同attempt steer→停止→原屏障顺序。
-③ 删除当前consumer的ps -axo全局发现与PID差集静止推断，只消费原登记固定资源和新鲜完整身份/原物理屏障。缺观察/查询失败/超时保留UNKNOWN；不额外发信号，不按PID猜，不搜索十二实例或借凭据。受控正负用例覆盖已结束后停止、未触发问题但仍可观察补充/停止、未知答复不重发、资源UNKNOWN不得归还/清理。只补当前路径必要分支，不扩历史oracle维护。
-④ 给这个聚焦入口明确的零模型执行方式，live仍默认拒绝、额度4/4时不可用；用同一consumer跑完整受控链和必要拒绝，保证原Work/contract/attempt/question/target/command绑定，不造第二生命周期/独立模拟权限系统。SOURCE_READY后持续修到实际受控consumer通过，不在单个fix结束；若发现生产缺口只交main最小复现，不代改生产断言或他人代码。
-⑤ 保留m03-control真实失败及原日志/Store/candidate/patch，持久保存一份准确范围汇总：原begin4、最后问题0/steer0、16:46自然结束/16:56终态停止，③⑥PARTIAL、整体4/6。旧m03-final是之前快照，不能把旧⑥PASS/3次表述当当前结果；纠正应在最终汇总标明，不改旧事实。受控修复通过只计受控，不把本次live失败改PASS；只报告就绪的后续复验方案，不自动新增模型额度或里程碑。
-只改原tests/product-acceptance/并推自己的origin分支，不改其他工作树/根lock/共享文档，不清UNKNOWN/临时历史或用户状态。交一个可持续消费的源码闭包、实际零模型命令exit和持久证据位置；每个检查点三行，完成时一份汇总即可。
+继续同一里程碑03的一个完整零模型消费者收尾，不开新wave、不发真实任务。安全合入最新origin/main并读 docs/product/MILESTONE-03.zh-CN.md 最新准入。main已验你e4dcb9b4：删除全局枚举、live拒绝和真实失败保持有效；但runControlledChain只给内存answers/steers/barrier赋值，没有执行原产品；boundCommandPlan里的target/steer也不符合原wire/UserCommand，故纯函数PASS不能作原产品控制链消费者。
+主线已直接补好可执行输入：source57243a54，tests/integration/original-control-browser.mjs，命令 node tests/integration/original-control-browser.mjs <你新建的私有证据父目录>。它实际开原App/HTTP/Store/Application/QuestionBroker，走生产Driver和原Runner回调/屏障，仅协议peer与资源为受控替身，不发模型。四场景已过：问题回答→同turn steer→运行停止；无问题仍steer/stop；答案响应丢失不重发；UNKNOWN保留占用。原Callback/拒绝/2&4恢复回归保持。
+不要再扩evaluateControl和自填PASS样例。你持续负责独立复验这个现成真实消费者：在原tests/product-acceptance/加一个聚焦零模型入口，消费主线已有真实组件/消费者及其原Store/HTTP产物，用你独立的断言核work/project/contract/ticket/assignment/attempt和原question/target/command全身份、一个begin、一个答案原生效果、真实deliver/native_accepted、stop请求在原资源停止前、原屏障后ended；缺观察/错身份/UNKNOWN仍拒绝。不能只读取主线打印PASS或借其summary作为独立oracle，不向原Store写假答案/屏障，不造第二生命周期。可复用主线fixture和正常UI路径，无需从头写Runner或另一套浏览器框架。
+独立核对丢HTTP响应后的原answer表/回执/原native effect未重放，UNKNOWN场景原binding及材料保留、无barrier；四个fresh测试Store须放你自己新建持久目录，不碰之前真实Store/十二实例。补你发现的当前消费者问题，持续到一个实际独立入口exit0，不在加schema/记录或SOURCE_READY结束；若生产缺口只交main最小复现。
+4/4真实额度已用尽，--run继续拒绝，不能跑旧live/continue/begin或恢复旧grant。原83f79包不变、原真实控制FAIL与本期4/6保持，受控通过不替代live；不要再改写为完整同包通过或拿合成ID绑定当原请求证明。最后只交一个源闭包、可运行命令exit、独立原ID/持久证据和准确限制汇总；不生成逐轮报告集，也不增加维护队列。等这一就绪依据验收后再由用户决定真实复验，不自动补额。
 ~~~

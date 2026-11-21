@@ -45,7 +45,7 @@ class ControlledProtocolHost extends ProcessHost {
             writableRoots: [], excludeSlashTmp: true, excludeTmpdirEnvVar: true } } })
       } else if (message.method === 'turn/start') {
         this.emit({ id: message.id, result: { turn: { id: 'controlled-turn' } } })
-        this.emit({ id: 42, method: 'item/tool/requestUserInput', params: { threadId: 'controlled-thread', turnId: 'controlled-turn',
+        if (!this.trace.questionless) this.emit({ id: 42, method: 'item/tool/requestUserInput', params: { threadId: 'controlled-thread', turnId: 'controlled-turn',
           itemId: 'controlled-item', questions: [{ id: 'choice', header: 'Output', question: 'Choose output', options: [{ label: 'Alpha' }, { label: 'Beta' }] }] } })
       } else if (!message.method && message.id === 42 && message.result) {
         const selected = message.result.answers?.choice?.answers?.[0]
@@ -55,7 +55,14 @@ class ControlledProtocolHost extends ProcessHost {
         writeFileSync(join(this.cwd, 'src/controlled-output.txt'), 'Beta\n')
         await this.trace.afterNativeEffect?.()
         this.emit({ method: 'serverRequest/resolved', params: { threadId: 'controlled-thread', requestId: 42 } })
-        this.emit({ method: 'turn/completed', params: { threadId: 'controlled-thread', turn: { id: 'controlled-turn', status: 'completed' } } })
+        if (!this.trace.holdAfterAnswer)
+          this.emit({ method: 'turn/completed', params: { threadId: 'controlled-thread', turn: { id: 'controlled-turn', status: 'completed' } } })
+      } else if (message.method === 'turn/steer') {
+        if (message.params?.threadId !== 'controlled-thread' || message.params?.expectedTurnId !== 'controlled-turn')
+          throw new Error('Supplement changed the original native thread/turn')
+        this.trace.supplements ??= []
+        this.trace.supplements.push(String(message.params.input?.[0]?.text))
+        this.emit({ id: message.id, result: {} })
       } else if (message.method === 'turn/interrupt') {
         this.emit({ id: message.id, result: {} })
         this.emit({ method: 'turn/completed', params: { threadId: 'controlled-thread', turn: { id: 'controlled-turn', status: 'interrupted' } } })
@@ -63,6 +70,7 @@ class ControlledProtocolHost extends ProcessHost {
     }
   }
   override async stopOwned() {
+    this.trace.stopCalls = (this.trace.stopCalls ?? 0) + 1
     if (!this.finished) { this.finished = true; this.output.end(); this.errors.end(); this.resolveExit({ code: 0, signal: null }) }
     return { quiescence: 'confirmed' as const, evidenceRefs: ['virtual-resource-closed-not-os-proof'] }
   }
@@ -74,6 +82,10 @@ export type CallbackTrace = {
   protocolMethods: string[]; errors: string[]; closers: (() => Promise<void>)[]
   inventoryUnknown?: boolean
   afterNativeEffect?: () => Promise<void>
+  holdAfterAnswer?: boolean
+  questionless?: boolean
+  supplements?: string[]
+  stopCalls?: number
 }
 export function nativeCallbackLink(trace: CallbackTrace): NativeRunnerLinkFactory {
   return options => ({
