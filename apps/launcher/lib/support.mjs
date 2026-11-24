@@ -8,7 +8,7 @@
 import { createHash } from 'node:crypto'
 import { existsSync, lstatSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { ProductStore, PRODUCT_SCHEMA_VERSION, verifyDatabase } from '../../../packages/storage/dist/index.js'
+import { PRODUCT_SCHEMA_VERSION, verifyDatabase } from '../../../packages/storage/dist/index.js'
 
 const VERSION = 'pa-support/1'
 const sha256 = (value) => createHash('sha256').update(value).digest('hex')
@@ -29,8 +29,7 @@ export function supportBundle({ roots, timeoutMs = 0 } = {}) {
   if (database.present) {
     try { database.digest = sha256(readFileSync(databasePath)) } catch { database.digest = null }
     try {
-      const store = new ProductStore({ path: databasePath })
-      store.close()
+      // Read-only PRAGMA/integrity inspection: no ProductStore construction, migration or writer claim.
       const verify = verifyDatabase(databasePath)
       database.schema = verify.productSchema
       database.integrity = verify.integrity
