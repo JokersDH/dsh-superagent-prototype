@@ -17,6 +17,8 @@ const NODE_LICENSE_SHA = '5888dbb9a1d2b18f2c3e6c5f6af1b39de658372b402a0577b00277
 const REVIEWED_WRAPPERS = new Set([
   '8de31c59d8c9afe90d6464a9b9208d3757a57e76ea49d7af20e473b90360c5dc',
   '339bdac0912a05da701d04de0670e7b6cd49cc1d86687536fb809f45396d866c',
+  // Desktop namespace and duplicate-copy URL reuse; original pa status still proves all identities.
+  '07c834a9bfc5678861602173af2b2b59ab6a09fa994694a2d3402bd76723afb2',
 ])
 const MAX_FILE = 256 * 1024 * 1024
 const MAX_TOTAL = 1024 * 1024 * 1024
@@ -174,8 +176,11 @@ export function verifyDirectory(input, expected = {}) {
   const checked = inventory(root, outer.files, { self: 'preview-manifest.json', modes: true, policy: true })
   const topFiles = new Set(['Start.command', 'Stop.command', 'Settings.command', 'README.zh-CN.md', 'personal-preview-launcher.mjs',
     'runtime/bin/node', 'runtime/LICENSE', 'preview-manifest.json'])
+  const productDocs = ['产品使用手册.md', '产品使用手册.html']
   for (const path of topFiles) if (path !== 'preview-manifest.json') demand(checked.cache.has(path), 'required_outer_file_missing', path)
-  for (const path of checked.cache.keys()) demand(path.startsWith('install/') || topFiles.has(path), 'unexpected_outer_payload', path)
+  for (const path of checked.cache.keys()) demand(path.startsWith('install/') || topFiles.has(path) || productDocs.includes(path), 'unexpected_outer_payload', path)
+  if (productDocs.some(path => checked.cache.has(path)))
+    demand(productDocs.every(path => checked.cache.has(path)), 'incomplete_product_guide')
   const installRoot = join(root, 'install')
   demand(lstatSync(installRoot).isDirectory() && !lstatSync(installRoot).isSymbolicLink(), 'inner_directory_required')
   const install = jsonFile(join(installRoot, 'install.json')), release = jsonFile(join(installRoot, 'var/config/release.json'))

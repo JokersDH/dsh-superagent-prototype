@@ -2,6 +2,7 @@ import { execFile } from 'node:child_process'
 import { constants, closeSync, fstatSync, lstatSync, openSync, readSync, realpathSync } from 'node:fs'
 import { isAbsolute, join, resolve } from 'node:path'
 import { promisify } from 'node:util'
+import { sameProcessStart } from '../../apps/launcher/lib/instance.mjs'
 
 const execute = promisify(execFile)
 const owned = (stat) => !process.getuid || stat.uid === process.getuid()
@@ -71,16 +72,16 @@ export function readInstanceRecord(state) {
   return record
 }
 
-async function command(file, argv) {
+async function command(file, argv, options = {}) {
   try {
-    return (await execute(file, argv, { timeout: 1500, maxBuffer: 65536, encoding: 'utf8' })).stdout.trim()
+    return (await execute(file, argv, { timeout: 1500, maxBuffer: 65536, encoding: 'utf8', ...options })).stdout.trim()
   } catch {
     throw new InstanceUnavailable('process_identity_unproven')
   }
 }
 
 export async function processStart(pid = process.pid) {
-  return command('ps', ['-p', String(pid), '-o', 'lstart='])
+  return command('ps', ['-p', String(pid), '-o', 'lstart='], { env: { ...process.env, LC_ALL: 'C', LANG: 'C' } })
 }
 
 export async function verifyLauncher(root, record) {
@@ -94,7 +95,7 @@ export async function verifyLauncher(root, record) {
   if (!cwd.split('\n').includes(`n${canonicalRoot}`) ||
       !/(?:^|[\s/])tools\/dev\/(?:start|workbench)\.mjs(?:\s|$)/.test(argv) ||
       (process.getuid && Number(uid) !== process.getuid()) ||
-      (record.processStart !== undefined && record.processStart !== start))
+      (record.processStart !== undefined && !sameProcessStart(record.processStart, start)))
     throw new InstanceUnavailable('process_identity_mismatch')
   return { start, legacy: record.protocol === undefined }
 }

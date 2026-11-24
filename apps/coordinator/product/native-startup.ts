@@ -1,9 +1,9 @@
-import { execFileSync } from 'node:child_process'
+import { execFileSync, spawnSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { homedir } from 'node:os'
 import { canonicalDigest } from '@personal-agent/contracts/canonical'
-import { NativeProjectRegistry, ensureStarterProject } from './project-registry.ts'
+import { NativeProjectRegistry } from './project-registry.ts'
 import type { NativeProductConfiguration } from './native-config.ts'
 import type { AgentProfile, ExecutionUnavailableReason } from '@personal-agent/contracts'
 
@@ -29,6 +29,15 @@ export function admittedNativeProfile(): AgentProfile {
   )
     throw new NativeAdmissionError('not_admitted')
   if (evidence.profileVersion !== version) throw new NativeAdmissionError('incompatible_version')
+  // This local CLI inspection does not start a turn or validate a remote account. Never expose its
+  // stdout/stderr: login status may contain account or API-key information.
+  const authentication = spawnSync(executable, ['login', 'status'], {
+    encoding: 'utf8', timeout: 5000, maxBuffer: 16384, stdio: ['ignore', 'pipe', 'pipe'],
+  })
+  if (authentication.error || authentication.signal || authentication.status === null)
+    throw new NativeAdmissionError('probe_failed')
+  if (authentication.status === 1) throw new NativeAdmissionError('needs_auth')
+  if (authentication.status !== 0) throw new NativeAdmissionError('probe_failed')
   return {
     id: 'profile-codex-native',
     revision: 1,
@@ -45,11 +54,6 @@ export function admittedNativeProfile(): AgentProfile {
 }
 function startupWithProfile(stateRoot: string, profile: AgentProfile) {
   const registry = new NativeProjectRegistry(stateRoot)
-  if (!registry.list().length) {
-    const path = join(homedir(), '.local/share/superagent-personal/projects/starter')
-    ensureStarterProject(path)
-    registry.save(registry.prepare({ path, displayName: '我的开发项目', check: 'node_test' }))
-  }
   const projects = registry.list()
   const native: NativeProductConfiguration = {
     profile,

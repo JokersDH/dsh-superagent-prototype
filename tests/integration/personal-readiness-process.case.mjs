@@ -11,7 +11,7 @@ import { NativeProjectRegistry } from '../../apps/coordinator/product/project-re
 import { personalCase, waitUntil } from './fixtures/personal-startup.mjs'
 
 const privateText = value => /fixture-private-version|fixture-readiness-key|private bin/.test(JSON.stringify(value))
-for (const mode of ['missing', 'incompatible', 'probe_error', 'operator']) test(`actual personal API starts in ${mode} discussion mode, without native or fixture sends`, async t => {
+for (const mode of ['missing', 'incompatible', 'probe_error', 'needs_auth', 'operator']) test(`actual personal API starts in ${mode} discussion mode, without native or fixture sends`, async t => {
   const h = await personalCase({ mode, noSystemPath: true }); t.after(() => h.close())
   await h.start()
   const config = (await h.json('/v1/configuration')).value, health = (await h.json('/v1/health')).value
@@ -32,8 +32,30 @@ for (const mode of ['missing', 'incompatible', 'probe_error', 'operator']) test(
   assert.equal((await h.json('/v1/snapshot')).value.works.length, 0)
   assert.equal(existsSync(h.launchLog), false)
   if (mode === 'operator') { assert.equal(existsSync(h.whichLog), false); assert.equal(existsSync(h.versionLog), false) }
+  if (mode === 'needs_auth' && process.platform === 'darwin' && process.arch === 'arm64') assert.equal(existsSync(h.authLog), true)
   const history = await h.json(`/v1/context/history?projectId=${DISCUSSION_PROJECT.id}`)
   assert.equal(history.status, 200); assert.deepEqual(history.value.entries, [])
+})
+
+test('ordinary personal workbench opens a ready empty instance without exposing fixed scratch executors', async t => {
+  if (process.platform !== 'darwin' || process.arch !== 'arm64') return t.skip('Native compatibility is only admitted on darwin-arm64')
+  const h = await personalCase({ mode: 'ready', workbench: true }); t.after(() => h.close())
+  await h.start()
+  const config = (await h.json('/v1/configuration')).value
+  assert.deepEqual(config.executionAvailability, { state: 'available', kind: 'native' })
+  assert.deepEqual(config.profiles.map(profile => profile.id), ['profile-codex-native'])
+  assert.deepEqual(config.projects.map(project => project.id), [DISCUSSION_PROJECT.id])
+  assert.equal(config.projects[0].discussionOnly, true)
+  assert.deepEqual(config.checks, [])
+  assert.equal(existsSync(join(h.state, 'scratch-project.json')), false)
+  assert.equal(existsSync(h.authLog), true)
+  assert.equal(existsSync(h.launchLog), false)
+  assert.equal(h.modelRequests.length, 0)
+  const refused = await h.json('/v1/commands', { kind: 'create_work', commandId: 'refused-personal-fixture', conversationId: 'conversation',
+    projectId: DISCUSSION_PROJECT.id, goal: 'No fixture task', scope: DISCUSSION_PROJECT.scope, profileId: 'profile-fixture-pass',
+    criteria: [{ id: 'review', kind: 'human', required: true, description: 'Must refuse' }] })
+  assert.equal(refused.value.status, 'rejected')
+  assert.equal((await h.json('/v1/snapshot')).value.works.length, 0)
 })
 
 test('the actual workbench manager serves personal HTTP UI with no admitted project/profile', async t => {

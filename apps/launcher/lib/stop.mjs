@@ -3,7 +3,7 @@
  * API child is signalled only after its command line, uid, private state and listener still match;
  * an unknown process, stale record with a live listener, or stop timeout is reported, not hidden.
  */
-import { listenersOnPort, processCommand, readInstanceRecord, processAlive, processStart, removeInstanceRecord, stopProcess, verifyCoordinatorProcess, verifyInstance } from './instance.mjs'
+import { listenersOnPort, processCommand, readInstanceRecord, processAlive, processStart, sameProcessStart, removeInstanceRecord, stopProcess, verifyCoordinatorProcess, verifyInstance } from './instance.mjs'
 import { requestedScopeCheck } from './identity.mjs'
 
 const record_removed_code = 'instance_record_removed'
@@ -54,7 +54,7 @@ export async function stopInstance({ roots, timeoutMs = 8000, requireInstall = t
     if (typeof expected !== 'string' || expected.length === 0) { identityGaps.push({ label, pid, reason: 'start_missing' }); return }
     let observed = null
     try { observed = await processStart(pid) } catch { observed = null }
-    if (observed === null || observed !== expected) identityGaps.push({ label, pid, reason: observed === null ? 'start_unreadable' : 'start_mismatch', expected, observed })
+    if (!sameProcessStart(expected, observed)) identityGaps.push({ label, pid, reason: observed === null ? 'start_unreadable' : 'start_mismatch', expected, observed })
   }
   await checkStart(record.pid, record.processStart, 'launcher')
   await checkStart(record.apiPid, record.apiProcessStart, 'api')

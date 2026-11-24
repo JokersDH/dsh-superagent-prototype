@@ -1,12 +1,12 @@
 # B：原终态证明持久确认到正常退出的完整责任包
 
-原目录 `/Users/hh/Desktop/joker/superagent-agent-b`，原分支 `codex/g1-runtime`。保留dirty后fetch/merge最新origin/main，读AGENTS、共同README和[11-19验收](../../reports/releases/recovery-milestone-01/admission-2026-11-19.json)。当前main **6d309128**，本轮B **91ba4f9a**。
+原目录 `/Users/hh/Desktop/joker/superagent-agent-b`，原分支 `codex/g1-runtime`。保留dirty后fetch/merge最新origin/main，读AGENTS、共同README和[11-19验收](../../reports/releases/recovery-milestone-01/admission-2026-11-19.json)。当前main **6d309128**，本轮B **09216f1c**。
 
-**主动，一个结果做到主线实际采用并独立验收，不在单个fix或SOURCE_READY处结束。** 目标仅是同一个原Runner的终态证明，在原main屏障持久提交前始终可恢复，提交后明确确认才退出。不是新增宿主、运维框架或另一条产品线。
+**主动，一个结果做到主线实际采用并独立验收，不在单个fix或SOURCE_READY处结束。** 主线已采用09216f的postcommit组件并通过受控回归；当前只收尾同一生命周期的finalize响应丢失/同confirmationId调和、UNKNOWN现场保留和entry正负复验。不是新增宿主、运维框架或另一条产品线。
 
-当前源码HOLD：awaitTerminalBarrier未进RunnerServiceHandle，实际entry+service直接strict报TS2339/TS2353；closed/noLease cancel里resolve、50ms后清endpoint早于main持久confirm，丢回复/第二次故障仍丢证明，UNKNOWN资源也不能清退。保留b38已改好的UNKNOWN材料保留，不回归。B39的fixture cancel正例不是自然turn终态/持久确认。
+旧HOLD已关闭：`awaitPostcommitFinalize`已进入RunnerServiceHandle，B direct strict通过；`cancel`不再清退endpoint，finalize要求精确subject/完整quiescent manifest/confirmationId。主线已在Store receipt/event提交后发送完整digest finalize。B39仍是组件证据，不冒充原Store durability。
 
-实施约定读[0095“唯一剩余生命周期接口约定”](../../docs/rfcs/WP-16/0095-main-original-running-callback-composition.md)：原inspect/cancel只给证明/关业务/停原资源，不负责endpoint最终清退；原main确认Store receipt/event成功提交后，再通过原认证连接做可选私有postcommit-finalize。B拥有service/entry/recovery-transport/endpoint，main独占Store适配。可选扩展不改冻结Bridge v1/hash，不新队列/ledger/公共用户命令；不要用50ms代替提交。
+实施约定读[0095](../../docs/rfcs/WP-16/0095-main-original-running-callback-composition.md)：原inspect/cancel只给证明/关业务/停原资源，main确认Store receipt/event成功提交后，再通过原认证连接做私有postcommit-finalize。B拥有service/entry/recovery-endpoint/transport，main独占Store适配。冻结Bridge v1/hash不变，不另建队列/ledger；不要用50ms代替提交。
 
 连续负责以下同一链路直到闭合：把实际entry/handle类型/所有直接consumer对齐；证明普通自然terminal与显式shutdown兼容；proof/cancel回复丢失或confirm前owner再退出时原endpoint仍在；main提交后finalize前退出可由原receipt继任；合法finalize响应丢失可按同确认ID调和；wrong/foreign/缺确认/资源UNKNOWN绝不清退。Finalize只允许已terminated/closed且完整原manifest和每资源quiescent的原对象，不带新停止/执行权限。无明确证明就保留材料。
 

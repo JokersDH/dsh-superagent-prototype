@@ -1,6 +1,10 @@
 # 个人 Agent 助理：方案 B 产品实现蓝图
 
-2026-11-19当前：[同一个恢复里程碑](../agent-tasks/recovery-milestone-01/README.zh-CN.md)，main6d309128已证受控同run恢复/交付/原槽/原排队Work前进，42测试/strict。B终态源码未准入；仅B/main/H持续闭合原持久屏障确认后的明确终态清退与独立验收，不扩线。[验收](../reports/releases/recovery-milestone-01/admission-2026-11-19.json)/[话术](../agent-tasks/recovery-milestone-01/forward-prompts.zh-CN.md)。
+2026-11-21当前：日常可用版里程碑03已按固定六项6/6关闭，见[安装与唯一完成汇总](../docs/product/MILESTONE-03-COMPLETION.zh-CN.md)。原4/4及新增main2/2真实额度均耗尽，所有agent待命，不自动开新wave/模型任务。原方案B仍为完整工程目标，当前85/100与完整B65.3%不等完整Beta；下文旧派工均按历史阅读。
+
+2026-11-19最新：Recovery01与原生控制02均已按用户冻结清单6/6关闭，真实Codex恢复用了1 turn+1自有coordinator SIGKILL，原生工作台控制用了5/6 turn。原口径重评82/100，方案B不含CAC63.1%，非完整发行准入。唯一[完成汇总](../docs/product/MILESTONES-01-02.zh-CN.md)。全部agent待命、原所有权恢复，不自动开始新wave/里程碑；以下旧入口仅作历史。
+
+2026-11-19当前：[同一个恢复里程碑](../agent-tasks/recovery-milestone-01/README.zh-CN.md)，mainbde57d42已证受控同run恢复/交付/原槽/原排队Work前进，且Store屏障提交后调用B postcommit finalize。剩余同ID finalize响应调和、H测试清理与真实native/物理层，仅B/main/H持续闭合，不扩线。[验收](../reports/releases/recovery-milestone-01/admission-2026-11-19.json)/[话术](../agent-tasks/recovery-milestone-01/forward-prompts.zh-CN.md)。
 
 2026-11-18现行工程入口：[原Work恢复里程碑01](../agent-tasks/recovery-milestone-01/README.zh-CN.md)，替代下面旧轮次的扩线派工。maind6244e63已受控原问题窗口接管到交付，B/H继续真实传输/ACK未知/原槽；D/E固定W36子集验完转待命，其余六位按需。[0095](../docs/rfcs/WP-16/0095-main-original-running-callback-composition.md)与[最新验收](../reports/releases/recovery-milestone-01/admission-2026-11-18.json)区分受控/真实OS/物理/安装，不新开wave或独立队列。
 

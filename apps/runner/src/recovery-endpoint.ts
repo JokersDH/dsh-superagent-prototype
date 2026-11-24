@@ -99,6 +99,11 @@ export async function serveRecoveryEndpoint(options: RecoveryEndpointOptions): P
       closed = true
       admission = 'closed'
       await server.close()
+      // Closing a transport is not evidence that its owned resources stopped. Preserve the original
+      // credential/reference material whenever the resource observation is active or unknown.
+      let resourcesQuiescent = false
+      try { resourcesQuiescent = options.resources().every(resource => resource.writer === 'quiescent') } catch {}
+      if (!resourcesQuiescent) return
       // A closed endpoint returns EVERY resource it created. The socket file and the credential used to
       // survive a normal close, so a stopped Runner left both behind; only the short-path case cleaned up.
       const ignoreMissing = (error: unknown): void => {

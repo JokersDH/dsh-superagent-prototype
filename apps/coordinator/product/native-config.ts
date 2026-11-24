@@ -6,5 +6,6 @@ export interface NativeProductConfiguration {
   profile: AgentProfile
   projects: readonly { id: string; path: string; check: CheckDefinition; environment?: ProjectEnvironmentPolicy }[]
   approvalPolicy: 'untrusted' | 'on-request'
+  collaborationMode?: 'plan' | 'default'
   model?: string
 }

@@ -17,10 +17,13 @@ export async function waitUntil(read, limit = 15000) {
 export async function personalCase({ mode = 'missing', workbench = false, wrapper = false, noSystemPath = false, assistant = true, replyGate } = {}) {
   const root = mkdtempSync('/tmp/pa-personal-startup-'), state = join(root, 'state'), bin = join(root, 'private bin'), modelDir = join(root, 'model')
   for (const dir of [state, bin, modelDir]) mkdirSync(dir, { mode: 0o700 })
-  const modelRequests = [], versionLog = join(root, 'version.log'), launchLog = join(root, 'native-launch.log'), whichLog = join(root, 'which.log')
+  const modelRequests = [], versionLog = join(root, 'version.log'), launchLog = join(root, 'native-launch.log'), whichLog = join(root, 'which.log'), authLog = join(root, 'auth.log')
   const codex = join(bin, 'codex')
+  const version = ['needs_auth', 'ready'].includes(mode)
+    ? JSON.parse(readFileSync(new URL('../../../reports/releases/native-mvp/native-product.json', import.meta.url), 'utf8')).profileVersion
+    : `fixture-private-version ${codex}`
   writeFileSync(join(bin, 'which'), `#!${process.execPath}\nconst fs=require('node:fs');if(process.argv[2]!=='codex')process.exit(1);fs.appendFileSync(${JSON.stringify(whichLog)},'which\\n');${mode === 'missing' ? 'process.exit(1)' : `console.log(${JSON.stringify(codex)})`}\n`, { mode: 0o700 })
-  writeFileSync(codex, `#!${process.execPath}\nconst fs=require('node:fs');if(process.argv[2]==='--version'){fs.appendFileSync(${JSON.stringify(versionLog)},'version\\n');${mode === 'probe_error' ? 'process.exit(3)' : `console.log('fixture-private-version '+__filename)`}}else{fs.appendFileSync(${JSON.stringify(launchLog)},process.argv.join(' ')+'\\n');process.exit(98)}\n`, { mode: 0o700 })
+  writeFileSync(codex, `#!${process.execPath}\nconst fs=require('node:fs');if(process.argv[2]==='--version'){fs.appendFileSync(${JSON.stringify(versionLog)},'version\\n');${mode === 'probe_error' ? 'process.exit(3)' : `console.log(${JSON.stringify(version)})`}}else if(process.argv[2]==='login'&&process.argv[3]==='status'){fs.appendFileSync(${JSON.stringify(authLog)},'auth\\n');console.error('fixture-private-account');process.exit(${mode === 'needs_auth' ? 1 : 0})}else{fs.appendFileSync(${JSON.stringify(launchLog)},process.argv.join(' ')+'\\n');process.exit(98)}\n`, { mode: 0o700 })
   const mock = createServer(async (req, res) => {
     let text = ''; for await (const bytes of req) text += bytes
     modelRequests.push(JSON.parse(text))
@@ -61,10 +64,10 @@ export async function personalCase({ mode = 'missing', workbench = false, wrappe
   const request = (path, body) => fetch(`${apiURL}${path}`, { ...(body === undefined ? {} : { method: 'POST', body: JSON.stringify(body) }),
     headers: { authorization: `Bearer ${readFileSync(join(state, 'api.key'), 'utf8').trim()}`, ...(body === undefined ? {} : { 'content-type': 'application/json' }) }, signal: AbortSignal.timeout(5000) })
   const json = async (path, body) => { const response = await request(path, body); return { status: response.status, value: await response.json() } }
-  return { root, state, apiPort, consolePort, apiURL, consoleURL, modelRequests, config, versionLog, launchLog, whichLog,
+  return { root, state, apiPort, consolePort, apiURL, consoleURL, modelRequests, config, versionLog, launchLog, whichLog, authLog,
     start, stop, request, json, get child() { return child }, get output() { return output },
     expectedReason: mode === 'operator' ? 'operator_disabled' : process.platform !== 'darwin' || process.arch !== 'arm64' ? 'unsupported_platform'
-      : mode === 'missing' ? 'not_installed' : mode === 'probe_error' ? 'probe_failed' : 'incompatible_version',
+      : mode === 'missing' ? 'not_installed' : mode === 'probe_error' ? 'probe_failed' : mode === 'needs_auth' ? 'needs_auth' : 'incompatible_version',
     close: async () => { if (stopped) return; stopped = true; await stop(); mock.closeAllConnections(); await new Promise(resolve => mock.close(resolve)); rmSync(root, { recursive: true, force: true }) },
   }
 }

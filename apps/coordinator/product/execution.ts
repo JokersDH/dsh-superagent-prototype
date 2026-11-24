@@ -351,7 +351,8 @@ export class ProductExecution {
     if (!project || realpathSync(project.path) !== realpathSync(location.projectPath)) throw new Error('Original project registration changed')
     const policy = NativeCodexSettingsSchema.parse((await this.store.payloads.read(prepared.spec.policySnapshotRef)).value)
     if (realpathSync(policy.workspacePath) !== realpathSync(location.path) || !same(policy.scope, contract.scope) ||
-        policy.approvalPolicy !== this.native?.approvalPolicy || policy.model !== this.native?.model)
+        policy.approvalPolicy !== this.native?.approvalPolicy || policy.model !== this.native?.model ||
+        policy.collaborationMode !== this.native?.collaborationMode)
       throw new Error('Original native execution policy changed')
     this.environments?.current({ assignment: binding, workspacePath: location.path })
     const producer = registration.body.producer
@@ -589,6 +590,7 @@ export class ProductExecution {
               workspacePath: workspace.path,
               scope,
               approvalPolicy: this.native!.approvalPolicy,
+              ...(this.native!.collaborationMode ? { collaborationMode: this.native!.collaborationMode } : {}),
               ...(this.native!.model ? { model: this.native!.model } : {}),
               timeoutMs: 600000,
             })

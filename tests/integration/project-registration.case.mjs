@@ -106,6 +106,16 @@ test('authenticated project registration adds a grant/check and survives runtime
   assert.equal(response.status, 200)
   const configuration = await response.json(),
     project = configuration.projects[0]
+  assert.deepEqual(configuration.profiles.map(value => value.id), [profile.id])
+  assert.deepEqual(configuration.checks.map(value => value.id), [h.registry.check(h.registry.list()[0]).id])
+  const fixtureRefused = await product.application.dispatch({
+    commandId: 'refuse-fixture-in-personal-runtime', conversationId: 'imported-conversation', kind: 'create_work',
+    projectId: project.id, scope: project.scope, criteria: project.defaultCriteria,
+    profileId: 'profile-fixture-pass', goal: 'Never replace a real native task with a fixed scratch flow',
+  }, { ...principal, source: 'local_ui' })
+  assert.equal(fixtureRefused.status, 'rejected')
+  assert.equal(fixtureRefused.error.code, 'unsupported_capability')
+  assert.equal((await product.application.inspect({})).works.length, 0)
   assert.deepEqual(project.profileIds, [profile.id])
   assert.equal(project.dispatchAllowed, true)
   assert.doesNotMatch(JSON.stringify(configuration), new RegExp(h.root))
