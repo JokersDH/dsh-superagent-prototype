@@ -158,16 +158,46 @@ export function removeInstanceRecord(configRoot) {
   try { unlinkSync(instancePath(configRoot)) } catch (error) { if (error.code !== 'ENOENT') throw error }
 }
 
-async function command(file, argv) {
+async function command(file, argv, options = {}) {
   try {
-    return (await execute(file, argv, { timeout: 2000, maxBuffer: 65536, encoding: 'utf8' })).stdout.trim()
+    return (await execute(file, argv, { timeout: 2000, maxBuffer: 65536, encoding: 'utf8', ...options })).stdout.trim()
   } catch {
     return null
   }
 }
 
 export async function processStart(pidValue = process.pid) {
-  return command('ps', ['-p', String(pidValue), '-o', 'lstart='])
+  // A Terminal's locale must not change the birth identity of an already running process.
+  return command('ps', ['-p', String(pidValue), '-o', 'lstart='], {
+    env: { ...process.env, LC_ALL: 'C', LANG: 'C' },
+  })
+}
+
+const BIRTH_WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+const BIRTH_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+const BIRTH_CHINESE_WEEKDAYS = ['日', '一', '二', '三', '四', '五', '六']
+
+/** Decode only known ps lstart forms; malformed or impossible values grant no identity. */
+function processStartKey(marker) {
+  if (typeof marker !== 'string' || marker.length === 0 || marker.length > 128) return null
+  const value = marker.trim()
+  const english = /^(Sun|Mon|Tue|Wed|Thu|Fri|Sat)\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{1,2})\s+(\d{2}):(\d{2}):(\d{2})\s+(\d{4})$/.exec(value)
+  const chinese = english ? null : /^(?:星期|周|週)?([日一二三四五六])\s+(\d{1,2})月(?:\/|\s+)(\d{1,2})\s+(\d{2}):(\d{2}):(\d{2})\s+(\d{4})$/.exec(value)
+  if (!english && !chinese) return null
+  const parts = english ?? chinese
+  const weekday = english ? BIRTH_WEEKDAYS.indexOf(parts[1]) : BIRTH_CHINESE_WEEKDAYS.indexOf(parts[1])
+  const month = english ? BIRTH_MONTHS.indexOf(parts[2]) + 1 : Number(parts[2])
+  const [day, hour, minute, second, year] = parts.slice(3).map(Number)
+  if (year < 1000 || month < 1 || month > 12 || day < 1 || day > 31 || hour > 23 || minute > 59 || second > 59) return null
+  const date = new Date(Date.UTC(year, month - 1, day, hour, minute, second))
+  if (date.getUTCFullYear() !== year || date.getUTCMonth() + 1 !== month || date.getUTCDate() !== day || date.getUTCDay() !== weekday) return null
+  return [year, month, day, hour, minute, second].join(':')
+}
+
+/** Locale compatibility only: PID, uid, exact argv, roots and all other guards still apply. */
+export function sameProcessStart(expected, observed) {
+  const key = processStartKey(expected)
+  return key !== null && key === processStartKey(observed)
 }
 
 /** Capture the start time and uid of an owned child for later identity comparison. */
@@ -226,7 +256,7 @@ export async function verifyCoordinatorProcess(record) {
     exact: record.apiArgv !== undefined ? argvExact : null,
     mismatches: structural,
   })
-  record0('api_process_start', record.apiProcessStart === undefined || start === record.apiProcessStart, {
+  record0('api_process_start', record.apiProcessStart === undefined || sameProcessStart(record.apiProcessStart, start), {
     expected: record.apiProcessStart ?? null,
     observed: start,
   })
@@ -296,7 +326,7 @@ export async function verifyInstance(record, options = {}) {
     command('ps', ['-p', String(record.pid), '-o', 'uid=']),
     command('lsof', ['-a', '-p', String(record.pid), '-d', 'cwd', '-Fn']),
   ])
-  record0('process_start', start !== null && start === record.processStart, start ?? 'unavailable')
+  record0('process_start', sameProcessStart(record.processStart, start), start ?? 'unavailable')
   const launcherMatches = record.launcherArgv !== undefined
     ? commandLine !== null && argvMatchesCommand(record.launcherArgv, commandLine, { baseDir: record.install })
     : commandLine !== null && LAUNCHER_COMMAND.test(commandLine)
@@ -327,7 +357,7 @@ export async function verifyInstance(record, options = {}) {
     exact: record.apiArgv !== undefined ? apiArgvExact : null,
     mismatches: apiStructural,
   })
-  record0('api_process_start', record.apiProcessStart === undefined || apiStart === record.apiProcessStart, {
+  record0('api_process_start', record.apiProcessStart === undefined || sameProcessStart(record.apiProcessStart, apiStart), {
     expected: record.apiProcessStart ?? null,
     observed: apiStart,
   })

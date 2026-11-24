@@ -56,7 +56,8 @@ function privateDirectory(path) {
 
 function context(manifest) {
   const parent = join(homedir(), 'Library/Application Support/PersonalAgent')
-  const root = join(parent, `Preview-${manifest.inner.buildId}`)
+  const desktop = process.env.PA_DESKTOP_APP === '1'
+  const root = join(parent, desktop ? 'Desktop' : `Preview-${manifest.inner.buildId}`)
   // Create only this application's namespace; never chmod or replace an existing user directory.
   if (!existsSync(parent)) mkdirSync(parent, { recursive: true, mode: 0o700 })
   privateDirectory(parent)
@@ -66,7 +67,7 @@ function context(manifest) {
   for (const path of Object.values(roots)) privateDirectory(path)
   const defaultModel = join(homedir(), '.config/superagent-personal/model.json')
   const model = process.env.PA_MODEL_CONFIG ? resolve(process.env.PA_MODEL_CONFIG) :
-    existsSync(defaultModel) ? defaultModel : join(roots.config, 'model.json')
+    !desktop && existsSync(defaultModel) ? defaultModel : join(roots.config, 'model.json')
   return { root, roots, model, bin: join(ROOT, 'install/bin/pa'), env: {
     ...process.env,
     PA_NODE: join(ROOT, 'runtime/bin/node'),
@@ -168,6 +169,20 @@ export async function main(args = process.argv.slice(2)) {
   const status = runJson(ctx, ['status'])
   if (!['RUNNING', 'STOPPED'].includes(status?.status)) throw new Error('原实例身份尚未核实，请先运行 status/doctor。')
   const existing = status.status === 'RUNNING' ? status.instance : undefined
+  if (existing && existing.install !== realpathSync(ctx.env.PA_INSTALL_ROOT)) {
+    if (existing.buildId !== manifest.inner.buildId ||
+      (explicitPort !== undefined && new URL(existing.consoleURL).port !== String(explicitPort)) ||
+      (explicitApi !== undefined && new URL(existing.apiURL).port !== String(explicitApi)) ||
+      parsed.values['discussion-only'] === true)
+      throw new Error('已有实例与本次版本、端口或模式选择不同。请先从原应用正常停止，再重新打开。')
+    // The original status already verified birth/UID/full argv/roots/listeners/health. A duplicate
+    // extraction only opens that original instance; it does not adopt it into a new installation.
+    const page = await fetch(existing.consoleURL, { redirect: 'error', signal: AbortSignal.timeout(3000) })
+    if (!page.ok) throw new Error('已有实例的工作台暂不可读。请从原应用检查状态，不结束未知进程。')
+    process.stdout.write(`Workbench: ${existing.consoleURL}\n已打开本机已核实的同版本实例。\n`)
+    spawn('/usr/bin/open', [existing.consoleURL], { stdio: 'ignore' }).unref()
+    return 0
+  }
   const consolePort = explicitPort ?? (existing ? portNumber(new URL(existing.consoleURL).port) : await availablePort())
   const apiPort = explicitApi ?? (existing ? portNumber(new URL(existing.apiURL).port) : await availablePort([consolePort]))
   if (consolePort === apiPort) throw new Error('网页端口与接口端口不能相同。')

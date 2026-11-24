@@ -6,6 +6,7 @@ import { chmodSync, copyFileSync, existsSync, lstatSync, mkdirSync, readFileSync
 import { basename, dirname, join, posix, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { parseArgs } from 'node:util'
+import { productGuideHTML } from './product-guide-html.mjs'
 
 const DEFAULT_TAR = '/Users/hh/Desktop/joker/pa-artifacts/wave31-target/wave31-target-4dcd28f.tar.gz'
 const DEFAULT_SHA = '405ecd02fcbf288bac0855e17911ec4035521b54fe27d81fa0b28feaf5addcc6'
@@ -64,7 +65,8 @@ function shellEntry(action) {
 }
 
 function readme(manifest) {
-  return `# 个人开发助手预览\n\n版本：${manifest.inner.buildId}；源码：${manifest.inner.source}。\n仅支持 macOS Apple Silicon。已附 Node ${manifest.runtime.version}，无需 Git、pnpm 或全局 Node 来打开工作台。导入和开发自己的 Git 项目仍需要本机 Git；原生开发需要你自己的已准入 Codex 及认证。\n\n## 开始使用\n\n1. 把整个文件夹解压到固定位置；保留 runtime 和 install 目录，不在运行时移动文件夹。\n2. 双击 Start.command，启动窗口会打印网页地址并打开浏览器。请保留启动窗口；默认普通模式按原执行器可用性降级，缺执行器时仍可讨论和审阅，不回退固定流程。\n3. 双击 Settings.command，用文本编辑器打开自己的私有模型 JSON。填入网关、key 和模型名后保存；这不是网页 API key 编辑器。没有配置也可先打开工作台。\n4. 结束时双击 Stop.command，继续由原 pa 启动器核对并停止此版本的实例。BLOCKED、UNKNOWN 或停止失败时保留现场，不删除 state/record、不强杀未知进程。\n\n若 macOS 提示未签名/无法验证，请先按下面的来源和 SHA 核对，再按你组织允许的系统打开方式操作；不要移除组织安全策略。当前是未签名个人预览，不是公证应用。\n\n## 数据和模型配置\n\n此版本的五个私有目录位于：\n\n\`~/Library/Application Support/PersonalAgent/Preview-${manifest.inner.buildId}/\`\n\nconfig、data、cache、logs、workspaces 不放入分享文件夹，重新分发此原始 ZIP 不携带运行后数据。保留完整原始 ZIP，勿把自己的私有目录一起发给同事。\n\n模型选择依次为：显式 PA_MODEL_CONFIG、当前用户已有的 \`~/.config/superagent-personal/model.json\`、此版本 config/model.json。Settings 仅在文件不存在时创建无秘密占位模板，绝不覆盖已有配置；目录需0700、文件需0600。HTTP 网关必须显式 allowInsecureHttp=true；网页只能切换 allowedModels 中的模型。\n\n原生执行认证使用同事自己的本机凭据；分享包没有作者的 key、账号目录、native session 或旧授权。正常启动不发送模型任务，用户明确发送对话或开发委托后才可能产生调用。\n\n## 操作与端口\n\nStart 优先复用原 pa 已核实的此版本实例；首次启动选两个空闲127.0.0.1端口。如端口竞争导致拒绝，保留实例后重试，或在终端用：\n\n\`./Start.command --port 5260 --api-port 8860\`\n\n仅对话可用 \`./Start.command --discussion-only\`；不要对已启用开发的实例静默换模式。状态和诊断可用：\n\n\`./runtime/bin/node ./personal-preview-launcher.mjs status\`\n\`./runtime/bin/node ./personal-preview-launcher.mjs doctor\`\n\n这些入口固定使用本包、自带 Node 和同一组五个私有根，不会替换旧5180–5191实例，也不借其 state 或凭据。\n\n## 功能和证据范围\n\n可见能力依包内版本：主对话、项目和明确委托、问题中心、检查/patch/人工接受、有限上下文与来源、模板、7/30天观察和 JSON 导出。开发需本机执行器就绪；机器检查和原授权守卫保持，人工接受不自动合并/push。\n\n${manifest.inner.predecessor ? '这是旧 R2 4dcd28f 的便携封装，不包含后续 terminal lease 修复；仅用于封装验证，不冒称修后新版。' : '这是以此清洁源码和冻结字节生成的新候选，具体修复由对应 source 证据说明；封装本身不增加发行或执行授权。'}\n\n独立 E 同包验收、真实 native 控制/中途恢复、两真实项目完整重开、跨机长期运行及创新收益均不能由此封装推出；macOS arm64 之外不支持。外层 ZIP 的实际启动和同事机器验收应单独记录。\n\n## 可核对身份\n\n- 内部 tar SHA256：${manifest.inner.tarSha256}\n- 内部 tar 字节数：${manifest.inner.tarBytes}\n- 原始 install 清单 SHA256：${manifest.inner.installManifestSha256}\n- Node 二进制 SHA256：${manifest.runtime.sha256}\n- Node 完整许可：runtime/LICENSE（SHA256 ${manifest.runtime.licenseSha256}）\n- 全部外层文件和构建来源：preview-manifest.json\n\n外层未改写 install 内任何文件或链接，保留原 MIT/第三方许可。不要运行来自未知来源或摘要不一致的包。\n`
+  const guide = readFileSync(new URL('../../docs/PRODUCT-GUIDE.zh-CN.md', import.meta.url), 'utf8')
+  return `# 个人 Agent 助理安装与使用\n\n源码：${manifest.inner.source}；构建：${manifest.inner.buildId}；Node：${manifest.runtime.version}。\n\n优先使用提供的DMG，将.app拖到“应用程序”后打开。此ZIP为备用命令版：保留整个解压目录，双击Start.command并保留终端；停止用Stop.command。网页“偏好设置”可配置模型，完整手册同时提供产品使用手册.html和产品使用手册.md。\n\nZIP私有根为 ~/Library/Application Support/PersonalAgent/Preview-${manifest.inner.buildId}/；桌面.app使用独立Desktop根。配置、账号、模型Key和运行数据不进入分享包。不要移动正在运行的安装。\n\n内部tar SHA256：${manifest.inner.tarSha256}\n原安装清单 SHA256：${manifest.inner.installManifestSha256}\nNode SHA256：${manifest.runtime.sha256}\n完整许可：runtime/LICENSE；原MIT和依赖许可保留在install内。\n\n封装本身只证明文件身份，启动修复/模型能力/跨机结论须按对应准确版本验收，不继承旧包PASS。\n\n---\n\n${guide}`
 }
 
 function outerInventory(root) {
@@ -127,6 +129,9 @@ export async function main(args = process.argv.slice(2)) {
   if (hash(readFileSync(join(folder, 'runtime/bin/node'))) !== NODE_SHA ||
     hash(readFileSync(join(folder, 'runtime/LICENSE'))) !== NODE_LICENSE_SHA) throw new Error('Copied runtime identity mismatch')
   copyFileSync(HELPER, join(folder, 'personal-preview-launcher.mjs')); chmodSync(join(folder, 'personal-preview-launcher.mjs'), 0o644)
+  const guide = fileURLToPath(new URL('../../docs/PRODUCT-GUIDE.zh-CN.md', import.meta.url))
+  copyFileSync(guide, join(folder, '产品使用手册.md'))
+  writeNew(join(folder, '产品使用手册.html'), productGuideHTML(guide))
   for (const [name, action] of [['Start', 'start'], ['Stop', 'stop'], ['Settings', 'settings']]) writeNew(join(folder, `${name}.command`), shellEntry(action), 0o755)
   const outer = { protocol: 'personal-agent-preview/1', launcherProtocol: 'personal-agent-preview-launcher/1', generatedAt: new Date().toISOString(),
     source: { packagerSha256: hash(readFileSync(SOURCE)), wrapperSha256: hash(readFileSync(HELPER)) },

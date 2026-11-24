@@ -1,6 +1,12 @@
 # 从这里开始：仓库、代码位置和并行开发
 
-**2026-11-19当前：用户已开启[里程碑03“日常可用版交付”](docs/product/MILESTONE-03.zh-CN.md)。** 只main/D/E主动，B/F具体阻断时参与；六项正常使用与同包验收，最多4次真实Codex（main预留1、E最多3、D0）。该文含D/E可直接转发的话术，是当前唯一任务入口。先正常源码使用，再冻结同一源码安装包给E独立验收；不新wave，不给其他agent开维护队列。以下“待命”“当前恢复”等均为旧检查点。
+**2026-11-24当前：里程碑04开工准备已完成，第二协议与产品创新方向重新开放。** 先执行[同事可用与第二协议计划](docs/product/MILESTONE-04.zh-CN.md)，只把[对应开工话术](agent-tasks/milestone-04/forward-prompts.zh-CN.md)分别发给B、D、E；main同步负责公共接线、新根授权和同事反馈，A/F按具体阻断参与。创新在第二协议真实出口成立后启动，不立即唤醒其他agent。当前清单0/13，未发本阶段真实任务；旧wave、旧预算及旧“不推进”决定按其历史日期阅读，原研究试点不恢复。
+
+**2026-11-21 安装与启动修复：已有M系列Mac的DMG安装版0.1.1。** 打开DMG，把Personal Agent.app拖到“应用程序”，打开后在浏览器工作台使用。先读[产品使用手册](docs/PRODUCT-GUIDE.zh-CN.md)，安装包位置、准确身份和零模型启动验证见[本次交付](docs/product/MACOS-0.1.1.zh-CN.md)。修复中文环境下process_start误判和重复解压入口；新桌面版使用独立Desktop数据根，旧Preview数据不迁移、不清理。以下M03/W系列保留各自历史验收范围。
+
+**2026-11-21当前：里程碑03日常可用版6/6关闭。** [安装、使用与唯一完成汇总](docs/product/MILESTONE-03-COMPLETION.zh-CN.md) · [使用指南](docs/ASSISTANT-GUIDE.zh-CN.md) · [进度](docs/product/STATUS.zh-CN.md)。M03固定source83f79e82/buildd3ba0ec6dccc5eac在M系列Mac、Codex0.164.0完成同包两项目/问题审批/运行补充停止/正常重开限定验收。本机85/100、完整B不含CAC65.3%，非跨机长期Beta。
+
+原4/4与本次补验2/2额度均已用尽，D/E及其余agent待命，不自动新增模型任务、维护派工或wave。旧任务包已关闭；以下检查点、待办和开工话术仅为历史。
 
 **2026-11-19当前：Recovery01与原生控制02均6/6关闭。** 真实同原Work SIGKILL恢复、原工作台审批/拒绝/plan澄清/steer/物理停止/未知结果核对通过；分别使用1 turn+1自有coordinator SIGKILL、5/6真实turn。原口径重评**82/100、方案B63.1%**，不是发行准入。唯一完成汇总在[这里](docs/product/MILESTONES-01-02.zh-CN.md)。临时B/H修改权结束，原所有权恢复，全部agent待命，不自动开新wave或里程碑；下文旧派工只作历史。
 
