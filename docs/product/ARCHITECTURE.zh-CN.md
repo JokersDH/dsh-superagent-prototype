@@ -1,5 +1,9 @@
 # 个人 Agent 助理：当前架构与代码地图
 
+2026-11-24：第二协议与产品创新已按[新决定](../reviews/next-phase-protocol-and-innovation-2026-11-24.zh-CN.md)重开；当前[里程碑04](MILESTONE-04.zh-CN.md)只推进同事可用和ACP两条线。以下原生能力结论仍属于原准确版本，本次只完成规划和源码审计，尚未接入第二协议或证明跨机通过。
+
+2026-11-21当前：固定source83f79e82/buildd3ba0ec6dccc5eac同包日常使用里程碑03已6/6关闭，详见[唯一完成汇总](MILESTONE-03-COMPLETION.zh-CN.md)。仍是原Store/Application/QuestionBroker、Ticket/Assignment、原Runner/生产CodexDriver与资源屏障；新增外部验收观察器只转发stdio计数，未新增运行时/生命周期或改动冻结包。以下旧源码检查点仅按历史范围读。
+
 2026-11-19收尾：原同Work真实Codex/SIGKILL恢复与原工作台审批、plan澄清、steer、物理停止已完成两项冻结里程碑；具体版本、范围和实际发送数见唯一[汇总](MILESTONES-01-02.zh-CN.md)。原native profile支持可选plan/default模式，变更在恢复时重新核对；single澄清选项由原表单显示，执行生命周期/授权/验证权威保持原实现。临时B/H修改权已结束，以下图与历史检查点按其范围读。
 
 > 本地优先的开发工作台：讨论需求，明确委托已有 Agent，在隔离工作区执行，查看可核对的检查与变更，再人工接受交付。
@@ -9,13 +13,13 @@
 | 项目 | 当前事实 |
 | --- | --- |
 | 仓库 | `https://github.com/JokersDH/dsh-superagent-prototype` |
-| 本文基线 | 2026-11-19；main6d309128受控同run原Work恢复/交付/原2&4槽/第3&5项前进；真实终态持久确认/清退仍待闭合 |
-| 首个用户界面 | React网页工作台；本机CLI负责启停/发行，暂无桌面壳 |
+| 本文基线 | macOS0.1.1已交付，Recovery01/原生控制02/M03按原准确范围关闭；M04处于实施规划，细节见各完成汇总 |
+| 首个用户界面 | React网页工作台；原生AppKit窗口和DMG包装原本机CLI入口，不另造执行内核 |
 | 技术栈 | TypeScript、Node24、pnpm workspace、React18/Vite、Hono、Zod、SQLite、Git worktree |
 | 原生执行 | 当前生产路径为Codex app-server；历史准入版本`codex-cli 0.164.0`，新版本需重新验证 |
 | 本机范围 | darwin/arm64、Node24.21.0/ABI137为本次冻结包实测组合；其它平台和真实跨机部署不借此认证 |
 | 证据范围 | 源码/受控流程/准确安装包/真实原生/恢复/收益分别验，不以测试总数替代 |
-| 可信度 | 主路径及受控owner退出后原问题接续有实际consumer；真实OS故障/全窗口/物理/原槽与收益未达 |
+| 可信度 | 已有真实原Work恢复、原生控制与M03同包日常使用的限定证据；跨机、第二协议、全故障窗口与创新收益仍未达 |
 
 ### 先理解三件事
 
@@ -105,6 +109,38 @@ flowchart TB
 | 发行与运维 | 完整闭包/manifest/源码绑定、启停、升级、备份恢复、支持材料 | `apps/launcher/`、`packages/portability/`、`tools/distribution/` |
 
 `packages/contracts/`是这些模块共用的运行时schema与类型边界；新增展示接口可加法演进，冻结Runner v1身份不能随意改变。浏览器只消费公开DTO，不导入Node分析、私有路径、凭据或原始账本。
+
+### 包使用审计（2026-11-24）
+
+对当前基线全部23个`packages/**/package.json`及受Git跟踪的生产源码做静态import/export/动态import引用检查，排除test/tests/e2e/examples/fixtures/scripts/dist/reports，再核对产品组合根和条件分支。计入相对路径和包名导入，区分类型引用、间接使用及fixture分支；不是运行时覆盖率、tree-shaking结果或删除授权。
+
+| 包 | 分类 | 当前真实消费或保留理由 |
+| --- | --- | --- |
+| application | 默认路径在用 | product/runtime、HTTP和各确定性产品命令 |
+| contracts | 默认路径在用 | HTTP/UI、Application、Runner共享schema和身份 |
+| orchestrator-core | 默认路径在用 | runtime/execution的原Ticket/Assignment生命周期 |
+| storage | 默认路径在用 | ProductStore、事务/原事实/原队列/历史 |
+| effects | 默认路径在用 | execution、question-effects、discussion-effects的事务后效果 |
+| execution | 默认路径在用 | 原NativeProductAttempt/Runner/资源及命令适配 |
+| driver-kit | 默认路径在用 | 原Runner framing、journal、命令/事实；并非每个导出都已用 |
+| drivers/codex-native | 默认路径在用 | execution和Runner工厂的生产CodexProductDriver；同包fake/旧协议Adapter分开看 |
+| policy-preparation | 默认路径在用（间接） | Codex生产Driver的策略准备；apps无直接import不能判闲置 |
+| questions | 默认路径在用 | runtime与HTTP原QuestionBroker/答案投递 |
+| workspaces | 默认路径在用 | runtime/execution/completion的隔离工作区 |
+| environment-preparation | 默认路径在用 | product/environments与Runner的受限依赖环境 |
+| verification | 默认路径在用 | 注册检查、完成判断、项目检查配置 |
+| context | 默认路径在用 | context-preview/context-records的来源选择与绑定 |
+| knowledge | 默认路径在用 | decisions/context-preview的范围、来源和撤销治理 |
+| proposals | 默认路径在用（部分） | product/proposals；整包导出和研究设想不等于全接入 |
+| routing | 默认路径在用（部分） | runtime接sharedAttentionRanker；adviseRoute/跨协议复核不在默认路径，保留给后续创新，路由收益继续后置 |
+| project-recipes | 默认路径在用（部分） | product/project-recipes的模板建议和原创建输入；不等于自动执行 |
+| usage-insights | 默认路径在用（部分） | product/usage-observation的动态导入、7/30观察/metadata支持；其余分析函数未据此认定已用 |
+| portability | 默认路径在用 | launcher的backup/restore等；目标新授权尚待M04实际接线 |
+| catalog | 研究/实验保留，M04将消费 | 目前默认runtime未使用包投影，存在readiness规则分歧；本期接兼容和双协议，不再另造能力表 |
+| testing | 研究/实验保留 | Runner入口显式fixture分支引用FakeDriver；不是生产native能力，不删除既有受控回归 |
+| workflows | 可以删除的候选，暂不删除 | 未发现生产import或间接生产链；`ProductStore.workflows`实际来自`storage/src/workflows.ts`，不能因同名判外部包已用。仍有测试/示例依赖，需A/main另行核对后按正常流程决定，不开本轮清理线 |
+
+本次没有删除、迁移、改包导出或改变默认运行路径。出现包名只有一个引用时，应先看它是否位于组合根，而非据行数或引用数删除。后续M04/M05复用已有模块，不为本表建立独立维护任务。
 
 ## 主要流程
 

@@ -27,7 +27,7 @@ import { closeSync, existsSync, fsyncSync, lstatSync, mkdirSync, openSync, readF
 import { dirname, join, resolve } from 'node:path'
 import { realpathSync } from 'node:fs'
 import { backupState } from './backup.mjs'
-import { processAlive, processCommand, processStart, processUid, readInstanceRecord, removeInstanceRecord, verifyCoordinatorProcess, verifyInstance } from './instance.mjs'
+import { processAlive, processCommand, processStart, sameProcessStart, processUid, readInstanceRecord, removeInstanceRecord, verifyCoordinatorProcess, verifyInstance } from './instance.mjs'
 import { argvMatchesCommand, requestedScopeCheck } from './identity.mjs'
 import { RELEASE_FILE, readRelease, validateRelease, verifyReleaseArtifacts } from './release.mjs'
 import { hasInstallManifest, initializeRelease, releaseBinding } from './release-bootstrap.mjs'
@@ -517,7 +517,7 @@ export async function accountRegisteredResources({ roots, target, record, spawne
     if (typeof start !== 'string' || start.length === 0) { mismatch(pid, label, 'start_missing'); return }
     let observedStart = null
     try { observedStart = await processStart(pid) } catch { observedStart = null }
-    if (observedStart === null || observedStart !== start) { pidReused = true; mismatch(pid, label, observedStart === null ? 'start_unreadable' : 'start_mismatch'); return }
+    if (!sameProcessStart(start, observedStart)) { pidReused = true; mismatch(pid, label, observedStart === null ? 'start_unreadable' : 'start_mismatch'); return }
     const command = commandOf(pid)
     if (command === '') { mismatch(pid, label, 'command_unreadable'); return }
     if (requireComplete) {
