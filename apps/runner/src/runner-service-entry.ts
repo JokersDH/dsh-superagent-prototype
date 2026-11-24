@@ -11,9 +11,9 @@
  *   it does not execute an installed Codex (that stays NOT_TESTED).
  */
 import { serveRunner } from './runner-service.ts'
+import { createRealDriver, isRealDriverId } from './driver-factory.ts'
 import { FakeDriver } from '../../../packages/testing/src/fake-driver.ts'
 import { CodexNativeDriver } from '../../../packages/drivers/codex-native/src/index.ts'
-import { CodexProductDriver } from '../../../packages/drivers/codex-native/src/native.ts'
 import { createFakeAppServer } from '../../../packages/drivers/codex-native/src/fake-app-server.ts'
 import { ProcessHost } from './process-host.ts'
 import { encodeFrame } from '../../../packages/driver-kit/src/index.ts'
@@ -40,7 +40,8 @@ const handle = await serveRunner({
     : {}),
   ...(process.env.PA_RUNNER_RECOVERY_ROOT ? { recoveryRoot: process.env.PA_RUNNER_RECOVERY_ROOT } : {}),
   createDriver: (_spec, hooks) =>
-    scenario === 'codex-native' ? new CodexProductDriver({ beforeAnswerWrite: hooks.beforeNativeWrite }) : scenario.startsWith('codex-fake')
+    isRealDriverId(scenario) ? createRealDriver(scenario, { beforeAnswerWrite: hooks.beforeNativeWrite })
+      : scenario.startsWith('codex-fake')
       ? new CodexNativeDriver({
           // `codex-fake` completes a plain turn; `codex-fake-approval` emits an approval first.
           connect: async () => createFakeAppServer({ approval: scenario === 'codex-fake-approval' }).transport(),

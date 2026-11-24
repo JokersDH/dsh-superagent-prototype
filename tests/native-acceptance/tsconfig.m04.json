@@ -1,0 +1,20 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "strict": true,
+    "exactOptionalPropertyTypes": true,
+    "allowImportingTsExtensions": true,
+    "skipLibCheck": true,
+    "types": ["node"],
+    "lib": ["ES2024"]
+  },
+  "include": [
+    "../../packages/catalog/src/compatibility.ts",
+    "../../packages/drivers/codex-native/src/schema-probe.ts",
+    "../../packages/drivers/codex-native/src/index.ts",
+    "../../packages/drivers/acp-v1/src/index.ts",
+    "../../packages/drivers/acp-v1/src/protocol.ts",
+    "../../apps/runner/src/driver-factory.ts"
+  ]
+}

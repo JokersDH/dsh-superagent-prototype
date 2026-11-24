@@ -1,0 +1,16 @@
+{
+  "name": "@personal-agent/drivers-acp-v1",
+  "version": "0.0.0-g2",
+  "private": true,
+  "type": "module",
+  "description": "ACP v1 (Agent Client Protocol) Driver: real initialize/session/prompt/permission/cancel over the original Runner and AttemptIO; no private shared types.",
+  "license": "MIT",
+  "engines": { "node": ">=24.21.0 <25" },
+  "exports": { ".": "./src/index.ts", "./protocol": "./src/protocol.ts" },
+  "scripts": { "test": "node --test test/*.test.ts" },
+  "dependencies": {
+    "@personal-agent/contracts": "workspace:*",
+    "@personal-agent/driver-kit": "workspace:*",
+    "@personal-agent/catalog": "workspace:*"
+  }
+}
