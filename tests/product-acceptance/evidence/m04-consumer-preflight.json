@@ -1,0 +1,134 @@
+{
+  "at": "2026-11-24T08:58:31.669Z",
+  "kind": "m04-consumer-preflight",
+  "package": {
+    "status": "BLOCKED_NO_F0"
+  },
+  "tools": {
+    "ok": true,
+    "checks": {
+      "platform": {
+        "ok": true,
+        "detail": {
+          "platform": "darwin",
+          "arch": "arm64"
+        }
+      },
+      "macos_version": {
+        "ok": true,
+        "detail": "26.6"
+      },
+      "tools": {
+        "ok": true
+      },
+      "static_verifier_self_test": {
+        "ok": true,
+        "detail": {
+          "protocol": "personal-agent-preview-verifier-self-test/1",
+          "status": "PASS",
+          "cases": [
+            {
+              "id": "inventory_positive",
+              "status": "PASS"
+            },
+            {
+              "id": "missing_file_refused",
+              "status": "PASS",
+              "code": "missing_or_wrong_type"
+            },
+            {
+              "id": "wrong_sha_refused",
+              "status": "PASS",
+              "code": "file_digest_mismatch"
+            },
+            {
+              "id": "internal_link_positive",
+              "status": "PASS"
+            },
+            {
+              "id": "absolute_link_refused",
+              "status": "PASS",
+              "code": "unsafe_symlink_target"
+            },
+            {
+              "id": "relative_foreign_link_refused",
+              "status": "PASS",
+              "code": "foreign_symlink"
+            },
+            {
+              "id": "credential_literal_refused",
+              "status": "PASS",
+              "code": "credential_literal_in_package"
+            },
+            {
+              "id": "extra_shell_command_refused",
+              "status": "PASS",
+              "code": "command_template_mismatch"
+            },
+            {
+              "id": "zip_positive_crc_checked",
+              "status": "PASS"
+            },
+            {
+              "id": "zip_traversal_refused",
+              "status": "PASS",
+              "code": "zip_preflight_or_extract_refused"
+            }
+          ],
+          "scope": "Synthetic independent file-inventory, exact-script, credential and standard ZIP refusal controls; not a full preview or runtime startup.",
+          "servicesStarted": 0,
+          "modelNativeTurns": 0,
+          "signals": 0
+        }
+      },
+      "no_frozen_manifest": {
+        "ok": true,
+        "detail": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/M04-F0.json"
+      }
+    }
+  },
+  "pure": {
+    "ok": true,
+    "checks": {
+      "verified_allowed": {
+        "ok": true
+      },
+      "unverified_not_native_passed": {
+        "ok": true
+      },
+      "unverified_trial_explicit": {
+        "ok": true
+      },
+      "incompatible_disabled": {
+        "ok": true
+      },
+      "unknown_disabled": {
+        "ok": true
+      },
+      "authorization_ok": {
+        "ok": true
+      },
+      "authorization_replay_no_effect": {
+        "ok": true
+      },
+      "authorization_unknown_lookup_only": {
+        "ok": true
+      },
+      "authorization_rejects_changes": {
+        "ok": true
+      },
+      "authorization_rejects_non_empty_and_marker": {
+        "ok": true
+      },
+      "authorization_rejects_unknown_inventory": {
+        "ok": true
+      }
+    }
+  },
+  "l1": "0/6",
+  "l2": "0/7",
+  "notes": [
+    "No frozen M04 DMG identity supplied; package and colleague items remain BLOCKED/NOT_TESTED.",
+    "Compatibility/auth pure checks are harness logic, not product evidence."
+  ]
+}

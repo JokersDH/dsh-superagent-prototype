@@ -1,0 +1,1744 @@
+{
+  "at": "2026-11-24T09:09:04.507Z",
+  "kind": "m04-harness-dry-run",
+  "cohort": "HARNESS_ONLY",
+  "static": {
+    "dmg": "/Users/hh/Desktop/joker/pa-artifacts/m04-dmg-d3ba/Personal-Agent-0.1.2-arm64.dmg",
+    "cohort": "HARNESS_ONLY",
+    "failures": [],
+    "checks": {
+      "dmg_sha256": {
+        "ok": true,
+        "detail": {
+          "observed": "3aaac8f886ef051dd869f996ef40eea88a4939df8c27fb00177026b7e1bce44e",
+          "expected": "3aaac8f886ef051dd869f996ef40eea88a4939df8c27fb00177026b7e1bce44e"
+        }
+      },
+      "hdiutil_verify": {
+        "ok": true,
+        "detail": "hdiutil: verify: checksum of \"/Users/hh/Desktop/joker/pa-artifacts/m04-dmg-d3ba/Personal-Agent-0.1.2-arm64.dmg\" is VALID\n"
+      },
+      "dmg_attach": {
+        "ok": true
+      },
+      "dmg_root_entries": {
+        "ok": true,
+        "detail": [
+          "Applications",
+          "Personal Agent.app",
+          "安装说明.txt"
+        ]
+      },
+      "app_bundle": {
+        "ok": true
+      },
+      "app_source_build_plist": {
+        "ok": true,
+        "detail": {
+          "source": "83f79e8249efd68f429f2b6828ea233278071737",
+          "build": "d3ba0ec6dccc5eac"
+        }
+      },
+      "embedded_engine_static": {
+        "ok": true,
+        "detail": "VERIFIED_STATIC"
+      },
+      "embedded_node_identity": {
+        "ok": true,
+        "detail": {
+          "nodeVersion": "v24.21.0",
+          "nodeAbi": "137",
+          "nodeSha": "e4b5a3af0e05c75de2eae013904145f40fe7fc2a6e6f17510128bf45cca4e79b"
+        }
+      },
+      "embedded_source_build": {
+        "ok": true,
+        "detail": {
+          "source": "83f79e8249efd68f429f2b6828ea233278071737",
+          "buildId": "d3ba0ec6dccc5eac",
+          "nodeSha256": "e4b5a3af0e05c75de2eae013904145f40fe7fc2a6e6f17510128bf45cca4e79b",
+          "version": null
+        }
+      },
+      "app_signature": {
+        "ok": true,
+        "detail": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/mounted image/Personal Agent.app: valid on disk\n/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/mounted image/Personal Agent.app: satisfies its Designated Requirement\n"
+      },
+      "artifact_identity": {
+        "ok": true,
+        "detail": {
+          "sha": "3aaac8f886ef051dd869f996ef40eea88a4939df8c27fb00177026b7e1bce44e",
+          "source": "83f79e8249efd68f429f2b6828ea233278071737",
+          "build": "d3ba0ec6dccc5eac",
+          "node": "e4b5a3af0e05c75de2eae013904145f40fe7fc2a6e6f17510128bf45cca4e79b"
+        }
+      },
+      "copied_apps": {
+        "ok": true
+      },
+      "copied_signature": {
+        "ok": true
+      }
+    },
+    "bytes": 98589468,
+    "sha256": "3aaac8f886ef051dd869f996ef40eea88a4939df8c27fb00177026b7e1bce44e",
+    "runRoot": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY",
+    "mount": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/mounted image",
+    "preview": {
+      "protocol": "personal-agent-preview-verification/1",
+      "status": "VERIFIED_STATIC",
+      "manifestSha256": "b20b42edf827193e29b1f3180d2e5bf0baa5248ee246722ca60983b55856e46e",
+      "source": "83f79e8249efd68f429f2b6828ea233278071737",
+      "buildId": "d3ba0ec6dccc5eac",
+      "predecessor": false,
+      "outer": {
+        "entries": 6899,
+        "regularFiles": 6876,
+        "internalLinks": 23,
+        "bytes": 192880978
+      },
+      "inner": {
+        "entries": 6889,
+        "regularFiles": 6866,
+        "internalLinks": 23,
+        "manifestSha256": "5128fa1db8ddb622a3989e56513500d3a30c08b78100fb112842225a80518c70",
+        "originalTarSha256": "52eee9083b4d2256a58189327c93605c157e38f5cd44894482a82c6198f56123",
+        "originalTarBytes": 20631227
+      },
+      "runtime": {
+        "version": "24.21.0",
+        "abi": "137",
+        "arch": "arm64",
+        "sha256": "e4b5a3af0e05c75de2eae013904145f40fe7fc2a6e6f17510128bf45cca4e79b",
+        "licenseSha256": "5888dbb9a1d2b18f2c3e6c5f6af1b39de658372b402a0577b002777f14c62ace"
+      },
+      "commandTemplatesExact": true,
+      "reviewedLauncherSha256": "07c834a9bfc5678861602173af2b2b59ab6a09fa994694a2d3402bd76723afb2",
+      "userDataPathsAndKnownCredentialFormsChecked": true,
+      "limitation": "Static integrity, pinned entry/runtime bytes and manifest consistency only. Original tar identity is recorded, not re-derived from an expanded directory. No package code, runtime version probe, service, model or native task was executed. This is not a signature, release approval or functional startup verdict.",
+      "servicesStarted": 0,
+      "modelNativeTurns": 0,
+      "signals": 0,
+      "releaseApproved": false,
+      "externallyExpectedSource": "83f79e8249efd68f429f2b6828ea233278071737",
+      "externallyExpectedBuildId": "d3ba0ec6dccc5eac",
+      "externallyExpectedArchiveHash": null
+    },
+    "embedded": {
+      "source": "83f79e8249efd68f429f2b6828ea233278071737",
+      "buildId": "d3ba0ec6dccc5eac",
+      "nodeSha256": "e4b5a3af0e05c75de2eae013904145f40fe7fc2a6e6f17510128bf45cca4e79b",
+      "version": null
+    },
+    "artifact": {
+      "format": "personal-agent-macos-dmg/1",
+      "app": "/Users/hh/Desktop/joker/pa-artifacts/m04-dmg-d3ba/disk-image/Personal Agent.app",
+      "dmg": "/Users/hh/Desktop/joker/pa-artifacts/m04-dmg-d3ba/Personal-Agent-0.1.2-arm64.dmg",
+      "bytes": 98589468,
+      "sha256": "3aaac8f886ef051dd869f996ef40eea88a4939df8c27fb00177026b7e1bce44e",
+      "version": "0.1.2",
+      "source": "83f79e8249efd68f429f2b6828ea233278071737",
+      "buildId": "d3ba0ec6dccc5eac",
+      "embeddedNodeSha256": "e4b5a3af0e05c75de2eae013904145f40fe7fc2a6e6f17510128bf45cca4e79b",
+      "mainExecutableSha256": "e2d2df6c0fa1be3ff7671f75efeee88ae3ff54fde8bc05077c39097c540bf5bd",
+      "launcherSourceSha256": "eaed50cf6e34c1b4a830307ae24d4c956ddf1906cd2bf3ed41d96c4c31019d0b",
+      "signature": "ad-hoc; not Developer ID signed or notarized",
+      "platform": "darwin-arm64",
+      "minimumMacOS": "14.0",
+      "servicesStarted": 0,
+      "modelTurns": 0,
+      "stateIncluded": false,
+      "codeRepository": "/Users/hh/Desktop/joker/superagent-agent-d/"
+    },
+    "home": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/fresh home with spaces",
+    "app": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/安装 路径/Personal Agent.app",
+    "duplicateApp": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/安装 路径/Personal Agent 2.app",
+    "processes": [
+      {
+        "role": "first-app",
+        "pid": 12425,
+        "identity": null
+      },
+      {
+        "role": "duplicate-app",
+        "pid": 12796,
+        "identity": null
+      },
+      {
+        "role": "reopen-app",
+        "pid": 13265,
+        "identity": null
+      },
+      {
+        "role": "unknown-executor-app",
+        "pid": 13855,
+        "identity": null
+      }
+    ],
+    "status": {
+      "status": "RUNNING",
+      "instance": {
+        "protocol": "personal-product-instance/1",
+        "pid": 12530,
+        "processStart": "二 11月/24 17:09:08 2026",
+        "apiPid": 12548,
+        "consolePid": 12530,
+        "apiURL": "http://127.0.0.1:60830",
+        "consoleURL": "http://127.0.0.1:60829",
+        "state": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/fresh home with spaces/Library/Application Support/PersonalAgent/Desktop/data",
+        "install": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/安装 路径/Personal Agent.app/Contents/Resources/engine/install/app",
+        "buildId": "d3ba0ec6dccc5eac",
+        "mode": "personal",
+        "access": "local-development",
+        "startupMode": "normal",
+        "launcherArgv": [
+          "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/安装 路径/Personal Agent.app/Contents/Resources/engine/runtime/bin/node",
+          "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/安装 路径/Personal Agent.app/Contents/Resources/engine/install/app/apps/launcher/bin/pa.mjs",
+          "start",
+          "--port",
+          "60829",
+          "--api-port",
+          "60830",
+          "--open",
+          "--discussion-only"
+        ],
+        "launcherCwd": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/安装 路径/Personal Agent.app/Contents/Resources/engine",
+        "apiArgv": [
+          "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/安装 路径/Personal Agent.app/Contents/Resources/engine/runtime/bin/node",
+          "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/安装 路径/Personal Agent.app/Contents/Resources/engine/install/app/apps/coordinator/product/demo.ts",
+          "--port",
+          "60830",
+          "--state",
+          "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/fresh home with spaces/Library/Application Support/PersonalAgent/Desktop/data",
+          "--console-origin",
+          "http://127.0.0.1:60829",
+          "--startup-mode",
+          "normal",
+          "--assistant",
+          "--discussion-only",
+          "--local-access"
+        ],
+        "apiProcessStart": "二 11月/24 17:09:09 2026",
+        "apiUid": 501,
+        "startedAt": "2026-11-24T09:09:10.026Z",
+        "configRoot": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/fresh home with spaces/Library/Application Support/PersonalAgent/Desktop/config"
+      },
+      "checks": [
+        {
+          "id": "launcher_alive",
+          "ok": true
+        },
+        {
+          "id": "process_start",
+          "ok": true,
+          "detail": "二 11月/24 17:09:08 2026"
+        },
+        {
+          "id": "launcher_command",
+          "ok": true,
+          "detail": "exact_argv"
+        },
+        {
+          "id": "owner",
+          "ok": true
+        },
+        {
+          "id": "cwd",
+          "ok": true,
+          "detail": "cwd_checked"
+        },
+        {
+          "id": "install_identity",
+          "ok": true
+        },
+        {
+          "id": "api_argv",
+          "ok": true,
+          "detail": {
+            "exact": true,
+            "mismatches": []
+          }
+        },
+        {
+          "id": "api_process_start",
+          "ok": true,
+          "detail": {
+            "expected": "二 11月/24 17:09:09 2026",
+            "observed": "二 11月/24 17:09:09 2026"
+          }
+        },
+        {
+          "id": "api_owner",
+          "ok": true
+        },
+        {
+          "id": "api_parent",
+          "ok": true
+        },
+        {
+          "id": "api_cwd",
+          "ok": true
+        },
+        {
+          "id": "listeners",
+          "ok": true
+        },
+        {
+          "id": "health",
+          "ok": true,
+          "detail": "personal"
+        },
+        {
+          "id": "runtime_mode",
+          "ok": true,
+          "detail": {
+            "expected": "personal",
+            "observed": "personal"
+          }
+        },
+        {
+          "id": "startup_mode",
+          "ok": true,
+          "detail": {
+            "expected": "normal",
+            "observed": "normal"
+          }
+        }
+      ],
+      "recovery": {
+        "startupMode": "normal",
+        "markerPresent": false,
+        "markerValid": false,
+        "warning": null,
+        "requiresRevalidation": [],
+        "pendingRebind": []
+      },
+      "installRoot": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/安装 路径/Personal Agent.app/Contents/Resources/engine/install/app",
+      "roots": {
+        "install": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/安装 路径/Personal Agent.app/Contents/Resources/engine/install/app",
+        "config": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/fresh home with spaces/Library/Application Support/PersonalAgent/Desktop/config",
+        "data": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/fresh home with spaces/Library/Application Support/PersonalAgent/Desktop/data",
+        "cache": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/fresh home with spaces/Library/Application Support/PersonalAgent/Desktop/cache",
+        "logs": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/fresh home with spaces/Library/Application Support/PersonalAgent/Desktop/logs",
+        "workspace": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/fresh home with spaces/Library/Application Support/PersonalAgent/Desktop/workspaces"
+      }
+    },
+    "readiness": {
+      "status": 200,
+      "body": {
+        "protocol": "trial-readiness/1",
+        "observedAt": "2026-11-24T09:09:11.049Z",
+        "configurationRevision": "5d70fb2687f92d5848f73bce843368a93f53aa912644a9a38216da8a46f7e216",
+        "mode": "personal",
+        "startupMode": "normal",
+        "discussion": "not_configured",
+        "execution": {
+          "state": "unavailable",
+          "reason": "operator_disabled"
+        },
+        "development": "blocked",
+        "projects": {
+          "development": 0,
+          "discussion": 1,
+          "dispatchable": 0
+        },
+        "profiles": {
+          "native": 1,
+          "controlled": 0,
+          "admittedNative": 0,
+          "admittedControlled": 0
+        },
+        "capabilities": {
+          "contextHistory": true,
+          "contextSources": true,
+          "decisions": true,
+          "proposals": true
+        },
+        "authorization": "none"
+      }
+    },
+    "configuration": {
+      "protocol": "application-configuration/1",
+      "revision": "5d70fb2687f92d5848f73bce843368a93f53aa912644a9a38216da8a46f7e216",
+      "reviewActivityAvailable": true,
+      "decisionsAvailable": true,
+      "proposalsAvailable": true,
+      "contextPreviewAvailable": true,
+      "assistantContextAvailable": false,
+      "contextHistoryAvailable": true,
+      "contextSourcesAvailable": true,
+      "replyCandidatesAvailable": true,
+      "executionAvailability": {
+        "state": "unavailable",
+        "reason": "operator_disabled"
+      },
+      "projects": [
+        {
+          "id": "project-personal-dialogue",
+          "displayName": "个人对话",
+          "scope": {
+            "projectId": "project-personal-dialogue",
+            "allowedPaths": [
+              "."
+            ],
+            "excludedPaths": [
+              ".git"
+            ],
+            "externalActions": []
+          },
+          "profileIds": [],
+          "defaultCriteria": [
+            {
+              "id": "review-output",
+              "description": "审阅讨论内容",
+              "kind": "human",
+              "required": true
+            }
+          ],
+          "settingsAvailable": false,
+          "discussionOnly": true,
+          "dispatchAllowed": false,
+          "blockedReason": "unsupported_capability"
+        }
+      ],
+      "profiles": [
+        {
+          "id": "profile-codex-native",
+          "revision": 1,
+          "displayName": "Codex · 未启用",
+          "driverId": "codex-native",
+          "kind": "native",
+          "readiness": "needs_setup",
+          "dispatchAllowed": false,
+          "blockedReason": "unsupported_capability"
+        }
+      ],
+      "checks": []
+    },
+    "ui": {
+      "url": "http://127.0.0.1:60829",
+      "chinese": true,
+      "text": "个人 Agent 工作台\n工作区\n个人工作区\n实时连接\n工作区\n新对话\n对话\n包含归档\n\n暂无历史对话\n\n主对话\n当前\n项目与工作\n0\n全部项目\n个人对话\n当前对话的工作\n0\n\n正在载入…\n\n本\n个人工作区\n对话模型未配置\n\n开发执行未就绪\n开发执行已关闭\n\n0\n进行中\n0\n待决定\n0\n已交付\n主对话\n\n个人工作区\n\n本地会话\n开始新的工作\n拆解开发需求\n分析代码或报错\n生成 Agent 任务单\n发送消息\n主对话"
+    },
+    "stop": {
+      "ok": true,
+      "status": "STOPPED",
+      "stopped": true,
+      "stillAlive": false,
+      "code": null,
+      "verification": {
+        "ok": true,
+        "checks": [
+          {
+            "id": "launcher_alive",
+            "ok": true
+          },
+          {
+            "id": "process_start",
+            "ok": true,
+            "detail": "二 11月/24 17:09:08 2026"
+          },
+          {
+            "id": "launcher_command",
+            "ok": true,
+            "detail": "exact_argv"
+          },
+          {
+            "id": "owner",
+            "ok": true
+          },
+          {
+            "id": "cwd",
+            "ok": true,
+            "detail": "cwd_checked"
+          },
+          {
+            "id": "install_identity",
+            "ok": true
+          },
+          {
+            "id": "api_argv",
+            "ok": true,
+            "detail": {
+              "exact": true,
+              "mismatches": []
+            }
+          },
+          {
+            "id": "api_process_start",
+            "ok": true,
+            "detail": {
+              "expected": "二 11月/24 17:09:09 2026",
+              "observed": "二 11月/24 17:09:09 2026"
+            }
+          },
+          {
+            "id": "api_owner",
+            "ok": true
+          },
+          {
+            "id": "api_parent",
+            "ok": true
+          },
+          {
+            "id": "api_cwd",
+            "ok": true
+          },
+          {
+            "id": "listeners",
+            "ok": true
+          },
+          {
+            "id": "health",
+            "ok": true,
+            "detail": "personal"
+          },
+          {
+            "id": "runtime_mode",
+            "ok": true,
+            "detail": {
+              "expected": "personal",
+              "observed": "personal"
+            }
+          },
+          {
+            "id": "startup_mode",
+            "ok": true,
+            "detail": {
+              "expected": "normal",
+              "observed": "normal"
+            }
+          }
+        ],
+        "failures": [],
+        "health": {
+          "status": "ok",
+          "mode": "personal",
+          "access": "local-development"
+        }
+      },
+      "instanceRecordRemoved": true
+    },
+    "unknownExecutor": {
+      "readiness": {
+        "protocol": "trial-readiness/1",
+        "observedAt": "2026-11-24T09:09:23.849Z",
+        "configurationRevision": "5d70fb2687f92d5848f73bce843368a93f53aa912644a9a38216da8a46f7e216",
+        "mode": "personal",
+        "startupMode": "normal",
+        "discussion": "not_configured",
+        "execution": {
+          "state": "unavailable",
+          "reason": "operator_disabled"
+        },
+        "development": "blocked",
+        "projects": {
+          "development": 0,
+          "discussion": 1,
+          "dispatchable": 0
+        },
+        "profiles": {
+          "native": 1,
+          "controlled": 0,
+          "admittedNative": 0,
+          "admittedControlled": 0
+        },
+        "capabilities": {
+          "contextHistory": true,
+          "contextSources": true,
+          "decisions": true,
+          "proposals": true
+        },
+        "authorization": "none"
+      },
+      "configuration": {
+        "protocol": "application-configuration/1",
+        "revision": "5d70fb2687f92d5848f73bce843368a93f53aa912644a9a38216da8a46f7e216",
+        "reviewActivityAvailable": true,
+        "decisionsAvailable": true,
+        "proposalsAvailable": true,
+        "contextPreviewAvailable": true,
+        "assistantContextAvailable": false,
+        "contextHistoryAvailable": true,
+        "contextSourcesAvailable": true,
+        "replyCandidatesAvailable": true,
+        "executionAvailability": {
+          "state": "unavailable",
+          "reason": "operator_disabled"
+        },
+        "projects": [
+          {
+            "id": "project-personal-dialogue",
+            "displayName": "个人对话",
+            "scope": {
+              "projectId": "project-personal-dialogue",
+              "allowedPaths": [
+                "."
+              ],
+              "excludedPaths": [
+                ".git"
+              ],
+              "externalActions": []
+            },
+            "profileIds": [],
+            "defaultCriteria": [
+              {
+                "id": "review-output",
+                "description": "审阅讨论内容",
+                "kind": "human",
+                "required": true
+              }
+            ],
+            "settingsAvailable": false,
+            "discussionOnly": true,
+            "dispatchAllowed": false,
+            "blockedReason": "unsupported_capability"
+          }
+        ],
+        "profiles": [
+          {
+            "id": "profile-codex-native",
+            "revision": 1,
+            "displayName": "Codex · 未启用",
+            "driverId": "codex-native",
+            "kind": "native",
+            "readiness": "needs_setup",
+            "dispatchAllowed": false,
+            "blockedReason": "unsupported_capability"
+          }
+        ],
+        "checks": []
+      }
+    },
+    "launchMethod": "app executable start; packaged launcher status/stop; duplicate app path; unknown executor negative probe"
+  },
+  "launch": {
+    "checks": {
+      "packaged_start_running": {
+        "ok": true,
+        "detail": "ication Support/PersonalAgent/Desktop/data\",\n    \"cache\": \"/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/fresh home with spaces/Library/Application Support/PersonalAgent/Desktop/cache\",\n    \"logs\": \"/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/fresh home with spaces/Library/Application Support/PersonalAgent/Desktop/logs\",\n    \"workspace\": \"/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/fresh home with spaces/Library/Application Support/PersonalAgent/Desktop/workspaces\"\n  }\n}\n"
+      },
+      "fresh_home_state": {
+        "ok": true,
+        "detail": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/fresh home with spaces/Library/Application Support/PersonalAgent/Desktop/data"
+      },
+      "no_checkout_or_global_node": {
+        "ok": true,
+        "detail": [
+          "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/安装 路径/Personal Agent.app/Contents/Resources/engine/runtime/bin/node",
+          "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/安装 路径/Personal Agent.app/Contents/Resources/engine/install/app/apps/coordinator/product/demo.ts",
+          "--port",
+          "60830",
+          "--state",
+          "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/fresh home with spaces/Library/Application Support/PersonalAgent/Desktop/data",
+          "--console-origin",
+          "http://127.0.0.1:60829",
+          "--startup-mode",
+          "normal",
+          "--assistant",
+          "--discussion-only",
+          "--local-access"
+        ]
+      },
+      "readiness_observed": {
+        "ok": true,
+        "detail": {
+          "protocol": "trial-readiness/1",
+          "observedAt": "2026-11-24T09:09:11.049Z",
+          "configurationRevision": "5d70fb2687f92d5848f73bce843368a93f53aa912644a9a38216da8a46f7e216",
+          "mode": "personal",
+          "startupMode": "normal",
+          "discussion": "not_configured",
+          "execution": {
+            "state": "unavailable",
+            "reason": "operator_disabled"
+          },
+          "development": "blocked",
+          "projects": {
+            "development": 0,
+            "discussion": 1,
+            "dispatchable": 0
+          },
+          "profiles": {
+            "native": 1,
+            "controlled": 0,
+            "admittedNative": 0,
+            "admittedControlled": 0
+          },
+          "capabilities": {
+            "contextHistory": true,
+            "contextSources": true,
+            "decisions": true,
+            "proposals": true
+          },
+          "authorization": "none"
+        }
+      },
+      "no_fixture_fallback": {
+        "ok": true,
+        "detail": {
+          "protocol": "trial-readiness/1",
+          "observedAt": "2026-11-24T09:09:11.049Z",
+          "configurationRevision": "5d70fb2687f92d5848f73bce843368a93f53aa912644a9a38216da8a46f7e216",
+          "mode": "personal",
+          "startupMode": "normal",
+          "discussion": "not_configured",
+          "execution": {
+            "state": "unavailable",
+            "reason": "operator_disabled"
+          },
+          "development": "blocked",
+          "projects": {
+            "development": 0,
+            "discussion": 1,
+            "dispatchable": 0
+          },
+          "profiles": {
+            "native": 1,
+            "controlled": 0,
+            "admittedNative": 0,
+            "admittedControlled": 0
+          },
+          "capabilities": {
+            "contextHistory": true,
+            "contextSources": true,
+            "decisions": true,
+            "proposals": true
+          },
+          "authorization": "none"
+        }
+      },
+      "compatibility_surface": {
+        "ok": false,
+        "detail": {
+          "state": "absent",
+          "reason": "compatibility_metadata_missing",
+          "profiles": [
+            {
+              "id": "profile-codex-native",
+              "classification": "unknown",
+              "raw": null,
+              "nativeTestPassed": null,
+              "dispatchAllowed": false,
+              "explicitTrialAdmission": false,
+              "label": null
+            }
+          ]
+        }
+      },
+      "unknown_not_native_test_passed": {
+        "ok": true,
+        "detail": [
+          {
+            "id": "profile-codex-native",
+            "classification": "unknown",
+            "raw": null,
+            "nativeTestPassed": null,
+            "dispatchAllowed": false,
+            "explicitTrialAdmission": false,
+            "label": null
+          }
+        ]
+      },
+      "ui_admission_consistency": {
+        "ok": true,
+        "detail": [
+          {
+            "id": "profile-codex-native",
+            "classification": "unknown",
+            "raw": null,
+            "nativeTestPassed": null,
+            "dispatchAllowed": false,
+            "explicitTrialAdmission": false,
+            "label": null
+          }
+        ]
+      },
+      "chinese_ui": {
+        "ok": true,
+        "detail": "个人 Agent 工作台\n工作区\n个人工作区\n实时连接\n工作区\n新对话\n对话\n包含归档\n\n暂无历史对话\n\n主对话\n当前\n项目与工作\n0\n全部项目\n个人对话\n当前对话的工作\n0\n\n正在载入…\n\n本\n个人工作区\n对话模型未配置\n\n开发执行未就绪\n开发执行已关闭\n\n0\n进行中\n0\n待决定\n0\n已交付\n主对话\n\n个人工作区\n\n本地会话\n开始新的工作\n拆解开发需求\n分析代码或报错\n生成 Agent 任务单\n发送消息\n主对话"
+      },
+      "duplicate_path_reuses_instance": {
+        "ok": true,
+        "detail": {
+          "before": 12530,
+          "after": 12530
+        }
+      },
+      "packaged_stop": {
+        "ok": true,
+        "detail": {
+          "ok": true,
+          "status": "STOPPED",
+          "stopped": true,
+          "stillAlive": false,
+          "code": null,
+          "verification": {
+            "ok": true,
+            "checks": [
+              {
+                "id": "launcher_alive",
+                "ok": true
+              },
+              {
+                "id": "process_start",
+                "ok": true,
+                "detail": "二 11月/24 17:09:08 2026"
+              },
+              {
+                "id": "launcher_command",
+                "ok": true,
+                "detail": "exact_argv"
+              },
+              {
+                "id": "owner",
+                "ok": true
+              },
+              {
+                "id": "cwd",
+                "ok": true,
+                "detail": "cwd_checked"
+              },
+              {
+                "id": "install_identity",
+                "ok": true
+              },
+              {
+                "id": "api_argv",
+                "ok": true,
+                "detail": {
+                  "exact": true,
+                  "mismatches": []
+                }
+              },
+              {
+                "id": "api_process_start",
+                "ok": true,
+                "detail": {
+                  "expected": "二 11月/24 17:09:09 2026",
+                  "observed": "二 11月/24 17:09:09 2026"
+                }
+              },
+              {
+                "id": "api_owner",
+                "ok": true
+              },
+              {
+                "id": "api_parent",
+                "ok": true
+              },
+              {
+                "id": "api_cwd",
+                "ok": true
+              },
+              {
+                "id": "listeners",
+                "ok": true
+              },
+              {
+                "id": "health",
+                "ok": true,
+                "detail": "personal"
+              },
+              {
+                "id": "runtime_mode",
+                "ok": true,
+                "detail": {
+                  "expected": "personal",
+                  "observed": "personal"
+                }
+              },
+              {
+                "id": "startup_mode",
+                "ok": true,
+                "detail": {
+                  "expected": "normal",
+                  "observed": "normal"
+                }
+              }
+            ],
+            "failures": [],
+            "health": {
+              "status": "ok",
+              "mode": "personal",
+              "access": "local-development"
+            }
+          },
+          "instanceRecordRemoved": true
+        }
+      },
+      "packaged_reopen": {
+        "ok": true,
+        "detail": {
+          "status": "RUNNING",
+          "instance": {
+            "protocol": "personal-product-instance/1",
+            "pid": 13441,
+            "processStart": "二 11月/24 17:09:17 2026",
+            "apiPid": 13547,
+            "consolePid": 13441,
+            "apiURL": "http://127.0.0.1:60880",
+            "consoleURL": "http://127.0.0.1:60879",
+            "state": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/fresh home with spaces/Library/Application Support/PersonalAgent/Desktop/data",
+            "install": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/安装 路径/Personal Agent.app/Contents/Resources/engine/install/app",
+            "buildId": "d3ba0ec6dccc5eac",
+            "mode": "personal",
+            "access": "local-development",
+            "startupMode": "normal",
+            "launcherArgv": [
+              "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/安装 路径/Personal Agent.app/Contents/Resources/engine/runtime/bin/node",
+              "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/安装 路径/Personal Agent.app/Contents/Resources/engine/install/app/apps/launcher/bin/pa.mjs",
+              "start",
+              "--port",
+              "60879",
+              "--api-port",
+              "60880",
+              "--open",
+              "--discussion-only"
+            ],
+            "launcherCwd": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/安装 路径/Personal Agent.app/Contents/Resources/engine",
+            "apiArgv": [
+              "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/安装 路径/Personal Agent.app/Contents/Resources/engine/runtime/bin/node",
+              "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/安装 路径/Personal Agent.app/Contents/Resources/engine/install/app/apps/coordinator/product/demo.ts",
+              "--port",
+              "60880",
+              "--state",
+              "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/fresh home with spaces/Library/Application Support/PersonalAgent/Desktop/data",
+              "--console-origin",
+              "http://127.0.0.1:60879",
+              "--startup-mode",
+              "normal",
+              "--assistant",
+              "--discussion-only",
+              "--local-access"
+            ],
+            "apiProcessStart": "二 11月/24 17:09:17 2026",
+            "apiUid": 501,
+            "startedAt": "2026-11-24T09:09:18.861Z",
+            "configRoot": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/fresh home with spaces/Library/Application Support/PersonalAgent/Desktop/config"
+          },
+          "checks": [
+            {
+              "id": "launcher_alive",
+              "ok": true
+            },
+            {
+              "id": "process_start",
+              "ok": true,
+              "detail": "二 11月/24 17:09:17 2026"
+            },
+            {
+              "id": "launcher_command",
+              "ok": true,
+              "detail": "exact_argv"
+            },
+            {
+              "id": "owner",
+              "ok": true
+            },
+            {
+              "id": "cwd",
+              "ok": true,
+              "detail": "cwd_checked"
+            },
+            {
+              "id": "install_identity",
+              "ok": true
+            },
+            {
+              "id": "api_argv",
+              "ok": true,
+              "detail": {
+                "exact": true,
+                "mismatches": []
+              }
+            },
+            {
+              "id": "api_process_start",
+              "ok": true,
+              "detail": {
+                "expected": "二 11月/24 17:09:17 2026",
+                "observed": "二 11月/24 17:09:17 2026"
+              }
+            },
+            {
+              "id": "api_owner",
+              "ok": true
+            },
+            {
+              "id": "api_parent",
+              "ok": true
+            },
+            {
+              "id": "api_cwd",
+              "ok": true
+            },
+            {
+              "id": "listeners",
+              "ok": true
+            },
+            {
+              "id": "health",
+              "ok": true,
+              "detail": "personal"
+            },
+            {
+              "id": "runtime_mode",
+              "ok": true,
+              "detail": {
+                "expected": "personal",
+                "observed": "personal"
+              }
+            },
+            {
+              "id": "startup_mode",
+              "ok": true,
+              "detail": {
+                "expected": "normal",
+                "observed": "normal"
+              }
+            }
+          ],
+          "recovery": {
+            "startupMode": "normal",
+            "markerPresent": false,
+            "markerValid": false,
+            "warning": null,
+            "requiresRevalidation": [],
+            "pendingRebind": []
+          },
+          "installRoot": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/安装 路径/Personal Agent.app/Contents/Resources/engine/install/app",
+          "roots": {
+            "install": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/安装 路径/Personal Agent.app/Contents/Resources/engine/install/app",
+            "config": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/fresh home with spaces/Library/Application Support/PersonalAgent/Desktop/config",
+            "data": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/fresh home with spaces/Library/Application Support/PersonalAgent/Desktop/data",
+            "cache": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/fresh home with spaces/Library/Application Support/PersonalAgent/Desktop/cache",
+            "logs": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/fresh home with spaces/Library/Application Support/PersonalAgent/Desktop/logs",
+            "workspace": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/fresh home with spaces/Library/Application Support/PersonalAgent/Desktop/workspaces"
+          }
+        }
+      },
+      "packaged_stop_after_reopen": {
+        "ok": true,
+        "detail": {
+          "ok": true,
+          "status": "STOPPED",
+          "stopped": true,
+          "stillAlive": false,
+          "code": null,
+          "verification": {
+            "ok": true,
+            "checks": [
+              {
+                "id": "launcher_alive",
+                "ok": true
+              },
+              {
+                "id": "process_start",
+                "ok": true,
+                "detail": "二 11月/24 17:09:17 2026"
+              },
+              {
+                "id": "launcher_command",
+                "ok": true,
+                "detail": "exact_argv"
+              },
+              {
+                "id": "owner",
+                "ok": true
+              },
+              {
+                "id": "cwd",
+                "ok": true,
+                "detail": "cwd_checked"
+              },
+              {
+                "id": "install_identity",
+                "ok": true
+              },
+              {
+                "id": "api_argv",
+                "ok": true,
+                "detail": {
+                  "exact": true,
+                  "mismatches": []
+                }
+              },
+              {
+                "id": "api_process_start",
+                "ok": true,
+                "detail": {
+                  "expected": "二 11月/24 17:09:17 2026",
+                  "observed": "二 11月/24 17:09:17 2026"
+                }
+              },
+              {
+                "id": "api_owner",
+                "ok": true
+              },
+              {
+                "id": "api_parent",
+                "ok": true
+              },
+              {
+                "id": "api_cwd",
+                "ok": true
+              },
+              {
+                "id": "listeners",
+                "ok": true
+              },
+              {
+                "id": "health",
+                "ok": true,
+                "detail": "personal"
+              },
+              {
+                "id": "runtime_mode",
+                "ok": true,
+                "detail": {
+                  "expected": "personal",
+                  "observed": "personal"
+                }
+              },
+              {
+                "id": "startup_mode",
+                "ok": true,
+                "detail": {
+                  "expected": "normal",
+                  "observed": "normal"
+                }
+              }
+            ],
+            "failures": [],
+            "health": {
+              "status": "ok",
+              "mode": "personal",
+              "access": "local-development"
+            }
+          },
+          "instanceRecordRemoved": true
+        }
+      },
+      "unknown_executor_start_running": {
+        "ok": true,
+        "detail": "ication Support/PersonalAgent/Desktop/data\",\n    \"cache\": \"/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/fresh home with spaces/Library/Application Support/PersonalAgent/Desktop/cache\",\n    \"logs\": \"/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/fresh home with spaces/Library/Application Support/PersonalAgent/Desktop/logs\",\n    \"workspace\": \"/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/fresh home with spaces/Library/Application Support/PersonalAgent/Desktop/workspaces\"\n  }\n}\n"
+      },
+      "unknown_executor_disables_development": {
+        "ok": true,
+        "detail": {
+          "protocol": "trial-readiness/1",
+          "observedAt": "2026-11-24T09:09:23.849Z",
+          "configurationRevision": "5d70fb2687f92d5848f73bce843368a93f53aa912644a9a38216da8a46f7e216",
+          "mode": "personal",
+          "startupMode": "normal",
+          "discussion": "not_configured",
+          "execution": {
+            "state": "unavailable",
+            "reason": "operator_disabled"
+          },
+          "development": "blocked",
+          "projects": {
+            "development": 0,
+            "discussion": 1,
+            "dispatchable": 0
+          },
+          "profiles": {
+            "native": 1,
+            "controlled": 0,
+            "admittedNative": 0,
+            "admittedControlled": 0
+          },
+          "capabilities": {
+            "contextHistory": true,
+            "contextSources": true,
+            "decisions": true,
+            "proposals": true
+          },
+          "authorization": "none"
+        }
+      },
+      "unknown_executor_not_native_passed": {
+        "ok": true,
+        "detail": {
+          "protocol": "application-configuration/1",
+          "revision": "5d70fb2687f92d5848f73bce843368a93f53aa912644a9a38216da8a46f7e216",
+          "reviewActivityAvailable": true,
+          "decisionsAvailable": true,
+          "proposalsAvailable": true,
+          "contextPreviewAvailable": true,
+          "assistantContextAvailable": false,
+          "contextHistoryAvailable": true,
+          "contextSourcesAvailable": true,
+          "replyCandidatesAvailable": true,
+          "executionAvailability": {
+            "state": "unavailable",
+            "reason": "operator_disabled"
+          },
+          "projects": [
+            {
+              "id": "project-personal-dialogue",
+              "displayName": "个人对话",
+              "scope": {
+                "projectId": "project-personal-dialogue",
+                "allowedPaths": [
+                  "."
+                ],
+                "excludedPaths": [
+                  ".git"
+                ],
+                "externalActions": []
+              },
+              "profileIds": [],
+              "defaultCriteria": [
+                {
+                  "id": "review-output",
+                  "description": "审阅讨论内容",
+                  "kind": "human",
+                  "required": true
+                }
+              ],
+              "settingsAvailable": false,
+              "discussionOnly": true,
+              "dispatchAllowed": false,
+              "blockedReason": "unsupported_capability"
+            }
+          ],
+          "profiles": [
+            {
+              "id": "profile-codex-native",
+              "revision": 1,
+              "displayName": "Codex · 未启用",
+              "driverId": "codex-native",
+              "kind": "native",
+              "readiness": "needs_setup",
+              "dispatchAllowed": false,
+              "blockedReason": "unsupported_capability"
+            }
+          ],
+          "checks": []
+        }
+      },
+      "unknown_executor_no_fixture": {
+        "ok": true,
+        "detail": {
+          "execution": {
+            "state": "unavailable",
+            "reason": "operator_disabled"
+          },
+          "profiles": [
+            {
+              "id": "profile-codex-native",
+              "revision": 1,
+              "displayName": "Codex · 未启用",
+              "driverId": "codex-native",
+              "kind": "native",
+              "readiness": "needs_setup",
+              "dispatchAllowed": false,
+              "blockedReason": "unsupported_capability"
+            }
+          ]
+        }
+      },
+      "unknown_executor_stop": {
+        "ok": true,
+        "detail": {
+          "ok": true,
+          "status": "STOPPED",
+          "stopped": true,
+          "stillAlive": false,
+          "code": null,
+          "verification": {
+            "ok": true,
+            "checks": [
+              {
+                "id": "launcher_alive",
+                "ok": true
+              },
+              {
+                "id": "process_start",
+                "ok": true,
+                "detail": "二 11月/24 17:09:21 2026"
+              },
+              {
+                "id": "launcher_command",
+                "ok": true,
+                "detail": "exact_argv"
+              },
+              {
+                "id": "owner",
+                "ok": true
+              },
+              {
+                "id": "cwd",
+                "ok": true,
+                "detail": "cwd_checked"
+              },
+              {
+                "id": "install_identity",
+                "ok": true
+              },
+              {
+                "id": "api_argv",
+                "ok": true,
+                "detail": {
+                  "exact": true,
+                  "mismatches": []
+                }
+              },
+              {
+                "id": "api_process_start",
+                "ok": true,
+                "detail": {
+                  "expected": "二 11月/24 17:09:22 2026",
+                  "observed": "二 11月/24 17:09:22 2026"
+                }
+              },
+              {
+                "id": "api_owner",
+                "ok": true
+              },
+              {
+                "id": "api_parent",
+                "ok": true
+              },
+              {
+                "id": "api_cwd",
+                "ok": true
+              },
+              {
+                "id": "listeners",
+                "ok": true
+              },
+              {
+                "id": "health",
+                "ok": true,
+                "detail": "personal"
+              },
+              {
+                "id": "runtime_mode",
+                "ok": true,
+                "detail": {
+                  "expected": "personal",
+                  "observed": "personal"
+                }
+              },
+              {
+                "id": "startup_mode",
+                "ok": true,
+                "detail": {
+                  "expected": "normal",
+                  "observed": "normal"
+                }
+              }
+            ],
+            "failures": [],
+            "health": {
+              "status": "ok",
+              "mode": "personal",
+              "access": "local-development"
+            }
+          },
+          "instanceRecordRemoved": true
+        }
+      }
+    },
+    "status": {
+      "status": "RUNNING",
+      "instance": {
+        "protocol": "personal-product-instance/1",
+        "pid": 12530,
+        "processStart": "二 11月/24 17:09:08 2026",
+        "apiPid": 12548,
+        "consolePid": 12530,
+        "apiURL": "http://127.0.0.1:60830",
+        "consoleURL": "http://127.0.0.1:60829",
+        "state": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/fresh home with spaces/Library/Application Support/PersonalAgent/Desktop/data",
+        "install": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/安装 路径/Personal Agent.app/Contents/Resources/engine/install/app",
+        "buildId": "d3ba0ec6dccc5eac",
+        "mode": "personal",
+        "access": "local-development",
+        "startupMode": "normal",
+        "launcherArgv": [
+          "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/安装 路径/Personal Agent.app/Contents/Resources/engine/runtime/bin/node",
+          "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/安装 路径/Personal Agent.app/Contents/Resources/engine/install/app/apps/launcher/bin/pa.mjs",
+          "start",
+          "--port",
+          "60829",
+          "--api-port",
+          "60830",
+          "--open",
+          "--discussion-only"
+        ],
+        "launcherCwd": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/安装 路径/Personal Agent.app/Contents/Resources/engine",
+        "apiArgv": [
+          "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/安装 路径/Personal Agent.app/Contents/Resources/engine/runtime/bin/node",
+          "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/安装 路径/Personal Agent.app/Contents/Resources/engine/install/app/apps/coordinator/product/demo.ts",
+          "--port",
+          "60830",
+          "--state",
+          "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/fresh home with spaces/Library/Application Support/PersonalAgent/Desktop/data",
+          "--console-origin",
+          "http://127.0.0.1:60829",
+          "--startup-mode",
+          "normal",
+          "--assistant",
+          "--discussion-only",
+          "--local-access"
+        ],
+        "apiProcessStart": "二 11月/24 17:09:09 2026",
+        "apiUid": 501,
+        "startedAt": "2026-11-24T09:09:10.026Z",
+        "configRoot": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/fresh home with spaces/Library/Application Support/PersonalAgent/Desktop/config"
+      },
+      "checks": [
+        {
+          "id": "launcher_alive",
+          "ok": true
+        },
+        {
+          "id": "process_start",
+          "ok": true,
+          "detail": "二 11月/24 17:09:08 2026"
+        },
+        {
+          "id": "launcher_command",
+          "ok": true,
+          "detail": "exact_argv"
+        },
+        {
+          "id": "owner",
+          "ok": true
+        },
+        {
+          "id": "cwd",
+          "ok": true,
+          "detail": "cwd_checked"
+        },
+        {
+          "id": "install_identity",
+          "ok": true
+        },
+        {
+          "id": "api_argv",
+          "ok": true,
+          "detail": {
+            "exact": true,
+            "mismatches": []
+          }
+        },
+        {
+          "id": "api_process_start",
+          "ok": true,
+          "detail": {
+            "expected": "二 11月/24 17:09:09 2026",
+            "observed": "二 11月/24 17:09:09 2026"
+          }
+        },
+        {
+          "id": "api_owner",
+          "ok": true
+        },
+        {
+          "id": "api_parent",
+          "ok": true
+        },
+        {
+          "id": "api_cwd",
+          "ok": true
+        },
+        {
+          "id": "listeners",
+          "ok": true
+        },
+        {
+          "id": "health",
+          "ok": true,
+          "detail": "personal"
+        },
+        {
+          "id": "runtime_mode",
+          "ok": true,
+          "detail": {
+            "expected": "personal",
+            "observed": "personal"
+          }
+        },
+        {
+          "id": "startup_mode",
+          "ok": true,
+          "detail": {
+            "expected": "normal",
+            "observed": "normal"
+          }
+        }
+      ],
+      "recovery": {
+        "startupMode": "normal",
+        "markerPresent": false,
+        "markerValid": false,
+        "warning": null,
+        "requiresRevalidation": [],
+        "pendingRebind": []
+      },
+      "installRoot": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/安装 路径/Personal Agent.app/Contents/Resources/engine/install/app",
+      "roots": {
+        "install": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/安装 路径/Personal Agent.app/Contents/Resources/engine/install/app",
+        "config": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/fresh home with spaces/Library/Application Support/PersonalAgent/Desktop/config",
+        "data": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/fresh home with spaces/Library/Application Support/PersonalAgent/Desktop/data",
+        "cache": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/fresh home with spaces/Library/Application Support/PersonalAgent/Desktop/cache",
+        "logs": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/fresh home with spaces/Library/Application Support/PersonalAgent/Desktop/logs",
+        "workspace": "/Users/hh/Desktop/joker/pa-artifacts/pa-e-m04-consumer/run-1795511337269-HARNESS_ONLY/fresh home with spaces/Library/Application Support/PersonalAgent/Desktop/workspaces"
+      }
+    },
+    "readiness": {
+      "status": 200,
+      "body": {
+        "protocol": "trial-readiness/1",
+        "observedAt": "2026-11-24T09:09:11.049Z",
+        "configurationRevision": "5d70fb2687f92d5848f73bce843368a93f53aa912644a9a38216da8a46f7e216",
+        "mode": "personal",
+        "startupMode": "normal",
+        "discussion": "not_configured",
+        "execution": {
+          "state": "unavailable",
+          "reason": "operator_disabled"
+        },
+        "development": "blocked",
+        "projects": {
+          "development": 0,
+          "discussion": 1,
+          "dispatchable": 0
+        },
+        "profiles": {
+          "native": 1,
+          "controlled": 0,
+          "admittedNative": 0,
+          "admittedControlled": 0
+        },
+        "capabilities": {
+          "contextHistory": true,
+          "contextSources": true,
+          "decisions": true,
+          "proposals": true
+        },
+        "authorization": "none"
+      }
+    },
+    "configuration": {
+      "protocol": "application-configuration/1",
+      "revision": "5d70fb2687f92d5848f73bce843368a93f53aa912644a9a38216da8a46f7e216",
+      "reviewActivityAvailable": true,
+      "decisionsAvailable": true,
+      "proposalsAvailable": true,
+      "contextPreviewAvailable": true,
+      "assistantContextAvailable": false,
+      "contextHistoryAvailable": true,
+      "contextSourcesAvailable": true,
+      "replyCandidatesAvailable": true,
+      "executionAvailability": {
+        "state": "unavailable",
+        "reason": "operator_disabled"
+      },
+      "projects": [
+        {
+          "id": "project-personal-dialogue",
+          "displayName": "个人对话",
+          "scope": {
+            "projectId": "project-personal-dialogue",
+            "allowedPaths": [
+              "."
+            ],
+            "excludedPaths": [
+              ".git"
+            ],
+            "externalActions": []
+          },
+          "profileIds": [],
+          "defaultCriteria": [
+            {
+              "id": "review-output",
+              "description": "审阅讨论内容",
+              "kind": "human",
+              "required": true
+            }
+          ],
+          "settingsAvailable": false,
+          "discussionOnly": true,
+          "dispatchAllowed": false,
+          "blockedReason": "unsupported_capability"
+        }
+      ],
+      "profiles": [
+        {
+          "id": "profile-codex-native",
+          "revision": 1,
+          "displayName": "Codex · 未启用",
+          "driverId": "codex-native",
+          "kind": "native",
+          "readiness": "needs_setup",
+          "dispatchAllowed": false,
+          "blockedReason": "unsupported_capability"
+        }
+      ],
+      "checks": []
+    },
+    "ui": {
+      "url": "http://127.0.0.1:60829",
+      "chinese": true,
+      "text": "个人 Agent 工作台\n工作区\n个人工作区\n实时连接\n工作区\n新对话\n对话\n包含归档\n\n暂无历史对话\n\n主对话\n当前\n项目与工作\n0\n全部项目\n个人对话\n当前对话的工作\n0\n\n正在载入…\n\n本\n个人工作区\n对话模型未配置\n\n开发执行未就绪\n开发执行已关闭\n\n0\n进行中\n0\n待决定\n0\n已交付\n主对话\n\n个人工作区\n\n本地会话\n开始新的工作\n拆解开发需求\n分析代码或报错\n生成 Agent 任务单\n发送消息\n主对话"
+    },
+    "stop": {
+      "ok": true,
+      "status": "STOPPED",
+      "stopped": true,
+      "stillAlive": false,
+      "code": null,
+      "verification": {
+        "ok": true,
+        "checks": [
+          {
+            "id": "launcher_alive",
+            "ok": true
+          },
+          {
+            "id": "process_start",
+            "ok": true,
+            "detail": "二 11月/24 17:09:08 2026"
+          },
+          {
+            "id": "launcher_command",
+            "ok": true,
+            "detail": "exact_argv"
+          },
+          {
+            "id": "owner",
+            "ok": true
+          },
+          {
+            "id": "cwd",
+            "ok": true,
+            "detail": "cwd_checked"
+          },
+          {
+            "id": "install_identity",
+            "ok": true
+          },
+          {
+            "id": "api_argv",
+            "ok": true,
+            "detail": {
+              "exact": true,
+              "mismatches": []
+            }
+          },
+          {
+            "id": "api_process_start",
+            "ok": true,
+            "detail": {
+              "expected": "二 11月/24 17:09:09 2026",
+              "observed": "二 11月/24 17:09:09 2026"
+            }
+          },
+          {
+            "id": "api_owner",
+            "ok": true
+          },
+          {
+            "id": "api_parent",
+            "ok": true
+          },
+          {
+            "id": "api_cwd",
+            "ok": true
+          },
+          {
+            "id": "listeners",
+            "ok": true
+          },
+          {
+            "id": "health",
+            "ok": true,
+            "detail": "personal"
+          },
+          {
+            "id": "runtime_mode",
+            "ok": true,
+            "detail": {
+              "expected": "personal",
+              "observed": "personal"
+            }
+          },
+          {
+            "id": "startup_mode",
+            "ok": true,
+            "detail": {
+              "expected": "normal",
+              "observed": "normal"
+            }
+          }
+        ],
+        "failures": [],
+        "health": {
+          "status": "ok",
+          "mode": "personal",
+          "access": "local-development"
+        }
+      },
+      "instanceRecordRemoved": true
+    },
+    "processes": [
+      {
+        "role": "first-app",
+        "pid": 12425,
+        "identity": null
+      },
+      {
+        "role": "duplicate-app",
+        "pid": 12796,
+        "identity": null
+      },
+      {
+        "role": "reopen-app",
+        "pid": 13265,
+        "identity": null
+      },
+      {
+        "role": "unknown-executor-app",
+        "pid": 13855,
+        "identity": null
+      }
+    ],
+    "launchMethod": "app executable start; packaged launcher status/stop; duplicate app path; unknown executor negative probe"
+  },
+  "compatibility": {
+    "state": "absent",
+    "reason": "compatibility_metadata_missing",
+    "profiles": [
+      {
+        "id": "profile-codex-native",
+        "classification": "unknown",
+        "raw": null,
+        "nativeTestPassed": null,
+        "dispatchAllowed": false,
+        "explicitTrialAdmission": false,
+        "label": null
+      }
+    ]
+  },
+  "recovery": {
+    "availability": null,
+    "authorization": null,
+    "implemented": true,
+    "state": "absent",
+    "reason": "recovery_surface_missing"
+  },
+  "items": {
+    "L1_1_compatibility_ui": "BLOCKED",
+    "L1_2_package_identity": "PASS",
+    "L1_5_start_stop_locale_paths": "PASS",
+    "L1_4_recovery_new_authorization": "BLOCKED",
+    "colleague_machine": "NOT_TESTED"
+  },
+  "status": "HARNESS_READY"
+}
