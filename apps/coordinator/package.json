@@ -38,6 +38,7 @@
     "@personal-agent/environment-preparation": "workspace:*",
     "@personal-agent/orchestrator-core": "workspace:*",
     "@personal-agent/questions": "workspace:*",
+    "@personal-agent/portability": "workspace:*",
     "@personal-agent/storage": "workspace:*",
     "@personal-agent/usage-insights": "workspace:*",
     "@personal-agent/project-recipes": "workspace:*",

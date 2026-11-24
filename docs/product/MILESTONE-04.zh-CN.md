@@ -6,6 +6,8 @@
 
 开工话术：[main / B / D / E](../../agent-tasks/milestone-04/forward-prompts.zh-CN.md)。同事说明：[一页试用说明](../COLLEAGUE-TRIAL.zh-CN.md)。原目录、分支和所有权沿用[原表](../../agent-tasks/product-wave-36/dispatch.json)，不执行原表中的旧任务。
 
+主线首个源码检查点：恢复后新根明确授权已进入默认HTTP/UI，原source保持只读、目标使用原命令回执持久化，相关31项安全测试和类型/构建通过。D接正常安装的新根入口，E继续独立验准确包；版本兼容/ACP尚待接入，因此清单仍0/13，不能为此提前冻结。源码、验证范围及本轮旧测试误触4次自有探针故障信号的记录见[RFC0096末节](../rfcs/WP-16/0096-milestone-04-protocol-admission-and-target-authorization.md)。没有新增真实模型发送。
+
 ## 源码核对后对评审建议的调整
 
 | 实际发现 | 本轮处理 |

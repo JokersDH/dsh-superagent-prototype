@@ -163,7 +163,11 @@ test('another configured root cannot substitute for the actual source database d
   assert.equal(h.store.events.cursor(), 0)
 })
 
-for (const window of ['before-commit', 'after-commit']) test(`actual independent-process SIGKILL ${window} preserves one original confirmation and held queue`, async t => {
+// These are OS fault experiments, not ordinary zero-model regressions. Setting this switch does
+// not itself authorize spending: the operator must have a separate, current signal grant.
+for (const window of ['before-commit', 'after-commit']) test(`actual independent-process SIGKILL ${window} preserves one original confirmation and held queue`, {
+  skip: process.env.PA_RECOVERY_SOURCE_FAULT_EXPERIMENT !== 'explicitly-authorized' ? 'Requires a separately authorized OS fault experiment' : false,
+}, async t => {
   const h = fixture(t), prepared = await h.prepare(), path = join(h.root, 'process-input.json')
   writeFileSync(path, JSON.stringify({ stateRoot: h.stateRoot, project: h.project, principal, projectId,
     token: prepared.token, now: '2026-11-13T02:00:00.000Z' }), { mode: 0o600 })

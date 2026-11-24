@@ -55,3 +55,17 @@
 B先交共享版本probe/分类小闭包，main/D消费；B同时持续ACP。main并行新授权接线。E从公共接口对已验证/兼容未验证/不兼容/unknown做独立正反例，覆盖当前绑定改变和未知回执，不能由producer简化断言。
 
 以上消费在受控路径成立后，才用同一个M04 ACP上限做真实任务。D冻结必须包含兼容及新授权的运行代码，E验准确包。同事完成另一台Mac首次任务和新根第二次任务，才有跨机/恢复真实交付结论。此RFC本身、纯函数或schema通过均不代表出口完成。
+
+## 首个已实现的主线消费者（2026-11-24）
+
+新根授权已沿原恢复source确认、D materializer、A库存和原目标Store接入默认恢复只读runtime。新增`POST /v1/recovery/targets/authorize`与`GET /v1/recovery/targets/:id/authorization`，工作台恢复面板明确核对项目/检查、准备目标、勾选授权；网络结果未知先保留请求，刷新后仅查询原回执。
+
+授权使用按generation确定的命令ID，写入**目标自己的原command_receipts/EventLog/UoW**。source只保留原确认，不写授权副本，因此原ignoreCommitted逻辑指纹及held队列保持。新增可选logicalFingerprint、parentIdentity和项目baselineCommit属于HTTP恢复契约，不改Runner wire或迁移版本；旧记录仍可审计，但不足以产生新的目标授权。
+
+目标原WriterLock守护提交。grant绑定principal、host、源确认/回执、目标material/generation、目录/父目录/数据库身份、项目配置和当前profile/可执行身份。普通demo启动识别recovery-target.json，未核到有效原grant不能启动执行；grant回执本身始终started=false/startupAvailable=false。新业务数据不要求恢复为空库，不依赖旧source五分钟后仍在线；换机器/根/数据库/父目录/profile不继承旧权限。
+
+相关安全测试31项通过，其中授权专项15项；包括同ID丢响应调和、源指纹不变、复制目标拒绝、同目录数据库替换拒绝、父目录替换拒绝。contracts/coordinator/console严格类型检查及网页构建通过，共享Runner identity保持不变。实际浏览器已零模型操作默认React/Hono/Store链，刷新仅GET原授权；最终桌面和390px结果态独立审查通过，范围只到源码结果态，不等安装/真实执行/跨机。
+
+D的下一消费者：使用当前目标授权回执与`verifyRecoveryTargetStartup()`接正常安装入口的新根选择，不移除历史restore marker。E消费上述原HTTP/UI和目标原回执，自行定义安装断言。当前固定项目配置变更会拒绝原授权，不能假称任意后续迁移/配置场景已覆盖。版本兼容与ACP公共注册仍待B早交源码后接入，本检查点不关闭L1④。
+
+本轮真实模型发送为0。执行既有source-confirmation测试时，第一次误包含两项自有子进程SIGKILL，后一次名称过滤未排除它们，又发生两次，共4次；这是误执行，不是获得授权的实验，不写入或复用历史额度及验收。已在父测试与worker同时增加默认禁用的显式故障实验开关，专项安全测试证实没有开关时worker在创建Store前正常拒绝、没有signal。十二用户实例未操作，后续本轮不再运行该故障测试文件。UI验收服务器均通过自有stdin关闭入口正常退出，没有故障清理信号。

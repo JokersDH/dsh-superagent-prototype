@@ -1,0 +1,7 @@
+{
+  "protocol": "recovery-target-authorization/1",
+  "runtimeContractSchemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
+  "runtimeValidationRequired": true,
+  "schemaHash": "2cbf3d052cd2c08a43aad3c10a835680dafdc6ad98bdc3c18011974278757d27",
+  "sourceHash": "c49f6cbb733c47f97cbf925b9323ff2db6166b179f65b9b348e166362f5780c1"
+}

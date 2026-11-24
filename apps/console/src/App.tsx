@@ -84,6 +84,7 @@ import { ProposalWorkspace } from './ProposalWorkspace.tsx'
 import { ReplyCandidates } from './ReplyCandidates.tsx'
 import type { CandidateDraft } from './ReplyCandidates.tsx'
 import { ContextWorkspace } from './ContextWorkspace.tsx'
+import { RecoveryWorkspace } from './RecoveryWorkspace.tsx'
 import { TrialWorkspace, useTrialReadiness } from './trial/index.ts'
 import { TrialModelConnectionForm } from './trial/ModelConnectionForm.tsx'
 import type { TrialModelConnectionDraft, TrialModelConnectionResult } from './trial/model-connection.ts'
@@ -1075,6 +1076,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
               <Bot size={18} aria-hidden="true" /><p><strong>{executionUnavailable === 'recovery_readonly' ? '恢复只读' : '开发执行未就绪'}</strong><span>{executionUnavailableLabel[executionUnavailable]}</span></p>
               <button type="button" className="icon-button" title="查看执行器" aria-label="查看执行器" onClick={() => openView('executors')}><ArrowUpRight size={17} /></button>
             </div>}
+            {executionUnavailable === 'recovery_readonly' && workspaceView === 'conversation' && transport.recoveryInspection && <RecoveryWorkspace transport={transport} />}
             {workspaceView === 'works' && <WorkDirectory works={works} loading={loading} configuration={configuration} onSelect={selectWork} onCreate={() => { openWorkDraft(); setWorkspaceOpen(true) }} />}
             <div className="attention-surface" hidden={workspaceView !== 'decisions'}><AttentionInbox transport={transport} configuration={configuration}
               active={workspaceView === 'decisions'} revision={snapshot?.cursor} onOpen={openAttention} onCount={setAttentionCount}

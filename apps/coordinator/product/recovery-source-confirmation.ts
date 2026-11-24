@@ -4,7 +4,7 @@ import { arch, hostname, platform } from 'node:os'
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from 'node:path'
 import { z } from 'zod'
 import {
-  RecoveryActivationIntentSchema, RecoveryActivationRecordSchema, RecoveryPlanSchema, RecoverySourceCheckpointSchema,
+  IdSchema, RecoveryActivationIntentSchema, RecoveryActivationRecordSchema, RecoveryPlanSchema, RecoverySourceCheckpointSchema,
   RecoverySourceConfirmSchema, RecoverySourcePrepareSchema, RecoverySourcePreparedSchema, RecoveryTargetConfigurationSchema, TrustedActorSchema,
 } from '@personal-agent/contracts'
 import type { RecoveryActivationCommit, RecoveryActivationRecord, RecoveryPlan, RecoverySourceConfirm, RecoverySourcePrepare,
@@ -76,7 +76,8 @@ export class ProductRecoverySource {
       throw new ApplicationFault('verification_failed', 'Source confirmation requires complete preflight and current local executor identity', 'none')
     return RecoveryTargetConfigurationSchema.parse({ protocol: 'recovery-target-configuration/1',
       projects: plan.bindings.map(binding => ({ sourceProjectId: binding.sourceProjectId, targetProjectId: binding.proposedProjectId,
-        registration: input.preflight.bindings.find(value => value.sourceProjectId === binding.sourceProjectId)!.project })),
+        registration: input.preflight.bindings.find(value => value.sourceProjectId === binding.sourceProjectId)!.project,
+        baselineCommit: binding.headCommit })),
       executor: { profileId: plan.executor.profileId, revision: plan.executor.revision, identityDigest: digest(plan.executor) } })
   }
   private policy(plan: RecoveryPlan) {
@@ -91,11 +92,14 @@ export class ProductRecoverySource {
     if (inspection.inspectionFingerprint !== plan.inspectionFingerprint || !inspection.markerDigest)
       throw new ApplicationFault('conflict', 'Source changed during preparation')
     const intent = RecoveryActivationIntentSchema.parse({ protocol: 'recovery-activation-intent/1',
-      activationId: `recovery-activation-${randomUUID()}`, commandId: `recovery-confirm-${randomUUID()}`,
+      // D's existing materializer binds an exact child named by activationId, not an arbitrary path.
+      activationId: IdSchema.parse(basename(target)), commandId: `recovery-confirm-${randomUUID()}`,
       planId: plan.planId, planDigest: digest(plan),
       source: { stateId: key('recovery-source-state', realpathSync(this.options.stateRoot), inspection.markerDigest),
-        stateRoot: realpathSync(this.options.stateRoot), markerDigest: inspection.markerDigest, inspectionFingerprint: plan.inspectionFingerprint },
-      target: { generationId: `recovery-generation-${randomUUID()}`, stateRoot: target, configurationDigest: digest(configuration) },
+        stateRoot: realpathSync(this.options.stateRoot), markerDigest: inspection.markerDigest, inspectionFingerprint: plan.inspectionFingerprint,
+        logicalFingerprint: plan.logicalSource!.fingerprint! },
+      target: { generationId: `recovery-generation-${randomUUID()}`, stateRoot: target, configurationDigest: digest(configuration),
+        parentIdentity: `${lstatSync(dirname(target)).dev}:${lstatSync(dirname(target)).ino}` },
       principal: this.options.principal, machineDigest: this.machine(), resourcePolicyDigest: this.policy(plan),
       createdAt: plan.createdAt, expiresAt: plan.expiresAt })
     const signed = SignedSchema.parse({ version: 1, input: value, plan, intent })
@@ -148,5 +152,21 @@ export class ProductRecoverySource {
     const committed = committer.commit(signed.intent, actor)
     return RecoveryActivationRecordSchema.parse({ protocol: 'recovery-activation-record/1', committed,
       authorization: 'not_granted', startupAvailable: false })
+  }
+
+  /** Prepared targets already exist. Revalidate the source without re-running the absent-target check. */
+  revalidateCommitted(commit: RecoveryActivationCommit, configuration?: import('@personal-agent/contracts').RecoveryTargetConfiguration): void {
+    this.actor({ ...this.options.principal, source: 'local_cli' })
+    const { intent } = commit, at = Date.parse(this.now())
+    if (Date.parse(intent.createdAt) > at || Date.parse(intent.expiresAt) <= at)
+      throw new ApplicationFault('stale_contract', 'Source confirmation expired before target authorization')
+    const current = this.recovery.inspect()
+    if (current.state !== 'recovery_readonly' || current.markerDigest !== intent.source.markerDigest ||
+      intent.machineDigest !== this.machine() || (configuration && digest(configuration) !== intent.target.configurationDigest) || !intent.source.logicalFingerprint)
+      throw new ApplicationFault('conflict', 'Source marker, host or confirmed configuration changed')
+    const checkpoint = RecoverySourceCheckpointSchema.parse(this.store.workflows.recoverySource.inspect({ ignoreCommitted: commit }))
+    if (checkpoint.coverage !== 'complete' || checkpoint.sourceFingerprint !== intent.source.logicalFingerprint ||
+      checkpoint.ignoredConfirmation?.commandId !== intent.commandId || checkpoint.ignoredConfirmation.receiptSeq !== commit.sourceReceipt.seq)
+      throw new ApplicationFault('conflict', 'Source changed beyond its exact original confirmation')
   }
 }

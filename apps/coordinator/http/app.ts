@@ -66,6 +66,8 @@ import {
   ContextPreviewSchema,
   RecoveryTargetPrepareInputSchema,
   RecoveryTargetStatusSchema,
+  RecoveryTargetAuthorizeSchema,
+  RecoveryTargetAuthorizationSchema,
   AssistantContextPrepareSchema,
   AssistantContextPreparedSchema,
   AssistantContextSendSchema,
@@ -83,6 +85,8 @@ import {
 import type {
   RecoveryTargetPrepareInput,
   RecoveryTargetStatus,
+  RecoveryTargetAuthorize,
+  RecoveryTargetAuthorization,
   AssistantContextPrepare,
   AssistantContextPrepared,
   AssistantContextSend,
@@ -208,6 +212,7 @@ export interface LocalHttpOptions {
     proposal?(command: ProposalCommand, actor: TrustedActor): Promise<CommandReceipt>
     contextPreview?(input: ContextPreviewInput, actor: TrustedActor): Promise<ContextPreview>
     recoveryTargetPrepare?(input: RecoveryTargetPrepareInput, actor: TrustedActor): Promise<RecoveryTargetStatus>
+    recoveryTargetAuthorize?(input: RecoveryTargetAuthorize, actor: TrustedActor): Promise<RecoveryTargetAuthorization>
     assistantContextPrepare?(input: AssistantContextPrepare, actor: TrustedActor): Promise<AssistantContextPrepared>
     assistantContextSend?(input: AssistantContextSend, actor: TrustedActor): Promise<CommandReceipt>
   }
@@ -221,6 +226,7 @@ export interface LocalHttpOptions {
     recovery?(): Promise<RecoveryInspection>
     recoveryActivation?(activationId: string): Promise<RecoveryActivationRecord | undefined>
     recoveryTarget?(activationId: string): Promise<RecoveryTargetStatus | undefined>
+    recoveryTargetAuthorization?(activationId: string): Promise<RecoveryTargetAuthorization | undefined>
     assistantContext?(messageId: string): Promise<AssistantContextBinding | undefined>
     contextHistory?(query: ContextHistoryQuery): Promise<ContextHistory>
     contextSources?(messageId: string, options?: { scopeReview?: boolean }): Promise<ContextSources | undefined>
@@ -381,7 +387,7 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
   })
   app.get('/v1/session', (c) => c.json({ status: 'authenticated' }))
   app.use('/v1/*', async (c, next) => {
-    const readOnlyRecoveryPreparation = c.req.method === 'POST' && ['/v1/recovery/prepare', '/v1/recovery/targets/prepare', '/v1/recovery/source/prepare', '/v1/recovery/source/confirm'].includes(c.req.path)
+    const readOnlyRecoveryPreparation = c.req.method === 'POST' && ['/v1/recovery/prepare', '/v1/recovery/targets/prepare', '/v1/recovery/source/prepare', '/v1/recovery/source/confirm', '/v1/recovery/targets/authorize'].includes(c.req.path)
     if (options.startupMode === 'recovery_readonly' && !readOnlyRecoveryPreparation && !['GET', 'HEAD', 'OPTIONS', 'DELETE'].includes(c.req.method))
       throw new ApplicationFault('unsupported_capability', 'Restored state is read-only until explicit recovery and local revalidation', 'none')
     await next()
@@ -437,6 +443,28 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
     const input = RecoveryTargetPrepareInputSchema.parse(await c.req.json())
     const result = RecoveryTargetStatusSchema.parse(await options.operations.recoveryTargetPrepare(input, c.get('actor')))
     if (result.activationId !== input.activationId) throw new ApplicationFault('storage_unavailable', 'Target preparation identity mismatch', 'none')
+    return c.json(result)
+  })
+  app.get('/v1/recovery/targets/:id/authorization', async c => {
+    if (Object.keys(c.req.query()).length) throw new ApplicationFault('invalid_request', 'Authorization audit accepts no query')
+    if (!options.read?.recoveryTargetAuthorization) throw new ApplicationFault('unsupported_capability', 'Target authorization is not connected')
+    const id = IdSchema.parse(c.req.param('id')), record = await options.read.recoveryTargetAuthorization(id)
+    if (!record) return c.json({ error: { code: 'invalid_request', message: 'Target authorization was not found', retry: 'none' } }, 404)
+    const result = RecoveryTargetAuthorizationSchema.parse(record)
+    if (result.grant.source.intent.activationId !== id)
+      throw new ApplicationFault('storage_unavailable', 'Target authorization audit identity mismatch', 'none')
+    return c.json(result)
+  })
+  app.post('/v1/recovery/targets/authorize', async c => {
+    if (options.startupMode !== 'recovery_readonly') throw new ApplicationFault('unsupported_capability', 'Target authorization requires restored read-only startup')
+    if (Object.keys(c.req.query()).length || !c.req.header('content-type')?.toLowerCase().startsWith('application/json'))
+      throw new ApplicationFault('invalid_request', 'Target authorization requires JSON without a query')
+    if (!options.operations?.recoveryTargetAuthorize) throw new ApplicationFault('unsupported_capability', 'Target authorization is not connected')
+    const input = RecoveryTargetAuthorizeSchema.parse(await c.req.json())
+    const result = RecoveryTargetAuthorizationSchema.parse(await options.operations.recoveryTargetAuthorize(input, c.get('actor')))
+    if (result.grant.source.intent.activationId !== input.activationId || result.grant.commandId !== input.commandId ||
+      result.grant.material.manifestDigest !== input.expectedManifestDigest)
+      throw new ApplicationFault('storage_unavailable', 'Target authorization response identity mismatch', 'none')
     return c.json(result)
   })
   const readConfiguration = async () => {

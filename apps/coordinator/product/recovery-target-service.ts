@@ -1,18 +1,19 @@
-import { realpathSync } from 'node:fs'
+import { lstatSync, realpathSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { ApplicationFault } from '@personal-agent/application'
 import {
   IdSchema, RecoveryTargetInventorySchema, RecoveryTargetMaterialSchema,
-  RecoveryTargetPrepareInputSchema, RecoveryTargetStatusSchema, TrustedActorSchema,
+  RecoveryTargetPrepareInputSchema, RecoveryTargetStatusSchema, RecoveryTargetAuthorizeSchema, TrustedActorSchema,
 } from '@personal-agent/contracts'
 import type {
   RecoveryActivationCommit, RecoveryTargetInventory, RecoveryTargetInventoryReader, RecoveryTargetMaterial,
-  RecoveryTargetMaterializer, RecoveryTargetPrepareInput, RecoveryTargetStatus, TrustedActor,
+  RecoveryTargetMaterializer, RecoveryTargetPrepareInput, RecoveryTargetStatus, RecoveryTargetAuthorize, RecoveryTargetAuthorization, TrustedActor,
 } from '@personal-agent/contracts'
 import { canonicalDigest } from '@personal-agent/contracts/canonical'
 import type { ProductStore } from '@personal-agent/storage'
 import { readRecoveryActivationRecord } from './recovery-intents.ts'
 import { bindRecoveryTargetConfiguration } from './recovery-targets.ts'
+import { ProductRecoveryTargetAuthorization, readRecoveryTargetAuthorization, targetAuthorizationCommandId } from './recovery-target-authorization.ts'
 
 const digest = (value: unknown) => canonicalDigest(JSON.parse(JSON.stringify(value ?? null)))
 type Blocker = RecoveryTargetStatus['blockers'][number]
@@ -24,6 +25,7 @@ type Options = {
   inventory: RecoveryTargetInventoryReader
   revalidateSource(commit: RecoveryActivationCommit): void
   initialize(material: RecoveryTargetMaterial): Promise<void>
+  authorizer?: ProductRecoveryTargetAuthorization
   now?: () => string
 }
 
@@ -84,6 +86,11 @@ export class ProductRecoveryTargets {
     const parsed = RecoveryTargetMaterialSchema.safeParse(input)
     if (!parsed.success) throw new ApplicationFault('verification_failed', 'Target material does not match the shared protocol')
     const value = parsed.data, intent = commit.intent
+    if (intent.target.parentIdentity) {
+      const parent = lstatSync(dirname(intent.target.stateRoot))
+      if (parent.isSymbolicLink() || !parent.isDirectory() || `${parent.dev}:${parent.ino}` !== intent.target.parentIdentity)
+        throw new ApplicationFault('conflict', 'Confirmed recovery parent was replaced', 'none')
+    }
     if (value.activationId !== intent.activationId || value.generationId !== intent.target.generationId ||
       value.stateRoot !== intent.target.stateRoot || value.intentDigest !== digest(intent) ||
       value.configurationDigest !== intent.target.configurationDigest)
@@ -124,7 +131,8 @@ export class ProductRecoveryTargets {
       generationId: commit.intent.target.generationId, stateRoot: commit.intent.target.stateRoot, sourceReceipt: commit.sourceReceipt,
       observedAt: this.now(), expiresAt: commit.intent.expiresAt, step,
       ...(material ? { material } : {}), ...(inventory ? { inventory } : {}),
-      blockers: [...all, { code: 'authorization_not_implemented', owner: 'main', detail: 'Target startup requires separate current host, resource and explicit authorization checks' }],
+      blockers: this.options.authorizer ? all : [...all, { code: 'authorization_not_implemented', owner: 'main', detail: 'Target startup requires separate current host, resource and explicit authorization checks' }],
+      ...(this.options.authorizer ? { authorizationCommandId: targetAuthorizationCommandId(commit.intent.target.generationId) } : {}),
       authorization: 'not_granted', startupAvailable: false })
   }
   async prepare(input: RecoveryTargetPrepareInput, inputActor: TrustedActor): Promise<RecoveryTargetStatus> {
@@ -226,5 +234,24 @@ export class ProductRecoveryTargets {
     }
     this.check(commit, false)
     return this.status(commit, material, inventory, this.missingDatabase(inventory) ? [] : this.inventoryBlockers(inventory, material))
+  }
+
+  async authorize(raw: RecoveryTargetAuthorize, actor: TrustedActor): Promise<RecoveryTargetAuthorization> {
+    if (!this.options.authorizer) throw new ApplicationFault('unsupported_capability', 'Target authorization is not connected', 'none')
+    const input = RecoveryTargetAuthorizeSchema.parse(raw), commit = this.source(input.activationId)
+    if (!commit) throw new ApplicationFault('invalid_request', 'Recovery source confirmation was not found', 'none')
+    const material = this.material(await this.options.materializer.read(commit.intent.target.stateRoot), commit)
+    return this.options.authorizer.authorize(commit, material, input, actor)
+  }
+  async authorization(activationId: string): Promise<RecoveryTargetAuthorization | undefined> {
+    const commit = this.source(IdSchema.parse(activationId))
+    if (!commit || !this.options.authorizer) return undefined
+    const raw = await this.options.materializer.read(commit.intent.target.stateRoot)
+    if (!raw) return undefined
+    const material = this.material(raw, commit)
+    const record = readRecoveryTargetAuthorization(material.stateRoot)
+    if (record && digest(record.grant.source) !== digest(commit))
+      throw new ApplicationFault('conflict', 'Target authorization belongs to another source confirmation', 'none')
+    return record
   }
 }
