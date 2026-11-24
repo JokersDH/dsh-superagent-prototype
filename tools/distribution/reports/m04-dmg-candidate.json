@@ -1,0 +1,20 @@
+{
+  "format": "personal-agent-macos-dmg/1",
+  "app": "/Users/hh/Desktop/joker/pa-artifacts/m04-dmg-d3ba/disk-image/Personal Agent.app",
+  "dmg": "/Users/hh/Desktop/joker/pa-artifacts/m04-dmg-d3ba/Personal-Agent-0.1.2-arm64.dmg",
+  "bytes": 98589468,
+  "sha256": "3aaac8f886ef051dd869f996ef40eea88a4939df8c27fb00177026b7e1bce44e",
+  "version": "0.1.2",
+  "source": "83f79e8249efd68f429f2b6828ea233278071737",
+  "buildId": "d3ba0ec6dccc5eac",
+  "embeddedNodeSha256": "e4b5a3af0e05c75de2eae013904145f40fe7fc2a6e6f17510128bf45cca4e79b",
+  "mainExecutableSha256": "e2d2df6c0fa1be3ff7671f75efeee88ae3ff54fde8bc05077c39097c540bf5bd",
+  "launcherSourceSha256": "eaed50cf6e34c1b4a830307ae24d4c956ddf1906cd2bf3ed41d96c4c31019d0b",
+  "signature": "ad-hoc; not Developer ID signed or notarized",
+  "platform": "darwin-arm64",
+  "minimumMacOS": "14.0",
+  "servicesStarted": 0,
+  "modelTurns": 0,
+  "stateIncluded": false,
+  "codeRepository": "/Users/hh/Desktop/joker/superagent-agent-d/"
+}
