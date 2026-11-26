@@ -62,6 +62,7 @@ import {
   RecoveryInspectionSchema, RecoverySourcePrepareSchema, RecoverySourcePreparedSchema, RecoverySourceConfirmSchema,
   RecoveryActivationRecordSchema, RecoveryTargetPrepareInputSchema, RecoveryTargetStatusSchema,
   RecoveryTargetAuthorizeSchema, RecoveryTargetAuthorizationSchema,
+  ExecutorTrialCommandSchema, ExecutorTrialInspectionSchema, ExecutorTrialReceiptSchema,
 } from '@personal-agent/contracts'
 import type {
   UsageObservationQuery,
@@ -122,6 +123,7 @@ import type {
   TrialReadiness,
   RecoveryInspection, RecoverySourcePrepare, RecoverySourcePrepared, RecoverySourceConfirm, RecoveryActivationRecord,
   RecoveryTargetPrepareInput, RecoveryTargetStatus, RecoveryTargetAuthorize, RecoveryTargetAuthorization,
+  ExecutorTrialCommand, ExecutorTrialInspection, ExecutorTrialReceipt,
 } from '@personal-agent/contracts'
 
 export interface VerificationDetail {
@@ -203,6 +205,9 @@ export interface ConsoleTransport {
   prepareRecoveryTarget?(input: RecoveryTargetPrepareInput): Promise<RecoveryTargetStatus>
   authorizeRecoveryTarget?(input: RecoveryTargetAuthorize): Promise<RecoveryTargetAuthorization>
   recoveryAuthorization?(activationId: string): Promise<RecoveryTargetAuthorization | undefined>
+  inspectExecutorTrial?(): Promise<ExecutorTrialInspection | undefined>
+  confirmExecutorTrial?(input: ExecutorTrialCommand): Promise<ExecutorTrialReceipt>
+  executorTrialReceipt?(commandId: string): Promise<ExecutorTrialReceipt | undefined>
   /** Authenticated local session check/bootstrap (HTTP lane); the fixture lane is always authenticated. */
   session?(): Promise<boolean>
   bootstrap?(bootstrapToken: string): Promise<void>
@@ -244,6 +249,25 @@ export class HttpTransport implements ConsoleTransport {
 
   async recoveryInspection(): Promise<RecoveryInspection> {
     return RecoveryInspectionSchema.parse(await this.request('/v1/recovery/inspect'))
+  }
+  async inspectExecutorTrial(): Promise<ExecutorTrialInspection | undefined> {
+    try { return ExecutorTrialInspectionSchema.parse(await this.request('/v1/executors/trial')) }
+    catch (error) { if (error instanceof TransportError && error.code === 'unsupported_capability') return undefined; throw error }
+  }
+  async confirmExecutorTrial(input: ExecutorTrialCommand): Promise<ExecutorTrialReceipt> {
+    const value = ExecutorTrialCommandSchema.parse(input)
+    const result = ExecutorTrialReceiptSchema.parse(await this.request('/v1/executors/trial/confirm', { method: 'POST', body: JSON.stringify(value) }))
+    if (result.commandId !== value.commandId || result.identityDigest !== value.identityDigest || result.policyDigest !== value.policyDigest ||
+      result.profileId !== value.profileId || result.revision !== value.revision)
+      throw new TransportError('schema_mismatch', '试用同意回执身份不一致，请查询原请求。', 'reconcile')
+    return result
+  }
+  async executorTrialReceipt(commandId: string): Promise<ExecutorTrialReceipt | undefined> {
+    const body = await this.request(`/v1/executors/trial/receipts/${encodeURIComponent(commandId)}`, undefined, 'json404')
+    if (body === missingOptionalResource) return undefined
+    const result = ExecutorTrialReceiptSchema.parse(body)
+    if (result.commandId !== commandId) throw new TransportError('schema_mismatch', '原试用同意回执身份不一致。', 'none')
+    return result
   }
   async prepareRecoverySource(input: RecoverySourcePrepare): Promise<RecoverySourcePrepared> {
     const value = RecoverySourcePrepareSchema.parse(input)

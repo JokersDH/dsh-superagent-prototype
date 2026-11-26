@@ -247,7 +247,13 @@ export class ProductExecution {
     const binding = this.store.bindings.current<IngressBinding>(target.ticketId)
     if (!binding || !same(attemptOf(binding), attemptOf(target)) || binding.state !== 'active') return 'stale'
     const runtime = this.attempts.get(target.attemptId)
+    if (runtime instanceof NativeProductAttempt && !this.nativeOperationAllowed('answer')) return 'unknown'
     return runtime && (!(runtime instanceof NativeProductAttempt) || runtime.connected) && target.connectionEpoch === 1 ? 'current' : 'unknown'
+  }
+  private nativeOperationAllowed(operation: 'begin' | 'answer' | 'steer' | 'cancel' | 'resume'): boolean {
+    const facts = this.native?.profileView?.compatibility
+    if (operation === 'begin' && this.native?.admissionCurrent && !this.native.admissionCurrent()) return false
+    return !facts || facts.operations.some(item => item.operation === operation && item.enabled)
   }
   private verificationRows() {
     return this.store.queue.dueRows('application.verify', Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER)
@@ -335,6 +341,7 @@ export class ProductExecution {
     })()
   }
   private async resumeNative(binding: IngressBinding): Promise<void> {
+    if (!this.nativeOperationAllowed('resume')) throw new Error('The current native profile has no verified resume capability')
     const ticket = this.current(binding)
     const saved = this.store.commands.get(key('product-start', binding.assignmentId))
     const prepared = saved && StartSchema.parse(saved.result)
@@ -504,6 +511,8 @@ export class ProductExecution {
       const runtime = binding && this.attempts.get(binding.attemptId)
       if (!binding || binding.state !== 'active' || !runtime)
         throw new UnknownSend('No current physical delivery target', 'delivery_target_unknown')
+      if (runtime instanceof NativeProductAttempt && !this.nativeOperationAllowed('steer'))
+        throw new UnknownSend('The current native profile has no enabled steer capability', 'unsupported_capability')
       const ids = [...ticket.undelivered],
         inputRef = this.input(ticket, ids, false)
       const command = this.command(binding, { kind: 'deliver', inputRef })
@@ -550,6 +559,8 @@ export class ProductExecution {
     const trigger = this.store.domain.triggers.get<Trigger>(ticket.origin.triggerId)!
     const profileId = String(trigger.meta.profileId)
     const nativeProfile = this.native?.profile.id === profileId ? this.native.profile : undefined
+    if (nativeProfile && !this.nativeOperationAllowed('begin'))
+      throw new UnknownSend('The current native profile has no enabled begin capability', 'unsupported_capability')
     if (!nativeProfile && !FIXTURE_PROFILES.includes(profileId as (typeof FIXTURE_PROFILES)[number]))
       throw new UnknownSend('Only explicit fixture profiles are enabled', 'unsupported_profile')
     const mode = nativeProfile
@@ -760,6 +771,8 @@ export class ProductExecution {
     intent: Intent,
   ): Promise<void> {
     if (!this.readyToDispatch(intent)) return
+    if (runtime instanceof NativeProductAttempt && !this.nativeOperationAllowed('begin'))
+      throw new UnknownSend('Native executable or admission changed before the original begin', 'admission_changed')
     // Only a live in-memory command proven not yet fed may wait through a dispatch hold.
     this.pendingBegins.delete(command.attemptId)
     try {

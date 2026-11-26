@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto'
 import { execFileSync } from 'node:child_process'
-import { lstatSync, readFileSync, realpathSync } from 'node:fs'
-import { arch, hostname, platform } from 'node:os'
+import { copyFileSync, lstatSync, mkdtempSync, readFileSync, realpathSync, rmSync } from 'node:fs'
+import { arch, hostname, platform, tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { DatabaseSync } from 'node:sqlite'
 import {
@@ -14,7 +14,7 @@ import type {
 } from '@personal-agent/contracts'
 import { canonicalDigest } from '@personal-agent/contracts/canonical'
 import { key } from '@personal-agent/orchestrator-core'
-import { InstanceRegistry, ProductStore, recoveryTargetInventory, WriterLock } from '@personal-agent/storage'
+import { InstanceRegistry, ProductStore, PRODUCT_SCHEMA_VERSION, recoveryTargetInventory, WriterLock } from '@personal-agent/storage'
 import { ApplicationFault } from '@personal-agent/application'
 import { NativeProjectRegistry } from './project-registry.ts'
 
@@ -64,8 +64,20 @@ export function readRecoveryTargetAuthorization(stateRoot: string): RecoveryTarg
   const material = readRecoveryTargetMaterial(stateRoot)
   if (!material) return undefined
   const path = join(stateRoot, 'state.sqlite'), before = identity(path, false)
-  const db = new DatabaseSync(path, { readOnly: true })
+  const stamp = (file: string) => {
+    try { const stat = lstatSync(file); identity(file, false); return `${stat.dev}:${stat.ino}:${stat.size}:${stat.mtimeMs}:${stat.ctimeMs}` }
+    catch (error) { if ((error as NodeJS.ErrnoException).code === 'ENOENT') return null; throw error }
+  }
+  const wal = `${path}-wal`, snapshotBefore = [stamp(path), stamp(wal)], snapshot = mkdtempSync(join(tmpdir(), 'pa-target-grant-read-'))
+  let db: DatabaseSync | undefined
   try {
+    // Even a readonly SQLite open in WAL mode may create -wal/-shm. Query an owned private copy so
+    // a refused startup does not change the original selected target at all.
+    copyFileSync(path, join(snapshot, 'state.sqlite'))
+    if (snapshotBefore[1] !== null) copyFileSync(wal, join(snapshot, 'state.sqlite-wal'))
+    if (JSON.stringify(snapshotBefore) !== JSON.stringify([stamp(path), stamp(wal)]))
+      throw new ApplicationFault('storage_unavailable', 'Target authorization snapshot changed while being read', 'none')
+    db = new DatabaseSync(join(snapshot, 'state.sqlite'), { readOnly: true })
     const row = db.prepare('SELECT payload_digest, status, seq, result FROM command_receipts WHERE command_id = ?')
       .get(targetAuthorizationCommandId(material.generationId))
     if (!row) return undefined
@@ -75,26 +87,32 @@ export function readRecoveryTargetAuthorization(stateRoot: string): RecoveryTarg
     if (!event || event.topic !== 'command' || event.entity_ref !== result.grant.commandId || event.payload !== JSON.stringify({ status: 'recorded' }) ||
       before !== identity(path, false)) throw new ApplicationFault('storage_unavailable', 'Target authorization event or database changed', 'none')
     return result
-  } finally { db.close() }
+  } finally { db?.close(); rmSync(snapshot, { recursive: true, force: true }) }
 }
 
 /** Startup must call this before enabling execution for a prepared target. A receipt is not a running service. */
-export function verifyRecoveryTargetStartup(stateRoot: string, principal: { userId: string; authorityRef: string }, profile: AgentProfile): void {
+export function verifyRecoveryTargetIdentity(stateRoot: string, principal: { userId: string; authorityRef: string }): RecoveryTargetAuthorization | undefined {
   const material = readRecoveryTargetMaterial(stateRoot)
-  if (!material) return
+  if (!material) return undefined
   const record = readRecoveryTargetAuthorization(stateRoot)
   if (!record) throw new ApplicationFault('forbidden', 'The prepared recovery target needs explicit new execution authorization', 'none')
   const { grant } = record
   if (digest(grant.principal) !== digest(principal) || grant.machineDigest !== recoveryHostDigest() ||
     grant.rootIdentity !== identity(stateRoot, true) || grant.source.intent.target.parentIdentity !== identity(dirname(stateRoot), true) ||
-    grant.databaseIdentity !== identity(join(stateRoot, 'state.sqlite'), false) || grant.profileDigest !== digest(profile) ||
-    grant.executableDigest !== sha(readFileSync(profile.executable)))
+    grant.databaseIdentity !== identity(join(stateRoot, 'state.sqlite'), false) || material.productSchema !== PRODUCT_SCHEMA_VERSION)
     throw new ApplicationFault('forbidden', 'Recovery authorization belongs to another host, root, principal or executor', 'none')
   // The authorization binds the operator's explicit initial project configuration. Normal business
   // data and historical source availability are deliberately not startup preconditions.
   const registry = new NativeProjectRegistry(stateRoot)
   if (grant.registryDigest !== digest(registry.list()))
     throw new ApplicationFault('conflict', 'Recovery target project configuration changed; explicit authorization must be reviewed', 'none')
+  return record
+}
+export function verifyRecoveryTargetStartup(stateRoot: string, principal: { userId: string; authorityRef: string }, profile: AgentProfile): void {
+  const record = verifyRecoveryTargetIdentity(stateRoot, principal)
+  if (!record) return
+  if (record.grant.profileDigest !== digest(profile) || record.grant.executableDigest !== sha(readFileSync(profile.executable)))
+    throw new ApplicationFault('forbidden', 'Recovery authorization belongs to another host, root, principal or executor', 'none')
 }
 
 type AuthorizationOptions = {

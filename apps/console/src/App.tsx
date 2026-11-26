@@ -85,6 +85,7 @@ import { ReplyCandidates } from './ReplyCandidates.tsx'
 import type { CandidateDraft } from './ReplyCandidates.tsx'
 import { ContextWorkspace } from './ContextWorkspace.tsx'
 import { RecoveryWorkspace } from './RecoveryWorkspace.tsx'
+import { ExecutorTrialPanel } from './ExecutorTrialPanel.tsx'
 import { TrialWorkspace, useTrialReadiness } from './trial/index.ts'
 import { TrialModelConnectionForm } from './trial/ModelConnectionForm.tsx'
 import type { TrialModelConnectionDraft, TrialModelConnectionResult } from './trial/model-connection.ts'
@@ -1081,7 +1082,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
             <div className="attention-surface" hidden={workspaceView !== 'decisions'}><AttentionInbox transport={transport} configuration={configuration}
               active={workspaceView === 'decisions'} revision={snapshot?.cursor} onOpen={openAttention} onCount={setAttentionCount}
               fallback={loading ? <p className="empty" role="status">正在读取问题…</p> : <Questions questions={openQuestions} deliveries={deliveries} pending={pending} onAnswer={answerQuestion} />} /></div>
-            {workspaceView === 'executors' && <ExecutorDirectory configuration={configuration} state={configState} onReload={() => void refreshConfiguration()} />}
+            {workspaceView === 'executors' && <ExecutorDirectory transport={transport} configuration={configuration} state={configState} onReload={() => void refreshConfiguration()} />}
             {workspaceView === 'trial' && <TrialWorkspace readiness={trial.readiness} loading={trial.loading} error={trial.error}
               unavailable={trial.unavailable} configuration={configuration} activeProjectId={projectFilter} activeConversationTitle={conversationTitle}
               insights={usageView}
@@ -1469,7 +1470,8 @@ function WorkDirectory({ works, loading, configuration, onSelect, onCreate }: {
   </div>
 }
 
-function ExecutorDirectory({ configuration, state, onReload }: {
+function ExecutorDirectory({ transport, configuration, state, onReload }: {
+  transport: ConsoleTransport
   configuration: ApplicationConfiguration | undefined
   state: 'loading' | 'ready' | 'unavailable' | 'failed'
   onReload: () => void
@@ -1479,11 +1481,12 @@ function ExecutorDirectory({ configuration, state, onReload }: {
   const controlled = profiles.filter(profile => profile.kind === 'controlled_fixture')
   const row = (profile: ApplicationConfiguration['profiles'][number]) => <div className="executor-row" key={profile.id}>
     <span className="executor-icon"><Bot size={22} /></span>
-    <div className="executor-info"><h3>{profile.displayName}</h3><p>{profile.driverId}<span>配置 {profile.revision}</span></p></div>
-    <div className="executor-readiness"><span className={`phase ${profile.dispatchAllowed ? 'phase-delivered' : 'phase-uncertain'}`}>{profile.kind === 'controlled_fixture' ? '固定流程' : profile.dispatchAllowed ? '已准入' : blockedLabel(profile.blockedReason)}</span><span>{configuration?.projects.filter(project => project.profileIds.includes(profile.id)).length ?? 0} 个项目</span></div>
+    <div className="executor-info"><h3>{profile.displayName}</h3><p>{profile.driverId}{profile.compatibility?.nativeVersion && <span>{profile.compatibility.nativeVersion}</span>}<span>配置 {profile.revision}</span></p></div>
+    <div className="executor-readiness"><span className={`phase ${profile.dispatchAllowed && !profile.trialAdmission ? 'phase-delivered' : 'phase-uncertain'}`}>{profile.kind === 'controlled_fixture' ? '固定流程' : profile.trialAdmission ? '未验证版本试用' : profile.dispatchAllowed ? '已准入' : blockedLabel(profile.blockedReason)}</span><span>{configuration?.projects.filter(project => project.profileIds.includes(profile.id)).length ?? 0} 个项目</span></div>
   </div>
   return <div className="workspace-view"><div className="view-header"><div><h2 className="view-title">执行器连接</h2><p className="view-description">{native.length} 个原生执行器 · {native.filter(profile => profile.dispatchAllowed).length} 个已准入</p></div><button type="button" className="icon-button" title="刷新执行器" aria-label="刷新执行器" onClick={onReload}><RefreshCw size={17} /></button></div>
     <div className="view-content"><div className="executor-directory">{native.map(row)}
+      <ExecutorTrialPanel transport={transport} />
       {state === 'loading' && <p className="empty">正在读取执行器…</p>}
       {state === 'failed' && <p className="warn-text" role="alert">执行器配置读取失败。</p>}
       {state === 'unavailable' && <p className="empty">执行器信息暂不可用。</p>}

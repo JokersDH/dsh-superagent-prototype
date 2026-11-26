@@ -42,6 +42,8 @@ import { initializeRecoveryTarget } from './recovery-target-initializer.ts'
 import { ProductRecoveryTargetAuthorization } from './recovery-target-authorization.ts'
 import { localRecoveryMaterializer } from './recovery-materializer.ts'
 import { admittedNativeProfile } from './native-startup.ts'
+import { ProductExecutorTrials } from './executor-trial.ts'
+import type { NativeExecutorInspection } from './native-inspection.ts'
 import { CompletedAssistantReplies } from './assistant-reply-results.ts'
 import { ProductContextRecords } from './context-records.ts'
 import { createDiscussionEffects } from './discussion-effects.ts'
@@ -62,6 +64,9 @@ export function createProductRuntime(
     /** Trusted local composition capacity; the original queue/bindings remain the only owners. */
     maxActiveAttempts?: 2 | 4
     executionUnavailable?: ExecutionUnavailableReason
+    /** Trusted local probe only. This port cannot be selected or supplied by an HTTP request. */
+    inspectExecutor?: () => Promise<NativeExecutorInspection>
+    inspectedProfiles?: readonly import('@personal-agent/contracts').ExecutionProfileView[]
     projectRegistry?: NativeProjectRegistry
     workspaceRoot?: string
     startupMode?: 'normal' | 'recovery_readonly'
@@ -80,10 +85,16 @@ export function createProductRuntime(
 ) {
   const unavailable = options.executionUnavailable === undefined ? undefined : ExecutionUnavailableReasonSchema.parse(options.executionUnavailable)
   if (unavailable && options.native) throw new TypeError('Unavailable execution cannot contain an admitted native runtime')
+  for (const input of options.inspectedProfiles ?? []) {
+    const view = ExecutionProfileViewSchema.parse(input)
+    if (view.kind !== 'native' || view.dispatchAllowed) throw new TypeError('Diagnostic profiles never authorize a runtime')
+  }
   if (options.native?.profileView) {
     const view = ExecutionProfileViewSchema.parse(options.native.profileView), profile = options.native.profile
     if (view.id !== profile.id || view.revision !== profile.revision || view.driverId !== profile.driverId || view.kind !== 'native' || !view.dispatchAllowed)
       throw new TypeError('The native public projection must match the trusted admitted runtime profile')
+    if (view.trialAdmission && !options.native.admissionCurrent)
+      throw new TypeError('Trial runtime admission requires a trusted fresh identity and receipt check')
   }
   // A real native runtime never offers the fixed scratch executors as a selectable alternative.
   const fixtureProfiles = unavailable || options.native ? [] : FIXTURE_PROFILES
@@ -148,7 +159,11 @@ export function createProductRuntime(
     executionEnabled: !unavailable,
     registeredChecks: checks.ids(),
     registeredCheck: id => !!checks.latest(id),
-    projectGrant: input => projectSettings?.authorize(input.projectId, input.profileId, input.criteria, input.newWork),
+    projectGrant: input => {
+      if (input.newWork && options.native?.admissionCurrent && !options.native.admissionCurrent())
+        throw new ApplicationFault('unsupported_capability', '执行器身份或策略已变化，请正常重开并重新核对；原工作保留。', 'user_action')
+      return projectSettings?.authorize(input.projectId, input.profileId, input.criteria, input.newWork)
+    },
     completion,
     verificationRecovery: {
       blocked: candidate => execution?.verificationBlocked(candidate) ?? false,
@@ -183,6 +198,8 @@ export function createProductRuntime(
     options.maxActiveAttempts,
   )
   const { store } = options
+  const executorTrials = options.startupMode !== 'recovery_readonly' && !options.native && options.inspectExecutor
+    ? new ProductExecutorTrials({ store, principal: options.principal, inspect: options.inspectExecutor }) : undefined
   const replyResults = options.assistantReplyResults ??
     (store.workflows.assistant as typeof store.workflows.assistant & { replyResults?: AssistantReplyResults }).replyResults
   const completedReplies = replyResults ? new CompletedAssistantReplies(store, replyResults, options.principal,
@@ -242,6 +259,8 @@ export function createProductRuntime(
     usageObservationDownload: query => usage.download(query),
     usageSupportDownload: query => usage.support(query),
     recovery: async () => recovery.inspect(),
+    ...(executorTrials ? { executorTrialInspection: () => executorTrials.read(),
+      executorTrialReceipt: async (id: string) => executorTrials.receipt(id) } : {}),
     recoveryActivation: async activationId => readRecoveryActivationRecord(store, activationId, options.principal),
     ...(completedReplies ? { replyCandidates: async (messageId: string) => proposals.replyCandidates(messageId) } : {}),
     ...(recoveryTargets ? { recoveryTarget: (id: string) => recoveryTargets.read(id),
@@ -366,6 +385,7 @@ export function createProductRuntime(
         }
       : {}),
     configuration: async () => {
+      const currentUnavailable = unavailable ?? (options.native?.admissionCurrent && !options.native.admissionCurrent() ? 'not_admitted' : undefined)
       const currentNative = nativeProjects.map(project => projectSettings?.has(project.id) ? projectSettings.latest(project.id) : project)
       const configuration = applicationConfiguration({
         projects: options.projects.map((project) => ({
@@ -373,10 +393,10 @@ export function createProductRuntime(
           ...(projectSettings?.has(project.id) ? { displayName: projectSettings.displayName(project.id) } : {}),
           settingsAvailable: projectSettings?.has(project.id) ?? false,
           ...(projectSettings?.has(project.id) && projectSettings.archived(project.id) ? { blockedReason: 'conflict' as const } : {}),
-          profileIds: unavailable || project.discussionOnly ? [] : options.native?.projects.some((native) => native.id === project.id)
+          profileIds: currentUnavailable || project.discussionOnly ? [] : options.native?.projects.some((native) => native.id === project.id)
             ? [options.native.profile.id]
             : fixtureProfiles,
-          defaultCriteria: unavailable || project.discussionOnly
+          defaultCriteria: currentUnavailable || project.discussionOnly
             ? [{ id: 'review-output', kind: 'human' as const, required: true, description: '审阅讨论内容' }]
             : options.native?.projects.some((native) => native.id === project.id)
             ? [
@@ -401,15 +421,15 @@ export function createProductRuntime(
               ],
         })),
         profiles: [
-          ...(unavailable ? [{ id: 'profile-codex-native', revision: 1, driverId: 'codex-native', kind: 'native' as const,
+          ...(unavailable ? options.inspectedProfiles ?? [{ id: 'profile-codex-native', revision: 1, driverId: 'codex-native', kind: 'native' as const,
             displayName: `Codex · ${{ not_installed: '未安装', incompatible_version: '版本未准入', unsupported_platform: '平台未准入', probe_failed: '检测未完成', not_admitted: '尚未准入', needs_auth: '尚未登录', operator_disabled: '未启用', recovery_readonly: '恢复只读' }[unavailable]}`,
-            readiness: unavailable === 'not_installed' ? 'missing' as const : unavailable === 'needs_auth' ? 'needs_auth' as const : unavailable === 'incompatible_version' || unavailable === 'unsupported_platform' ? 'incompatible' as const : 'needs_setup' as const }] : []),
+            readiness: currentUnavailable === 'not_installed' ? 'missing' as const : currentUnavailable === 'needs_auth' ? 'needs_auth' as const : currentUnavailable === 'incompatible_version' || currentUnavailable === 'unsupported_platform' ? 'incompatible' as const : 'needs_setup' as const }] : []),
           ...(options.native
             ? [
                 options.native.profileView ?? {
                   id: options.native.profile.id,
                   revision: options.native.profile.revision,
-                  displayName: 'Codex · 本机开发',
+                  displayName: `Codex · 本机开发 · ${options.native.profile.expectedVersion}`,
                   driverId: 'codex-native',
                   kind: 'native' as const,
                   readiness: 'native_test_passed' as const,
@@ -425,11 +445,11 @@ export function createProductRuntime(
             readiness: 'fixture_ready' as const,
           })),
         ],
-        checks: (unavailable ? [] : [...new Set([...(fixtureProfiles.length ? [FIXTURE_CHECK] : []), ...currentNative.map(project => project.check.id)])])
+        checks: (currentUnavailable ? [] : [...new Set([...(fixtureProfiles.length ? [FIXTURE_CHECK] : []), ...currentNative.map(project => project.check.id)])])
           .map((id) => ({ id, revision: checks.require(id).revision, displayName: checks.require(id).title ?? id })),
-        enabledProfileIds: options.startupMode === 'recovery_readonly' ? [] : [...(options.native ? [options.native.profile.id] : []), ...fixtureProfiles],
+        enabledProfileIds: options.startupMode === 'recovery_readonly' || currentUnavailable ? [] : [...(options.native ? [options.native.profile.id] : []), ...fixtureProfiles],
         executionAvailability: options.startupMode === 'recovery_readonly' ? { state: 'unavailable', reason: 'recovery_readonly' }
-          : unavailable ? { state: 'unavailable', reason: unavailable } : { state: 'available', kind: options.native ? 'native' : 'controlled_fixture' },
+          : currentUnavailable ? { state: 'unavailable', reason: currentUnavailable } : { state: 'available', kind: options.native ? 'native' : 'controlled_fixture' },
         reviewActivityAvailable: options.startupMode !== 'recovery_readonly',
         decisionsAvailable: options.startupMode !== 'recovery_readonly',
         proposalsAvailable: options.startupMode !== 'recovery_readonly',
@@ -510,6 +530,7 @@ export function createProductRuntime(
       recoveryPrepare: async (input: RecoveryPrepare, actor: TrustedActor) => recovery.prepare(input, actor),
       recoverySourcePrepare: async (input: RecoverySourcePrepare, actor: TrustedActor) => recoverySource.prepare(input, actor),
       recoverySourceConfirm: async (input: RecoverySourceConfirm, actor: TrustedActor) => recoverySource.confirm(input, actor),
+      ...(executorTrials ? { executorTrialConfirm: (input: import('@personal-agent/contracts').ExecutorTrialCommand, actor: TrustedActor) => executorTrials.confirm(input, actor) } : {}),
       ...(recoveryTargets ? { recoveryTargetPrepare: (input: RecoveryTargetPrepareInput, actor: TrustedActor) => {
         if (options.startupMode !== 'recovery_readonly') throw new ApplicationFault('unsupported_capability', 'Target preparation requires restored read-only startup', 'none')
         return recoveryTargets.prepare(input, actor)

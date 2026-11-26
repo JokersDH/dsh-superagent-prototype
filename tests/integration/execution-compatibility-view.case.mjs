@@ -64,7 +64,7 @@ test('the original runtime/configuration HTTP consumer publishes trial facts wit
   const view = executionProfileView({ profile, displayName: 'Explicit trial agent', verdict: verdict(), operations, admission: trial() })
   const principal = { userId: 'compatibility-user', authorityRef: 'compatibility-authority' }
   const product = createProductRuntime({ store, principal, stateRoot: state, scratchProject: root, projects: [], actionSecret: Buffer.alloc(32, 51),
-    native: { profile, profileView: view, approvalPolicy: 'on-request', projects: [] } })
+    native: { profile, profileView: view, admissionCurrent: () => true, approvalPolicy: 'on-request', projects: [] } })
   t.after(async () => { await product.close(); store.close(); rmSync(root, { recursive: true, force: true }) })
   const api = createLocalHttpApp({ application: product.application, principal, apiToken: 'a'.repeat(64), bootstrapToken: 'b'.repeat(64),
     allowedOrigins: ['http://127.0.0.1:4499'], mode: 'personal', read: product.read, operations: product.operations })

@@ -87,7 +87,7 @@ export function RecoveryWorkspace({ transport }: { transport: ConsoleTransport }
       {prepared && <div className="recovery-prepared">
         <h3>确认新的执行范围</h3>
         <dl><dt>本机项目</dt><dd>{prepared.configuration.projects.map(project => project.registration.path).join('、')}</dd>
-          <dt>新工作区</dt><dd>{prepared.intent.target.stateRoot}</dd><dt>开发执行器</dt><dd>{prepared.configuration.executor.profileId}</dd></dl>
+          <dt>新工作区</dt><dd>{prepared.intent.target.stateRoot}</dd><dt>开发执行器</dt><dd>{prepared.configuration.executor.profileId} · {prepared.plan.executor?.version}</dd></dl>
         {!target && <button type="button" disabled={busy} onClick={() => void prepareTarget()}>{busy ? '正在准备…' : '确认来源并准备新工作区'}</button>}
       </div>}
       {target && !authorization && <>

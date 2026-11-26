@@ -274,6 +274,12 @@ button.stage-pending:hover:not(:disabled) { border: 0; background: #f5e9d3; colo
 .recovery-workspace button { justify-self: start; }
 .recovery-workspace .recovery-confirm { display: flex; flex-direction: row; align-items: flex-start; gap: 10px; max-width: 68ch; margin: 20px 0; line-height: 1.6; }
 .recovery-confirm input { flex: 0 0 auto; margin-top: 4px; accent-color: var(--accent); }
+.executor-trial { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); max-width: 68ch; }
+.executor-trial h3 { margin: 0 0 8px; font-size: 15px; }
+.executor-trial p { color: var(--muted); font-size: 14px; line-height: 1.7; margin: 8px 0 16px; }
+.executor-trial-facts { margin-top: 20px; }
+.executor-trial-consent { display: flex; align-items: flex-start; gap: 10px; margin: 16px 0; font-size: 14px; line-height: 1.7; }
+.executor-trial-consent input { flex: 0 0 auto; margin-top: 5px; accent-color: var(--accent); }
 .recovery-result { margin-top: 24px; color: var(--ok); }
 @media (max-width: 760px) { .recovery-workspace { padding: 20px 17px; } .recovery-workspace input:not([type='checkbox']), .recovery-workspace select { font-size: 16px; } }
 .view-header { display: flex; flex: 0 0 auto; align-items: center; justify-content: space-between; gap: 18px; min-height: 96px; padding: 24px 32px 20px; border-bottom: 1px solid var(--line); }

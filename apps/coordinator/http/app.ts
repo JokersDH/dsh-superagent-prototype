@@ -68,6 +68,9 @@ import {
   RecoveryTargetStatusSchema,
   RecoveryTargetAuthorizeSchema,
   RecoveryTargetAuthorizationSchema,
+  ExecutorTrialCommandSchema,
+  ExecutorTrialInspectionSchema,
+  ExecutorTrialReceiptSchema,
   AssistantContextPrepareSchema,
   AssistantContextPreparedSchema,
   AssistantContextSendSchema,
@@ -87,6 +90,9 @@ import type {
   RecoveryTargetStatus,
   RecoveryTargetAuthorize,
   RecoveryTargetAuthorization,
+  ExecutorTrialCommand,
+  ExecutorTrialInspection,
+  ExecutorTrialReceipt,
   AssistantContextPrepare,
   AssistantContextPrepared,
   AssistantContextSend,
@@ -213,6 +219,7 @@ export interface LocalHttpOptions {
     contextPreview?(input: ContextPreviewInput, actor: TrustedActor): Promise<ContextPreview>
     recoveryTargetPrepare?(input: RecoveryTargetPrepareInput, actor: TrustedActor): Promise<RecoveryTargetStatus>
     recoveryTargetAuthorize?(input: RecoveryTargetAuthorize, actor: TrustedActor): Promise<RecoveryTargetAuthorization>
+    executorTrialConfirm?(input: ExecutorTrialCommand, actor: TrustedActor): Promise<ExecutorTrialReceipt>
     assistantContextPrepare?(input: AssistantContextPrepare, actor: TrustedActor): Promise<AssistantContextPrepared>
     assistantContextSend?(input: AssistantContextSend, actor: TrustedActor): Promise<CommandReceipt>
   }
@@ -227,6 +234,8 @@ export interface LocalHttpOptions {
     recoveryActivation?(activationId: string): Promise<RecoveryActivationRecord | undefined>
     recoveryTarget?(activationId: string): Promise<RecoveryTargetStatus | undefined>
     recoveryTargetAuthorization?(activationId: string): Promise<RecoveryTargetAuthorization | undefined>
+    executorTrialInspection?(): Promise<ExecutorTrialInspection>
+    executorTrialReceipt?(commandId: string): Promise<ExecutorTrialReceipt | undefined>
     assistantContext?(messageId: string): Promise<AssistantContextBinding | undefined>
     contextHistory?(query: ContextHistoryQuery): Promise<ContextHistory>
     contextSources?(messageId: string, options?: { scopeReview?: boolean }): Promise<ContextSources | undefined>
@@ -465,6 +474,33 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
     if (result.grant.source.intent.activationId !== input.activationId || result.grant.commandId !== input.commandId ||
       result.grant.material.manifestDigest !== input.expectedManifestDigest)
       throw new ApplicationFault('storage_unavailable', 'Target authorization response identity mismatch', 'none')
+    return c.json(result)
+  })
+  app.get('/v1/executors/trial', async c => {
+    if (Object.keys(c.req.query()).length) throw new ApplicationFault('invalid_request', 'Executor inspection accepts no query')
+    if (options.startupMode === 'recovery_readonly' || !options.read?.executorTrialInspection)
+      throw new ApplicationFault('unsupported_capability', 'Executor trial inspection is not available here', 'none')
+    return c.json(ExecutorTrialInspectionSchema.parse(await options.read.executorTrialInspection()))
+  })
+  app.post('/v1/executors/trial/confirm', async c => {
+    if (options.startupMode === 'recovery_readonly' || !options.operations?.executorTrialConfirm)
+      throw new ApplicationFault('unsupported_capability', 'Executor trial consent is not available here', 'none')
+    if (Object.keys(c.req.query()).length || !c.req.header('content-type')?.toLowerCase().startsWith('application/json'))
+      throw new ApplicationFault('invalid_request', 'Executor consent requires JSON without a query')
+    const input = ExecutorTrialCommandSchema.parse(await c.req.json())
+    const result = ExecutorTrialReceiptSchema.parse(await options.operations.executorTrialConfirm(input, c.get('actor')))
+    if (result.commandId !== input.commandId || result.identityDigest !== input.identityDigest || result.policyDigest !== input.policyDigest ||
+      result.profileId !== input.profileId || result.revision !== input.revision)
+      throw new ApplicationFault('storage_unavailable', 'Executor consent response identity is inconsistent', 'none')
+    return c.json(result)
+  })
+  app.get('/v1/executors/trial/receipts/:id', async c => {
+    if (Object.keys(c.req.query()).length) throw new ApplicationFault('invalid_request', 'Executor receipt accepts no query')
+    if (!options.read?.executorTrialReceipt) throw new ApplicationFault('unsupported_capability', 'Executor consent audit is not available', 'none')
+    const id = IdSchema.parse(c.req.param('id')), record = await options.read.executorTrialReceipt(id)
+    if (!record) return c.json({ error: { code: 'invalid_request', message: 'Executor consent receipt was not found', retry: 'none' } }, 404)
+    const result = ExecutorTrialReceiptSchema.parse(record)
+    if (result.commandId !== id) throw new ApplicationFault('storage_unavailable', 'Executor consent audit identity mismatch', 'none')
     return c.json(result)
   })
   const readConfiguration = async () => {

@@ -1,0 +1,7 @@
+{
+  "protocol": "executor-trial-inspection/1",
+  "runtimeContractSchemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
+  "runtimeValidationRequired": true,
+  "schemaHash": "652bd8a21c14f5575a7ef822530dfc406c3af99c9e442b8e26b3adec755c701a",
+  "sourceHash": "eda9ebc400e0229ae8d40ac15e6145b0a207e0eab6e5c430b300353064ed0fbf"
+}

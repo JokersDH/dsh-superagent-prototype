@@ -1,5 +1,6 @@
 import { execFileSync, spawnSync } from 'node:child_process'
-import { readFileSync } from 'node:fs'
+import { readFileSync, realpathSync } from 'node:fs'
+import { createHash } from 'node:crypto'
 import { join } from 'node:path'
 import { homedir } from 'node:os'
 import { canonicalDigest } from '@personal-agent/contracts/canonical'
@@ -52,11 +53,17 @@ export function admittedNativeProfile(): AgentProfile {
     requiredFeatures: [],
   }
 }
-function startupWithProfile(stateRoot: string, profile: AgentProfile) {
+export function startupWithProfile(stateRoot: string, profile: AgentProfile) {
   const registry = new NativeProjectRegistry(stateRoot)
   const projects = registry.list()
+  const expectedExecutableDigest = createHash('sha256').update(readFileSync(profile.executable)).digest('hex')
+  const executable = realpathSync(profile.executable)
   const native: NativeProductConfiguration = {
     profile,
+    admissionCurrent: () => {
+      try { return realpathSync(profile.executable) === executable && createHash('sha256').update(readFileSync(profile.executable)).digest('hex') === expectedExecutableDigest }
+      catch { return false }
+    },
     projects: projects.map((project) => ({ id: project.id, path: project.path, check: registry.check(project),
       ...(project.environment ? { environment: registry.environment(project)! } : {}) })),
     approvalPolicy: 'on-request',

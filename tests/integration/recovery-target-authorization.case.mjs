@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
+import { createHash } from 'node:crypto'
 import { execFileSync, spawnSync } from 'node:child_process'
-import { copyFileSync, cpSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, renameSync, rmSync, writeFileSync } from 'node:fs'
+import { copyFileSync, cpSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { test } from 'node:test'
@@ -165,4 +166,18 @@ test('the historical fault worker refuses an unapproved crash argument before cr
   })
   assert.equal(result.status, 1); assert.equal(result.signal, null)
   assert.match(result.stderr, /OS fault injection is disabled/)
+})
+
+test('the actual coordinator entry refuses an ungranted target before credentials or database writes', async t => {
+  const h = fixture(t), data = await h.prepare()
+  const snapshot = () => ({ files: readdirSync(data.targetRoot).sort(), database: createHash('sha256').update(readFileSync(join(data.targetRoot, 'state.sqlite'))).digest('hex') })
+  const before = snapshot(), entry = new URL('../../apps/coordinator/product/demo.ts', import.meta.url).href
+  const script = `process.argv=[process.execPath,'--state',${JSON.stringify(data.targetRoot)},'--discussion-only','--port','0'];
+    setTimeout(()=>process.exit(91),1500).unref();
+    try{await import(${JSON.stringify(entry)})}catch(error){if(error?.error?.code!=='forbidden')throw error;console.log('forbidden');process.exitCode=42}`
+  const result = spawnSync(process.execPath, ['--input-type=module', '-e', script], { encoding: 'utf8' })
+  assert.equal(result.signal, null)
+  assert.equal(result.status, 42, result.stderr)
+  assert.match(result.stdout, /forbidden/, result.stderr)
+  assert.deepEqual(snapshot(), before)
 })

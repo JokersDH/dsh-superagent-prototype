@@ -9,10 +9,12 @@ import { listenLocalHttp } from '../http/server.ts'
 import { createProductRuntime } from './runtime.ts'
 import { ensureScratchProject } from './scratch.ts'
 import { PrivateModelProvider } from './model-provider.ts'
-import { DISCUSSION_PROJECT, preparePersonalStartup } from './native-startup.ts'
+import { DISCUSSION_PROJECT } from './native-startup.ts'
 import { NativeProjectRegistry } from './project-registry.ts'
 import { loadRestoredReviewWithIdentity } from './restored-review.ts'
-import { readRecoveryTargetMaterial, verifyRecoveryTargetStartup } from './recovery-target-authorization.ts'
+import { readRecoveryTargetMaterial, verifyRecoveryTargetIdentity, verifyRecoveryTargetStartup } from './recovery-target-authorization.ts'
+import { prepareInspectedPersonalStartup } from './inspected-startup.ts'
+import { inspectNativeExecutor, inspectRecoveryExecutor } from './native-inspection.ts'
 
 const { values } = parseArgs({
   options: {
@@ -34,9 +36,11 @@ const stateRoot = resolve(values.state!),
   port = Number(values.port)
 if (!['normal', 'recovery_readonly'].includes(values['startup-mode']!)) throw new Error('Unsupported startup mode')
 const recovery = values['startup-mode'] === 'recovery_readonly' || existsSync(join(stateRoot, 'restore-report.json'))
+const principal = { userId: 'local-demo-user', authorityRef: 'local-demo-authority' }
+// Refuse a selected prepared target before creating credentials, opening a writer or running migrations.
+if (!recovery && existsSync(join(stateRoot, 'recovery-target.json'))) verifyRecoveryTargetIdentity(stateRoot, principal)
 const credential = localCredentials(stateRoot)
 const store = new ProductStore({ path: join(stateRoot, 'state.sqlite') })
-const principal = { userId: 'local-demo-user', authorityRef: 'local-demo-authority' }
 let explicitReview: ReturnType<typeof loadRestoredReviewWithIdentity> | undefined
 try {
   if (values['review-restored-scope']) {
@@ -54,7 +58,8 @@ try {
 let product: ReturnType<typeof createProductRuntime> | undefined
 try {
   const personal = values.native || values['discussion-only']
-  const personalStartup = personal && !recovery ? preparePersonalStartup(stateRoot, { discussionOnly: values['discussion-only'] }) : undefined
+  const recoveryExecutor = personal && recovery ? await inspectRecoveryExecutor() : undefined
+  const personalStartup = personal && !recovery ? await prepareInspectedPersonalStartup(stateRoot, store, principal, { discussionOnly: values['discussion-only'] }) : undefined
   const native = personalStartup && 'native' in personalStartup ? personalStartup.native : undefined
   if (!recovery && readRecoveryTargetMaterial(stateRoot)) {
     if (!personal) throw new Error('Prepared recovery targets require the personal startup entry')
@@ -89,6 +94,9 @@ try {
     ...(native ? { native } : {}),
     ...(personalStartup ? { projectRegistry: personalStartup.registry, workspaceRoot: personalStartup.workspaceRoot } : {}),
     ...(executionUnavailable ? { executionUnavailable } : {}),
+    ...(personalStartup && 'inspectedProfiles' in personalStartup ? { inspectedProfiles: personalStartup.inspectedProfiles } : {}),
+    ...(personal && !recovery ? { inspectExecutor: inspectNativeExecutor } : {}),
+    ...(recoveryExecutor ? { recoveryExecutor: () => recoveryExecutor } : {}),
   })
   product = activeProduct
   const http = createLocalHttpApp({
