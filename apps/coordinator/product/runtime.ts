@@ -5,8 +5,8 @@ import type { ApplicationOptions } from '@personal-agent/application'
 import { sharedAttentionRanker } from '@personal-agent/routing'
 import { recoveryTargetInventory } from '@personal-agent/storage'
 import type { AssistantContextBindings, AssistantContextHistory, AssistantContextPrepare, AssistantContextSend, AssistantReplyResults, AttentionRanker, ContextPreviewInput, ConversationCommand, DecisionCommand, DecisionPrepare, NativeQuestionBinding, ProjectSettingsCommand, ProposalCommand, ProposalPrepare, RecoveryActivationCommit, RecoveryPrepare, RecoveryTargetInventoryReader, RecoveryTargetMaterial, RecoveryTargetMaterializer, RecoveryTargetPrepareInput, ReviewActivity, Scope, TrustedActor } from '@personal-agent/contracts'
-import { ExecutionUnavailableReasonSchema, WorkEvidenceSchema } from '@personal-agent/contracts'
-import type { AgentProfile, ExecutionUnavailableReason, RecoverySourcePrepare, RecoverySourceConfirm } from '@personal-agent/contracts'
+import { ExecutionProfileViewSchema, ExecutionUnavailableReasonSchema, WorkEvidenceSchema } from '@personal-agent/contracts'
+import type { AgentProfile, ExecutionUnavailableReason, RecoverySourcePrepare, RecoverySourceConfirm, RecoveryTargetAuthorize } from '@personal-agent/contracts'
 import { key } from '@personal-agent/orchestrator-core'
 import type { Ticket } from '@personal-agent/orchestrator-core'
 import { CheckRegistry } from '@personal-agent/verification'
@@ -39,6 +39,9 @@ import { ProductContextPreview } from './context-preview.ts'
 import { ProductAssistantContext } from './assistant-context-use.ts'
 import { ProductRecoveryTargets } from './recovery-target-service.ts'
 import { initializeRecoveryTarget } from './recovery-target-initializer.ts'
+import { ProductRecoveryTargetAuthorization } from './recovery-target-authorization.ts'
+import { localRecoveryMaterializer } from './recovery-materializer.ts'
+import { admittedNativeProfile } from './native-startup.ts'
 import { CompletedAssistantReplies } from './assistant-reply-results.ts'
 import { ProductContextRecords } from './context-records.ts'
 import { createDiscussionEffects } from './discussion-effects.ts'
@@ -77,6 +80,11 @@ export function createProductRuntime(
 ) {
   const unavailable = options.executionUnavailable === undefined ? undefined : ExecutionUnavailableReasonSchema.parse(options.executionUnavailable)
   if (unavailable && options.native) throw new TypeError('Unavailable execution cannot contain an admitted native runtime')
+  if (options.native?.profileView) {
+    const view = ExecutionProfileViewSchema.parse(options.native.profileView), profile = options.native.profile
+    if (view.id !== profile.id || view.revision !== profile.revision || view.driverId !== profile.driverId || view.kind !== 'native' || !view.dispatchAllowed)
+      throw new TypeError('The native public projection must match the trusted admitted runtime profile')
+  }
   // A real native runtime never offers the fixed scratch executors as a selectable alternative.
   const fixtureProfiles = unavailable || options.native ? [] : FIXTURE_PROFILES
   options = {
@@ -181,12 +189,6 @@ export function createProductRuntime(
     () => configuredProjects.map(project => project.id)) : undefined
   let assistantContext: ProductAssistantContext | undefined
   let contextRecords: ProductContextRecords | undefined
-  const recoveryTargets = options.recoveryTargets ? new ProductRecoveryTargets({
-    store, principal: options.principal, stateRoot: options.stateRoot,
-    materializer: options.recoveryTargets.materializer, inventory: options.recoveryTargets.inventory ?? recoveryTargetInventory,
-    revalidateSource: options.recoveryTargets.revalidateSource,
-    initialize: options.recoveryTargets.initialize ?? initializeRecoveryTarget, ...(options.now ? { now: options.now } : {}),
-  }) : undefined
   const reviewTiming = new ProductReviewTiming(store, application, completion, options.principal, () => configuredProjects.map(project => project.id))
   completion.onAccepted = (candidate, actor, at) => {
     const eventSeq = reviewTiming.accepted(candidate, actor, at)
@@ -202,6 +204,17 @@ export function createProductRuntime(
   const recoverySource = new ProductRecoverySource(store, recovery, { stateRoot: options.stateRoot,
     startupMode: options.startupMode ?? 'normal', principal: options.principal, secret: options.actionSecret,
     ...(options.now ? { now: options.now } : {}) })
+  const defaultTargets = options.startupMode === 'recovery_readonly' && !options.recoveryTargets
+  const revalidateSource = (commit: RecoveryActivationCommit) => recoverySource.revalidateCommitted(commit)
+  const targetPorts = options.recoveryTargets ?? (defaultTargets ? { materializer: localRecoveryMaterializer(), revalidateSource } : undefined)
+  const targetAuthorizer = defaultTargets ? new ProductRecoveryTargetAuthorization({ principal: options.principal,
+    executor: options.recoveryExecutor ?? admittedNativeProfile,
+    revalidateSource: (commit, configuration) => recoverySource.revalidateCommitted(commit, configuration),
+    ...(options.now ? { now: options.now } : {}) }) : undefined
+  const recoveryTargets = targetPorts ? new ProductRecoveryTargets({ store, principal: options.principal, stateRoot: options.stateRoot,
+    materializer: targetPorts.materializer, inventory: options.recoveryTargets?.inventory ?? recoveryTargetInventory,
+    revalidateSource: targetPorts.revalidateSource, initialize: options.recoveryTargets?.initialize ?? initializeRecoveryTarget,
+    ...(targetAuthorizer ? { authorizer: targetAuthorizer } : {}), ...(options.now ? { now: options.now } : {}) }) : undefined
   const attention = new ProductAttention(store, application, completion, {
     projectIds: () => configuredProjects.map(project => project.id), verification: work => execution!.verificationStatus(work),
     ranker: options.attentionRanker ?? sharedAttentionRanker, ...(options.now ? { now: options.now } : {}),
@@ -231,7 +244,8 @@ export function createProductRuntime(
     recovery: async () => recovery.inspect(),
     recoveryActivation: async activationId => readRecoveryActivationRecord(store, activationId, options.principal),
     ...(completedReplies ? { replyCandidates: async (messageId: string) => proposals.replyCandidates(messageId) } : {}),
-    ...(recoveryTargets ? { recoveryTarget: (id: string) => recoveryTargets.read(id) } : {}),
+    ...(recoveryTargets ? { recoveryTarget: (id: string) => recoveryTargets.read(id),
+      recoveryTargetAuthorization: (id: string) => recoveryTargets.authorization(id) } : {}),
     assistantContext: async messageId => assistantContext?.audit(messageId),
     contextHistory: async query => {
       if (!contextRecords) throw new ApplicationFault('unsupported_capability', 'Context history is not connected')
@@ -392,7 +406,7 @@ export function createProductRuntime(
             readiness: unavailable === 'not_installed' ? 'missing' as const : unavailable === 'needs_auth' ? 'needs_auth' as const : unavailable === 'incompatible_version' || unavailable === 'unsupported_platform' ? 'incompatible' as const : 'needs_setup' as const }] : []),
           ...(options.native
             ? [
-                {
+                options.native.profileView ?? {
                   id: options.native.profile.id,
                   revision: options.native.profile.revision,
                   displayName: 'Codex · 本机开发',
@@ -499,6 +513,9 @@ export function createProductRuntime(
       ...(recoveryTargets ? { recoveryTargetPrepare: (input: RecoveryTargetPrepareInput, actor: TrustedActor) => {
         if (options.startupMode !== 'recovery_readonly') throw new ApplicationFault('unsupported_capability', 'Target preparation requires restored read-only startup', 'none')
         return recoveryTargets.prepare(input, actor)
+      }, recoveryTargetAuthorize: (input: RecoveryTargetAuthorize, actor: TrustedActor) => {
+        if (options.startupMode !== 'recovery_readonly') throw new ApplicationFault('unsupported_capability', 'Target authorization requires restored read-only startup', 'none')
+        return recoveryTargets.authorize(input, actor)
       } } : {}),
       prepareDecision: async (input: DecisionPrepare, actor: TrustedActor) => decisions.prepare(input, actor),
       prepareProposal: (input: ProposalPrepare, actor: TrustedActor) => proposals.prepare(input, actor),

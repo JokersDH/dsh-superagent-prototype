@@ -10,8 +10,11 @@ export const RecoveryActivationIntentSchema = z.strictObject({
   commandId: IdSchema,
   planId: IdSchema,
   planDigest: DigestSchema,
-  source: z.strictObject({ stateId: IdSchema, stateRoot, markerDigest: DigestSchema, inspectionFingerprint: DigestSchema }),
-  target: z.strictObject({ generationId: IdSchema, stateRoot, configurationDigest: DigestSchema }),
+  source: z.strictObject({ stateId: IdSchema, stateRoot, markerDigest: DigestSchema, inspectionFingerprint: DigestSchema,
+    /** New grants require the exact logical source before the original confirmation transaction. */
+    logicalFingerprint: DigestSchema.optional() }),
+  target: z.strictObject({ generationId: IdSchema, stateRoot, configurationDigest: DigestSchema,
+    parentIdentity: z.string().min(3).max(128).optional() }),
   principal: z.strictObject({ userId: IdSchema, authorityRef: IdSchema }),
   machineDigest: DigestSchema,
   /** Digest of the current, verified resource/isolation policy; a historical binding is insufficient. */

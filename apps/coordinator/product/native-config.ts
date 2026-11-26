@@ -1,9 +1,11 @@
-import type { AgentProfile } from '@personal-agent/contracts'
+import type { AgentProfile, ExecutionProfileView } from '@personal-agent/contracts'
 import type { CheckDefinition } from '@personal-agent/verification'
 import type { ProjectEnvironmentPolicy } from './environments.ts'
 
 export interface NativeProductConfiguration {
   profile: AgentProfile
+  /** Public facts from main's shared projection; supplying a view is not runtime authorization. */
+  profileView?: ExecutionProfileView
   projects: readonly { id: string; path: string; check: CheckDefinition; environment?: ProjectEnvironmentPolicy }[]
   approvalPolicy: 'untrusted' | 'on-request'
   collaborationMode?: 'plan' | 'default'

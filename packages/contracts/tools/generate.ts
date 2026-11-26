@@ -27,6 +27,8 @@ import { AssistantContextBindingSchema, AssistantContextPrepareSchema, Assistant
 import { AssistantInferenceRecordSchema, AssistantReplyBodySchema, AssistantReplyResultSchema, AssistantContextHistoryQuerySchema, AssistantContextHistoryPageSchema } from '../src/assistant-records.ts';
 import { RecoverySourceCheckpointQuerySchema, RecoverySourceCheckpointSchema } from '../src/recovery-source.ts';
 import { RecoverySourcePrepareSchema, RecoverySourcePreparedSchema, RecoverySourceConfirmSchema } from '../src/recovery-source-confirmation.ts';
+import { RecoveryTargetAuthorizeSchema, RecoveryTargetGrantSchema, RecoveryTargetAuthorizationSchema } from '../src/recovery-target-authorization.ts';
+import { ExecutionCompatibilityViewSchema, ExecutionOperationViewSchema, ExecutionTrialAdmissionSchema } from '../src/execution-compatibility.ts';
 import { ContextHistoryQuerySchema, ContextHistoryEntrySchema, ContextHistorySchema, ContextSourcesSchema } from '../src/context-records.ts';
 import { TrialReadinessSchema } from '../src/trial-readiness.ts';
 import { UsageObservationQuerySchema, UsageObservationSchema, UsageObservationDownloadSchema } from '../src/usage-observation.ts';
@@ -129,6 +131,8 @@ for (const [name, protocol, source, schemas] of [
   ['recovery-source', 'recovery-source-checkpoint/1', 'recovery-source.ts', { RecoverySourceCheckpointQuery: RecoverySourceCheckpointQuerySchema, RecoverySourceCheckpoint: RecoverySourceCheckpointSchema }],
   ['recovery-source-confirmation', 'recovery-source-prepared/1', 'recovery-source-confirmation.ts', { RecoverySourcePrepare: RecoverySourcePrepareSchema, RecoverySourcePrepared: RecoverySourcePreparedSchema, RecoverySourceConfirm: RecoverySourceConfirmSchema }],
   ['context-records', 'context-records/1', 'context-records.ts', { ContextHistoryQuery: ContextHistoryQuerySchema, ContextHistoryEntry: ContextHistoryEntrySchema, ContextHistory: ContextHistorySchema, ContextSources: ContextSourcesSchema }],
+  ['recovery-target-authorization', 'recovery-target-authorization/1', 'recovery-target-authorization.ts', { RecoveryTargetAuthorize: RecoveryTargetAuthorizeSchema, RecoveryTargetGrant: RecoveryTargetGrantSchema, RecoveryTargetAuthorization: RecoveryTargetAuthorizationSchema }],
+  ['execution-compatibility', 'execution-compatibility/1', 'execution-compatibility.ts', { ExecutionCompatibilityView: ExecutionCompatibilityViewSchema, ExecutionOperationView: ExecutionOperationViewSchema, ExecutionTrialAdmission: ExecutionTrialAdmissionSchema }],
 ] as const) {
   const text = canonical({ $schema: 'https://json-schema.org/draft/2020-12/schema', $id: `urn:personal-agent:${name}:1`,
     $defs: Object.fromEntries(Object.entries(schemas).map(([key, schema]) => [key, z.toJSONSchema(schema, { target: 'draft-2020-12', io: 'input' })])) });

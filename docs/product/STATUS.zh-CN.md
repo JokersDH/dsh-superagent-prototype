@@ -1,5 +1,7 @@
 # 产品进度、完成度与当前可用范围
 
+2026-11-26续验：B/D/E本批完成的是组件与工具准备，尚未闭合原M04出口。main已精确接B诊断闭包及公共版本兼容/显式试用投影，49项针对性回归通过；ACP原payload/授权/静止阻断、D旧引擎包、E实际consumer缺口仍在，跨机NOT_TESTED。按[当前续工话术](../../agent-tasks/milestone-04/continue-prompts.zh-CN.md)继续两条线，L1 0/6、L2 0/7，完成度保持85/100和完整B65.3%，尚不启动M05。
+
 2026-11-24当前方向：[里程碑04](MILESTONE-04.zh-CN.md)推进“另一台Mac同事可用”和“第二真实ACP协议”两条线，已准备[B/D/E整包话术](../../agent-tasks/milestone-04/forward-prompts.zh-CN.md)和[同事说明](../COLLEAGUE-TRIAL.zh-CN.md)。源码审计已确认版本准入、多profile默认接线和迁移后新授权仍需实施；当前0/13，未启动真实CLI/模型任务，**85/100与65.3%保持不变**。第二协议和产品创新重开，旧三组研究试点不恢复；以下原日期的暂停研究表述均属历史。
 
 2026-11-21。**里程碑03日常可用版6/6关闭**。唯一[完成汇总与安装入口](MILESTONE-03-COMPLETION.zh-CN.md)记录准确包、原Work/问题/命令/资源证据、实际额度及使用方式。[使用指南](../ASSISTANT-GUIDE.zh-CN.md) · [架构](ARCHITECTURE.zh-CN.md) · [创新](INNOVATION.zh-CN.md)。
