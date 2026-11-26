@@ -41,12 +41,14 @@ export const ExecutionProfileViewSchema = z
     if ((value.kind === 'controlled_fixture') !== (value.readiness === 'fixture_ready'))
       ctx.addIssue({ code: 'custom', message: 'Fixture readiness belongs only to a controlled fixture' })
     const trial = value.trialAdmission !== undefined
-    const trialReady = trial && value.compatibility?.classification === 'compatible_unverified' && value.readiness === 'inspection_passed' &&
-      value.compatibility.operations.some(item => item.operation === 'begin' && item.enabled)
+    const trialValid = trial && value.compatibility?.classification === 'compatible_unverified' && value.readiness === 'inspection_passed'
+    const trialReady = trialValid && value.compatibility?.operations.some(item => item.operation === 'begin' && item.enabled)
     if (value.kind === 'controlled_fixture' && (value.compatibility || trial))
       ctx.addIssue({ code: 'custom', message: 'Native compatibility and trial admission cannot be assigned to a fixture' })
-    if (trial && !trialReady)
+    if (trial && (!trialValid || (value.dispatchAllowed && !trialReady)))
       ctx.addIssue({ code: 'custom', message: 'Explicit trial admission requires compatible protocol and a checked begin consumer' })
+    if (!value.dispatchAllowed && value.compatibility?.operations.some(item => item.enabled))
+      ctx.addIssue({ code: 'custom', message: 'A blocked profile cannot publish enabled native operations' })
     if (value.compatibility && ['incompatible', 'unknown'].includes(value.compatibility.classification) && value.dispatchAllowed)
       ctx.addIssue({ code: 'custom', message: 'Unknown or incompatible execution cannot be admitted' })
     if (value.compatibility && value.readiness === 'native_test_passed' && value.compatibility.classification !== 'verified')

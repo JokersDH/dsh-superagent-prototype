@@ -473,7 +473,9 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
     const value = ApplicationConfigurationSchema.parse(await options.read.configuration())
     return options.startupMode === 'recovery_readonly' ? ApplicationConfigurationSchema.parse({ ...value, reviewActivityAvailable: false, decisionsAvailable: false, proposalsAvailable: false, contextPreviewAvailable: false, assistantContextAvailable: false,
       executionAvailability: { state: 'unavailable', reason: 'recovery_readonly' },
-      profiles: value.profiles.map(profile => ({ ...profile, dispatchAllowed: false, blockedReason: 'writer_indeterminate' })),
+      profiles: value.profiles.map(profile => ({ ...profile, dispatchAllowed: false, blockedReason: 'writer_indeterminate',
+        ...(profile.compatibility ? { compatibility: { ...profile.compatibility,
+          operations: profile.compatibility.operations.map(operation => ({ ...operation, enabled: false })) } } : {}) })),
       projects: value.projects.map(project => { const { defaultProfileId: _, ...rest } = project; return { ...rest, profileIds: [], dispatchAllowed: false, blockedReason: 'writer_indeterminate' } }),
     }) : value
   }

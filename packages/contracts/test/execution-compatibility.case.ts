@@ -36,4 +36,7 @@ test('unknown, incompatible, fixture and duplicate operation projections cannot 
     operations: [compatibility.operations[0], compatibility.operations[0]] } }).success, false)
   assert.equal(ExecutionProfileViewSchema.safeParse({ ...profile, compatibility: { ...compatibility, executable: '/private/agent' } }).success, false)
   assert.equal(ExecutionProfileViewSchema.safeParse({ ...profile, trialAdmission: { ...profile.trialAdmission, actor: 'user' } }).success, false)
+  assert.equal(ExecutionProfileViewSchema.safeParse({ ...profile, dispatchAllowed: false, blockedReason: 'unsupported_capability' }).success, false)
+  assert.equal(ExecutionProfileViewSchema.safeParse({ ...profile, dispatchAllowed: false, blockedReason: 'unsupported_capability',
+    compatibility: { ...compatibility, operations: compatibility.operations.map(operation => ({ ...operation, enabled: false })) } }).success, true)
 })

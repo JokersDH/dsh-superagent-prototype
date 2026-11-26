@@ -73,6 +73,13 @@ test('the original runtime/configuration HTTP consumer publishes trial facts wit
   const body = await response.json()
   assert.deepEqual(body.profiles, [view]); assert.equal(body.profiles.length, 1)
   assert.equal(body.profiles[0].readiness, 'inspection_passed')
+  const readonlyApi = createLocalHttpApp({ application: product.application, principal, apiToken: 'a'.repeat(64), bootstrapToken: 'b'.repeat(64),
+    allowedOrigins: ['http://127.0.0.1:4499'], mode: 'personal', startupMode: 'recovery_readonly', read: product.read, operations: product.operations })
+  const readonlyResponse = await readonlyApi.request('/v1/configuration', { headers: { authorization: `Bearer ${'a'.repeat(64)}` } })
+  assert.equal(readonlyResponse.status, 200)
+  const readonlyView = await readonlyResponse.json()
+  assert.equal(readonlyView.profiles[0].dispatchAllowed, false)
+  assert.equal(readonlyView.profiles[0].compatibility.operations.some(item => item.enabled), false)
   assert.equal(store.domain.tickets.list().length, 0)
   assert.equal(store.events.cursor(), 0)
 })
