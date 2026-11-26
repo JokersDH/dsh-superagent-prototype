@@ -112,8 +112,8 @@ export function probeAuthorExecutor({ installRoot, required = false, expectedVer
   } catch {
     facts.authPresent = false
   }
-  if (required && expectedVersion !== null && version !== expectedVersion)
-    return { ok: false, code: 'author_executor_version_mismatch', message: 'Author executor version differs from the admitted profile', facts }
+  if (expectedVersion !== null && version !== expectedVersion)
+    return { ok: !required, code: 'author_executor_version_mismatch', message: 'Author executor version differs from the historical admitted profile; workbench availability is not native execution admission', facts }
   if (required && !facts.authPresent)
     return { ok: false, code: 'author_auth_unavailable', message: 'No private author auth file is available for the author executor', facts }
   return { ok: true, code: null, message: null, facts }

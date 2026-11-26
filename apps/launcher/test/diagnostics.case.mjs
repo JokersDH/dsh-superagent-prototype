@@ -63,6 +63,9 @@ test('author executor probe distinguishes missing binary, missing auth and versi
 
   const drifted = probeAuthorExecutor({ installRoot: root, required: true, expectedVersion: 'codex-cli 0.999.0' })
   assert.equal(drifted.code, 'author_executor_version_mismatch')
+  const optional = probeAuthorExecutor({ installRoot: root, required: false, expectedVersion: 'codex-cli 0.999.0' })
+  assert.equal(optional.ok, true, 'optional diagnostics cannot block a workbench by themselves')
+  assert.equal(optional.code, 'author_executor_version_mismatch', 'a changed version is never relabelled as native-tested')
 })
 
 test('port probing reports a busy loopback port without stopping its owner', async () => {

@@ -19,6 +19,8 @@ const REVIEWED_WRAPPERS = new Set([
   '339bdac0912a05da701d04de0670e7b6cd49cc1d86687536fb809f45396d866c',
   // Desktop namespace and duplicate-copy URL reuse; original pa status still proves all identities.
   '07c834a9bfc5678861602173af2b2b59ab6a09fa994694a2d3402bd76723afb2',
+  // Selected prepared targets retain original grant verification; per-launch desktop URL is rechecked.
+  'fcafba15e32daabfff908624a335f79abe2fdfea5f30a3fcca8556e2f0cbed94',
 ])
 const MAX_FILE = 256 * 1024 * 1024
 const MAX_TOTAL = 1024 * 1024 * 1024

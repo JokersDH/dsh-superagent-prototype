@@ -25,6 +25,7 @@ import { expectedStartupMode, recoverySummary } from './recovery.mjs'
 import { httpGet } from './http-probe.mjs'
 import { consoleIndexPath, readRelease, statFile, verifyConsoleBuild, verifyReleaseArtifacts, verifyRuntimeDependencies } from './release.mjs'
 import { createDistributionServer, listenDistributionServer } from './static-server.mjs'
+import { hasInspectedNativeStartup } from './inspected-startup.mjs'
 
 export const DEFAULT_CONSOLE_PORT = 5190
 export const DEFAULT_API_PORT = 8790
@@ -284,7 +285,11 @@ async function startInstanceLocked({ installRoot, roots, values, log = (line) =>
       return blocked('port_in_use', `本机端口 ${port} 已被占用`, { name, port, cause: availability.code }, '用 --port/--api-port 选择其它端口，或先运行 `pa doctor` 核对已有实例。')
   }
 
-  if (mode === 'personal' && !discussionOnly) {
+  // A current receiver can safely display missing/changed executor and consent blocks itself.
+  // This only permits opening that workbench; it does not admit a native profile or skip its guard.
+  const inspectedReceiver = mode === 'personal' && !discussionOnly &&
+    await hasInspectedNativeStartup({ installRoot: canonicalInstall, stateRoot: canonicalState })
+  if (mode === 'personal' && !discussionOnly && !inspectedReceiver) {
     const evidence = readAuthorEvidence(installRoot)
     const expectedVersion = evidence?.status === 'PASS_REAL_NATIVE_PRODUCT' ? evidence.profileVersion : null
     const executor = probeAuthorExecutor({ installRoot, required: true, expectedVersion })

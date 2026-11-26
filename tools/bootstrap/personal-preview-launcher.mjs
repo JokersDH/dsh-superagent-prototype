@@ -6,7 +6,7 @@ import { constants, closeSync, existsSync, fstatSync, lstatSync, mkdirSync, open
 import { createServer } from 'node:net'
 import { homedir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import { parseArgs } from 'node:util'
 
 const ROOT = dirname(fileURLToPath(import.meta.url))
@@ -64,7 +64,25 @@ function context(manifest) {
   privateDirectory(root)
   const roots = { config: join(root, 'config'), data: join(root, 'data'), cache: join(root, 'cache'),
     logs: join(root, 'logs'), workspace: join(root, 'workspaces') }
-  for (const path of Object.values(roots)) privateDirectory(path)
+  // A user-selected existing target root is only a path preference. It is never authorization;
+  // the original pa/recovery-target verifier still checks the original target grant before execution.
+  const selectedTarget = process.env.PA_TARGET_DATA_ROOT
+  if (selectedTarget) {
+    const target = resolve(selectedTarget)
+    if (!existsSync(target) || !lstatSync(target).isDirectory() || lstatSync(target).isSymbolicLink() ||
+      (lstatSync(target).mode & 0o077) !== 0 || lstatSync(target).uid !== process.getuid?.())
+      throw new Error('所选工作区必须是当前用户拥有的既有私有目录；不会创建或替换它。')
+    const markerFiles = ['recovery-target.json', 'restore-report.json'].map(name => join(target, name))
+    const presentMarkers = markerFiles.filter(path => existsSync(path))
+    if (!presentMarkers.length || presentMarkers.some(path => !lstatSync(path).isFile() || lstatSync(path).isSymbolicLink()))
+      throw new Error('所选目录不是恢复来源或已准备的新工作区；恢复来源只读，路径选择不能绕过原恢复授权。')
+    if (existsSync(join(target, 'state.sqlite')) && !lstatSync(join(target, 'state.sqlite')).isFile())
+      throw new Error('所选工作区的 state.sqlite 不是普通文件。')
+    roots.data = target
+  } else {
+    for (const path of Object.values(roots)) privateDirectory(path)
+  }
+  if (selectedTarget) { for (const name of ['config', 'cache', 'logs', 'workspace']) privateDirectory(roots[name]) }
   const defaultModel = join(homedir(), '.config/superagent-personal/model.json')
   const model = process.env.PA_MODEL_CONFIG ? resolve(process.env.PA_MODEL_CONFIG) :
     !desktop && existsSync(defaultModel) ? defaultModel : join(roots.config, 'model.json')
@@ -195,9 +213,22 @@ export async function main(args = process.argv.slice(2)) {
     const authorReady = detail.available === true && detail.authPresent === true &&
       detail.evidence?.status === 'PASS_REAL_NATIVE_PRODUCT' && typeof detail.evidence.profileVersion === 'string' &&
       detail.version === detail.evidence.profileVersion
-    if (!authorReady) {
+    let inspectedReceiver = false
+    try {
+      // Import only this install's fixed receiver detector. No profile, env or HTTP chooses code.
+      const helper = join(realpathSync(ctx.env.PA_INSTALL_ROOT), 'apps/launcher/lib/inspected-startup.mjs')
+      const stat = lstatSync(helper)
+      if (stat.isFile() && !stat.isSymbolicLink() && realpathSync(helper) === helper) {
+        const module = await import(pathToFileURL(helper).href)
+        inspectedReceiver = typeof module.hasInspectedNativeStartup === 'function' &&
+          await module.hasInspectedNativeStartup({ installRoot: ctx.env.PA_INSTALL_ROOT, stateRoot: ctx.roots.data })
+      }
+    } catch { /* Legacy installs retain their original explicit discussion-only fallback. */ }
+    if (!authorReady && !inspectedReceiver) {
       discussionOnly = true
       process.stdout.write('原启动器尚未确认可用的开发执行器，本次明确以仅对话模式启动。\n')
+    } else if (!authorReady) {
+      process.stdout.write('正在打开执行器检查工作台；开发执行须经后端能力检查与当前明确授权。\n')
     }
   }
   process.stdout.write(`个人预览 ${manifest.inner.buildId}\n私有数据：${ctx.root}\n模型配置：${ctx.model}\n请保留启动窗口；结束时双击 Stop.command。\n`)
