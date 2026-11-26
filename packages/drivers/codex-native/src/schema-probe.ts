@@ -37,6 +37,14 @@ export function codexRequiredSurface(): RequiredSurface {
     notifications: ['item/started', 'item/completed', 'turn/completed', 'thread/tokenUsage/updated'],
     serverRequestPatterns: ['requestApproval', 'requestUserInput'],
     requestIdTypes: ['integer', 'string'],
+    requiredFields: { initialize: ['clientInfo'], 'turn/start': ['threadId', 'input'], 'turn/steer': ['threadId', 'expectedTurnId', 'input'], 'turn/interrupt': ['threadId', 'turnId'] },
+    fieldTypes: {
+      initialize: { clientInfo: ['object'], capabilities: ['object'] },
+      'thread/start': { model: ['string', 'null'], approvalPolicy: ['string', 'null'], sandbox: ['string', 'null'] },
+      'turn/start': { threadId: ['string'], input: ['array'] },
+      'turn/steer': { threadId: ['string'], expectedTurnId: ['string'], input: ['array'] },
+      'turn/interrupt': { threadId: ['string'], turnId: ['string'] },
+    },
   }
 }
 
@@ -75,15 +83,22 @@ function typeValues(node: unknown, definitions: Json, seen = new Set<string>()):
   }
   const found: string[] = []
   if (typeof value.type === 'string') found.push(value.type)
+  if (Array.isArray(value.type)) for (const type of value.type) if (typeof type === 'string') found.push(type)
   for (const key of ['anyOf', 'oneOf']) for (const item of asArray(value[key])) found.push(...typeValues(item, definitions, seen))
   return found
 }
 
 function definitionProperties(node: Json, definitions: Json): string[] {
+  return Object.keys(definitionSchema(node, definitions).properties ?? {})
+}
+function definitionSchema(node: Json, definitions: Json): { properties: Json; required: string[] } {
   const ref = typeof node.$ref === 'string' ? node.$ref.split('/').pop() : undefined
   const target = ref ? asObject(definitions[ref]) : node
-  const properties = asObject(target.properties)
-  return Object.keys(properties)
+  return { properties: asObject(target.properties), required: asArray(target.required).filter(item => typeof item === 'string') as string[] }
+}
+function fieldTypesOf(node: Json, definitions: Json): Record<string, string[]> {
+  const target = definitionSchema(node, definitions)
+  return Object.fromEntries(Object.entries(target.properties).map(([name, schema]) => [name, [...new Set(typeValues(schema, definitions))].sort()]))
 }
 
 /** Parse the generated Codex schema files into the shared ProtocolSurface. */
@@ -97,6 +112,8 @@ export function observeCodexSchema(files: {
   const definitions = asObject(client.definitions)
   const methods: string[] = []
   const requestFields: Record<string, string[]> = {}
+  const fieldTypes: Record<string, Record<string, string[]>> = {}
+  const requiredFields: Record<string, string[]> = {}
   const enums: Record<string, string[]> = {}
   for (const entry of asArray(client.oneOf)) {
     const request = asObject(entry)
@@ -105,6 +122,8 @@ export function observeCodexSchema(files: {
     if (!method) continue
     methods.push(method)
     requestFields[method] = definitionProperties(asObject(properties.params), definitions).sort()
+    fieldTypes[method] = fieldTypesOf(asObject(properties.params), definitions)
+    requiredFields[method] = [...definitionSchema(asObject(properties.params), definitions).required].sort()
     enums[method] = [...new Set(enumValues(properties.params, definitions))].sort()
   }
   const notifications: string[] = []
@@ -116,6 +135,8 @@ export function observeCodexSchema(files: {
     notifications.push(method)
     enums[method] = [...new Set([...(enums[method] ?? []), ...enumValues(properties.params, notificationDefs)])].sort()
     requestFields[method] = [...new Set([...(requestFields[method] ?? []), ...definitionProperties(asObject(properties.params), notificationDefs)])].sort()
+    fieldTypes[method] = { ...(fieldTypes[method] ?? {}), ...fieldTypesOf(asObject(properties.params), notificationDefs) }
+    requiredFields[method] = [...new Set([...(requiredFields[method] ?? []), ...definitionSchema(asObject(properties.params), notificationDefs).required])].sort()
   }
   const serverRequests: string[] = []
   const serverDefs = asObject(asObject(files.serverRequest).definitions)
@@ -129,12 +150,17 @@ export function observeCodexSchema(files: {
     wireVersion: 'codex-app-server-json-schema',
     methods: [...methods].sort(), requestFields: Object.fromEntries(Object.entries(requestFields).sort(([a], [b]) => a < b ? -1 : 1)),
     enums: Object.fromEntries(Object.entries(enums).sort(([a], [b]) => a < b ? -1 : 1)),
+    fieldTypes: Object.fromEntries(Object.entries(fieldTypes).sort(([a], [b]) => a < b ? -1 : 1)),
+    requiredFields: Object.fromEntries(Object.entries(requiredFields).sort(([a], [b]) => a < b ? -1 : 1)),
     notifications: [...notifications].sort(), serverRequests: [...serverRequests].sort(), requestIdTypes,
   }
   return { ...canonical, schemaDigest: createHash('sha256').update(JSON.stringify(canonical)).digest('hex') }
 }
 
-export type CodexSurfaceProbeOptions = { executable: string; argv?: readonly string[]; timeoutMs?: number; version?: string }
+export type CodexSurfaceProbeOptions = { executable: string; argv?: readonly string[]; timeoutMs?: number; version?: string
+  /** Trusted local inspection runner; product startup supplies its no-signal command owner. */
+  runCommand?: (executable: string, argv: readonly string[]) => Promise<{ stdout: string }>
+}
 
 /**
  * Run the zero-model probe against one installed Codex. Returns observed facts or an explicit
@@ -142,10 +168,13 @@ export type CodexSurfaceProbeOptions = { executable: string; argv?: readonly str
  */
 export async function probeCodexSurface(options: CodexSurfaceProbeOptions): Promise<SurfaceObservation> {
   const evidence: string[] = []
+  const execute = (argv: readonly string[]) => options.runCommand
+    ? options.runCommand(options.executable, argv)
+    : run(options.executable, [...argv], { timeout: options.timeoutMs ?? 15000, maxBuffer: 256 * 1024, encoding: 'utf8' })
   let version = options.version
   try {
     if (version === undefined) {
-      const result = await run(options.executable, ['--version'], { timeout: options.timeoutMs ?? 15000, maxBuffer: 64 * 1024, encoding: 'utf8' })
+      const result = await execute(['--version'])
       version = String(result.stdout).trim().split('\n').pop()?.trim().replace(/^codex-cli\s+/i, '')
       if (!version) return { status: 'failed', reason: 'version_unreadable', evidenceRefs: evidence }
     }
@@ -156,7 +185,7 @@ export async function probeCodexSurface(options: CodexSurfaceProbeOptions): Prom
       const command = argv.includes('app-server')
         ? [...argv, 'generate-json-schema', '--out', dir]
         : [...argv, 'app-server', 'generate-json-schema', '--out', dir]
-      await run(options.executable, command, { timeout: options.timeoutMs ?? 15000, maxBuffer: 256 * 1024, encoding: 'utf8' })
+      await execute(command)
       const read = async (name: string): Promise<unknown> => JSON.parse(await readFile(join(dir, name), 'utf8'))
       const surface = observeCodexSchema({
         clientRequest: await read('ClientRequest.json'),
