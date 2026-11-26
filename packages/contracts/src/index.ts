@@ -26,6 +26,7 @@ export * from './recovery-activation.ts';
 export * from './proposal-commands.ts';
 export * from './recovery-target.ts';
 export * from './recovery-target-authorization.ts';
+export * from './execution-compatibility.ts';
 export * from './context-preview.ts';
 export * from './assistant-context.ts';
 export * from './assistant-records.ts';

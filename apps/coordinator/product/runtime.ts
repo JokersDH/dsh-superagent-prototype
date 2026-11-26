@@ -5,7 +5,7 @@ import type { ApplicationOptions } from '@personal-agent/application'
 import { sharedAttentionRanker } from '@personal-agent/routing'
 import { recoveryTargetInventory } from '@personal-agent/storage'
 import type { AssistantContextBindings, AssistantContextHistory, AssistantContextPrepare, AssistantContextSend, AssistantReplyResults, AttentionRanker, ContextPreviewInput, ConversationCommand, DecisionCommand, DecisionPrepare, NativeQuestionBinding, ProjectSettingsCommand, ProposalCommand, ProposalPrepare, RecoveryActivationCommit, RecoveryPrepare, RecoveryTargetInventoryReader, RecoveryTargetMaterial, RecoveryTargetMaterializer, RecoveryTargetPrepareInput, ReviewActivity, Scope, TrustedActor } from '@personal-agent/contracts'
-import { ExecutionUnavailableReasonSchema, WorkEvidenceSchema } from '@personal-agent/contracts'
+import { ExecutionProfileViewSchema, ExecutionUnavailableReasonSchema, WorkEvidenceSchema } from '@personal-agent/contracts'
 import type { AgentProfile, ExecutionUnavailableReason, RecoverySourcePrepare, RecoverySourceConfirm, RecoveryTargetAuthorize } from '@personal-agent/contracts'
 import { key } from '@personal-agent/orchestrator-core'
 import type { Ticket } from '@personal-agent/orchestrator-core'
@@ -80,6 +80,11 @@ export function createProductRuntime(
 ) {
   const unavailable = options.executionUnavailable === undefined ? undefined : ExecutionUnavailableReasonSchema.parse(options.executionUnavailable)
   if (unavailable && options.native) throw new TypeError('Unavailable execution cannot contain an admitted native runtime')
+  if (options.native?.profileView) {
+    const view = ExecutionProfileViewSchema.parse(options.native.profileView), profile = options.native.profile
+    if (view.id !== profile.id || view.revision !== profile.revision || view.driverId !== profile.driverId || view.kind !== 'native' || !view.dispatchAllowed)
+      throw new TypeError('The native public projection must match the trusted admitted runtime profile')
+  }
   // A real native runtime never offers the fixed scratch executors as a selectable alternative.
   const fixtureProfiles = unavailable || options.native ? [] : FIXTURE_PROFILES
   options = {
@@ -401,7 +406,7 @@ export function createProductRuntime(
             readiness: unavailable === 'not_installed' ? 'missing' as const : unavailable === 'needs_auth' ? 'needs_auth' as const : unavailable === 'incompatible_version' || unavailable === 'unsupported_platform' ? 'incompatible' as const : 'needs_setup' as const }] : []),
           ...(options.native
             ? [
-                {
+                options.native.profileView ?? {
                   id: options.native.profile.id,
                   revision: options.native.profile.revision,
                   displayName: 'Codex · 本机开发',
