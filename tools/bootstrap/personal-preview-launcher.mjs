@@ -72,6 +72,9 @@ function context(manifest) {
     if (!existsSync(target) || !lstatSync(target).isDirectory() || lstatSync(target).isSymbolicLink() ||
       (lstatSync(target).mode & 0o077) !== 0 || lstatSync(target).uid !== process.getuid?.())
       throw new Error('所选工作区必须是当前用户拥有的既有私有目录；不会创建或替换它。')
+    const targetFile = join(target, 'recovery-target.json')
+    if (!existsSync(targetFile) || !lstatSync(targetFile).isFile() || lstatSync(targetFile).isSymbolicLink())
+      throw new Error('所选目录不是已准备的恢复后工作区；路径选择不能绕过原恢复授权。')
     if (existsSync(join(target, 'state.sqlite')) && !lstatSync(join(target, 'state.sqlite')).isFile())
       throw new Error('所选工作区的 state.sqlite 不是普通文件。')
     roots.data = target
