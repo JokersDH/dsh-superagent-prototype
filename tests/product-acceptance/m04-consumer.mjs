@@ -16,6 +16,7 @@ import { spawn, spawnSync } from 'node:child_process'
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { DatabaseSync } from 'node:sqlite'
+import { ExecutionProfileViewSchema } from '../../packages/contracts/src/configuration.ts'
 import { openBrowser } from './lib/browser.mjs'
 
 const ROOT = resolve('.')
@@ -195,6 +196,63 @@ function launcher(env, args) {
   return { status: result.status, json, stdout: result.stdout.slice(-600), stderr: result.stderr.slice(-600) }
 }
 
+function processIdentity(pid) {
+  if (!pid) return null
+  const result = sh('ps', ['-p', String(pid), '-o', 'pid=,ppid=,uid=,lstart=,command='])
+  return result.status === 0 ? result.stdout.trim() : null
+}
+
+/** Normal application quit by exact process identity; no signal is sent and a failed quit stays UNKNOWN. */
+async function quitApplication(pid) {
+  if (!pid) return { ok: false, reason: 'missing_pid' }
+  const before = processIdentity(pid)
+  if (!before) return { ok: true, alreadyExited: true }
+  const script = `ObjC.import('AppKit'); var app = $.NSRunningApplication.runningApplicationWithProcessIdentifier(${pid}); if (app.isNil()) { 'missing' } else { app.terminate(); 'terminate_sent' }`
+  const sent = sh('/usr/bin/osascript', ['-l', 'JavaScript', '-e', script], { timeout: 15_000 })
+  for (let attempt = 0; attempt < 30; attempt += 1) {
+    await sleep(500)
+    if (!processIdentity(pid)) return { ok: true, method: 'NSRunningApplication.terminate', before, output: sent.stdout.trim() }
+  }
+  const retry = sh('/usr/bin/osascript', ['-l', 'JavaScript', '-e', script], { timeout: 15_000 })
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    await sleep(500)
+    if (!processIdentity(pid)) return { ok: true, method: 'NSRunningApplication.terminate_retry', before, output: retry.stdout.trim() }
+  }
+  // Duplicate copies of the same bundle can refuse the per-process terminate; a normal application quit
+  // event is the packaged app's own exit path and carries no signal.
+  const appQuit = sh('/usr/bin/osascript', ['-e', 'tell application id "com.jokersdh.personalagent" to quit'], { timeout: 15_000 })
+  for (let attempt = 0; attempt < 30; attempt += 1) {
+    await sleep(500)
+    if (!processIdentity(pid)) return { ok: true, method: 'application_quit_event', before, output: appQuit.stdout.trim() }
+  }
+  // Exact-PID menu Quit is the same user-visible application exit path; no signal or force quit.
+  const menuScript = `tell application "System Events"
+  tell (first process whose unix id is ${pid})
+    set frontmost to true
+    delay 0.5
+    repeat with barItem in menu bar items of menu bar 1
+      try
+        click menu item "退出个人 Agent 助理" of menu 1 of barItem
+        return "clicked"
+      end try
+    end repeat
+  end tell
+end tell`
+  let menuQuit = sh('/usr/bin/osascript', ['-e', menuScript], { timeout: 20_000 })
+  for (let attempt = 0; attempt < 30; attempt += 1) {
+    await sleep(500)
+    if (!processIdentity(pid)) return { ok: true, method: 'exact_pid_application_menu_quit', before, output: menuQuit.stdout.trim() }
+  }
+  // A first user Quit may cancel while the shared packaged stop is settling; a second normal Quit is retried.
+  menuQuit = sh('/usr/bin/osascript', ['-e', menuScript], { timeout: 20_000 })
+  for (let attempt = 0; attempt < 30; attempt += 1) {
+    await sleep(500)
+    if (!processIdentity(pid)) return { ok: true, method: 'exact_pid_application_menu_quit_retry', before, output: menuQuit.stdout.trim() }
+  }
+  return { ok: false, reason: 'normal_app_quit_timeout_or_refused', before, identity: processIdentity(pid), output: sent.stdout.trim(),
+    retryOutput: retry.stdout.trim(), appQuit: appQuit.stdout.trim(), menuQuit: menuQuit.stdout.trim() }
+}
+
 async function launchChecks(facts, envBase) {
   const checks = {}
   const check = (name, ok, detail) => { checks[name] = { ok: !!ok, detail } }
@@ -229,12 +287,7 @@ async function launchChecks(facts, envBase) {
     const configuration = await configResponse.json()
     facts.configuration = configuration
     const compatibility = inspectCompatibility(configuration)
-    check('compatibility_surface', compatibility.state === 'present', compatibility)
-    check('unknown_not_native_test_passed', compatibility.state !== 'present' ||
-      compatibility.profiles.every(item => item.classification === 'verified' || item.nativeTestPassed === false), compatibility.profiles)
-    check('ui_admission_consistency', compatibility.state !== 'present' ||
-      compatibility.profiles.every(item => item.dispatchAllowed === (item.classification === 'verified' ||
-        (item.classification === 'compatible_unverified' && item.explicitTrialAdmission === true))), compatibility.profiles)
+    Object.assign(checks, compatibilityChecks(compatibility))
     const browser = await openBrowser({ root: ROOT })
     try {
       await browser.page.goto(instance.consoleURL, { waitUntil: 'domcontentloaded' })
@@ -242,6 +295,21 @@ async function launchChecks(facts, envBase) {
       const body = await browser.page.locator('body').innerText()
       facts.ui = { url: instance.consoleURL, chinese: /工作台|主对话|待决定/u.test(body), text: body.slice(0, 600) }
       check('chinese_ui', facts.ui.chinese, facts.ui.text)
+      if (compatibility.state === 'present') {
+        await page.getByRole('button', { name: '新建委托', exact: true }).click().catch(() => {})
+        const form = page.locator('form').filter({ has: page.locator('textarea') }).first()
+        const profileSelect = form.getByRole('combobox', { name: '开发执行器', exact: true })
+        const options = await profileSelect.locator('option').evaluateAll(elements => elements.map(option => ({ value: option.value,
+          text: option.textContent, disabled: option.disabled }))).catch(() => [])
+        facts.ui.profileOptions = options
+        const blocked = compatibility.profiles.filter(item => item.dispatchAllowed === false).map(item => item.id)
+        const allowed = compatibility.profiles.filter(item => item.dispatchAllowed === true).map(item => item.id)
+        check('ui_profile_options', blocked.every(id => !options.some(option => option.value === id && !option.disabled)) &&
+          allowed.every(id => options.some(option => option.value === id && !option.disabled)), { options, blocked, allowed })
+        await page.keyboard.press('Escape').catch(() => {})
+      } else {
+        check('ui_profile_options', false, { reason: 'compatibility_absent' })
+      }
     } finally { await browser.close().catch(() => {}) }
     // Duplicate app path must not create a second writer/instance identity.
     const duplicate = spawn(join(facts.duplicateApp, 'Contents/MacOS/PersonalAgent'), [], { cwd: facts.duplicateApp, env, stdio: 'ignore' })
@@ -250,11 +318,15 @@ async function launchChecks(facts, envBase) {
     const afterDuplicate = launcher({ app: facts.app, processEnv: env }, ['status'])
     check('duplicate_path_reuses_instance', afterDuplicate.json?.instance?.pid === instance.pid &&
       afterDuplicate.json?.instance?.processStart === instance.processStart, { before: instance.pid, after: afterDuplicate.json?.instance?.pid })
-    try { duplicate.kill('SIGTERM') } catch { /* already exited */ }
-    // Normal packaged stop, then reopen through the packaged app.
+    // Normal packaged stop first, then normal application quits. Stopping the shared backend before
+    // quitting either window avoids a synthetic duplicate app waiting on its own quit.
     const stop = launcher({ app: facts.app, processEnv: env }, ['stop'])
     check('packaged_stop', stop.json?.status === 'STOPPED' && stop.json?.stillAlive === false, stop.json ?? stop.stderr)
     facts.stop = stop.json ?? null
+    const firstQuit = await quitApplication(app.pid)
+    check('first_app_quit_normal', firstQuit.ok, firstQuit)
+    const duplicateQuit = await quitApplication(duplicate.pid)
+    check('duplicate_app_quit_normal', duplicateQuit.ok, duplicateQuit)
     const reopen = spawn(appExe, [], { cwd: facts.app, env, stdio: 'ignore' })
     facts.processes.push({ role: 'reopen-app', pid: reopen.pid })
     let reopened = null
@@ -267,7 +339,8 @@ async function launchChecks(facts, envBase) {
       reopened?.json ?? null)
     const stop2 = launcher({ app: facts.app, processEnv: env }, ['stop'])
     check('packaged_stop_after_reopen', stop2.json?.status === 'STOPPED', stop2.json ?? stop2.stderr)
-    try { reopen.kill('SIGTERM') } catch { /* already exited */ }
+    const reopenQuit = await quitApplication(reopen.pid)
+    check('reopen_app_quit_normal', reopenQuit.ok, reopenQuit)
     // Negative admission probe: an unknown CLI version must stay disabled and never become native_test_passed.
     const fakeBin = join(envBase, 'bin'); mkdirSync(fakeBin, { recursive: true, mode: 0o700 })
     writeFileSync(join(fakeBin, 'codex'), '#!/bin/sh\nif [ "$1" = "--version" ]; then echo "codex-cli 0.0.0-unknown"; exit 0; fi\nexit 0\n', { mode: 0o700 })
@@ -298,14 +371,17 @@ async function launchChecks(facts, envBase) {
     }
     const unknownStop = launcher({ app: facts.app, processEnv: fakeEnv }, ['stop'])
     check('unknown_executor_stop', unknownStop.json?.status === 'STOPPED', unknownStop.json ?? unknownStop.stderr)
-    try { unknownApp.kill('SIGTERM') } catch { /* already exited */ }
+    const unknownQuit = await quitApplication(unknownApp.pid)
+    check('unknown_executor_quit_normal', unknownQuit.ok, unknownQuit)
     // Official stop path used by the packaged launcher; GUI button remains a later app-level assertion.
     facts.launchMethod = 'app executable start; packaged launcher status/stop; duplicate app path; unknown executor negative probe'
     return { checks, env, app }
   } finally {
-    try { app.kill('SIGTERM') } catch { /* exited */ }
+    const leftover = await quitApplication(app.pid)
+    if (!leftover.ok && processIdentity(app.pid)) checks.final_app_quit_normal = { ok: false, detail: leftover }
+    else checks.final_app_quit_normal = { ok: true, detail: leftover }
     await sleep(500)
-    facts.processes = (facts.processes ?? []).map(item => ({ ...item, identity: exactProcess(item.pid) }))
+    facts.processes = (facts.processes ?? []).map(item => ({ ...item, identity: processIdentity(item.pid) }))
   }
 }
 
@@ -317,25 +393,51 @@ function exactProcess(pid) {
 
 function inspectCompatibility(configuration) {
   const profiles = Array.isArray(configuration?.profiles) ? configuration.profiles : []
-  const candidates = profiles.filter(profile => profile && typeof profile === 'object')
-  if (!candidates.length) return { state: 'absent', reason: 'no_profiles' }
-  const classify = item => {
-    const raw = item.compatibility ?? item.compatibilityClass ?? item.admission ?? item.versionClass ??
-      item.classification ?? item.versionEvidence?.classification ?? null
-    const value = typeof raw === 'string' ? raw : raw?.classification ?? raw?.state ?? null
-    return value
-  }
-  const mapped = candidates.map(item => {
-    const raw = classify(item)
-    const classification = ['verified', 'compatible_unverified', 'incompatible', 'unknown'].includes(raw) ? raw : 'unknown'
-    return { id: item.id ?? item.profileId ?? null, classification, raw,
-      nativeTestPassed: item.nativeTestPassed ?? item.versionEvidence?.nativeTestPassed ?? null,
-      dispatchAllowed: item.dispatchAllowed ?? item.dispatch ?? null,
-      explicitTrialAdmission: item.explicitTrialAdmission ?? item.trialAdmission ?? false,
-      label: item.label ?? item.classificationLabel ?? null }
+  const mapped = profiles.map(profile => {
+    let parsed = null, parseError = null
+    try { parsed = ExecutionProfileViewSchema.parse(profile) } catch (error) { parseError = String(error?.message ?? error).slice(0, 300) }
+    const compatibility = parsed?.compatibility ?? null
+    if (!compatibility) return { id: profile?.id ?? null, valid: false, reason: parseError ?? 'compatibility_missing', raw: profile }
+    const operations = compatibility.operations ?? []
+    const nativeTestPassed = parsed.readiness === 'native_test_passed'
+    return { id: parsed.id, revision: parsed.revision, readiness: parsed.readiness, dispatchAllowed: parsed.dispatchAllowed,
+      classification: compatibility.classification, nativeVersion: compatibility.nativeVersion,
+      protocol: compatibility.protocol, schemaDigest: compatibility.schemaDigest, checkedAt: compatibility.checkedAt,
+      operations: operations.map(item => ({ operation: item.operation, supported: item.supported, validation: item.validation, enabled: item.enabled })),
+      trialAdmission: parsed.trialAdmission ?? null, nativeTestPassed, valid: true, parseError: null }
   })
-  const present = mapped.some(item => item.raw !== null)
-  return { state: present ? 'present' : 'absent', reason: present ? null : 'compatibility_metadata_missing', profiles: mapped }
+  const present = profiles.length > 0 && mapped.every(item => item.valid)
+  const noCompatibilityField = profiles.length > 0 && profiles.every(profile => profile?.compatibility === undefined)
+  return { state: profiles.length === 0 || noCompatibilityField ? 'absent' : present ? 'present' : 'malformed',
+    reason: profiles.length === 0 ? 'no_profiles' : noCompatibilityField ? 'compatibility_metadata_missing' : present ? null : 'contract_invalid', profiles: mapped }
+}
+
+function compatibilityChecks(compatibility) {
+  const checks = {}
+  const check = (name, ok, detail) => { checks[name] = { ok: !!ok, detail: detail ?? null } }
+  if (compatibility.state !== 'present') {
+    for (const name of ['compatibility_contract_valid', 'unknown_incompatible_disabled', 'native_pass_requires_verified',
+      'protocol_operations_disabled', 'trial_admission_explicit', 'dispatch_matches_admission'])
+      check(name, false, compatibility)
+    return checks
+  }
+  const profiles = compatibility.profiles
+  check('compatibility_contract_valid', profiles.every(item => item.valid &&
+    ['verified', 'compatible_unverified', 'incompatible', 'unknown'].includes(item.classification) &&
+    Number.isSafeInteger(item.revision) && typeof item.checkedAt === 'string'), profiles)
+  check('unknown_incompatible_disabled', profiles.filter(item => ['unknown', 'incompatible'].includes(item.classification))
+    .every(item => item.dispatchAllowed === false && item.operations.every(operation => operation.enabled === false)), profiles)
+  check('native_pass_requires_verified', profiles.every(item => item.nativeTestPassed === (item.classification === 'verified')),
+    profiles.map(item => ({ id: item.id, readiness: item.readiness, classification: item.classification })))
+  check('protocol_operations_disabled', profiles.every(item => item.operations
+    .filter(operation => operation.validation === 'protocol' || operation.validation === 'unobserved')
+    .every(operation => operation.enabled === false)), profiles)
+  check('trial_admission_explicit', profiles.every(item => item.classification !== 'compatible_unverified' || item.dispatchAllowed === false ||
+    (item.trialAdmission?.mode === 'explicit_trial' && /^[a-f0-9]{64}$/u.test(item.trialAdmission.identityDigest ?? '') &&
+      /^[a-f0-9]{64}$/u.test(item.trialAdmission.policyDigest ?? '') && typeof item.trialAdmission.confirmationCommandId === 'string')), profiles)
+  check('dispatch_matches_admission', profiles.every(item => item.classification === 'verified' ? true :
+    item.classification === 'compatible_unverified' ? (item.dispatchAllowed === (item.trialAdmission?.mode === 'explicit_trial')) : item.dispatchAllowed === false), profiles)
+  return checks
 }
 
 function inspectRecovery(configuration, readiness, status) {
@@ -362,14 +464,18 @@ async function runPackage(dmg, options, cohort) {
     processes: staticFacts.processes, launchMethod: staticFacts.launchMethod }
   const healthNames = ['packaged_start_running', 'fresh_home_state', 'no_checkout_or_global_node', 'readiness_observed',
     'no_fixture_fallback', 'chinese_ui', 'duplicate_path_reuses_instance', 'packaged_stop', 'packaged_reopen', 'packaged_stop_after_reopen', 'unknown_executor_start_running', 'unknown_executor_disables_development',
-    'unknown_executor_not_native_passed', 'unknown_executor_no_fixture', 'unknown_executor_stop']
+    'unknown_executor_not_native_passed', 'unknown_executor_no_fixture', 'unknown_executor_stop',
+    'first_app_quit_normal', 'duplicate_app_quit_normal', 'reopen_app_quit_normal', 'unknown_executor_quit_normal', 'final_app_quit_normal']
   const launchOk = healthNames.every(name => launched.checks[name]?.ok === true)
   const compatibility = inspectCompatibility(staticFacts.configuration)
   const recovery = inspectRecovery(staticFacts.configuration, staticFacts.readiness, staticFacts.status)
+  const compatibilityContract = compatibilityChecks(compatibility)
+  const compatibilityOk = compatibility.state === 'present' && Object.values(compatibilityContract).every(item => item.ok)
   evidence.compatibility = compatibility
+  evidence.compatibilityContract = compatibilityContract
   evidence.recovery = recovery
   evidence.items = {
-    L1_1_compatibility_ui: compatibility.state === 'present' ? 'PASS' : 'BLOCKED',
+    L1_1_compatibility_ui: compatibility.state === 'present' && compatibilityOk ? 'PARTIAL' : 'BLOCKED',
     L1_2_package_identity: 'PASS',
     L1_5_start_stop_locale_paths: launchOk ? 'PASS' : 'FAIL',
     L1_4_recovery_new_authorization: recovery.state === 'present' ? 'BLOCKED' : 'BLOCKED',
