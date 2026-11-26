@@ -1,5 +1,7 @@
 # 从这里开始：仓库、代码位置和并行开发
 
+**2026-11-26第二次续验：主线版本试用与桌面切根已接通源码。** `ddb43c89/83609dc6/b11ec430`为当前可消费代码，新增入口见[产品手册第10节](docs/PRODUCT-GUIDE.zh-CN.md)。CLI0.164.0/0.169.0-alpha.11.1只做零模型协议检查；旧DMG未更新。ACP仍待实际策略与完整能力准入，E待整包消费者修复，不把source或旧包当F0。以下同日较早的原P1记录按历史读，最新事实见[RFC0096末节](docs/rfcs/WP-16/0096-milestone-04-protocol-admission-and-target-authorization.md)。
+
 **2026-11-26当前：已核对B/D/E首批交付，继续同一个里程碑04。** [当前三段续工话术](agent-tasks/milestone-04/continue-prompts.zh-CN.md)分别发B、D、E；main已接共享诊断与公共兼容/显式试用投影。ACP仍有原payload/授权/资源阻断，D候选为旧引擎、E为HARNESS_ONLY，不能当F0/跨机通过。清单仍0/13，两个结果线不变；下一步是正常安装新根入口和原产品第二协议，创新尚未启动。
 
 **2026-11-24当前：里程碑04开工准备已完成，第二协议与产品创新方向重新开放。** 先执行[同事可用与第二协议计划](docs/product/MILESTONE-04.zh-CN.md)，只把[对应开工话术](agent-tasks/milestone-04/forward-prompts.zh-CN.md)分别发给B、D、E；main同步负责公共接线、新根授权和同事反馈，A/F按具体阻断参与。创新在第二协议真实出口成立后启动，不立即唤醒其他agent。当前清单0/13，未发本阶段真实任务；旧wave、旧预算及旧“不推进”决定按其历史日期阅读，原研究试点不恢复。

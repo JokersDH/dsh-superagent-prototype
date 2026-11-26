@@ -91,3 +91,23 @@ B41里版本/可执行digest/配置指纹含固定fixture值，ACP把v1定义复
 本次明确选取的49项契约/投影/原HTTP配置/兼容诊断/Codex既有协议测试通过，contracts生成校验和coordinator/console严格类型检查通过。共享Runner hash保持原值。未跑B41 live探针、B42原进程消费者、E包启动或历史故障实验；本次main真实模型/故障信号为0。D接正常安装新根入口，E按公共接口定义实际断言，B修原payload/策略/答案/物理状态；main继续默认多profile、实际probe/consent和能力控制接线。
 
 可消费的代码检查点为`33a69f44`及`4af915f2`。后者让恢复只读和未准入配置的逐操作enabled同步变为false，保留诊断/历史试用metadata但不展示可执行状态；同一原HTTP消费者已覆盖，49项回归复跑通过。三份续工话术引用这些固定接口，不需要等下一个共享类型包，也不把这份DTO当真实试用授权已经落地。
+
+## 同日第二次续验：版本试用已成为实际主线消费者
+
+代码检查点：`ddb43c89`采纳B的精确schema类型/required/partial修正及E独立恢复消费者；`83609dc6`接原Store版本同意、默认启动及UI；`b11ec430`接桌面切根与新接收协议。当前源码可以核对不同CLI版本并记录明确试用同意，但尚无本轮最终安装包或跨机结论，清单不按组件数量提前划全。
+
+B `9dd07424`已修复原输入、答案和journal推静止三组问题的主要代码。ACP仍未准入默认执行：策略JSON尚无当前实际执行来源、inspect为partial/unknown且缺完整准入观察入口、fs/terminal声明与请求实现不一致。没有为了跑通而由main写造enforced/passed。原B新grant记录0/6、not_ready，未宣布LIVE_READY。
+
+主线已实际接入：`GET /v1/executors/trial`仅检查、`POST /v1/executors/trial/confirm`要求明确同意，`GET /v1/executors/trial/receipts/:id`核对原未知响应。版本同意使用原command_receipts/EventLog/UoW，绑定principal、当前state目录/DB身份、machine、CLI身份和产品策略源码摘要；拷贝Store或更新身份不能继承同意。当前实例不热启用，下一正常启动重验后才可explicit_trial；实际新Work及begin前继续重验CLI摘要/原回执，变化时停止新发送，原运行身份不改写。resume等未核控制保持禁用。
+
+配置事实明确分层：`codex-product-request-policy-v1`只指产品固定argv/thread sandbox/审批/网络参数及其执行代码摘要，这些字节可冻结；操作者全量native resolved config仍标unobserved。协议兼容不等于native已验。原CodexProductDriver仍须在thread/start实际核cwd/sandbox/network/审批并提交policy.prepared，之后才可begin，UI同意不能替代该屏障。
+
+实际无模型检查覆盖本机Homebrew `0.164.0`、Node安装入口`0.164.0`及桌面内置`0.169.0-alpha.11.1`。最终代码`b11ec430`上重新核前后两种不同版本，schema摘要分别为`6ce9924fc181269820587dd6ed081029b09d4955bc26d23e6a6ece0a00e136a8`和`18790ab50329c539f7d04f47f2438c15e7bb743d40d413824fed48be40e97914`；均compatible_unverified、nativeTestPassed=false、操作enabled=0，未创建session/prompt或实际CLI试用同意。详细私有事实在`/Users/hh/Desktop/joker/pa-artifacts/m04-main-20261126/version-matrix/final.json`，不包含认证输出。
+
+实际受控工作台已操作“查版本→勾选→原同意写后503→刷新→GET同一command”，未重复POST；另复现并修复重检失败保留旧勾选的状态问题。最终桌面/390px检查和回执态独立审查ship，范围仅此UI扩展，0.999.1为fixture而非另一真实CLI版本。页面同意明确说明当前没有自动任务、需正常重开。
+
+D的`d33b5efa/827eddf2`方向正确，但切根存在output复用旧URL及task=nil不足以证明可切换。main按其两文件完成最小修复：每次launch清输出/递增代次，忽略旧回调，URL经过原status与当前选中root核对，只有原正常停止确认后允许切根，UNKNOWN保留；可选择历史恢复源（强readonly）或准备目标（须原grant）。launcher只在本安装确有`inspected-native-startup/1`接收协议时把执行准入留给backend，否则保留旧精确版本拒绝；显式discussion-only不变。最终wrapper已审SHA为`fcafba15e32daabfff908624a335f79abe2fdfea5f30a3fcca8556e2f0cbed94`。
+
+实际demo现会在创建credentials/Store前拒绝未授权目标；readonly授权查询改用自有私有DB/WAL快照，避免只读SQLite打开原目录时写-wal/-shm。真实进程入口负例核到拒绝且原DB摘要/目录不变。E `d9c0fe9d`的独立`m04-recovery.mjs`已原字节纳入，在main新私有根复验18断言通过；后置反例有顺序局限，不升格独立每类覆盖。E整包脚本仍有未声明page、按bundle ID广播退出和query失败当退出的问题，未导入或运行它。
+
+验证：113项明确选择的主线回归通过；15项launcher/桌面入口测试通过（与前者有重叠，不能相加成全产品准入）；verifier自身10项、严格类型检查、生成校验、Swift静态编译与网页构建通过。未跑旧fault实验；本段真实模型turn/故障信号0，十二用户实例未操作。源码已就绪供D/E消费，准确DMG仍等同包消费者；新版本真实交付、第二协议真实执行和同事实测均未借此认证。

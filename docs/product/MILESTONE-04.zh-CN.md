@@ -6,7 +6,7 @@
 
 开工话术：[main / B / D / E](../../agent-tasks/milestone-04/forward-prompts.zh-CN.md)。同事说明：[一页试用说明](../COLLEAGUE-TRIAL.zh-CN.md)。原目录、分支和所有权沿用[原表](../../agent-tasks/product-wave-36/dispatch.json)，不执行原表中的旧任务。
 
-2026-11-26请用[当前三段续工话术](../../agent-tasks/milestone-04/continue-prompts.zh-CN.md)。B诊断5个文件已精确接入、公共兼容/显式试用投影经原HTTP验证；ACP原输入消费已复现FAIL，策略/答案/静止仍需修。D候选仍封旧引擎，E为HARNESS_ONLY，不能当F0。实际范围和49项主线回归见[RFC0096末节](../rfcs/WP-16/0096-milestone-04-protocol-admission-and-target-authorization.md)。
+2026-11-26第二次续验：B的原输入/答案/静止问题已主要修复，当前阻断改为实际策略证据、完整兼容观察和客户端能力实现。main已把版本检查/原回执同意/正常重开接入，并修桌面切根及前置旧版本 gate；真实零模型检查覆盖0.164.0/0.169.0-alpha.11.1，E独立恢复HTTP消费者在main复验。未把旧包/组件当F0，实际范围与代码检查点见[RFC0096末节](../rfcs/WP-16/0096-milestone-04-protocol-admission-and-target-authorization.md)。仍继续[原两条线](../../agent-tasks/milestone-04/continue-prompts.zh-CN.md)，不启动M05。
 
 主线首个源码检查点：恢复后新根明确授权已进入默认HTTP/UI，原source保持只读、目标使用原命令回执持久化，相关31项安全测试和类型/构建通过。D接正常安装的新根入口，E继续独立验准确包；版本兼容/ACP尚待接入，因此清单仍0/13，不能为此提前冻结。源码、验证范围及本轮旧测试误触4次自有探针故障信号的记录见[RFC0096末节](../rfcs/WP-16/0096-milestone-04-protocol-admission-and-target-authorization.md)。没有新增真实模型发送。
 

@@ -1,5 +1,7 @@
 # 里程碑04续工：从组件交付到可用安装和第二协议
 
+本页下面是同日第一轮原持续责任。第二次验收后，请以`ddb43c89/83609dc6/b11ec430`和[RFC0096最新节](../../docs/rfcs/WP-16/0096-milestone-04-protocol-admission-and-target-authorization.md)继续：B原输入/答案/journal静止问题已修，不重复派它们；B只续当前实际策略/完整兼容入口/fs-terminal真实能力。main已修D桌面切根和旧版本前置gate，D消费同一源码验证实际安装链，不能覆盖回旧代码。E独立恢复消费者已在main复验，整包脚本的未声明page、bundle广播退出和查询失败当退出仍须修，之后才运行准确包。没有新wave或新增额度。
+
 2026-11-26。分别转发下列三段给B、D、E；沿用原目录/分支，不启动其他队列。仍是原M04的13项，不是新wave，不增加预算或验收项。先读根AGENTS、[M04](../../docs/product/MILESTONE-04.zh-CN.md)与[RFC0096](../../docs/rfcs/WP-16/0096-milestone-04-protocol-admission-and-target-authorization.md)。原开工话术的持续责任仍有效，本页补充实际验收反馈和现在已可消费的接口。
 
 当前可消费主线代码：`33a69f44`（诊断闭包、公共兼容和显式试用投影）及`4af915f2`（恢复只读下关闭逐操作可用状态）。先合入origin/main中的这两个代码检查点；仅共享文档变化不要求再次测试或打包。
