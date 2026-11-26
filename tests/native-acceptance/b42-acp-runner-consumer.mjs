@@ -18,6 +18,7 @@ import { attachRunnerAttempt } from '../../packages/execution/src/attached-attem
 import { connectRunnerRecovery } from '../../packages/execution/src/recovery-transport.ts'
 import { endpointDirectory } from '../../apps/runner/src/recovery-endpoint.ts'
 import { makeAttemptSpec, makeCommand } from '../../packages/testing/src/index.ts'
+import { canonicalDigest } from '../../packages/contracts/src/canonical.ts'
 
 const log = new CaseLog()
 const root = await mkdtemp(join(tmpdir(), 'pa-m04-acp-'))
@@ -59,8 +60,16 @@ let runner
 try {
   process.env.PA_RUNNER_RECOVERY_ROOT = join(root, 'recovery')
   process.env.PA_RUNNER_RECEIVER_LOG = join(root, 'receiver.jsonl')
+  const scope = { projectId: 'project-1', allowedPaths: ['.'], excludedPaths: [], externalActions: [] }
+  const policyPayloads = new Map([
+    [spec.policySnapshotRef, { kind: 'acp-v1-settings/1', workspacePath: root, scope, enforcement: 'enforced', verification: 'passed', policyEvidenceRef: 'policy-evidence-acp-1' }],
+    ['policy-evidence-acp-1', { kind: 'acp-v1-policy-evidence/1', workspacePath: root, scopeDigest: canonicalDigest(scope), enforcement: 'enforced', verification: 'passed', evidenceRefs: ['controlled-policy-evidence'] }],
+    ['input-acp', { inputId: 'input-acp', contract: spec.contract, text: 'Controlled ACP input text', contextRefs: [], sourceMessageRefs: [], provenance: 'authorized_work_input' }],
+  ])
   const link = new RunnerLink({ executable: process.execPath, entry: ENTRY, args: ['acp-v1', '--pure'], stateRoot: join(root, 'attempt'), producer })
-  link.bindPayload(spec.policySnapshotRef, { workspacePath: root, scope: { projectId: 'project-1', allowedPaths: ['.'], excludedPaths: [], externalActions: [] } })
+  link.bindPayload(spec.policySnapshotRef, policyPayloads.get(spec.policySnapshotRef))
+  link.bindPayload('policy-evidence-acp-1', policyPayloads.get('policy-evidence-acp-1'))
+  link.bindPayload('input-acp', policyPayloads.get('input-acp'))
   runner = await link.spawnAttempt({ ...spec, profile }, async fact => ({ factId: fact.factId, persisted: true, seq: commands.length }))
   const directory = endpointDirectory(process.env.PA_RUNNER_RECOVERY_ROOT, spec.attemptId)
   let registered = null
@@ -73,8 +82,9 @@ try {
   const state = await client.channelState()
   await client.channelNext('lease-acp-runner', state.generation)
   const facts = []
-  const policyPayloads = new Map([[spec.policySnapshotRef, { workspacePath: root, scope: { projectId: 'project-1', allowedPaths: ['.'], excludedPaths: [], externalActions: [] } }]])
   let questionAnswer
+  let beginResult = 'not_sent'
+  let preparedRef
   let sequence = 0
   const pump = async (page) => {
     const request = page?.request
@@ -85,7 +95,13 @@ try {
       if (fact.kind === 'question.opened' && !questionAnswer) {
         const raw = await fetchPayload(registered, context, fact.payloadRef)
         const target = raw?.value?.targets?.[0]
-        questionAnswer = { binding: target?.id, option: raw?.value?.presentation?.options?.[0]?.id ?? 'allow-once' }
+        questionAnswer = { binding: target, option: raw?.value?.presentation?.options?.[0]?.id }
+      }
+      if (fact.kind === 'policy.prepared' && !preparedRef) {
+        const raw = await fetchPayload(registered, context, fact.payloadRef)
+        preparedRef = `payload:${canonicalDigest(raw.value)}`
+        beginResult = await runner.command(makeCommand('begin', { ...attempt, id: 'cmd-acp-begin', inputRef: 'input-acp', preparedPolicyRef: preparedRef }))
+          .then(() => 'accepted').catch(error => `refused:${String(error?.message ?? error).slice(0, 160)}`)
       }
       await client.channelReply('lease-acp-runner', { v: 1, type: 'receipt', id: request.id, factId: fact.factId, receipt: { factId: fact.factId, persisted: true, seq: ++sequence } })
       return true
@@ -96,25 +112,35 @@ try {
       return true
     }
     if (request.type === 'native-write-intent') {
-      await client.channelReply('lease-acp-runner', { v: 1, type: 'write-admission', id: request.id, allowed: false })
+      // Controlled consumer guard: admit only the exact answer command this test sends.
+      const allowed = request.command?.kind === 'answer' && request.command?.id === 'cmd-acp-answer'
+      await client.channelReply('lease-acp-runner', { v: 1, type: 'write-admission', id: request.id, allowed })
       return true
     }
     return false
   }
-  const beginResult = await runner.command(makeCommand('begin', { ...attempt, id: 'cmd-acp-begin', inputRef: 'input-acp', preparedPolicyRef: spec.policySnapshotRef }))
-    .then(() => 'accepted').catch(error => `refused:${String(error?.message ?? error).slice(0, 160)}`)
   let answered = false
-  for (let index = 0; index < 800 && !facts.some(fact => fact.kind === 'turn.ended'); index += 1) {
+  for (let index = 0; index < 1000 && !facts.some(fact => fact.kind === 'turn.ended'); index += 1) {
     const page = await client.channelNext('lease-acp-runner').catch(() => null)
     if (await pump(page)) continue
-    if (questionAnswer && !answered) {
+    if (preparedRef && questionAnswer && !answered) {
       answered = true
-      await client.command(makeCommand('answer', { ...attempt, id: 'cmd-acp-answer', nativeBindingRef: questionAnswer.binding, answerRef: 'allow-once' }), 'lease-acp-runner').catch(() => undefined)
+      const bindingRef = 'binding-acp-1'
+      const answerRef = 'answer-acp-1'
+      const binding = questionAnswer.binding
+      policyPayloads.set(bindingRef, binding)
+      policyPayloads.set(answerRef, {
+        answerId: 'answer-acp-1', questionId: facts.find(fact => fact.kind === 'question.opened')?.factId ? (await fetchPayload(registered, context, facts.find(fact => fact.kind === 'question.opened').payloadRef)).value.id : 'acp-question',
+        questionVersion: 1, nativeBinding: binding, answer: { kind: 'choices', optionIds: [questionAnswer.option] }, authorityRef: 'authority-acp-1',
+      })
+      await client.command(makeCommand('answer', { ...attempt, id: 'cmd-acp-answer', nativeBindingRef: bindingRef, answerRef }), 'lease-acp-runner').catch(() => undefined)
     }
     await wait(10)
   }
   const earlyExit = await Promise.race([runner.waitExit().then(value => ({ value })).catch(error => ({ error: String(error) })), wait(500).then(() => null)])
   const receiver = (() => { try { return readFileSync(join(root, 'receiver.jsonl'), 'utf8').trim().split('\n').filter(Boolean) } catch { return [] } })()
+  const errorFact = facts.find(fact => fact.kind === 'runtime.error')
+  const errorPayload = errorFact ? await fetchPayload(registered, context, errorFact.payloadRef).catch(() => undefined) : undefined
   const kinds = facts.map(fact => fact.kind)
   const answerFact = facts.find(fact => fact.kind === 'answer.observed')
   let answerPayload
@@ -123,11 +149,11 @@ try {
     answerPayload = raw?.value
   }
   log.begin('M04-ACP-RUNNER-QUESTION-ANSWER', 'the ACP Driver runs through the original Runner and answers the exact native permission request', 'controlled_process')
-  log.evidence({ kinds, questionAnswer, answerPayload, beginResult, earlyExit, receiver })
-  const targetPreserved = answerPayload?.targetBindingId === questionAnswer?.binding && answerPayload?.answerId === 'allow-once'
+  log.evidence({ kinds, questionAnswer, answerPayload, beginResult, earlyExit, receiver, errorPayload })
+  const targetPreserved = answerPayload?.targetBindingId === questionAnswer?.binding?.id && answerPayload?.answerId === 'answer-acp-1'
   if (kinds.includes('question.opened') && kinds.includes('answer.observed') && kinds.includes('turn.ended') && targetPreserved) {
     log.pass('the fake ACP peer served initialize/session/prompt through the Runner; the original question target was answered (response_written) and the same attempt reached turn.ended')
-  } else log.fail(`ACP Runner consumer did not complete: ${JSON.stringify({ kinds, answerPayload, questionAnswer, beginResult, earlyExit, receiver })}`)
+  } else log.fail(`ACP Runner consumer did not complete: ${JSON.stringify({ kinds, answerPayload, questionAnswer, beginResult, earlyExit, receiver, errorPayload })}`)
 
   log.begin('M04-ACP-NO-REAL-PROMPT', 'controlled fake ACP peer; no model/native/network prompt', 'controlled_process')
   log.notTested('the ACP peer is a local controlled fake; real ACP prompt/approval/stop acceptance is not claimed and the six-send grant remains unused')

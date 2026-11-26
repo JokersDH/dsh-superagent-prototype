@@ -19,21 +19,16 @@ const host = {
 }
 const handshake: AcpHandshake = { protocolVersion: 1, agentName: 'OpenCode', agentVersion: '1.18.34', capabilities: { promptCapabilities: { embeddedContext: true } }, evidenceRefs: ['acp-initialize:1'] }
 
-test('ACP inspect classifies an initialize-only handshake without any prompt', async () => {
+test('ACP inspect records only the initialize handshake and refuses compatibility', async () => {
   const result = await inspectAcpCompatibility(profile, host, { handshake: async () => handshake })
-  assert.equal(result.verdict.class, 'compatible_unverified')
-  assert.equal(result.verdict.admission, 'trial')
-  assert.equal(result.report.readiness, 'inspection_passed')
+  assert.equal(result.verdict.class, 'unknown')
+  assert.equal(result.verdict.admission, 'disabled')
+  assert.equal(result.report.readiness, 'needs_setup')
+  assert.ok(result.verdict.identity)
+  assert.ok(result.verdict.reasons.some(reason => reason.includes('probe_partial')))
   assert.ok(!result.report.evidenceRefs.includes('native_test_passed'))
-  const verified = await inspectAcpCompatibility(profile, host, { handshake: async () => handshake, verifiedVersions: [{
-    profileId: profile.id, profileRevision: 1, driverId: profile.driverId, nativeVersion: handshake.agentVersion!,
-    executableDigest: D('a'), driverRelease: profile.driverRelease, wireVersion: 'acp-v1',
-    schemaDigest: acpObservedSurface(handshake).schemaDigest, evidenceRef: 'native:acp-run-1',
-  }] })
-  assert.equal(verified.verdict.class, 'verified')
   const wrong = await inspectAcpCompatibility(profile, host, { handshake: async () => ({ ...handshake, protocolVersion: 2 }) })
   assert.notEqual(wrong.verdict.class, 'compatible_unverified')
-  assert.equal(wrong.report.readiness, 'incompatible')
 })
 
 test('ACP surface requirements include real fields, enums, notifications and request ids', () => {
@@ -99,25 +94,28 @@ function fakeAcp(onPrompt?: (server: AcpConnection, value: Record<string, Json>)
   return { transport, server, task, stop: () => { stopped = true; server.close('stopped') } }
 }
 
-async function fixture(onPrompt?: (server: AcpConnection, value: Record<string, Json>) => Promise<void>, autoResolve = true) {
+async function fixture(onPrompt?: (server: AcpConnection, value: Record<string, Json>) => Promise<void>, autoResolve = true, guard: () => Promise<void> = async () => undefined) {
   const root = await mkdtemp(join(tmpdir(), 'pa-acp-test-'))
   const spec = makeAttemptSpec()
   const commands = new Queue<RunnerCommand>()
   const facts: CriticalFact[] = []
   const payloads = new Map<string, Json>()
   payloads.set(spec.policySnapshotRef, { workspacePath: root, scope: { projectId: 'project-1', allowedPaths: ['.'], excludedPaths: [], externalActions: [] } })
+  payloads.set('input-acp-begin', { inputId: 'input-acp-begin', contract: spec.contract, text: 'controlled ACP input', contextRefs: [], sourceMessageRefs: [], provenance: 'authorized_work_input' })
+  const payloadValues = new Map<string, Json>()
   const io = {
     commands,
     async record(fact: CriticalFact) { facts.push(fact); return { factId: fact.factId, persisted: true as const, seq: facts.length } },
     publishProgress() {},
     runtime: {} as never,
     payloads: {
-      async read(reference: string) { const value = payloads.get(reference); if (value === undefined) throw new Error('missing payload'); return value },
+      async read(reference: string) { const value = payloads.get(reference) ?? payloadValues.get(reference); if (value === undefined) throw new Error('missing payload'); return value },
       async store(payload: Json) { const ref = `payload-${payloads.size + 1}`; payloads.set(ref, payload); return ref },
     },
+    bind(reference: string, value: Json) { payloadValues.set(reference, value) },
   }
   const fake = fakeAcp(onPrompt, autoResolve)
-  return { root, spec, commands, facts, io, fake, driver: new AcpDriver({ connect: async () => fake.transport, timeoutMs: 3000 }), cleanup: async () => { fake.stop(); await rm(root, { recursive: true, force: true }) } }
+  return { root, spec, commands, facts, io, fake, driver: new AcpDriver({ connect: async () => fake.transport, timeoutMs: 3000, beforeAnswerWrite: guard }), cleanup: async () => { fake.stop(); await rm(root, { recursive: true, force: true }) } }
 }
 
 function payloadOf(facts: CriticalFact[], kind: string) {
@@ -142,10 +140,18 @@ test('begin sends one prompt; permission answer is response_written, not native_
   for (let index = 0; index < 200 && !payloadOf(f.facts, 'question.opened'); index += 1) await new Promise(resolve => setTimeout(resolve, 10))
   const question = payloadOf(f.facts, 'question.opened')
   assert.ok(question)
-  const questionValue = await f.io.payloads.read(question!.payloadRef) as { value?: { targets?: Array<{ id?: string }> } }
-  const bindingId = questionValue.value?.targets?.[0]?.id
-  assert.ok(bindingId)
-  f.commands.push(makeCommand('answer', { ...attemptOf(f.spec), id: 'cmd-acp-answer', nativeBindingRef: bindingId!, answerRef: 'allow-once' }))
+  const questionValue = await f.io.payloads.read(question!.payloadRef) as { value: { targets: Array<Record<string, unknown>>; presentation: { options: Array<{ id: string }> }; id: string; version: number } }
+  const binding = questionValue.value.targets[0]!
+  const optionId = questionValue.value.presentation.options[0]!.id
+  const bindingRef = 'binding-acp-test-1'
+  const answerRef = 'answer-acp-test-1'
+  // Store the exact original binding under the payload ref an answer command names.
+  const storedBinding = { ...binding }
+  // fixture store is private; use its read/store via a helper map exposed below
+  f.io.bind(bindingRef, storedBinding as never)
+  f.io.bind(answerRef, { answerId: 'answer-acp-test-1', questionId: questionValue.value.id, questionVersion: questionValue.value.version,
+    nativeBinding: binding, answer: { kind: 'choices', optionIds: [optionId] }, authorityRef: 'authority-1' } as never)
+  f.commands.push(makeCommand('answer', { ...attemptOf(f.spec), id: 'cmd-acp-answer', nativeBindingRef: bindingRef, answerRef }))
   const exit = await serve
   assert.equal(exit.reason, 'terminal')
   const answer = payloadOf(f.facts, 'answer.observed')
@@ -184,6 +190,24 @@ test('cancel writes session/cancel and never claims native_applied or physical q
   assert.ok(!f.facts.some(fact => fact.kind === 'answer.observed'))
   await f.cleanup()
 })
+
+test('reconcile never reports quiescent from a turn fact or journal alone', async () => {
+  const driver = new AcpDriver()
+  const ref = { ...attemptOf(makeAttemptSpec()), ownership: 'spawned_process', runnerIdentityRef: 'r', connectionEpoch: 1, journalRef: 'journal-1' }
+  const host = {
+    async readJournal() { return [{ kind: 'turn.ended' }, { kind: 'runtime.exited' }] as never },
+    async inspectRuntime() { return { status: 'terminal', writer: 'indeterminate', evidenceRefs: ['owned-runtime-unknown'] } },
+  }
+  const report = await driver.reconcile(ref as never, host as never)
+  assert.equal(report.status, 'terminal')
+  assert.equal(report.writer, 'indeterminate')
+  assert.ok(report.evidenceRefs.includes('owned-runtime-unknown'))
+  const unknownHost = { async readJournal() { return [] as never }, async inspectRuntime() { throw new Error('owned runtime unavailable') } }
+  const unknown = await driver.reconcile(ref as never, unknownHost as never)
+  assert.equal(unknown.writer, 'indeterminate')
+  assert.equal(unknown.status, 'indeterminate')
+})
+
 
 function attemptOf(spec: AttemptSpec) {
   return { ticketId: spec.ticketId, assignmentId: spec.assignmentId, attemptId: spec.attemptId, fenceEpoch: spec.fenceEpoch, contract: spec.contract }

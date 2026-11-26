@@ -22,5 +22,5 @@ export function createRealDriver(id: RealDriverId, hooks: { beforeAnswerWrite: (
   // Store, credential or second lifecycle. `beforeAnswerWrite` is the Runner's injected fresh guard.
   return id === 'codex-native'
     ? new CodexProductDriver({ beforeAnswerWrite: hooks.beforeAnswerWrite })
-    : new AcpDriver()
+    : new AcpDriver({ beforeAnswerWrite: hooks.beforeAnswerWrite })
 }

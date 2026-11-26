@@ -174,6 +174,13 @@ export class ProcessHost implements OwnedProcessHost {
     }
   }
 
+  /** Close one owned child's stdin normally (probe/handshake EOF), without stopping its process group. */
+  async closeInput(resourceRef: string): Promise<void> {
+    const handle = this.#handles.get(resourceRef)
+    if (!handle) throw new DriverError('transport_lost', 'unknown_resource', `Unknown resource: ${resourceRef}`)
+    handle.child.stdin.end()
+  }
+
   async write(resourceRef: string, frame: Uint8Array): Promise<void> {
     const handle = this.#handles.get(resourceRef)
     if (!handle) throw new DriverError('transport_lost', 'unknown_resource', `Unknown resource: ${resourceRef}`)

@@ -201,7 +201,8 @@ export class RunnerLink {
       // A mismatched claim is refused by the channel, so a neutral default would break every genuine
       // fixture run rather than express a real foreign producer.
       producer: this.#options.producer ?? {
-        source: (this.#options.args ?? []).some(arg => String(arg).startsWith('codex')) ? 'codex-native' : 'fake-driver',
+        source: (this.#options.args ?? []).includes('acp-v1') ? 'acp-v1'
+          : (this.#options.args ?? []).some(arg => String(arg).startsWith('codex')) ? 'codex-native' : 'fake-driver',
         runnerIdentityRef: `runner-${spec.attemptId}`,
       },
     })

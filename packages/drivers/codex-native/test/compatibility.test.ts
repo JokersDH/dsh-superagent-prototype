@@ -27,7 +27,15 @@ const surface = (over: Partial<ProtocolSurface> = {}): ProtocolSurface => ({
   },
   notifications: ['item/started', 'item/updated', 'item/completed', 'turn/completed', 'thread/tokenUsage/updated', 'config/changed'],
   serverRequests: ['item/commandExecution/requestApproval', 'item/fileChange/requestApproval', 'item/tool/requestUserInput'],
-  requestIdTypes: ['integer', 'string'], ...over,
+  requestIdTypes: ['integer', 'string'],
+  requiredFields: { initialize: ['clientInfo'], 'turn/start': ['threadId', 'input'], 'turn/steer': ['threadId', 'expectedTurnId', 'input'], 'turn/interrupt': ['threadId', 'turnId'] },
+  fieldTypes: {
+    initialize: { clientInfo: ['object'], capabilities: ['object'] },
+    'thread/start': { model: ['string', 'null'], approvalPolicy: ['string', 'null'], sandbox: ['string', 'null'] },
+    'turn/start': { threadId: ['string'], input: ['array'] },
+    'turn/steer': { threadId: ['string'], expectedTurnId: ['string'], input: ['array'] },
+    'turn/interrupt': { threadId: ['string'], turnId: ['string'] },
+  }, ...over,
 })
 const host = {
   async inspectExecutable() { return { version: '0.164.0', digest: D('a'), evidenceRef: 'exe:0.164.0' } },

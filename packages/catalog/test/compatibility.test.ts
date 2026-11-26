@@ -89,6 +89,14 @@ test('missing methods, actual fields, enums, notifications or request id types a
   assert.deepEqual(verdict.missing.requestIdTypes, ['string'])
 })
 
+test('a partial observation (handshake-only) is unknown and never compatible', () => {
+  const verdict = classifyCompatibility({ profile, probe: probe(), surface: { status: 'partial', surface, reason: 'initialize_only', evidenceRefs: ['handshake'] }, required })
+  assert.equal(verdict.class, 'unknown')
+  assert.equal(verdict.admission, 'disabled')
+  assert.ok(verdict.reasons.some(reason => reason.includes('probe_partial')))
+  assert.equal(toProbeReport(verdict).readiness, 'needs_setup')
+})
+
 test('probe missing/timeout/failed, auth/setup, unverified config or identity are unknown and disabled', () => {
   for (const state of ['missing', 'timeout', 'failed'] as const) {
     const verdict = classifyCompatibility({ profile, probe: probe(), surface: { status: state, reason: 'probe_' + state, evidenceRefs: [] }, required })

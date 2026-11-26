@@ -44,6 +44,10 @@ export type ProtocolSurface = {
   serverRequests: readonly string[]
   /** JSON-RPC id types the peer can emit for server requests (e.g. integer/string). */
   requestIdTypes: readonly string[]
+  /** Observed JSON types per method/field (from the actual schema, not only field names). */
+  fieldTypes?: Readonly<Record<string, Readonly<Record<string, readonly string[]>>>>
+  /** Fields the actual schema marks required per method. */
+  requiredFields?: Readonly<Record<string, readonly string[]>>
 }
 
 export type RequiredSurface = {
@@ -56,10 +60,16 @@ export type RequiredSurface = {
   serverRequestPatterns?: readonly string[]
   /** Required values of `requestIdTypes`, e.g. ['integer','string']. */
   requestIdTypes?: readonly string[]
+  /** Required observed JSON types per method/field. */
+  fieldTypes?: Readonly<Record<string, Readonly<Record<string, readonly string[]>>>>
+  /** Fields that must be schema-required per method. */
+  requiredFields?: Readonly<Record<string, readonly string[]>>
 }
 
 export type SurfaceObservation =
   | { status: 'observed'; surface: ProtocolSurface; evidenceRefs: readonly string[] }
+  /** A real handshake observed only part of the surface; this can never be called compatible. */
+  | { status: 'partial'; surface: ProtocolSurface; reason: string; evidenceRefs: readonly string[] }
   | { status: 'missing' | 'failed' | 'timeout'; reason: string; evidenceRefs: readonly string[] }
 
 export type VerifiedVersion = {
@@ -92,6 +102,8 @@ export type MissingEvidence = {
   notifications: string[]
   serverRequests: string[]
   requestIdTypes: string[]
+  fieldTypes: string[]
+  requiredFields: string[]
 }
 
 export type CompatibilityVerdict = {
@@ -109,7 +121,7 @@ export type CompatibilityVerdict = {
 }
 
 const DIGEST = /^[a-f0-9]{64}$/
-const emptyMissing = (): MissingEvidence => ({ methods: [], requestFields: [], enums: [], notifications: [], serverRequests: [], requestIdTypes: [] })
+const emptyMissing = (): MissingEvidence => ({ methods: [], requestFields: [], enums: [], notifications: [], serverRequests: [], requestIdTypes: [], fieldTypes: [], requiredFields: [] })
 
 /** Classify one probe result without widening any permission. */
 export function classifyCompatibility(input: CompatibilityInput): CompatibilityVerdict {
@@ -132,6 +144,10 @@ export function classifyCompatibility(input: CompatibilityInput): CompatibilityV
   })
 
   // Probe-level states are distinct: missing setup/auth/executable is unknown, not "compatible".
+  if (input.surface.status === 'partial') {
+    for (const ref of input.surface.evidenceRefs) evidence.add(ref)
+    return unknown(`probe_partial:${input.surface.reason}`)
+  }
   if (input.surface.status !== 'observed') {
     for (const ref of input.surface.evidenceRefs) evidence.add(ref)
     return unknown(`probe_${input.surface.status}:${input.surface.reason}`)
@@ -165,10 +181,12 @@ export function classifyCompatibility(input: CompatibilityInput): CompatibilityV
 
   diffRequiredSurface(surface, input.required, missing)
   if (missing.methods.length || missing.requestFields.length || missing.enums.length ||
-      missing.notifications.length || missing.serverRequests.length || missing.requestIdTypes.length) {
+      missing.notifications.length || missing.serverRequests.length || missing.requestIdTypes.length ||
+      missing.fieldTypes.length || missing.requiredFields.length) {
     for (const item of [...missing.methods.map(x => `method:${x}`), ...missing.requestFields.map(x => `field:${x}`),
       ...missing.enums.map(x => `enum:${x}`), ...missing.notifications.map(x => `notification:${x}`),
-      ...missing.serverRequests.map(x => `serverRequest:${x}`), ...missing.requestIdTypes.map(x => `requestId:${x}`)])
+      ...missing.serverRequests.map(x => `serverRequest:${x}`), ...missing.requestIdTypes.map(x => `requestId:${x}`),
+      ...missing.fieldTypes.map(x => `fieldType:${x}`), ...missing.requiredFields.map(x => `requiredField:${x}`)])
       reasons.push(`missing_${item}`)
     return incompatible('protocol_surface_incomplete')
   }
@@ -233,6 +251,18 @@ function diffRequiredSurface(surface: ProtocolSurface, required: RequiredSurface
     if (!surface.serverRequests.some(method => regex.test(method))) missing.serverRequests.push(pattern)
   }
   for (const idType of required.requestIdTypes ?? []) if (!surface.requestIdTypes.includes(idType)) missing.requestIdTypes.push(idType)
+  for (const [method, fields] of Object.entries(required.fieldTypes ?? {})) {
+    for (const [field, types] of Object.entries(fields)) {
+      const observed = surface.fieldTypes?.[method]?.[field]
+      if (!observed) { missing.fieldTypes.push(`${method}.${field}`); continue }
+      // A required type must be among the observed alternatives; nullable additions are allowed.
+      if (!types.every(type => observed.includes(type))) missing.fieldTypes.push(`${method}.${field}:${types.join('|')}`)
+    }
+  }
+  for (const [method, fields] of Object.entries(required.requiredFields ?? {})) {
+    const observed = new Set(surface.requiredFields?.[method] ?? [])
+    for (const field of fields) if (!observed.has(field)) missing.requiredFields.push(`${method}.${field}`)
+  }
 }
 
 /**

@@ -1,0 +1,18 @@
+{
+  "protocol": "m04-send-ledger/1",
+  "grantId": "m04-second-protocol-live-20261126",
+  "owner": "B",
+  "limit": 6,
+  "sent": 0,
+  "unknownOutcome": 0,
+  "inFlight": null,
+  "entries": [],
+  "state": "not_ready",
+  "blockers": [
+    "main default multi-profile consumer does not yet register an ACP profile",
+    "main explicit trial consent receipt is not issued",
+    "main original workbench/HTTP Ticket/Assignment/Broker/check/candidate/accept consumer for ACP is not ready",
+    "real ACP identity and policy evidence are not admitted for a live attempt"
+  ],
+  "note": "Only an actual new business prompt/turn send increments sent. UNKNOWN sends occupy a slot and must be reconciled against original evidence before any retry. Dry-run and handshake spend nothing. Historical cap4/research grants are untouched."
+}

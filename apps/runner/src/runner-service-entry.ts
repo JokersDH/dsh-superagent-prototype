@@ -34,8 +34,10 @@ const handle = await serveRunner({
   write: frame => {
     if (!detached) process.stdout.write(encodeFrame(frame))
   },
-  eagerPrepare: scenario === 'codex-native',
-  ...(scenario === 'codex-native' && process.env.PA_RUNNER_ENVIRONMENT_PLAN
+  // Every reviewed real Driver may prepare policy before the first business begin. Codex uses this
+  // for its native handshake; ACP emits policy.prepared from its initialize/applied-settings proof.
+  eagerPrepare: isRealDriverId(scenario),
+  ...(isRealDriverId(scenario) && process.env.PA_RUNNER_ENVIRONMENT_PLAN
     ? { prepare: (spec, context) => prepareRunnerEnvironment(process.env.PA_RUNNER_ENVIRONMENT_PLAN!, spec, context) }
     : {}),
   ...(process.env.PA_RUNNER_RECOVERY_ROOT ? { recoveryRoot: process.env.PA_RUNNER_RECOVERY_ROOT } : {}),
