@@ -4,6 +4,8 @@ import { ProductStore } from '../../../packages/storage/dist/index.js'
 import { createProductRuntime } from '../../../apps/coordinator/product/runtime.ts'
 
 const input = JSON.parse(readFileSync(process.argv[2], 'utf8')), crash = process.argv[3]
+if (crash && process.env.PA_RECOVERY_SOURCE_FAULT_EXPERIMENT !== 'explicitly-authorized')
+  throw new Error('OS fault injection is disabled without a separately authorized experiment')
 const store = new ProductStore({ path: join(input.stateRoot, 'state.sqlite') })
 const product = createProductRuntime({ store, stateRoot: input.stateRoot, scratchProject: input.project,
   principal: input.principal, projects: [{ id: input.projectId, scope: { projectId: input.projectId, allowedPaths: ['.'], excludedPaths: ['.git'], externalActions: [] } }],

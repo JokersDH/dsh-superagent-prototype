@@ -1,0 +1,7 @@
+{
+  "protocol": "execution-compatibility/1",
+  "runtimeContractSchemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
+  "runtimeValidationRequired": true,
+  "schemaHash": "c71b1ccfd9df7b3d671b1de56bc9773c7cd7dbe1d1c9b8c283aceb264a6ba721",
+  "sourceHash": "7217c814b39e58e7df9d29889ed8a73f72a3f9c2f1bddff56081281bc316d1d8"
+}

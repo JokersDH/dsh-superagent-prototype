@@ -1,0 +1,193 @@
+{
+  "$defs": {
+    "ExecutionCompatibilityView": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "checkedAt": {
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+          "type": "string"
+        },
+        "classification": {
+          "enum": [
+            "verified",
+            "compatible_unverified",
+            "incompatible",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "nativeVersion": {
+          "anyOf": [
+            {
+              "maxLength": 128,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "operations": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              },
+              "operation": {
+                "enum": [
+                  "begin",
+                  "answer",
+                  "steer",
+                  "cancel",
+                  "resume"
+                ],
+                "type": "string"
+              },
+              "supported": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "validation": {
+                "enum": [
+                  "native",
+                  "controlled",
+                  "protocol",
+                  "unobserved"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "operation",
+              "supported",
+              "validation",
+              "enabled"
+            ],
+            "type": "object"
+          },
+          "maxItems": 5,
+          "readOnly": true,
+          "type": "array"
+        },
+        "protocol": {
+          "anyOf": [
+            {
+              "maxLength": 128,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "schemaDigest": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "classification",
+        "nativeVersion",
+        "protocol",
+        "schemaDigest",
+        "checkedAt",
+        "operations"
+      ],
+      "type": "object"
+    },
+    "ExecutionOperationView": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "operation": {
+          "enum": [
+            "begin",
+            "answer",
+            "steer",
+            "cancel",
+            "resume"
+          ],
+          "type": "string"
+        },
+        "supported": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "validation": {
+          "enum": [
+            "native",
+            "controlled",
+            "protocol",
+            "unobserved"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "operation",
+        "supported",
+        "validation",
+        "enabled"
+      ],
+      "type": "object"
+    },
+    "ExecutionTrialAdmission": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "confirmationCommandId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+          "type": "string"
+        },
+        "identityDigest": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "mode": {
+          "const": "explicit_trial",
+          "type": "string"
+        },
+        "policyDigest": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "mode",
+        "identityDigest",
+        "policyDigest",
+        "confirmationCommandId"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:personal-agent:execution-compatibility:1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

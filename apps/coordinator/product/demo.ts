@@ -12,6 +12,7 @@ import { PrivateModelProvider } from './model-provider.ts'
 import { DISCUSSION_PROJECT, preparePersonalStartup } from './native-startup.ts'
 import { NativeProjectRegistry } from './project-registry.ts'
 import { loadRestoredReviewWithIdentity } from './restored-review.ts'
+import { readRecoveryTargetMaterial, verifyRecoveryTargetStartup } from './recovery-target-authorization.ts'
 
 const { values } = parseArgs({
   options: {
@@ -55,6 +56,10 @@ try {
   const personal = values.native || values['discussion-only']
   const personalStartup = personal && !recovery ? preparePersonalStartup(stateRoot, { discussionOnly: values['discussion-only'] }) : undefined
   const native = personalStartup && 'native' in personalStartup ? personalStartup.native : undefined
+  if (!recovery && readRecoveryTargetMaterial(stateRoot)) {
+    if (!personal) throw new Error('Prepared recovery targets require the personal startup entry')
+    if (native) verifyRecoveryTargetStartup(stateRoot, principal, native.profile)
+  }
   const executionUnavailable = personalStartup && 'executionUnavailable' in personalStartup ? personalStartup.executionUnavailable : undefined
   const restoredProjects = explicitReview?.projects ?? (recovery ? new NativeProjectRegistry(stateRoot).list().map(project => ({ id: project.id,
     displayName: project.displayName, scope: { projectId: project.id, allowedPaths: ['.'], excludedPaths: ['.git'], externalActions: [] } })) : [])

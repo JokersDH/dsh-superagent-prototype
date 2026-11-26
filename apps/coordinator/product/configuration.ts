@@ -47,6 +47,8 @@ export function applicationConfiguration(source: ConfigurationSource, now = Date
     return {
       ...publicProfile,
       dispatchAllowed,
+      ...(publicProfile.compatibility && !dispatchAllowed ? { compatibility: { ...publicProfile.compatibility,
+        operations: publicProfile.compatibility.operations.map(operation => ({ ...operation, enabled: false })) } } : {}),
       ...(dispatchAllowed ? {} : { blockedReason: blockedReason ?? ('unsupported_capability' as const) }),
     }
   })

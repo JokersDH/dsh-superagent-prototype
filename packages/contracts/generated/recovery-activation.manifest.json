@@ -2,6 +2,6 @@
   "protocol": "recovery-activation-intent/1",
   "runtimeContractSchemaHash": "74ffd32d8eed4e88d8d4fdd98f6e84c3bf449a785f2c76ccffee56c0538ffa3d",
   "runtimeValidationRequired": true,
-  "schemaHash": "404e12be5d30f8ed5289c514446217f2a5e8867761a4bf83e00e92f71816a90b",
-  "sourceHash": "bb852db8fda5e845c2d3fa90fe7acd4136668cd71b2a1acbc279bceb2e535825"
+  "schemaHash": "0ff5d3696d0f372747667362db50696092d060eb29ba4b5b45ce3af0043982e1",
+  "sourceHash": "a56355af68cba90bcc593575b8b9aa3c86436f33933fd510d6a31b8b1a720cf9"
 }

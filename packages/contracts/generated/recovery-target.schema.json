@@ -32,6 +32,10 @@
           "items": {
             "additionalProperties": false,
             "properties": {
+              "baselineCommit": {
+                "pattern": "^(?:[a-f0-9]{40}|[a-f0-9]{64})$",
+                "type": "string"
+              },
               "registration": {
                 "additionalProperties": false,
                 "properties": {
@@ -353,6 +357,10 @@
               "items": {
                 "additionalProperties": false,
                 "properties": {
+                  "baselineCommit": {
+                    "pattern": "^(?:[a-f0-9]{40}|[a-f0-9]{64})$",
+                    "type": "string"
+                  },
                   "registration": {
                     "additionalProperties": false,
                     "properties": {
@@ -523,6 +531,10 @@
                       "pattern": "^[a-f0-9]{64}$",
                       "type": "string"
                     },
+                    "logicalFingerprint": {
+                      "pattern": "^[a-f0-9]{64}$",
+                      "type": "string"
+                    },
                     "markerDigest": {
                       "pattern": "^[a-f0-9]{64}$",
                       "type": "string"
@@ -554,6 +566,11 @@
                     },
                     "generationId": {
                       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                      "type": "string"
+                    },
+                    "parentIdentity": {
+                      "maxLength": 128,
+                      "minLength": 3,
                       "type": "string"
                     },
                     "stateRoot": {
@@ -669,6 +686,10 @@
               "items": {
                 "additionalProperties": false,
                 "properties": {
+                  "baselineCommit": {
+                    "pattern": "^(?:[a-f0-9]{40}|[a-f0-9]{64})$",
+                    "type": "string"
+                  },
                   "registration": {
                     "additionalProperties": false,
                     "properties": {
@@ -783,6 +804,10 @@
         },
         "authorization": {
           "const": "not_granted",
+          "type": "string"
+        },
+        "authorizationCommandId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
           "type": "string"
         },
         "blockers": {

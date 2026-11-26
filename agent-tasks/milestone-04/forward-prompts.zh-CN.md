@@ -1,5 +1,7 @@
 # 里程碑04：可分别转发的开工话术
 
+2026-11-26续工请转发[当前B/D/E话术](continue-prompts.zh-CN.md)。本页保留最初的持续责任，下面旧“准备完成”等表述不表示M04出口已通过。当前实测与main接入见[RFC0096](../../docs/rfcs/WP-16/0096-milestone-04-protocol-admission-and-target-authorization.md)。
+
 2026-11-24。现在只给 **B、D、E** 下发；main同时实施公共接线。四个角色共同推进两个结果，不启用十路wave。A/F遇具体阻断再参与；C等第二协议真实出口通过后启动创新，G/H/I/J待命。
 
 所有角色先读根AGENTS.md、START-HERE.zh-CN.md、product-spec/README.md、[本次唯一实施计划](../../docs/product/MILESTONE-04.zh-CN.md)和[RFC0096](../../docs/rfcs/WP-16/0096-milestone-04-protocol-admission-and-target-authorization.md)。任务是从早交源码持续到同一个结果验收，不能做完探针或组件测试就停工。不要执行原wave队列。原目录/分支和dirty保留，不新建替代仓库，不整枝夹带旧候选。
