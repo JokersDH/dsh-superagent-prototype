@@ -55,3 +55,39 @@
 B先交共享版本probe/分类小闭包，main/D消费；B同时持续ACP。main并行新授权接线。E从公共接口对已验证/兼容未验证/不兼容/unknown做独立正反例，覆盖当前绑定改变和未知回执，不能由producer简化断言。
 
 以上消费在受控路径成立后，才用同一个M04 ACP上限做真实任务。D冻结必须包含兼容及新授权的运行代码，E验准确包。同事完成另一台Mac首次任务和新根第二次任务，才有跨机/恢复真实交付结论。此RFC本身、纯函数或schema通过均不代表出口完成。
+
+## 首个已实现的主线消费者（2026-11-24）
+
+新根授权已沿原恢复source确认、D materializer、A库存和原目标Store接入默认恢复只读runtime。新增`POST /v1/recovery/targets/authorize`与`GET /v1/recovery/targets/:id/authorization`，工作台恢复面板明确核对项目/检查、准备目标、勾选授权；网络结果未知先保留请求，刷新后仅查询原回执。
+
+授权使用按generation确定的命令ID，写入**目标自己的原command_receipts/EventLog/UoW**。source只保留原确认，不写授权副本，因此原ignoreCommitted逻辑指纹及held队列保持。新增可选logicalFingerprint、parentIdentity和项目baselineCommit属于HTTP恢复契约，不改Runner wire或迁移版本；旧记录仍可审计，但不足以产生新的目标授权。
+
+目标原WriterLock守护提交。grant绑定principal、host、源确认/回执、目标material/generation、目录/父目录/数据库身份、项目配置和当前profile/可执行身份。普通demo启动识别recovery-target.json，未核到有效原grant不能启动执行；grant回执本身始终started=false/startupAvailable=false。新业务数据不要求恢复为空库，不依赖旧source五分钟后仍在线；换机器/根/数据库/父目录/profile不继承旧权限。
+
+相关安全测试31项通过，其中授权专项15项；包括同ID丢响应调和、源指纹不变、复制目标拒绝、同目录数据库替换拒绝、父目录替换拒绝。contracts/coordinator/console严格类型检查及网页构建通过，共享Runner identity保持不变。实际浏览器已零模型操作默认React/Hono/Store链，刷新仅GET原授权；最终桌面和390px结果态独立审查通过，范围只到源码结果态，不等安装/真实执行/跨机。
+
+D的下一消费者：使用当前目标授权回执与`verifyRecoveryTargetStartup()`接正常安装入口的新根选择，不移除历史restore marker。E消费上述原HTTP/UI和目标原回执，自行定义安装断言。当前固定项目配置变更会拒绝原授权，不能假称任意后续迁移/配置场景已覆盖。版本兼容与ACP公共注册仍待B早交源码后接入，本检查点不关闭L1④。
+
+主线已发布目标授权源码检查点`0a2f8fc2`。随后只采纳D已完成的`6754e6cb`单文件只读support修复（主线`a784d65c`），没有导入D整枝或其候选包结论。main实际以旧的非空SQLite消费support，确认原文件摘要/目录和原表均不变、私有正文不导出；连同原support测试2项通过。最终DMG仍等版本兼容及正常新根入口一起就绪，不能用这两项测试提前冻结。
+
+本轮真实模型发送为0。执行既有source-confirmation测试时，第一次误包含两项自有子进程SIGKILL，后一次名称过滤未排除它们，又发生两次，共4次；这是误执行，不是获得授权的实验，不写入或复用历史额度及验收。已在父测试与worker同时增加默认禁用的显式故障实验开关，专项安全测试证实没有开关时worker在创建Store前正常拒绝、没有signal。十二用户实例未操作，后续本轮不再运行该故障测试文件。UI验收服务器均通过自有stdin关闭入口正常退出，没有故障清理信号。
+
+## 2026-11-26：组件验收及公共兼容投影
+
+本节是同一里程碑的源码交接，非完成汇总。主线核对B `6c0207a0`、D `ddfd01b8`、E `3a54438a`后，原13项仍0/13，计分保持85/100与65.3%。当前[三段续工话术](../../../agent-tasks/milestone-04/continue-prompts.zh-CN.md)只给B/D/E，不启动第三条线。
+
+**B接受最小诊断闭包。** 精确导入`catalog/src/compatibility.ts`及测试、`drivers/codex-native/src/index.ts`、`schema-probe.ts`及兼容测试，共5个原文件，未修改其字节。main先在B路径复现14个组件测试，再在main复现诊断9项；这些是fixture/受控检查，不是实际版本矩阵或真实ACP。ACP包/Runner工厂未接默认路径。
+
+**ACP仍有三个直接生产阻断。** begin只发`command.inputRef`而不解析原ExecutionInput；策略缺失会补宽scope且未走原policy.prepared。answer把原payload引用当选项，正则猜允许/拒绝，工厂未向ACP传原beforeAnswerWrite。reconcile看到turn.ended/runtime.exited便报writer=quiescent。主线实际运行`/Users/hh/Desktop/joker/pa-artifacts/m04-admission-20261126/acp-input-repro.mjs`（零进程、零模型、fake transport）exit1，收到`opaque-original-input-ref`而非合法ExecutionInput正文。其他两组经源码独立核对，交B修同一实际消费者；修好前不宣布LIVE_READY。
+
+B41里版本/可执行digest/配置指纹含固定fixture值，ACP把v1定义复制成observed，initialize本身不能证明全部权限/cancel/ID方法已观察。没有本轮完整持久输出便只记录B自述结果；B报告真实prompt0，尚待独立新grant发送账核对，不写成已核实六次可用。旧ledger/研究样本不修改。
+
+**D/E安装结果收窄。** D新外壳0.1.2实际封装旧source83f79e82/buildd3ba，尚无main新授权和兼容消费，不是M04 F0。E报告明确HARNESS_ONLY/HARNESS_READY、兼容/恢复BLOCKED、同事实测NOT_TESTED，这部分限定有效；但其L1①只按字段存在判PASS、恢复从configuration猜字段、几处裸PID清理都应先改成真实consumer和原正常退出。暂不导入运行E工具，不混旧cohort。
+
+**main已交公共事实接口。** `contracts/src/execution-compatibility.ts`定义版本/协议/schema/逐操作的native、controlled、protocol、unobserved证据层；`ExecutionProfileView.compatibility`为可选加法。`trialAdmission`明确为`explicit_trial`，引用当前身份/策略摘要和确认命令ID，仍使用inspection_passed，不能伪报native_test_passed；protocol-only、unknown、incompatible、fixture及没有原生/受控begin消费者的状态都不能因此开启dispatch。
+
+`product/execution-profile-view.ts`消费B的一份CompatibilityVerdict，没有可信admission输入时强制不派工、操作均关闭。原NativeProductConfiguration可携带该安全profileView，runtime校验它与可信profile同id/revision/driver，经过原`/v1/configuration`发布；本次原runtime/HTTP消费者已实际跑通，没有创建Work、ticket或原生进程。它不是实际用户同意命令或新授权的实现，外部HTTP不能上传这个对象获得执行权；默认native-startup仍保持原准入，后续main负责真实consent回执及发送前检查。
+
+本次明确选取的49项契约/投影/原HTTP配置/兼容诊断/Codex既有协议测试通过，contracts生成校验和coordinator/console严格类型检查通过。共享Runner hash保持原值。未跑B41 live探针、B42原进程消费者、E包启动或历史故障实验；本次main真实模型/故障信号为0。D接正常安装新根入口，E按公共接口定义实际断言，B修原payload/策略/答案/物理状态；main继续默认多profile、实际probe/consent和能力控制接线。
+
+可消费的代码检查点为`33a69f44`及`4af915f2`。后者让恢复只读和未准入配置的逐操作enabled同步变为false，保留诊断/历史试用metadata但不展示可执行状态；同一原HTTP消费者已覆盖，49项回归复跑通过。三份续工话术引用这些固定接口，不需要等下一个共享类型包，也不把这份DTO当真实试用授权已经落地。

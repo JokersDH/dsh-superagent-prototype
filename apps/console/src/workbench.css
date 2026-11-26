@@ -260,6 +260,22 @@ button.stage-pending:hover:not(:disabled) { border: 0; background: #f5e9d3; colo
 .template-menu button:hover:not(:disabled) { border: 0; background: #edf5e9; }
 
 .workspace-view { display: flex; flex: 1; flex-direction: column; min-width: 0; min-height: 0; background: #fff; }
+.recovery-workspace { flex: 0 0 auto; max-height: 65vh; overflow: auto; padding: 24px 28px; border-bottom: 1px solid var(--line); }
+.recovery-workspace header, .recovery-workspace form, .recovery-prepared, .recovery-result { max-width: 68ch; }
+.recovery-workspace h2 { margin: 0 0 8px; font-size: 20px; font-weight: 600; }
+.recovery-workspace h3 { margin: 20px 0 8px; font-size: 15px; }
+.recovery-workspace p { margin: 8px 0 16px; color: var(--muted); font-size: 14px; line-height: 1.7; }
+.recovery-facts { display: flex; flex-wrap: wrap; gap: 24px; margin: 16px 0 24px; }
+.recovery-workspace dt { margin-bottom: 4px; color: var(--muted); font-size: 12px; }
+.recovery-workspace dd { margin: 0 0 10px; overflow-wrap: anywhere; font-size: 14px; }
+.recovery-workspace form { display: grid; gap: 14px; }
+.recovery-workspace label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+.recovery-workspace input:not([type='checkbox']), .recovery-workspace select { width: 100%; min-width: 0; padding: 9px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--ink); font: inherit; }
+.recovery-workspace button { justify-self: start; }
+.recovery-workspace .recovery-confirm { display: flex; flex-direction: row; align-items: flex-start; gap: 10px; max-width: 68ch; margin: 20px 0; line-height: 1.6; }
+.recovery-confirm input { flex: 0 0 auto; margin-top: 4px; accent-color: var(--accent); }
+.recovery-result { margin-top: 24px; color: var(--ok); }
+@media (max-width: 760px) { .recovery-workspace { padding: 20px 17px; } .recovery-workspace input:not([type='checkbox']), .recovery-workspace select { font-size: 16px; } }
 .view-header { display: flex; flex: 0 0 auto; align-items: center; justify-content: space-between; gap: 18px; min-height: 96px; padding: 24px 32px 20px; border-bottom: 1px solid var(--line); }
 .view-title { color: var(--muted); font-size: 20px; font-weight: 600; line-height: 1.5; }
 .view-description { margin-top: 5px; color: var(--muted); font-size: 12px; line-height: 1.7; }

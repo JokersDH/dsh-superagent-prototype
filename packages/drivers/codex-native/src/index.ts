@@ -25,6 +25,8 @@ import type {
   ServeExit,
 } from '../../../contracts/src/types.ts'
 import { DriverError, attemptIdentity, criticalFact, factIdFor } from '../../../driver-kit/src/index.ts'
+import { classifyCompatibility, toProbeReport, type CompatibilityVerdict, type SurfaceObservation, type VerifiedVersion } from '../../../catalog/src/compatibility.ts'
+import { codexRequiredSurface, probeCodexSurface } from './schema-probe.ts'
 import { CodexConnection, CodexProtocolError, losslessId, type JsonValue, type LosslessId } from './protocol.ts'
 
 /**
@@ -46,6 +48,7 @@ const SERVER_REQUEST_METHODS = [
 
 export * from './protocol.ts'
 export * from './native.ts'
+export * from './schema-probe.ts'
 
 export type CodexDriverOptions = {
   /** Build a connection for this attempt (real spawn or a fake transport). */
@@ -56,9 +59,94 @@ export type CodexDriverOptions = {
     close: () => void
   }>
   clientInfo?: { name: string; version: string }
+  /** Zero-model surface probe; tests inject, production uses the installed CLI's own schema. */
+  probeSurface?: (profile: AttemptSpec['profile']) => Promise<SurfaceObservation>
+  /** Original native evidence supplied by the caller; this module never fabricates it. */
+  verifiedVersions?: readonly VerifiedVersion[]
+  clientInfoForProbe?: { name: string; version: string }
 }
 
 type ItemRecord = { itemId: string; turnId: string; kind: string }
+
+
+/** Map the Driver's actually implemented features onto protocol surface evidence. */
+function codexCapabilities(required: readonly string[], surface: SurfaceObservation): ProbeReport['capabilities'] {
+  if (surface.status !== 'observed') return required.map(feature => ({ feature, advertised: {}, observed: {}, test: 'NOT_TESTED' as const, policy: 'blocked' as const, evidenceRefs: [] }))
+  const methods = new Set(surface.surface.methods)
+  const notifications = new Set(surface.surface.notifications)
+  const servers = new Set(surface.surface.serverRequests)
+  const supported: Record<string, { present: boolean; evidence: string[] }> = {
+    'chat.turn': { present: methods.has('turn/start') && notifications.has('turn/completed'), evidence: ['schema:turn/start', 'schema:turn/completed'] },
+    chat: { present: methods.has('turn/start'), evidence: ['schema:turn/start'] },
+    turn: { present: methods.has('turn/start'), evidence: ['schema:turn/start'] },
+    'session.new': { present: methods.has('thread/start'), evidence: ['schema:thread/start'] },
+    deliver: { present: methods.has('turn/steer'), evidence: ['schema:turn/steer'] },
+    cancel: { present: methods.has('turn/interrupt'), evidence: ['schema:turn/interrupt'] },
+    'pause_at_boundary': { present: methods.has('turn/interrupt'), evidence: ['schema:turn/interrupt'] },
+    questions: { present: [...servers].some(method => /requestUserInput|requestApproval/.test(method)), evidence: ['schema:server-request'] },
+    'approval.request': { present: [...servers].some(method => /requestApproval/.test(method)), evidence: ['schema:requestApproval'] },
+    'command.exec': { present: [...servers].some(method => /requestApproval/.test(method)), evidence: ['schema:requestApproval'] },
+  }
+  return required.map(feature => {
+    const found = supported[feature]
+    if (!found || !found.present) return { feature, advertised: {}, observed: {}, test: 'NOT_TESTED' as const, policy: 'blocked' as const, evidenceRefs: [] }
+    // PASS here means the protocol surface actually has the methods/fields the Driver uses; it is not a
+    // claim that a native turn or approval was exercised. native_test_passed remains separate.
+    return { feature, advertised: { supportedBySurface: true }, observed: { schemaPresent: true }, test: 'PASS' as const,
+      policy: 'allowed' as const, evidenceRefs: [...found.evidence, ...surface.evidenceRefs] }
+  })
+}
+
+export type CodexCompatibilityInspection = { verdict: CompatibilityVerdict; report: ProbeReport }
+
+/** One reusable zero-model classification for the Codex Driver; main/D consume the same verdict. */
+export async function inspectCodexCompatibility(
+  profile: AttemptSpec['profile'],
+  host: ProbeHost,
+  options: { probeSurface?: (profile: AttemptSpec['profile']) => Promise<SurfaceObservation>; verifiedVersions?: readonly VerifiedVersion[] } = {},
+): Promise<CodexCompatibilityInspection> {
+  const checkedAt = new Date().toISOString()
+  let executable: { version: string; digest: string; evidenceRef: string }
+  let config: { fingerprint: string; stability: 'frozen' | 'watched' | 'unverified' }
+  try {
+    executable = await host.inspectExecutable(profile)
+    config = await host.inspectConfig(profile.nativeConfigRef)
+  } catch (error) {
+    const report: ProbeReport = { capabilities: [], readiness: 'needs_setup', checkedAt,
+      evidenceRefs: [`codex-probe-failed:${String((error as Error)?.message ?? error).slice(0, 120)}`] }
+    return { report, verdict: classifyCompatibility({ profile, probe: report,
+      surface: { status: 'failed', reason: 'probe_host_failed', evidenceRefs: report.evidenceRefs },
+      required: codexRequiredSurface(), verifiedVersions: options.verifiedVersions ?? [] }) }
+  }
+  const surface = options.probeSurface
+    ? await options.probeSurface(profile)
+    : await probeCodexSurface({ executable: profile.executable, argv: profile.argv })
+  const surfaceEvidence = surface.status === 'observed' ? surface.evidenceRefs : surface.evidenceRefs
+  const identity: CompatibilityVerdict['identity'] = surface.status === 'observed'
+    ? {
+        profileId: profile.id, profileRevision: profile.revision, executableDigest: executable.digest,
+        nativeVersion: executable.version, driverRelease: profile.driverRelease, driverApiMajor: 1,
+        wireVersion: surface.surface.wireVersion, schemaDigest: surface.surface.schemaDigest,
+        resolvedConfigFingerprint: config.fingerprint, permissionPolicyRevision: profile.permissionPolicyRevision,
+        configStability: config.stability, platform: process.platform, architecture: process.arch, runtimeVersion: process.version,
+      }
+    : undefined
+  const capabilities = codexCapabilities(profile.requiredFeatures, surface)
+  const probe: ProbeReport = {
+    ...(identity === undefined ? {} : { identity }),
+    capabilities,
+    readiness: 'inspection_passed',
+    checkedAt,
+    evidenceRefs: [...new Set([executable.evidenceRef, ...surfaceEvidence, ...capabilities.flatMap(cap => cap.evidenceRefs),
+      ...(identity === undefined ? [] : [`config:${config.fingerprint}`])])],
+  }
+  const verdict = classifyCompatibility({
+    profile, probe, surface, required: codexRequiredSurface(),
+    verifiedVersions: options.verifiedVersions ?? [],
+    environment: { platform: process.platform, architecture: process.arch, runtimeVersion: process.version },
+  })
+  return { verdict, report: toProbeReport(verdict) }
+}
 
 export class CodexNativeDriver implements AgentDriverV1 {
   readonly #options: CodexDriverOptions
@@ -67,14 +155,12 @@ export class CodexNativeDriver implements AgentDriverV1 {
     this.#options = options
   }
 
-  async inspect(_profile: AttemptSpec['profile'], _host: ProbeHost): Promise<ProbeReport> {
-    // Inspection is version/help only: no model task, no login, no home reset.
-    return {
-      capabilities: [],
-      readiness: 'needs_setup',
-      checkedAt: '2026-11-08T00:00:00.000Z',
-      evidenceRefs: ['codex-inspect-not-configured'],
-    }
+  async inspect(profile: AttemptSpec['profile'], host: ProbeHost): Promise<ProbeReport> {
+    const inspection = await inspectCodexCompatibility(profile, host, {
+      ...(this.#options.probeSurface === undefined ? {} : { probeSurface: this.#options.probeSurface }),
+      ...(this.#options.verifiedVersions === undefined ? {} : { verifiedVersions: this.#options.verifiedVersions }),
+    })
+    return inspection.report
   }
 
   async reconcile(_ref: Parameters<AgentDriverV1['reconcile']>[0], _host: RecoveryHost): Promise<ReconcileReport> {

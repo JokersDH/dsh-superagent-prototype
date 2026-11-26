@@ -59,6 +59,9 @@ import {
   UsageSupportDownloadSchema,
   ProjectRecipePreviewInputSchema,
   ProjectRecipePreviewSchema,
+  RecoveryInspectionSchema, RecoverySourcePrepareSchema, RecoverySourcePreparedSchema, RecoverySourceConfirmSchema,
+  RecoveryActivationRecordSchema, RecoveryTargetPrepareInputSchema, RecoveryTargetStatusSchema,
+  RecoveryTargetAuthorizeSchema, RecoveryTargetAuthorizationSchema,
 } from '@personal-agent/contracts'
 import type {
   UsageObservationQuery,
@@ -117,6 +120,8 @@ import type {
   ContextHistory,
   ContextSources,
   TrialReadiness,
+  RecoveryInspection, RecoverySourcePrepare, RecoverySourcePrepared, RecoverySourceConfirm, RecoveryActivationRecord,
+  RecoveryTargetPrepareInput, RecoveryTargetStatus, RecoveryTargetAuthorize, RecoveryTargetAuthorization,
 } from '@personal-agent/contracts'
 
 export interface VerificationDetail {
@@ -192,6 +197,12 @@ export interface ConsoleTransport {
   usageObservation?(query: UsageObservationQuery, signal?: AbortSignal): Promise<UsageObservation | undefined>
   downloadUsageObservation?(query: UsageObservationQuery, signal?: AbortSignal): Promise<UsageObservationDownload | undefined>
   downloadUsageSupport?(query: UsageObservationQuery, signal?: AbortSignal): Promise<UsageSupportDownload | undefined>
+  recoveryInspection?(): Promise<RecoveryInspection>
+  prepareRecoverySource?(input: RecoverySourcePrepare): Promise<RecoverySourcePrepared>
+  confirmRecoverySource?(input: RecoverySourceConfirm): Promise<RecoveryActivationRecord>
+  prepareRecoveryTarget?(input: RecoveryTargetPrepareInput): Promise<RecoveryTargetStatus>
+  authorizeRecoveryTarget?(input: RecoveryTargetAuthorize): Promise<RecoveryTargetAuthorization>
+  recoveryAuthorization?(activationId: string): Promise<RecoveryTargetAuthorization | undefined>
   /** Authenticated local session check/bootstrap (HTTP lane); the fixture lane is always authenticated. */
   session?(): Promise<boolean>
   bootstrap?(bootstrapToken: string): Promise<void>
@@ -229,6 +240,44 @@ export class HttpTransport implements ConsoleTransport {
   private readonly base: string
   constructor(base = '') {
     this.base = base
+  }
+
+  async recoveryInspection(): Promise<RecoveryInspection> {
+    return RecoveryInspectionSchema.parse(await this.request('/v1/recovery/inspect'))
+  }
+  async prepareRecoverySource(input: RecoverySourcePrepare): Promise<RecoverySourcePrepared> {
+    const value = RecoverySourcePrepareSchema.parse(input)
+    const result = RecoverySourcePreparedSchema.parse(await this.request('/v1/recovery/source/prepare', { method: 'POST', body: JSON.stringify(value) }))
+    if (result.intent.source.inspectionFingerprint !== value.preflight.expectedFingerprint ||
+      JSON.stringify(result.configuration.projects.map(project => ({ sourceProjectId: project.sourceProjectId, project: project.registration }))) !== JSON.stringify(value.preflight.bindings))
+      throw new TransportError('schema_mismatch', '恢复来源与本次选择不一致，请重新核对。', 'none')
+    return result
+  }
+  async confirmRecoverySource(input: RecoverySourceConfirm): Promise<RecoveryActivationRecord> {
+    return RecoveryActivationRecordSchema.parse(await this.request('/v1/recovery/source/confirm', {
+      method: 'POST', body: JSON.stringify(RecoverySourceConfirmSchema.parse(input)),
+    }))
+  }
+  async prepareRecoveryTarget(input: RecoveryTargetPrepareInput): Promise<RecoveryTargetStatus> {
+    const value = RecoveryTargetPrepareInputSchema.parse(input)
+    const result = RecoveryTargetStatusSchema.parse(await this.request('/v1/recovery/targets/prepare', { method: 'POST', body: JSON.stringify(value) }))
+    if (result.activationId !== value.activationId) throw new TransportError('schema_mismatch', '恢复目标身份不一致。', 'none')
+    return result
+  }
+  async authorizeRecoveryTarget(input: RecoveryTargetAuthorize): Promise<RecoveryTargetAuthorization> {
+    const value = RecoveryTargetAuthorizeSchema.parse(input)
+    const result = RecoveryTargetAuthorizationSchema.parse(await this.request('/v1/recovery/targets/authorize', { method: 'POST', body: JSON.stringify(value) }))
+    if (result.grant.commandId !== value.commandId || result.grant.source.intent.activationId !== value.activationId ||
+      result.grant.material.manifestDigest !== value.expectedManifestDigest)
+      throw new TransportError('schema_mismatch', '新授权回执尚未核实，请保留原请求并查询。', 'reconcile')
+    return result
+  }
+  async recoveryAuthorization(activationId: string): Promise<RecoveryTargetAuthorization | undefined> {
+    const value = await this.request(`/v1/recovery/targets/${encodeURIComponent(activationId)}/authorization`, undefined, 'json404')
+    if (value === missingOptionalResource) return undefined
+    const result = RecoveryTargetAuthorizationSchema.parse(value)
+    if (result.grant.source.intent.activationId !== activationId) throw new TransportError('schema_mismatch', '恢复授权查询身份不一致。', 'none')
+    return result
   }
 
   private async request(path: string, init?: RequestInit, optionalResource: boolean | 'json404' = false, receiptCommandId?: string, maxBytes?: number): Promise<unknown> {

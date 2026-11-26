@@ -8,7 +8,8 @@ const stateRoot = RecoveryActivationIntentSchema.shape.target.shape.stateRoot
 export const RecoveryTargetConfigurationSchema = z.strictObject({
   protocol: z.literal('recovery-target-configuration/1'),
   projects: z.array(z.strictObject({ sourceProjectId: IdSchema, targetProjectId: IdSchema,
-    registration: ProjectRegistrationInputSchema })).min(1).max(20).readonly(),
+    registration: ProjectRegistrationInputSchema,
+    baselineCommit: z.string().regex(/^(?:[a-f0-9]{40}|[a-f0-9]{64})$/).optional() })).min(1).max(20).readonly(),
   executor: ExecutionProfileRefSchema,
 }).refine(value => new Set(value.projects.map(project => project.sourceProjectId)).size === value.projects.length &&
   new Set(value.projects.map(project => project.targetProjectId)).size === value.projects.length, 'Recovery project mappings must be unique')
@@ -58,6 +59,7 @@ export const RecoveryTargetStatusSchema = z.strictObject({
     'initialization_unknown', 'inventory_incomplete', 'business_rows_present', 'authorization_not_implemented']),
     owner: z.enum(['main', 'A', 'B', 'D']), detail: z.string().min(1).max(1024) })).max(16).readonly(),
   authorization: z.literal('not_granted'), startupAvailable: z.literal(false),
+  authorizationCommandId: IdSchema.optional(),
 }).superRefine((value, context) => {
   if ((value.material && (value.material.activationId !== value.activationId || value.material.generationId !== value.generationId || value.material.stateRoot !== value.stateRoot)) ||
     (value.inventory && value.inventory.stateRoot !== value.stateRoot) ||
