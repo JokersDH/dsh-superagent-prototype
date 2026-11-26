@@ -64,7 +64,21 @@ function context(manifest) {
   privateDirectory(root)
   const roots = { config: join(root, 'config'), data: join(root, 'data'), cache: join(root, 'cache'),
     logs: join(root, 'logs'), workspace: join(root, 'workspaces') }
-  for (const path of Object.values(roots)) privateDirectory(path)
+  // A user-selected existing target root is only a path preference. It is never authorization;
+  // the original pa/recovery-target verifier still checks the original target grant before execution.
+  const selectedTarget = process.env.PA_TARGET_DATA_ROOT
+  if (selectedTarget) {
+    const target = resolve(selectedTarget)
+    if (!existsSync(target) || !lstatSync(target).isDirectory() || lstatSync(target).isSymbolicLink() ||
+      (lstatSync(target).mode & 0o077) !== 0 || lstatSync(target).uid !== process.getuid?.())
+      throw new Error('所选工作区必须是当前用户拥有的既有私有目录；不会创建或替换它。')
+    if (existsSync(join(target, 'state.sqlite')) && !lstatSync(join(target, 'state.sqlite')).isFile())
+      throw new Error('所选工作区的 state.sqlite 不是普通文件。')
+    roots.data = target
+  } else {
+    for (const path of Object.values(roots)) privateDirectory(path)
+  }
+  if (selectedTarget) { for (const name of ['config', 'cache', 'logs', 'workspace']) privateDirectory(roots[name]) }
   const defaultModel = join(homedir(), '.config/superagent-personal/model.json')
   const model = process.env.PA_MODEL_CONFIG ? resolve(process.env.PA_MODEL_CONFIG) :
     !desktop && existsSync(defaultModel) ? defaultModel : join(roots.config, 'model.json')

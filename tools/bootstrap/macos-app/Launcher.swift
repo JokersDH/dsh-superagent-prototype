@@ -10,6 +10,7 @@ final class AssistantApp: NSObject, NSApplicationDelegate {
     var stopButton: NSButton!
     var task: Process?
     var workbench: URL?
+    var targetRoot: URL?
     var output = ""
     var quitting = false
     var busy = false
@@ -35,6 +36,7 @@ final class AssistantApp: NSObject, NSApplicationDelegate {
         }
         env["PATH"] = ([engine.appendingPathComponent("runtime/bin").path] + paths).joined(separator: ":")
         env["PA_DESKTOP_APP"] = "1"
+        if let target = targetRoot { env["PA_TARGET_DATA_ROOT"] = target.path }
         return env
     }
     func log(_ text: String) {
@@ -61,6 +63,7 @@ final class AssistantApp: NSObject, NSApplicationDelegate {
         let menu = NSMenu()
         let appMenu = NSMenuItem(); menu.addItem(appMenu)
         let items = NSMenu()
+        let workspace = NSMenuItem(title: "打开已有工作区…", action: #selector(openWorkspace), keyEquivalent: "o"); workspace.target = self; items.addItem(workspace)
         let guide = NSMenuItem(title: "使用手册", action: #selector(showGuide), keyEquivalent: "?"); guide.target = self; items.addItem(guide)
         let logs = NSMenuItem(title: "打开日志", action: #selector(showLogs), keyEquivalent: "l"); logs.target = self; items.addItem(logs)
         items.addItem(.separator())
@@ -79,13 +82,15 @@ final class AssistantApp: NSObject, NSApplicationDelegate {
         detail = NSTextField(wrappingLabelWithString: "首次使用请在工作台配置模型，并导入自己的 Git 项目。")
         detail.textColor = .secondaryLabelColor; detail.font = .systemFont(ofSize: 12); detail.frame = NSRect(x: 36, y: 94, width: 485, height: 40); content.addSubview(detail)
         openButton = NSButton(title: "打开工作台", target: self, action: #selector(openWorkbench))
-        openButton.bezelStyle = .rounded; openButton.keyEquivalent = "\r"; openButton.frame = NSRect(x: 30, y: 34, width: 142, height: 36); openButton.isEnabled = false; content.addSubview(openButton)
+        openButton.bezelStyle = .rounded; openButton.keyEquivalent = "\r"; openButton.frame = NSRect(x: 24, y: 34, width: 122, height: 36); openButton.isEnabled = false; content.addSubview(openButton)
         stopButton = NSButton(title: "停止服务", target: self, action: #selector(stopService))
-        stopButton.bezelStyle = .rounded; stopButton.frame = NSRect(x: 182, y: 34, width: 112, height: 36); stopButton.isEnabled = false; content.addSubview(stopButton)
+        stopButton.bezelStyle = .rounded; stopButton.frame = NSRect(x: 150, y: 34, width: 100, height: 36); stopButton.isEnabled = false; content.addSubview(stopButton)
+        let workspaceButton = NSButton(title: "已有工作区", target: self, action: #selector(openWorkspace))
+        workspaceButton.bezelStyle = .rounded; workspaceButton.frame = NSRect(x: 254, y: 34, width: 116, height: 36); content.addSubview(workspaceButton)
         let help = NSButton(title: "使用手册", target: self, action: #selector(showGuide))
-        help.bezelStyle = .rounded; help.frame = NSRect(x: 324, y: 34, width: 100, height: 36); content.addSubview(help)
+        help.bezelStyle = .rounded; help.frame = NSRect(x: 374, y: 34, width: 88, height: 36); content.addSubview(help)
         let logsButton = NSButton(title: "日志", target: self, action: #selector(showLogs))
-        logsButton.bezelStyle = .rounded; logsButton.frame = NSRect(x: 432, y: 34, width: 74, height: 36); content.addSubview(logsButton)
+        logsButton.bezelStyle = .rounded; logsButton.frame = NSRect(x: 466, y: 34, width: 64, height: 36); content.addSubview(logsButton)
         window.makeKeyAndOrderFront(nil); NSApp.activate(ignoringOtherApps: true)
         launch()
     }
@@ -136,6 +141,17 @@ final class AssistantApp: NSObject, NSApplicationDelegate {
     @objc func openWorkbench() {
         if let url = workbench { NSWorkspace.shared.open(url) }
         else { status.stringValue = "正在启动本地工作台…"; launch() }
+    }
+    @objc func openWorkspace() {
+        if task != nil {
+            status.stringValue = "请先停止当前服务"; detail.stringValue = "不能在运行中切换工作区；先点击“停止服务”。"
+            return
+        }
+        let panel = NSOpenPanel(); panel.canChooseDirectories = true; panel.canChooseFiles = false
+        panel.allowsMultipleSelection = false; panel.prompt = "选择已有工作区"; panel.message = "选择恢复后目标或已有工作区的私有目录；路径选择本身不授予执行权。"
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+        targetRoot = url; status.stringValue = "正在打开已有工作区…"; detail.stringValue = "将使用原恢复授权校验；路径选择不替代授权。"
+        workbench = nil; openButton.isEnabled = false; launch()
     }
     @objc func showGuide() { NSWorkspace.shared.open(engine.appendingPathComponent("产品使用手册.html")) }
     @objc func showLogs() {
