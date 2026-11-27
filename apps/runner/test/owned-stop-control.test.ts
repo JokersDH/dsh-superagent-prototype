@@ -94,6 +94,37 @@ test('an empty query alone cannot replace the original exit event', async () => 
   assert.equal(h.signals.length, 0)
 })
 
+test('a fast original child needs no fabricated birth to prove signal-free exit plus empty group', async () => {
+  const h = fixture(), observe = h.observer.process
+  h.observer.process = () => ({ kind: 'unknown', reason: 'already-exited-before-live-inspection' })
+  const resource = await h.spawn()
+  assert.equal(resource.identity.startMarker, null)
+  h.exit(resource.identity.pid)
+  const stopped = await h.host.stopOwned(resource.resourceRef, 40)
+  assert.equal(stopped.quiescence, 'confirmed')
+  assert.equal(h.signals.length, 0)
+  assert.equal(resource.identity.startMarker, null, 'No marker is manufactured after exit')
+  assert.equal(h.host.resources().length, 0)
+  assert.ok(stopped.evidenceRefs.includes('original-complete-group-barrier'))
+  h.observer.process = observe
+  assert.ok((await h.spawn()).resourceRef, 'Normal short-command cleanup does not block the native successor')
+})
+
+test('a missing live birth never authorizes a signal, and exit without positive empty group stays UNKNOWN', async () => {
+  for (const state of ['live', 'empty-without-exit', 'exited-unobserved-group', 'exited-surviving-member'] as const) {
+    const h = fixture()
+    h.observer.process = () => ({ kind: 'unknown', reason: 'controlled-live-identity-unobserved' })
+    const resource = await h.spawn()
+    if (state === 'empty-without-exit') h.groups.set(resource.identity.groupId, [])
+    if (state === 'exited-unobserved-group') { h.exit(resource.identity.pid); h.groups.delete(resource.identity.groupId) }
+    if (state === 'exited-surviving-member') h.exit(resource.identity.pid, [resource.identity.pid + 99])
+    assert.equal((await h.host.stopOwned(resource.resourceRef, 40)).quiescence, 'indeterminate')
+    assert.equal(h.signals.length, 0)
+    assert.equal(h.host.resources().length, 1)
+    assert.equal(h.host.inventory()[0]!.writer, 'indeterminate')
+  }
+})
+
 test('the whole stopAll plan is checked before the first signal', async () => {
   const h = fixture(), first = await h.spawn(), second = await h.spawn()
   h.snapshots.get(second.identity.pid)!.uid++

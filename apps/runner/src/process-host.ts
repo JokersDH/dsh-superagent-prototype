@@ -292,14 +292,19 @@ export class ProcessHost implements OwnedProcessHost {
     return refs.map(ref => {
       if (this.#inventory.get(ref)?.writer === 'quiescent') return { ref, state: 'quiescent' as const, evidence: 'original-confirmed-barrier' }
       const handle = this.#handles.get(ref), identity = handle?.identity
-      if (!handle || !identity?.startMarker || identity.uid === null || identity.groupId !== identity.pid)
+      if (!handle || !identity || identity.uid === null || identity.groupId !== identity.pid || identity.operation !== 'spawn')
         return { ref, state: 'unknown' as const, evidence: 'original-spawn-identity-incomplete' }
       try {
         const group = this.#observer.group(identity.groupId)
         if (group.kind !== 'observed') return { ref, state: 'unknown' as const, evidence: 'owned-group-unobserved' }
+        // A short original child can exit before its full live identity is observed. Its OWN exit
+        // event plus a positively empty original detached group proves no registered writer remains
+        // without signalling or inventing a birth marker. Missing PID/terminal/ACK alone never do.
         if (group.pids.length === 0) return handle.exited.done
           ? { ref, state: 'quiescent' as const, evidence: 'original-exit-and-observed-empty-group' }
           : { ref, state: 'unknown' as const, evidence: 'original-exit-not-observed', pendingExit: true }
+        // Live signalling authority is a distinct, stronger requirement and remains fail-closed.
+        if (!identity.startMarker) return { ref, state: 'unknown' as const, evidence: 'original-spawn-identity-incomplete' }
         if (group.pids.length !== 1 || group.pids[0] !== identity.pid)
           return { ref, state: 'unknown' as const, evidence: 'unregistered-group-member' }
         if (handle.exited.done) return { ref, state: 'unknown' as const, evidence: 'group-not-empty-after-original-exit' }
