@@ -62,6 +62,7 @@ function fixture(options: {
   policyHost?: false
   businessOpen?: () => boolean
   reusePermissionId?: boolean
+  permissionTitle?: false
 } = {}) {
   const spec: AttemptSpec = { ...makeAttemptSpec(), profile: { ...makeAttemptSpec().profile, driverId: 'acp-v1' } }
   const ref = attemptIdentity(spec), commands = new Queue<RunnerCommand>(), facts: CriticalFact[] = []
@@ -109,7 +110,7 @@ function fixture(options: {
   const permission = async (context: AgentRequestContext<PromptRequest>) => {
     // Official SDK request ID is exposed unchanged in the original native binding.
     const answer = await context.client.request(methods.client.session.requestPermission, { sessionId: context.params.sessionId,
-      toolCall: { toolCallId: 'controlled-tool', title: 'Write controlled file' }, options: [
+      toolCall: { toolCallId: 'controlled-tool', ...(options.permissionTitle === false ? {} : { title: 'Write controlled file' }) }, options: [
         { optionId: 'native/allow-once', name: 'Allow this write', kind: 'allow_once' },
         { optionId: 'native/allow-always', name: 'Always allow writes', kind: 'allow_always' },
         { optionId: 'native/reject-once', name: 'Reject this write', kind: 'reject_once' },
@@ -209,6 +210,20 @@ test('permission preserves original options and request identity; response_writt
     assert.deepEqual(f.permissionResponses, [{ outcome: { outcome: 'selected', optionId: 'native/allow-once' } }])
     assert.deepEqual(f.values('answer.observed').map(value => (value as { status: string }).status), ['response_written'])
     assert.ok(f.values('dispatch.observed').some(value => (value as { commandId: string }).commandId === 'controlled-answer-command'))
+  } finally { f.close() }
+})
+
+test('standard permission with only toolCallId still opens and answers the original native request', async () => {
+  const f = fixture({ permissionTitle: false, prompt: async context => { await f.permission(context); return { stopReason: 'end_turn' } } })
+  try {
+    const { work, begin } = await f.start(); begin(); await waitFor(() => f.values('question.opened').length === 1)
+    const question = f.values('question.opened')[0] as unknown as { prompt: string; nativePayloadRef: string }
+    assert.match(question.prompt, /controlled-tool/)
+    const original = f.payloads.get(question.nativePayloadRef) as { params: { toolCall: object } }
+    assert.deepEqual(original.params.toolCall, { toolCallId: 'controlled-tool' })
+    await f.answer(); assert.equal((await work).reason, 'terminal')
+    assert.deepEqual(f.permissionResponses, [{ outcome: { outcome: 'selected', optionId: 'native/allow-once' } }])
+    assert.equal(f.values('answer.observed').length, 1)
   } finally { f.close() }
 })
 

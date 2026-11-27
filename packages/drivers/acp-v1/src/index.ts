@@ -249,8 +249,11 @@ export class AcpDriver implements AgentDriverV1 {
           const binding = NativeQuestionBindingSchema.parse({ ...ref, id: `acp-target-${id}`, connectionEpoch: 1,
             nativeRequestId, nativeMethod: context.method, provenanceRef: raw })
           const mapped = permissionOptions(context.params.options)
+          // ACP ToolCallUpdate permits an omitted title (DSH sends only toolCallId). Keep the
+          // native request unchanged and supply a display label, never a new permission identity.
+          const prompt = context.params.toolCall.title?.trim() || `Agent requests permission for tool call ${context.params.toolCall.toolCallId}`
           const question = UserQuestionSchema.parse({ id: `acp-question-${id}`, version: 1, kind: 'permission', contract: spec.contract,
-            scope: settings.scope, prompt: context.params.toolCall.title, nativePayloadRef: raw,
+            scope: settings.scope, prompt, nativePayloadRef: raw,
             presentation: { kind: 'choices', multiple: false, options: mapped.items }, targets: [binding], openedAt: new Date().toISOString(), validity: 'open' })
           const pending: PendingPermission = { binding, question, options: mapped.native, result: deferred(), written: deferred(),
             answered: false, sessionId: context.params.sessionId, cancelled: false }

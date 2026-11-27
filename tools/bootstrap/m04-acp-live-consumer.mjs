@@ -247,8 +247,23 @@ try {
     report.attemptId ??= binding?.attemptId
     const beginIndexed = report.attemptId && store.db.prepare("SELECT command_id FROM command_receipts WHERE json_extract(result,'$.command.attemptId') = ? AND json_extract(result,'$.command.kind') = 'begin'").get(report.attemptId)
     const noSendProven = productClosed && !counted && !beginIndexed
-    const terminal = report.attemptId && store.observations.forAttempt(report.attemptId).some(item => item.kind === 'turn.ended')
-    const knownOutcome = terminal && binding?.state === 'ended' && report.sendOutcome !== 'UNKNOWN'
+    const observations = report.attemptId ? store.observations.forAttempt(report.attemptId) : []
+    let accepted
+    for (const row of observations.filter(item => item.kind === 'dispatch.observed')) {
+      const payload = (await store.payloads.read(row.payloadRef)).value
+      if (payload?.kind === 'dispatch.observed' && payload.value.delivery === 'native_accepted' &&
+          payload.value.commandId === current.nativeDispatch?.commandId)
+        accepted = { commandId: payload.value.commandId, factId: row.factId, delivery: 'native_accepted' }
+    }
+    const terminal = observations.some(item => item.kind === 'turn.ended')
+    // Actual prompt consumption and physical release are separate facts. Never refund a consumed
+    // turn, or release the original Work/resources, because the other layer failed.
+    const knownOutcome = terminal && Boolean(accepted)
+    if (knownOutcome) {
+      if (current.state === 'unknown') ledger.unknownOutcome--
+      current.state = 'sent'; current.reconciliation = accepted; report.sendOutcome = 'RECONCILED'
+      if (binding?.state !== 'ended') current.physicalState = 'UNKNOWN_RETAINED'
+    }
     if (!noSendProven && !knownOutcome) {
       if (!counted) ledger.sent++
       if (current.state !== 'unknown') ledger.unknownOutcome++
