@@ -90,6 +90,8 @@ export class ProcessHost implements OwnedProcessHost {
   readonly #signalProcess: (pid: number, signal: 'SIGTERM' | 'SIGKILL') => void | Promise<void>
   readonly #wait: (ms: number) => Promise<void>
   #stopping: Promise<void> = Promise.resolve()
+  #stopWindows = 0
+  readonly #resourceStopping = new Set<string>()
   readonly #stderrRing: StderrRing | undefined
 
   constructor(options: ProcessHostOptions = {}) {
@@ -136,6 +138,7 @@ export class ProcessHost implements OwnedProcessHost {
 
   async #admitSpawn(spec: ProcessSpec, context?: { cwd: string; env: NodeJS.ProcessEnv }): Promise<OwnedProcess> {
     if (this.#admissionClosed || this.#spawnAdmissionClosed) throw new DriverError('state_indeterminate', 'admission_closed', 'Process admission is closed')
+    if (this.#stopWindows > 0) throw new DriverError('state_indeterminate', 'stop_observation_in_progress', 'Original resource stop observation is in progress')
     const pending = this.#spawn(spec, context)
     this.#spawning.add(pending)
     try { return await pending } finally { this.#spawning.delete(pending) }
@@ -248,8 +251,27 @@ export class ProcessHost implements OwnedProcessHost {
     const previous = this.#inventory.get(resourceRef)
     if (previous?.writer === 'quiescent') return { quiescence: 'confirmed', evidenceRefs: [...previous.evidence] }
     if (!this.#handles.has(resourceRef)) return { quiescence: 'indeterminate', evidenceRefs: ['unknown-resource'] }
-    this.closeAdmission()
-    return this.#serializedStop(() => this.#stopResources([resourceRef], deadlineMs))
+    const window = this.#stopWindow(deadlineMs)
+    this.#resourceStopping.add(resourceRef)
+    this.#stopWindows++
+    try { return await this.#serializedStop(() => this.#stopResources([resourceRef], window)) }
+    finally { this.#stopWindows-- }
+  }
+
+  #stopWindow(deadlineMs: number) {
+    const termDeadline = this.#now() + Math.max(0, deadlineMs)
+    return { termDeadline, finalDeadline: termDeadline + this.#killGraceMs }
+  }
+  async #awaitSpawning(deadline: number): Promise<boolean> {
+    const pending = [...this.#spawning]
+    if (pending.length === 0) return true
+    const remaining = deadline - this.#now()
+    if (remaining <= 0) return false
+    let timer: ReturnType<typeof setTimeout> | undefined
+    try {
+      return await Promise.race([Promise.allSettled(pending).then(() => true),
+        new Promise<boolean>(resolve => { timer = setTimeout(() => resolve(false), remaining) })])
+    } finally { if (timer) clearTimeout(timer) }
   }
 
   #serializedStop<T>(operation: () => Promise<T>): Promise<T> {
@@ -299,10 +321,10 @@ export class ProcessHost implements OwnedProcessHost {
       this.#handles.delete(item.ref)
     }
   }
-  async #stopResources(targets: readonly string[], deadlineMs: number): Promise<{ quiescence: 'confirmed' | 'indeterminate'; evidenceRefs: readonly string[] }> {
-    await Promise.allSettled([...this.#spawning])
+  async #stopResources(targets: readonly string[], window: { termDeadline: number; finalDeadline: number }): Promise<{ quiescence: 'confirmed' | 'indeterminate'; evidenceRefs: readonly string[] }> {
+    if (!await this.#awaitSpawning(window.termDeadline))
+      return { quiescence: 'indeterminate', evidenceRefs: ['original-spawn-completion-unobserved-before-deadline'] }
     const universe = [...this.#handles.keys()], evidence: string[] = []
-    const deadline = this.#now() + Math.max(0, deadlineMs)
     const result = (confirmed: boolean, why?: string) => {
       if (why) evidence.push(why)
       if (!confirmed) for (const ref of targets) if (this.#handles.has(ref))
@@ -329,7 +351,8 @@ export class ProcessHost implements OwnedProcessHost {
         if (missing) return result(false, `pre-${signal.toLowerCase()}:${missing.evidence}`)
         const target = plan.find(item => item.ref === ref)
         if (target?.state !== 'live') continue
-        if (signal === 'SIGTERM' && this.#now() > deadline) return result(false, 'preflight-deadline-exceeded')
+        if (this.#now() >= (signal === 'SIGTERM' ? window.termDeadline : window.finalDeadline))
+          return result(false, `pre-${signal.toLowerCase()}:preflight-deadline-exceeded`)
         const handle = this.#handles.get(ref)!
         try {
           // The admitted cohort is exactly one original leader per group. Signal that exact PID,
@@ -338,7 +361,7 @@ export class ProcessHost implements OwnedProcessHost {
           evidence.push(`${signal.toLowerCase()}-owned-pid:${handle.identity.pid}`)
         } catch { return result(false, `${signal.toLowerCase()}-delivery-unconfirmed`) }
       }
-      const until = signal === 'SIGTERM' ? deadline : this.#now() + this.#killGraceMs
+      const until = signal === 'SIGTERM' ? window.termDeadline : window.finalDeadline
       for (;;) {
         plan = inspect()
         if (complete()) return result(true, 'original-complete-group-barrier')
@@ -353,12 +376,14 @@ export class ProcessHost implements OwnedProcessHost {
 
   /** Stop the original complete inventory; a single unknown entry prevents every new signal. */
   async stopAll(deadlineMs: number): Promise<{ quiescence: 'confirmed' | 'indeterminate'; evidenceRefs: readonly string[] }> {
+    const window = this.#stopWindow(deadlineMs)
     this.closeAdmission()
     return this.#serializedStop(async () => {
-      await Promise.allSettled([...this.#spawning])
+      if (!await this.#awaitSpawning(window.termDeadline))
+        return { quiescence: 'indeterminate', evidenceRefs: ['original-spawn-completion-unobserved-before-deadline'] }
       const refs = [...this.#handles.keys()]
       if (refs.length === 0) return { quiescence: 'confirmed', evidenceRefs: ['no-owned-resources'] }
-      return this.#stopResources(refs, deadlineMs)
+      return this.#stopResources(refs, window)
     })
   }
 
@@ -380,6 +405,7 @@ export class ProcessHost implements OwnedProcessHost {
 
   async #write(handle: Handle, frame: Uint8Array): Promise<void> {
     if (this.#admissionClosed) throw new DriverError('state_indeterminate', 'admission_closed', 'Native write admission is closed')
+    if (this.#resourceStopping.has(handle.resourceRef)) throw new DriverError('state_indeterminate', 'resource_stopping', 'Original resource write admission is closed')
     if (handle.exited.done) throw new DriverError('transport_lost', 'process_exited', 'Cannot write to an exited process')
     const stdin = handle.child.stdin
     if (!stdin || stdin.destroyed || stdin.writableEnded) {

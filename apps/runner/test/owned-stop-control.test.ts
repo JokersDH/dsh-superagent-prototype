@@ -32,7 +32,7 @@ function fixture() {
   const host = new ProcessHost({ observer, spawnProcess: fakeSpawn, now: () => now, killGraceMs: 40,
     wait: async ms => { now += ms }, signalProcess: (target, signal) => { assert.ok(target > 0, 'Only an exact original PID may be signalled'); signals.push({ pid: target, signal }); onSignal(target, signal) } })
   return { host, observer, snapshots, groups, signals, children, exit,
-    now: () => now, onSignal: (callback: typeof onSignal) => { onSignal = callback },
+    now: () => now, advance: (ms: number) => { now += ms }, onSignal: (callback: typeof onSignal) => { onSignal = callback },
     spawn: (argv: string[] = ['--controlled', 'two words', '']) => host.spawn({ executable: process.execPath, argv, cwdRef: 'original-workspace', environmentRef: 'original-config' }) }
 }
 
@@ -167,4 +167,42 @@ test('delivery failure is UNKNOWN, never a missing-process proof', async () => {
   h.onSignal(() => { throw Object.assign(new Error('controlled ESRCH'), { code: 'ESRCH' }) })
   assert.equal((await h.host.stopOwned(resource.resourceRef, 40)).quiescence, 'indeterminate')
   assert.deepEqual(h.signals.map(signal => signal.signal), ['SIGTERM'])
+})
+
+test('a per-command natural completion does not permanently close the later native spawn', async () => {
+  const h = fixture(), command = await h.spawn()
+  h.exit(command.identity.pid)
+  assert.equal((await h.host.stopOwned(command.resourceRef, 40)).quiescence, 'confirmed')
+  const native = await h.spawn()
+  assert.notEqual(native.resourceRef, command.resourceRef)
+  assert.equal(h.signals.length, 0)
+})
+
+test('a per-resource stop closes only that resource and temporarily fences expansion of its plan', async () => {
+  const h = fixture(), command = await h.spawn()
+  const stopping = h.host.stopOwned(command.resourceRef, 40)
+  await assert.rejects(h.spawn(), error => (error as { reason?: string }).reason === 'stop_observation_in_progress')
+  assert.equal((await stopping).quiescence, 'confirmed')
+  const next = await h.spawn()
+  assert.ok(next.resourceRef)
+  await assert.rejects(h.host.write(command.resourceRef, new Uint8Array()), error => (error as { code?: string }).code === 'transport_lost')
+})
+
+test('preflight time counts against the original TERM deadline', async () => {
+  const h = fixture(), resource = await h.spawn(), observe = h.observer.process
+  h.observer.process = pid => { h.advance(50); return observe(pid) }
+  assert.equal((await h.host.stopOwned(resource.resourceRef, 40)).quiescence, 'indeterminate')
+  assert.equal(h.signals.length, 0)
+})
+
+test('an escalation preflight cannot extend the original final deadline', async () => {
+  const h = fixture(), resource = await h.spawn(), observe = h.observer.process, deadline = h.now() + 40
+  let readsAtDeadline = 0
+  h.onSignal(() => {})
+  h.observer.process = pid => {
+    if (h.signals.length && h.now() >= deadline && ++readsAtDeadline >= 2) h.advance(100)
+    return observe(pid)
+  }
+  assert.equal((await h.host.stopOwned(resource.resourceRef, 40)).quiescence, 'indeterminate')
+  assert.deepEqual(h.signals.map(item => item.signal), ['SIGTERM'])
 })
