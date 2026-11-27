@@ -20,7 +20,8 @@ import { handleAssistantReplies } from './assistant-replies.ts'
 import type { PrivateModelProvider } from './model-provider.ts'
 import { ModelProviderError } from './model-provider.ts'
 import { AssistantStreams } from './assistant-streams.ts'
-import type { NativeProductConfiguration } from './native-config.ts'
+import type { NativeProductConfiguration, ProductExecutorConfiguration } from './native-config.ts'
+import { executorProfiles, executorProfileRef, executorAdmissionCurrent } from './executor-profiles.ts'
 import type { NativeRunnerLinkFactory } from './native-attempt.ts'
 import type { NativeProjectRegistry } from './project-registry.ts'
 import { ProductEnvironments } from './environments.ts'
@@ -59,13 +60,15 @@ export function createProductRuntime(
     scratchProject: string
     assistantProvider?: PrivateModelProvider
     native?: NativeProductConfiguration
+    /** Trusted installed adapters; a request cannot register implementations or policy functions. */
+    executors?: readonly ProductExecutorConfiguration[]
     /** Trusted in-process test/host port; never read from configuration or HTTP. */
     nativeRunnerLinkFactory?: NativeRunnerLinkFactory
     /** Trusted local composition capacity; the original queue/bindings remain the only owners. */
     maxActiveAttempts?: 2 | 4
     executionUnavailable?: ExecutionUnavailableReason
     /** Trusted local probe only. This port cannot be selected or supplied by an HTTP request. */
-    inspectExecutor?: () => Promise<NativeExecutorInspection>
+    inspectExecutor?: (profileId?: string) => Promise<NativeExecutorInspection>
     inspectedProfiles?: readonly import('@personal-agent/contracts').ExecutionProfileView[]
     projectRegistry?: NativeProjectRegistry
     workspaceRoot?: string
@@ -84,7 +87,9 @@ export function createProductRuntime(
   },
 ) {
   const unavailable = options.executionUnavailable === undefined ? undefined : ExecutionUnavailableReasonSchema.parse(options.executionUnavailable)
-  if (unavailable && options.native) throw new TypeError('Unavailable execution cannot contain an admitted native runtime')
+  const executors = executorProfiles(options.native, options.executors)
+  const hasNative = executors.length > 0
+  if (unavailable && hasNative) throw new TypeError('Unavailable execution cannot contain an admitted native runtime')
   for (const input of options.inspectedProfiles ?? []) {
     const view = ExecutionProfileViewSchema.parse(input)
     if (view.kind !== 'native' || view.dispatchAllowed) throw new TypeError('Diagnostic profiles never authorize a runtime')
@@ -97,12 +102,12 @@ export function createProductRuntime(
       throw new TypeError('Trial runtime admission requires a trusted fresh identity and receipt check')
   }
   // A real native runtime never offers the fixed scratch executors as a selectable alternative.
-  const fixtureProfiles = unavailable || options.native ? [] : FIXTURE_PROFILES
+  const fixtureProfiles = unavailable || hasNative ? [] : FIXTURE_PROFILES
   options = {
     ...options,
     principal: structuredClone(options.principal),
     projects: options.projects.map((project) => {
-      if (unavailable || project.discussionOnly || options.startupMode === 'recovery_readonly' || options.native?.projects.some((native) => native.id === project.id)) return structuredClone(project)
+      if (unavailable || project.discussionOnly || options.startupMode === 'recovery_readonly' || executors.some(entry => entry.projects.some(native => native.id === project.id))) return structuredClone(project)
       const grant = structuredClone(project.scope)
       const scope: Scope = {
         projectId: project.id,
@@ -117,11 +122,12 @@ export function createProductRuntime(
     }),
   }
   const configuredProjects = [...options.projects]
-  const nativeProjects = [...(options.native?.projects ?? [])]
+  const nativeProjects = [...new Map(executors.flatMap(entry => entry.projects).map(project => [project.id, project])).values()]
+  const projectProfiles = new Map(nativeProjects.map(project => [project.id,
+    executors.filter(entry => entry.projects.some(item => item.id === project.id)).map(entry => entry.profile.id)]))
   options = {
     ...options,
     projects: configuredProjects,
-    ...(options.native ? { native: { ...options.native, projects: nativeProjects } } : {}),
   }
   const environments = new ProductEnvironments(options.store, options.stateRoot)
   const workspaceRoot = options.workspaceRoot && (!unavailable || existsSync(options.workspaceRoot))
@@ -141,9 +147,9 @@ export function createProductRuntime(
     outputLimitBytes: 64 * 1024,
   })
   const versionedProjectIds = new Set(options.projectRegistry?.list().map(project => project.id) ?? [])
-  for (const project of options.native?.projects ?? []) if (!versionedProjectIds.has(project.id)) checks.register(project.check)
-  const projectSettings = options.native && options.projectRegistry
-    ? new ProductProjectSettings(options.store, options.projectRegistry, checks, options.principal, options.native.profile.id) : undefined
+  for (const entry of executors) for (const project of entry.projects) if (!versionedProjectIds.has(project.id)) checks.register(project.check)
+  const projectSettings = hasNative && options.projectRegistry
+    ? new ProductProjectSettings(options.store, options.projectRegistry, checks, options.principal, executors.map(entry => entry.profile.id)) : undefined
   if (projectSettings) for (const record of options.projectRegistry!.list())
     projectSettings.register(record, nativeProjects.find(project => project.id === record.id))
   const completion = new ProductCompletion(options.store, workspaces, checks, {
@@ -155,12 +161,15 @@ export function createProductRuntime(
   let execution: ExecutionConsumer | undefined
   const application = createProductApplication({
     ...options,
-    profileIds: [...(options.native ? [options.native.profile.id] : []), ...fixtureProfiles],
+    profileIds: [...executors.map(entry => entry.profile.id), ...fixtureProfiles],
+    executionProfile: id => { const entry = executors.find(entry => entry.profile.id === id); return entry && executorProfileRef(entry) },
+    canSupplement: ticketId => execution instanceof ProductExecution && execution.canSupplement(ticketId),
     executionEnabled: !unavailable,
     registeredChecks: checks.ids(),
     registeredCheck: id => !!checks.latest(id),
     projectGrant: input => {
-      if (input.newWork && options.native?.admissionCurrent && !options.native.admissionCurrent())
+      const executor = executors.find(entry => entry.profile.id === input.profileId)
+      if (executor && (!projectProfiles.get(input.projectId)?.includes(input.profileId) || input.newWork && !executorAdmissionCurrent(executor)))
         throw new ApplicationFault('unsupported_capability', '执行器身份或策略已变化，请正常重开并重新核对；原工作保留。', 'user_action')
       return projectSettings?.authorize(input.projectId, input.profileId, input.criteria, input.newWork)
     },
@@ -196,9 +205,10 @@ export function createProductRuntime(
       : nativeProjects.find(project => project.id === contract.scope.projectId) : undefined,
     options.nativeRunnerLinkFactory,
     options.maxActiveAttempts,
+    options.executors,
   )
   const { store } = options
-  const executorTrials = options.startupMode !== 'recovery_readonly' && !options.native && options.inspectExecutor
+  const executorTrials = options.startupMode !== 'recovery_readonly' && options.inspectExecutor
     ? new ProductExecutorTrials({ store, principal: options.principal, inspect: options.inspectExecutor }) : undefined
   const replyResults = options.assistantReplyResults ??
     (store.workflows.assistant as typeof store.workflows.assistant & { replyResults?: AssistantReplyResults }).replyResults
@@ -243,7 +253,7 @@ export function createProductRuntime(
       ? projectSettings.read(project.id).current : project.scope })) }), options.actionSecret, options.now)
   if (options.assistantProvider)
     handleAssistantReplies(execution.effects, store, options.assistantProvider, assistantStreams, {
-      nativeExecution: !!options.native,
+      nativeExecution: hasNative,
       executionUnavailable: !!unavailable,
       canReply: message => configuredProjects.some(project => project.id === message.projectId),
       proposalScope: projectId => configuredProjects.find(project => project.id === projectId)?.scope,
@@ -259,7 +269,7 @@ export function createProductRuntime(
     usageObservationDownload: query => usage.download(query),
     usageSupportDownload: query => usage.support(query),
     recovery: async () => recovery.inspect(),
-    ...(executorTrials ? { executorTrialInspection: () => executorTrials.read(),
+    ...(executorTrials ? { executorTrialInspection: (profileId?: string) => executorTrials.read(profileId),
       executorTrialReceipt: async (id: string) => executorTrials.receipt(id) } : {}),
     recoveryActivation: async activationId => readRecoveryActivationRecord(store, activationId, options.principal),
     ...(completedReplies ? { replyCandidates: async (messageId: string) => proposals.replyCandidates(messageId) } : {}),
@@ -299,7 +309,7 @@ export function createProductRuntime(
       if (!work) throw new ApplicationFault('invalid_request', 'Unknown work')
       return execution!.verificationStatus(work)
     },
-    ...((options.native || unavailable) && options.projectRegistry
+    ...((hasNative || unavailable) && options.projectRegistry
       ? {
           registerProject: async (input) => {
             const record = options.projectRegistry!.prepare(input)
@@ -317,17 +327,24 @@ export function createProductRuntime(
               configuredProjects.unshift(project)
               if (!unavailable) nativeProjects.unshift({ id: record.id, path: record.path, check,
                 ...(record.environment ? { environment: options.projectRegistry!.environment(record)! } : {}) })
+              if (!unavailable) projectProfiles.set(record.id, executors.map(entry => entry.profile.id))
               projectSettings?.register(record, nativeProjects[0])
             }
             return await read.configuration!()
           },
         }
       : {}),
+    workExecution: async workId => {
+      const work = (await application.inspect({ workId })).works[0]
+      if (!work) throw new ApplicationFault('invalid_request', 'Unknown work')
+      if (!(execution instanceof ProductExecution)) throw new ApplicationFault('unsupported_capability', 'Execution inspection is unavailable')
+      return execution.workExecution(work)
+    },
     workLocation: async (workId) => {
       const view = (await application.inspect({ workId })).works[0]
       if (!view) throw new ApplicationFault('invalid_request', 'Unknown work')
       const projectPath =
-        options.native?.projects.find((project) => project.id === view.work.projectId)?.path ??
+        nativeProjects.find((project) => project.id === view.work.projectId)?.path ??
         options.projectRegistry?.list().find(project => project.id === view.work.projectId)?.path ?? options.scratchProject
       const link = view.links.find(
         (link) => link.role === 'primary' && link.contract.revision === view.contract.revision,
@@ -345,7 +362,7 @@ export function createProductRuntime(
       const view = (await application.inspect({ workId })).works[0]
       if (!view) throw new ApplicationFault('invalid_request', 'Unknown work')
       const policy = (projectSettings?.has(view.work.projectId) ? projectSettings.forContract(view.contract)
-        : options.native?.projects.find(project => project.id === view.work.projectId))?.environment?.policy
+        : nativeProjects.find(project => project.id === view.work.projectId))?.environment?.policy
       const link = view.links.find(link => link.role === 'primary' && link.contract.revision === view.contract.revision)
       const binding = link && options.store.bindings.current(link.ticketId)
       const status = policy ? binding ? environments.status(binding) : { status: 'waiting' as const } : { status: 'not_configured' as const }
@@ -385,7 +402,8 @@ export function createProductRuntime(
         }
       : {}),
     configuration: async () => {
-      const currentUnavailable = unavailable ?? (options.native?.admissionCurrent && !options.native.admissionCurrent() ? 'not_admitted' : undefined)
+      const currentExecutors = executors.filter(executorAdmissionCurrent)
+      const currentUnavailable = unavailable ?? (hasNative && !currentExecutors.length ? 'not_admitted' : undefined)
       const currentNative = nativeProjects.map(project => projectSettings?.has(project.id) ? projectSettings.latest(project.id) : project)
       const configuration = applicationConfiguration({
         projects: options.projects.map((project) => ({
@@ -393,12 +411,10 @@ export function createProductRuntime(
           ...(projectSettings?.has(project.id) ? { displayName: projectSettings.displayName(project.id) } : {}),
           settingsAvailable: projectSettings?.has(project.id) ?? false,
           ...(projectSettings?.has(project.id) && projectSettings.archived(project.id) ? { blockedReason: 'conflict' as const } : {}),
-          profileIds: currentUnavailable || project.discussionOnly ? [] : options.native?.projects.some((native) => native.id === project.id)
-            ? [options.native.profile.id]
-            : fixtureProfiles,
+          profileIds: currentUnavailable || project.discussionOnly ? [] : projectProfiles.get(project.id) ?? fixtureProfiles,
           defaultCriteria: currentUnavailable || project.discussionOnly
             ? [{ id: 'review-output', kind: 'human' as const, required: true, description: '审阅讨论内容' }]
-            : options.native?.projects.some((native) => native.id === project.id)
+            : nativeProjects.some((native) => native.id === project.id)
             ? [
                 {
                   id: 'project-tests',
@@ -424,18 +440,8 @@ export function createProductRuntime(
           ...(unavailable ? options.inspectedProfiles ?? [{ id: 'profile-codex-native', revision: 1, driverId: 'codex-native', kind: 'native' as const,
             displayName: `Codex · ${{ not_installed: '未安装', incompatible_version: '版本未准入', unsupported_platform: '平台未准入', probe_failed: '检测未完成', not_admitted: '尚未准入', needs_auth: '尚未登录', operator_disabled: '未启用', recovery_readonly: '恢复只读' }[unavailable]}`,
             readiness: currentUnavailable === 'not_installed' ? 'missing' as const : currentUnavailable === 'needs_auth' ? 'needs_auth' as const : currentUnavailable === 'incompatible_version' || currentUnavailable === 'unsupported_platform' ? 'incompatible' as const : 'needs_setup' as const }] : []),
-          ...(options.native
-            ? [
-                options.native.profileView ?? {
-                  id: options.native.profile.id,
-                  revision: options.native.profile.revision,
-                  displayName: `Codex · 本机开发 · ${options.native.profile.expectedVersion}`,
-                  driverId: 'codex-native',
-                  kind: 'native' as const,
-                  readiness: 'native_test_passed' as const,
-                },
-              ]
-            : []),
+          ...executors.map(entry => entry.profileView),
+          ...(!unavailable ? (options.inspectedProfiles ?? []).filter(view => !executors.some(entry => entry.profile.id === view.id)) : []),
           ...fixtureProfiles.map((id) => ({
             id,
             revision: 1,
@@ -447,9 +453,9 @@ export function createProductRuntime(
         ],
         checks: (currentUnavailable ? [] : [...new Set([...(fixtureProfiles.length ? [FIXTURE_CHECK] : []), ...currentNative.map(project => project.check.id)])])
           .map((id) => ({ id, revision: checks.require(id).revision, displayName: checks.require(id).title ?? id })),
-        enabledProfileIds: options.startupMode === 'recovery_readonly' || currentUnavailable ? [] : [...(options.native ? [options.native.profile.id] : []), ...fixtureProfiles],
+        enabledProfileIds: options.startupMode === 'recovery_readonly' || currentUnavailable ? [] : [...currentExecutors.map(entry => entry.profile.id), ...fixtureProfiles],
         executionAvailability: options.startupMode === 'recovery_readonly' ? { state: 'unavailable', reason: 'recovery_readonly' }
-          : currentUnavailable ? { state: 'unavailable', reason: currentUnavailable } : { state: 'available', kind: options.native ? 'native' : 'controlled_fixture' },
+          : currentUnavailable ? { state: 'unavailable', reason: currentUnavailable } : { state: 'available', kind: hasNative ? 'native' : 'controlled_fixture' },
         reviewActivityAvailable: options.startupMode !== 'recovery_readonly',
         decisionsAvailable: options.startupMode !== 'recovery_readonly',
         proposalsAvailable: options.startupMode !== 'recovery_readonly',

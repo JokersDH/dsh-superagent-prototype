@@ -4,6 +4,7 @@
  * frozen runtime schemas, so a fixture cannot smuggle a shape the real product would reject.
  */
 import {
+  IdSchema,
   AnswerDeliverySchema,
   ApplicationConfigurationSchema,
   ChangeSchema,
@@ -19,6 +20,7 @@ import {
   AssistantStreamUpdateSchema,
   ProjectRegistrationInputSchema,
   WorkLocationSchema,
+  WorkExecutionSchema,
   WorkEnvironmentSchema,
   WorkVerificationStatusSchema,
   VerificationRetryCommandSchema,
@@ -87,6 +89,7 @@ import type {
   UserCommand,
   ProjectRegistrationInput,
   WorkLocation,
+  WorkExecution,
   WorkEnvironment,
   WorkVerificationStatus,
   VerificationRetryCommand,
@@ -171,6 +174,7 @@ export interface ConsoleTransport {
   prepareReplyCandidate?(input: AssistantCandidatePrepare): Promise<ProposalPreview>
   registerProject?(input: ProjectRegistrationInput): Promise<ApplicationConfiguration>
   workLocation?(workId: string): Promise<WorkLocation | undefined>
+  workExecution?(workId: string): Promise<WorkExecution | undefined>
   workEnvironment?(workId: string): Promise<WorkEnvironment | undefined>
   workVerification?(workId: string): Promise<WorkVerificationStatus | undefined>
   retryVerification?(command: VerificationRetryCommand): Promise<CommandReceipt>
@@ -205,7 +209,7 @@ export interface ConsoleTransport {
   prepareRecoveryTarget?(input: RecoveryTargetPrepareInput): Promise<RecoveryTargetStatus>
   authorizeRecoveryTarget?(input: RecoveryTargetAuthorize): Promise<RecoveryTargetAuthorization>
   recoveryAuthorization?(activationId: string): Promise<RecoveryTargetAuthorization | undefined>
-  inspectExecutorTrial?(): Promise<ExecutorTrialInspection | undefined>
+  inspectExecutorTrial?(profileId?: string): Promise<ExecutorTrialInspection | undefined>
   confirmExecutorTrial?(input: ExecutorTrialCommand): Promise<ExecutorTrialReceipt>
   executorTrialReceipt?(commandId: string): Promise<ExecutorTrialReceipt | undefined>
   /** Authenticated local session check/bootstrap (HTTP lane); the fixture lane is always authenticated. */
@@ -250,8 +254,12 @@ export class HttpTransport implements ConsoleTransport {
   async recoveryInspection(): Promise<RecoveryInspection> {
     return RecoveryInspectionSchema.parse(await this.request('/v1/recovery/inspect'))
   }
-  async inspectExecutorTrial(): Promise<ExecutorTrialInspection | undefined> {
-    try { return ExecutorTrialInspectionSchema.parse(await this.request('/v1/executors/trial')) }
+  async inspectExecutorTrial(profileId?: string): Promise<ExecutorTrialInspection | undefined> {
+    try {
+      const value = ExecutorTrialInspectionSchema.parse(await this.request('/v1/executors/trial' + (profileId ? `?profileId=${encodeURIComponent(IdSchema.parse(profileId))}` : '')))
+      if (profileId && value.profile.id !== profileId) throw new TransportError('schema_mismatch', 'Executor inspection profile mismatch')
+      return value
+    }
     catch (error) { if (error instanceof TransportError && error.code === 'unsupported_capability') return undefined; throw error }
   }
   async confirmExecutorTrial(input: ExecutorTrialCommand): Promise<ExecutorTrialReceipt> {
@@ -443,6 +451,16 @@ export class HttpTransport implements ConsoleTransport {
       body: JSON.stringify(ProjectRegistrationInputSchema.parse(input)),
     })
     return ApplicationConfigurationSchema.parse(body)
+  }
+  async workExecution(workId: string): Promise<WorkExecution | undefined> {
+    try {
+      const value = WorkExecutionSchema.parse(await this.request(`/v1/works/${encodeURIComponent(workId)}/execution`))
+      if (value.contract.workId !== workId) throw new TransportError('schema_mismatch', 'Work execution identity mismatch')
+      return value
+    } catch (error) {
+      if (error instanceof TransportError && error.code === 'unsupported_capability') return undefined
+      throw error
+    }
   }
   async workLocation(workId: string): Promise<WorkLocation | undefined> {
     try {

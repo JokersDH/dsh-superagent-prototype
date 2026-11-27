@@ -4,7 +4,7 @@
  * the backend snapshot and `actions.available`; the UI never infers a phase or invents an action.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { ConversationMessageSchema, IdSchema, ProjectRecipePreviewInputSchema } from '@personal-agent/contracts'
+import { ConversationMessageSchema, IdSchema, ProgressUpdateSchema, ProjectRecipePreviewInputSchema } from '@personal-agent/contracts'
 import {
   ArrowUp,
   ArrowUpRight,
@@ -69,6 +69,8 @@ import type {
   AttentionItem,
   ProjectRecipeFields,
   ProjectRecipePreviewInput,
+  ProgressUpdate,
+  WorkExecution,
 } from '@personal-agent/contracts'
 import type { ConsoleTransport, ExecutorSnapshot, TargetDelivery, VerificationDetail } from './transport.ts'
 import { TransportError } from './transport.ts'
@@ -95,6 +97,7 @@ import { CompletionHistoryPanel } from './CompletionHistoryPanel.tsx'
 import { blockedLabel, executionUnavailableLabel } from './configuration-labels.ts'
 import type { FixtureAdapter } from './fixture.ts'
 import { conversationId as defaultConversationId } from './config.ts'
+const progressKey = (contract: ContractRef): string => `${contract.workId}:${contract.revision}:${contract.digest}`
 const phaseLabel: Record<WorkView['phase'], string> = {
   evaluating: '评估中',
   queued: '已排队',
@@ -186,6 +189,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
   const [assistant, setAssistant] = useState<AssistantProviderStatus | undefined>()
   const [waitingAfter, setWaitingAfter] = useState<number | undefined>()
   const [streamReplies, setStreamReplies] = useState<readonly AssistantStreamUpdate[]>([])
+  const [workProgress, setWorkProgress] = useState<ReadonlyMap<string, { seq: number; update: ProgressUpdate }>>(new Map())
   const fixture =
     typeof (transport as FixtureAdapter).setModelOffline === 'function' ? (transport as FixtureAdapter) : undefined
   const [snapshot, setSnapshot] = useState<Snapshot | undefined>(undefined)
@@ -212,6 +216,7 @@ export function App({ transport }: { transport: ConsoleTransport }) {
   const [contextOpen, setContextOpen] = useState(false)
   const [activateWorkId, setActivateWorkId] = useState<string | undefined>()
   const [workLocation, setWorkLocation] = useState<WorkLocation | undefined>()
+  const [workExecution, setWorkExecution] = useState<WorkExecution | undefined>()
   const [workEnvironment, setWorkEnvironment] = useState<WorkEnvironment | undefined>()
   const [workVerification, setWorkVerification] = useState<WorkVerificationStatus | undefined>()
   const [verificationFailure, setVerificationFailure] = useState<string | undefined>()
@@ -468,7 +473,16 @@ export function App({ transport }: { transport: ConsoleTransport }) {
             lastSeq.current = Math.max(lastSeq.current, change.seq)
             failures = 0
             setConnection('live')
-            if (change.topic === 'conversation.message') {
+            if (change.topic === 'application.execution.progress') {
+              const progress = ProgressUpdateSchema.safeParse(change.payload)
+              if (progress.success && progress.data.contract.workId === change.entityRef) setWorkProgress(previous => {
+                const id = progressKey(progress.data.contract)
+                if ((previous.get(id)?.seq ?? 0) >= change.seq) return previous
+                const next = new Map(previous); next.delete(id); next.set(id, { seq: change.seq, update: progress.data })
+                while (next.size > 32) next.delete(next.keys().next().value!)
+                return next
+              })
+            } else if (change.topic === 'conversation.message') {
               const message = ConversationMessageSchema.safeParse((change.payload as { message?: unknown }).message)
               if (message.success && message.data.conversationId === conversationId) appendMessage(message.data)
               else scheduleRefresh()
@@ -631,6 +645,16 @@ export function App({ transport }: { transport: ConsoleTransport }) {
       cancelled = true
     }
   }, [selectedWorkId, snapshot?.cursor, inspectorOpen, modelPanelOpen, transport])
+
+  useEffect(() => {
+    setWorkExecution(undefined)
+    if (!selectedWorkId || !transport.workExecution) return
+    let cancelled = false
+    void transport.workExecution(selectedWorkId)
+      .then(value => { if (!cancelled) setWorkExecution(value) })
+      .catch(() => { /* Unknown capability remains disabled while the original backend stays authoritative. */ })
+    return () => { cancelled = true }
+  }, [selectedWorkId, snapshot?.cursor, transport])
 
   const openWorkDraft = (goal = '', projectId = projectFilter ?? '', recipe?: ProjectRecipePreviewInput) => {
     setWorkspaceOpen(true)
@@ -1128,6 +1152,8 @@ export function App({ transport }: { transport: ConsoleTransport }) {
               snapshot={snapshot}
               projectFilter={projectFilter}
               selectedWork={selectedWork}
+              workExecution={workExecution}
+              executionCapabilityAvailable={!!transport.workExecution}
               pending={pending === 'chat'}
               offline={offline}
               assistant={assistant}
@@ -1231,6 +1257,8 @@ export function App({ transport }: { transport: ConsoleTransport }) {
                 transport={transport}
                 historyIdentity={`${trialIdentity}:${configuration?.revision ?? ''}`}
                 work={selectedWork}
+                execution={workExecution}
+                progress={selectedWork ? workProgress.get(progressKey(selectedWork.contract))?.update : undefined}
                 location={workLocation}
                 environment={workEnvironment}
                 locationFailure={locationFailure}
@@ -1486,7 +1514,7 @@ function ExecutorDirectory({ transport, configuration, state, onReload }: {
   </div>
   return <div className="workspace-view"><div className="view-header"><div><h2 className="view-title">执行器连接</h2><p className="view-description">{native.length} 个原生执行器 · {native.filter(profile => profile.dispatchAllowed).length} 个已准入</p></div><button type="button" className="icon-button" title="刷新执行器" aria-label="刷新执行器" onClick={onReload}><RefreshCw size={17} /></button></div>
     <div className="view-content"><div className="executor-directory">{native.map(row)}
-      <ExecutorTrialPanel transport={transport} />
+      <ExecutorTrialPanel transport={transport} profiles={native} />
       {state === 'loading' && <p className="empty">正在读取执行器…</p>}
       {state === 'failed' && <p className="warn-text" role="alert">执行器配置读取失败。</p>}
       {state === 'unavailable' && <p className="empty">执行器信息暂不可用。</p>}
@@ -2203,6 +2231,8 @@ function Conversation({
   snapshot,
   projectFilter,
   selectedWork,
+  workExecution,
+  executionCapabilityAvailable,
   selectedProjectName,
   selectedQuestionCount,
   onInspectWork,
@@ -2232,6 +2262,8 @@ function Conversation({
   snapshot: Snapshot | undefined
   projectFilter: string | undefined
   selectedWork: WorkView | undefined
+  workExecution: WorkExecution | undefined
+  executionCapabilityAvailable: boolean
   selectedProjectName: string
   selectedQuestionCount: number
   onInspectWork: () => void
@@ -2254,6 +2286,9 @@ function Conversation({
   useEffect(() => { onDraftChange(draft) }, [draft, onDraftChange])
   useEffect(() => { if (settledContextDraft) setDraft(current => current === settledContextDraft.text ? '' : current) }, [settledContextDraft])
   const [useWorkContext, setUseWorkContext] = useState(false)
+  const executionCurrent = selectedWork && workExecution && progressKey(selectedWork.contract) === progressKey(workExecution.contract)
+  const runningInputBlocked = !!selectedWork && selectedWork.resourceStatus !== 'quiescent' && executionCapabilityAvailable &&
+    (!executionCurrent || workExecution?.runningInput !== 'native_steer')
   useEffect(() => {
     if (!executionBlocked && activateWorkId && selectedWork?.work.id === activateWorkId) {
       setUseWorkContext(true)
@@ -2411,7 +2446,7 @@ function Conversation({
         onSubmit={async (event) => {
           event.preventDefault()
           const text = draft.trim()
-          if (!text || pending || waiting || streaming) return
+          if (!text || pending || waiting || streaming || useWorkContext && runningInputBlocked) return
           followReply.current = true
           if (await onSend(text, useWorkContext && !!selectedWork)) setDraft('')
         }}
@@ -2430,6 +2465,7 @@ function Conversation({
             if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) event.currentTarget.form?.requestSubmit()
           }}
         />
+        {useWorkContext && runningInputBlocked && <p className="pending-note" role="status">当前执行器未开放运行中补充。可切换主对话继续讨论，交付后再委托新的工作。</p>}
         <div className="composer-actions">
           <div className="composer-context" role="group" aria-label="消息上下文">
             <details
@@ -2470,7 +2506,8 @@ function Conversation({
                 type="button"
                 className={useWorkContext ? 'context-mode active' : 'context-mode'}
                 aria-pressed={useWorkContext}
-                disabled={executionBlocked}
+                disabled={executionBlocked || runningInputBlocked}
+                title={runningInputBlocked ? '当前执行器未开放运行中补充；可切换主对话继续讨论。' : undefined}
                 onClick={() => setUseWorkContext(true)}
               >
                 <Folder size={14} />
@@ -2494,7 +2531,7 @@ function Conversation({
             <button
               className="send-button"
               type="submit"
-              disabled={pending || waiting || streaming || !draft.trim()}
+              disabled={pending || waiting || streaming || !draft.trim() || useWorkContext && runningInputBlocked}
               aria-label="发送消息"
               title={useWorkContext ? '补充当前工作' : '发送到对话模型'}
             >
@@ -2828,6 +2865,8 @@ function WorkDetail({
   transport,
   historyIdentity,
   work,
+  execution,
+  progress,
   location,
   environment,
   locationFailure,
@@ -2847,6 +2886,8 @@ function WorkDetail({
   transport: ConsoleTransport
   historyIdentity: string
   work: WorkView | undefined
+  execution: WorkExecution | undefined
+  progress: ProgressUpdate | undefined
   location: WorkLocation | undefined
   environment: WorkEnvironment | undefined
   locationFailure: string | undefined
@@ -2892,6 +2933,10 @@ function WorkDetail({
         <span className={`phase phase-${work.phase}`}>{phaseLabel[work.phase]}</span>
       </div>
       <h3 className="detail-title">{work.work.title}</h3>
+      {execution && progressKey(execution.contract) === progressKey(work.contract) && <p className="context-line">
+        执行器：{execution.displayName}{execution.driverId === 'acp-v1' ? ' · ACP' : ''}
+        {execution.runningInput === 'unsupported' ? ' · 本次运行不支持补充指令' : ''}
+      </p>}
       <details className="technical-details">
         <summary>合同详情</summary>
         <p className="context-line">
@@ -3020,6 +3065,12 @@ function WorkDetail({
           )}
         </div>
       )}
+      {progress && progress.contract.workId === work.work.id && progress.contract.revision === work.contract.revision &&
+        progress.contract.digest === work.contract.digest && <details className="technical-details execution-progress" open>
+        <summary>执行动态</summary>
+        <pre className="artifact-text">{progress.text}</pre>
+        <p className="muted">显示最近动态；交付状态以当前检查和人工审阅为准。</p>
+      </details>}
       <h4>当前候选产物</h4>
       <Artifacts ids={work.artifactIds} reader={artifactReader} />
       <WorkEvidencePanel key={work.work.id} work={work} transport={transport} />

@@ -7,7 +7,7 @@
  * and physical stop evidence comes from the ProcessHost.
  */
 import type { AgentDriverV1, AttemptIO } from '../../../packages/contracts/src/ports.ts'
-import type { AttemptSpec, CriticalFact, DurableReceipt, RunnerCommand, ServeExit } from '../../../packages/contracts/src/types.ts'
+import type { AttemptSpec, CriticalFact, DurableReceipt, ProgressUpdate, RunnerCommand, ServeExit } from '../../../packages/contracts/src/types.ts'
 import { RunnerCommandSchema } from '../../../packages/contracts/src/schemas.ts'
 import {
   CommandQueue,
@@ -37,6 +37,8 @@ export type RunnerOptions = {
    */
   spool?: FileCriticalJournal
   progressIntervalMs?: number
+  /** Best-effort observation of the coalesced snapshot. It never owns a critical receipt. */
+  onProgress?: (update: ProgressUpdate) => void | Promise<void>
   commandCapacity?: number
 }
 
@@ -73,7 +75,10 @@ export class AttemptRunner {
       new ProcessHost({ stderrRing: this.stderrRing, ...options.processHostOptions })
     this.commands = new CommandQueue({ maxPending: options.commandCapacity ?? 256 })
     this.#progress = new ProgressCoalescer({
-      publish: update => this.journal.appendDiagnostic('progress', update.text),
+      publish: update => {
+        this.journal.appendDiagnostic('progress', update.text)
+        try { void Promise.resolve(options.onProgress?.(update)).catch(() => undefined) } catch { /* diagnostic observers cannot fail business or control */ }
+      },
       windowMs: options.progressIntervalMs ?? 100,
     })
   }
@@ -158,6 +163,16 @@ export class AttemptRunner {
     this.#admissionClosed = true
     this.commands.close('admission_closed', true)
     this.#processHost.closeAdmission()
+  }
+  /** Original ACP stop: revoke business, retain only the original cancel while existing FDs drain. */
+  requestCancel(command: RunnerCommand): void {
+    if (!this.#spec) throw new DriverError('state_indeterminate', 'not_launched', 'Cancellation requires an original attempt')
+    const parsed = RunnerCommandSchema.parse(command)
+    assertCommandIdentity(parsed, this.#spec)
+    if (parsed.kind !== 'cancel') throw new DriverError('protocol_error', 'not_cancel', 'Expected the original cancellation command')
+    this.#admissionClosed = true
+    this.#processHost.closeSpawnAdmission()
+    this.commands.closeWithCancel(parsed)
   }
   stopPhysical(deadlineMs: number): Promise<{ quiescence: 'confirmed' | 'indeterminate'; evidenceRefs: readonly string[] }> {
     return this.#processHost.stopAll(deadlineMs)

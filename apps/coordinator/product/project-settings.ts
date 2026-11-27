@@ -35,12 +35,12 @@ export class ProductProjectSettings {
   private readonly registry: NativeProjectRegistry
   private readonly checks: CheckRegistry
   private readonly principal: { userId: string; authorityRef: string }
-  private readonly profileId: string
+  private readonly profileIds: ReadonlySet<string>
   private readonly known = new Map<string, RegisteredProject>()
   constructor(store: ProductStore, registry: NativeProjectRegistry, checks: CheckRegistry,
-    principal: { userId: string; authorityRef: string }, profileId: string) {
+    principal: { userId: string; authorityRef: string }, profileId: string | readonly string[]) {
     this.store = store; this.registry = registry; this.checks = checks
-    this.principal = structuredClone(principal); this.profileId = profileId
+    this.principal = structuredClone(principal); this.profileIds = new Set(typeof profileId === 'string' ? [profileId] : profileId)
   }
   register(record: RegisteredProject, initial?: NativeProject): void {
     this.known.set(record.id, structuredClone(record))
@@ -110,7 +110,7 @@ export class ProductProjectSettings {
     if (!this.has(projectId)) return
     const current = this.require(projectId)
     if (current.archivedAt) throw new ApplicationFault('conflict', 'Project is archived; restore it before authorizing new work')
-    if (profileId !== this.profileId) throw new ApplicationFault('unsupported_capability', 'This project requires its registered native executor')
+    if (!this.profileIds.has(profileId)) throw new ApplicationFault('unsupported_capability', 'This project requires a registered native executor')
     const refs = criteria.filter(criterion => criterion.kind === 'machine' && criterion.required).map(criterion => criterion.checkDefinitionRef)
     const allowed = newWork ? [this.snapshot(current).check.id]
       : this.store.workflows.projects.history(projectId, { limit: 100 }).map(version => this.snapshot(version).check.id)

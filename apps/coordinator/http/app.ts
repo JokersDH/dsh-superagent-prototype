@@ -19,6 +19,7 @@ import {
   AssistantStreamUpdateSchema,
   ProjectRegistrationInputSchema,
   WorkLocationSchema,
+  WorkExecutionSchema,
   WorkEnvironmentSchema,
   ChangeSchema,
   CommandReceiptSchema,
@@ -111,6 +112,7 @@ import type {
   AssistantStreamUpdate,
   ProjectRegistrationInput,
   WorkLocation,
+  WorkExecution,
   WorkEnvironment,
   AppError,
   ApplicationService,
@@ -234,7 +236,7 @@ export interface LocalHttpOptions {
     recoveryActivation?(activationId: string): Promise<RecoveryActivationRecord | undefined>
     recoveryTarget?(activationId: string): Promise<RecoveryTargetStatus | undefined>
     recoveryTargetAuthorization?(activationId: string): Promise<RecoveryTargetAuthorization | undefined>
-    executorTrialInspection?(): Promise<ExecutorTrialInspection>
+    executorTrialInspection?(profileId?: string): Promise<ExecutorTrialInspection>
     executorTrialReceipt?(commandId: string): Promise<ExecutorTrialReceipt | undefined>
     assistantContext?(messageId: string): Promise<AssistantContextBinding | undefined>
     contextHistory?(query: ContextHistoryQuery): Promise<ContextHistory>
@@ -251,6 +253,7 @@ export interface LocalHttpOptions {
     guide?(): Promise<string>
     registerProject?(input: ProjectRegistrationInput): Promise<ApplicationConfiguration>
     workLocation?(workId: string): Promise<WorkLocation>
+    workExecution?(workId: string): Promise<WorkExecution>
     workEnvironment?(workId: string): Promise<WorkEnvironment>
     workVerification?(workId: string): Promise<WorkVerificationStatus>
     workEvidence?(workId: string): Promise<WorkEvidence>
@@ -477,10 +480,15 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
     return c.json(result)
   })
   app.get('/v1/executors/trial', async c => {
-    if (Object.keys(c.req.query()).length) throw new ApplicationFault('invalid_request', 'Executor inspection accepts no query')
+    const params = new URL(c.req.url).searchParams
+    for (const key of params.keys()) if (key !== 'profileId' || params.getAll(key).length !== 1)
+      throw new ApplicationFault('invalid_request', 'Executor inspection accepts only one profileId')
+    const profileId = params.has('profileId') ? IdSchema.parse(params.get('profileId')) : undefined
     if (options.startupMode === 'recovery_readonly' || !options.read?.executorTrialInspection)
       throw new ApplicationFault('unsupported_capability', 'Executor trial inspection is not available here', 'none')
-    return c.json(ExecutorTrialInspectionSchema.parse(await options.read.executorTrialInspection()))
+    const value = ExecutorTrialInspectionSchema.parse(await options.read.executorTrialInspection(profileId))
+    if (profileId && value.profile.id !== profileId) throw new ApplicationFault('storage_unavailable', 'Executor inspection profile mismatch', 'none')
+    return c.json(value)
   })
   app.post('/v1/executors/trial/confirm', async c => {
     if (options.startupMode === 'recovery_readonly' || !options.operations?.executorTrialConfirm)
@@ -782,6 +790,14 @@ export function createLocalHttpApp(options: LocalHttpOptions) {
   app.get('/v1/works/:id/evidence', async (c) => {
     if (!options.read?.workEvidence) throw new ApplicationFault('unsupported_capability', 'Work evidence is not connected')
     return c.json(WorkEvidenceSchema.parse(await options.read.workEvidence(IdSchema.parse(c.req.param('id')))))
+  })
+  app.get('/v1/works/:id/execution', async c => {
+    if (Object.keys(c.req.query()).length) throw new ApplicationFault('invalid_request', 'Work execution accepts no query parameters')
+    if (!options.read?.workExecution) throw new ApplicationFault('unsupported_capability', 'Work execution is not connected')
+    const workId = IdSchema.parse(c.req.param('id')), value = WorkExecutionSchema.parse(await options.read.workExecution(workId))
+    if (value.contract.workId !== workId) throw new ApplicationFault('storage_unavailable', 'Work execution identity mismatch', 'none')
+    c.header('cache-control', 'no-store')
+    return c.json(value)
   })
   app.get('/v1/works/:id/location', async (c) => {
     if (!options.read?.workLocation)

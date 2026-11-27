@@ -77,6 +77,15 @@ export class CommandQueue implements AsyncIterable<RunnerCommand> {
     this.#wake()
   }
 
+  /** Revoke every queued business write, deliver one original cancellation, then end the stream. */
+  closeWithCancel(command: RunnerCommand): void {
+    if (command.kind !== 'cancel') throw new DriverError('protocol_error', 'not_cancel', 'Only cancellation can close the queue with a final command')
+    if (this.#closed) return
+    this.#entries = []
+    this.push(command)
+    this.close('cancel_requested')
+  }
+
   [Symbol.asyncIterator](): AsyncIterator<RunnerCommand> {
     return { next: () => this.#take() }
   }

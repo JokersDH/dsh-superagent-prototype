@@ -162,7 +162,8 @@ export class RunnerLink {
           break
         case 'progress':
           progress.push(downstream.text)
-          this.#options.onProgress?.(downstream.text)
+          if (progress.length > 256) progress.splice(0, progress.length - 256)
+          try { this.#options.onProgress?.(downstream.text) } catch { /* diagnostic display cannot break the protocol reader */ }
           break
         case 'exited':
           exitFrame = downstream

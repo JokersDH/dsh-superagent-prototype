@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { ExecutorTrialCommandSchema } from '@personal-agent/contracts'
-import type { ExecutorTrialCommand, ExecutorTrialInspection, ExecutorTrialReceipt } from '@personal-agent/contracts'
+import type { ExecutionProfileView, ExecutorTrialCommand, ExecutorTrialInspection, ExecutorTrialReceipt } from '@personal-agent/contracts'
 import type { ConsoleTransport } from './transport.ts'
 import { TransportError } from './transport.ts'
 
@@ -11,9 +11,12 @@ function remembered() {
 }
 const labels = { verified: '原生验证通过', compatible_unverified: '协议兼容 · 版本尚未实测', incompatible: '协议不兼容', unknown: '检查信息不完整' }
 
-export function ExecutorTrialPanel({ transport }: { transport: ConsoleTransport }) {
+export function ExecutorTrialPanel({ transport, profiles = [] }: { transport: ConsoleTransport; profiles?: readonly ExecutionProfileView[] }) {
   const [initial] = useState(remembered)
   const [pending, setPending] = useState<ExecutorTrialCommand | undefined>(initial.command)
+  const [choice, setChoice] = useState(initial.command?.profileId ?? '')
+  const selected = choice || profiles[0]?.id
+  const selectedProfile = profiles.find(profile => profile.id === selected)
   const [inspection, setInspection] = useState<ExecutorTrialInspection>(), [receipt, setReceipt] = useState<ExecutorTrialReceipt>()
   const [confirmed, setConfirmed] = useState(false), [busy, setBusy] = useState(false), [unavailable, setUnavailable] = useState(false)
   const [error, setError] = useState(initial.damaged ? '原同意请求暂不可读，请保留当前工作区并查看诊断。' : '')
@@ -26,7 +29,7 @@ export function ExecutorTrialPanel({ transport }: { transport: ConsoleTransport 
   const inspect = () => act(async () => {
     if (!transport.inspectExecutorTrial) return
     setInspection(undefined); setConfirmed(false); setUnavailable(false)
-    const value = await transport.inspectExecutorTrial()
+    const value = await transport.inspectExecutorTrial(selected)
     setInspection(value); setUnavailable(!value); setConfirmed(false)
   })
   const consent = () => act(async () => {
@@ -55,6 +58,15 @@ export function ExecutorTrialPanel({ transport }: { transport: ConsoleTransport 
   return <section className="executor-trial" aria-label="执行器版本检查" aria-busy={busy}>
     <h3>执行器版本检查</h3>
     <p>版本不同会先核对协议和当前策略。检查不发送模型任务，也不会自动允许编码。</p>
+    {profiles.length > 0 && <label>检查执行器
+      <select aria-label="检查执行器" value={selected} disabled={busy || !!pending || initial.damaged} onChange={event => {
+        setChoice(event.target.value); setInspection(undefined); setConfirmed(false); setReceipt(undefined); setUnavailable(false); setError('')
+      }}>
+        {choice && !profiles.some(profile => profile.id === choice) && <option value={choice}>待核对的原执行器</option>}
+        {profiles.map(profile => <option key={profile.id} value={profile.id}>{profile.displayName}</option>)}
+      </select>
+    </label>}
+    {selectedProfile?.driverId === 'acp-v1' && <p>标准 ACP v1。当前 DSH 配置开放文件读写与编辑，检查由工作台运行；运行中补充、原生会话恢复和结构化澄清尚未开放。</p>}
     {!pending && !receipt && <button type="button" disabled={busy || initial.damaged} onClick={() => void inspect()}>{busy ? '正在检查…' : '检查版本兼容'}</button>}
     {unavailable && <p role="status">当前执行器无需试用确认，或此安装尚未提供检查入口。执行可用性以工作台当前状态为准。</p>}
     {inspection && <div className="executor-trial-facts"><strong>{labels[inspection.profile.compatibility?.classification ?? 'unknown']}</strong><p>{inspection.profile.compatibility?.nativeVersion ?? '版本尚未核实'}</p>

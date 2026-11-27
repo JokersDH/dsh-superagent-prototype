@@ -55,7 +55,8 @@ export type RunnerServiceOptions = {
   /** Downstream sink (runner -> coordinator). */
   write: (frame: BridgeFrame | Record<string, unknown>) => void
   /** Driver for this attempt; injected so tests use a fake and integration a real one. */
-  createDriver: (spec: AttemptSpec, hooks: { beforeNativeWrite(command: RunnerCommand): Promise<void> }) => AgentDriverV1
+  createDriver: (spec: AttemptSpec, hooks: { beforeNativeWrite(command: RunnerCommand): Promise<void>; isBusinessOpen(): boolean;
+    ownedRuntime: Pick<ProcessHost, 'originalIdentity'> }) => AgentDriverV1
   /** Native metadata/policy preparation may run before the first business begin. */
   eagerPrepare?: boolean
   /** Trusted host preparation runs inside this Runner before the native driver may spawn. */
@@ -344,7 +345,8 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
     void id
   }
 
-  const hooks = { beforeNativeWrite: async (command: RunnerCommand) => {
+  const hooks = { ownedRuntime: { originalIdentity: (resourceRef: string) => processHost.originalIdentity?.(resourceRef) },
+    isBusinessOpen: () => !businessClosed && !closed && !preparation.signal.aborted, beforeNativeWrite: async (command: RunnerCommand) => {
     if (!attach || businessClosed || command.kind !== 'answer') throw new Error('Native write admission is closed')
     // Each intent gets a fresh correlation id while the original command id/body stay untouched; the
     // channel never lets an earlier allowed frame approve a later intent.
@@ -445,6 +447,7 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
             attach.bind({ producer: channelProducer, connectionId: stdioConnectionId, expectedGeneration: 0 })
           }
           runner = new AttemptRunner({
+            onProgress: update => write({ type: 'progress', id: update.attemptId, text: update.text, observedAt: update.observedAt }),
             payloads: {
               read: reference => {
                 // Ask the coordinator for the immutable payload; the Runner has no store of its own.
@@ -501,9 +504,16 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
                 // is still allowed, but a terminal service is not revived.
                 const fence = controlRefusal(auth, 'cancel', true)
                 if (fence) throw Object.assign(new Error(fence.reason), fence)
-                // Cancel closes admission first (the endpoint does that) and then stops owned work.
+                // Standard ACP cancellation must reach the original Driver before stdin closes.
+                // Business/answers/spawns are revoked immediately; only the original queued cancel
+                // gets a bounded drain opportunity. A native reply never replaces the physical barrier.
+                if (spec?.profile.driverId === 'acp-v1' && runner && running && !businessClosed) {
+                  businessClosed = true
+                  preparation.abort()
+                  runner.requestCancel(command)
+                  await Promise.race([running.catch(() => undefined), new Promise<void>(resolve => setTimeout(resolve, 250))])
+                }
                 await stopPhysical()
-                void command
               },
               finalize: async (auth, confirmation) => {
                 // Postcommit finalize: the coordinator's original Store has already committed the barrier

@@ -9,6 +9,7 @@ import { inspectCodexCompatibility, probeCodexSurface } from '../../../packages/
 import { NativeAdmissionError, admittedNativeProfile } from './native-startup.ts'
 
 export type NativeExecutorInspection = {
+  displayName?: string
   profile: AgentProfile
   verdict: CompatibilityVerdict
   operations: readonly ExecutionOperationView[]
@@ -63,6 +64,7 @@ function policyTemplate(profile: AgentProfile) {
       ['driver', new URL('../../../packages/drivers/codex-native/src/native.ts', import.meta.url)],
       ['attemptGuard', new URL('./native-attempt.ts', import.meta.url)],
       ['execution', new URL('./execution.ts', import.meta.url)],
+      ['profileComposition', new URL('./executor-profiles.ts', import.meta.url)],
       ['startupAdmission', new URL('./inspected-startup.ts', import.meta.url)],
       ['trialConsent', new URL('./executor-trial.ts', import.meta.url)],
       ['inspection', new URL('./native-inspection.ts', import.meta.url)],

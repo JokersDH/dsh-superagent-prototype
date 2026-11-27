@@ -15,6 +15,7 @@ import {
   PreparedExecutionPolicySchema,
   RunnerCommandSchema,
   WorkVerificationStatusSchema,
+  WorkExecutionSchema,
 } from '@personal-agent/contracts'
 import type {
   AttemptRef,
@@ -26,6 +27,7 @@ import type {
   RuntimeFactPayload,
   WorkVerificationStatus,
   WorkView,
+  WorkExecution,
   ContractRevision,
 } from '@personal-agent/contracts'
 import type { RunningAttempt } from '../../../packages/execution/src/contracts.ts'
@@ -50,8 +52,8 @@ import { ownedResourceManifestDigest } from '../resource-barrier.ts'
 import { ControlledProductAttempt } from './controlled-attempt.ts'
 import { NativeProductAttempt } from './native-attempt.ts'
 import type { NativeRunnerLinkFactory } from './native-attempt.ts'
-import type { NativeProductConfiguration } from './native-config.ts'
-import { NativeCodexSettingsSchema } from '../../../packages/drivers/codex-native/src/native.ts'
+import type { NativeProductConfiguration, ProductExecutorConfiguration } from './native-config.ts'
+import { executorProfiles, executorProfileRef, executorOperationAllowed } from './executor-profiles.ts'
 import type { ProductCompletion } from './completion.ts'
 import type { ProductEnvironments } from './environments.ts'
 import { captureAttemptProfile } from './accepted-outcomes.ts'
@@ -74,6 +76,7 @@ const attemptOf = (value: AttemptRef): AttemptRef =>
     fenceEpoch: value.fenceEpoch,
     contract: value.contract,
   })
+const contractRef = (value: ContractRevision) => ({ workId: value.workId, revision: value.revision, digest: value.digest })
 const StartSchema = z.strictObject({
   spec: AttemptSpecSchema,
   initialInputRef: IdSchema,
@@ -115,7 +118,7 @@ export class ProductExecution {
   private readonly attempts = new Map<string, ControlledProductAttempt | NativeProductAttempt>()
   private readonly pendingBegins = new Map<string, RunnerCommand>()
   private readonly runs = new Set<Promise<void>>()
-  private readonly waiters = new Map<string, (dispatch: NativeDispatch) => void>()
+  private readonly waiters = new Map<string, { attemptId: string; resolve(dispatch: NativeDispatch): void; reject(error: unknown): void }>()
   private readonly verifying = new Set<string>()
   private readonly ingress: ReturnType<typeof createStoredRuntimeIngress>
   private timer: ReturnType<typeof setInterval> | undefined
@@ -128,7 +131,7 @@ export class ProductExecution {
   private readonly scratchProject: string
   private readonly stateRoot: string
   private readonly principal: { userId: string }
-  private readonly native: NativeProductConfiguration | undefined
+  private readonly executors: readonly ProductExecutorConfiguration[]
   private readonly nativeRunnerLinkFactory: NativeRunnerLinkFactory | undefined
   private readonly environments: ProductEnvironments | undefined
   private readonly projectForContract: ((contract: ContractRevision) => NativeProductConfiguration['projects'][number] | undefined) | undefined
@@ -146,6 +149,7 @@ export class ProductExecution {
     projectForContract?: (contract: ContractRevision) => NativeProductConfiguration['projects'][number] | undefined,
     nativeRunnerLinkFactory?: NativeRunnerLinkFactory,
     maxActiveAttempts: 2 | 4 = 4,
+    additionalExecutors: readonly ProductExecutorConfiguration[] = [],
   ) {
     if (maxActiveAttempts !== 2 && maxActiveAttempts !== 4) throw new RangeError('Execution capacity must be 2 or 4')
     this.maxActiveAttempts = maxActiveAttempts
@@ -155,7 +159,7 @@ export class ProductExecution {
     this.scratchProject = scratchProject
     this.stateRoot = stateRoot
     this.principal = principal
-    this.native = native
+    this.executors = executorProfiles(native, additionalExecutors)
     this.nativeRunnerLinkFactory = nativeRunnerLinkFactory
     this.environments = environments
     this.projectForContract = projectForContract
@@ -247,13 +251,36 @@ export class ProductExecution {
     const binding = this.store.bindings.current<IngressBinding>(target.ticketId)
     if (!binding || !same(attemptOf(binding), attemptOf(target)) || binding.state !== 'active') return 'stale'
     const runtime = this.attempts.get(target.attemptId)
-    if (runtime instanceof NativeProductAttempt && !this.nativeOperationAllowed('answer')) return 'unknown'
+    if (runtime instanceof NativeProductAttempt && !this.nativeOperationAllowed('answer', runtime.spec.profile.id)) return 'unknown'
     return runtime && (!(runtime instanceof NativeProductAttempt) || runtime.connected) && target.connectionEpoch === 1 ? 'current' : 'unknown'
   }
-  private nativeOperationAllowed(operation: 'begin' | 'answer' | 'steer' | 'cancel' | 'resume'): boolean {
-    const facts = this.native?.profileView?.compatibility
-    if (operation === 'begin' && this.native?.admissionCurrent && !this.native.admissionCurrent()) return false
-    return !facts || facts.operations.some(item => item.operation === operation && item.enabled)
+  canSupplement(ticketId: string): boolean {
+    const binding = this.store.bindings.current<IngressBinding>(ticketId)
+    if (!binding || binding.state === 'ended') return true
+    if (binding.state !== 'active') return false
+    const runtime = this.attempts.get(binding.attemptId)
+    return runtime instanceof ControlledProductAttempt || runtime instanceof NativeProductAttempt &&
+      this.nativeOperationAllowed('steer', runtime.spec.profile.id)
+  }
+  workExecution(work: WorkView): WorkExecution {
+    const link = work.links.find(link => link.role === 'primary' && same(link.contract, contractRef(work.contract)))
+    const ticket = link && this.store.domain.tickets.get<Ticket>(link.ticketId)
+    if (!ticket) throw new ApplicationFault('storage_unavailable', 'Original execution selection is missing')
+    const trigger = this.store.domain.triggers.get<Trigger>(ticket.origin.triggerId)!
+    const binding = this.store.bindings.current<IngressBinding>(ticket.id)
+    const start = binding && this.store.commands.get(key('product-start', binding.assignmentId))
+    const original = start && StartSchema.safeParse(start.result)
+    const entry = this.executors.find(entry => entry.profile.id === trigger.meta.profileId)
+    const confirmed = entry && same(trigger.meta.executionProfile, executorProfileRef(entry))
+    const profile = original && original.success ? original.data.spec.profile : confirmed ? entry.profile : undefined
+    return WorkExecutionSchema.parse({ protocol: 'work-execution/1', contract: contractRef(work.contract),
+      profileId: String(trigger.meta.profileId), revision: profile?.revision ?? null, driverId: profile?.driverId ?? null,
+      displayName: entry && profile && same(entry.profile, profile) ? entry.profileView.displayName : '原执行配置待核对',
+      runningInput: !binding || binding.state === 'ended' ? 'not_running' : this.canSupplement(ticket.id) ? 'native_steer'
+        : binding.state === 'active' && this.attempts.has(binding.attemptId) ? 'unsupported' : 'unknown' })
+  }
+  private nativeOperationAllowed(operation: 'begin' | 'answer' | 'steer' | 'cancel' | 'resume', profileId: string): boolean {
+    return executorOperationAllowed(this.executors.find(entry => entry.profile.id === profileId), operation)
   }
   private verificationRows() {
     return this.store.queue.dueRows('application.verify', Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER)
@@ -315,12 +342,11 @@ export class ProductExecution {
     this.store.uow.atomic(() => {
       for (const ticket of this.store.domain.tickets.list<Ticket>()) {
         const binding = this.store.bindings.current<IngressBinding>(ticket.id)
-        if (
-          binding &&
-          ['controlled-product-fixture', 'codex-native'].includes(binding.source) &&
-          binding.state !== 'ended'
-        ) {
-          if (binding.source === 'codex-native' && binding.state === 'active' && this.native) {
+        const originalStart = binding && this.store.commands.get(key('product-start', binding.assignmentId))
+        const saved = originalStart && StartSchema.safeParse(originalStart.result)
+        const native = saved && saved.success && saved.data.mode === 'native'
+        if (binding && (binding.source === 'controlled-product-fixture' || native) && binding.state !== 'ended') {
+          if (native && binding.state === 'active' && this.executors.length) {
             recoverable.push(binding)
             continue
           }
@@ -341,25 +367,25 @@ export class ProductExecution {
     })()
   }
   private async resumeNative(binding: IngressBinding): Promise<void> {
-    if (!this.nativeOperationAllowed('resume')) throw new Error('The current native profile has no verified resume capability')
     const ticket = this.current(binding)
     const saved = this.store.commands.get(key('product-start', binding.assignmentId))
     const prepared = saved && StartSchema.parse(saved.result)
+    const executor = prepared && this.executors.find(entry => entry.profile.id === prepared.spec.profile.id)
+    if (!executor || !this.nativeOperationAllowed('resume', executor.profile.id))
+      throw new Error('The original execution profile has no verified resume capability')
     if (!ticket || latestAssignment(ticket)?.state !== 'running' || !prepared || saved?.status !== 'recorded' ||
         saved.payloadDigest !== canonicalDigest(JsonSchema.parse(prepared)) || prepared.mode !== 'native' ||
-        !same(attemptOf(prepared.spec), attemptOf(binding)) || !same(prepared.spec.profile, this.native?.profile))
+        !same(attemptOf(prepared.spec), attemptOf(binding)) || !same(prepared.spec.profile, executor.profile))
       throw new Error('Original native begin/profile is not eligible for recovery')
     const registration = loadRecoveryRunner(this.store, binding.attemptId)
     if (!registration) throw new Error('Original native registration is missing')
     const location = this.workspaces.location(binding)
     const contract = this.store.product.contracts.getByRef(binding.contract)!
     const project = this.projectForContract ? this.projectForContract(contract)
-      : this.native?.projects.find(value => value.id === contract.scope.projectId)
+      : executor.projects.find(value => value.id === contract.scope.projectId)
     if (!project || realpathSync(project.path) !== realpathSync(location.projectPath)) throw new Error('Original project registration changed')
-    const policy = NativeCodexSettingsSchema.parse((await this.store.payloads.read(prepared.spec.policySnapshotRef)).value)
-    if (realpathSync(policy.workspacePath) !== realpathSync(location.path) || !same(policy.scope, contract.scope) ||
-        policy.approvalPolicy !== this.native?.approvalPolicy || policy.model !== this.native?.model ||
-        policy.collaborationMode !== this.native?.collaborationMode)
+    const policy = (await this.store.payloads.read(prepared.spec.policySnapshotRef)).value
+    if (!same(policy, executor.settings({ attempt: prepared.spec, workspacePath: location.path, scope: contract.scope })))
       throw new Error('Original native execution policy changed')
     this.environments?.current({ assignment: binding, workspacePath: location.path })
     const producer = registration.body.producer
@@ -449,7 +475,7 @@ export class ProductExecution {
     let timer: ReturnType<typeof setTimeout> | undefined
     try {
       const observation = new Promise<NativeDispatch>((resolve, reject) => {
-        this.waiters.set(command.id, resolve)
+        this.waiters.set(command.id, { attemptId: command.attemptId, resolve, reject })
         timer = setTimeout(
           () => reject(new UnknownSend('No committed native write fact', 'write_unknown')),
           runtime instanceof NativeProductAttempt ? 15000 : 2500,
@@ -511,7 +537,7 @@ export class ProductExecution {
       const runtime = binding && this.attempts.get(binding.attemptId)
       if (!binding || binding.state !== 'active' || !runtime)
         throw new UnknownSend('No current physical delivery target', 'delivery_target_unknown')
-      if (runtime instanceof NativeProductAttempt && !this.nativeOperationAllowed('steer'))
+      if (runtime instanceof NativeProductAttempt && !this.nativeOperationAllowed('steer', runtime.spec.profile.id))
         throw new UnknownSend('The current native profile has no enabled steer capability', 'unsupported_capability')
       const ids = [...ticket.undelivered],
         inputRef = this.input(ticket, ids, false)
@@ -558,9 +584,14 @@ export class ProductExecution {
     }
     const trigger = this.store.domain.triggers.get<Trigger>(ticket.origin.triggerId)!
     const profileId = String(trigger.meta.profileId)
-    const nativeProfile = this.native?.profile.id === profileId ? this.native.profile : undefined
-    if (nativeProfile && !this.nativeOperationAllowed('begin'))
+    const executor = this.executors.find(entry => entry.profile.id === profileId)
+    const nativeProfile = executor?.profile
+    if (nativeProfile && !this.nativeOperationAllowed('begin', profileId))
       throw new UnknownSend('The current native profile has no enabled begin capability', 'unsupported_capability')
+    if (executor && trigger.meta.executionProfile !== undefined && !same(trigger.meta.executionProfile, executorProfileRef(executor)))
+      throw new UnknownSend('The confirmed execution profile or policy changed; explicit confirmation is required', 'profile_changed')
+    if (executor && trigger.meta.executionProfile === undefined)
+      throw new UnknownSend('This unstarted Work needs explicit revision to confirm its execution profile', 'profile_snapshot_missing')
     if (!nativeProfile && !FIXTURE_PROFILES.includes(profileId as (typeof FIXTURE_PROFILES)[number]))
       throw new UnknownSend('Only explicit fixture profiles are enabled', 'unsupported_profile')
     const mode = nativeProfile
@@ -585,7 +616,7 @@ export class ProductExecution {
       fenceEpoch: (previous?.fenceEpoch ?? 0) + 1,
     })
     const nativeProject =
-      nativeProfile && (this.projectForContract ? this.projectForContract(contract) : this.native?.projects.find((project) => project.id === contract.scope.projectId))
+      executor && (this.projectForContract ? this.projectForContract(contract) : executor.projects.find((project) => project.id === contract.scope.projectId))
     if (nativeProfile && !nativeProject)
       throw new UnknownSend('Native project is not registered', 'unsupported_project')
     const workspace = this.workspaces.reserve({
@@ -596,15 +627,7 @@ export class ProductExecution {
     const policySnapshotRef = this.store.payloads.write(
       JsonSchema.parse(
         nativeProfile
-          ? NativeCodexSettingsSchema.parse({
-              kind: 'codex-native-settings/1',
-              workspacePath: workspace.path,
-              scope,
-              approvalPolicy: this.native!.approvalPolicy,
-              ...(this.native!.collaborationMode ? { collaborationMode: this.native!.collaborationMode } : {}),
-              ...(this.native!.model ? { model: this.native!.model } : {}),
-              timeoutMs: 600000,
-            })
+          ? executor!.settings({ attempt, workspacePath: workspace.path, scope })
           : {
               kind: 'fixed-scratch-fixture-policy/1',
               scope,
@@ -651,7 +674,7 @@ export class ProductExecution {
     const binding: IngressBinding = {
       ...attempt,
       runnerIdentityRef: key(nativeProfile ? 'native-host' : 'controlled-host', attempt.attemptId),
-      source: nativeProfile ? 'codex-native' : 'controlled-product-fixture',
+      source: nativeProfile ? nativeProfile.driverId : 'controlled-product-fixture',
       state: 'active',
       resources: [],
     }
@@ -736,6 +759,12 @@ export class ProductExecution {
     const run = (async () => {
       try {
         const exit = await running.waitExit()
+        // A Runner can terminate after a write whose critical receipt was refused/lost. Wake the
+        // ORIGINAL waiter as unknown; never leave it looking not_sent or invent an acceptance.
+        for (const [commandId, waiter] of this.waiters) if (waiter.attemptId === attempt.attemptId) {
+          this.store.uow.atomic(() => this.store.dispatch.markIndeterminate(commandId, attempt.attemptId, 'runtime_ended_before_dispatch_receipt'))
+          waiter.reject(new UnknownSend('Original Runner ended before this command receipt; reconcile before retry', 'write_unknown'))
+        }
         const barrier = await runtime.quiesce()
         this.store.uow.atomic(() => {
           const current = this.current(intent)
@@ -771,7 +800,7 @@ export class ProductExecution {
     intent: Intent,
   ): Promise<void> {
     if (!this.readyToDispatch(intent)) return
-    if (runtime instanceof NativeProductAttempt && !this.nativeOperationAllowed('begin'))
+    if (runtime instanceof NativeProductAttempt && !this.nativeOperationAllowed('begin', runtime.spec.profile.id))
       throw new UnknownSend('Native executable or admission changed before the original begin', 'admission_changed')
     // Only a live in-memory command proven not yet fed may wait through a dispatch hold.
     this.pendingBegins.delete(command.attemptId)
@@ -839,7 +868,7 @@ export class ProductExecution {
           this.application.core.inputsReadAssignment(fact.ticketId, fact.assignmentId, inputIds)
         }
       }
-      this.store.uow.afterCommit(() => this.waiters.get(dispatch.commandId)?.(dispatch))
+      this.store.uow.afterCommit(() => this.waiters.get(dispatch.commandId)?.resolve(dispatch))
     }
   }
   async close(): Promise<void> {

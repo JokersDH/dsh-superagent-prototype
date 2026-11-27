@@ -63,6 +63,7 @@ export class ProcessHost implements OwnedProcessHost {
   readonly #inventory = new Map<string, { ref: string; ownership: 'spawned_process'; writer: 'active' | 'quiescent' | 'indeterminate'; evidence: string[] }>()
   readonly #spawning = new Set<Promise<OwnedProcess>>()
   #admissionClosed = false
+  #spawnAdmissionClosed = false
   readonly #now: () => number
   readonly #killGraceMs: number
   readonly #resolveCwd: (ref: string) => string
@@ -83,7 +84,14 @@ export class ProcessHost implements OwnedProcessHost {
     return [...this.#handles.keys()]
   }
   inventory() { return [...this.#inventory.values()].map(item => structuredClone(item)) }
-  closeAdmission(): void { this.#admissionClosed = true }
+  /** Read only the original spawn record; never discover, infer or adopt a process by PID. */
+  originalIdentity(resourceRef: string): ProcessIdentity | undefined {
+    const handle = this.#handles.get(resourceRef)
+    return handle && !handle.exited.done ? structuredClone(handle.identity) : undefined
+  }
+  closeAdmission(): void { this.#admissionClosed = true; this.#spawnAdmissionClosed = true }
+  /** A bounded cancellation drain may write to existing owned FDs, but must never spawn new work. */
+  closeSpawnAdmission(): void { this.#spawnAdmissionClosed = true }
 
   async spawn(spec: ProcessSpec): Promise<OwnedProcess> {
     return this.#admitSpawn(spec)
@@ -102,14 +110,13 @@ export class ProcessHost implements OwnedProcessHost {
   }
 
   async #admitSpawn(spec: ProcessSpec, context?: { cwd: string; env: NodeJS.ProcessEnv }): Promise<OwnedProcess> {
-    if (this.#admissionClosed) throw new DriverError('state_indeterminate', 'admission_closed', 'Process admission is closed')
+    if (this.#admissionClosed || this.#spawnAdmissionClosed) throw new DriverError('state_indeterminate', 'admission_closed', 'Process admission is closed')
     const pending = this.#spawn(spec, context)
     this.#spawning.add(pending)
     try { return await pending } finally { this.#spawning.delete(pending) }
   }
   async #spawn(spec: ProcessSpec, context?: { cwd: string; env: NodeJS.ProcessEnv }): Promise<OwnedProcess> {
     validateSpec(spec)
-    this.#installCleanup()
     const child = spawn(spec.executable, [...spec.argv], {
       shell: false,
       detached: true, // own process group; required for group stop and identity
@@ -159,7 +166,7 @@ export class ProcessHost implements OwnedProcessHost {
       // Keep the handle until stopOwned observes the exit, so late evidence stays addressable.
     })
 
-    if (this.#admissionClosed) {
+    if (this.#admissionClosed || this.#spawnAdmissionClosed) {
       await this.stopOwned(resourceRef, 1500)
       throw new DriverError('state_indeterminate', 'admission_closed', 'Process admission closed during spawn')
     }
@@ -178,6 +185,20 @@ export class ProcessHost implements OwnedProcessHost {
     const handle = this.#handles.get(resourceRef)
     if (!handle) throw new DriverError('transport_lost', 'unknown_resource', `Unknown resource: ${resourceRef}`)
     await this.#write(handle, frame)
+  }
+  /** Normal EOF for one original owned stdin. It sends no signal and grants no exit/quiescence. */
+  async closeInput(resourceRef: string): Promise<void> {
+    const handle = this.#handles.get(resourceRef)
+    if (!handle) throw new DriverError('transport_lost', 'unknown_resource', `Unknown resource: ${resourceRef}`)
+    if (handle.child.stdin.writableEnded || handle.child.stdin.destroyed) return
+    await new Promise<void>((resolve, reject) => {
+      const clean = () => { handle.child.stdin.off('error', failed); handle.child.stdin.off('finish', finished) }
+      const failed = (error: Error) => { clean(); reject(error) }
+      const finished = () => { clean(); resolve() }
+      handle.child.stdin.once('error', failed)
+      handle.child.stdin.once('finish', finished)
+      handle.child.stdin.end()
+    })
   }
 
   /**
@@ -368,31 +389,7 @@ export class ProcessHost implements OwnedProcessHost {
     })
   }
 
-  /**
-   * Register best-effort cleanup once per process, not once per host: a listener per host would
-   * accumulate across tests and keep the event loop alive.
-   */
-  #installCleanup(): void {
-    const registry = (globalThis as { __g1ProcessHostRegistry?: Set<ProcessHost> }).__g1ProcessHostRegistry
-    if (registry) {
-      registry.add(this)
-      return
-    }
-    const hosts = new Set<ProcessHost>([this])
-    ;(globalThis as { __g1ProcessHostRegistry?: Set<ProcessHost> }).__g1ProcessHostRegistry = hosts
-    process.once('exit', () => {
-      for (const host of hosts) {
-        for (const handle of host.#handles.values()) {
-          if (handle.exited.done) continue
-          try {
-            process.kill(-handle.identity.groupId, 'SIGKILL')
-          } catch {
-            // best-effort cleanup on process exit
-          }
-        }
-      }
-    })
-  }
+
 }
 
 function validateSpec(spec: ProcessSpec): void {

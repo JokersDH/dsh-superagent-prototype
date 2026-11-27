@@ -10,6 +10,7 @@ import {
   IdSchema,
   ScopeSchema,
   VerificationRetryCommandSchema,
+  ExecutionProfileRefSchema,
 } from '@personal-agent/contracts'
 import type {
   AppError,
@@ -33,6 +34,7 @@ import type {
   VerificationRetryCommand,
   PreparedUserCommand,
   TransactionalApplicationCommands,
+  ExecutionProfileRef,
 } from '@personal-agent/contracts'
 import {
   canRetry,
@@ -82,6 +84,10 @@ export interface ApplicationOptions {
   projectPreflight?: (projectId: string) => Promise<void>
   registeredCheck?: (id: string) => boolean
   projectGrant?: (input: { projectId: string; profileId: string; criteria: ContractRevision['criteria']; newWork: boolean }) => void
+  /** Trusted composition snapshot, captured in the original trigger in the command transaction. */
+  executionProfile?: (profileId: string) => ExecutionProfileRef | undefined
+  /** Synchronous current-attempt capability gate, before adding an input to the original core. */
+  canSupplement?: (ticketId: string, profileId: string) => boolean
   verificationRecovery?: {
     retry(candidate: CandidateRef, blockedId: string): void
     blocked?(candidate: CandidateRef): boolean
@@ -407,6 +413,10 @@ class LocalApplication implements ProductApplication {
     if (!this.options.profileIds.includes(profileId))
       throw new ApplicationFault('unsupported_capability', 'Unknown execution profile')
     this.options.projectGrant?.({ projectId: work.projectId, profileId, criteria: command.criteria, newWork: command.kind === 'create_work' })
+    const selectedProfile = this.options.executionProfile?.(profileId)
+    const executionProfile = selectedProfile === undefined ? undefined : ExecutionProfileRefSchema.parse(selectedProfile)
+    if (executionProfile && executionProfile.profileId !== profileId)
+      throw new ApplicationFault('unsupported_capability', 'Execution profile snapshot changed')
     if (
       !command.criteria.some((item) => item.kind === 'machine' && item.required) ||
       command.criteria.some(
@@ -440,7 +450,8 @@ class LocalApplication implements ProductApplication {
       addressed: 'direct',
       at: this.now(),
       text: command.goal,
-      meta: { contract: refOf(contract), profileId, authorityRef: actor.authorityRef },
+      meta: { contract: refOf(contract), profileId, authorityRef: actor.authorityRef,
+        ...(executionProfile ? { executionProfile } : {}) },
     }
     this.core.receive(trigger)
     const decision = this.core.decide(trigger.id, {
@@ -599,6 +610,14 @@ class LocalApplication implements ProductApplication {
       this.expect('contract' in command.expected ? command.expected.contract : command.expected)
     if (command.kind === 'stop_work') {
       this.core.stopTicket(current.ticket.id)
+      // A standard protocol may have written begin without a native start ACK. The core assignment
+      // can still be pending while the ORIGINAL registered physical writer is already active.
+      // Logical stop must retain and stop that binding through the existing resource barrier.
+      for (const { binding } of this.physical(workId)) {
+        if (binding.state === 'ended' || binding.state === 'stopping') continue
+        this.store.bindings.record({ ...binding, state: 'stopping' })
+        this.enqueue('runtime.reconcile', binding.attemptId, binding.ticketId)
+      }
       this.emit(workId)
       return { workId }
     }
@@ -756,6 +775,8 @@ class LocalApplication implements ProductApplication {
       )
         throw new ApplicationFault('stale_contract', 'The selected work is not an active target')
       const original = this.store.domain.triggers.get<Trigger>(current.ticket.origin.triggerId)!
+      if (this.options.canSupplement && !this.options.canSupplement(current.ticket.id, String(original.meta.profileId)))
+        throw new ApplicationFault('unsupported_capability', '当前执行器不支持运行中补充；可在主对话讨论，或在本次交付后新建工作。', 'user_action')
       if (command.selectedProfileId && command.selectedProfileId !== original.meta.profileId)
         throw new ApplicationFault('conflict', 'A profile selection cannot change a running work')
       this.core.receive({

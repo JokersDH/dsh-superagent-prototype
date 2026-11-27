@@ -1,0 +1,19 @@
+{
+  "name": "@personal-agent/drivers-acp-v1",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Standard ACP v1 Client using the official SDK behind the original AgentDriverV1 and Runner.",
+  "license": "MIT",
+  "engines": { "node": ">=24.21.0 <25" },
+  "exports": { ".": "./src/index.ts", "./protocol": "./src/protocol.ts" },
+  "scripts": { "test": "node --test test/*.test.ts", "typecheck": "tsc -p tsconfig.json --noEmit" },
+  "dependencies": {
+    "@agentclientprotocol/sdk": "2.12.0",
+    "@personal-agent/contracts": "workspace:*",
+    "@personal-agent/driver-kit": "workspace:*",
+    "@personal-agent/catalog": "workspace:*",
+    "@personal-agent/policy-preparation": "workspace:*",
+    "zod": "4.4.3"
+  }
+}

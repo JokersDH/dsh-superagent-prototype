@@ -2,6 +2,8 @@
 
 日期：2026-11-27。依据用户提出的“每个 Work 可连接不同 Agent，支持 CLI 等标准接入，并支持标准 ACP”。状态：接入架构决定与实施约束；不是新执行器的准入或完成报告。源码核对基线为 `febf05271f582396beffe7a11a309fe698a12969`。
 
+同日后续用户决定：先只实现标准 **ACP Client**，并已创建对应实现 goal。下文第8节的对外 Facade 和 CLI 转 ACP 仅保留为设计背景，不进入此 goal、当前排期或完成条件。
+
 本文补充 [0096](0096-milestone-04-protocol-admission-and-target-authorization.md) 和[里程碑04](../../product/MILESTONE-04.zh-CN.md)。当前只实施原第二协议结果线所需的统一接入，不增加里程碑清单、真实调用预算或第三条结果线。对外 ACP 服务、第三个执行器和通用 headless CLI 的实施顺序在下文单列，不能因接口设计完成便自动开工。
 
 ## 1. 决定
@@ -140,6 +142,10 @@ flowchart TB
 
 ### 可用性与降级
 
+标准ACP不要求Agent另行提供私有schema导出命令。协议兼容可依据一次成功的标准v1协商、准确安装/配置身份和官方稳定v1 schema建立，但证据必须标为`protocol_declaration`：只把initialize列入已观察，把必选方法列入规范声明；保留`nativeOperationsVerified=false`、能力NOT_TESTED和无执行权。B可在原Catalog增加明确的标准符合性分类入口，满足这些前提时返回`compatible_unverified`，不能覆盖/改写原partial观察，更不能把它升级为verified/native_test_passed。main消费同一Catalog事实，禁止自行将unknown改绿。
+
+在该路径上，原受控产品消费者检查、可信原生策略与当前身份核对、原命令回执中的逐Profile显式试用确认仍共同约束开始执行；握手或规范声明单独不启用begin/answer/cancel。Codex等原生协议的schema检查规则不因此放宽。真实厂商能力仍由原预算内的产品验收给出，native版本与ACP agentInfo实现版本分别记录。
+
 先提供“委托、流式进度、审批、产物、运行中停止”所需能力；steer、原生恢复、澄清分别显示支持程度。后端同步拒绝不支持的命令，不能只隐藏按钮。若只能下一 turn 收到补充，则明示“本轮结束后送达”，不假装立即 steer，也不在后台悄悄新发一次 prompt。
 
 原生扩展可用于更完整的计划、子团队、replay 或运行控制。扩展必须按 ACP 的 `_meta`/`_` 方法与实际协商规则标明，不能向标准对象根部塞私有字段或称之为标准 ACP；不协商扩展的客户端仍能使用标准子集。具体扩展须有真实消费需求再定义。
@@ -231,4 +237,22 @@ M04 仍为最多两个结果线，B 唯一实际发送者、共享最多6次且�
 - [ZCode原生协议设计](https://github.com/zai-org/ZCode/blob/a4b4445141eb7d3b3e99eada9292775383bfc44e/apps/zcode-cli/docs/design/v2/zcode-protocol-agent-server.md)：app-server 是 ZCode 自有协议，不能直接套 Codex/ACP Driver；安装版仍需对齐。
 - [OpenCode ACP](https://opencode.ai/docs/acp/)与[Provider配置](https://opencode.ai/docs/providers/)：可作为同协议其他 Profile 的候选，网页配置版本不能盲套本机1.18.34。
 
-本次仅产出接入设计和既有源码/公开文档核对，没有新增运行代码、SDK依赖、模型发送、Agent session、资源信号或安装包。M04 L1 0/6、L2 0/7保持，已有历史实测范围和分数不因本RFC改变。
+本RFC初版仅产出设计。后续用户授权的源码实现检查点如下，不能把该层证据移用为真实执行器或安装包验收。
+
+## 13. 标准 Client 源码检查点
+
+- 主线锁定官方 `@agentclientprotocol/sdk@2.12.0` 稳定 v1 入口；`packages/drivers/acp-v1/` 不保留第二个私有 JSON-RPC reader，只广告已实现的客户端能力。
+- `executor-profiles.ts`、原 runtime/execution 组合根支持多个 Profile，原 `create_work` 事务把 `ExecutionProfileRef` 记入原 trigger。旧未开始且没有身份快照的工作须明确修订，不能继承新 Codex 准入；同项目的路径、检查或环境冲突在组合时拒绝。
+- 原 Runner 的 `registered-native` 工厂按不可变 Profile 选择 Driver，未知 ID 不回退。现有 `AgentDriverV1`、Store/Application/QuestionBroker 和 Runner wire v1 均保留。
+- ACP 的标准 prompt response 才是该 prompt 已消费的依据，不把写出当受理。审批仅报告真实 `response_written`，关键回执失败或停止时仍对自己的原 session 取消，未知结果不重发。
+- 标准协议没有开始 ACK 时，原生写入可能早于 core Assignment 的 `running`。`stop_work` 因此也沿原非终态物理 binding 入原停止/核对队列；逻辑结束仍不能释放资源。原 endpoint 给标准取消有限投递机会，随后仍须完整原资源屏障。
+- 原进度帧进入 `application.execution.progress` 与工作详情，按合同分别保存最近快照。展示不产生业务权威，也不声明完整对话归档。
+- 新只读 `WorkExecutionSchema` 和 `/v1/works/:id/execution` 暴露所选 Profile 与运行中输入能力，不包含启动路径、参数或凭据，不改变冻结 wire。原 Application 在接纳补充前检查实际 attempt 能力，避免无 steer 的 Agent 留下不能消费的输入；界面同步降级，主对话保持可用。
+
+受控验证跨原认证 HTTP、Application、Broker、实际 Runner 和官方 SDK 两端：允许审批后经原注册检查、当前候选和人工接受到 delivered；拒绝零写；在途取消及原 begin 回执窗口取消；每个场景只发一个受控 prompt。虚拟 native 资源不是 OS/厂商静止证据。实际浏览器另验输出快照、合同/Work 隔离、HTML 纯文本与窄屏布局。
+
+生产 ACP 工厂在缺少可信实际策略宿主时继续拒绝，不能从 Profile 文本、握手或试用同意中生成 `enforced/passed`。当前继续实现 DSH 的专用私有配置及原生受限工具策略，保持 ACP wire 标准；真实产品发送和独立验收尚未完成。本检查点真实 vendor/model prompt 为0、故障信号为0、没有新安装包；M04 L1 0/6、L2 0/7和原分数不因此上调。
+
+接续已加入 `acp-connections.ts/configure-acp.ts/acp-inspection.ts/acp-startup.ts`：专用配置不授执行权，正常personal入口逐Profile核标准协商、原试用回执和当前策略；已有Codex不因另一ACP配置失败而全局禁用。版本检查可以选择具体Profile，开始前还会核原配置快照。模型Key只在专用home凭据文件，原白名单备份排除整个连接目录；不迁移旧账号或权限。使用方法见[产品手册第11节](../../PRODUCT-GUIDE.zh-CN.md#11-标准-acp-client接入-dsh-与自己的模型资源)。
+
+真实DSH0.2.1-rc.2在本机独立私有根的stdio initialize/session-new、原OwnedProcess身份与guard activation绑定已通过，模型端使用本机trap且请求0，没有session/prompt；EOF后的leader正常退出，不推断完整group物理静止。另一消费者实际经过标准initialize、专用连接加载、原Store试用确认、重新准备及正常项目/配置HTTP，仍未执行Work。它们属于原生**setup**证据，不是L2③–⑤的真实开发或停止。SDK/Runner另修复了响应完成后合法复用RPC ID、关键回执拒绝时取消自身在途prompt，以及拒绝/token-limit不能成为成功候选；原未预检exit→SIGKILL已移除，未知材料保留。

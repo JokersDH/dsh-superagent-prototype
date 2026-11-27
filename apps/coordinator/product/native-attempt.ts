@@ -6,6 +6,7 @@ import {
   CriticalFactSchema,
   JsonSchema,
   PreparedExecutionPolicySchema,
+  ProgressUpdateSchema,
   RunnerCommandSchema,
   parseRuntimeFactPayload,
 } from '@personal-agent/contracts'
@@ -26,6 +27,7 @@ import { confirmOwnedQuiescence, ownedResourceManifestDigest } from '../resource
 import type { IngressBinding, RuntimeProducer } from '../runtime-ingress.ts'
 import { storedAttemptPayloads } from '../stored-ingress.ts'
 import { key } from '@personal-agent/orchestrator-core'
+import { attemptIdentity } from '../../../packages/driver-kit/src/index.ts'
 
 /** Trusted Node composition only; no profile, environment flag or public request can select it. */
 export type NativeRunnerLinkFactory = (options: RunnerLinkOptions) => Pick<RunnerLink, 'spawnAttempt'>
@@ -51,6 +53,8 @@ export class NativeProductAttempt {
   private callbacksStopped = false
   private recovered = false
   private terminal: ServeExit | undefined
+  private progressBytes = 0
+  private progressTruncated = false
   get connected(): boolean { return !!this.callbackOwner && !this.callbacksStopped }
   private readonly environment: { planRef: string; capture(): void } | undefined
   constructor(
@@ -86,6 +90,26 @@ export class NativeProductAttempt {
       }
     }
     return connectRunnerRecovery(this.endpoint, this.producer)
+  }
+  private publishProgress(text: string): void {
+    if (!text || this.disposed || this.callbacksStopped || !this.current() || this.progressTruncated) return
+    let preview = text.slice(-8192)
+    if (preview.charCodeAt(0) >= 0xdc00 && preview.charCodeAt(0) <= 0xdfff) preview = preview.slice(1)
+    const update = ProgressUpdateSchema.parse({ ...attemptIdentity(this.spec),
+      text: preview, observedAt: new Date().toISOString() })
+    this.progressBytes += Buffer.byteLength(update.text, 'utf8')
+    if (this.progressBytes > 8 * 1024 * 1024) {
+      this.progressTruncated = true
+      update.text = '\n后续实时动态已折叠，请查看当前变更与交付产物。\n'
+    }
+    // Diagnostic text has no execution/acceptance authority. Failure cannot block native control.
+    try {
+      this.store.uow.atomic(() => {
+        if (!this.current()) return
+        this.store.events.append({ topic: 'application.execution.progress', entityRef: this.spec.contract.workId,
+          payload: JsonSchema.parse(update) })
+      })
+    } catch { /* best-effort display; original durable business facts use the separate receipt path */ }
   }
   private async register() {
     const proof = await this.connection().inspect()
@@ -149,7 +173,7 @@ export class NativeProductAttempt {
     if (fact.kind === 'turn.ended') {
       const parsed = parseRuntimeFactPayload(fact, payload)
       if (parsed.kind === 'turn.ended') this.terminal = {
-        reason: parsed.value.outcome === 'completed' ? 'terminal' : parsed.value.outcome === 'cancelled' ? 'cancelled' : 'error',
+        reason: parsed.value.outcome === 'completed' && parsed.value.candidateAvailable ? 'terminal' : parsed.value.outcome === 'cancelled' ? 'cancelled' : 'error',
         evidenceRefs: [fact.factId],
       }
     }
@@ -173,13 +197,14 @@ export class NativeProductAttempt {
     const link = this.createLink({
       executable: process.execPath,
       entry: fileURLToPath(new URL('../../runner/src/runner-service-entry.ts', import.meta.url)),
-      args: ['codex-native'],
+      args: ['registered-native'],
       stateRoot: this.stateRoot,
       env: { PA_RUNNER_CWD: this.workspacePath, PA_RUNNER_RECOVERY_ROOT: this.recoveryRoot,
         ...(this.environment ? { PA_RUNNER_ENVIRONMENT_PLAN: this.environment.planRef } : {}) },
       producer: { source: this.producer.source, runnerIdentityRef: this.producer.runnerIdentityRef },
       payloads: { read: reference => this.readPayload(reference) },
       beforeNativeWrite: command => this.beforeNativeWrite(command),
+      onProgress: text => this.publishProgress(text),
     })
     this.child = await link.spawnAttempt(this.spec, recordFact)
     void this.child.waitExit().then(() => failed(new Error('Native Runner ended before policy preparation')))
@@ -267,6 +292,8 @@ export class NativeProductAttempt {
         }
         const value = await this.child!.waitExit()
         await this.stopCallbacks()
+        if (value.exit.reason === 'terminal' && this.terminal?.reason !== 'terminal')
+          return this.terminal ?? { reason: 'error', evidenceRefs: ['native-terminal-fact-unconfirmed'] }
         return value.exit
       },
       stop: async () => {

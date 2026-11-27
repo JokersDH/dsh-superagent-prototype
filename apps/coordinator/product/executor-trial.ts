@@ -74,31 +74,35 @@ export function readExecutorTrialReceipt(store: ProductStore, commandId: string,
 }
 
 export class ProductExecutorTrials {
-  constructor(options: { store: ProductStore; principal: { userId: string; authorityRef: string }; inspect(): Promise<NativeExecutorInspection> }) {
+  constructor(options: { store: ProductStore; principal: { userId: string; authorityRef: string }; inspect(profileId?: string): Promise<NativeExecutorInspection> }) {
     this.store = options.store; this.principal = structuredClone(options.principal); this.inspect = options.inspect
   }
   private readonly store: ProductStore
   private readonly principal: { userId: string; authorityRef: string }
-  private readonly inspect: () => Promise<NativeExecutorInspection>
+  private readonly inspect: (profileId?: string) => Promise<NativeExecutorInspection>
   receipt(commandId: string): ExecutorTrialReceipt | undefined { return readExecutorTrialReceipt(this.store, commandId, this.principal) }
-  private observing: Promise<NativeExecutorInspection> | undefined
-  private observe(): Promise<NativeExecutorInspection> {
-    if (!this.observing) {
-      const active = this.inspect().catch(error => {
+  private readonly observing = new Map<string, Promise<NativeExecutorInspection>>()
+  private observe(profileId?: string): Promise<NativeExecutorInspection> {
+    const key = profileId ?? ''
+    if (!this.observing.has(key)) {
+      const active = this.inspect(profileId).then(inspection => {
+        if (profileId && inspection.profile.id !== profileId) throw new ApplicationFault('unsupported_capability', '检查结果与所选执行器不符。', 'none')
+        return inspection
+      }).catch(error => {
         if (!(error instanceof NativeAdmissionError)) throw error
-        if (error.reason === 'needs_auth') throw new ApplicationFault('auth_required', 'Codex 尚未登录，请使用自己的账号登录后再检查。', 'user_action')
+        if (error.reason === 'needs_auth') throw new ApplicationFault('auth_required', '执行器尚未配置认证；请完成自己的原生登录或模型连接后再检查。', 'user_action')
         throw new ApplicationFault('unsupported_capability', '当前执行器的版本或协议尚未核实，不能开放试用。', 'none')
       })
-      this.observing = active
-      void active.finally(() => { if (this.observing === active) this.observing = undefined }).catch(() => undefined)
+      this.observing.set(key, active)
+      void active.finally(() => { if (this.observing.get(key) === active) this.observing.delete(key) }).catch(() => undefined)
     }
-    return this.observing
+    return this.observing.get(key)!
   }
-  async read(): Promise<ExecutorTrialInspection> {
-    const inspection = await this.observe()
+  async read(profileId?: string): Promise<ExecutorTrialInspection> {
+    const inspection = await this.observe(profileId)
     const admitted = readExecutorTrialAdmission(this.store, inspection, this.principal)
     return ExecutorTrialInspectionSchema.parse({ protocol: 'executor-trial-inspection/1',
-      profile: executionProfileView({ profile: inspection.profile, displayName: 'Codex · 版本检查', verdict: inspection.verdict, operations: inspection.operations }),
+      profile: executionProfileView({ profile: inspection.profile, displayName: inspection.displayName ?? 'Codex · 版本检查', verdict: inspection.verdict, operations: inspection.operations }),
       identityDigest: inspection.identityDigest, policyDigest: inspection.policyDigest, confirmationCommandId: executorTrialCommandId(this.store, inspection),
       authorization: admitted ? 'granted' : 'not_granted', confirmationAvailable: current(inspection), observedAt: inspection.verdict.checkedAt })
   }
@@ -107,7 +111,7 @@ export class ProductExecutorTrials {
     if (actor.source === 'explicit_rule' || actor.userId !== this.principal.userId || actor.authorityRef !== this.principal.authorityRef)
       throw new ApplicationFault('forbidden', 'Trial consent requires the authenticated local user', 'none')
     if (this.store.uow.nesting) throw new ApplicationFault('invalid_request', 'Executor inspection must run outside the Store transaction', 'none')
-    const inspection = await this.observe()
+    const inspection = await this.observe(command.profileId)
     if (!current(inspection) || digest(command) !== digest(commandFor(this.store, inspection)))
       throw new ApplicationFault('conflict', 'Executor identity, protocol or policy changed; inspect it again', 'none')
     const saved = this.store.commands.get(command.commandId)

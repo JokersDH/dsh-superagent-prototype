@@ -20,6 +20,7 @@
     "@personal-agent/execution": "workspace:*",
     "@personal-agent/environment-preparation": "workspace:*",
     "zod": "4.4.3",
-    "@personal-agent/drivers-codex-native": "workspace:*"
+    "@personal-agent/drivers-codex-native": "workspace:*",
+    "@personal-agent/drivers-acp-v1": "workspace:*"
   }
 }

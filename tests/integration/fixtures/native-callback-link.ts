@@ -20,6 +20,7 @@ class ControlledProtocolHost extends ProcessHost {
   private readonly trace: CallbackTrace
   constructor(trace: CallbackTrace) { super(); this.trace = trace }
   override closeAdmission() { this.closed = true; super.closeAdmission() }
+  override closeSpawnAdmission() { this.trace.spawnAdmissionClosures = (this.trace.spawnAdmissionClosures ?? 0) + 1; super.closeSpawnAdmission() }
   override resources() { return this.finished ? [] : ['controlled-protocol-resource'] }
   override inventory() {
     return [{ ref: 'controlled-protocol-resource', ownership: 'spawned_process' as const,
@@ -86,8 +87,11 @@ export type CallbackTrace = {
   questionless?: boolean
   supplements?: string[]
   stopCalls?: number
+  progress?: string[]
+  spawnAdmissionClosures?: number
+  controlCommands?: string[]
 }
-export function nativeCallbackLink(trace: CallbackTrace): NativeRunnerLinkFactory {
+export function nativeCallbackLink(trace: CallbackTrace, createDriver?: NonNullable<Parameters<typeof serveRunner>[0]['createDriver']>): NativeRunnerLinkFactory {
   return options => ({
     async spawnAttempt(spec, sink) {
       const input = new PassThrough(), receipts: any[] = [], progress: string[] = []
@@ -98,12 +102,13 @@ export function nativeCallbackLink(trace: CallbackTrace): NativeRunnerLinkFactor
       const send = (frame: Record<string, unknown>) => { input.write(encodeFrame({ v: 1, ...frame })) }
       const service = serveRunner({ input, recoveryRoot: options.env!.PA_RUNNER_RECOVERY_ROOT!, eagerPrepare: true, processHost: host,
         payloads: { read: reference => options.payloads!.read(reference) },
-        createDriver: (_spec, hooks) => new CodexProductDriver({ beforeAnswerWrite: hooks.beforeNativeWrite }),
+        createDriver: createDriver ?? ((_spec, hooks) => new CodexProductDriver({ beforeAnswerWrite: hooks.beforeNativeWrite })),
         write: frame => {
           const value = frame as any
           if (value.type === 'ready') resolveReady()
           else if (value.type === 'exited') resolveExit(value)
           else if (value.type === 'receipt') receipts.push(value.receipt)
+          else if (value.type === 'progress') { (trace.progress ??= []).push(value.text); options.onProgress?.(value.text) }
           else if (value.type === 'fact') {
             trace.stdioFacts.push(value.fact.kind)
             void sink(value.fact).then(receipt => send({ type: 'receipt', id: value.id, factId: value.fact.factId, receipt }))

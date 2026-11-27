@@ -118,6 +118,73 @@ export type CompatibilityVerdict = {
   reasons: string[]
   evidenceRefs: string[]
   checkedAt: string
+  /** Evidence origin is explicit; protocol declaration never means native operations were tested. */
+  origin?: 'protocol_declaration'
+}
+
+/** One reviewed standard artifact; callers cannot choose an arbitrary schema and self-label it. */
+export const ACP_V1_STANDARD_SCHEMA = Object.freeze({ sdkVersion: '2.12.0', sdkEntrypoint: '@agentclientprotocol/sdk',
+  schemaDigest: 'd3ddaefbee593abf74beeda91bdf57b58ef99bf90219dc1cb4ae90be3ba18518' })
+
+export type AcpConformanceDeclaration = {
+  origin: 'protocol_declaration'
+  protocol: 'agent-client-protocol'
+  protocolVersion: number
+  sdkVersion: string
+  sdkEntrypoint: string
+  schemaDigest: string
+  declaredBaseMethods: readonly string[]
+  observed: { initialize: boolean; protocolVersion: number; evidenceRefs: readonly string[] }
+  nativeOperationsVerified: boolean
+  grantsExecution: boolean
+}
+
+/**
+ * Explicit standard-conformance classification (RFC0097). It does not upgrade/replace a partial
+ * observation. The caller retains that observation separately. No fake observed methods or native
+ * capability PASS is manufactured, and only the original product trial/policy gates can dispatch.
+ */
+export function classifyStandardAcpConformance(input: Pick<CompatibilityInput, 'profile' | 'probe' | 'environment'> & {
+  declaration?: AcpConformanceDeclaration
+}): CompatibilityVerdict {
+  const declaration = input.declaration
+  const observedRefs = declaration?.observed?.evidenceRefs
+  const evidenceRefs = [...new Set([...input.probe.evidenceRefs, ...(Array.isArray(observedRefs) ? observedRefs : [])])]
+  const capabilities = input.probe.capabilities.map(capability => ({ ...capability, test: 'NOT_TESTED' as const }))
+  const result = (kind: Exclude<CompatibilityClass, 'verified'>, reason: string): CompatibilityVerdict => ({
+    class: kind, readiness: kind === 'incompatible' ? 'incompatible' : kind === 'unknown' ? 'needs_setup' : 'inspection_passed',
+    admission: kind === 'compatible_unverified' ? 'trial' : 'disabled', nativeTestPassed: false,
+    identity: input.probe.identity, capabilities, missing: emptyMissing(), reasons: [reason], evidenceRefs,
+    checkedAt: input.probe.checkedAt, origin: 'protocol_declaration',
+  })
+  if (!declaration) return result('unknown', 'standard_declaration_missing')
+  if (declaration.origin !== 'protocol_declaration' || declaration.protocol !== 'agent-client-protocol') return result('unknown', 'standard_declaration_unrecognized')
+  if (declaration.observed?.initialize !== true || !Array.isArray(observedRefs) || observedRefs.length === 0) return result('unknown', 'standard_negotiation_unobserved')
+  if (declaration.protocolVersion !== 1 || declaration.observed.protocolVersion !== 1) return result('incompatible', 'standard_version_mismatch')
+  if (declaration.nativeOperationsVerified !== false || declaration.grantsExecution !== false) return result('unknown', 'declaration_authority_claim_refused')
+  if (declaration.sdkVersion !== ACP_V1_STANDARD_SCHEMA.sdkVersion || declaration.sdkEntrypoint !== ACP_V1_STANDARD_SCHEMA.sdkEntrypoint ||
+      declaration.schemaDigest !== ACP_V1_STANDARD_SCHEMA.schemaDigest) return result('unknown', 'standard_schema_unverified')
+  if (input.profile.driverId !== 'acp-v1') return result('incompatible', 'standard_driver_mismatch')
+  const problem = identityRefusal(input)
+  if (problem) return result(problem.class, problem.reason)
+  const identity = input.probe.identity!
+  if (identity.wireVersion !== 'acp-v1') return result('incompatible', 'identity_wire_mismatch')
+  if (identity.schemaDigest !== declaration.schemaDigest || identity.sdkVersion !== declaration.sdkVersion || identity.sdkEntrypoint !== declaration.sdkEntrypoint)
+    return result('incompatible', 'identity_standard_schema_mismatch')
+  const base = ['session/new', 'session/prompt', 'session/cancel', 'session/update']
+  if (!Array.isArray(declaration.declaredBaseMethods) || declaration.declaredBaseMethods.length !== base.length || base.some(method => !declaration.declaredBaseMethods.includes(method)))
+    return result('unknown', 'standard_baseline_declaration_incomplete')
+  const byFeature = new Map(capabilities.map(capability => [capability.feature, capability]))
+  for (const feature of input.profile.requiredFeatures) {
+    const capability = byFeature.get(feature)
+    if (!capability) return result('unknown', `required_capability_unreported:${feature}`)
+    if (capability.policy === 'blocked') return result('incompatible', `required_capability_blocked:${feature}`)
+    if (input.probe.capabilities.some(item => item.feature === feature && item.test === 'FAIL')) return result('incompatible', `required_capability_failed:${feature}`)
+  }
+  evidenceRefs.push(`standard-schema:${declaration.schemaDigest}`, 'standard-declaration:acp-v1')
+  const verdict = result('compatible_unverified', 'standard_v1_negotiated_unverified_operations')
+  verdict.reasons.push('protocol_declaration_only', 'native_operations_not_verified', 'product_trial_and_policy_still_required')
+  return verdict
 }
 
 const DIGEST = /^[a-f0-9]{64}$/
@@ -153,26 +220,9 @@ export function classifyCompatibility(input: CompatibilityInput): CompatibilityV
     return unknown(`probe_${input.surface.status}:${input.surface.reason}`)
   }
   for (const ref of input.surface.evidenceRefs) evidence.add(ref)
-  if (input.probe.readiness === 'missing') return unknown('executable_missing')
-  if (input.probe.readiness === 'needs_auth') return unknown('auth_required')
-  if (input.probe.readiness === 'needs_setup') return unknown('setup_incomplete')
-  if (input.probe.readiness === 'incompatible') return incompatible('probe_incompatible')
-  const identity = input.probe.identity
-  if (!identity) return unknown('identity_unavailable')
-  if (identity.profileId !== input.profile.id || identity.profileRevision !== input.profile.revision)
-    return incompatible('identity_profile_mismatch')
-  if (identity.driverApiMajor !== 1) return incompatible('driver_api_major_mismatch')
-  if (identity.driverRelease !== input.profile.driverRelease) return incompatible('driver_release_mismatch')
-  if (!DIGEST.test(identity.executableDigest)) return unknown('executable_digest_unverified')
-  if (!DIGEST.test(identity.schemaDigest)) return unknown('schema_digest_unverified')
-  if (!DIGEST.test(identity.resolvedConfigFingerprint)) return unknown('config_fingerprint_unverified')
-  if (identity.configStability === 'unverified') return unknown('config_stability_unverified')
-  if (identity.permissionPolicyRevision !== input.profile.permissionPolicyRevision) return incompatible('permission_policy_mismatch')
-  if (input.environment) {
-    if (identity.platform !== input.environment.platform || identity.architecture !== input.environment.architecture)
-      return incompatible('environment_mismatch')
-    if (identity.runtimeVersion !== input.environment.runtimeVersion) return incompatible('runtime_version_mismatch')
-  }
+  const identityProblem = identityRefusal(input)
+  if (identityProblem) return identityProblem.class === 'unknown' ? unknown(identityProblem.reason) : incompatible(identityProblem.reason)
+  const identity = input.probe.identity!
   const surface = input.surface.surface
   if (input.required.wireVersion !== undefined && input.required.wireVersion !== surface.wireVersion)
     return incompatible('wire_version_mismatch')
@@ -225,6 +275,32 @@ export function classifyCompatibility(input: CompatibilityInput): CompatibilityV
     ...base, identity, class: 'compatible_unverified', readiness: 'inspection_passed', admission: 'trial',
     nativeTestPassed: false, missing, reasons, evidenceRefs: [...evidence],
   }
+}
+
+type IdentityRefusal = { class: 'unknown' | 'incompatible'; reason: string }
+function identityRefusal(input: Pick<CompatibilityInput, 'profile' | 'probe' | 'environment'>): IdentityRefusal | undefined {
+  const refuse = (kind: IdentityRefusal['class'], reason: string): IdentityRefusal => ({ class: kind, reason })
+  if (input.probe.readiness === 'missing') return refuse('unknown', 'executable_missing')
+  if (input.probe.readiness === 'needs_auth') return refuse('unknown', 'auth_required')
+  if (input.probe.readiness === 'needs_setup') return refuse('unknown', 'setup_incomplete')
+  if (input.probe.readiness === 'incompatible') return refuse('incompatible', 'probe_incompatible')
+  const identity = input.probe.identity
+  if (!identity) return refuse('unknown', 'identity_unavailable')
+  if (identity.profileId !== input.profile.id || identity.profileRevision !== input.profile.revision)
+    return refuse('incompatible', 'identity_profile_mismatch')
+  if (identity.driverApiMajor !== 1) return refuse('incompatible', 'driver_api_major_mismatch')
+  if (identity.driverRelease !== input.profile.driverRelease) return refuse('incompatible', 'driver_release_mismatch')
+  if (!DIGEST.test(identity.executableDigest)) return refuse('unknown', 'executable_digest_unverified')
+  if (!DIGEST.test(identity.schemaDigest)) return refuse('unknown', 'schema_digest_unverified')
+  if (!DIGEST.test(identity.resolvedConfigFingerprint)) return refuse('unknown', 'config_fingerprint_unverified')
+  if (identity.configStability === 'unverified') return refuse('unknown', 'config_stability_unverified')
+  if (identity.permissionPolicyRevision !== input.profile.permissionPolicyRevision) return refuse('incompatible', 'permission_policy_mismatch')
+  if (input.environment) {
+    if (identity.platform !== input.environment.platform || identity.architecture !== input.environment.architecture)
+      return refuse('incompatible', 'environment_mismatch')
+    if (identity.runtimeVersion !== input.environment.runtimeVersion) return refuse('incompatible', 'runtime_version_mismatch')
+  }
+  return undefined
 }
 
 function diffRequiredSurface(surface: ProtocolSurface, required: RequiredSurface, missing: MissingEvidence): void {

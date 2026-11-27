@@ -15,6 +15,8 @@ import { loadRestoredReviewWithIdentity } from './restored-review.ts'
 import { readRecoveryTargetMaterial, verifyRecoveryTargetIdentity, verifyRecoveryTargetStartup } from './recovery-target-authorization.ts'
 import { prepareInspectedPersonalStartup } from './inspected-startup.ts'
 import { inspectNativeExecutor, inspectRecoveryExecutor } from './native-inspection.ts'
+import { inspectAcpConnection } from './acp-inspection.ts'
+import { prepareAcpStartup } from './acp-startup.ts'
 
 const { values } = parseArgs({
   options: {
@@ -61,11 +63,16 @@ try {
   const recoveryExecutor = personal && recovery ? await inspectRecoveryExecutor() : undefined
   const personalStartup = personal && !recovery ? await prepareInspectedPersonalStartup(stateRoot, store, principal, { discussionOnly: values['discussion-only'] }) : undefined
   const native = personalStartup && 'native' in personalStartup ? personalStartup.native : undefined
+  const acp = personal && !recovery && !values['discussion-only']
+    ? await prepareAcpStartup(stateRoot, store, principal) : undefined
   if (!recovery && readRecoveryTargetMaterial(stateRoot)) {
     if (!personal) throw new Error('Prepared recovery targets require the personal startup entry')
     if (native) verifyRecoveryTargetStartup(stateRoot, principal, native.profile)
   }
-  const executionUnavailable = personalStartup && 'executionUnavailable' in personalStartup ? personalStartup.executionUnavailable : undefined
+  const executionUnavailable = native || acp?.executors.length ? undefined
+    : personalStartup && 'executionUnavailable' in personalStartup ? personalStartup.executionUnavailable : undefined
+  const inspectedProfiles = [...(personalStartup && 'inspectedProfiles' in personalStartup ? personalStartup.inspectedProfiles ?? [] : []),
+    ...(acp?.inspectedProfiles ?? [])]
   const restoredProjects = explicitReview?.projects ?? (recovery ? new NativeProjectRegistry(stateRoot).list().map(project => ({ id: project.id,
     displayName: project.displayName, scope: { projectId: project.id, allowedPaths: ['.'], excludedPaths: ['.git'], externalActions: [] } })) : [])
   const activeProduct = createProductRuntime({
@@ -92,10 +99,12 @@ try {
     actionSecret: Buffer.from(credential('action.key'), 'hex'),
     ...(values.assistant && !recovery ? { assistantProvider: new PrivateModelProvider() } : {}),
     ...(native ? { native } : {}),
+    ...(acp?.executors.length ? { executors: acp.executors } : {}),
     ...(personalStartup ? { projectRegistry: personalStartup.registry, workspaceRoot: personalStartup.workspaceRoot } : {}),
     ...(executionUnavailable ? { executionUnavailable } : {}),
-    ...(personalStartup && 'inspectedProfiles' in personalStartup ? { inspectedProfiles: personalStartup.inspectedProfiles } : {}),
-    ...(personal && !recovery ? { inspectExecutor: inspectNativeExecutor } : {}),
+    ...(inspectedProfiles.length ? { inspectedProfiles } : {}),
+    ...(personal && !recovery ? { inspectExecutor: (profileId?: string) => profileId && profileId !== 'profile-codex-native'
+      ? inspectAcpConnection(stateRoot, profileId) : inspectNativeExecutor() } : {}),
     ...(recoveryExecutor ? { recoveryExecutor: () => recoveryExecutor } : {}),
   })
   product = activeProduct
@@ -146,7 +155,7 @@ try {
         : executionUnavailable
         ? `Personal discussion mode: execution unavailable (${executionUnavailable}); business queues are retained.`
         : personal
-        ? 'Native Codex MVP enabled: isolated worktrees, registered checks and reviewed patch delivery.'
+        ? 'Native Agent execution enabled: isolated worktrees, registered profiles, checks and reviewed patch delivery.'
         : values.assistant
         ? 'Model dialogue enabled when privately configured; work execution uses controlled scratch profiles.'
         : 'Real scratch subprocess, questions and artifact verification; fixture profiles only; zero vendor calls.',

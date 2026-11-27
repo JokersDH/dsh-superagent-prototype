@@ -249,6 +249,9 @@ importers:
       '@personal-agent/driver-kit':
         specifier: workspace:*
         version: link:../../packages/driver-kit
+      '@personal-agent/drivers-acp-v1':
+        specifier: workspace:*
+        version: link:../../packages/drivers/acp-v1
       '@personal-agent/drivers-codex-native':
         specifier: workspace:*
         version: link:../../packages/drivers/codex-native
@@ -330,6 +333,27 @@ importers:
       '@personal-agent/contracts':
         specifier: workspace:*
         version: link:../contracts
+
+  packages/drivers/acp-v1:
+    dependencies:
+      '@agentclientprotocol/sdk':
+        specifier: 2.12.0
+        version: 2.12.0(zod@4.4.3)
+      '@personal-agent/catalog':
+        specifier: workspace:*
+        version: link:../../catalog
+      '@personal-agent/contracts':
+        specifier: workspace:*
+        version: link:../../contracts
+      '@personal-agent/driver-kit':
+        specifier: workspace:*
+        version: link:../../driver-kit
+      '@personal-agent/policy-preparation':
+        specifier: workspace:*
+        version: link:../../policy-preparation
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
 
   packages/drivers/codex-native:
     dependencies:
@@ -650,6 +674,15 @@ importers:
         version: 6.0.3
 
 packages:
+
+  '@agentclientprotocol/sdk@2.12.0':
+    resolution: {integrity: sha512-nSkamfY4Lw9/AVBU5G5V9p82ScXhANDMBybQwcPH/9+euUtZm04/VFUMaLj4gLFEXxQEy+QP1VQiKgSRbYVIPg==}
+    peerDependencies:
+      '@modelcontextprotocol/server': ^2.4.0
+      zod: ^3.25.76 || ^4.0.0
+    peerDependenciesMeta:
+      '@modelcontextprotocol/server':
+        optional: true
 
   '@asamuzakjp/css-color@5.1.11':
     resolution: {integrity: sha512-KVw6qIiCTUQhByfTd78h2yD1/00waTmm9uy/R7Ck/ctUyAPj+AEDLkQIdJW0T8+qGgj3j5bpNKK7Q3G+LedJWg==}
@@ -2768,6 +2801,10 @@ packages:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
 
 snapshots:
+
+  '@agentclientprotocol/sdk@2.12.0(zod@4.4.3)':
+    dependencies:
+      zod: 4.4.3
 
   '@asamuzakjp/css-color@5.1.11':
     dependencies:
