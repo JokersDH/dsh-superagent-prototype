@@ -8,7 +8,10 @@
  * PID is not touched. A missing marker means identity could not be confirmed; the host then refuses
  * to signal and reports indeterminate instead of guessing.
  */
-import { execFileSync, spawn } from 'node:child_process'
+import { spawn } from 'node:child_process'
+import { realpathSync } from 'node:fs'
+import { createTargetedProcessObserver } from './owned-process-observer.ts'
+import type { OwnedProcessObserver, ProcessSnapshot } from './owned-process-observer.ts'
 import type { ChildProcessWithoutNullStreams } from 'node:child_process'
 import { randomUUID } from 'node:crypto'
 import type { OwnedProcessHost } from '../../../packages/contracts/src/ports.ts'
@@ -17,14 +20,22 @@ import { DriverError } from '../../../packages/driver-kit/src/index.ts'
 import type { StderrRing } from './journal.ts'
 
 export type ProcessIdentity = {
-  pid: number
-  groupId: number
-  nonce: string
-  executable: string
-  argv: readonly string[]
+  readonly pid: number
+  readonly groupId: number
+  readonly nonce: string
+  readonly executable: string
+  readonly canonicalExecutable: string
+  readonly argv0: string
+  readonly argv: readonly string[]
+  readonly uid: number | null
+  readonly parentPid: number
+  readonly cwd: string
+  readonly cwdRef: string
+  readonly environmentRef: string
+  readonly operation: 'spawn'
   /** `ps -o lstart=` value captured at spawn; null when it could not be read. */
-  startMarker: string | null
-  spawnedAt: number
+  readonly startMarker: string | null
+  readonly spawnedAt: number
 }
 
 export type OwnedProcess = {
@@ -46,6 +57,11 @@ export type ProcessHostOptions = {
   resolveEnv?: (ref: string) => NodeJS.ProcessEnv
   /** Injected for tests; defaults to `ps -o lstart= -p <pid>`. */
   readStartMarker?: (pid: number) => string | null
+  /** Trusted in-process seams for deterministic control tests. Never read from profile/env/HTTP. */
+  observer?: OwnedProcessObserver
+  spawnProcess?: typeof spawn
+  signalProcess?: (pid: number, signal: 'SIGTERM' | 'SIGKILL') => void | Promise<void>
+  wait?: (ms: number) => Promise<void>
   /** Optional bounded sink: all child stderr is teed here as well as yielded to the Driver. */
   stderrRing?: StderrRing
 }
@@ -68,7 +84,12 @@ export class ProcessHost implements OwnedProcessHost {
   readonly #killGraceMs: number
   readonly #resolveCwd: (ref: string) => string
   readonly #resolveEnv: (ref: string) => NodeJS.ProcessEnv
-  readonly #readStartMarker: (pid: number) => string | null
+  readonly #readStartMarker: ((pid: number) => string | null) | undefined
+  readonly #observer: OwnedProcessObserver
+  readonly #spawnProcess: typeof spawn
+  readonly #signalProcess: (pid: number, signal: 'SIGTERM' | 'SIGKILL') => void | Promise<void>
+  readonly #wait: (ms: number) => Promise<void>
+  #stopping: Promise<void> = Promise.resolve()
   readonly #stderrRing: StderrRing | undefined
 
   constructor(options: ProcessHostOptions = {}) {
@@ -76,7 +97,11 @@ export class ProcessHost implements OwnedProcessHost {
     this.#killGraceMs = options.killGraceMs ?? 500
     this.#resolveCwd = options.resolveCwd ?? (() => process.cwd())
     this.#resolveEnv = options.resolveEnv ?? (() => process.env)
-    this.#readStartMarker = options.readStartMarker ?? defaultStartMarker
+    this.#readStartMarker = options.readStartMarker
+    this.#observer = options.observer ?? createTargetedProcessObserver()
+    this.#spawnProcess = options.spawnProcess ?? spawn
+    this.#signalProcess = options.signalProcess ?? ((pid, signal) => { process.kill(pid, signal) })
+    this.#wait = options.wait ?? sleep
     this.#stderrRing = options.stderrRing
   }
 
@@ -117,11 +142,15 @@ export class ProcessHost implements OwnedProcessHost {
   }
   async #spawn(spec: ProcessSpec, context?: { cwd: string; env: NodeJS.ProcessEnv }): Promise<OwnedProcess> {
     validateSpec(spec)
-    const child = spawn(spec.executable, [...spec.argv], {
+    let cwd: string, canonicalExecutable: string
+    try { cwd = realpathSync(context?.cwd ?? this.#resolveCwd(spec.cwdRef)); canonicalExecutable = realpathSync(spec.executable) }
+    catch { throw new DriverError('executable_missing', 'spawn_inputs_unobserved', 'Trusted executable or workspace identity is unavailable') }
+    const startedAt = this.#now()
+    const child = this.#spawnProcess(spec.executable, [...spec.argv], {
       shell: false,
       detached: true, // own process group; required for group stop and identity
       stdio: ['pipe', 'pipe', 'pipe'],
-      cwd: context?.cwd ?? this.#resolveCwd(spec.cwdRef),
+      cwd,
       env: context?.env ?? this.#resolveEnv(spec.environmentRef),
     })
     await new Promise<void>((resolve, reject) => {
@@ -139,16 +168,18 @@ export class ProcessHost implements OwnedProcessHost {
 
     const pid = child.pid
     if (pid === undefined) throw new DriverError('process_exited', 'spawn_without_pid', 'Child process has no pid')
-    const startedAt = this.#now()
-    const identity: ProcessIdentity = {
-      pid,
-      groupId: pid,
-      nonce: randomUUID(),
-      executable: spec.executable,
-      argv: [...spec.argv],
-      startMarker: this.#readStartMarker(pid),
-      spawnedAt: startedAt,
+    const expected = {
+      pid, groupId: pid, nonce: randomUUID(), executable: spec.executable, canonicalExecutable,
+      argv0: spec.executable, argv: Object.freeze([...spec.argv]), uid: process.geteuid?.() ?? null,
+      parentPid: process.pid, cwd, cwdRef: spec.cwdRef, environmentRef: spec.environmentRef,
+      operation: 'spawn' as const, spawnedAt: startedAt,
     }
+    const observed = this.#processObservation(pid)
+    let group: ReturnType<OwnedProcessObserver['group']>
+    try { group = this.#observer.group(pid) } catch { group = { kind: 'unknown', reason: 'spawn-group-unobserved' } }
+    const attributable = observed !== undefined && matchesOriginal(expected, observed) &&
+      group.kind === 'observed' && group.pids.length === 1 && group.pids[0] === pid
+    const identity: ProcessIdentity = Object.freeze({ ...expected, startMarker: attributable ? observed.startMarker : null })
     const resourceRef = `res-${pid}-${identity.nonce.replaceAll('-', '').slice(0, 12)}`
     const exited = { done: false, code: null as number | null, signal: null as string | null }
     const exitPromise = new Promise<{ code: number | null; signal: string | null }>(resolve => {
@@ -167,7 +198,8 @@ export class ProcessHost implements OwnedProcessHost {
     })
 
     if (this.#admissionClosed || this.#spawnAdmissionClosed) {
-      await this.stopOwned(resourceRef, 1500)
+      // The explicit stop owner waits for this spawn to settle, then validates the WHOLE plan.
+      // Never signal recursively from an admission-close race or around a missing identity.
       throw new DriverError('state_indeterminate', 'admission_closed', 'Process admission closed during spawn')
     }
     return {
@@ -215,141 +247,119 @@ export class ProcessHost implements OwnedProcessHost {
   async stopOwned(resourceRef: string, deadlineMs: number): Promise<{ quiescence: 'confirmed' | 'indeterminate'; evidenceRefs: readonly string[] }> {
     const previous = this.#inventory.get(resourceRef)
     if (previous?.writer === 'quiescent') return { quiescence: 'confirmed', evidenceRefs: [...previous.evidence] }
-    const result = await this.#stopOwned(resourceRef, deadlineMs)
-    if (this.#inventory.has(resourceRef)) this.#inventory.set(resourceRef, { ref: resourceRef, ownership: 'spawned_process',
-      writer: result.quiescence === 'confirmed' ? 'quiescent' : 'indeterminate', evidence: [...result.evidenceRefs].slice(0, 32) })
-    return result
+    if (!this.#handles.has(resourceRef)) return { quiescence: 'indeterminate', evidenceRefs: ['unknown-resource'] }
+    this.closeAdmission()
+    return this.#serializedStop(() => this.#stopResources([resourceRef], deadlineMs))
   }
-  async #stopOwned(resourceRef: string, deadlineMs: number): Promise<{ quiescence: 'confirmed' | 'indeterminate'; evidenceRefs: readonly string[] }> {
-    const handle = this.#handles.get(resourceRef)
-    if (!handle) return { quiescence: 'indeterminate', evidenceRefs: ['unknown-resource'] }
-    const evidence: string[] = []
-    const group = handle.identity.groupId
 
-    // Identity gate: a missing or drifted marker means we cannot prove this group is ours.
-    if (!handle.identity.startMarker) {
-      return { quiescence: 'indeterminate', evidenceRefs: ['identity-unconfirmed:no-start-marker'] }
-    }
-    const observedMarker = this.#readStartMarker(handle.identity.pid)
-    if (!observedMarker) {
-      // The leader is already gone. Its group may still hold descendants we cannot attribute.
-      evidence.push('leader-gone-without-marker')
-    } else if (observedMarker !== handle.identity.startMarker) {
-      return { quiescence: 'indeterminate', evidenceRefs: ['identity-mismatch'] }
-    }
-
-    // Signal the whole group; a gone leader does not mean the group is empty.
+  #serializedStop<T>(operation: () => Promise<T>): Promise<T> {
+    const run = this.#stopping.then(operation, operation)
+    this.#stopping = run.then(() => undefined, () => undefined)
+    return run
+  }
+  #processObservation(pid: number): ProcessSnapshot | undefined {
     try {
-      process.kill(-group, 'SIGTERM')
-      evidence.push('sigterm-group')
-    } catch (error) {
-      evidence.push(isMissingProcess(error) ? 'sigterm-esrch' : 'sigterm-failed')
-    }
-    const deadline = this.#now() + Math.max(0, deadlineMs)
-    while (this.#now() < deadline) {
-      if (await this.#groupQuiescent(handle, group)) {
-        evidence.push('group-quiescent', `leader:${exitEvidence(handle)}`)
-        this.#handles.delete(resourceRef)
-        return { quiescence: 'confirmed', evidenceRefs: evidence }
-      }
-      await sleep(Math.min(20, Math.max(1, deadline - this.#now())))
-    }
-
-    // Escalate on the next round-trip that is still attributable to this group.
-    try {
-      process.kill(-group, 'SIGKILL')
-      evidence.push('sigkill-group')
-    } catch (error) {
-      evidence.push(isMissingProcess(error) ? 'sigkill-esrch' : 'sigkill-failed')
-    }
-    const killDeadline = this.#now() + this.#killGraceMs
-    while (this.#now() < killDeadline) {
-      if (await this.#groupQuiescent(handle, group)) {
-        evidence.push('group-quiescent-after-sigkill', `leader:${exitEvidence(handle)}`)
-        this.#handles.delete(resourceRef)
-        return { quiescence: 'confirmed', evidenceRefs: evidence }
-      }
-      await sleep(Math.min(20, Math.max(1, killDeadline - this.#now())))
-    }
-
-    const observation = this.#observeGroup(group)
-    if (observation.kind === 'unobservable') {
-      evidence.push(`group-unobservable:${observation.why}`)
-      return { quiescence: 'indeterminate', evidenceRefs: evidence }
-    }
-    evidence.push(`still-alive:${observation.live.length}`, ...observation.live.slice(0, 5).map(member => `member:${member.pid}:${member.state}`))
-    return { quiescence: 'indeterminate', evidenceRefs: evidence }
+      const result = this.#observer.process(pid)
+      if (result.kind !== 'observed') return undefined
+      const value = structuredClone(result.process)
+      if (this.#readStartMarker) value.startMarker = this.#readStartMarker(pid) ?? ''
+      return value
+    } catch { return undefined }
   }
-
-  /**
-   * A group is quiescent when the leader has exited, the group could be **observed**, and no
-   * non-zombie member remains. An observation failure is never treated as "empty": an unreadable
-   * `ps` (missing tool, permission, parse error) yields `unknown`, which keeps the stop indeterminate.
-   */
-  async #groupQuiescent(handle: Handle, group: number): Promise<boolean> {
-    if (!handle.exited.done) return false
-    const observation = this.#observeGroup(group)
-    return observation.kind === 'observed' && observation.live.length === 0
+  #plan(refs: readonly string[]): Array<{ ref: string; state: 'live' | 'quiescent' | 'unknown'; evidence: string; pendingExit?: boolean }> {
+    return refs.map(ref => {
+      if (this.#inventory.get(ref)?.writer === 'quiescent') return { ref, state: 'quiescent' as const, evidence: 'original-confirmed-barrier' }
+      const handle = this.#handles.get(ref), identity = handle?.identity
+      if (!handle || !identity?.startMarker || identity.uid === null || identity.groupId !== identity.pid)
+        return { ref, state: 'unknown' as const, evidence: 'original-spawn-identity-incomplete' }
+      try {
+        const group = this.#observer.group(identity.groupId)
+        if (group.kind !== 'observed') return { ref, state: 'unknown' as const, evidence: 'owned-group-unobserved' }
+        if (group.pids.length === 0) return handle.exited.done
+          ? { ref, state: 'quiescent' as const, evidence: 'original-exit-and-observed-empty-group' }
+          : { ref, state: 'unknown' as const, evidence: 'original-exit-not-observed', pendingExit: true }
+        if (group.pids.length !== 1 || group.pids[0] !== identity.pid)
+          return { ref, state: 'unknown' as const, evidence: 'unregistered-group-member' }
+        if (handle.exited.done) return { ref, state: 'unknown' as const, evidence: 'group-not-empty-after-original-exit' }
+        const process = this.#processObservation(identity.pid)
+        if (!process || !matchesOriginal(identity, process) || process.startMarker !== identity.startMarker || process.state.startsWith('Z'))
+          return { ref, state: 'unknown' as const, evidence: 'fresh-process-identity-mismatch-or-missing' }
+        const again = this.#observer.group(identity.groupId)
+        if (again.kind !== 'observed' || again.pids.length !== 1 || again.pids[0] !== identity.pid)
+          return { ref, state: 'unknown' as const, evidence: 'owned-group-changed-during-preflight' }
+        return { ref, state: 'live' as const, evidence: 'full-original-identity-and-singleton-group' }
+      } catch { return { ref, state: 'unknown' as const, evidence: 'owned-plan-observation-failed' } }
+    })
   }
-
-  /**
-   * Observe a process group. Returns:
-   * - `observed` with the live (non-zombie) members, possibly none — a *positive* observation;
-   * - `unobservable` when `ps` cannot be run or its output cannot be trusted (ESRCH is the one
-   *   failure that does prove the group has no members on this platform).
-   */
-  #observeGroup(group: number): { kind: 'observed'; live: Array<{ pid: number; state: string }> } | { kind: 'unobservable'; why: string } {
-    let text: string
-    try {
-      // `ps -g` is unreliable across platforms (it exits 1 even for an existing group on macOS), so
-      // enumerate every process with its group and filter here: a successful listing is a positive
-      // observation, and an empty filtered set genuinely means "no members".
-      text = execFileSync('ps', ['-A', '-o', 'pid=,stat=,pgid='], {
-        encoding: 'utf8',
-        stdio: ['ignore', 'pipe', 'ignore'],
-        // A bounded buffer: output overflow is an observation failure, never "no members".
-        maxBuffer: 8 * 1024 * 1024,
-      })
-    } catch (error) {
-      const code = (error as { code?: string } | null)?.code
-      // A failed or truncated listing cannot prove absence; only a successful one can.
-      return { kind: 'unobservable', why: code ?? 'ps_failed' }
+  #rememberQuiescence(plan: Array<{ ref: string; state: 'live' | 'quiescent' | 'unknown'; evidence: string; pendingExit?: boolean }>, evidence: readonly string[]): void {
+    for (const item of plan) if (item.state === 'quiescent' && this.#handles.has(item.ref)) {
+      const handle = this.#handles.get(item.ref)!
+      this.#inventory.set(item.ref, { ref: item.ref, ownership: 'spawned_process', writer: 'quiescent',
+        evidence: [...evidence, item.evidence, 'group-quiescent', `leader:${exitEvidence(handle)}`].slice(-32) })
+      this.#handles.delete(item.ref)
     }
-    const members: Array<{ pid: number; state: string }> = []
-    for (const line of text.split('\n')) {
-      const [pidText, state, pgidText] = line.trim().split(/\s+/)
-      if (!pidText || !state || !pgidText) continue
-      const pid = Number(pidText)
-      const pgid = Number(pgidText)
-      if (!Number.isFinite(pid) || pgid !== group) continue
-      // Z = zombie (already dead, waiting to be reaped); Z+ is the same with session-leader flag.
-      const base = state.replace('+', '')
-      if (base.startsWith('Z')) continue
-      members.push({ pid, state })
-    }
-    return { kind: 'observed', live: members }
   }
-
-  /** Distinct from "no members": used for evidence when a stop cannot observe the group. */
-  #observationFailed(group: number): boolean {
-    return this.#observeGroup(group).kind === 'unobservable'
-  }
-
-  /** Stop every owned resource; confirmed only when all are proven quiescent. */
-  async stopAll(deadlineMs: number): Promise<{ quiescence: 'confirmed' | 'indeterminate'; evidenceRefs: readonly string[] }> {
+  async #stopResources(targets: readonly string[], deadlineMs: number): Promise<{ quiescence: 'confirmed' | 'indeterminate'; evidenceRefs: readonly string[] }> {
     await Promise.allSettled([...this.#spawning])
-    const refs = [...this.#handles.keys()]
-    if (refs.length === 0) return { quiescence: 'confirmed', evidenceRefs: ['no-owned-resources'] }
-    const evidence: string[] = []
-    let allConfirmed = true
-    const deadline = this.#now() + deadlineMs
-    for (const ref of refs) {
-      const remaining = Math.max(0, deadline - this.#now())
-      const result = await this.stopOwned(ref, remaining)
-      evidence.push(...result.evidenceRefs)
-      if (result.quiescence !== 'confirmed') allConfirmed = false
+    const universe = [...this.#handles.keys()], evidence: string[] = []
+    const deadline = this.#now() + Math.max(0, deadlineMs)
+    const result = (confirmed: boolean, why?: string) => {
+      if (why) evidence.push(why)
+      if (!confirmed) for (const ref of targets) if (this.#handles.has(ref))
+        this.#inventory.set(ref, { ref, ownership: 'spawned_process', writer: 'indeterminate', evidence: [...evidence].slice(-32) })
+      return { quiescence: confirmed ? 'confirmed' as const : 'indeterminate' as const, evidenceRefs: [...evidence] }
     }
-    return { quiescence: allConfirmed ? 'confirmed' : 'indeterminate', evidenceRefs: evidence }
+    const inspect = () => {
+      const plan = this.#plan(universe)
+      this.#rememberQuiescence(plan, evidence)
+      return plan
+    }
+    const complete = () => targets.every(ref => this.#inventory.get(ref)?.writer === 'quiescent')
+    let plan = inspect()
+    if (complete()) return result(true, 'original-complete-group-barrier')
+    if (plan.some(item => item.state === 'unknown')) return result(false, plan.find(item => item.state === 'unknown')!.evidence)
+
+    for (const signal of ['SIGTERM', 'SIGKILL'] as const) {
+      for (const ref of targets) {
+        if (this.#inventory.get(ref)?.writer === 'quiescent') continue
+        // Whole-plan revalidation, including OTHER original resources, happens immediately before
+        // EVERY ordinary signal and escalation. A group number alone is never a signal authority.
+        plan = inspect()
+        const missing = plan.find(item => item.state === 'unknown')
+        if (missing) return result(false, `pre-${signal.toLowerCase()}:${missing.evidence}`)
+        const target = plan.find(item => item.ref === ref)
+        if (target?.state !== 'live') continue
+        if (signal === 'SIGTERM' && this.#now() > deadline) return result(false, 'preflight-deadline-exceeded')
+        const handle = this.#handles.get(ref)!
+        try {
+          // The admitted cohort is exactly one original leader per group. Signal that exact PID,
+          // never an unregistered child that could join the group between observation and delivery.
+          await this.#signalProcess(handle.identity.pid, signal)
+          evidence.push(`${signal.toLowerCase()}-owned-pid:${handle.identity.pid}`)
+        } catch { return result(false, `${signal.toLowerCase()}-delivery-unconfirmed`) }
+      }
+      const until = signal === 'SIGTERM' ? deadline : this.#now() + this.#killGraceMs
+      for (;;) {
+        plan = inspect()
+        if (complete()) return result(true, 'original-complete-group-barrier')
+        const failure = plan.find(item => item.state === 'unknown' && !item.pendingExit)
+        if (failure) return result(false, `after-${signal.toLowerCase()}:${failure.evidence}`)
+        if (this.#now() >= until) break
+        await this.#wait(Math.min(20, Math.max(1, until - this.#now())))
+      }
+    }
+    return result(false, 'owned-writer-still-active-or-unobserved')
+  }
+
+  /** Stop the original complete inventory; a single unknown entry prevents every new signal. */
+  async stopAll(deadlineMs: number): Promise<{ quiescence: 'confirmed' | 'indeterminate'; evidenceRefs: readonly string[] }> {
+    this.closeAdmission()
+    return this.#serializedStop(async () => {
+      await Promise.allSettled([...this.#spawning])
+      const refs = [...this.#handles.keys()]
+      if (refs.length === 0) return { quiescence: 'confirmed', evidenceRefs: ['no-owned-resources'] }
+      return this.#stopResources(refs, deadlineMs)
+    })
   }
 
   /**
@@ -402,15 +412,6 @@ function validateSpec(spec: ProcessSpec): void {
   }
 }
 
-function defaultStartMarker(pid: number): string | null {
-  try {
-    const output = execFileSync('ps', ['-o', 'lstart=', '-p', String(pid)], { encoding: 'utf8' }).trim()
-    return output.length > 0 ? output : null
-  } catch {
-    return null
-  }
-}
-
 /**
  * Referenced sleep. It is deliberately **not** unref'd: `stopOwned()`'s completion is part of the
  * caller's awaited work, so a top-level `await stop(...)` must keep the event loop alive until the
@@ -426,23 +427,10 @@ function exitEvidence(handle: Handle): string {
   return `code=${handle.exited.code ?? 'null'};signal=${handle.exited.signal ?? 'null'}`
 }
 
-function isMissingProcess(error: unknown): boolean {
-  return (error as { code?: string } | null)?.code === 'ESRCH'
-}
 
-async function raceExit(exitPromise: Promise<unknown>, ms: number): Promise<boolean> {
-  if (ms <= 0) {
-    return await Promise.race([exitPromise.then(() => true), Promise.resolve(false)])
-  }
-  let timer: ReturnType<typeof setTimeout> | undefined
-  try {
-    return await Promise.race([
-      exitPromise.then(() => true),
-      new Promise<boolean>(resolve => {
-        timer = setTimeout(() => resolve(false), ms)
-      }),
-    ])
-  } finally {
-    if (timer) clearTimeout(timer)
-  }
+/** Match observed OS fields to the immutable caller-selected spawn record, not to another label. */
+function matchesOriginal(identity: Pick<ProcessIdentity, 'pid' | 'groupId' | 'canonicalExecutable' | 'argv0' | 'argv' | 'uid' | 'parentPid' | 'cwd'>, observed: ProcessSnapshot): boolean {
+  return identity.pid === observed.pid && identity.groupId === observed.groupId && identity.uid !== null && identity.uid === observed.uid &&
+    identity.parentPid === observed.parentPid && identity.canonicalExecutable === observed.executable && identity.argv0 === observed.argv0 &&
+    identity.cwd === observed.cwd && identity.argv.length === observed.argv.length && identity.argv.every((argument, index) => argument === observed.argv[index])
 }
