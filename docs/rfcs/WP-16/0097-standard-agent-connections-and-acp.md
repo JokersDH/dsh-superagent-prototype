@@ -4,6 +4,8 @@
 
 同日后续用户决定：先只实现标准 **ACP Client**，并已创建对应实现 goal。下文第8节的对外 Facade 和 CLI 转 ACP 仅保留为设计背景，不进入此 goal、当前排期或完成条件。
 
+2026-11-27实际接入更新：固定运行源码`a5ae9c5e`已通过DSH真实交付、审批允许/拒绝、运行中停止，详细事实与限制见第14节。前文“待实现/未发送”保留其设计检查点含义，不覆盖该节；安装包和同事线仍独立验收。
+
 本文补充 [0096](0096-milestone-04-protocol-admission-and-target-authorization.md) 和[里程碑04](../../product/MILESTONE-04.zh-CN.md)。当前只实施原第二协议结果线所需的统一接入，不增加里程碑清单、真实调用预算或第三条结果线。对外 ACP 服务、第三个执行器和通用 headless CLI 的实施顺序在下文单列，不能因接口设计完成便自动开工。
 
 ## 1. 决定
@@ -256,3 +258,42 @@ M04 仍为最多两个结果线，B 唯一实际发送者、共享最多6次且�
 接续已加入 `acp-connections.ts/configure-acp.ts/acp-inspection.ts/acp-startup.ts`：专用配置不授执行权，正常personal入口逐Profile核标准协商、原试用回执和当前策略；已有Codex不因另一ACP配置失败而全局禁用。版本检查可以选择具体Profile，开始前还会核原配置快照。模型Key只在专用home凭据文件，原白名单备份排除整个连接目录；不迁移旧账号或权限。使用方法见[产品手册第11节](../../PRODUCT-GUIDE.zh-CN.md#11-标准-acp-client接入-dsh-与自己的模型资源)。
 
 真实DSH0.2.1-rc.2在本机独立私有根的stdio initialize/session-new、原OwnedProcess身份与guard activation绑定已通过，模型端使用本机trap且请求0，没有session/prompt；EOF后的leader正常退出，不推断完整group物理静止。另一消费者实际经过标准initialize、专用连接加载、原Store试用确认、重新准备及正常项目/配置HTTP，仍未执行Work。它们属于原生**setup**证据，不是L2③–⑤的真实开发或停止。SDK/Runner另修复了响应完成后合法复用RPC ID、关键回执拒绝时取消自身在途prompt，以及拒绝/token-limit不能成为成功候选；原未预检exit→SIGKILL已移除，未知材料保留。
+
+## 14. 标准 Client 的真实产品验收，2026-11-27
+
+本节固定运行源码为`a5ae9c5e9001888360079c61beff4db9061bc959`，Node24.21.0/darwin-arm64、DSH0.2.1-rc.2、ACP agentInfo `deepseek-harness-acp/0.0.1`、官方SDK2.12.0稳定v1。模型为用户已提供资源中的`GLM-5.3`，使用专用配置`profile-acp-dsh-glm53`，与主对话模型分开。原拟DeepSeek-V4-Flash-1017未在实际只读模型目录中列出，原配置与材料保留，没有冒用其验收结果。
+
+用户明确将原B剩余6次发送权移交本会话，B停止发送，总额度不变。原B ledger继续记账，实际新prompt共5次，未知发送0，剩余1次未用且本轮不再发送。前两次旧源码失败没有退款；用原同begin的`native_accepted`与`turn.ended`调和发送状态，不将物理UNKNOWN改为成功。没有新建发送账本或绕开原占槽。
+
+### 实际消费者与证据
+
+消费者为`tools/bootstrap/m04-acp-live-consumer.mjs`；允许场景通过真实App/HttpTransport选择Profile、创建Work、回答问题和接受候选。拒绝和停止通过同一原认证HTTP/Application/Broker入口，未直接调用ACP prompt。所有业务仍由原Ticket/Assignment、事务effects、Runner与原Store处理。浏览器创建的原commandId在转发前同步持久保留；未知请求不会自动重发。
+
+| 场景 | 原Work | 原attempt | 结果与边界 |
+| --- | --- | --- | --- |
+| 允许与交付 | `bef8e80be5f82c1f2fd2b811922eda80` | `attempt-bdbb8f27-3c75-46b2-a3c9-d2dc65f03cd8` | 标准原生审批允许后，仅把`a-b`改为`a+b`；原注册测试不变且PASS；审阅冻结manifest/patch与当前candidate后，在网页接受到delivered；原完整屏障及binding ended成立 |
+| 拒绝 | `f6d7d8532a98a23694b836b0067c033b` | `attempt-52971955-2045-45fa-8b20-4bdfa2ec286f` | 原target/answer观察到response_written；source与测试保持baseline，完整Git状态干净、冻结patch为空；原检查仍FAIL、无接受或交付，仅拒绝控制PASS；原资源quiescent/binding ended |
+| 运行中停止 | `27699fda9bd1e738d9d9aac501ed3a37` | `attempt-fab12cfe-434a-42e2-b260-431afaf617ce` | 原prompt在途、权限问题未回答、resource active且没有candidate时停止；原完整屏障后ended并归还槽位，不把自然完成后stop当在途控制 |
+
+模型正文分多次进入原`application.execution.progress`，以原合同隔离显示；这证明可见增量，不承诺逐token或全部工具对话归档。操作者为本会话在用户授权下代操作与审阅，不是同事跨机独立使用。真实原生问题的target/session/question/command仍保持原身份；`response_written`没有升级成`native_applied`。
+
+原Store、报告、冻结产物与7张实际UI截图保留在本机私有验收根，凭据、数据库、原生home和构建物均不入Git。独立审核已从只读原Store和实际产物确认三场景的限定出口：allow/deny各9个critical fact、stop共5个，payload字节、fact receipt与event摘要一致。allow的原检查exit0/PASS、冻结generation3/artifactDigest、reviewDigest和接受记录匹配，完整屏障为seq122；deny无接受，完整屏障为seq186。stop顺序为begin written seq212 → 原权限问题seq217 → stop_work回执seq220 → 完整屏障seq224，零答案、无selected permission，停止前无terminal；原认证host proof为terminated/closed/complete_owned_resources且全资源quiescent。Store没有该停止的native cancel ACK业务fact，不据此补造ACK或native_applied。此结论不是依靠消费者stdout的PASS，也不是同事/跨机/安装包或价值验证。
+
+### 真实联调纠正了什么
+
+1. **标准可选字段。** DSH合法的权限请求只给`toolCallId`，不提供`title`。旧实现把可选title直接当必填问题正文，导致问题构造失败；现仅补通用显示标题，原request/选项/payload不变，没有加DSH私有审批方法。
+2. **原生结束与物理静止。** 标准turn结束不能释放进程；Client先正常结束原stdin，保留唯一SDK stdout reader和stderr drain，在同一有界窗口等原child退出，再由原完整资源屏障判断。EOF或child exit本身不授释放权。
+3. **观测失败与信号权限。** 宿主只检查原已知group和精确PID，原出生/UID/完整有序argv/cwd/executable与全资源计划逐次复核；缺失或漂移拒绝信号。快速命令的原exit事件与正向空组可形成无信号静止证据，不补造出生。终态端点只读重观原inventory可调和短暂UNKNOWN，不复活业务/lease，不省略原barrier及postcommit finalize。
+4. **发送账与资源账分开。** 同begin已消费可以核对发送结果；旧物理UNKNOWN仍保留原槽位。失败后验证是新的明确Work，没有重发旧begin/answer，没有换根抹去旧占用。
+
+前两份旧源码样本继续保留：`7a5ae216`的Work `7c770dc7afd9845bdb00e460a55ca921`、`2a0e306e`的Work `e821b79a8fcbc4f892de678f29535ff8`均没有完成可信交付，原binding仍stopping。第三至第五份成功不改写它们；同一Store原4槽中这两个旧槽继续保留。
+
+### 当前产品边界与后续接入
+
+标准协议Client与品牌策略分开：Driver是通用ACP稳定v1，首个准入的原生策略只验证了DSH的read/write/edit，项目根范围、排除`.git`、无外部动作。shell/MCP/原生子团队、客户端fs/terminal、steer、原生会话恢复、结构化澄清均未因此开放；更窄scope或不同排除项在发送前拒绝，不能悄悄放宽。
+
+标准协商、显式试用、受控验证和此处真实证据仍分别记录；本次不自动把版本分类写成native_test_passed，不将一个Profile扩大为全部DSH模型、ZCode或OpenCode认证。新同协议Agent复用Client，但仍需其实际安装/配置、可信策略与完整生命周期消费者；新协议才增加Driver。ZCode原生app-server不因名称类似便成为ACP。
+
+共享AgentDriverV1、Store/Application/QuestionBroker、Ticket/Assignment及Runner v1身份未变。没有实现ACP Server、CLI转ACP、另一套模型工具循环、调度器或业务生命周期账。本期仅完成Client方向，旧DMG与十二用户实例没有更新；同事安装线另按M04继续，暂不自动启动创新或新Agent接入。
+
+按原M04清单核对，L2为7/7：准确端点/零模型协商、原Driver与默认组合、真实交付、允许/拒绝、在途停止、明确未支持能力和本节复盘均有对应证据；L1仍0/6，整个M04未关闭。多协议维度已由“仅接口准备”推进到“第二协议在原产品的真实受限消费者”，但未覆盖所有Agent、shell、恢复或同包双执行器，不能给多协议评满；原十二项及旧准确安装的85/100、65.3%不因本源码goal自动加分，正式整体计分在原M04收尾进行。50项定向控制/SDK/Runner回归、原产品集成与类型检查均通过；它们与这三份原生证据分别记录。

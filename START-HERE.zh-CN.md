@@ -1,5 +1,7 @@
 # 从这里开始：仓库、代码位置和并行开发
 
+**2026-11-27标准ACP Client已完成真实产品消费者。** 固定运行源码`a5ae9c5e`用DSH0.2.1-rc.2/GLM-5.3跑通网页委托、增量动态、审批允许、注册检查与接受交付，另验拒绝和真正运行中停止。实际5/6发送，原两份失败/物理UNKNOWN占槽保留；不自动用剩余1次。见[RFC0097第14节](docs/rfcs/WP-16/0097-standard-agent-connections-and-acp.md#14-标准-client-的真实产品验收2026-11-27)和[使用手册第11节](docs/PRODUCT-GUIDE.zh-CN.md#11-标准-acp-client接入-dsh-与自己的模型资源)。只做Client，未实现Server/CLI桥接；旧DMG和十二用户实例未更新，同事线与其他Agent需分别验收。
+
 **2026-11-26第二次续验：主线版本试用与桌面切根已接通源码。** `ddb43c89/83609dc6/b11ec430`为当前可消费代码，新增入口见[产品手册第10节](docs/PRODUCT-GUIDE.zh-CN.md)。CLI0.164.0/0.169.0-alpha.11.1只做零模型协议检查；旧DMG未更新。ACP仍待实际策略与完整能力准入，E待整包消费者修复，不把source或旧包当F0。以下同日较早的原P1记录按历史读，最新事实见[RFC0096末节](docs/rfcs/WP-16/0096-milestone-04-protocol-admission-and-target-authorization.md)。
 
 **2026-11-26当前：已核对B/D/E首批交付，继续同一个里程碑04。** [当前三段续工话术](agent-tasks/milestone-04/continue-prompts.zh-CN.md)分别发B、D、E；main已接共享诊断与公共兼容/显式试用投影。ACP仍有原payload/授权/资源阻断，D候选为旧引擎、E为HARNESS_ONLY，不能当F0/跨机通过。清单仍0/13，两个结果线不变；下一步是正常安装新根入口和原产品第二协议，创新尚未启动。
