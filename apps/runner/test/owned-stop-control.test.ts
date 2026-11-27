@@ -102,6 +102,24 @@ test('the whole stopAll plan is checked before the first signal', async () => {
   assert.ok(h.host.resources().includes(first.resourceRef))
 })
 
+test('the remaining plan is revalidated before signalling the next original resource', async () => {
+  const h = fixture(), first = await h.spawn(), second = await h.spawn()
+  h.onSignal(pid => { h.exit(pid); h.snapshots.get(second.identity.pid)!.uid++ })
+  assert.equal((await h.host.stopAll(40)).quiescence, 'indeterminate')
+  assert.deepEqual(h.signals, [{ pid: first.identity.pid, signal: 'SIGTERM' }])
+  assert.equal(h.host.inventory().find(item => item.ref === second.resourceRef)!.writer, 'indeterminate')
+})
+
+test('an admission-close spawn race retains the original handle for the explicit complete stop plan', async () => {
+  const h = fixture(), spawning = h.spawn()
+  const stopping = h.host.stopAll(40)
+  await assert.rejects(spawning, error => (error as { reason?: string }).reason === 'admission_closed')
+  assert.equal((await stopping).quiescence, 'confirmed')
+  assert.equal(h.signals.length, 1)
+  assert.equal(h.host.inventory().length, 1)
+  assert.equal(h.host.inventory()[0]!.writer, 'quiescent')
+})
+
 test('identity changes between initial validation and the TERM delivery refuse the signal', async () => {
   const h = fixture(), resource = await h.spawn(), observe = h.observer.process
   let reads = 0

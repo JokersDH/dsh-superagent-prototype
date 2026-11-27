@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { createTargetedProcessObserver, MAC_PROCESS_ARGUMENTS_READER, type ObservationCommand } from '../src/owned-process-observer.ts'
+import { createTargetedProcessObserver, failedObservationCommand, MAC_PROCESS_ARGUMENTS_READER, type ObservationCommand } from '../src/owned-process-observer.ts'
 
 const bytes = (value: string) => new TextEncoder().encode(value)
 test('Mac inspection uses only the selected PID/group and keeps exact argv boundaries including empty args', () => {
@@ -32,6 +32,14 @@ test('only documented empty pgrep result is empty; failed, timed out, malformed 
   assert.deepEqual(result(1, ''), { kind: 'observed', pids: [] })
   for (const observation of [result(null, '', '', true), result(2, ''), result(1, '', 'permission denied'), result(0, ''), result(0, 'not-a-pid\n'), result(0, '41001\n41001\n')])
     assert.equal(observation.kind, 'unknown')
+})
+
+test('a targeted pgrep normal status-1 error with signal:null remains distinguishable from command failure', () => {
+  const noMatch = failedObservationCommand({ status: 1, signal: null, stdout: bytes(''), stderr: bytes('') })
+  assert.equal(noMatch.failed, false)
+  assert.deepEqual(createTargetedProcessObserver({ platform: 'darwin', command: () => noMatch }).group(41001), { kind: 'observed', pids: [] })
+  const timeout = failedObservationCommand({ status: null, signal: 'SIGTERM', code: 'ETIMEDOUT', stdout: bytes(''), stderr: bytes('') })
+  assert.equal(createTargetedProcessObserver({ platform: 'darwin', command: () => timeout }).group(41001).kind, 'unknown')
 })
 
 test('an incomplete exact-PID identity is unknown, with no ps-text argv fallback', () => {

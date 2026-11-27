@@ -25,10 +25,14 @@ function execute(executable: string, argv: readonly string[], limits?: { timeout
       env: { PATH: '/usr/bin:/bin:/usr/sbin:/sbin', LANG: 'C', LC_ALL: 'C' } })
     return { status: 0, stdout, stderr: new Uint8Array() }
   } catch (error) {
-    const failure = error as { status?: number | null; stdout?: Uint8Array; stderr?: Uint8Array; code?: string; signal?: string }
-    return { status: failure.status ?? null, stdout: failure.stdout ?? new Uint8Array(), stderr: failure.stderr ?? new Uint8Array(),
-      failed: failure.signal !== undefined || failure.code !== undefined }
+    return failedObservationCommand(error)
   }
+}
+/** Normal exit-status errors have signal:null; that is distinct from timeout/spawn failure. */
+export function failedObservationCommand(error: unknown): ObservationCommandResult {
+  const failure = error as { status?: number | null; stdout?: Uint8Array; stderr?: Uint8Array; code?: string; signal?: string | null }
+  return { status: failure.status ?? null, stdout: failure.stdout ?? new Uint8Array(), stderr: failure.stderr ?? new Uint8Array(),
+    failed: failure.signal != null || (failure.code !== undefined && failure.status == null) }
 }
 
 /** KERN_PROCARGS2 includes environment bytes; the fixed reader emits ONLY argc argv/executable. */
