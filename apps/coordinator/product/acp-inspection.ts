@@ -23,6 +23,7 @@ export function acpInspectionPolicyDigest(profile: AgentProfile): string {
     ['catalog', new URL('../../../packages/catalog/src/compatibility.ts', import.meta.url)],
     ['runner', new URL('../../runner/src/runner-service.ts', import.meta.url)],
     ['host', new URL('../../runner/src/process-host.ts', import.meta.url)],
+    ['observer', new URL('../../runner/src/owned-process-observer.ts', import.meta.url)],
     ['factory', new URL('../../runner/src/driver-factory.ts', import.meta.url)],
     ['application', new URL('../../../packages/application/src/service.ts', import.meta.url)],
     ['execution', new URL('./execution.ts', import.meta.url)],
