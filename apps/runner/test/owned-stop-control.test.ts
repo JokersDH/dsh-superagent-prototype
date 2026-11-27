@@ -237,3 +237,64 @@ test('an escalation preflight cannot extend the original final deadline', async 
   assert.equal((await h.host.stopOwned(resource.resourceRef, 40)).quiescence, 'indeterminate')
   assert.deepEqual(h.signals.map(item => item.signal), ['SIGTERM'])
 })
+
+test('signal-free observation refreshes original exit plus empty inventory without closing open admission', async () => {
+  const h = fixture()
+  h.observer.process = () => ({ kind: 'unknown', reason: 'short-original-child-already-gone' })
+  const resource = await h.spawn()
+  h.exit(resource.identity.pid)
+  assert.equal((await h.host.observeQuiescence()).quiescence, 'confirmed')
+  assert.equal(h.signals.length, 0)
+  assert.equal(h.host.inventory()[0]!.writer, 'quiescent')
+  assert.equal(h.host.resources().length, 0)
+  assert.ok((await h.spawn()).resourceRef)
+})
+
+test('signal-free observation retains live or unknown resources and never calls the signal sink', async () => {
+  for (const unknown of [false, true]) {
+    const h = fixture(), resource = await h.spawn()
+    if (unknown) h.groups.delete(resource.identity.groupId)
+    assert.equal((await h.host.observeQuiescence()).quiescence, 'indeterminate')
+    assert.equal(h.signals.length, 0)
+    assert.deepEqual(h.host.resources(), [resource.resourceRef])
+    assert.notEqual(h.host.inventory()[0]!.writer, 'quiescent')
+  }
+})
+
+test('a closed admission stays closed while signal-free observation reconciles a later real exit', async () => {
+  const h = fixture(), resource = await h.spawn()
+  h.host.closeAdmission()
+  assert.equal((await h.host.observeQuiescence()).quiescence, 'indeterminate')
+  h.exit(resource.identity.pid)
+  assert.equal((await h.host.observeQuiescence()).quiescence, 'confirmed')
+  await assert.rejects(h.spawn(), error => (error as { reason?: string }).reason === 'admission_closed')
+  assert.equal(h.signals.length, 0)
+})
+
+test('signal-free observation never calls a process observer while an original spawn is in flight', async () => {
+  const h = fixture(), process = h.observer.process, group = h.observer.group
+  let observing = false, readsDuringObservation = 0
+  h.observer.process = pid => { if (observing) readsDuringObservation++; return process(pid) }
+  h.observer.group = pid => { if (observing) readsDuringObservation++; return group(pid) }
+  const spawning = h.spawn()
+  observing = true
+  const observation = h.host.observeQuiescence()
+  observing = false
+  assert.equal((await observation).quiescence, 'indeterminate')
+  assert.equal(readsDuringObservation, 0)
+  assert.ok((await spawning).resourceRef)
+  assert.equal(h.signals.length, 0)
+})
+
+test('signal-free observation rejects a resource-plan expansion during its read', async () => {
+  const h = fixture(), first = await h.spawn(), group = h.observer.group
+  h.exit(first.identity.pid)
+  let spawned: ReturnType<typeof h.spawn> | undefined
+  h.observer.group = pid => { spawned ??= h.spawn(); return group(pid) }
+  const result = await h.host.observeQuiescence()
+  assert.equal(result.quiescence, 'indeterminate')
+  assert.ok(result.evidenceRefs.includes('original-resource-plan-changed-during-observation'))
+  assert.ok(h.host.resources().includes(first.resourceRef))
+  assert.ok((await spawned!).resourceRef)
+  assert.equal(h.signals.length, 0)
+})

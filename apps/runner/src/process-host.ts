@@ -326,6 +326,28 @@ export class ProcessHost implements OwnedProcessHost {
       this.#handles.delete(item.ref)
     }
   }
+  /**
+   * Reobserve ONLY the original owned inventory. This never signals, spawns, closes/reopens
+   * admission, or grants a new lifecycle. A closed Runner can refresh a transient UNKNOWN barrier
+   * without reviving business/leases; the coordinator must still confirm the original full manifest.
+   */
+  async observeQuiescence(): Promise<{ quiescence: 'confirmed' | 'indeterminate'; evidenceRefs: readonly string[] }> {
+    if (this.#spawning.size > 0)
+      return { quiescence: 'indeterminate', evidenceRefs: ['original-spawn-still-in-flight'] }
+    const refs = [...this.#handles.keys()]
+    if (this.#inventory.size !== refs.length + [...this.#inventory.values()].filter(item => item.writer === 'quiescent').length)
+      return { quiescence: 'indeterminate', evidenceRefs: ['original-resource-registration-incomplete'] }
+    const plan = this.#plan(refs)
+    const current = [...this.#handles.keys()]
+    if (this.#spawning.size > 0 || refs.length !== current.length || refs.some((ref, index) => current[index] !== ref))
+      return { quiescence: 'indeterminate', evidenceRefs: ['original-resource-plan-changed-during-observation'] }
+    this.#rememberQuiescence(plan, ['signal-free-original-inventory-observation'])
+    const complete = [...this.#inventory.values()].every(item => item.writer === 'quiescent')
+    return { quiescence: complete ? 'confirmed' : 'indeterminate', evidenceRefs: [
+      'signal-free-original-inventory-observation', ...plan.map(item => item.evidence),
+      complete ? 'original-complete-group-barrier' : 'original-owned-resources-not-quiescent',
+    ] }
+  }
   async #stopResources(targets: readonly string[], window: { termDeadline: number; finalDeadline: number }): Promise<{ quiescence: 'confirmed' | 'indeterminate'; evidenceRefs: readonly string[] }> {
     if (!await this.#awaitSpawning(window.termDeadline))
       return { quiescence: 'indeterminate', evidenceRefs: ['original-spawn-completion-unobserved-before-deadline'] }
