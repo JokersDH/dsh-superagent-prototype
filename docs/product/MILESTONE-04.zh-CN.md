@@ -4,6 +4,8 @@
 
 目标只有两个：一位同事独立安装后完成真实交付和迁移后的新任务；另一个真正异构的协议通过同一产品完成开发、审批和停止。任务大小按对结果持续负责定义，不再扩大功能清单。
 
+2026-11-27接入方向细化见[RFC0097](../rfcs/WP-16/0097-standard-agent-connections-and-acp.md)：复用原Driver标准，分离CLI连接、ACP/原生消息协议、模型资源和逐Work配置绑定。main/B先把多Profile与ACP实际消费闭合；对外ACP Facade、第三Agent和通用CLI只保留后续顺序，不增加本期清单、结果线或预算。
+
 开工话术：[main / B / D / E](../../agent-tasks/milestone-04/forward-prompts.zh-CN.md)。同事说明：[一页试用说明](../COLLEAGUE-TRIAL.zh-CN.md)。原目录、分支和所有权沿用[原表](../../agent-tasks/product-wave-36/dispatch.json)，不执行原表中的旧任务。
 
 2026-11-26第二次续验：B的原输入/答案/静止问题已主要修复，当前阻断改为实际策略证据、完整兼容观察和客户端能力实现。main已把版本检查/原回执同意/正常重开接入，并修桌面切根及前置旧版本 gate；真实零模型检查覆盖0.164.0/0.169.0-alpha.11.1，E独立恢复HTTP消费者在main复验。未把旧包/组件当F0，实际范围与代码检查点见[RFC0096末节](../rfcs/WP-16/0096-milestone-04-protocol-admission-and-target-authorization.md)。仍继续[原两条线](../../agent-tasks/milestone-04/continue-prompts.zh-CN.md)，不启动M05。

@@ -1,5 +1,7 @@
 # 个人 Agent 助理：当前架构与代码地图
 
+2026-11-27接入架构：[统一Agent接入与ACP边界（0097）](../rfcs/WP-16/0097-standard-agent-connections-and-acp.md)明确每个Work独立选择执行配置，复用现有AgentDriverV1接CLI/原生协议/ACP，区分Agent与模型资源。先在原M04第二协议线完成默认多Profile消费；对外ACP服务作为原Application的后续入口，不新建生命周期。本次是设计约束，未增加已接入执行器或修改下文原生验收范围。
+
 2026-11-24：第二协议与产品创新已按[新决定](../reviews/next-phase-protocol-and-innovation-2026-11-24.zh-CN.md)重开；当前[里程碑04](MILESTONE-04.zh-CN.md)只推进同事可用和ACP两条线。以下原生能力结论仍属于原准确版本，本次只完成规划和源码审计，尚未接入第二协议或证明跨机通过。
 
 2026-11-21当前：固定source83f79e82/buildd3ba0ec6dccc5eac同包日常使用里程碑03已6/6关闭，详见[唯一完成汇总](MILESTONE-03-COMPLETION.zh-CN.md)。仍是原Store/Application/QuestionBroker、Ticket/Assignment、原Runner/生产CodexDriver与资源屏障；新增外部验收观察器只转发stdio计数，未新增运行时/生命周期或改动冻结包。以下旧源码检查点仅按历史范围读。
