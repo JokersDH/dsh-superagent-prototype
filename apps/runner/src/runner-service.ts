@@ -56,7 +56,7 @@ export type RunnerServiceOptions = {
   write: (frame: BridgeFrame | Record<string, unknown>) => void
   /** Driver for this attempt; injected so tests use a fake and integration a real one. */
   createDriver: (spec: AttemptSpec, hooks: { beforeNativeWrite(command: RunnerCommand): Promise<void>; isBusinessOpen(): boolean;
-    ownedRuntime: Pick<ProcessHost, 'originalIdentity'> }) => AgentDriverV1
+    ownedRuntime: Pick<ProcessHost, 'originalIdentity' | 'closeInput'> }) => AgentDriverV1
   /** Native metadata/policy preparation may run before the first business begin. */
   eagerPrepare?: boolean
   /** Trusted host preparation runs inside this Runner before the native driver may spawn. */
@@ -345,7 +345,8 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
     void id
   }
 
-  const hooks = { ownedRuntime: { originalIdentity: (resourceRef: string) => processHost.originalIdentity?.(resourceRef) },
+  const hooks = { ownedRuntime: { originalIdentity: (resourceRef: string) => processHost.originalIdentity?.(resourceRef),
+    closeInput: (resourceRef: string) => processHost.closeInput(resourceRef) },
     isBusinessOpen: () => !businessClosed && !closed && !preparation.signal.aborted, beforeNativeWrite: async (command: RunnerCommand) => {
     if (!attach || businessClosed || command.kind !== 'answer') throw new Error('Native write admission is closed')
     // Each intent gets a fresh correlation id while the original command id/body stay untouched; the
@@ -495,6 +496,12 @@ export async function serveRunner(options: RunnerServiceOptions): Promise<Runner
                   if (auth?.leaseId) throw Object.assign(new Error('stale_lease'), { code: 'stale_connection', reason: 'stale_lease' })
                   if (auth?.producer && channelProducer && !sameCoordinatorChannelProducer(auth.producer as never, channelProducer))
                     throw Object.assign(new Error('foreign_producer'), { code: 'identity_mismatch', reason: 'foreign_producer' })
+                  // A transient terminal observation may have preceded the original child exit.
+                  // Refresh ONLY that original inventory; never signal, reopen or replay business.
+                  if (!physicallyStopped) {
+                    const observed = await processHost.observeQuiescence()
+                    physicallyStopped = observed.quiescence === 'confirmed' && processHost.inventory().every(item => item.writer === 'quiescent')
+                  }
                   // A cancel observes/stops and returns the recorded barrier, but it NEVER finalizes the
                   // terminal endpoint: only a postcommit finalize after main's Store commit may do that.
                   return

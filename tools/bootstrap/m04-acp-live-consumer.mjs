@@ -133,6 +133,8 @@ try {
     lastWork = snapshot.works[0]; lastQuestions = snapshot.questions
     await observeSend()
     report.phase = lastWork.phase; report.resourceStatus = lastWork.resourceStatus
+    const runtimeFailure = report.attemptId && store.commands.get(key('product-runtime-failure', report.attemptId))?.result
+    if (runtimeFailure?.error) throw new Error(`Original runtime held its resources: ${runtimeFailure.error}`)
     const question = snapshot.questions.find(item => item.kind === 'permission' && !answered.has(item.id))
     if (question) {
       report.nativeQuestions.push({ id: question.id, version: question.version, targets: question.targets, prompt: question.prompt,

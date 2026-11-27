@@ -10,10 +10,11 @@ export const REAL_DRIVER_IDS = ['codex-native', 'acp-v1'] as const
 export type RealDriverId = typeof REAL_DRIVER_IDS[number]
 export function isRealDriverId(id: string): id is RealDriverId { return (REAL_DRIVER_IDS as readonly string[]).includes(id) }
 export function createRealDriver(id: string, hooks: { beforeAnswerWrite(command: RunnerCommand): Promise<void>; isBusinessOpen?: () => boolean;
-  ownedRuntime?: Pick<ProcessHost, 'originalIdentity'>; acpPolicyHost?: AcpPolicyHost }): AgentDriverV1 {
+  ownedRuntime?: Pick<ProcessHost, 'originalIdentity'> & Partial<Pick<ProcessHost, 'closeInput'>>; acpPolicyHost?: AcpPolicyHost }): AgentDriverV1 {
   switch (id) {
     case 'codex-native': return new CodexProductDriver({ beforeAnswerWrite: hooks.beforeAnswerWrite })
     case 'acp-v1': return new AcpDriver({ beforeAnswerWrite: hooks.beforeAnswerWrite, businessOpen: hooks.isBusinessOpen,
+      ...(hooks.ownedRuntime?.closeInput ? { closeInput: ref => hooks.ownedRuntime!.closeInput!(ref) } : {}),
       ...(hooks.acpPolicyHost ? { policyHost: hooks.acpPolicyHost } : hooks.ownedRuntime ? { policyHost: createDshAcpPolicyHost({ runtime: hooks.ownedRuntime }) } : {}) })
     default: throw new TypeError(`Unregistered native Driver: ${id}`)
   }

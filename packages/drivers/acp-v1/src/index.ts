@@ -57,6 +57,8 @@ export type AcpDriverOptions = {
   handshake?: (profile: AgentProfile) => Promise<AcpHandshake>
   verifiedVersions?: readonly VerifiedVersion[]
   beforeAnswerWrite?: (command: RunnerCommand) => Promise<void>
+  /** Private original-host EOF, never a signal, native capability or quiescence grant. */
+  closeInput?: (resourceRef: string) => Promise<void>
   /** Original Runner's synchronous admission state; not a Profile or native capability claim. */
   businessOpen?: () => boolean
   clientInfo?: { name: string; version: string }
@@ -106,6 +108,7 @@ export class AcpDriver implements AgentDriverV1 {
     let cancelDelivery: Promise<void> | undefined
     let nativeCancelWrite: Promise<void> | undefined
     let activePrompt: Promise<unknown> | undefined
+    let closeTransport: (() => Promise<void>) | undefined
     const businessCommands = new CommandQueue({ maxPending: 32 })
     const outcome = deferred<ServeExit>(), promptWritten = deferred<void>()
     const finish = (reason: ServeExit['reason'], evidenceRef: string) => {
@@ -165,6 +168,7 @@ export class AcpDriver implements AgentDriverV1 {
       }
       await policyHost.beforeSpawn?.({ spec, settings, io })
       const transport = this.options.connect ? await this.options.connect(spec, io) : await this.ownedTransport(spec, io, record)
+      closeTransport = transport.closeInput
       let policyInput: AcpPolicyInput | undefined, policy: PreparedExecutionPolicy | undefined, preparedPolicyRef = ''
       const currentPolicy = async () => {
         if (!policy || !policyInput) throw new AcpProtocolError('policy_missing', 'ACP has no prepared policy')
@@ -374,6 +378,10 @@ export class AcpDriver implements AgentDriverV1 {
       // protocol draining only; its success or deadline never grants physical quiescence.
       if (nativeCancelWrite && activePrompt && !promptSettled)
         await deadline(activePrompt, 100, 'cancel_reply_unknown').catch(() => undefined)
+      // End this original stdio connection normally, before the Runner observes its complete
+      // resource barrier. A terminal turn, EOF or even this exit observation does not release it.
+      if (closeTransport) await deadline(closeTransport(), 2500, 'native_eof_exit_unobserved').catch(() => undefined)
+      // Keep the SDK as the sole stdout reader during shutdown, avoiding a blocked native writer.
       connection?.close()
     }
   }
@@ -419,7 +427,11 @@ export class AcpDriver implements AgentDriverV1 {
     // Exit is a fact for this resource only, never a complete quiescence proof.
     void child.exited.then(value => record('runtime.exited', { resourceRef: child.resourceRef, exitCode: value.code,
       signal: value.signal, evidenceRefs: ['acp-owned-process-exited'] })).catch(() => undefined)
-    return { resourceRef: child.resourceRef, stdout: child.stdout, write: bytes => io.runtime.write(child.resourceRef, bytes) }
+    return { resourceRef: child.resourceRef, stdout: child.stdout, write: bytes => io.runtime.write(child.resourceRef, bytes),
+      ...(this.options.closeInput ? { closeInput: async () => {
+        await this.options.closeInput!(child.resourceRef)
+        await deadline(child.exited, 2000, 'native_eof_exit_unobserved')
+      } } : {}) }
   }
 }
 

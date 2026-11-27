@@ -63,6 +63,7 @@ function fixture(options: {
   businessOpen?: () => boolean
   reusePermissionId?: boolean
   permissionTitle?: false
+  closeInput?: () => Promise<void>
 } = {}) {
   const spec: AttemptSpec = { ...makeAttemptSpec(), profile: { ...makeAttemptSpec().profile, driverId: 'acp-v1' } }
   const ref = attemptIdentity(spec), commands = new Queue<RunnerCommand>(), facts: CriticalFact[] = []
@@ -82,6 +83,7 @@ function fixture(options: {
     })
     .onNotification(methods.agent.session.cancel, () => { calls.push('session/cancel'); pendingPrompt.resolve({ stopReason: 'cancelled' }) })
   const pair = sdkPair(app, options.reusePermissionId)
+  if (options.closeInput) pair.transport.closeInput = options.closeInput
   const policyHost: AcpPolicyHost = {
     async prepare(input) {
       const nativeAppliedSettingsRef = await input.io.payloads.store(JsonSchema.parse({ controlledEnforcer: true, scope: input.settings.scope }), 'critical')
@@ -211,6 +213,20 @@ test('permission preserves original options and request identity; response_writt
     assert.deepEqual(f.values('answer.observed').map(value => (value as { status: string }).status), ['response_written'])
     assert.ok(f.values('dispatch.observed').some(value => (value as { commandId: string }).commandId === 'controlled-answer-command'))
   } finally { f.close() }
+})
+
+test('terminal waits for normal transport EOF without granting writer quiescence', async () => {
+  const closed = deferred<void>()
+  let eofEntered = false, returned = false
+  const f = fixture({ closeInput: async () => { eofEntered = true; await closed.promise }, prompt: async () => ({ stopReason: 'end_turn' }) })
+  try {
+    const { work, begin } = await f.start(); begin()
+    void work.then(() => { returned = true })
+    await waitFor(() => eofEntered)
+    assert.equal(returned, false)
+    closed.resolve(); assert.equal((await work).reason, 'terminal')
+    assert.equal(f.values('writer.observed').length, 0)
+  } finally { closed.resolve(); f.close() }
 })
 
 test('standard permission with only toolCallId still opens and answers the original native request', async () => {
