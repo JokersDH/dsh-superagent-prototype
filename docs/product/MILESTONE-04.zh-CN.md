@@ -6,6 +6,12 @@
 
 2026-11-27接入方向细化见[RFC0097](../rfcs/WP-16/0097-standard-agent-connections-and-acp.md)：复用原Driver标准，分离CLI连接、ACP/原生消息协议、模型资源和逐Work配置绑定。main/B先把多Profile与ACP实际消费闭合；对外ACP Facade、第三Agent和通用CLI只保留后续顺序，不增加本期清单、结果线或预算。
 
+2026-11-27标准Client源码已到main `fbdedecb`：官方SDK稳定v1、逐Work Profile、原问题/候选/检查/接受、动态与停止已由原产品受控消费者验证；真实DSH的初始化/策略绑定与原Store确认到配置入口有零模型setup证据。当前goal只做Client，不实施Server或CLI转ACP。源码与setup不等于真实Work，原13项尚不据此提前关闭。
+
+真实发送前使用本源码的原工作台入口。main提供的`node tools/bootstrap/prepare-acp-acceptance.mjs --profile-id <实际配置ID>`只创建独立Git小项目和三份稳定命令输入（允许审批交付、拒绝、在途停止），不启动Agent/服务、不打开Store或发送账本、不发prompt。项目初始注册检查明确失败，允许任务完成后须使用原未改测试与人工审阅；停止必须发生在原prompt在途，不能用自然结束代替。生成材料留在私有目录，未知结果继续核对其中同一个command ID，不换材料重试业务。
+
+main已只读核对原B账本`tests/native-acceptance/reports/m04-send-ledger.json`：`sent=0/6`、`inFlight=null`、`not_ready`。其旧B43脚本仍引用已移除的手工ACP证据schema和旧probe接口，不能直接套到此SDK Client。B继续原责任时须消费当前main默认入口与同一个原始发送账；main没有修改、搬迁或重置该账本。现阶段仍缺用户指定的真实专用模型配置及其当前回执，未宣布LIVE_READY。
+
 开工话术：[main / B / D / E](../../agent-tasks/milestone-04/forward-prompts.zh-CN.md)。同事说明：[一页试用说明](../COLLEAGUE-TRIAL.zh-CN.md)。原目录、分支和所有权沿用[原表](../../agent-tasks/product-wave-36/dispatch.json)，不执行原表中的旧任务。
 
 2026-11-26第二次续验：B的原输入/答案/静止问题已主要修复，当前阻断改为实际策略证据、完整兼容观察和客户端能力实现。main已把版本检查/原回执同意/正常重开接入，并修桌面切根及前置旧版本 gate；真实零模型检查覆盖0.164.0/0.169.0-alpha.11.1，E独立恢复HTTP消费者在main复验。未把旧包/组件当F0，实际范围与代码检查点见[RFC0096末节](../rfcs/WP-16/0096-milestone-04-protocol-admission-and-target-authorization.md)。仍继续[原两条线](../../agent-tasks/milestone-04/continue-prompts.zh-CN.md)，不启动M05。
